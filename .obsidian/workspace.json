@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "ab759998410dda7b",
+        "id": "f0943510fa28d948",
         "type": "tabs",
         "children": [
           {
-            "id": "a58ec4fb0fe5ee37",
+            "id": "058a17a63180d170",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
+                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "elasticsearc",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
+                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
+                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md"
+                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md"
               }
             }
           }
@@ -134,8 +134,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -147,44 +146,46 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "a58ec4fb0fe5ee37",
+  "active": "058a17a63180d170",
   "lastOpenFiles": [
-    "coding/algorithm/DP入门之爬楼梯.md",
-    "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
-    "coding/cpp/C++反射TS初探.md",
-    "coding/reverse-engineering/爱了爱了，这篇寄存器讲的有点意思.md",
-    "coding/os/linux/深入理解 Linux 异步 IO 框架 io_uring.md",
-    "coding/os/linux/Linux内核 Netlink机制分析与使用.md",
-    "coding/cpp/C++对象的底层原理都在这儿了，还敢说学不会？.md",
-    "coding/network/DPDK.md",
-    "coding/network/最后一天，继续卷！.md",
-    "coding/cpp/为什么建议少用 if 语句！.md",
-    "coding/reverse-engineering/内核学习-异常处理.md",
-    "coding/reverse-engineering/Chrom V8分析入门——Google CTF2018 justintime分析.md",
-    "coding/os/如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
-    "coding/reverse-engineering/手把手教你汇编 Debug.md",
-    "coding/os/Untitled",
-    "coding/cpp/「现代C++设计魅力」虚函数继承-thunk技术初探.md",
-    "coding/reverse-engineering/Untitled",
-    "coding/cpp/为什么指针被誉为现代编程语言的开山鼻祖的灵魂？.md",
-    "coding/algorithm/DP入门之不同路径.md",
-    "self-improvement/health/柔性指压 Quote.md",
-    "coding/reverse-engineering/手撕汇编。。。.md",
-    "coding/reverse-engineering/GDB调试-从入门实践到原理.md",
-    "coding/cpp/C++的全链路追踪方案，稍微有点高端.md",
-    "coding/golang/在实现小工具的过程中学会 Go 反射.md",
-    "coding/reverse-engineering/一道内核CTF题：Kernel从0开始.md",
-    "coding/北京上百家知名科技公司都在这里了.md",
-    "coding/cpp/C C++编码准则，可借鉴的东西还挺多！.md",
-    "coding/cpp/C语言中三块难啃的硬骨头.md",
+    "coding/os/linux/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
+    "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
+    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
+    "coding/os/linux/浅析Linux sockfs文件系统.md",
+    "coding/os/linux/Untitled",
+    "coding/os/linux/Linux 多线程全面解析.md",
+    "coding/os/linux/Linux中断虚拟化（二）.md",
+    "coding/os/linux/Linux系统虚拟化模型及障碍.md",
+    "coding/os/linux/用Rust开发Linux，可行吗？.md",
+    "coding/os/linux/BPF/eBPF 概述：第 3 部分：软件开发生态.md",
+    "coding/os/甄建勇：五分钟搞定计算机体系结构（上）.md",
+    "coding/os/linux/正确认识实时Linux内核.md",
+    "coding/os/linux/内核内存错误检测工具KFENCE.md",
+    "coding/os/一文看懂 GDB底层实现原理.md",
+    "coding/os/linux/内核层的三种Hook技术的使用.md",
+    "coding/os/linux/甄建勇：五分钟搞定Cache（下）.md",
+    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
+    "coding/os/linux/BPF/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+    "coding/os/linux/Linux加密文件系统eCryptfs介绍.md",
+    "coding/os/linux/内存管理：程序是如何被优雅的装载到内存中.md",
+    "coding/os/linux/超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
+    "coding/network/TCP粘包 硬核图解.md",
+    "coding/os/linux/图解 Linux进程通信 - 管道实现.md",
+    "coding/os/linux/Linux驱动实践：带你一步一步编译内核驱动程序.md",
+    "coding/os/linux/“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
+    "coding/network/25 张图，一万字，拆解 Linux 网络包发送过程.md",
+    "coding/network/实战 QUIC协议在蚂蚁集团落地.md",
+    "Untitled 1.canvas",
+    "Untitled.canvas",
+    "self-improvement/learning-method",
     "coding/rust",
     "coding/algorithm",
+    "coding/app/Untitled",
+    "self-improvement/meditation",
+    "self-improvement/health",
+    "self-improvement/commandment",
     "gitpush.sh",
-    "coding/golang",
-    "coding/frontend",
-    "coding/ai/Untitled",
-    "coding/app",
-    "coding/java",
+    "coding/reverse-engineering",
     "Pasted image 20240804095201.png"
   ]
 }
