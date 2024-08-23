@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "193c1199d2dc4e2c",
+        "id": "ab759998410dda7b",
         "type": "tabs",
         "children": [
           {
-            "id": "bf6419c2813347cd",
+            "id": "a58ec4fb0fe5ee37",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/总结了一份Qt5 的开发经验.md",
+                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/总结了一份Qt5 的开发经验.md",
+                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/总结了一份Qt5 的开发经验.md",
+                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/总结了一份Qt5 的开发经验.md"
+                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md"
               }
             }
           }
@@ -146,11 +146,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "bf6419c2813347cd",
+  "active": "a58ec4fb0fe5ee37",
   "lastOpenFiles": [
+    "228. Summary Ranges.md",
+    "coding/cpp/总结了一份Qt5 的开发经验.md",
     "gitpush.sh",
     "self-improvement/health/疫情之下，给读者的几句忠告.md",
-    "coding/cpp/总结了一份Qt5 的开发经验.md",
     "self-improvement/meditation/内观 Quote.md",
     "self-improvement/meditation/岩松老师禅修群开示录（二）.md",
     "coding/做点实事吧。.md",
@@ -183,7 +184,6 @@
     "coding/network",
     "self-improvement/meditation",
     "self-improvement/health",
-    "self-improvement/commandment",
     "Pasted image 20240804095201.png"
   ]
 }
