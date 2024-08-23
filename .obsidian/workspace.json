@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "self-improvement/meditation/内观 Quote.md",
+                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "self-improvement/meditation/内观 Quote.md",
+                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "self-improvement/meditation/内观 Quote.md",
+                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "self-improvement/meditation/内观 Quote.md"
+                "file": "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md"
               }
             }
           }
@@ -149,32 +149,35 @@
   },
   "active": "a58ec4fb0fe5ee37",
   "lastOpenFiles": [
-    "self-improvement/盘古 Quote.md",
-    "self-improvement/meditation/岩松老师 你找到那个开关了吗？.md",
+    "coding/algorithm/DP入门之爬楼梯.md",
+    "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
+    "coding/cpp/C++反射TS初探.md",
+    "coding/reverse-engineering/爱了爱了，这篇寄存器讲的有点意思.md",
+    "coding/os/linux/深入理解 Linux 异步 IO 框架 io_uring.md",
+    "coding/os/linux/Linux内核 Netlink机制分析与使用.md",
+    "coding/cpp/C++对象的底层原理都在这儿了，还敢说学不会？.md",
+    "coding/network/DPDK.md",
+    "coding/network/最后一天，继续卷！.md",
+    "coding/cpp/为什么建议少用 if 语句！.md",
+    "coding/reverse-engineering/内核学习-异常处理.md",
+    "coding/reverse-engineering/Chrom V8分析入门——Google CTF2018 justintime分析.md",
+    "coding/os/如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
+    "coding/reverse-engineering/手把手教你汇编 Debug.md",
+    "coding/os/Untitled",
+    "coding/cpp/「现代C++设计魅力」虚函数继承-thunk技术初探.md",
+    "coding/reverse-engineering/Untitled",
+    "coding/cpp/为什么指针被誉为现代编程语言的开山鼻祖的灵魂？.md",
+    "coding/algorithm/DP入门之不同路径.md",
     "self-improvement/health/柔性指压 Quote.md",
-    "self-improvement/meditation/内观 Quote.md",
-    "coding/database/高手过招， 为什么 Redis Cluster 是16384个槽位.md",
-    "coding/在互联网大厂，我们是怎么“反内卷”的.md",
-    "self-improvement/许成钢：应对危机，大规模免税比直接发钱更好.md",
-    "self-improvement/meditation/《绝顶美妙的经历》（病中日记）.md",
-    "self-improvement/meditation/隆波甘恬.md",
-    "self-improvement/health/颈椎不疼了，外八字脚正了，手脚变热了….md",
-    "coding/algorithm/新手程序员靠刷题真的能进大厂吗？.md",
-    "coding/algorithm/通用排序框架在爱奇艺推荐的应用.md",
-    "coding/cpp/工作多年，那些曾经帮我成长的开源 C++ 项目、学习方法，现在全部分享给你.md",
-    "self-improvement/health/柔性指压手法是如何解决“痛经”问题的。.md",
-    "coding/os/linux/linux loop device 机制介绍.md",
-    "coding/os/甄建勇：五分钟搞定MMU.md",
-    "self-improvement/health/早中期的肿瘤患者不要只接受中医治疗，这意味着放弃自己生命.md",
-    "coding/os/linux/Linux IO 那些事儿.md",
-    "coding/cpp/祝贺龙蜥社区理事单位成员入选C++ 标准委员会，首个国内企业代表加入.md",
-    "coding/database/亿级系统的Redis缓存如何设计？？？.md",
-    "coding/os/linux/甄建勇：五分钟搞定Cache（上）.md",
-    "coding/os/linux/图解 Linux内存性能优化核心思想.md",
-    "self-improvement/health/三十多年的肠胃问题解决了，肚子也小了.md",
-    "coding/cpp/C++，YYDS！.md",
-    "coding/architecture/大牛书单 消息队列方向的好书.md",
-    "coding/os/linux/BPF/eBPF综述 已付费.md",
+    "coding/reverse-engineering/手撕汇编。。。.md",
+    "coding/reverse-engineering/GDB调试-从入门实践到原理.md",
+    "coding/cpp/C++的全链路追踪方案，稍微有点高端.md",
+    "coding/golang/在实现小工具的过程中学会 Go 反射.md",
+    "coding/reverse-engineering/一道内核CTF题：Kernel从0开始.md",
+    "coding/北京上百家知名科技公司都在这里了.md",
+    "coding/cpp/C C++编码准则，可借鉴的东西还挺多！.md",
+    "coding/cpp/C语言中三块难啃的硬骨头.md",
+    "coding/rust",
     "coding/algorithm",
     "gitpush.sh",
     "coding/golang",
@@ -182,9 +185,6 @@
     "coding/ai/Untitled",
     "coding/app",
     "coding/java",
-    "coding/reverse-engineering",
-    "coding/network",
-    "self-improvement/meditation",
     "Pasted image 20240804095201.png"
   ]
 }
