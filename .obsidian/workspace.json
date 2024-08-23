@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "f0943510fa28d948",
+        "id": "3186f43f7451fcdf",
         "type": "tabs",
         "children": [
           {
-            "id": "058a17a63180d170",
+            "id": "5b19738b786a8b89",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
+                "file": "coding/os/GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
+                "file": "coding/os/GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
+                "file": "coding/os/GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md"
+                "file": "coding/os/GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md"
               }
             }
           }
@@ -134,7 +134,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -146,46 +147,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "058a17a63180d170",
+  "active": "5b19738b786a8b89",
   "lastOpenFiles": [
-    "coding/os/linux/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
-    "coding/os/linux/使用 Linux 的 diff 和 patch 对文件进行协作.md",
-    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
-    "coding/os/linux/浅析Linux sockfs文件系统.md",
-    "coding/os/linux/Untitled",
-    "coding/os/linux/Linux 多线程全面解析.md",
-    "coding/os/linux/Linux中断虚拟化（二）.md",
-    "coding/os/linux/Linux系统虚拟化模型及障碍.md",
-    "coding/os/linux/用Rust开发Linux，可行吗？.md",
-    "coding/os/linux/BPF/eBPF 概述：第 3 部分：软件开发生态.md",
-    "coding/os/甄建勇：五分钟搞定计算机体系结构（上）.md",
-    "coding/os/linux/正确认识实时Linux内核.md",
-    "coding/os/linux/内核内存错误检测工具KFENCE.md",
-    "coding/os/一文看懂 GDB底层实现原理.md",
-    "coding/os/linux/内核层的三种Hook技术的使用.md",
-    "coding/os/linux/甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
-    "coding/os/linux/BPF/BPF案例分析(2)—XDP程序原理与案例讲解.md",
-    "coding/os/linux/Linux加密文件系统eCryptfs介绍.md",
-    "coding/os/linux/内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
-    "coding/network/TCP粘包 硬核图解.md",
-    "coding/os/linux/图解 Linux进程通信 - 管道实现.md",
-    "coding/os/linux/Linux驱动实践：带你一步一步编译内核驱动程序.md",
-    "coding/os/linux/“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
-    "coding/network/25 张图，一万字，拆解 Linux 网络包发送过程.md",
-    "coding/network/实战 QUIC协议在蚂蚁集团落地.md",
-    "Untitled 1.canvas",
-    "Untitled.canvas",
+    "society/十年光阴如梭.md",
+    "coding/os/GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md",
+    "coding/os/linux/彻底搞懂IO多路复用.md",
+    "coding/os/linux/高性能服务器开发学习专栏汇总.md",
+    "coding/os/linux/直播回顾：如何对付臭名昭著的 IO 夯？诊断利器来了 龙蜥技术.md",
+    "coding/os/linux/KSM机制剖析 — Linux 内核中的内存去耦合.md",
+    "coding/os/linux/使用 GDB + Qemu 调试 Linux 内核.md",
+    "coding/os/linux/BPF/使用 eBPF 和 XDP 高速处理数据包.md",
+    "coding/os/linux/Linux kernel中栈的介绍.md",
+    "coding/os/linux/看一遍就理解：IO模型详解.md",
+    "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
+    "coding/os/linux/图解 Linux  管道通信的原理？.md",
+    "coding/os/linux/宋宝华：为什么Linux内核常常用unsigned long来代替指针.md",
+    "coding/os/linux/深入理解Linux内核之脏页跟踪.md",
+    "coding/os/linux/Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
+    "coding/os/linux/block io生命历程.md",
+    "coding/os/linux/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+    "coding/os/linux/「linux」孤儿进程与僵尸进程产生及其处理.md",
+    "coding/cpp/四万字长文，这是我见过最好的模板元编程文章！.md",
+    "coding/os/linux/一文说清linux system load.md",
+    "coding/os/linux/这篇 CPU Cache，估计也没人看.md",
+    "coding/os/linux/CFS任务放置代码详解.md",
+    "coding/algorithm/图论算法基础（修订版）.md",
+    "coding/algorithm/如何基于LSM-tree架构实现一写多读.md",
+    "coding/algorithm/存储架构 聊聊 LSM Tree 强悍的设计.md",
+    "coding/os/linux/epoll背后的原理.md",
+    "society",
     "self-improvement/learning-method",
+    "coding/os/Untitled",
+    "coding/reverse-engineering/Untitled",
     "coding/rust",
     "coding/algorithm",
-    "coding/app/Untitled",
-    "self-improvement/meditation",
-    "self-improvement/health",
-    "self-improvement/commandment",
     "gitpush.sh",
-    "coding/reverse-engineering",
+    "coding/golang",
+    "coding/frontend",
+    "coding/ai/Untitled",
     "Pasted image 20240804095201.png"
   ]
 }
