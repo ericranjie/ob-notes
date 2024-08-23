@@ -6,9 +6,6 @@ CPP开发者
 
 以下文章来源于腾讯云开发者 ，作者沈芳
 
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4VrfJGRic9cMlydQkzsTsDFptqtib3k4CxI3TOVia4Nmicpw/0)
 
 **腾讯云开发者**.
 

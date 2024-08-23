@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "ab759998410dda7b",
+        "id": "5aa1005f974a14b1",
         "type": "tabs",
         "children": [
           {
-            "id": "a58ec4fb0fe5ee37",
+            "id": "c6c394b3e71cae45",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
+                "file": "self-improvement/health/柔性指压 Quote.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
+                "file": "self-improvement/health/柔性指压 Quote.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
+                "file": "self-improvement/health/柔性指压 Quote.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md"
+                "file": "self-improvement/health/柔性指压 Quote.md"
               }
             }
           }
@@ -146,44 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "a58ec4fb0fe5ee37",
+  "active": "c6c394b3e71cae45",
   "lastOpenFiles": [
-    "228. Summary Ranges.md",
-    "coding/cpp/总结了一份Qt5 的开发经验.md",
-    "gitpush.sh",
-    "self-improvement/health/疫情之下，给读者的几句忠告.md",
     "self-improvement/meditation/内观 Quote.md",
-    "self-improvement/meditation/岩松老师禅修群开示录（二）.md",
-    "coding/做点实事吧。.md",
-    "coding/论师傅的引领的重要性.md",
-    "self-improvement/health/揭秘命在旦夕的中医针灸术！.md",
-    "self-improvement/health/亚健康：本可以大展拳脚的中医却一再遭遇滑铁卢.md",
-    "self-improvement/health/真正仁心医术的践行者——盛厚义爷爷.md",
-    "coding/cpp/C++协程在阿里的推广和大规模应用.md",
-    "self-improvement/health/多年患者舍弃中药，靠站桩成功恢复！.md",
-    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
-    "coding/cpp/C++ 反射：全方位解读 Lura 库的前世今生！.md",
-    "coding/golang/Golang调试工具pprof与trace.md",
-    "self-improvement/health/三位患友亲历记：民间中医—最不靠谱的一类中医.md",
-    "coding/network/（超）低延迟视频流传输的未来.md",
-    "coding/os/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "coding/cpp/谷歌正寻求提高 C++ 内存安全.md",
-    "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
-    "self-improvement/commandment/这种痛苦，真不希望你也要经历！.md",
-    "coding/os/linux/聊聊内存模型与内存序.md",
-    "self-improvement/commandment/人生不可以重来，但可以醒来.md",
-    "self-improvement/meditation/禅修，只排在第二位了 （Part Ⅰ）.md",
-    "self-improvement/health/携母寻医记：名医大多见面不如闻名！.md",
-    "self-improvement/health/是我运气不好？还是大多数中医大夫都在骗人？.md",
-    "coding/golang",
-    "coding/frontend",
-    "coding/ai/Untitled",
-    "coding/app",
-    "coding/java",
-    "coding/reverse-engineering",
-    "coding/network",
+    "self-improvement/health/柔性指压 Quote.md",
+    "self-improvement/health/恶性肿瘤术后患者如何尽快恢复.md",
+    "self-improvement/health/为什么静养对健康伤害大？.md",
+    "self-improvement/盘古社区累计套现5.4亿，散户该如何有效维权？.md",
+    "self-improvement/独家：莫大根本没有被抓，盘古崩盘，股东们挺住！.md",
+    "self-improvement/2天疯狂套现5亿！盘古维权群居然在贷款护盘？.md",
+    "self-improvement/meditation/佛陀：見緣起查你個鬼前后世.md",
+    "self-improvement/health/男人恶习让我有了这3000字求医记！.md",
+    "self-improvement/疫情下的北京失业中年.md",
+    "self-improvement/Tony Buzan Quote.md",
+    "self-improvement/盘古 Quote.md",
+    "coding/architecture/万字长文 淘宝 10年架构演进.md",
+    "self-improvement/伤痛慢慢的好一些，相信一切都会好起来.md",
+    "228. Summary Ranges.md",
+    "coding/os/潘爱民谈物联网系统的架构设计.md",
+    "coding/os/linux/性能提升 8450%，Linux 内核函数获大幅改进.md",
+    "self-improvement/health/惟愿未来诸君能与我们一如既往，再接再厉.md",
+    "coding/app/万字多图，搞懂 Nginx 高性能网络工作原理！.md",
+    "coding/database/Redis 内存优化在 vivo 的探索与实践.md",
+    "coding/os/GDB调试-从入门实践到原理.md",
+    "coding/cpp/基于C语言的微组件架构实践.md",
+    "coding/cpp/共享指针四宗罪.md",
+    "self-improvement/meditation/斯里兰卡 与禅修大神对话02 （更多关于隆波田法の技巧）.md",
+    "self-improvement/meditation/与禅修大神对话③（哪里阿罗汉多？更多关于隆波田法）.md",
+    "self-improvement/meditation/与禅修大神对话④（隆波田、隆波帕默 、阿姜查）.md",
+    "coding/algorithm",
+    "coding/app/Untitled",
     "self-improvement/meditation",
     "self-improvement/health",
+    "self-improvement/commandment",
+    "gitpush.sh",
+    "coding/reverse-engineering",
+    "coding/network",
+    "coding/java",
+    "coding/golang",
     "Pasted image 20240804095201.png"
   ]
 }
