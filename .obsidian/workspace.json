@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "5aa1005f974a14b1",
+        "id": "ab759998410dda7b",
         "type": "tabs",
         "children": [
           {
-            "id": "c6c394b3e71cae45",
+            "id": "a58ec4fb0fe5ee37",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "self-improvement/health/柔性指压 Quote.md",
+                "file": "self-improvement/meditation/内观 Quote.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "elasticsearc",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "self-improvement/health/柔性指压 Quote.md",
+                "file": "self-improvement/meditation/内观 Quote.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "self-improvement/health/柔性指压 Quote.md",
+                "file": "self-improvement/meditation/内观 Quote.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "self-improvement/health/柔性指压 Quote.md"
+                "file": "self-improvement/meditation/内观 Quote.md"
               }
             }
           }
@@ -134,7 +134,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -146,44 +147,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "c6c394b3e71cae45",
+  "active": "a58ec4fb0fe5ee37",
   "lastOpenFiles": [
-    "self-improvement/meditation/内观 Quote.md",
-    "self-improvement/health/柔性指压 Quote.md",
-    "self-improvement/health/恶性肿瘤术后患者如何尽快恢复.md",
-    "self-improvement/health/为什么静养对健康伤害大？.md",
-    "self-improvement/盘古社区累计套现5.4亿，散户该如何有效维权？.md",
-    "self-improvement/独家：莫大根本没有被抓，盘古崩盘，股东们挺住！.md",
-    "self-improvement/2天疯狂套现5亿！盘古维权群居然在贷款护盘？.md",
-    "self-improvement/meditation/佛陀：見緣起查你個鬼前后世.md",
-    "self-improvement/health/男人恶习让我有了这3000字求医记！.md",
-    "self-improvement/疫情下的北京失业中年.md",
-    "self-improvement/Tony Buzan Quote.md",
     "self-improvement/盘古 Quote.md",
-    "coding/architecture/万字长文 淘宝 10年架构演进.md",
-    "self-improvement/伤痛慢慢的好一些，相信一切都会好起来.md",
-    "228. Summary Ranges.md",
-    "coding/os/潘爱民谈物联网系统的架构设计.md",
-    "coding/os/linux/性能提升 8450%，Linux 内核函数获大幅改进.md",
-    "self-improvement/health/惟愿未来诸君能与我们一如既往，再接再厉.md",
-    "coding/app/万字多图，搞懂 Nginx 高性能网络工作原理！.md",
-    "coding/database/Redis 内存优化在 vivo 的探索与实践.md",
-    "coding/os/GDB调试-从入门实践到原理.md",
-    "coding/cpp/基于C语言的微组件架构实践.md",
-    "coding/cpp/共享指针四宗罪.md",
-    "self-improvement/meditation/斯里兰卡 与禅修大神对话02 （更多关于隆波田法の技巧）.md",
-    "self-improvement/meditation/与禅修大神对话③（哪里阿罗汉多？更多关于隆波田法）.md",
-    "self-improvement/meditation/与禅修大神对话④（隆波田、隆波帕默 、阿姜查）.md",
+    "self-improvement/meditation/岩松老师 你找到那个开关了吗？.md",
+    "self-improvement/health/柔性指压 Quote.md",
+    "self-improvement/meditation/内观 Quote.md",
+    "coding/database/高手过招， 为什么 Redis Cluster 是16384个槽位.md",
+    "coding/在互联网大厂，我们是怎么“反内卷”的.md",
+    "self-improvement/许成钢：应对危机，大规模免税比直接发钱更好.md",
+    "self-improvement/meditation/《绝顶美妙的经历》（病中日记）.md",
+    "self-improvement/meditation/隆波甘恬.md",
+    "self-improvement/health/颈椎不疼了，外八字脚正了，手脚变热了….md",
+    "coding/algorithm/新手程序员靠刷题真的能进大厂吗？.md",
+    "coding/algorithm/通用排序框架在爱奇艺推荐的应用.md",
+    "coding/cpp/工作多年，那些曾经帮我成长的开源 C++ 项目、学习方法，现在全部分享给你.md",
+    "self-improvement/health/柔性指压手法是如何解决“痛经”问题的。.md",
+    "coding/os/linux/linux loop device 机制介绍.md",
+    "coding/os/甄建勇：五分钟搞定MMU.md",
+    "self-improvement/health/早中期的肿瘤患者不要只接受中医治疗，这意味着放弃自己生命.md",
+    "coding/os/linux/Linux IO 那些事儿.md",
+    "coding/cpp/祝贺龙蜥社区理事单位成员入选C++ 标准委员会，首个国内企业代表加入.md",
+    "coding/database/亿级系统的Redis缓存如何设计？？？.md",
+    "coding/os/linux/甄建勇：五分钟搞定Cache（上）.md",
+    "coding/os/linux/图解 Linux内存性能优化核心思想.md",
+    "self-improvement/health/三十多年的肠胃问题解决了，肚子也小了.md",
+    "coding/cpp/C++，YYDS！.md",
+    "coding/architecture/大牛书单 消息队列方向的好书.md",
+    "coding/os/linux/BPF/eBPF综述 已付费.md",
     "coding/algorithm",
-    "coding/app/Untitled",
-    "self-improvement/meditation",
-    "self-improvement/health",
-    "self-improvement/commandment",
     "gitpush.sh",
+    "coding/golang",
+    "coding/frontend",
+    "coding/ai/Untitled",
+    "coding/app",
+    "coding/java",
     "coding/reverse-engineering",
     "coding/network",
-    "coding/java",
-    "coding/golang",
+    "self-improvement/meditation",
     "Pasted image 20240804095201.png"
   ]
 }
