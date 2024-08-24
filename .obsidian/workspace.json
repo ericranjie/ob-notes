@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "d186fccfb8157764",
+        "id": "e53169d3ce7754f2",
         "type": "tabs",
         "children": [
           {
-            "id": "9568f2808a47381a",
+            "id": "8f89ebea9bc76c8a",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/architecture/一口气说出 6种 延时队列的实现方法，面试官也得服.md",
+                "file": "coding/java/十亿级流量下，我与Redis时延小突刺的战斗史.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "内核漏洞学习-HEVD-StackOverflowGS",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/architecture/一口气说出 6种 延时队列的实现方法，面试官也得服.md",
+                "file": "coding/java/十亿级流量下，我与Redis时延小突刺的战斗史.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/architecture/一口气说出 6种 延时队列的实现方法，面试官也得服.md",
+                "file": "coding/java/十亿级流量下，我与Redis时延小突刺的战斗史.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/architecture/一口气说出 6种 延时队列的实现方法，面试官也得服.md"
+                "file": "coding/java/十亿级流量下，我与Redis时延小突刺的战斗史.md"
               }
             }
           }
@@ -147,36 +147,36 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "9568f2808a47381a",
+  "active": "8f89ebea9bc76c8a",
   "lastOpenFiles": [
-    "coding/network/Wireshark的抓包和分析，看这篇就够了！.md",
-    "coding/architecture/一口气说出 6种 延时队列的实现方法，面试官也得服.md",
-    "coding/architecture/为什么我们需要Pulsar？.md",
-    "coding/cpp/Glibc.md",
-    "coding/cpp/如何在嵌入式中使用设计模式的思想？.md",
-    "coding/architecture/开源微服务编排框架：Netflix Conductor.md",
-    "coding/architecture/并发场景下的幂等问题——分布式锁详解.md",
-    "coding/architecture/手动埋点转无痕埋点，如何做到代码“零”入侵.md",
-    "coding/architecture/如何从零设计一款高并发架构（建议收藏）.md",
-    "coding/architecture/多图详解Kafka中的数据采集和统计机制.md",
-    "coding/java/记一次Quartz重复调度(任务重复执行)的问题排查及解决，被老大骂了！.md",
-    "coding/network/如果让你来设计网络，你会把它弄成啥样？.md",
-    "coding/architecture/美团搜索多业务商品排序探索与实践.md",
-    "coding/architecture/vivo统一告警平台建设与实践.md",
-    "coding/architecture/分布式一致性算法Raft.md",
-    "coding/os/深入理解DPDK架构 经典PDF分享.md",
+    "coding/reverse-engineering/少量虚假控制流混淆后的算法还原案例.md",
+    "coding/java/十亿级流量下，我与Redis时延小突刺的战斗史.md",
+    "coding/reverse-engineering/Android APP漏洞之战——Activity漏洞挖掘详解.md",
+    "coding/reverse-engineering/Android APP漏洞之战——Content Provider漏洞详解.md",
+    "coding/os/linux/使用 logrotate 命令轮转和归档日志 Linux 中国.md",
+    "coding/os/【中断】的本质.md",
+    "coding/reverse-engineering/Android Linker详解.md",
+    "coding/java/真正的缓存之王，Google Guava 只是弟弟.md",
+    "coding/architecture/RocketMQ这样做，压测后性能提高30%.md",
+    "coding/algorithm/干掉布隆过滤器：布谷鸟过滤器有哪些神奇的魔法.md",
+    "coding/app/Chrome 与 Chromium 有何不同？ Linux 中国.md",
+    "coding/architecture/从微服务架构的现状和未来看学习路径.md",
+    "coding/architecture/查漏补缺，Kafka 核心知识，总有一个拨动你的心弦.md",
+    "coding/architecture/如何用Netty写一个高性能的分布式服务框架？.md",
+    "coding/architecture/亿级用户中心的设计与实践.md",
+    "coding/os/Android架构纵横谈之——软件自愈能力 （1）.md",
+    "coding/network/聊聊 Cookie、Session、Token 背后的故事.md",
+    "coding/java/打通 JAVA 与内核系列之 一 ReentrantLock 锁的实现原理.md",
+    "coding/architecture/幂等设计详解.md",
+    "coding/algorithm/在排序数组中查找元素的第一个和最后一个位置.md",
+    "coding/os/【性能优化】lock-free在召回引擎中的实现.md",
+    "coding/algorithm/软件开发架构模式浅谈：一些思考和实践记录.md",
+    "coding/algorithm/Homebrew大神面试Google被拒，只因写不出一道算法题？.md",
+    "coding/architecture/FlutterWeb性能优化探索与实践.md",
+    "coding/database/女朋友问我：为什么 MySQL 喜欢 B+ 树？我笑着画了 20 张图.md",
+    "coding/os/Shopee 送命题：进程切换为什么比线程切换慢.md",
     "coding/architecture/Untitled",
-    "coding/architecture/玩转直播：如何从 0 到 1 构建简单直播系统.md",
-    "coding/reverse-engineering/某视频app(V15.7)及web分析记录.md",
-    "coding/golang/Golang 闭包的实现.md",
-    "coding/reverse-engineering/2021看雪SDC议题回顾 Chrome 浏览器解优化过程中的漏洞安全研究.md",
-    "coding/reverse-engineering/超过 90 秒的任务不自动化，你好意思说自己是黑客？.md",
     "coding/reverse-engineering/Untitled",
-    "coding/architecture/浅谈 Apache APISIX 的可观测性.md",
-    "coding/database/面试官：说说MySQL 事务的实现原理.md",
-    "coding/java/为什么不建议直接使用 Async 注解？.md",
-    "coding/architecture/亿级流量架构实战之秒杀设计.md",
-    "coding/reverse-engineering/通过对PsSetCreateProcessNotifyRoutineEx的逆向分析得出的结果来实现反进程监控.md",
     "coding/database/Untitled",
     "society",
     "self-improvement/learning-method",
