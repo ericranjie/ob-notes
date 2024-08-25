@@ -4,8 +4,6 @@
 
  _2023年10月18日 20:59_ _广东_
 
-![](http://mmbiz.qpic.cn/mmbiz_png/4g5IMGibSxt45QXJZicZ9gaNU2mRSlvqhQd94MJ7oQh4QFj1ibPV66xnUiaKoicSatwaGXepL5sBDSDLEckicX1ttibHg/0?wx_fmt=png)
-
 **vivo互联网技术**
 
 分享 vivo 互联网技术干货与沙龙活动，推荐最新行业动态与热门会议。

@@ -20,8 +20,6 @@ InfoQ & 阿里云签约作者，分享原创技术干货和成长经验
 
 注意这里问的是为什么进程**切换**比线程慢，而不是问为什么进程比线程慢。当然这里的线程肯定指的是同一个进程中的线程。
 
-![](https://mmbiz.qpic.cn/mmbiz_png/PocakShgoGELnicBoj8poS9or2DUBdPEFVY1akJHOxoQxS61WiaKIotH9M2CSCQBfq0kfjPB2UDNCnhicg6UkqFzA/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
 > 老规矩，背诵版在文末。
 
 ## 引子
