@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "35b7955b956b1af9",
+        "id": "f0943510fa28d948",
         "type": "tabs",
         "children": [
           {
-            "id": "a95fccb74f0b354d",
+            "id": "058a17a63180d170",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/frontend/详解16个CSS新特性（2021最新版-下）.md",
+                "file": "society/程序员技术路线图（经典).md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "程序员技术路线图（经典)",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -65,7 +65,8 @@
               "state": {}
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "horizontal",
@@ -85,7 +86,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/frontend/详解16个CSS新特性（2021最新版-下）.md",
+                "file": "society/程序员技术路线图（经典).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +103,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/frontend/详解16个CSS新特性（2021最新版-下）.md",
+                "file": "society/程序员技术路线图（经典).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +126,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/frontend/详解16个CSS新特性（2021最新版-下）.md"
+                "file": "society/程序员技术路线图（经典).md"
               }
             }
           }
@@ -134,8 +135,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -147,44 +147,46 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "a95fccb74f0b354d",
+  "active": "058a17a63180d170",
   "lastOpenFiles": [
-    "coding/reverse-engineering/MS17-010 “永恒之蓝”漏洞分析与复现.md",
-    "coding/frontend/详解16个CSS新特性（2021最新版-下）.md",
-    "coding/app/又一款Nginx 管理可视化神器！通过界面完成配置监控，一条龙！.md",
-    "self-improvement/health/肾：先天之本如何保养.md",
+    "coding/程序员技术路线图（经典).md",
+    "society/程序员技术路线图（经典).md",
+    "self-improvement/health/放松排病实践中的一些技巧（下）.md",
+    "coding/app/章亦春（agentzh）谈ngx_lua之来龙去脉.md",
+    "society/打破10倍速软件工程师神话.md",
+    "coding/os/钓鱼累了，写下断言怎么用.md",
+    "society/推荐一门全美最受欢迎的课程，YYDS！.md",
+    "coding/os/冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
+    "communication/射频表贴电感的选型与使用.md",
+    "coding/os/Linux V4L2子系统与视频编解码设备介绍.md",
+    "communication",
+    "coding/ai/一文读懂高通GPU驱动渲染流程.md",
+    "coding/os/linux/BPF/Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
+    "coding/ai/TPC-C too simple？一文详解 TPC-E：TPC-C 的升级版.md",
+    "coding/golang/给大家丢脸了，用了三年golang，我还是没答对这道内存泄漏题。.md",
+    "coding/os/free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
+    "coding/rust/在 eBPF 中重新实现我的 Linux Rust 调度程序.md",
+    "coding/os/大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+    "coding/algorithm/球盒模型：一切回溯穷举，皆从此法出.md",
+    "self-improvement/health/柔性指压 Quote.md",
     "self-improvement/meditation/内观 Quote.md",
-    "self-improvement/meditation/润 物 细 无 声.md",
-    "self-improvement/meditation/隆波田内观2015年春节课程圆满结束.md",
-    "self-improvement/meditation/隆波田《平常心》 连载十一：我们必须修行而且自己亲知.md",
-    "self-improvement/meditation/岩松老师：《原地经行，老幼皆宜》.md",
-    "self-improvement/health/从乡间草医到一号难求的国医大师，不治病却添病！ 已付费.md",
-    "self-improvement/meditation/岩松老师：《对治失眠行之有效的方法》.md",
-    "self-improvement/commandment/国外19岁戒友戒了350天的方法与心得.md",
-    "self-improvement/meditation/岩松老师  觉知与见明色.md",
-    "coding/os/带你快速对比SPI、UART、I2C通信的区别与应用！.md",
-    "coding/os/Docker镜像瘦身：从1.43G到22.4MB.md",
-    "coding/reverse-engineering/dll注入&代码注入 学习总结.md",
-    "coding/architecture/流计算引擎数据一致性的本质.md",
-    "coding/cpp/Untitled.md",
-    "coding/reverse-engineering/PHP反序列化漏洞基础.md",
-    "coding/java/用 Dubbo 传输文件，被老大一顿揍。。.md",
-    "coding/cpp/这种扯淡的嵌入式项目，尽量不要碰.md",
-    "coding/cpp/利用Makfile给多文件、多目录C源码建立工程.md",
-    "coding/cpp/深入理解重要的编程模型.md",
-    "coding/reverse-engineering/钉钉邀请上台功能分析.md",
-    "society/雷军做程序员时写的文章，太牛了！.md",
-    "coding/java/为什么有人可以在屎一样混乱的几千行代码里加功能？不重构能驾驭屎山吗？.md",
-    "coding/frontend/Untitled",
+    "society/冰河写的文章开源了！！.md",
+    "coding/architecture/支付宝二面：生成订单30分钟未支付，则自动取消，该怎么实现？.md",
+    "coding/ai/ICBU可控文本生成技术详解.md",
+    "society/校招黑名单.md",
+    "coding/architecture/openFeign夺命连环9问.md",
+    "coding/java/JUC 常用 4 大并发工具类.md",
     "coding/architecture/Untitled",
-    "coding/reverse-engineering/Untitled",
-    "coding/database/Untitled",
     "society",
+    "coding/os/linux/Untitled",
+    "Untitled 1.canvas",
+    "Untitled.canvas",
     "self-improvement/learning-method",
-    "coding/os/Untitled",
     "coding/rust",
     "coding/algorithm",
-    "gitpush.sh",
+    "coding/app/Untitled",
+    "self-improvement/meditation",
+    "self-improvement/health",
     "Pasted image 20240804095201.png"
   ]
 }
