@@ -8,24 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "b51a9778df0c6173",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "3d83eb1179956a39",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x00-graph/linux/debug.md",
+                "file": "coding/os/linux/BPF/BPF内核实现详解.md",
                 "mode": "source",
                 "source": false
               }
@@ -97,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
+                "file": "coding/os/linux/BPF/BPF内核实现详解.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -114,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
+                "file": "coding/os/linux/BPF/BPF内核实现详解.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -137,12 +125,11 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md"
+                "file": "coding/os/linux/BPF/BPF内核实现详解.md"
               }
             }
           }
-        ],
-        "currentTab": 3
+        ]
       }
     ],
     "direction": "horizontal",
@@ -159,8 +146,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "b51a9778df0c6173",
+  "active": "3d83eb1179956a39",
   "lastOpenFiles": [
+    "coding/os/linux/BPF/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+    "coding/os/linux/BPF/BPF C 编程入门.md",
+    "coding/os/linux/BPF/BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+    "coding/os/linux/图文详解 Linux 分页机制！.md",
+    "0x99-image/Pasted image 20240826090049.png",
+    "0x99-image",
+    "0x99-image/Pasted image 20240826090009.png",
+    "0x00-graph/linux/debug.md",
+    "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
     "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
     "coding/os/linux/BPF/边缘网络 eBPF 超能力：eBPF map 原理与性能解析.md",
     "coding/os/linux/Linux读写锁逻辑解析.md",
@@ -178,25 +174,17 @@
     "coding/os/linux/Linux内核Makefile执行流程.md",
     "coding/os/linux/Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
     "coding/os/linux/Linux内核源码研读与实战演练 (版本5.6.18).md",
-    "0x00-graph/linux/debug.md",
     "0x00-graph/linux/memory.md",
     "coding/os/linux/Linux kernel中栈的介绍.md",
     "coding/os/linux/Linux IO 那些事儿.md",
-    "coding/os/linux/Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
-    "coding/os/linux/Linux 最大并发数是多少？.md",
-    "coding/os/linux/Linux 虚拟网络设备之 bridge.md",
-    "coding/os/linux/Linux 性能基准测试工具及测试方法.md",
-    "coding/os/linux/Linux 物理内存初始化.md",
-    "Pasted image 20240826094141.png",
-    "Pasted image 20240826094128.png",
-    "Pasted image 20240826094109.png",
-    "Pasted image 20240826094055.png",
-    "Pasted image 20240826094041.png",
-    "Pasted image 20240826094026.png",
-    "Pasted image 20240826094011.png",
-    "Pasted image 20240826093958.png",
-    "Pasted image 20240826093937.png",
-    "Pasted image 20240826093925.png",
+    "0x99-image/Pasted image 20240826094141.png",
+    "0x99-image/Pasted image 20240826094128.png",
+    "0x99-image/Pasted image 20240826094109.png",
+    "0x99-image/Pasted image 20240826094055.png",
+    "0x99-image/Pasted image 20240826094041.png",
+    "0x99-image/Pasted image 20240826094026.png",
+    "0x99-image/Pasted image 20240826094011.png",
+    "0x99-image/Pasted image 20240826093958.png",
     "entrance-point/Untitled",
     "0x00-graph/linux",
     "0x00-graph",
@@ -205,7 +193,6 @@
     "coding/architecture/Untitled",
     "coding/reverse-engineering/Untitled",
     "coding/database/Untitled",
-    "society",
-    "self-improvement/learning-method"
+    "society"
   ]
 }
