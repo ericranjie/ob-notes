@@ -5,7 +5,6 @@ CPP开发者
 
 以下文章来源于Linux内核那些事 ，作者songsong001
 
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6dwH9qJmWO5T0Rnsiaib5jEUibibJgLmkkG02PrbyOWab4UA/0)
 

@@ -20,8 +20,7 @@ Original cxuan 程序员cxuan
 分页机制可以通过 CR0 控制寄存器的 PG 这个标志位来判断是否开启分页机制；如果 PG = 1 ，则表示启用分页操作，处理器会使用本节描述的机制将线性地址转换为物理地址。如果 PG = 0，则表示禁用分页机制，此时分段产生的线性地址会被直接用作物理地址。
 
 分段机制和分页机制还有一个区别就是：分段机制可以在任意可变长度的内存上进行操作，而分页机制只能对固定大小的页面（内存块）进行操作。分页机制把线性和物理地址空间都划分成页面。线性地址空间中的页面都可以映射在物理地址空间内，如下图所示。
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240826090009.png]]
 
 80x86 使用 4K (2 ^ 12) 字节固定大小的页面，每个页面均是 4KB，并且对齐于 4KB 地址边界处。这表示分页机制会把 4GB 划分成为以 4KB 为基础的页面，共划分 1M（1048576） 个，线性地址的低 12 bit 位可以直接作为页内偏移量，也可直接作为物理地址的低 12 位。
 
@@ -35,7 +34,7 @@ Original cxuan 程序员cxuan
 
 下面是一个线性地址到物理地址的变换过程图。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240826090049.png]]
 
 可以看到，80x86 使用了两级页，这是为了减少页的数量所设计的，因为虽然每个页字节是 4K，共有 2 ^ 20 （1MB）个页，总共占据 4MB 大小，但实际上应用程序一次用不到这么多页，会造成资源浪费，所以采用了一种分层的设计方式。
 
@@ -49,7 +48,7 @@ Original cxuan 程序员cxuan
 
 > 这里需要特别注意的是，页目录的结构和页表的结构是一样的，只不过他俩描述的主体不一样，一个描述的是页目录，一个描述的是页表。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240826090107.png]]
 
 - P -- 位 0 是存在（Present）标志，用于指明表项对地址转换是否有效。P = 1 表示有效，P = 0 表示无效，在页的转换过程中，如果说涉及的页目录或页表的表项无效，也就是页面没有再物理地址中，就会产生一个异常。如果 P = 0 ，那么除了表项无效外，其余的 bit 位可以自由使用。
     

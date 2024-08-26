@@ -4,47 +4,34 @@
     "type": "split",
     "children": [
       {
-        "id": "35b7955b956b1af9",
+        "id": "f730344563a1f6df",
         "type": "tabs",
         "children": [
           {
-            "id": "a95fccb74f0b354d",
+            "id": "b51a9778df0c6173",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "self-improvement/meditation/内观 Quote.md",
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
                 "mode": "source",
                 "source": false
               }
             }
           },
           {
-            "id": "a6bcd553a5703cc8",
+            "id": "3d83eb1179956a39",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "self-improvement/meditation/《绝顶美妙的经历》（病中日记）.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "240b95d44c35785e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "coding/os/linux/深入理解TLB.md",
+                "file": "0x00-graph/linux/debug.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ],
-        "currentTab": 2
+        ]
       }
     ],
     "direction": "vertical"
@@ -73,7 +60,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "最近心得总结：你为什么会连续破戒",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -110,7 +97,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/深入理解TLB.md",
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -127,7 +114,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/深入理解TLB.md",
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -150,11 +137,12 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/深入理解TLB.md"
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md"
               }
             }
           }
-        ]
+        ],
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -171,35 +159,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "240b95d44c35785e",
+  "active": "b51a9778df0c6173",
   "lastOpenFiles": [
-    "0x00-graph/GPU.md",
-    "self-improvement/meditation/内观 Quote.md",
-    "self-improvement/health/奇恒之腑丨病入骨髓为什么那么可怕？.md",
-    "self-improvement/health/南怀瑾老师：“六字诀”对调理身体器官、呼出病气非常有用（呼吸法门之十四）.md",
-    "80c0f5a70583f670c050228034d0070a.jpg",
-    "self-improvement/meditation/岩松老师修行随笔：苦的本质 —— 黏着（执取）.md",
-    "self-improvement/meditation/岩松老师禅修随笔： 在工作与生活中禅修的三个要素.md",
-    "self-improvement/meditation/隆波田：《为何要修行？》.md",
-    "self-improvement/meditation/关于三藏经典的思考.md",
-    "self-improvement/meditation/隆波田《平常心》 连载之十：正确培养觉知的果报.md",
-    "self-improvement/commandment/趣闻分享：南非祖鲁人这样来检验处男.md",
-    "self-improvement/commandment/赖床、熬夜的问题说明.md",
-    "self-improvement/commandment/欲望休眠期存在吗？.md",
-    "self-improvement/commandment/说说失眠破戒.md",
-    "self-improvement/commandment/内心挣扎，快要忍不住了怎么办？.md",
-    "self-improvement/commandment/NAC戒瘾实操第二部分.md",
-    "self-improvement/commandment/法谈开示 隆波阿内尊者：体验动中禅的修行方法(四).md",
-    "self-improvement/commandment/精髓总结：戒色的25条金句分享.md",
-    "self-improvement/commandment/拼到最后，还是拼执行力.md",
-    "self-improvement/learning-method/跟大家聊聊如何学习.md",
-    "coding/os/linux/大疆一面：请说出水平触发和边缘触发的区别？.md",
-    "coding/os/linux/RISC-V Linux 内核 UEFI 启动过程分析（Part1）：构建、加载与启动内核.md",
-    "self-improvement/meditation/《绝顶美妙的经历》（病中日记）.md",
-    "coding/os/linux/Systrace 线程 CPU 运行状态分析技巧 - Runnable.md",
-    "coding/os/linux/x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
-    "coding/os/linux/深入理解 Linux 调度（GPU）虚拟化.md",
-    "0x00-graph/register.md",
+    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
+    "coding/os/linux/BPF/边缘网络 eBPF 超能力：eBPF map 原理与性能解析.md",
+    "coding/os/linux/Linux读写锁逻辑解析.md",
+    "coding/os/linux/Linux Kernel：内存分页机制核心原理.md",
+    "coding/os/linux/linux loop device 机制介绍.md",
+    "coding/os/linux/Linux Mmap映射：优化文件访问和共享内存.md",
+    "coding/os/linux/Linux后台开发调试经验分享.md",
+    "coding/os/linux/Linux加密文件系统eCryptfs介绍.md",
+    "coding/os/linux/linux内存回收(一）---kswapd回收.md",
+    "coding/os/linux/Linux内核 Netlink机制分析与使用.md",
+    "coding/os/linux/Linux内核-信号的传递过程.md",
+    "coding/os/linux/Linux内核调试的方式以及工具集锦.md",
+    "coding/os/linux/Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
+    "coding/os/linux/Linux系统虚拟化模型及障碍.md",
+    "coding/os/linux/Linux内核Makefile执行流程.md",
+    "coding/os/linux/Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
+    "coding/os/linux/Linux内核源码研读与实战演练 (版本5.6.18).md",
+    "0x00-graph/linux/debug.md",
+    "0x00-graph/linux/memory.md",
+    "coding/os/linux/Linux kernel中栈的介绍.md",
+    "coding/os/linux/Linux IO 那些事儿.md",
+    "coding/os/linux/Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
+    "coding/os/linux/Linux 最大并发数是多少？.md",
+    "coding/os/linux/Linux 虚拟网络设备之 bridge.md",
+    "coding/os/linux/Linux 性能基准测试工具及测试方法.md",
+    "coding/os/linux/Linux 物理内存初始化.md",
+    "Pasted image 20240826094141.png",
+    "Pasted image 20240826094128.png",
+    "Pasted image 20240826094109.png",
+    "Pasted image 20240826094055.png",
+    "Pasted image 20240826094041.png",
+    "Pasted image 20240826094026.png",
+    "Pasted image 20240826094011.png",
+    "Pasted image 20240826093958.png",
+    "Pasted image 20240826093937.png",
+    "Pasted image 20240826093925.png",
     "entrance-point/Untitled",
     "0x00-graph/linux",
     "0x00-graph",
@@ -209,7 +206,6 @@
     "coding/reverse-engineering/Untitled",
     "coding/database/Untitled",
     "society",
-    "self-improvement/learning-method",
-    "Pasted image 20240804095201.png"
+    "self-improvement/learning-method"
   ]
 }

@@ -84,23 +84,23 @@ Ftrace 的使用的接口为 tracefs 文件系统，需要保证该文件系统�
 
 tracing 目录下核心文件介绍如下表格，当前可仅关注黑体加粗的项，其他项可在需要的时候再进行回顾：
 
-|文件|描述|
-|---|---|
-|**available_tracers**|可用跟踪器，hwlat blk function_graph wakeup_dl wakeup_rt wakeup function nop，nop 表示不使用跟踪器|
-|**current_tracer**|当前使用的跟踪器|
-|function_profile_enabled|启用函数性能分析器|
-|available_filter_functions|可跟踪的完整函数列表|
-|**set_ftrace_filter**|选择跟踪函数的列表，支持批量设置，例如 *tcp、tcp* 和 *tcp* 等|
-|set_ftrace_notrace|设置不跟踪的函数列表|
-|**set_event_pid**|设置跟踪的 PID，表示仅跟踪 PID 程序的函数或者其他跟踪|
-|**tracing_on**|是否启用跟踪，1 启用跟踪 0 关闭跟踪|
-|trace_options|设置跟踪的选项|
-|trace_stat（目录）|函数性能分析的输出目录|
-|kprobe_events|启用 kprobe 的配置|
-|uprobe_events|启用 uprobe 的配置|
-|events ( 目录 )|事件（Event）跟踪器的控制文件：tracepoint、kprobe、uprobe|
-|**trace**|跟踪的输出 （Ring Buffer）|
-|trace_pipe|跟踪的输出；提供持续不断的数据流，适用于程序进行读取|
+| 文件                         | 描述                                                                                  |
+| -------------------------- | ----------------------------------------------------------------------------------- |
+| **available_tracers**      | 可用跟踪器，hwlat blk function_graph wakeup_dl wakeup_rt wakeup function nop，nop 表示不使用跟踪器 |
+| **current_tracer**         | 当前使用的跟踪器                                                                            |
+| function_profile_enabled   | 启用函数性能分析器                                                                           |
+| available_filter_functions | 可跟踪的完整函数列表                                                                          |
+| **set_ftrace_filter**      | 选择跟踪函数的列表，支持批量设置，例如 *tcp、tcp* 和 *tcp* 等                                             |
+| set_ftrace_notrace         | 设置不跟踪的函数列表                                                                          |
+| **set_event_pid**          | 设置跟踪的 PID，表示仅跟踪 PID 程序的函数或者其他跟踪                                                     |
+| **tracing_on**             | 是否启用跟踪，1 启用跟踪 0 关闭跟踪                                                                |
+| trace_options              | 设置跟踪的选项                                                                             |
+| trace_stat（目录）             | 函数性能分析的输出目录                                                                         |
+| kprobe_events              | 启用 kprobe 的配置                                                                       |
+| uprobe_events              | 启用 uprobe 的配置                                                                       |
+| events ( 目录 )              | 事件（Event）跟踪器的控制文件：tracepoint、kprobe、uprobe                                          |
+| **trace**                  | 跟踪的输出 （Ring Buffer）                                                                 |
+| trace_pipe                 | 跟踪的输出；提供持续不断的数据流，适用于程序进行读取                                                          |
 
 > perf_tools 包含了一个复位所有 ftrace 选型的工具脚本，在跟踪不符合预期的情况下，建议先使用 reset-ftrace[4] 进行复位，然后再进行测试。
 
