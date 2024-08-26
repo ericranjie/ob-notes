@@ -1,19 +1,11 @@
-# 
 
 dog250 Linux阅码场
 
  _2021年12月14日 07:00_
 
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/nOQDlo8iaKME6rViaWWN1QI31mvoEeGscGBJsQwZoDI5efUdwichQoCicg0ReJNAa0ZhehGofR4a9o2oI16TVW7rEA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 _**原文作者：dog250**_
 
 _**原文链接：https://blog.csdn.net/dog250/article/details/48690407**_
-
-  
-
   
 
 本文可以作为《 Linux转发性能评估与优化(转发瓶颈分析与解决方案)》的姊妹篇，这两篇文章结合在一起，恰好就是整个Linux内核协议栈的一个优化方案。事实上Linux协议栈本来就是面向两个方向的，一个是转发，更多的是本地接收。目前大量的服务器采用Linux作为其载体，更加体现了协议栈本地处理相对于转发的重要性，因此本文就这个问题扯两句，欢迎拍砖！

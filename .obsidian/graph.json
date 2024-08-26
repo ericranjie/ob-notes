@@ -1,6 +1,6 @@
 {
-  "collapse-filter": true,
-  "search": "",
+  "collapse-filter": false,
+  "search": "cache",
   "showTags": false,
   "showAttachments": false,
   "hideUnresolved": false,

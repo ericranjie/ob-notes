@@ -13,13 +13,38 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "self-improvement/commandment/最近心得总结：你为什么会连续破戒.md",
+                "file": "self-improvement/meditation/内观 Quote.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "a6bcd553a5703cc8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "self-improvement/meditation/《绝顶美妙的经历》（病中日记）.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "240b95d44c35785e",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "coding/os/linux/深入理解TLB.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -48,7 +73,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "最近心得总结：你为什么会连续破戒",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +110,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "self-improvement/commandment/最近心得总结：你为什么会连续破戒.md",
+                "file": "coding/os/linux/深入理解TLB.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +127,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "self-improvement/commandment/最近心得总结：你为什么会连续破戒.md",
+                "file": "coding/os/linux/深入理解TLB.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +150,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "self-improvement/commandment/最近心得总结：你为什么会连续破戒.md"
+                "file": "coding/os/linux/深入理解TLB.md"
               }
             }
           }
@@ -146,34 +171,38 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "a95fccb74f0b354d",
+  "active": "240b95d44c35785e",
   "lastOpenFiles": [
-    "self-improvement/meditation/岩松老师  “无我”原则在禅修中的重要作用.md",
-    "self-improvement/commandment/最近心得总结：你为什么会连续破戒.md",
-    "self-improvement/meditation/岩松老师 禅修的误区（一）.md",
-    "self-improvement/meditation/修行 （一） 培养正念.md",
-    "coding/java/我女朋友们竟然不会Flink的CheckPoint机制.md",
-    "coding/os/实时音视频权威指南：从零开始的RTC程序设计.md",
-    "coding/os/Linux设备树语法规范.md",
-    "coding/os/RISC-V Linux 内核技术文章合集 第 7 期.md",
-    "coding/os/NOC总线架构拓扑介绍（转载）.md",
-    "coding/os/Shopee 送命题：进程切换为什么比线程切换慢.md",
-    "coding/java/一文聊透 JVM 内存分布、内存对齐、压缩指针！.md",
-    "coding/java/真正的缓存之王，Google Guava 只是弟弟.md",
-    "coding/java/这些年背过的面试题——Netty篇.md",
-    "coding/java/这些年背过的面试题——Java基础及面试题篇.md",
-    "coding/java/用 Dubbo 传输文件，被老大一顿揍。。.md",
-    "coding/java/一次接口的性能优化之旅.md",
-    "coding/java/为什么有人可以在屎一样混乱的几千行代码里加功能？不重构能驾驭屎山吗？.md",
-    "coding/java/为什么不建议直接使用 Async 注解？.md",
-    "coding/java/十亿级流量下，我与Redis时延小突刺的战斗史.md",
-    "coding/java/深入理解Java内存架构.md",
-    "coding/java/深入理解并发编程艺术之内存模型.md",
-    "coding/java/深入理解 Netty FastThreadLocal.md",
-    "coding/java/骚操作：不重启 JVM，如何替换掉已经加载的类？.md",
-    "coding/java/看下有多少人对Java感兴趣？.md",
-    "coding/java/记一次Quartz重复调度(任务重复执行)的问题排查及解决，被老大骂了！.md",
-    "coding/java/带颜色的JVM：三色标记详解.md",
+    "0x00-graph/GPU.md",
+    "self-improvement/meditation/内观 Quote.md",
+    "self-improvement/health/奇恒之腑丨病入骨髓为什么那么可怕？.md",
+    "self-improvement/health/南怀瑾老师：“六字诀”对调理身体器官、呼出病气非常有用（呼吸法门之十四）.md",
+    "80c0f5a70583f670c050228034d0070a.jpg",
+    "self-improvement/meditation/岩松老师修行随笔：苦的本质 —— 黏着（执取）.md",
+    "self-improvement/meditation/岩松老师禅修随笔： 在工作与生活中禅修的三个要素.md",
+    "self-improvement/meditation/隆波田：《为何要修行？》.md",
+    "self-improvement/meditation/关于三藏经典的思考.md",
+    "self-improvement/meditation/隆波田《平常心》 连载之十：正确培养觉知的果报.md",
+    "self-improvement/commandment/趣闻分享：南非祖鲁人这样来检验处男.md",
+    "self-improvement/commandment/赖床、熬夜的问题说明.md",
+    "self-improvement/commandment/欲望休眠期存在吗？.md",
+    "self-improvement/commandment/说说失眠破戒.md",
+    "self-improvement/commandment/内心挣扎，快要忍不住了怎么办？.md",
+    "self-improvement/commandment/NAC戒瘾实操第二部分.md",
+    "self-improvement/commandment/法谈开示 隆波阿内尊者：体验动中禅的修行方法(四).md",
+    "self-improvement/commandment/精髓总结：戒色的25条金句分享.md",
+    "self-improvement/commandment/拼到最后，还是拼执行力.md",
+    "self-improvement/learning-method/跟大家聊聊如何学习.md",
+    "coding/os/linux/大疆一面：请说出水平触发和边缘触发的区别？.md",
+    "coding/os/linux/RISC-V Linux 内核 UEFI 启动过程分析（Part1）：构建、加载与启动内核.md",
+    "self-improvement/meditation/《绝顶美妙的经历》（病中日记）.md",
+    "coding/os/linux/Systrace 线程 CPU 运行状态分析技巧 - Runnable.md",
+    "coding/os/linux/x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
+    "coding/os/linux/深入理解 Linux 调度（GPU）虚拟化.md",
+    "0x00-graph/register.md",
+    "entrance-point/Untitled",
+    "0x00-graph/linux",
+    "0x00-graph",
     "communication",
     "coding/frontend/Untitled",
     "coding/architecture/Untitled",
@@ -181,9 +210,6 @@
     "coding/database/Untitled",
     "society",
     "self-improvement/learning-method",
-    "coding/os/Untitled",
-    "coding/rust",
-    "coding/algorithm",
     "Pasted image 20240804095201.png"
   ]
 }

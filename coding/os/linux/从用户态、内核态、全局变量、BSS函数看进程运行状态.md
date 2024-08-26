@@ -3,14 +3,6 @@
 
  _2022年01月07日 11:52_
 
-击上方“**一口Linux**”，选择“**星标公众号**”
-
-# 
-
-干货福利，第一时间送达！
-
-# ![图片](https://mmbiz.qpic.cn/mmbiz/cZV2hRpuAPiaJQXWGyC9wrUzIicibgXayrgibTYarT3A1yzttbtaO0JlV21wMqroGYT3QtPq2C7HMYsvicSB2p7dTBg/640?wx_fmt=gif&wxfrom=13&tp=wxpic "动态黑色音符")
-
 # 收集项目组需求的时候，我们知道一个进程要运行起来需要以下的内存结构。  
 
 用户态：
