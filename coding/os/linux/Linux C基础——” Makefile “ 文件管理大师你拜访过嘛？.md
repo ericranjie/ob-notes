@@ -5,8 +5,6 @@ Linux内核之旅
 
 The following article is from 一口Linux Author 土豆居士
 
-[
-
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6Y7VnVXfice2VtFnTr3IEibCiboib78PWNs5M2GeOz265umA/0)
 
 **一口Linux**.

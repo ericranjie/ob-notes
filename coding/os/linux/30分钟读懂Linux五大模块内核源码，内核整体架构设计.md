@@ -1,18 +1,11 @@
 
-
 土豆居士 一口Linux
 
  _2021年12月03日 11:49_
 
 击上方“**一口Linux**”，选择“**星标公众号**”
 
-  
-
-# 
-
 干货福利，第一时间送达！
-
-# ![Image](https://mmbiz.qpic.cn/mmbiz/cZV2hRpuAPiaJQXWGyC9wrUzIicibgXayrgibTYarT3A1yzttbtaO0JlV21wMqroGYT3QtPq2C7HMYsvicSB2p7dTBg/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1 "动态黑色音符")
 
 一、前言
 

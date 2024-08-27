@@ -3,10 +3,6 @@ dog250 Linux阅码场
 
  _2021年12月07日 07:02_
 
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/nOQDlo8iaKME6rViaWWN1QI31mvoEeGscGBJsQwZoDI5efUdwichQoCicg0ReJNAa0ZhehGofR4a9o2oI16TVW7rEA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 _**原文作者：dog250**_
 
 _**原文链接：https://blog.csdn.net/dog250/article/details/103301816**_
@@ -113,7 +109,6 @@ netronome开创了智能网卡新时代，netronome SmartNIC可以配备几十�
 
 eBPF和智能网卡是我们这种手艺人的福音！
 
-  
 
 **编程手艺人指的就是不懂大型软件工程流程，没参与过大型软件开发，不会高级编程语言，没写过多少代码，不会使用发布工具，不经常用git，但也不是一点都不会编程，还是稍微懂一点编程的。不过手艺人精通计算机原理，精通操作系统的实现，精通网络协议，所以手艺人一般可以轻松完成BUG的定位和fix工作，由于不会大段大段写代码，所以手艺人往往精于精准定位，一两行代码就能fix，比如加一个mb。所以，手艺人往往在职场工作量上吃亏，手艺人善于自己玩。**
 

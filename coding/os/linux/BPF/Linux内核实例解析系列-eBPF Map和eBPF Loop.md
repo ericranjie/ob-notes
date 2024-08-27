@@ -1,4 +1,3 @@
-# 
 
 Original clouds clouds
 
@@ -64,8 +63,6 @@ int bpf_loop(int nr, int (*fn)(__u32, void *), void *ctx, int flags);
 - **`ctx`**: 用户提供的上下文指针，将作为参数传递给回调函数。
     
 - **`flags`**: 目前没有实际作用，通常设置为 0。
-    
-      
     
 
 在本文讲解的eBPF程序中，`bpf_loop`用来遍历每个CPU上的映射元素。

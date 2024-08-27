@@ -11,20 +11,15 @@ https://github.com/davidsajare/david-share.git
 
 ](https://mp.weixin.qq.com/s?__biz=Mzg2OTc0ODAzMw==&mid=2247502844&idx=1&sn=c07bb9790134e838e9155da7fdcc107e&source=41&key=daf9bdc5abc4e8d0d378999a7bf5d061a81b269f1f3efcf6926b00068b94bbb8e8be33f32645ad1597bc90b3da5050e046c839adcc8a0a695d51963d397cf23dc13db14b15ea6edf673a8da0735b26c680ebfa218b4dbe1d5caeb45511f2b7a9b7e81ccb467f984be449a8856a64e8317066aef1d7e3db74871c2b3e931ae271&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQdwlUSuCyKJPGnvG2sd4kWBLmAQIE97dBBAEAAAAAAKKZMgYbXDgAAAAOpnltbLcz9gKNyK89dVj0RwsiC2h5AYV0cUsQOch%2B7ZoBj1QFa4TQfSZxkRPwOw01iUTLMEUbO0mgTlbfEb2zzuuk%2Fmqn0YoCd6aqxPABJNEY6oWVxhhoDEG%2BXy1laG9OQNkzL3PBdT46GrzQTJE5ajxDpNQC6EUX8E6kQXJar%2BwoQiTMflVl0q7sgre7Vvq9MrS4kPmm8iEdR%2FrjUl2ERolxhyZjIHwUHYFBGDtJAr1eoQV1zKbb7sxuPKnWlkTeYPJ5Y2hTRsdMe1zgl%2F7F&acctmode=0&pass_ticket=S3YLSDm0Cu9LqfedoHJMm9c4NJXKmSB3o9oiHlwcZ3z9u0lDMg6BzoRbkBkKohw8&wx_header=1#)
 
-**Statement：  
-**
+**Statement:
 
 **This views and opinions expressed in this account are those of my own and do not represent those of my employer, NVIDIA.**
 
-  
-
 **The information covered in this article is public information on the Internet and does not contain any commercial or technical secrets. I will give reference links after the article.**
 
-  
 
 **本文仅代表作者个人观点，本文中的内容不能作为生产上的指导！**
 
-  
 
 **本文在书写过程中，得到了我同事韩潮的指点，在此表示感谢！**
 
@@ -35,14 +30,12 @@ https://github.com/davidsajare/david-share.git
 - RDMA/RoCE适合大量内存拷贝类的应用，如分布式存储等。降低CPU使用率，降低延迟。
     
 - OVS-DPDK会增加流表的插入速度、适合大量包转发。大概能做到 210M PPS左右（具体内容见下图和下面链接）。
-    
 
 http://fast.dpdk.org/doc/perf/DPDK_21_08_Mellanox_NIC_performance_report.pdf
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/akGXyic486nUVIygKGcSNsbn1Gl08eEXwrBr1aeVXcQWA7s2CjuGBtGCBa8NwyIyXql1NXZz66VyliaKFEsjwfsA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
   
-
 Mellanox是RDMA的发起者之一，不再赘述。在DPDK方面，每个网卡厂商自己的PMD驱动。NVIDIA Mellanox的PMD驱动有两个： mlx4 和mlx5。
 
 The two NVIDIA PMDs are mlx4 for NVIDIA® ConnectX®-3 Pro Ethernet adapters and mlx5 for ConnectX-4 Lx, ConnectX-5, ConnectX-5 Ex, ConnectX-6, ConnectX-6 Lx, ConnectX-6 Dx, and NVIDIA BlueField®-2 Ethernet adapters SmartNICs and data processing units (DPUs). NVIDIA PMDs support bare-metal, Kernel-Based Virtual Machine (KVM) and VMware SR-IOV on x86_64, Arm, and Power architectures.  
@@ -68,12 +61,7 @@ NVIDIA Mellanox网卡能做网络I/O卸载，本质上是因为它内嵌了一�
 
 后续的报文的流表在eswitch有记录的话，提取多元组进行匹配，查到一个表象，表象里有action，然后就会执行对应的action，如forward、drop、header rewrite。然后报文再出去。这是ASAP简单的处理流程。
 
-  
-
 除此之外，eswitch可以做tunnal头的encap和decap。识别隧道报文，然后进行封包解包。VxLAN、GRE等。
-
-  
-
   
 
 那么，eswitch向上如何呈现？或者说如何使用？

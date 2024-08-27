@@ -1,12 +1,9 @@
-# 
 
 Linux爱好者
 
  _2021年10月07日 11:50_
 
 The following article is from 奇伢云存储 Author 奇伢
-
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4hc7tFZP4icTrg4hc2Ic8ibCyiay1WymOVzcVbVWibLVSblw/0)
 
@@ -28,7 +25,6 @@ socket fd 长什么样子？
 
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
 
 什么是 socket fd ？粗糙的来讲，就是网络 fd，比如我们最常见的 C/S 客户端服务端的编程模式，就是网络通信的一种方式。撇开底层和协议细节，**网络通信**和**文件读写**从接口上有本质区别吗？  
 

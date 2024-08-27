@@ -1,12 +1,9 @@
-# 
 
 Linux内核之旅
 
  _2021年11月22日 10:06_
 
 The following article is from Linux内核那些事 Author songsong001
-
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6dwH9qJmWO5T0Rnsiaib5jEUibibJgLmkkG02PrbyOWab4UA/0)
 

@@ -18,6 +18,18 @@
                 "source": false
               }
             }
+          },
+          {
+            "id": "34d0339386a1f6c8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "0x00-graph/linux/schedule.md",
+                "mode": "source",
+                "source": false
+              }
+            }
           }
         ]
       }
@@ -48,7 +60,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "Shopee 送命题：进程切换为什么比线程切换慢",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -148,24 +160,44 @@
   },
   "active": "3d83eb1179956a39",
   "lastOpenFiles": [
-    "coding/os/linux/全方位剖析内核抢占机制.md",
-    "coding/os/linux/驱动加载的本质.md",
-    "coding/os/linux/浅析Linux sockfs文件系统.md",
-    "0x99-image/Pasted image 20240826200605.png",
-    "coding/os/NOC总线架构拓扑介绍（转载）.md",
-    "coding/os/RISC-V Linux 内核技术文章合集 第 7 期.md",
+    "0x00-graph/linux/schedule.md",
+    "coding/os/linux/CFS任务放置代码详解.md",
+    "coding/os/linux/block io生命历程.md",
+    "coding/os/linux/arm64 cache机制分析.md",
+    "coding/os/linux/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
+    "coding/os/一文看懂 GDB底层实现原理.md",
+    "coding/os/linux/books",
     "coding/os/Shopee 送命题：进程切换为什么比线程切换慢.md",
-    "coding/reverse-engineering/内核层的三种Hook技术的使用.md",
-    "coding/os/linux/内存泄漏-原因、避免以及定位.md",
-    "coding/os/linux/内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/架构必知：Linux性能优化全景指南（建议收藏）.md",
-    "coding/os/linux/架构必知：深入理解Linux IO系统.md",
-    "coding/os/linux/基于qemu手写vhost virtio，简化虚拟设备通信.md",
-    "coding/os/linux/好书推荐--《代码优化：有效使用内存》.md",
-    "coding/os/linux/从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
-    "coding/os/linux/彻底搞懂IO多路复用.md",
-    "0x00-graph/linux/io.md",
+    "coding/os/RISC-V Linux 内核技术文章合集 第 7 期.md",
+    "coding/os/linux/books/《邱铁 - Linux 内核API完全参考手册》.md",
+    "README.md",
+    "coding/os/linux/0x01-/Untitled",
+    "coding/os/linux/0x01-",
+    "coding/network/深入理解 Linux socket.md",
+    "coding/0x00-books",
+    "0x00-graph/linux/CMA-DMA.md",
+    "coding/network/QUIC/实战 QUIC 协议助力腾讯业务提速 30%.md",
+    "coding/network/TCP",
+    "Untitled",
+    "coding/network/QUIC",
+    "0x00-graph/linux/network/QUIC.md",
+    "0x00-graph/linux/network/network.md",
+    "0x00-graph/linux/network/TCP.md",
+    "0x00-graph/linux/BPF.md",
+    "0x00-graph/linux/network",
+    "coding/network/如果让你来设计网络，你会把它弄成啥样？.md",
+    "0x00-graph/compiler.md",
+    "coding/os/linux/Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
+    "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
+    "0x00-graph/linux/0x00-linux.md",
+    "coding/network/TCP/告别 TCP！.md",
+    "coding/network/向左向右 网络IO卸载.md",
+    "coding/network/25 张图，一万字，拆解 Linux 网络包发送过程.md",
+    "coding/network/（超）低延迟视频流传输的未来.md",
+    "coding/algorithm/leetcode-grandyang",
+    "self-improvement/80c0f5a70583f670c050228034d0070a.jpg",
+    "test",
+    "0x99-image/Pasted image 20240826200605.png",
     "0x99-image/Pasted image 20240826200923.png",
     "0x99-image/Pasted image 20240826200853.png",
     "0x99-image/Pasted image 20240826200840.png",
@@ -173,26 +205,6 @@
     "0x99-image/Pasted image 20240826200805.png",
     "0x99-image/Pasted image 20240826200747.png",
     "0x99-image/Pasted image 20240826200727.png",
-    "0x99-image/Pasted image 20240826200711.png",
-    "0x99-image/Pasted image 20240826200655.png",
-    "coding/os/linux/超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
-    "coding/os/linux/案例分析 - 内存泄露的排查方法.md",
-    "coding/os/linux/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
-    "coding/os/linux/7 张图，轻松掌握零拷贝原理.md",
-    "coding/os/linux/【万字长文】带你搞定MMU&TLB&TWU.md",
-    "coding/os/linux/「linux」孤儿进程与僵尸进程产生及其处理.md",
-    "coding/os/linux/“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
-    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
-    "coding/os/linux/BPF/eBPF综述 已付费.md",
-    "0x99-image",
-    "entrance-point/Untitled",
-    "0x00-graph/linux",
-    "0x00-graph",
-    "communication",
-    "coding/frontend/Untitled",
-    "coding/architecture/Untitled",
-    "coding/reverse-engineering/Untitled",
-    "coding/database/Untitled",
-    "society"
+    "0x99-image/Pasted image 20240826200711.png"
   ]
 }

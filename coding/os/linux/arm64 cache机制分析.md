@@ -1,4 +1,3 @@
-# 
 
 原创 LoyenWang LoyenWang
 
@@ -26,7 +25,6 @@
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/OtawKxIaP3ibe3fE48wFnb4sG5icQcYYTJkWh7ec6uzFF46sMYUaV3NmicMzVYnTV8t8OWHlgvulXOI0Cy5GOOFjQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
-  
 
 - 不同存储器技术的访问时间差异很大，CPU和主存的速度差距在增大，如果直接从主存进行数据的load/store，CPU的大部分时间将会处在等待的状态；
     
@@ -36,8 +34,6 @@
 以ARMv8的CPU架构为例：
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/OtawKxIaP3ibe3fE48wFnb4sG5icQcYYTJ1hdfRtHnL2fWYZvdpjIYQ3Xme31Zncso3YDI8zDJNeuZiaWANcGWOdA/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
-  
 
 - ARMv架构的CPU通常包含两级或多级cache；
     
@@ -71,7 +67,6 @@
 - `Way`：cache分成大小相同的子块，每个子块以相同的方式进行索引；
     
 - `Set`：所有`Way`中相同的索引对应的`cache line`组成的集合；
-    
 
 ## 2.2 cache映射
 
@@ -79,7 +74,6 @@
 
 直接映射的方式如下：
 
-  
 
 - 图中的示例cache只有四个缓存行，内存中`index域`相同的地址，都会映射到cache中的同一行上；
     
@@ -93,8 +87,6 @@
 ### 2.2.2 set associative
 
 组相连的映射方式如下：
-
-  
 
 - 组相联方式在现代处理器中得到广泛的使用；
     
@@ -134,8 +126,6 @@
 
   
 
-  
-
 ## 2.4 cache分类
 
 先来看看cache中的重名(`aliasing`)问题和同名(`homonyms`)问题：
@@ -146,8 +136,6 @@
     
 - 引入的问题包括：1）浪费cache的空间，造成性能下降；2）写操作时可能造成cache数据更新不一致，造成物理地址在cache中维护多个不同的数据；
     
-
-  
 
 - `homonyms`：相同的虚拟地址映射到不同的物理地址；
     

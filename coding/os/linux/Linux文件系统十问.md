@@ -5,7 +5,6 @@ Linux爱好者
 
 以下文章来源于开发内功修炼 ，作者张彦飞allen
 
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5PSTGibsjHYiaRMmoGJxNMm8VFPdHQgvCVyBuEibNnqLMwA/0)
 
@@ -50,7 +49,6 @@ Linux爱好者
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/BBjAFF4hcwo2yKthDibQx0hPyQNmD6fc5Nmv5fUvsKA6CQg15C2alR97XtMCGAT6FiayewBK6AWDFtehBUrO59Iw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
   
-
 本人爱上 Linux 的一个原因就是只要你愿意下功夫，你就能把 Linux 的内部逻辑彻底铺开来看，这点比 Windows 要好太多了。Linux 上可以通过 fdisk 命令，来查看当前系统使用的磁盘的这些物理信息。  
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/BBjAFF4hcwo2yKthDibQx0hPyQNmD6fc5gCUdNiczJNSVYicjiaVQ0t8M5MmUeMY0SyAIbhP3IFxeAm2D3M4pOnjWw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)

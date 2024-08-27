@@ -5,7 +5,6 @@ CPP开发者
 
 以下文章来源于鹅厂架构师 ，作者sTGW-QUIC
 
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6kTFJr72TDAXYicYmJibCVwYyxwcv4V10gMdLVu3ia68l2w/0)
 
