@@ -1,4 +1,3 @@
-# 
 
 Linux内核之旅
 
@@ -10,7 +9,6 @@ Editor's Note
 
 The following article is from 技术简说 Author 董旭
 
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5b9FrINsvZl3ribRAQicibVs74cJ9zMmiagjpZREkxAeAFuQ/0)
 
@@ -24,7 +22,6 @@ The following article is from 技术简说 Author 董旭
 
 浅析Linux sockfs文件系统
 
-  
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/EjWxxIM2EQI0YHzCpIYYwO0iaqh08EGCibYEjLqIqYm2CXPzmicQTkxqF453q1d9RcSicSLGjjCNyBsjDXdx8oDhcA/300?wx_fmt=png&wxfrom=19)
 

@@ -1,12 +1,9 @@
-# 
 
 Linux内核之旅
 
  _2021年11月12日 15:33_
 
 The following article is from 内核工匠 Author Stephen Fang
-
-[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6RLUCnKO3ibq4vBV8CTFqV5ibnt5e1aeIn8ZRoxrtproqA/0)
 

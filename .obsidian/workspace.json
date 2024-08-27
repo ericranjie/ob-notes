@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/BPF/BPF内核实现详解.md",
+                "file": "coding/os/linux/如何提升CMA利用率？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/BPF/BPF内核实现详解.md",
+                "file": "coding/os/linux/如何提升CMA利用率？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/BPF/BPF内核实现详解.md",
+                "file": "coding/os/linux/如何提升CMA利用率？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/BPF/BPF内核实现详解.md"
+                "file": "coding/os/linux/如何提升CMA利用率？.md"
               }
             }
           }
@@ -148,43 +148,43 @@
   },
   "active": "3d83eb1179956a39",
   "lastOpenFiles": [
-    "coding/os/linux/BPF/BPF案例分析(2)—XDP程序原理与案例讲解.md",
-    "coding/os/linux/BPF/BPF C 编程入门.md",
-    "coding/os/linux/BPF/BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
-    "coding/os/linux/图文详解 Linux 分页机制！.md",
-    "0x99-image/Pasted image 20240826090049.png",
+    "coding/os/linux/全方位剖析内核抢占机制.md",
+    "coding/os/linux/驱动加载的本质.md",
+    "coding/os/linux/浅析Linux sockfs文件系统.md",
+    "0x99-image/Pasted image 20240826200605.png",
+    "coding/os/NOC总线架构拓扑介绍（转载）.md",
+    "coding/os/RISC-V Linux 内核技术文章合集 第 7 期.md",
+    "coding/os/Shopee 送命题：进程切换为什么比线程切换慢.md",
+    "coding/reverse-engineering/内核层的三种Hook技术的使用.md",
+    "coding/os/linux/内存泄漏-原因、避免以及定位.md",
+    "coding/os/linux/内存管理：程序是如何被优雅的装载到内存中.md",
+    "coding/os/linux/架构必知：Linux性能优化全景指南（建议收藏）.md",
+    "coding/os/linux/架构必知：深入理解Linux IO系统.md",
+    "coding/os/linux/基于qemu手写vhost virtio，简化虚拟设备通信.md",
+    "coding/os/linux/好书推荐--《代码优化：有效使用内存》.md",
+    "coding/os/linux/从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
+    "coding/os/linux/彻底搞懂IO多路复用.md",
+    "0x00-graph/linux/io.md",
+    "0x99-image/Pasted image 20240826200923.png",
+    "0x99-image/Pasted image 20240826200853.png",
+    "0x99-image/Pasted image 20240826200840.png",
+    "0x99-image/Pasted image 20240826200823.png",
+    "0x99-image/Pasted image 20240826200805.png",
+    "0x99-image/Pasted image 20240826200747.png",
+    "0x99-image/Pasted image 20240826200727.png",
+    "0x99-image/Pasted image 20240826200711.png",
+    "0x99-image/Pasted image 20240826200655.png",
+    "coding/os/linux/超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
+    "coding/os/linux/案例分析 - 内存泄露的排查方法.md",
+    "coding/os/linux/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
+    "coding/os/linux/7 张图，轻松掌握零拷贝原理.md",
+    "coding/os/linux/【万字长文】带你搞定MMU&TLB&TWU.md",
+    "coding/os/linux/「linux」孤儿进程与僵尸进程产生及其处理.md",
+    "coding/os/linux/“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
+    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
+    "coding/os/linux/BPF/eBPF综述 已付费.md",
     "0x99-image",
-    "0x99-image/Pasted image 20240826090009.png",
-    "0x00-graph/linux/debug.md",
-    "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
-    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
-    "coding/os/linux/BPF/边缘网络 eBPF 超能力：eBPF map 原理与性能解析.md",
-    "coding/os/linux/Linux读写锁逻辑解析.md",
-    "coding/os/linux/Linux Kernel：内存分页机制核心原理.md",
-    "coding/os/linux/linux loop device 机制介绍.md",
-    "coding/os/linux/Linux Mmap映射：优化文件访问和共享内存.md",
-    "coding/os/linux/Linux后台开发调试经验分享.md",
-    "coding/os/linux/Linux加密文件系统eCryptfs介绍.md",
-    "coding/os/linux/linux内存回收(一）---kswapd回收.md",
-    "coding/os/linux/Linux内核 Netlink机制分析与使用.md",
-    "coding/os/linux/Linux内核-信号的传递过程.md",
-    "coding/os/linux/Linux内核调试的方式以及工具集锦.md",
-    "coding/os/linux/Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
-    "coding/os/linux/Linux系统虚拟化模型及障碍.md",
-    "coding/os/linux/Linux内核Makefile执行流程.md",
-    "coding/os/linux/Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
-    "coding/os/linux/Linux内核源码研读与实战演练 (版本5.6.18).md",
-    "0x00-graph/linux/memory.md",
-    "coding/os/linux/Linux kernel中栈的介绍.md",
-    "coding/os/linux/Linux IO 那些事儿.md",
-    "0x99-image/Pasted image 20240826094141.png",
-    "0x99-image/Pasted image 20240826094128.png",
-    "0x99-image/Pasted image 20240826094109.png",
-    "0x99-image/Pasted image 20240826094055.png",
-    "0x99-image/Pasted image 20240826094041.png",
-    "0x99-image/Pasted image 20240826094026.png",
-    "0x99-image/Pasted image 20240826094011.png",
-    "0x99-image/Pasted image 20240826093958.png",
     "entrance-point/Untitled",
     "0x00-graph/linux",
     "0x00-graph",
