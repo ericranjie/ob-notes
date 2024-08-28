@@ -1,22 +1,18 @@
 
-
 Original 字节跳动STE团队 字节跳动SYS Tech
 
  _2023年07月21日 19:33_ _北京_
 
 导语：ASAN(AddressSanitizer) 是 C/C++开发者常用的内存错误检测工具，主要用于检测缓冲区溢出、访问已释放的内存等内存错误。AArch64 上提供了 Top-Byte-Ingore 硬件特性，HWASan(HardWare-assisted AddressSanitizer) 就是利用 Top-Byte-Ignore 特性实现的增强版 ASan，与 ASAN 相比 HWASan 的内存开销更低，检测到的内存错误范围更大。因此在 AArch64 平台，建议使用 HWASAN。本篇文章将深入分析 HWASAN 检测内存错误的原理，帮助大家更好地理解和使用 HWASan 来排查程序中存在的疑难内存错误。
 
-  
 
 **前言**
 
 在字节跳动，C++语言被广泛应用在各个业务中，由于C++语言的特性，导致 C++ 程序很容易出现内存问题。ASAN 等内存检测工具在字节跳动内部已经取得了可观的收益和效果（更多内容请查看视频分享：Sanitizer 在字节跳动 C/C++ 业务中的实践：https://www.bilibili.com/video/BV1YT411Q7BU/），服务于60个业务线，近一年协助修复上百个内存缺陷。但是仍然有很大的提升空间，特别是在性能开销方面。随着 ARM 进入服务器芯片市场，ARM 架构下的一些硬件特性可以用来缓解 ASAN 工具的性能问题，利用这些硬件特性研发的 HWASAN 检测工具在超大型 C++ 服务上的检测能力还有待确认。
 
   
-
 为此，STE 团队对 HWASAN 进行了深入分析，并在字节跳动 C++ 核心服务上进行了落地验证。在落地 HWASAN 过程中，修复了 HWASAN 实现中的一些关键 bug，并对易用性进行了提升。相关 patch 已经贡献到LLVM开源社区（详情请查看文末链接）。本篇文章将深入分析 HWASAN 检测内存错误的原理，帮助大家更好地理解和使用 HWASan 来排查程序中存在的疑难内存错误。
 
-  
 
 **概述**
 

@@ -1,12 +1,9 @@
 
-
 闻茂泉 深入浅出BPF
 
  _2024年03月18日 12:09_ _上海_
 
-**01**
-
-**欲穷千里目，更上一层楼**
+**01** **欲穷千里目，更上一层楼**
 
 在上一篇文章《[eBPF动手实践系列二：构建基于纯C语言的eBPF项目](https://mp.weixin.qq.com/s?__biz=MzUwOTkwNzQxMg==&mid=2247485351&idx=1&sn=5025af06acf375c6aeb0f03700f7ce6c&scene=21#wechat_redirect)》中，我们初步实现了脱离内核源码进行纯C语言eBPF项目的构建。libbpf库在早期和内核源码结合的比较紧密，如今的libbpf库更加成熟，已经完全脱离内核源码独立发展。
 
@@ -24,9 +21,7 @@ $ cat ./source/tools/lib/bpf/libbpf.map | grep -oE '^LIBBPF_([0-9.]+)' | sort -r
 $ cat ./source/tools/lib/bpf/Makefile
 ```
 
-**02**
-
-**eBPF编程方案简介**
+**02** **eBPF编程方案简介**
 
 为了简化 eBPF程序的开发流程，降低开发者在使用 libbpf 库时的入门难度，libbpf-bootstrap 框架应运而生。基于libbpf-bootstrap框架的编程方案是目前网络上看到的最主流编程方案。此外，网络上也偶见比较古老的仅依赖一个bpf_load.c文件的C语言编程方案，这个方案并不需要依赖libbpf库的支持。
 
@@ -49,9 +44,7 @@ $ cat ./source/tools/lib/bpf/Makefile
 
 本文将由浅入深介绍第 2 代原生libbpf库的eBPF编程方案，并提出一种改进思路。
 
-**03**
-
-**准备eBPF开发的基础环境**
+**03** **准备eBPF开发的基础环境**
 
 主流的linux发行版大多是基于rpm包或deb包的包管理系统。不同的包管理系统，初始化eBPF开发环境时所依赖的包，也略有差别。本文将分别进行介绍。
 
@@ -75,9 +68,7 @@ $  yum install git make                               # 基础包
 $  apt-get update                                     # 更新apt源信息
 ```
 
-**04**
-
-**构建基于原生libbpf库的eBPF项目**
+**04** **构建基于原生libbpf库的eBPF项目**
 
 本文的目的是向大家分享一个以第2代 ebpf 编程方案为基础的改进ebpf编译构建方案。本节先用一些篇幅内容，对第2代方案本身的构建编译过程做一些介绍。
 
