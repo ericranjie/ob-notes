@@ -54,7 +54,9 @@
 
 那么系统如果没有LSE扩展呢，即armv8.0，其实现的原型如下所示，这段代码中最核心的也就是ldxr、stxr指令了。
 
-`(linux/arch/arm64/include/asm/atomic_ll_sc.h)      static inline void __ll_sc_atomic_##op(int i, atomic_t *v)\   {         \    unsigned long tmp;      \    int result;       \            \    asm volatile("// atomic_" #op "\n"    \    __LL_SC_FALLBACK(      \   " prfm pstl1strm, %2\n"     \   "1: ldxr %w0, %2\n"      \   " " #asm_op " %w0, %w0, %w3\n"    \   " stxr %w1, %w0, %2\n"      \   " cbnz %w1, 1b\n")      \    : "=&r" (result), "=&r" (tmp), "+Q" (v->counter)  \    : __stringify(constraint) "r" (i));    \   }   `
+```c
+(linux/arch/arm64/include/asm/atomic_ll_sc.h)      static inline void __ll_sc_atomic_##op(int i, atomic_t *v)\   {         \    unsigned long tmp;      \    int result;       \            \    asm volatile("// atomic_" #op "\n"    \    __LL_SC_FALLBACK(      \   " prfm pstl1strm, %2\n"     \   "1: ldxr %w0, %2\n"      \   " " #asm_op " %w0, %w0, %w3\n"    \   " stxr %w1, %w0, %2\n"      \   " cbnz %w1, 1b\n")      \    : "=&r" (result), "=&r" (tmp), "+Q" (v->counter)  \    : __stringify(constraint) "r" (i));    \   } 
+```
 
 那么在armv8.0之前呢，如armv7是怎样实现的？如下所示， 这段代码中最核心的也就是ldrex、strex指令了。
 
@@ -109,7 +111,8 @@
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-`(linux/include/linux/spinlock.h)      static __always_inline void spin_unlock(spinlock_t *lock)   {    raw_spin_unlock(&lock->rlock);   }         static __always_inline void spin_lock(spinlock_t *lock)   {    raw_spin_lock(&lock->rlock);   }   `
+```c
+(linux/include/linux/spinlock.h)      static __always_inline void spin_unlock(spinlock_t *lock)   {    raw_spin_unlock(&lock->rlock);   }         static __always_inline void spin_lock(spinlock_t *lock)   {    raw_spin_lock(&lock->rlock);   }   `
 
 `(linux/include/linux/spinlock.h)      #define raw_spin_lock_irq(lock)  _raw_spin_lock_irq(lock)   #define raw_spin_lock_bh(lock)  _raw_spin_lock_bh(lock)   #define raw_spin_unlock(lock)  _raw_spin_unlock(lock)   #define raw_spin_unlock_irq(lock) _raw_spin_unlock_irq(lock)         #define raw_spin_lock(lock) _raw_spin_lock(lock)   `
 
@@ -117,13 +120,17 @@
 
 `(linux/include/linux/spinlock_api_smp.h)      static inline void __raw_spin_unlock(raw_spinlock_t *lock)   {    spin_release(&lock->dep_map, _RET_IP_);    do_raw_spin_unlock(lock);    preempt_enable();   }      static inline void __raw_spin_lock(raw_spinlock_t *lock)   {    preempt_disable();    spin_acquire(&lock->dep_map, 0, 0, _RET_IP_);    LOCK_CONTENDED(lock, do_raw_spin_trylock, do_raw_spin_lock);   }   `
 
-`(linux/include/linux/spinlock.h)      static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)   {    mmiowb_spin_unlock();    arch_spin_unlock(&lock->raw_lock);    __release(lock);   }      static inline void do_raw_spin_lock(raw_spinlock_t *lock) __acquires(lock)   {    __acquire(lock);    arch_spin_lock(&lock->raw_lock);    mmiowb_spin_lock();   }   `
+`(linux/include/linux/spinlock.h)      static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)   {    mmiowb_spin_unlock();    arch_spin_unlock(&lock->raw_lock);    __release(lock);   }      static inline void do_raw_spin_lock(raw_spinlock_t *lock) __acquires(lock)   {    __acquire(lock);    arch_spin_lock(&lock->raw_lock);    mmiowb_spin_lock();   }   
+```
 
 对于arch_spin_lock()、arch_spin_unlock()的底层实现，不同的kernel版本也一直在变化。
 
 对于kernel4.4这个版本，还是比较好理解的，最核心的也就是ldaxr、ldaxr独占指令 ，以及stlrh release指令
 
-`(linux/arch/arm64/include/asm/spinlock.h)      static inline void arch_spin_lock(arch_spinlock_t *lock)   {    unsigned int tmp;    arch_spinlock_t lockval, newval;       asm volatile(    /* Atomically increment the next ticket. */    ARM64_LSE_ATOMIC_INSN(    /* LL/SC */   " prfm pstl1strm, %3\n"   "1: ldaxr %w0, %3\n"   " add %w1, %w0, %w5\n"   " stxr %w2, %w1, %3\n"   " cbnz %w2, 1b\n",    /* LSE atomics */   " mov %w2, %w5\n"   " ldadda %w2, %w0, %3\n"   " nop\n"   " nop\n"   " nop\n"    )       /* Did we get the lock? */   " eor %w1, %w0, %w0, ror #16\n"   " cbz %w1, 3f\n"    /*     * No: spin on the owner. Send a local event to avoid missing an     * unlock before the exclusive load.     */   " sevl\n"   "2: wfe\n"   " ldaxrh %w2, %4\n"   " eor %w1, %w2, %w0, lsr #16\n"   " cbnz %w1, 2b\n"    /* We got the lock. Critical section starts here. */   "3:"    : "=&r" (lockval), "=&r" (newval), "=&r" (tmp), "+Q" (*lock)    : "Q" (lock->owner), "I" (1 << TICKET_SHIFT)    : "memory");   }         static inline void arch_spin_unlock(arch_spinlock_t *lock)   {    unsigned long tmp;       asm volatile(ARM64_LSE_ATOMIC_INSN(    /* LL/SC */    " ldrh %w1, %0\n"    " add %w1, %w1, #1\n"    " stlrh %w1, %0",    /* LSE atomics */    " mov %w1, #1\n"    " nop\n"    " staddlh %w1, %0")    : "=Q" (lock->owner), "=&r" (tmp)    :    : "memory");   }   `
+```c
+(linux/arch/arm64/include/asm/spinlock.h)      static inline void arch_spin_lock(arch_spinlock_t *lock)   {    unsigned int tmp;    arch_spinlock_t lockval, newval;       asm volatile(    /* Atomically increment the next ticket. */    ARM64_LSE_ATOMIC_INSN(    /* LL/SC */   " prfm pstl1strm, %3\n"   "1: ldaxr %w0, %3\n"   " add %w1, %w0, %w5\n"   " stxr %w2, %w1, %3\n"   " cbnz %w2, 1b\n",    /* LSE atomics */   " mov %w2, %w5\n"   " ldadda %w2, %w0, %3\n"   " nop\n"   " nop\n"   " nop\n"    )       /* Did we get the lock? */   " eor %w1, %w0, %w0, ror #16\n"   " cbz %w1, 3f\n"    /*     * No: spin on the owner. Send a local event to avoid missing an     * unlock before the exclusive load.     */   " sevl\n"   "2: wfe\n"   " ldaxrh %w2, %4\n"   " eor %w1, %w2, %w0, lsr #16\n"   " cbnz %w1, 2b\n"    /* We got the lock. Critical section starts here. */   "3:"    : "=&r" (lockval), "=&r" (newval), "=&r" (tmp), "+Q" (*lock)    : "Q" (lock->owner), "I" (1 << TICKET_SHIFT)    : "memory");   }         static inline void arch_spin_unlock(arch_spinlock_t *lock)   {    unsigned long tmp;       asm volatile(ARM64_LSE_ATOMIC_INSN(    /* LL/SC */    " ldrh %w1, %0\n"    " add %w1, %w1, #1\n"    " stlrh %w1, %0",    /* LSE atomics */    " mov %w1, #1\n"    " nop\n"    " staddlh %w1, %0")    : "=Q" (lock->owner), "=&r" (tmp)    :    : "memory");   }
+```
+
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "虚线阴影分割线")
 

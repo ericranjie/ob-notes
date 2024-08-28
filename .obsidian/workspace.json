@@ -4,16 +4,40 @@
     "type": "split",
     "children": [
       {
-        "id": "d4a7558516443612",
+        "id": "f730344563a1f6df",
         "type": "tabs",
         "children": [
           {
-            "id": "c124e3ed1ab908f4",
+            "id": "3d83eb1179956a39",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/Kubernetes 微内核的分布式操作系统.md",
+                "file": "coding/os/linux/memory/Meltdown论文翻译.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "1614ee9488341ff2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Interview.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "34d0339386a1f6c8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "0x00-graph/linux/schedule.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +72,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "蓝牙协议分析(10)_BLE安全机制之LE Encryption",
+                "query": "Shopee 送命题：进程切换为什么比线程切换慢",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +109,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/Kubernetes 微内核的分布式操作系统.md",
+                "file": "coding/os/linux/memory/Meltdown论文翻译.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +126,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/Kubernetes 微内核的分布式操作系统.md",
+                "file": "coding/os/linux/memory/Meltdown论文翻译.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +149,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/Kubernetes 微内核的分布式操作系统.md"
+                "file": "coding/os/linux/memory/Meltdown论文翻译.md"
               }
             }
           }
@@ -146,44 +170,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "c124e3ed1ab908f4",
+  "active": "3d83eb1179956a39",
   "lastOpenFiles": [
-    "README.md",
-    "coding/os/linux/debug/ftrace时间精度issue修复.md",
-    "coding/os/linux/CPU/CPU 多核指令 —— WFE 原理.md",
-    "coding/os/linux/BPF/Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
-    "coding/os/linux/BPF/Linux eBPF学习路径.md",
-    "coding/os/linux/BPF/eBPF综述 已付费.md",
-    "coding/os/linux/BPF/eBPF技术应用云原生网络实践系列之kubernetes网络.md",
-    "coding/os/linux/BPF/eBPF动手实践系列三：基于原生libbpf库的eBPF编程改进方案.md",
-    "coding/os/linux/BPF/eBPF Talk ringbuf 经验分享.md",
-    "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
-    "coding/os/linux/BPF/BPF内核实现详解.md",
-    "coding/os/linux/BPF/边缘网络 eBPF 超能力：eBPF map 原理与性能解析.md",
-    "coding/os/linux/memory/内存初始化代码分析（二）：内存布局.md",
-    "coding/os/linux/memory/内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/os/linux/device/bluetooth/蓝牙协议分析(9)_BLE安全机制之LL Privacy.md",
-    "coding/os/linux/device/基于Hikey的 Boot from USB 调试.md",
-    "coding/os/linux/device/eMMC/MMC SD SDIO介绍.md",
-    "coding/os/linux/device/eMMC/eMMC 原理 1 ：Flash Memory 简介.md",
-    "coding/os/linux/device/eMMC/Linux MMC framework(1)_软件架构.md",
-    "coding/os/linux/device/eMMC/eMMC 原理 2 ：eMMC 简介.md",
-    "coding/os/linux/图解 Linux进程通信 - 管道实现.md",
-    "coding/os/linux/「linux」孤儿进程与僵尸进程产生及其处理.md",
-    "coding/os/ARM/ARM Linux上的系统调用代码分析.md",
-    "coding/os/linux/schedule/Linux系统如何标识进程？.md",
-    "coding/os/linux/Debian8 内核升级实验.md",
-    "coding/os/linux/device/eMMC/eMMC 原理 4 ：总线协议.md",
-    "coding/os/linux/device/eMMC",
+    "coding/os/linux/memory/Linux 内存管理窥探：页面回收 (LRU).md",
+    "coding/os/linux/io/block io生命历程.md",
+    "coding/os/linux/arm64 cache机制分析.md",
+    "coding/os/linux/memory/7 张图，轻松掌握零拷贝原理.md",
+    "coding/os/linux/process/「linux」孤儿进程与僵尸进程产生及其处理.md",
+    "coding/os/linux/schedule/Kernel同步机制的底层实现.md",
+    "coding/os/linux/process",
+    "coding/os/linux/io/Linux IO 那些事儿.md",
+    "coding/os/linux/Linux kernel中栈的介绍.md",
+    "coding/os/linux/io",
+    "coding/os/linux/Linux Kernel：内存分页机制核心原理.md",
+    "coding/os/linux/如何提升CMA利用率？.md",
+    "0x00-graph/linux/schedule.md",
+    "Interview.md",
+    "coding/os/蜗窝微信群问题整理.md",
+    "coding/os/linux/schedule/RCU/RCU（2）- 使用方法.md",
+    "coding/os/linux/schedule/RCU/RCU（1）- 概述.md",
+    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
+    "coding/os/linux/schedule/CFS/CFS调度器（6）-总结.md",
+    "coding/os/linux/schedule/CFS/CFS调度器（5）-带宽控制.md",
+    "coding/os/linux/schedule/CFS/CFS调度器（4）-PELT(per entity load tracking).md",
+    "coding/os/linux/schedule/CFS/CFS调度器（3）-组调度.md",
+    "coding/os/linux/schedule/CFS/CFS调度器（2）-源码解析.md",
+    "coding/os/linux/schedule/CFS/CFS调度器（1）-基本原理.md",
+    "coding/os/linux/schedule/CFS/CFS任务的负载均衡（概述）.md",
+    "coding/os/linux/schedule/CFS/CFS任务的负载均衡（任务放置）.md",
+    "coding/os/linux/schedule/CFS/CFS任务的负载均衡（load balance）.md",
+    "coding/os/linux/schedule/CFS/CFS任务放置代码详解.md",
+    "coding/os/linux/schedule/RCU",
+    "coding/os/linux/schedule/CFS",
+    "coding/os/linux/schedule",
     "coding/os/linux/modules/timer",
     "coding/os/linux/modules",
-    "coding/os/linux/device/bluetooth",
-    "coding/os/linux/debug",
-    "coding/compiler",
-    "coding/os/linux/schedule/RCU",
-    "coding/os/linux/filesystem",
     "coding/os/linux/memory",
-    "coding/os/linux/schedule/CFS",
+    "coding/os/linux/filesystem",
+    "coding/os/linux/device/eMMC",
     "self-improvement/80c0f5a70583f670c050228034d0070a.jpg",
     "0x99-image/Pasted image 20240826200605.png",
     "0x99-image/Pasted image 20240826200923.png",
