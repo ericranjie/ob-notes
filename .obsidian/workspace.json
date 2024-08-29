@@ -8,30 +8,6 @@
         "type": "tabs",
         "children": [
           {
-            "id": "3d83eb1179956a39",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "coding/network/Linux 虚拟网络设备之 bridge.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "1614ee9488341ff2",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Interview.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
             "id": "34d0339386a1f6c8",
             "type": "leaf",
             "state": {
@@ -43,8 +19,7 @@
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -110,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "Interview.md",
+                "file": "0x00-graph/linux/schedule.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -127,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "Interview.md",
+                "file": "0x00-graph/linux/schedule.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -150,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "Interview.md"
+                "file": "0x00-graph/linux/schedule.md"
               }
             }
           }
@@ -171,22 +146,38 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "1614ee9488341ff2",
+  "active": "34d0339386a1f6c8",
   "lastOpenFiles": [
-    "README.md",
-    "Welcome.md",
+    "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
+    "coding/os/linux/io/彻底搞懂IO多路复用.md",
+    "coding/os/linux/device/学习下 eMMC.md",
+    "coding/os/linux/memory/图文详解 Linux 分页机制！.md",
+    "coding/os/linux/debug/内核内存错误检测工具KFENCE.md",
+    "coding/os/linux/modules/图解 Linux进程通信 - 管道实现.md",
+    "coding/os/linux/learning/原创内核文章汇总.md",
+    "coding/os/linux/memory/内存管理：程序是如何被优雅的装载到内存中.md",
+    "coding/os/linux/schedule/全方位剖析内核抢占机制.md",
+    "coding/os/linux/shell/使用 logrotate 命令轮转和归档日志 Linux 中国.md",
+    "coding/os/linux/shell/使用 Linux 的 diff 和 patch 对文件进行协作.md",
+    "coding/os/linux/build/Linux如何从Boot到OS，再到应用程序？.md",
+    "coding/os/linux/shell",
+    "coding/os/linux/debug/使用 GDB + Qemu 调试 Linux 内核.md",
+    "coding/os/linux/io/关于linux io_uring性能测试及其 实现原理的一些探索.md",
+    "coding/os/linux/memory/从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
+    "coding/os/linux/schedule/从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/memory/五万字 深入理解Linux内存管理.md",
+    "coding/os/linux/BPF/万字长文 深入理解XDP全景指南.md",
+    "coding/os/linux/device/一文搞懂 Linux 驱动的来龙去脉.md",
+    "coding/os/linux/memory/一文读懂零拷贝技术｜splice原理与实现.md",
+    "coding/os/linux/一文看懂 fork 系统调用.md",
+    "coding/os/linux/virtual/QEMU虚拟机管理器：一种高效硬件模拟器.md",
+    "coding/os/linux/virtual/Linux系统虚拟化模型及障碍.md",
+    "coding/os/linux/virtual",
+    "coding/os/linux/schedule/什么时候需要cpu_relax()锁.md",
+    "coding/os/linux/memory/【万字长文】带你搞定MMU&TLB&TWU.md",
+    "coding/os/linux/performance/一文说清linux system load.md",
     "0x99-image/Pasted image 20240829154814.png",
-    "coding/os/linux/filesystem/Linux文件系统十问.md",
-    "coding/os/linux/performance/Linux系统性能优化：七个实战经验.md",
-    "coding/os/linux/learning/Linux系统那些硬核的黑科技技术.md",
-    "coding/os/linux/schedule/Linux读写锁逻辑解析 1.md",
-    "coding/os/linux/device/Linux驱动实践：带你一步一步编译内核驱动程序.md",
-    "coding/os/linux/learning/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
-    "coding/os/linux/learning/Linux内核源码研读与实战演练 (版本5.6.18).md",
-    "coding/os/linux/learning/Linux嵌入式所有知识点-思维导图-【一口君吐血奉献】.md",
     "coding/os/linux/learning",
-    "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
-    "coding/os/linux/build/Linux内核Makefile执行流程.md",
     "0x99-image/Pasted image 20240829155437.png",
     "0x99-image/Pasted image 20240829155424.png",
     "0x99-image/Pasted image 20240829155410.png",
@@ -196,28 +187,12 @@
     "0x99-image/Pasted image 20240829155255.png",
     "0x99-image/Pasted image 20240829155235.png",
     "0x99-image/Pasted image 20240829155221.png",
-    "coding/os/linux/build/Linux 内核的编译和模拟执行.md",
-    "coding/os/linux/build/Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
-    "coding/os/linux/build/Linux 动态链接过程中的【重定位】底层原理.md",
     "coding/os/linux/build",
-    "coding/os/linux/device/dm-verity原理剖析.md",
-    "coding/os/ARM/Linux kernel中栈的介绍.md",
-    "coding/os/linux/memory/mmap在arm64背后的那个深坑.md",
-    "coding/os/linux/debug/Linux后台开发调试经验分享.md",
-    "coding/os/linux/memory/多级cache之间的替换(缓存)策略.md",
-    "coding/os/linux/多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "Interview.md",
-    "coding/network/Linux 虚拟网络设备之 bridge.md",
-    "coding/network/linux loop device 机制介绍.md",
-    "coding/os/linux/performance/Linux性能优化全景指南.md",
-    "coding/os/linux/schedule/Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
     "coding/os/linux/timer",
     "coding/os/linux/performance",
     "coding/os/linux/memory/cache",
     "coding/os/linux/schedule/debug",
     "coding/os/linux/schedule/locking/Untitled",
-    "coding/os/linux/schedule/lock",
-    "coding/os/linux/schedule/deadline",
-    "coding/os/linux/memory/slub"
+    "coding/os/linux/schedule/lock"
   ]
 }
