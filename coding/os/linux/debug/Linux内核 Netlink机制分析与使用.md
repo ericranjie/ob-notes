@@ -6,7 +6,6 @@
 
 Linux内核 netlink机制分析与使用  
 
-  
 
 **前面文章分析了sockfs文件系统、socket底层的原理：**  
 

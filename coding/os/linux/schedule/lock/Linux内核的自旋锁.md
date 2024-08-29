@@ -208,7 +208,7 @@ typedef struct {
 spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock()  -> do_raw_spin_lock() -> arch_spin_lock()
 
 **arch/arm64/include/asm/spinlock.h**
-
+```c
 1    static inline void arch_spin_lock(arch_spinlock_t *lock)
 
 2    {
@@ -274,6 +274,7 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 32   : "memory");
 
 33  }
+```
 
 第6～18行代码，申请排队号，然后把自旋锁的排队号加1，这是一个原子操作，有两种实现方法：
 

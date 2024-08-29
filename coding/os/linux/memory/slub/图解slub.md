@@ -38,7 +38,7 @@ slub的数据结构相对于slab来说要简单很多。并且对外接口和sla
 ## 2.1. kmem_cache
 
 现在假如从伙伴系统分配一页内存供slub分配器管理。对于slub分配器来说，就是将这段连续内存平均分成若干大小相等的object（对象）进行管理。可是我们总得知道每一个object的size吧！管理的内存页数也是需要知道的吧！不然怎么知道如何分配呢！因此需要一个数据结构管理。那就是struct kmem_cache。kmem_cache数据结构描述如下：
-
+```c
 1. struct kmem_cache {
 2.     struct kmem_cache_cpu __percpu *cpu_slab;
 3.     /* Used for retriving partial slabs etc */
@@ -64,6 +64,7 @@ slub的数据结构相对于slab来说要简单很多。并且对外接口和sla
 23.     struct list_head list;  /* List of slab caches */
 24.     struct kmem_cache_node *node[MAX_NUMNODES];
 25. };
+```
 
 1)     cpu_slab：一个per cpu变量，对于每个cpu来说，相当于一个本地内存缓存池。当分配内存的时候优先从本地cpu分配内存以保证cache的命中率。
 

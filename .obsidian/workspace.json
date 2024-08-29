@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/Meltdown论文翻译.md",
+                "file": "coding/network/Linux 虚拟网络设备之 bridge.md",
                 "mode": "source",
                 "source": false
               }
@@ -43,7 +43,8 @@
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -72,7 +73,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "Shopee 送命题：进程切换为什么比线程切换慢",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -109,7 +110,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/Meltdown论文翻译.md",
+                "file": "Interview.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -126,7 +127,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/Meltdown论文翻译.md",
+                "file": "Interview.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -149,7 +150,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/Meltdown论文翻译.md"
+                "file": "Interview.md"
               }
             }
           }
@@ -170,53 +171,53 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "3d83eb1179956a39",
+  "active": "1614ee9488341ff2",
   "lastOpenFiles": [
-    "coding/os/linux/memory/Linux 内存管理窥探：页面回收 (LRU).md",
-    "coding/os/linux/io/block io生命历程.md",
-    "coding/os/linux/arm64 cache机制分析.md",
-    "coding/os/linux/memory/7 张图，轻松掌握零拷贝原理.md",
-    "coding/os/linux/process/「linux」孤儿进程与僵尸进程产生及其处理.md",
-    "coding/os/linux/schedule/Kernel同步机制的底层实现.md",
-    "coding/os/linux/process",
-    "coding/os/linux/io/Linux IO 那些事儿.md",
-    "coding/os/linux/Linux kernel中栈的介绍.md",
-    "coding/os/linux/io",
-    "coding/os/linux/Linux Kernel：内存分页机制核心原理.md",
-    "coding/os/linux/如何提升CMA利用率？.md",
-    "0x00-graph/linux/schedule.md",
+    "README.md",
+    "Welcome.md",
+    "0x99-image/Pasted image 20240829154814.png",
+    "coding/os/linux/filesystem/Linux文件系统十问.md",
+    "coding/os/linux/performance/Linux系统性能优化：七个实战经验.md",
+    "coding/os/linux/learning/Linux系统那些硬核的黑科技技术.md",
+    "coding/os/linux/schedule/Linux读写锁逻辑解析 1.md",
+    "coding/os/linux/device/Linux驱动实践：带你一步一步编译内核驱动程序.md",
+    "coding/os/linux/learning/30分钟读懂Linux五大模块内核源码，内核整体架构设计.md",
+    "coding/os/linux/learning/Linux内核源码研读与实战演练 (版本5.6.18).md",
+    "coding/os/linux/learning/Linux嵌入式所有知识点-思维导图-【一口君吐血奉献】.md",
+    "coding/os/linux/learning",
+    "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
+    "coding/os/linux/build/Linux内核Makefile执行流程.md",
+    "0x99-image/Pasted image 20240829155437.png",
+    "0x99-image/Pasted image 20240829155424.png",
+    "0x99-image/Pasted image 20240829155410.png",
+    "0x99-image/Pasted image 20240829155355.png",
+    "0x99-image/Pasted image 20240829155328.png",
+    "0x99-image/Pasted image 20240829155311.png",
+    "0x99-image/Pasted image 20240829155255.png",
+    "0x99-image/Pasted image 20240829155235.png",
+    "0x99-image/Pasted image 20240829155221.png",
+    "coding/os/linux/build/Linux 内核的编译和模拟执行.md",
+    "coding/os/linux/build/Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
+    "coding/os/linux/build/Linux 动态链接过程中的【重定位】底层原理.md",
+    "coding/os/linux/build",
+    "coding/os/linux/device/dm-verity原理剖析.md",
+    "coding/os/ARM/Linux kernel中栈的介绍.md",
+    "coding/os/linux/memory/mmap在arm64背后的那个深坑.md",
+    "coding/os/linux/debug/Linux后台开发调试经验分享.md",
+    "coding/os/linux/memory/多级cache之间的替换(缓存)策略.md",
+    "coding/os/linux/多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
     "Interview.md",
-    "coding/os/蜗窝微信群问题整理.md",
-    "coding/os/linux/schedule/RCU/RCU（2）- 使用方法.md",
-    "coding/os/linux/schedule/RCU/RCU（1）- 概述.md",
-    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
-    "coding/os/linux/schedule/CFS/CFS调度器（6）-总结.md",
-    "coding/os/linux/schedule/CFS/CFS调度器（5）-带宽控制.md",
-    "coding/os/linux/schedule/CFS/CFS调度器（4）-PELT(per entity load tracking).md",
-    "coding/os/linux/schedule/CFS/CFS调度器（3）-组调度.md",
-    "coding/os/linux/schedule/CFS/CFS调度器（2）-源码解析.md",
-    "coding/os/linux/schedule/CFS/CFS调度器（1）-基本原理.md",
-    "coding/os/linux/schedule/CFS/CFS任务的负载均衡（概述）.md",
-    "coding/os/linux/schedule/CFS/CFS任务的负载均衡（任务放置）.md",
-    "coding/os/linux/schedule/CFS/CFS任务的负载均衡（load balance）.md",
-    "coding/os/linux/schedule/CFS/CFS任务放置代码详解.md",
-    "coding/os/linux/schedule/RCU",
-    "coding/os/linux/schedule/CFS",
-    "coding/os/linux/schedule",
-    "coding/os/linux/modules/timer",
-    "coding/os/linux/modules",
-    "coding/os/linux/memory",
-    "coding/os/linux/filesystem",
-    "coding/os/linux/device/eMMC",
-    "self-improvement/80c0f5a70583f670c050228034d0070a.jpg",
-    "0x99-image/Pasted image 20240826200605.png",
-    "0x99-image/Pasted image 20240826200923.png",
-    "0x99-image/Pasted image 20240826200853.png",
-    "0x99-image/Pasted image 20240826200840.png",
-    "0x99-image/Pasted image 20240826200823.png",
-    "0x99-image/Pasted image 20240826200805.png",
-    "0x99-image/Pasted image 20240826200747.png",
-    "0x99-image/Pasted image 20240826200727.png",
-    "0x99-image/Pasted image 20240826200711.png"
+    "coding/network/Linux 虚拟网络设备之 bridge.md",
+    "coding/network/linux loop device 机制介绍.md",
+    "coding/os/linux/performance/Linux性能优化全景指南.md",
+    "coding/os/linux/schedule/Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
+    "coding/os/linux/timer",
+    "coding/os/linux/performance",
+    "coding/os/linux/memory/cache",
+    "coding/os/linux/schedule/debug",
+    "coding/os/linux/schedule/locking/Untitled",
+    "coding/os/linux/schedule/lock",
+    "coding/os/linux/schedule/deadline",
+    "coding/os/linux/memory/slub"
   ]
 }
