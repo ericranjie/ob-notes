@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x00-graph/linux/schedule.md",
+                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x00-graph/linux/schedule.md",
+                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x00-graph/linux/schedule.md",
+                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x00-graph/linux/schedule.md"
+                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md"
               }
             }
           }
@@ -148,34 +148,34 @@
   },
   "active": "34d0339386a1f6c8",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/内核抢占，让世界变得更美好.md",
+    "coding/os/linux/memory/论好名字的重要性： Linux内核page到folio的变迁.md",
+    "coding/os/linux/learning/高性能服务器开发学习专栏汇总.md",
+    "coding/os/linux/filesystem/文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
+    "coding/os/linux/performance/好书推荐--《代码优化：有效使用内存》.md",
+    "coding/os/linux/debug/内存泄漏-原因、避免以及定位.md",
+    "coding/os/linux/io/盘点Linux Epoll那些致命弱点.md",
+    "coding/os/linux/io/浅析Linux sockfs文件系统.md",
+    "coding/os/linux/如何提升CMA利用率？.md",
+    "coding/os/linux/device/驱动加载的本质.md",
+    "coding/os/linux/memory/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+    "coding/os/linux/schedule/多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
+    "coding/os/linux/memory/聊聊内存模型与内存序.md",
+    "coding/os/linux/memory/解决 Linux 内核 Section GC 失败问题 - Part 1.md",
+    "coding/os/linux/io/超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
+    "coding/os/linux/io/架构必知：深入理解Linux IO系统.md",
+    "coding/os/linux/io/大疆一面：请说出水平触发和边缘触发的区别？.md",
+    "coding/os/linux/memory/深入理解Linux内核之脏页跟踪.md",
+    "coding/os/linux/深入理解TLB.md",
+    "0x00-graph/linux/schedule.md",
     "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/io/彻底搞懂IO多路复用.md",
     "coding/os/linux/device/学习下 eMMC.md",
     "coding/os/linux/memory/图文详解 Linux 分页机制！.md",
     "coding/os/linux/debug/内核内存错误检测工具KFENCE.md",
     "coding/os/linux/modules/图解 Linux进程通信 - 管道实现.md",
-    "coding/os/linux/learning/原创内核文章汇总.md",
-    "coding/os/linux/memory/内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/schedule/全方位剖析内核抢占机制.md",
-    "coding/os/linux/shell/使用 logrotate 命令轮转和归档日志 Linux 中国.md",
-    "coding/os/linux/shell/使用 Linux 的 diff 和 patch 对文件进行协作.md",
-    "coding/os/linux/build/Linux如何从Boot到OS，再到应用程序？.md",
     "coding/os/linux/shell",
-    "coding/os/linux/debug/使用 GDB + Qemu 调试 Linux 内核.md",
-    "coding/os/linux/io/关于linux io_uring性能测试及其 实现原理的一些探索.md",
-    "coding/os/linux/memory/从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
-    "coding/os/linux/schedule/从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/memory/五万字 深入理解Linux内存管理.md",
-    "coding/os/linux/BPF/万字长文 深入理解XDP全景指南.md",
-    "coding/os/linux/device/一文搞懂 Linux 驱动的来龙去脉.md",
-    "coding/os/linux/memory/一文读懂零拷贝技术｜splice原理与实现.md",
-    "coding/os/linux/一文看懂 fork 系统调用.md",
-    "coding/os/linux/virtual/QEMU虚拟机管理器：一种高效硬件模拟器.md",
-    "coding/os/linux/virtual/Linux系统虚拟化模型及障碍.md",
     "coding/os/linux/virtual",
-    "coding/os/linux/schedule/什么时候需要cpu_relax()锁.md",
-    "coding/os/linux/memory/【万字长文】带你搞定MMU&TLB&TWU.md",
-    "coding/os/linux/performance/一文说清linux system load.md",
     "0x99-image/Pasted image 20240829154814.png",
     "coding/os/linux/learning",
     "0x99-image/Pasted image 20240829155437.png",
