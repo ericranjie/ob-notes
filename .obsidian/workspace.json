@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "f730344563a1f6df",
+        "id": "90206c78aac7eb0b",
         "type": "tabs",
         "children": [
           {
-            "id": "34d0339386a1f6c8",
+            "id": "e1a748f240a9d44c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md",
+                "file": "coding/os/linux/memory/linux kernel内存回收机制.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md",
+                "file": "coding/os/linux/memory/linux kernel内存回收机制.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md",
+                "file": "coding/os/linux/memory/linux kernel内存回收机制.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/io/深入揭秘 epoll 是如何实现 IO 多路复用的.md"
+                "file": "coding/os/linux/memory/linux kernel内存回收机制.md"
               }
             }
           }
@@ -146,34 +146,37 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "34d0339386a1f6c8",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/schedule/内核抢占，让世界变得更美好.md",
-    "coding/os/linux/memory/论好名字的重要性： Linux内核page到folio的变迁.md",
-    "coding/os/linux/learning/高性能服务器开发学习专栏汇总.md",
-    "coding/os/linux/filesystem/文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
-    "coding/os/linux/performance/好书推荐--《代码优化：有效使用内存》.md",
-    "coding/os/linux/debug/内存泄漏-原因、避免以及定位.md",
-    "coding/os/linux/io/盘点Linux Epoll那些致命弱点.md",
-    "coding/os/linux/io/浅析Linux sockfs文件系统.md",
-    "coding/os/linux/如何提升CMA利用率？.md",
-    "coding/os/linux/device/驱动加载的本质.md",
-    "coding/os/linux/memory/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
-    "coding/os/linux/schedule/多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "coding/os/linux/memory/聊聊内存模型与内存序.md",
-    "coding/os/linux/memory/解决 Linux 内核 Section GC 失败问题 - Part 1.md",
-    "coding/os/linux/io/超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
-    "coding/os/linux/io/架构必知：深入理解Linux IO系统.md",
-    "coding/os/linux/io/大疆一面：请说出水平触发和边缘触发的区别？.md",
-    "coding/os/linux/memory/深入理解Linux内核之脏页跟踪.md",
-    "coding/os/linux/深入理解TLB.md",
-    "0x00-graph/linux/schedule.md",
-    "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
-    "coding/os/linux/io/彻底搞懂IO多路复用.md",
-    "coding/os/linux/device/学习下 eMMC.md",
-    "coding/os/linux/memory/图文详解 Linux 分页机制！.md",
-    "coding/os/linux/debug/内核内存错误检测工具KFENCE.md",
-    "coding/os/linux/modules/图解 Linux进程通信 - 管道实现.md",
+    "coding/os/ARM/ARM64的启动过程之（二）：创建启动阶段的页表.md",
+    "coding/os/linux/device/Device Tree（二）：基本概念.md",
+    "coding/os/linux/process/Process Creation（二）.md",
+    "coding/os/linux/device/linux内核中的GPIO系统之（1）：软件框架.md",
+    "coding/os/linux/device/Linux设备模型(1)_基本概念.md",
+    "coding/os/linux/schedule/linux kernel的中断子系统之（八）：softirq.md",
+    "coding/os/linux/schedule/Linux kernel的中断子系统之（二）：IRQ Domain介绍.md",
+    "coding/os/linux/schedule/Linux内核同步机制之（二）：Per-CPU变量.md",
+    "coding/os/linux/schedule/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+    "coding/os/linux/device/Linux设备模型(2)_Kobject.md",
+    "coding/os/linux/device/Linux设备模型(3)_Uevent.md",
+    "coding/os/linux/device/Linux设备模型(4)_sysfs.md",
+    "coding/os/linux/device/Linux设备模型(5)_device和device driver.md",
+    "coding/os/linux/Untitled",
+    "coding/os/linux/device/Linux设备模型(6)_Bus.md",
+    "coding/os/linux/process/Process Creation（一）.md",
+    "coding/os/linux/device/Linux设备模型(8)_platform设备.md",
+    "coding/os/linux/device/Linux设备模型(7)_Class.md",
+    "coding/os/linux/device/Device Tree（一）：背景介绍.md",
+    "coding/os/linux/device/Device Tree（三）：代码分析.md",
+    "coding/os/linux/计算机科学基础知识（一）The Memory Hierarchy.md",
+    "coding/os/linux/schedule/Linux kernel的中断子系统之（六）：ARM中断处理过程.md",
+    "coding/os/linux/schedule/Linux kernel的中断子系统之（一）：综述.md",
+    "coding/os/linux/schedule/linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
+    "coding/os/linux/schedule/linux kernel的中断子系统之（四）：High level irq event handler.md",
+    "coding/os/linux/schedule/linux kernel的中断子系统之（七）：GIC代码分析.md",
+    "coding/os/linux/Linux电源管理(10)_autosleep.md",
+    "coding/os/linux/device/TTY",
+    "coding/os/linux/schedule/interrupt",
     "coding/os/linux/shell",
     "coding/os/linux/virtual",
     "0x99-image/Pasted image 20240829154814.png",
@@ -190,9 +193,6 @@
     "coding/os/linux/build",
     "coding/os/linux/timer",
     "coding/os/linux/performance",
-    "coding/os/linux/memory/cache",
-    "coding/os/linux/schedule/debug",
-    "coding/os/linux/schedule/locking/Untitled",
-    "coding/os/linux/schedule/lock"
+    "coding/os/linux/memory/cache"
   ]
 }
