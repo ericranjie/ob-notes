@@ -196,7 +196,7 @@ Adapting the pointer-publish example for the linked list results in the code sho
 Line 15 must be protected by some synchronization mechanism (most commonly some sort of lock) to prevent multiple list_add_rcu() instances from executing concurrently. However, such synchronization does not prevent this list_add() instance from executing concurrently with RCU readers.  
 Subscribing to an RCU-protected list is straightforward:
 
-上面第15行的代码必须使用某种同步机制来保护（一般会使用某种锁的机制），以便防止多个list_add_rcu()并发执行。当然，这种同步机制不会阻止并发的RCU reader thread。
+上面第15行的代码必须使用某种同步机制来保护（一般会使用某种锁的机制），以便防止多个list_add_rcu()并发执行。当然，这种同步机制不会阻止并 发的RCU reader thread。
 
 上面描述了如何公布于众（publish），我们再来看看如果derefence，代码如下：
 
