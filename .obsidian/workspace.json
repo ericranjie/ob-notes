@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "test/2024-09-01.md",
+                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "test/2024-09-01.md",
+                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "test/2024-09-01.md",
+                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "test/2024-09-01.md"
+                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md"
               }
             }
           }
@@ -146,8 +146,15 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e1a748f240a9d44c",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/device/X-014-KERNEL-ARM GIC driver的移植.md",
+    "coding/os/linux/x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
+    "coding/os/linux/schedule/perfbook memory barrier（14.2章节）的中文翻译（上）.md",
+    "coding/os/linux/schedule/RCU synchronize原理分析.md",
+    "test/阿卡西记录.md",
+    "test/2024-09-01.md",
+    "coding/os/linux/schedule/Perf book 9.3章节翻译（上）.md",
     "coding/os/linux/schedule/Linux2.6.23 ：sleepable RCU的实现.md",
     "coding/os/linux/schedule/Linux2.6.11版本：classic RCU的实现.md",
     "coding/os/linux/schedule/Linux kernel中断子系统之（五）：驱动申请中断API.md",
@@ -167,13 +174,6 @@
     "coding/os/linux/CPU/ARM CPU性能实验.md",
     "coding/os/ARM/为什么会有“ARMv8A Architecture”这个分类.md",
     "coding/os/ARM/ARM概念梳理：Architecture, Core, CPU，SOC.md",
-    "coding/os/ARM/ARMv8之Observability.md",
-    "coding/os/ARM/ARMv8-a架构简介.md",
-    "coding/os/ARM/ARM64架构下地址翻译相关的宏定义.md",
-    "coding/os/ARM/ARM WFI和WFE指令.md",
-    "coding/os/linux/memory/Linux内存模型.md",
-    "test/2024-09-01.md",
-    "coding/os/linux/memory/slub分配器.md",
     "coding/os/linux/Untitled",
     "coding/os/linux/device/TTY",
     "coding/os/linux/schedule/interrupt",
