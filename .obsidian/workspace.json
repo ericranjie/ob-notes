@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
+                "file": "coding/os/linux/memory/用快速固定块内存分配器替换 malloc free.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
+                "file": "coding/os/linux/memory/用快速固定块内存分配器替换 malloc free.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
+                "file": "coding/os/linux/memory/用快速固定块内存分配器替换 malloc free.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/process/进程管理和终端驱动：基本概念.md"
+                "file": "coding/os/linux/memory/用快速固定块内存分配器替换 malloc free.md"
               }
             }
           }
@@ -148,12 +148,25 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/device/X-014-KERNEL-ARM GIC driver的移植.md",
+    "coding/os/linux/memory/内存初始化（上）.md",
     "coding/os/linux/x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
+    "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md",
+    "coding/os/linux/schedule/Why Memory Barriers中文翻译（下）.md",
+    "coding/os/linux/schedule/Why Memory Barriers？中文翻译（上）.md",
+    "coding/os/linux/build/u-boot FIT image介绍.md",
+    "coding/os/linux/schedule/Perf book 9.3章节翻译（下）.md",
+    "coding/os/linux/build/systemd：为何要创建一个新的init系统软件.md",
+    "coding/os/linux/device/Linux电源管理(10)_autosleep.md",
+    "coding/os/linux/build/Debian8 内核升级实验.md",
+    "coding/os/linux/virtual/深入理解虚拟化.md",
+    "coding/os/linux/debug/自己动手写一个GDB 设置断点（原理篇）.md",
+    "test/阿卡西记录.md",
+    "test/init-mm.c.md",
+    "test/2024-09-01.md",
+    "coding/os/linux/process/进程管理和终端驱动：基本概念.md",
+    "coding/os/linux/device/X-014-KERNEL-ARM GIC driver的移植.md",
     "coding/os/linux/schedule/perfbook memory barrier（14.2章节）的中文翻译（上）.md",
     "coding/os/linux/schedule/RCU synchronize原理分析.md",
-    "test/阿卡西记录.md",
-    "test/2024-09-01.md",
     "coding/os/linux/schedule/Perf book 9.3章节翻译（上）.md",
     "coding/os/linux/schedule/Linux2.6.23 ：sleepable RCU的实现.md",
     "coding/os/linux/schedule/Linux2.6.11版本：classic RCU的实现.md",
@@ -161,19 +174,6 @@
     "coding/os/linux/schedule/Concurrency Managed Workqueue之（四）：workqueue如何处理work.md",
     "coding/os/linux/schedule/Concurrency Managed Workqueue之（三）：创建workqueue代码分析.md",
     "coding/os/linux/schedule/Concurrency Managed Workqueue之（一）：workqueue的基本概念.md",
-    "coding/os/linux/process/Linux进程冻结技术.md",
-    "coding/os/linux/memory/TLB flush操作.md",
-    "coding/os/linux/memory/Linux vm运行参数之（二）：OOM相关的参数.md",
-    "coding/os/linux/memory/Linux vm运行参数之（一）：overcommit相关的参数.md",
-    "coding/os/linux/memory/Fix-Mapped Addresses.md",
-    "coding/os/linux/memory/DRAM 原理 5 ：DRAM Devices Organization.md",
-    "coding/os/linux/memory/DRAM 原理 4 ：DRAM Timing.md",
-    "coding/os/linux/memory/DRAM 原理 3 ：DRAM Device.md",
-    "coding/os/linux/memory/DRAM 原理 1 ：DRAM Storage Cell.md",
-    "coding/os/linux/CPU/Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
-    "coding/os/linux/CPU/ARM CPU性能实验.md",
-    "coding/os/ARM/为什么会有“ARMv8A Architecture”这个分类.md",
-    "coding/os/ARM/ARM概念梳理：Architecture, Core, CPU，SOC.md",
     "coding/os/linux/Untitled",
     "coding/os/linux/device/TTY",
     "coding/os/linux/schedule/interrupt",
