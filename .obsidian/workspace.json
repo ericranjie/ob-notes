@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "f730344563a1f6df",
+        "id": "90206c78aac7eb0b",
         "type": "tabs",
         "children": [
           {
-            "id": "34d0339386a1f6c8",
+            "id": "e1a748f240a9d44c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/Perf book 9.3章节翻译（上）.md",
+                "file": "test/2024-09-01.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/Perf book 9.3章节翻译（上）.md",
+                "file": "test/2024-09-01.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/Perf book 9.3章节翻译（上）.md",
+                "file": "test/2024-09-01.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/Perf book 9.3章节翻译（上）.md"
+                "file": "test/2024-09-01.md"
               }
             }
           }
@@ -146,36 +146,37 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "34d0339386a1f6c8",
+  "active": "e1a748f240a9d44c",
   "lastOpenFiles": [
-    "coding/os/linux/Perf book 9.3章节翻译（下）.md",
-    "coding/os/linux/Perf book 9.3章节翻译（上）.md",
-    "coding/os/linux/process/Linux进程冻结技术.md",
-    "coding/os/ARM/为什么会有“ARMv8A Architecture”这个分类.md",
-    "coding/os/linux/memory/TLB flush操作.md",
-    "coding/os/linux/schedule/Linux2.6.11版本：classic RCU的实现.md",
-    "coding/os/linux/debug/Linux下“用户空间修改设备寄存器或者物理内存”的实现.md",
-    "coding/os/linux/memory/Linux vm运行参数之（二）：OOM相关的参数.md",
-    "coding/os/linux/build/Linux kernel内核配置解析(1)_概述(基于ARM64架构).md",
-    "coding/os/linux/build/Linux kernel内核配置解析(5)_Boot options(基于ARM64架构).md",
-    "coding/os/linux/device/Common Clock Framework系统结构.md",
     "coding/os/linux/schedule/Linux2.6.23 ：sleepable RCU的实现.md",
-    "coding/os/linux/memory/Linux vm运行参数之（一）：overcommit相关的参数.md",
+    "coding/os/linux/schedule/Linux2.6.11版本：classic RCU的实现.md",
     "coding/os/linux/schedule/Linux kernel中断子系统之（五）：驱动申请中断API.md",
-    "coding/os/linux/debug/Linux kernel debug技巧----开启DEBUG选项.md",
-    "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
-    "coding/os/linux/CPU/Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
-    "coding/os/linux/memory/Fix-Mapped Addresses.md",
-    "coding/os/ARM/ARMv8-a架构简介.md",
+    "coding/os/linux/schedule/Concurrency Managed Workqueue之（四）：workqueue如何处理work.md",
+    "coding/os/linux/schedule/Concurrency Managed Workqueue之（三）：创建workqueue代码分析.md",
     "coding/os/linux/schedule/Concurrency Managed Workqueue之（一）：workqueue的基本概念.md",
+    "coding/os/linux/process/Linux进程冻结技术.md",
+    "coding/os/linux/memory/TLB flush操作.md",
+    "coding/os/linux/memory/Linux vm运行参数之（二）：OOM相关的参数.md",
+    "coding/os/linux/memory/Linux vm运行参数之（一）：overcommit相关的参数.md",
+    "coding/os/linux/memory/Fix-Mapped Addresses.md",
+    "coding/os/linux/memory/DRAM 原理 5 ：DRAM Devices Organization.md",
+    "coding/os/linux/memory/DRAM 原理 4 ：DRAM Timing.md",
+    "coding/os/linux/memory/DRAM 原理 3 ：DRAM Device.md",
+    "coding/os/linux/memory/DRAM 原理 1 ：DRAM Storage Cell.md",
+    "coding/os/linux/CPU/Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
+    "coding/os/linux/CPU/ARM CPU性能实验.md",
+    "coding/os/ARM/为什么会有“ARMv8A Architecture”这个分类.md",
     "coding/os/ARM/ARM概念梳理：Architecture, Core, CPU，SOC.md",
     "coding/os/ARM/ARMv8之Observability.md",
+    "coding/os/ARM/ARMv8-a架构简介.md",
     "coding/os/ARM/ARM64架构下地址翻译相关的宏定义.md",
     "coding/os/ARM/ARM WFI和WFE指令.md",
-    "coding/os/linux/CPU/ARM CPU性能实验.md",
-    "coding/os/linux/memory/DRAM 原理 1 ：DRAM Storage Cell.md",
-    "coding/os/linux/schedule/interrupt",
+    "coding/os/linux/memory/Linux内存模型.md",
+    "test/2024-09-01.md",
+    "coding/os/linux/memory/slub分配器.md",
+    "coding/os/linux/Untitled",
     "coding/os/linux/device/TTY",
+    "coding/os/linux/schedule/interrupt",
     "coding/os/linux/shell",
     "coding/os/linux/virtual",
     "0x99-image/Pasted image 20240829154814.png",
@@ -192,7 +193,6 @@
     "coding/os/linux/build",
     "coding/os/linux/timer",
     "coding/os/linux/performance",
-    "coding/os/linux/memory/cache",
-    "coding/os/linux/schedule/debug"
+    "coding/os/linux/memory/cache"
   ]
 }
