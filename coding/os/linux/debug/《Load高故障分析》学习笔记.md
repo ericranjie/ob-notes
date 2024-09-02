@@ -87,7 +87,7 @@ main.c
 #include <linux/sched/loadavg.h>  
 #include <linux/stacktrace.h>  
 #include "load.h"  
-struct hrtimer timer;  
+struct hrtimer timer;
 //static unsigned long *ptr_avenrun;  
 //static unsigned long avnrun[3];  
   
