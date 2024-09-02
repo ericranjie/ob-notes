@@ -22,7 +22,9 @@ bcc是BPF高度封装的框架，我们使用的时候可以直接运行脚本�
 
 简单回顾一下上次介绍的eBPF机制的框架图：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/SeWfibBcBT0E37XW86gsNeX7E22NH3yoeVfqZ7bMzkJGLD5jjULlHoIWbVVAtPT8qSzsFcVCr3wnlYQjoP77AfQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+
+![[Pasted image 20240902145320.png]]
+
 
 如图所示，左边是BPF工具，使用BPF工具需要我们自己来编写BPF程序，BPF程序经过Clang和LLVM会编译生成一段BPF字节码，通过用户空间的加载器将BPF字节码，通过系统调用的方式加载进内核。
 
@@ -136,13 +138,13 @@ root@ubuntu:/usr/src/linux-5.4# make M=samples/bpf
 
 此时进入/linux-5.4/samples/bpf/中，会看到生成了BPF字节码文件*_kern.o和用户态的可执行文件。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240902145412.png]]
   
 
 下一步我们就可以编写我们自己的BPF程序了。整个的流程如下图：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240902145431.png]]
+
 
 **使用BPF Ｃ编写运行一个hello world程序**
 
@@ -200,9 +202,8 @@ root@ubuntu:/usr/src/linux-5.4/samples/bpf# make M=samples/BPF
 root@ubuntu:/usr/src/linux-5.4/samples/bpf# ./hello
 ```
 
+![[Pasted image 20240902145457.png]]
   
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **BPF CALL指令调用的内核辅助函数转换为BPF字节码的过程**
 
@@ -210,7 +211,8 @@ root@ubuntu:/usr/src/linux-5.4/samples/bpf# ./hello
 
 看到在上一次的内容中我们提到了一个概念叫做BPF程序的节。SEC宏会把名字为括号中的字符串编译到elf的目标文件中。如图：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240902145511.png]]
+
 
 节本身是elf文件中的概念。SEC宏中第一个为程序类型，第二个是我们要跟踪的函数。对于SEC宏来说的话他会把整个kprobe/sys_write当成节的名字，编译到elf的目标文件中。
 
@@ -219,6 +221,8 @@ root@ubuntu:/usr/src/linux-5.4/samples/bpf# ./hello
 ```
 root@ubuntu:/usr/src/linux-5.4/samples/bpf# readelf -S hello_kern.o
 ```
+
+![[Pasted image 20240902145528.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
@@ -234,6 +238,8 @@ root@ubuntu:/usr/src/linux-5.4/samples/bpf# readelf -S hello_kern.o
 root@ubuntu:/usr/src/linux-5.4/samples/bpf# objdump -s hello_kern.o
 ```
 
+![[Pasted image 20240902145541.png]]
+
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到kern.o它是目标文件，格式为elf64，采用小端来存储。这里面就显示了我们节的一些信息。比如说我们用SEC定义的节名字叫做kprobe/sys_bpf，还有个licence许可证的节，说明我们用SEC宏把我们后面定义的一些名字编译到elf目标文件中的某个节中。现在我们应该理解了SEC宏的作用。
@@ -246,7 +252,7 @@ root@ubuntu:/usr/src/linux-5.4/samples/bpf# objdump -s hello_kern.o
 
 首先我们来使用llvm-objdump工具来反汇编BPF字节码来看一下他的BPF汇编表示。
 
-  
+![[Pasted image 20240902145548.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -268,7 +274,7 @@ root@ubuntu:/usr/src/linux-5.4/samples/bpf# objdump -s hello_kern.o
 /include/uapi/linux/bpf.h(line 2754)
 ```
 
-  
+![[Pasted image 20240902145557.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -280,6 +286,10 @@ BPF_FUNC_map_lookup_elem()函数是在文件uapi/bpf.h文件中定义的，它�
 
 **宏展开过程**
 
+![[Pasted image 20240902145612.png]]
+
+![[Pasted image 20240902145618.png]]
+
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -287,6 +297,8 @@ BPF_FUNC_map_lookup_elem()函数是在文件uapi/bpf.h文件中定义的，它�
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 bpf_call 123是伪汇编的表示，并不是真正的BPF指令，它对应的真正的BPF指令为BPF_EMIT_CALL(FUNC)。  
+![[Pasted image 20240902145627.png]]
+
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -302,11 +314,15 @@ bpf_call 123是伪汇编的表示，并不是真正的BPF指令，它对应的�
 
 接下来 因为我们在bpf程序中调用的是trace_printk函数，我们还是以trace_printk来进行举例。
 
+![[Pasted image 20240902145638.png]]
+
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 继续将指令宏展开，会得到bpf_insn结构体，即为BPF指令集的格式。
 
 其中，BPF_CALL为真正的BPF调用指令，dst_reg为目的寄存器，sec_reg为源寄存器，off为偏移量，imm为立即数。  
+
+![[Pasted image 20240902145646.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -321,6 +337,8 @@ bpf_call 123是伪汇编的表示，并不是真正的BPF指令，它对应的�
   
 
 进行组合
+![[Pasted image 20240902145655.png]]
+
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -345,8 +363,8 @@ bpf_insn表示的BPF指令级的格式，我们把里面的成员按照字节序
     ```
     
 
-  
-
+  ![[Pasted image 20240902145712.png]]
+![[Pasted image 20240902145719.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -359,7 +377,7 @@ bpf_insn表示的BPF指令级的格式，我们把里面的成员按照字节序
 
 现在我们就把整个编译过程来理解一下
 
-  
+  ![[Pasted image 20240902145726.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -370,7 +388,7 @@ bpf_insn表示的BPF指令级的格式，我们把里面的成员按照字节序
   
 
 这幅图就展示了它的编译过程
-
+![[Pasted image 20240902145736.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -378,8 +396,8 @@ bpf_insn表示的BPF指令级的格式，我们把里面的成员按照字节序
 clang的作用 用做词法分析、语法分析还有语义分析，最关键的一步它会生成
 
 IR文件 ，IR是llvm的中间表示 它也是一种语言，类似于底层那种汇编语言。生成IR以后会把IR文件交给llvm的后端,在后端的时候生成对应平台的机器码。
-
-  
+![[Pasted image 20240902145749.png]]
+![[Pasted image 20240902145755.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 

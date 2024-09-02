@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/小小的引用计数，大大的性能考究.md",
+                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "interview",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/小小的引用计数，大大的性能考究.md",
+                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/小小的引用计数，大大的性能考究.md",
+                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/小小的引用计数，大大的性能考究.md"
+                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md"
               }
             }
           }
@@ -146,53 +146,53 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "e1a748f240a9d44c",
   "lastOpenFiles": [
-    "coding/os/linux/performance/系统性能监控工具ssar实例精选 龙蜥SIG.md",
-    "coding/os/linux/learning/为了兴趣爱好，我该选嵌入式么？.md",
-    "coding/os/linux/learning/蜗窝微信群问题整理.md",
-    "coding/os/linux/performance/系统性能分析从入门到进阶.md",
-    "coding/os/linux/performance/微信工程师：常见性能优化方案与实用工具.md",
-    "coding/os/linux/memory/图解 Linux内存背后的那些神秘往事.md",
-    "coding/os/linux/memory/万字长文图解 带你领略 glibc 内存管理精髓.md",
-    "coding/os/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "coding/os/linux/learning/实时音视频权威指南：从零开始的RTC程序设计.md",
-    "coding/os/深入理解SR-IOV和IO虚拟化.md",
-    "coding/os/linux/performance/手把手教你调优.md",
-    "coding/os/linux/learning/今天聊聊飞哥是怎么阅读内核源码的.md",
+    "coding/os/linux/network/面试必问的十八个TCP协议问题（汇总版）.md",
+    "0x99-image/Pasted image 20240902145412.png",
+    "coding/os/linux/BPF/BPF C 编程入门.md",
+    "0x99-image/Pasted image 20240902145755.png",
+    "0x99-image/Pasted image 20240902145749.png",
+    "0x99-image/Pasted image 20240902145736.png",
+    "0x99-image/Pasted image 20240902145726.png",
+    "0x99-image/Pasted image 20240902145719.png",
+    "0x99-image/Pasted image 20240902145712.png",
+    "0x99-image/Pasted image 20240902145655.png",
+    "0x99-image/Pasted image 20240902145646.png",
+    "0x99-image/Pasted image 20240902145638.png",
+    "coding/Coding-Quote.md",
+    "coding/database/Redis/Redis 过滤请求绝技 — 布隆过滤器与布谷鸟过滤器.md",
+    "coding/database/Redis/Redis 延时任务（高手养成篇）.md",
+    "coding/database/Redis/redis 源码 epoll 用法.md",
+    "coding/database/Redis/Redis 内存优化在 vivo 的探索与实践.md",
+    "coding/database/Redis/Redis 实现限流的三种方式.md",
+    "coding/database/PostgreSQL/PostgreSQL正在吞噬数据库世界.md",
+    "coding/database/PostgreSQL/PostgreSQL is eating the database world.md",
+    "coding/database/Redis/Redis 7.0 Multi Part AOF的设计和实现.md",
+    "coding/database/PostgreSQL",
+    "coding/database/Redis",
+    "coding/database/EuroSys’24｜字节STE团队合作论文提出面向 OvS 的数据面定制化框架Hoda，性能提升1.7倍.md",
+    "coding/os/linux/learning/论师傅的引领的重要性.md",
+    "interview/北京上百家知名科技公司都在这里了.md",
+    "interview",
+    "coding/os/linux/learning/做点实事吧。.md",
+    "Interview-Resource.md",
+    "coding/os/linux/learning/程序员技术路线图（经典).md",
+    "coding/os/linux/learning/在互联网大厂，我们是怎么“反内卷”的.md",
+    "coding/os/linux/performance/闻茂泉：系统性能监控与分析的工程化实践之路.md",
     "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
-    "coding/os/linux/memory/如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
-    "coding/os/linux/performance/低延迟场景下的性能优化实践.md",
-    "coding/os/linux/build/计算机科学基础知识（三）静态库和静态链接.md",
-    "coding/cpp/C++26 中的新功能.md",
-    "coding/os/linux/memory/深度学习armv8 armv9 cache的原理.md",
-    "coding/os/linux/debug/手把手教你 拦截系统调用.md",
-    "coding/os/linux/BPF/深入理解DPDK架构 经典PDF分享.md",
-    "coding/os/linux/schedule/如何利用CAS技术实现无锁队列.md",
-    "coding/os/linux/learning/潘爱民：计算机程序的演进——我的程序人生三十年.md",
-    "coding/os/linux/debug/钓鱼累了，写下断言怎么用.md",
-    "coding/os/linux/debug/冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
-    "coding/os/linux/debug/带你快速对比SPI、UART、I2C通信的区别与应用！.md",
-    "coding/os/linux/debug/大厂干掉 OOM 的套路，不过如此.md",
+    "coding/os/linux/debug/18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
+    "coding/os/linux/memory/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
+    "self-improvement/learning-method/爱因斯坦的读书方法.md",
+    "coding/os/linux/memory/甄建勇：五分钟搞定MMU.md",
+    "coding/os/linux/learning/潘爱民谈物联网系统的架构设计.md",
+    "coding/os/linux/device/libdrm-modetest 原理及图显系统验证方法.md",
+    "coding/cloud",
+    "coding/os/FreeRTOS",
     "coding/os/linux/Untitled",
     "coding/os/linux/device/TTY",
     "coding/os/linux/schedule/interrupt",
     "coding/os/linux/shell",
-    "coding/os/linux/virtual",
-    "0x99-image/Pasted image 20240829154814.png",
-    "coding/os/linux/learning",
-    "0x99-image/Pasted image 20240829155437.png",
-    "0x99-image/Pasted image 20240829155424.png",
-    "0x99-image/Pasted image 20240829155410.png",
-    "0x99-image/Pasted image 20240829155355.png",
-    "0x99-image/Pasted image 20240829155328.png",
-    "0x99-image/Pasted image 20240829155311.png",
-    "0x99-image/Pasted image 20240829155255.png",
-    "0x99-image/Pasted image 20240829155235.png",
-    "0x99-image/Pasted image 20240829155221.png",
-    "coding/os/linux/build",
-    "coding/os/linux/timer",
-    "coding/os/linux/performance",
-    "coding/os/linux/memory/cache"
+    "coding/os/linux/virtual"
   ]
 }

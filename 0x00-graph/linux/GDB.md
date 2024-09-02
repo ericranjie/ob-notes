@@ -1,6 +1,6 @@
 
-[[coding/os/GDB调试-从入门实践到原理|GDB调试-从入门实践到原理]]
 [[GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译]]
 [[使用 GDB + Qemu 调试 Linux 内核]]
 [[一文看懂 GDB底层实现原理]]
 [[自己动手写一个GDB 设置断点（原理篇）]]
+[[coding/reverse-engineering/GDB调试-从入门实践到原理|GDB调试-从入门实践到原理]]

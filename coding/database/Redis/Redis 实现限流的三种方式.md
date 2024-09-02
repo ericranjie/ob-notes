@@ -43,7 +43,7 @@
 
 代码如下
 
-```
+```java
 public Response limitFlow(){        Long currentTime = new Date().getTime();        System.out.println(currentTime);        if(redisTemplate.hasKey("limit")) {            Integer count = redisTemplate.opsForZSet().rangeByScore("limit", currentTime -  intervalTime, currentTime).size();        // intervalTime是限流的时间             System.out.println(count);            if (count != null && count > 5) {                return Response.ok("每分钟最多只能访问5次");            }        }        redisTemplate.opsForZSet().add("limit",UUID.randomUUID().toString(),currentTime);        return Response.ok("访问成功");    }
 ```
 
@@ -63,7 +63,7 @@ public Response limitFlow(){        Long currentTime = new Date().
 
 依靠List的leftPop来获取令牌
 
-```
+```java
 // 输出令牌public Response limitFlow2(Long id){        Object result = redisTemplate.opsForList().leftPop("limit_list");        if(result == null){            return Response.ok("当前令牌桶中无令牌");        }        return Response.ok(articleDescription2);    }
 ```
 
