@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "90206c78aac7eb0b",
+        "id": "76cdcf27b971e749",
         "type": "tabs",
         "children": [
           {
-            "id": "e1a748f240a9d44c",
+            "id": "d22de2f394be7866",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md",
+                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "interview",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md",
+                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md",
+                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/聊聊 Cookie、Session、Token 背后的故事.md"
+                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md"
               }
             }
           }
@@ -146,11 +146,42 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e1a748f240a9d44c",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/network/面试必问的十八个TCP协议问题（汇总版）.md",
-    "0x99-image/Pasted image 20240902145412.png",
-    "coding/os/linux/BPF/BPF C 编程入门.md",
+    "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+    "coding/os/linux/memory/rmap",
+    "coding/os/linux/memory/memory-init/内存初始化（上）.md",
+    "coding/os/linux/memory/cache/浅谈Cache Memory.md",
+    "coding/os/linux/memory/memory-init",
+    "coding/os/linux/memory/7 张图，轻松掌握零拷贝原理.md",
+    "coding/os/linux/memory/【万字长文】带你搞定MMU&TLB&TWU.md",
+    "coding/os/linux/memory/cache/多级cache之间的替换(缓存)策略.md",
+    "coding/os/linux/BPF/BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+    "coding/os/linux/BPF/浅谈一下，Linux中基于eBPF的恶意利用与检测机制.md",
+    "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+    "coding/os/linux/BPF/BPF 赋能调度器：万字详解 sched_ext 实现机制与工作流程【建议收藏】.md",
+    "coding/os/linux/BPF/边缘网络 eBPF 超能力：eBPF map 原理与性能解析.md",
+    "coding/os/linux/BPF/XDP/简单的XDP程序.md",
+    "coding/os/linux/BPF/XDP/使用 eBPF 和 XDP 高速处理数据包.md",
+    "coding/os/linux/BPF/XDP",
+    "coding/os/linux/memory/小小的引用计数，大大的性能考究.md",
+    "self-improvement/learning-method/爱因斯坦的读书方法.md",
+    "interview/北京上百家知名科技公司都在这里了.md",
+    "interview",
+    "coding/os/linux/schedule/甄建勇：五分钟搞定计算机体系结构（上）.md",
+    "coding/os/linux/schedule/Concurrency Managed Workqueue之（二）：CMWQ概述.md",
+    "coding/os/linux/process/Shopee 送命题：进程切换为什么比线程切换慢.md",
+    "coding/os/linux/performance/闻茂泉：系统性能监控与分析的工程化实践之路.md",
+    "coding/os/linux/memory/甄建勇：五分钟搞定MMU.md",
+    "coding/os/linux/memory/理解内存的Rank、位宽以及内存颗粒内部结构.md",
+    "coding/os/linux/memory/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
+    "coding/os/linux/memory/一篇论文讲透Cache优化.md",
+    "coding/os/linux/memory/free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
+    "coding/os/linux/memory/Jemalloc内存分配与优化实践.md",
+    "coding/os/FreeRTOS",
+    "coding/database/Redis",
+    "coding/database/PostgreSQL",
+    "coding/cloud",
     "0x99-image/Pasted image 20240902145755.png",
     "0x99-image/Pasted image 20240902145749.png",
     "0x99-image/Pasted image 20240902145736.png",
@@ -160,39 +191,8 @@
     "0x99-image/Pasted image 20240902145655.png",
     "0x99-image/Pasted image 20240902145646.png",
     "0x99-image/Pasted image 20240902145638.png",
-    "coding/Coding-Quote.md",
-    "coding/database/Redis/Redis 过滤请求绝技 — 布隆过滤器与布谷鸟过滤器.md",
-    "coding/database/Redis/Redis 延时任务（高手养成篇）.md",
-    "coding/database/Redis/redis 源码 epoll 用法.md",
-    "coding/database/Redis/Redis 内存优化在 vivo 的探索与实践.md",
-    "coding/database/Redis/Redis 实现限流的三种方式.md",
-    "coding/database/PostgreSQL/PostgreSQL正在吞噬数据库世界.md",
-    "coding/database/PostgreSQL/PostgreSQL is eating the database world.md",
-    "coding/database/Redis/Redis 7.0 Multi Part AOF的设计和实现.md",
-    "coding/database/PostgreSQL",
-    "coding/database/Redis",
-    "coding/database/EuroSys’24｜字节STE团队合作论文提出面向 OvS 的数据面定制化框架Hoda，性能提升1.7倍.md",
-    "coding/os/linux/learning/论师傅的引领的重要性.md",
-    "interview/北京上百家知名科技公司都在这里了.md",
-    "interview",
-    "coding/os/linux/learning/做点实事吧。.md",
-    "Interview-Resource.md",
-    "coding/os/linux/learning/程序员技术路线图（经典).md",
-    "coding/os/linux/learning/在互联网大厂，我们是怎么“反内卷”的.md",
-    "coding/os/linux/performance/闻茂泉：系统性能监控与分析的工程化实践之路.md",
-    "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
-    "coding/os/linux/debug/18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
-    "coding/os/linux/memory/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "self-improvement/learning-method/爱因斯坦的读书方法.md",
-    "coding/os/linux/memory/甄建勇：五分钟搞定MMU.md",
-    "coding/os/linux/learning/潘爱民谈物联网系统的架构设计.md",
-    "coding/os/linux/device/libdrm-modetest 原理及图显系统验证方法.md",
-    "coding/cloud",
-    "coding/os/FreeRTOS",
+    "0x99-image/Pasted image 20240902145627.png",
     "coding/os/linux/Untitled",
-    "coding/os/linux/device/TTY",
-    "coding/os/linux/schedule/interrupt",
-    "coding/os/linux/shell",
-    "coding/os/linux/virtual"
+    "coding/os/linux/device/TTY"
   ]
 }
