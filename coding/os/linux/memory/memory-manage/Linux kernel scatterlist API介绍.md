@@ -57,9 +57,9 @@
 
 struct scatterlist用于描述一个在物理地址上连续的内存块（以page为单位），它的定义位于“include/linux/scatterlist.h”中，如下：
 
-|   |
-|---|
-|struct scatterlist {  <br>#ifdef CONFIG_DEBUG_SG  <br>        unsigned long   sg_magic;  <br>#endif  <br>        unsigned long   page_link;  <br>        unsigned int    offset;  <br>        unsigned int    length;  <br>        dma_addr_t      dma_address;  <br>#ifdef CONFIG_NEED_SG_DMA_LENGTH  <br>        unsigned int    dma_length;  <br>#endif  <br>};|
+|                                                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| struct scatterlist {  <br>#ifdef CONFIG_DEBUG_SG  <br>        unsigned long   sg_magic;  <br>#endif  <br>        unsigned long   page_link;  <br>        unsigned int    offset;  <br>        unsigned int    length;  <br>        dma_addr_t      dma_address;  <br>#ifdef CONFIG_NEED_SG_DMA_LENGTH  <br>        unsigned int    dma_length;  <br>#endif  <br>}; |
 
 > page_link，指示该内存块所在的页面。bit0和bit1有特殊用途（可参考后面的介绍），因此要求page最低4字节对齐。  
 > offset，指示该内存块在页面中的偏移（起始位置）。  

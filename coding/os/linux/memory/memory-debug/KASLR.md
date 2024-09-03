@@ -92,8 +92,7 @@ kernel启动初期在汇编阶段创建映射关系。代码位于head.S文件�
 
 创建映射的函数是__create_page_tables。
 
-```assembly
- 
+```c
 __create_page_tables:    /*     * Map the kernel image.     */    adrp	x0, swapper_pg_dir    mov_q	x5, KIMAGE_VADDR + TEXT_OFFSET  // compile time __va(_text)    add	x5, x5, x23                         // add KASLR displacement    create_pgd_entry x0, x5, x3, x6    adrp	x6, _end                        // runtime __pa(_end)    adrp	x3, _text                       // runtime __pa(_text)    sub	x6, x6, x3                          // _end - _text    add	x6, x6, x5                          // runtime __va(_end)    create_block_map x0, x7, x3, x5, x6
 ```
 

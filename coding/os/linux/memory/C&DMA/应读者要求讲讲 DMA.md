@@ -57,16 +57,16 @@ DMA 控制器可以同时进行的传输个数是有限的，每一个传输都�
     
 
 完成一次 DMA 传输所需要的参数：
-
+```c
 `struct dma_slave_config {    /*    指明传输的方向    DMA_MEM_TO_MEM，memory到memory的传输；       DMA_MEM_TO_DEV，memory到设备的传输；       DMA_DEV_TO_MEM，设备到memory的传输；       DMA_DEV_TO_DEV，设备到设备的传输。    */    enum dma_transfer_direction direction;    /*    传输方向是dev2mem或者dev2dev时，读取数据的位置（通常是固定的FIFO地址）。    对mem2dev类型的channel，不需配置该参数（每次传输的时候会指定）；    */    phys_addr_t src_addr;    /*    传输方向是mem2dev或者dev2dev时，写入数据的位置（通常是固定的FIFO地址）。    对dev2mem类型的channel，不需配置该参数（每次传输的时候会指定）；    */    phys_addr_t dst_addr;    //src地址的宽度    enum dma_slave_buswidth src_addr_width;    //dst地址的宽度    enum dma_slave_buswidth dst_addr_width;    //src最大可传输的burst size    u32 src_maxburst;    //dst最大可传输的burst size    u32 dst_maxburst;    u32 src_port_window_size;    u32 dst_port_window_size;    u32 src_fifo_num;    u32 dst_fifo_num;    bool device_fc;    /*    外部设备通过slave_id告诉dma controller自己是谁（一般和某个request line对应）。    很多dma controller并不区分slave，只要给它src、dst、len等信息，它就可以进行传输，因此slave_id可以忽略。    而有些controller，必须清晰地知道此次传输的对象是哪个外设，就必须要提供slave_id了。    */    unsigned int slave_id;   };   `
-
+```
 - **dma_async_tx_descriptor**
     
 
 用于描述一次 DMA 传输:
-
+```c
 `struct dma_async_tx_descriptor {    dma_cookie_t cookie;    /*    DMA_CTRL_开头的标记，包括：    DMA_CTRL_REUSE，表明这个描述符可以被重复使用，直到它被清除或者释放；    DMA_CTRL_ACK，如果该flag为0，表明暂时不能被重复使用。    */    enum dma_ctrl_flags flags; /* not a 'long' to pack with cookie */    //该描述符的物理地址    dma_addr_t phys;    //对应的dma channel    struct dma_chan *chan;    /*    controller driver提供的回调函数，用于把改描述符提交到待传输列表。    通常由dma engine调用，client driver不会直接和该接口打交道。    */    dma_cookie_t (*tx_submit)(struct dma_async_tx_descriptor *tx);    /*    用于释放该描述符的回调函数。    通常由dma engine调用，client driver不会直接和该接口打交道。    */    int (*desc_free)(struct dma_async_tx_descriptor *tx);    //传输完成的回调函数（及其参数），由client driver提供。    dma_async_tx_callback callback;    dma_async_tx_callback_result callback_result;    //传输完成的回调函数（及其参数），由client driver提供。    void *callback_param;    struct dmaengine_unmap_data *unmap;   #ifdef CONFIG_ASYNC_TX_ENABLE_CHANNEL_SWITCH    struct dma_async_tx_descriptor *next;    struct dma_async_tx_descriptor *parent;    spinlock_t lock;   #endif   };   `
-
+```
 ### 设备驱动使用 dmaengine 的步骤
 
 一个设备驱动程序使用 dmaengine 的话一般步骤如下：

@@ -109,13 +109,13 @@ mmap_base 表示虚拟地址空间中用于内存映射的起始地址。一般�
 
 除了位置信息之外，struct mm_struct 里面还专门有一个结构 vm_area_struct，来描述这些区域的属性。
 
-```
+```c
 struct vm_area_struct *mmap;		/* list of VMAs */struct rb_root mm_rb;
 ```
 
 这里面一个是单链表，用于将这些区域串起来。另外还有一个红黑树。又是这个数据结构，在进程调度的时候我们用的也是红黑树。它的好处就是查找和修改都很快。这里用红黑树，就是为了快速查找一个内存区域，并在需要改变的时候，能够快速修改。
 
-```
+```c
 struct vm_area_struct {	/* The first cache line has the info for VMA tree walking. */	unsigned long vm_start;		/* Our start address within vm_mm. */	unsigned long vm_end;		/* The first byte after our end address within vm_mm. */	/* linked list of VM areas per task, sorted by address */	struct vm_area_struct *vm_next, *vm_prev;	struct rb_node vm_rb;	struct mm_struct *vm_mm;	/* The address space we belong to. */	struct list_head anon_vma_chain; /* Serialized by mmap_sem &					  * page_table_lock */	struct anon_vma *anon_vma;	/* Serialized by page_table_lock */	/* Function pointers to deal with this struct. */	const struct vm_operations_struct *vm_ops;	struct file * vm_file;		/* File we map to (can be NULL). */	void * vm_private_data;		/* was vm_pte (shared mem) */} __randomize_layout;
 ```
 
@@ -129,7 +129,7 @@ vm_start 和 vm_end 指定了该区域在用户空间中的起始和结束地址
 
 当 exec 运行一个二进制程序的时候，除了解析 ELF 的格式之外，另外一个重要的事情就是建立内存映射。
 
-```
+```c
 static int load_elf_binary(struct linux_binprm *bprm){......  setup_new_exec(bprm);......  retval = setup_arg_pages(bprm, randomize_stack_top(STACK_TOP),				 executable_stack);......  error = elf_map(bprm->file, load_bias + vaddr, elf_ppnt,				elf_prot, elf_flags, total_size);......  retval = set_brk(elf_bss, elf_brk, bss_prot);......  elf_entry = load_elf_interp(&loc->interp_elf_ex,					    interpreter,					    &interp_map_addr,					    load_bias, interp_elf_phdata);......  current->mm->end_code = end_code;  current->mm->start_code = start_code;  current->mm->start_data = start_data;  current->mm->end_data = end_data;  current->mm->start_stack = bprm->p;......}
 ```
 
@@ -156,7 +156,7 @@ load_elf_binary 会完成以下的事情：
 
 brk 系统调用实现的入口是 sys_brk 函数，就像下面代码定义的一样。
 
-```
+```c
 SYSCALL_DEFINE1(brk, unsigned long, brk){	unsigned long retval;	unsigned long newbrk, oldbrk;	struct mm_struct *mm = current->mm;	struct vm_area_struct *next;......	newbrk = PAGE_ALIGN(brk);	oldbrk = PAGE_ALIGN(mm->brk);	if (oldbrk == newbrk)		goto set_brk;	/* Always allow shrinking brk. */	if (brk <= mm->brk) {		if (!do_munmap(mm, newbrk, oldbrk-newbrk, &uf))			goto set_brk;		goto out;	}	/* Check against existing mmap mappings. */	next = find_vma(mm, oldbrk);	if (next && newbrk + PAGE_SIZE > vm_start_gap(next))		goto out;	/* Ok, looks good - let it rip. */	if (do_brk(oldbrk, newbrk-oldbrk, &uf) < 0)		goto out;set_brk:	mm->brk = brk;......	return brk;out:	retval = mm->brk;	return retval
 ```
 
@@ -170,7 +170,7 @@ SYSCALL_DEFINE1(brk, unsigned long, brk){	unsigned long retval;	unsigned long ne
 
 如果还有空间，就调用 do_brk 进一步分配堆空间，从旧堆顶开始，分配计算出的新旧堆顶之间的页数。
 
-```
+```c
 static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	return do_brk_flags(addr, len, 0, uf);}static int do_brk_flags(unsigned long addr, unsigned long request, unsigned long flags, struct list_head *uf){	struct mm_struct *mm = current->mm;	struct vm_area_struct *vma, *prev;	unsigned long len;	struct rb_node **rb_link, *rb_parent;	pgoff_t pgoff = addr >> PAGE_SHIFT;	int error;	len = PAGE_ALIGN(request);......	find_vma_links(mm, addr, addr + len, &prev, &rb_link,			      &rb_parent);......	vma = vma_merge(mm, prev, addr, addr + len, flags,			NULL, NULL, pgoff, NULL, NULL_VM_UFFD_CTX);	if (vma)		goto out;......	vma = kmem_cache_zalloc(vm_area_cachep, GFP_KERNEL);	INIT_LIST_HEAD(&vma->anon_vma_chain);	vma->vm_mm = mm;	vma->vm_start = addr;	vma->vm_end = addr + len;	vma->vm_pgoff = pgoff;	vma->vm_flags = flags;	vma->vm_page_prot = vm_get_page_prot(flags);	vma_link(mm, vma, prev, rb_link, rb_parent);out:	perf_event_mmap(vma);	mm->total_vm += len >> PAGE_SHIFT;	mm->data_vm += len >> PAGE_SHIFT;	if (flags & VM_LOCKED)		mm->locked_vm += (len >> PAGE_SHIFT);	vma->vm_flags |= VM_SOFTDIRTY;	return 0;
 ```
 
@@ -203,7 +203,7 @@ static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	
 - __va(paddr) 则计算出对应于物理地址 paddr 的虚拟地址。
     
 
-```
+```c
 #define __va(x)			((void *)((unsigned long)(x)+PAGE_OFFSET))    #define __pa(x)		__phys_addr((unsigned long)(x))    #define __phys_addr(x)		__phys_addr_nodebug(x)    #define __phys_addr_nodebug(x)	((x) - PAGE_OFFSET)
 ```
 
