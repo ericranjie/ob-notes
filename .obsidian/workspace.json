@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md",
+                "file": "coding/os/linux/memory/memory-model/Linux内存模型.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md",
+                "file": "coding/os/linux/memory/memory-model/Linux内存模型.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md",
+                "file": "coding/os/linux/memory/memory-model/Linux内存模型.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/深度学习armv8 armv9 cache的原理.md"
+                "file": "coding/os/linux/memory/memory-model/Linux内存模型.md"
               }
             }
           }
@@ -148,40 +148,42 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
-    "coding/os/linux/memory/rmap",
-    "coding/os/linux/memory/memory-init/内存初始化（上）.md",
-    "coding/os/linux/memory/cache/浅谈Cache Memory.md",
-    "coding/os/linux/memory/memory-init",
-    "coding/os/linux/memory/7 张图，轻松掌握零拷贝原理.md",
-    "coding/os/linux/memory/【万字长文】带你搞定MMU&TLB&TWU.md",
-    "coding/os/linux/memory/cache/多级cache之间的替换(缓存)策略.md",
-    "coding/os/linux/BPF/BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
-    "coding/os/linux/BPF/浅谈一下，Linux中基于eBPF的恶意利用与检测机制.md",
-    "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
-    "coding/os/linux/BPF/BPF 赋能调度器：万字详解 sched_ext 实现机制与工作流程【建议收藏】.md",
-    "coding/os/linux/BPF/边缘网络 eBPF 超能力：eBPF map 原理与性能解析.md",
-    "coding/os/linux/BPF/XDP/简单的XDP程序.md",
-    "coding/os/linux/BPF/XDP/使用 eBPF 和 XDP 高速处理数据包.md",
-    "coding/os/linux/BPF/XDP",
+    "coding/os/linux/memory/userspace/mmap在arm64背后的那个深坑.md",
+    "coding/os/linux/memory/memory-model/ARMv8之memory model.md",
+    "coding/os/linux/memory/TLB flush操作.md",
+    "coding/os/linux/memory/memory-model",
+    "coding/os/linux/memory/memory-manage/页面回收的基本概念.md",
+    "coding/os/linux/memory/memory-manage/五万字 深入理解Linux内存管理.md",
+    "coding/os/linux/memory/从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
+    "coding/os/linux/memory/cache/一篇论文讲透Cache优化.md",
+    "coding/os/linux/memory/KASAN实现原理.md",
+    "coding/os/linux/memory/memory-manage/slub分配器.md",
+    "coding/os/linux/memory/memory-manage/fixmap addresses原理.md",
+    "coding/os/linux/memory/memory-manage/Linux下访问匿名页发生的神奇“化学反应”.md",
+    "coding/os/linux/memory/userspace/Linux Mmap映射：优化文件访问和共享内存.md",
+    "coding/os/linux/memory/rmap/逆向映射的演进.md",
+    "coding/os/linux/memory/memory-init/Linux 物理内存初始化.md",
     "coding/os/linux/memory/小小的引用计数，大大的性能考究.md",
-    "self-improvement/learning-method/爱因斯坦的读书方法.md",
-    "interview/北京上百家知名科技公司都在这里了.md",
+    "coding/os/linux/memory/memory-performance",
+    "coding/os/linux/memory/一个较复杂dcache问题.md",
+    "coding/os/linux/memory/RISC-V 内存虚拟化简析（一）.md",
+    "0x01-leetcode/1-dimensional/148. Sort List.md",
+    "Interview-Resource.md",
+    "0x01-leetcode/1-dimensional",
+    "Awesome-List.md",
+    "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
+    "0x01-leetcode",
+    "coding/os/linux/memory/C&DMA/如何提升CMA利用率？.md",
+    "coding/os/linux/memory/memory-manage/Linux kernel内存管理的基本概念.md",
+    "coding/os/linux/memory/Linux kernel scatterlist API介绍.md",
+    "coding/os/linux/memory/memory-manage/linux内存回收(一）---kswapd回收.md",
+    "coding/os/linux/memory/memory-manage/Linux 内存管理窥探：页面回收 (LRU).md",
+    "coding/os/linux/memory/memory-manage",
+    "coding/os/linux/memory/userspace",
+    "coding/os/linux/memory/rmap",
+    "coding/os/linux/memory/memory-init",
+    "coding/os/linux/BPF/XDP",
     "interview",
-    "coding/os/linux/schedule/甄建勇：五分钟搞定计算机体系结构（上）.md",
-    "coding/os/linux/schedule/Concurrency Managed Workqueue之（二）：CMWQ概述.md",
-    "coding/os/linux/process/Shopee 送命题：进程切换为什么比线程切换慢.md",
-    "coding/os/linux/performance/闻茂泉：系统性能监控与分析的工程化实践之路.md",
-    "coding/os/linux/memory/甄建勇：五分钟搞定MMU.md",
-    "coding/os/linux/memory/理解内存的Rank、位宽以及内存颗粒内部结构.md",
-    "coding/os/linux/memory/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "coding/os/linux/memory/一篇论文讲透Cache优化.md",
-    "coding/os/linux/memory/free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
-    "coding/os/linux/memory/Jemalloc内存分配与优化实践.md",
-    "coding/os/FreeRTOS",
-    "coding/database/Redis",
-    "coding/database/PostgreSQL",
-    "coding/cloud",
     "0x99-image/Pasted image 20240902145755.png",
     "0x99-image/Pasted image 20240902145749.png",
     "0x99-image/Pasted image 20240902145736.png",
@@ -191,8 +193,6 @@
     "0x99-image/Pasted image 20240902145655.png",
     "0x99-image/Pasted image 20240902145646.png",
     "0x99-image/Pasted image 20240902145638.png",
-    "0x99-image/Pasted image 20240902145627.png",
-    "coding/os/linux/Untitled",
-    "coding/os/linux/device/TTY"
+    "0x99-image/Pasted image 20240902145627.png"
   ]
 }

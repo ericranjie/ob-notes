@@ -122,7 +122,7 @@ pgprot_t是另一个64位（PAE激活时）或32位（PAE禁用时）的数据�
 
 > 参照arch/x86/include/asm/pgtable_64_types.h
 
-```
+```c
 #ifndef __ASSEMBLY__#include <linux/types.h>/* * These are used to make use of C type-checking.. */typedef unsigned long   pteval_t;typedef unsigned long   pmdval_t;typedef unsigned long   pudval_t;typedef unsigned long   pgdval_t;typedef unsigned long   pgprotval_t;typedef struct { pteval_t pte; } pte_t;#endif  /* !__ASSEMBLY__ */
 ```
 
@@ -131,7 +131,7 @@ pgprot_t是另一个64位（PAE激活时）或32位（PAE禁用时）的数据�
 
 > 参照 /arch/x86/include/asm/pgtable_types.h
 
-```
+```c
 typedef struct { pgdval_t pgd; } pgd_t;static inline pgd_t native_make_pgd(pgdval_t val){        return (pgd_t) { val };}static inline pgdval_t native_pgd_val(pgd_t pgd){        return pgd.pgd;}static inline pgdval_t pgd_flags(pgd_t pgd){        return native_pgd_val(pgd) & PTE_FLAGS_MASK;}#if CONFIG_PGTABLE_LEVELS > 3typedef struct { pudval_t pud; } pud_t;static inline pud_t native_make_pud(pmdval_t val){        return (pud_t) { val };}static inline pudval_t native_pud_val(pud_t pud){        return pud.pud;}#else#include <asm-generic/pgtable-nopud.h>static inline pudval_t native_pud_val(pud_t pud){        return native_pgd_val(pud.pgd);}#endif#if CONFIG_PGTABLE_LEVELS > 2typedef struct { pmdval_t pmd; } pmd_t;static inline pmd_t native_make_pmd(pmdval_t val){        return (pmd_t) { val };}static inline pmdval_t native_pmd_val(pmd_t pmd){        return pmd.pmd;}#else#include <asm-generic/pgtable-nopmd.h>static inline pmdval_t native_pmd_val(pmd_t pmd){        return native_pgd_val(pmd.pud.pgd);}#endifstatic inline pudval_t pud_pfn_mask(pud_t pud){        if (native_pud_val(pud) & _PAGE_PSE)                return PHYSICAL_PUD_PAGE_MASK;        else                return PTE_PFN_MASK;}static inline pudval_t pud_flags_mask(pud_t pud){        return ~pud_pfn_mask(pud);}static inline pudval_t pud_flags(pud_t pud){        return native_pud_val(pud) & pud_flags_mask(pud);}static inline pmdval_t pmd_pfn_mask(pmd_t pmd){        if (native_pmd_val(pmd) & _PAGE_PSE)                return PHYSICAL_PMD_PAGE_MASK;        else                return PTE_PFN_MASK;}static inline pmdval_t pmd_flags_mask(pmd_t pmd){        return ~pmd_pfn_mask(pmd);}static inline pmdval_t pmd_flags(pmd_t pmd){        return native_pmd_val(pmd) & pmd_flags_mask(pmd);}static inline pte_t native_make_pte(pteval_t val){        return (pte_t) { .pte = val };}static inline pteval_t native_pte_val(pte_t pte){        return pte.pte;}static inline pteval_t pte_flags(pte_t pte){        return native_pte_val(pte) & PTE_FLAGS_MASK;}
 ```
 

@@ -92,7 +92,6 @@
 当进程切换到内核态（中断，异常，系统调用等）后，如何才能避免内核态访问用户态地址空间呢？其实不难想出，改变ttbr0_el1的值即可，指向一段非法的映射即可。因此，我们为此准备了一份特殊的页表，该页表大小4k内存，其值全是0。当进程切换到内核态后，修改ttbr0_el1的值为该页表的地址即可保证访问用户空间地址是非法访问。因为页表的值是非法的。这个特殊的页表内存通过[链接脚本](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/kernel/vmlinux.lds.S#L228)分配。
 
 ```c#
- 
 #define RESERVED_TTBR0_SIZE	(PAGE_SIZE) SECTIONS{	reserved_ttbr0 = .;	. += RESERVED_TTBR0_SIZE;	swapper_pg_dir = .;	. += SWAPPER_DIR_SIZE;	swapper_pg_end = .;}
 ```
 
@@ -121,15 +120,13 @@ __uaccess_ttbr0_disable对应的C语言实现可以参考[这里](https://elixir
 
 我们以[copy_to_user()](https://elixir.bootlin.com/linux/v4.18/source/include/linux/uaccess.h#L152)为例分析。函数调用流程如下：
 
-```txt
- 
+```c
 copy_to_user()->_copy_to_user()->raw_copy_to_user()->__arch_copy_to_user()
 ```
 
 [__arch_copy_to_user()](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/lib/copy_to_user.S#L65)在ARM64平台是汇编代码实现，这部分代码很关键。
 
-```assembly
- 
+```C
 end	.req	x5ENTRY(__arch_copy_to_user)	uaccess_enable_not_uao x3, x4, x5	add	end, x0, x2#include "copy_template.S"	uaccess_disable_not_uao x3, x4	mov	x0, #0	retENDPROC(__arch_copy_to_user) 	.section .fixup,"ax"	.align	29998:	sub	x0, end, dst			// bytes not copied	ret	.previous
 ```
 
@@ -139,15 +136,13 @@ end	.req	x5ENTRY(__arch_copy_to_user)	uaccess_enable_not_uao x3, x4, x5	add	end,
 
 对比前面分析的结果，其实__arch_copy_to_user()可以近似等效如下关系。
 
-```txt
- 
+```c
 uaccess_enable_not_uao();memcpy(ubuf, kbuf, size);      ==     __arch_copy_to_user(ubuf, kbuf, size);uaccess_disable_not_uao();
 ```
 
 先插播一条消息，解释[copy_template.S](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/lib/copy_template.S)为何是memcpy()。memcpy()在ARM64平台是由汇编代码实现。其定义在[arch/arm64/lib/memcpy.S](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/lib/memcpy.S)文件。
 
-```assembly
- 
+```c
  .weak memcpyENTRY(__memcpy)ENTRY(memcpy)#include "copy_template.S"	retENDPIPROC(memcpy)ENDPROC(__memcpy)
 ```
 
@@ -156,7 +151,6 @@ uaccess_enable_not_uao();memcpy(ubuf, kbuf, size);      ==     __arch_copy_to_us
 下面继续进入正题，再重复一遍：内核态访问用户空间地址，如果触发page fault，只要用户空间地址合法，内核态也会像什么也没有发生一样修复异常（分配物理内存，建立页表映射关系）。但是如果访问非法用户空间地址，就选择第2条路，尝试救赎自己。这条路就是利用`.fixup`和`__ex_table`段。如果无力回天只能给当前进程发送SIGSEGV信号。并且，轻则kernel oops，重则panic（取决于kernel配置选项CONFIG_PANIC_ON_OOPS）。在内核态访问非法用户空间地址的情况下，do_page_fault()最终会跳转`no_context`标号处的[__do_kernel_fault()](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/mm/fault.c#L274)。
 
 ```c
- 
 static void __do_kernel_fault(unsigned long addr, unsigned int esr,                              struct pt_regs *regs){	/*	 * Are we prepared to handle this kernel fault?	 * We are almost certainly not prepared to handle instruction faults.	 */	if (!is_el1_instruction_abort(esr) && fixup_exception(regs))		return;	/* ... */}
 ```
 
@@ -164,15 +158,13 @@ static void __do_kernel_fault(unsigned long addr, unsigned int esr,             
 
 __ex_table段的首尾地址分别是`__start___ex_table`和`__stop___ex_table`（定义在[include/asm-generic/vmlinux.lds.h](https://elixir.bootlin.com/linux/v4.18/source/include/asm-generic/vmlinux.lds.h#L563)。这段内存可以看作是一个数组，数组的每个元素都是`struct exception_table_entry`类型，其记录着异常发生地址及其对应的修复地址。
 
-```txt
- 
+```c
  exception tables__start___ex_table --> +---------------+                       |     entry     |                       +---------------+                       |     entry     |                       +---------------+                       |      ...      |                       +---------------+                       |     entry     |                       +---------------+                       |     entry     |__stop___ex_table  --> +---------------+
 ```
 
 在32位处理器上，struct exception_table_entry[定义](https://elixir.bootlin.com/linux/v4.18/source/include/asm-generic/extable.h#L18)如下：
 
 ```c
- 
 struct exception_table_entry {	unsigned long insn, fixup;};
 ```
 
@@ -188,12 +180,11 @@ unsigned long search_fixup_addr32(unsigned long ex_addr){	const struct exception
 当64位处理器开始发展起来，如果我们继续使用这种方式，势必需要2倍于32位处理器的内存存储exception table（因为存储一个地址需要8 bytes）。所以，kernel换用另一种方式实现。在64处理器上，struct exception_table_entry[定义](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/include/asm/extable.h#L18)如下：
 
 ```c
- 
 struct exception_table_entry {	int insn, fixup;};
 ```
 
 每个exception table entry占用的内存和32位处理器情况一样，因此内存占用不变。但是insn和fixup的意义发生变化。insn和fixup分别存储着异常发生地址及修复地址相对于当前结构体成员地址的偏移（有点拗口）。例如，根据异常地址ex_addr查找对应的修复地址（未找到返回0），其示意代码如下：
-
+```c
 1. unsigned long search_fixup_addr64(unsigned long ex_addr)
 2. {
 3. 	const struct exception_table_entry *e;
@@ -204,11 +195,10 @@ struct exception_table_entry {	int insn, fixup;};
 
 9. 	return 0;
 10. } 
-
+```
 因此，我们的关注点就是如何去构建exception_table_entry。我们针对每个用户空间地址的内存访问都需要创建一个exception table entry，并插入__ex_table段。例如下面的汇编指令（汇编指令对应的地址是随意写的，不用纠结对错。理解原理才是王道）。
 
-```assembly
- 
+```c
 0xffff000000000000: ldr x1, [x0]0xffff000000000004: add x1, x1, #0x100xffff000000000008: ldr x2, [x0, #0x10]/* ... */0xffff000040000000: mov x0, #0xfffffffffffffff2    // -140xffff000040000004: ret
 ```
 

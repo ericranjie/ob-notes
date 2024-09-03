@@ -24,7 +24,7 @@ Linux中有后备文件支持的页称为文件页，如属于进程的代码段
 
 首先以一个简单的示例代码来说明：
 
-```
+```c
 #include <stdio.h>#include <stdlib.h>#include <unistd.h>#include <string.h>#include <sys/mman.h>#define MAP_SIZE (100 * 1024 * 1024)int main(int argc, char *argv[]){ char *p; char val; int i; puts("before mmap ok, pleace exec 'free -m'!"); sleep(5); //mmap p = mmap(NULL, MAP_SIZE, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0); if(p == NULL) {  perror("fail to malloc");  return -1; }  puts("after mmap ok, pleace exec 'free -m'!"); sleep(5); //read for (i = 0; i < MAP_SIZE; i++) {  val = p[i]; } puts("read ok, pleace exec 'free -m'!"); sleep(5);#if 1 //write memset(p, 0x55, MAP_SIZE); puts("write ok, pleace exec 'free -m'!");#endif //sleep pause(); return 0;}
 ```
 
@@ -32,13 +32,13 @@ Linux中有后备文件支持的页称为文件页，如属于进程的代码段
 
 程序执行结果如下：
 
-```
+```c
 $ ./anon_rw_demobefore mmap ok, pleace exec 'free -m'!after mmap ok, pleace exec 'free -m'!read ok, pleace exec 'free -m'!write ok, pleace exec 'free -m'!
 ```
 
 命令执行结果如下：
 
-```
+```c
 $ free -m              总计         已用        空闲      共享    缓冲/缓存    可用内存：       15729        8286        1945         895        5497        6220交换：       16290        1599       14691$ free -m              总计         已用        空闲      共享    缓冲/缓存    可用内存：       15729        8286        1945         895        5497        6220交换：       16290        1599       14691$ free -m              总计         已用        空闲      共享    缓冲/缓存    可用内存：       15729        8286        1945         895        5497        6220交换：       16290        1599       14691$ free -m              总计         已用        空闲      共享    缓冲/缓存    可用内存：       15729        8383        1848         895        5497        6123交换：       16290        1599       14691
 ```
 
@@ -66,7 +66,7 @@ mmap申请匿名页的时候，只是申请了虚拟内存（通过vm_area_struc
 
 缺页异常调用链如下：
 
-```
+```c
 "mm/memory.c"处理器架构相关异常处理代码-> handle_mm_fault    -> __handle_mm_fault        -> handle_pte_fault            ->  if (!vmf->pte) {   ------------------- 1                     if (vma_is_anonymous(vmf->vma))  ------------------- 2                             return do_anonymous_page(vmf);   ------------------- 3
 ```
 
@@ -74,7 +74,7 @@ mmap申请匿名页的时候，只是申请了虚拟内存（通过vm_area_struc
 
 下面主要看下第一次读匿名页的处理：
 
-```
+```c
 do_anonymous_page->pte_alloc(vma->vm_mm, vmf->pmd)   ------------------- 1->/* Use the zero-page for reads */if (!(vmf->flags & FAULT_FLAG_WRITE) &&     ------------------- 2                !mm_forbids_zeropage(vma->vm_mm)) { ------------------- 3        entry = pte_mkspecial(pfn_pte(my_zero_pfn(vmf->address),                                        vma->vm_page_prot));  ------------------- 4        vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd,                        vmf->address, &vmf->ptl);  ------------------- 5               ...        goto setpte;}->  page = alloc_zeroed_user_highpage_movable(vma, vmf->address); ------------------- 6-> entry = mk_pte(page, vma->vm_page_prot);  ------------------- 7 entry = pte_sw_mkyoung(entry); ------------------- 8 if (vma->vm_flags & VM_WRITE)         entry = pte_mkwrite(pte_mkdirty(entry));  ------------------- 9 vmf->pte = pte_offset_map_lock(vma->vm_mm, vmf->pmd, vmf->address,                 &vmf->ptl); ------------------- 10                  ->set_pte_at(vma->vm_mm, vmf->address, vmf->pte, entry);  ------------------- 11
 ```
 
@@ -114,7 +114,7 @@ do_anonymous_page->pte_alloc(vma->vm_mm, vmf->pmd)   ------------------- 1-
 
 我们可以从源代码找到答案：
 
-```
+```c
 "mm/mmap.c"do_mmap->mmap_region    ->vma_set_page_prot(vma)        ->vm_page_prot = vm_pgprot_modify(vma->vm_page_prot, vm_flags);  ---------1            ->pgprot_modify(oldprot, vm_get_page_prot(vm_flags))        ->WRITE_ONCE(vma->vm_page_prot, vm_page_prot);  ---------------2                 /* description of effects of mapping type and prot in current implementation.  * this is due to the limited x86 page protection hardware.  The expected  * behavior is in parens:  *  * map_type     prot  *              PROT_NONE       PROT_READ       PROT_WRITE      PROT_EXEC  * MAP_SHARED   r: (no) no      r: (yes) yes    r: (no) yes     r: (no) yes  *              w: (no) no      w: (no) no      w: (yes) yes    w: (no) no  *              x: (no) no      x: (no) yes     x: (no) yes     x: (yes) yes  *  * MAP_PRIVATE  r: (no) no      r: (yes) yes    r: (no) yes     r: (no) yes  *              w: (no) no      w: (no) no      w: (copy) copy  w: (no) no  *              x: (no) no      x: (no) yes     x: (no) yes     x: (yes) yes  */->vm_get_page_prot     pgprot_t protection_map[16] __ro_after_init = {        __P000, __P001, __P010, __P011, __P100, __P101, __P110, __P111,        __S000, __S001, __S010, __S011, __S100, __S101, __S110, __S111};
 ```
 
@@ -134,7 +134,7 @@ do_anonymous_page->pte_alloc(vma->vm_mm, vmf->pmd)   ------------------- 1-
 
 下面给出调用链：
 
-```
+```c
 "mm/memory.c"handle_pte_fault->if (vmf->flags & FAULT_FLAG_WRITE) {  -----------1        if (!pte_write(entry)) -----------2                return do_wp_page(vmf); -----------3
 ```
 
