@@ -13,26 +13,13 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/opensource/coroutine/使用C++20协程和io_uring优雅地实现异步IO.md",
-                "mode": "source",
-                "source": false
-              }
-            }
-          },
-          {
-            "id": "982b34fcdc709c23",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "coding/cpp/template/C++模板总结.md",
+                "file": "coding/architecture/并发模拟的四种方式.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -98,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/template/C++模板总结.md",
+                "file": "coding/architecture/并发模拟的四种方式.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/template/C++模板总结.md",
+                "file": "coding/architecture/并发模拟的四种方式.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/template/C++模板总结.md"
+                "file": "coding/architecture/并发模拟的四种方式.md"
               }
             }
           }
@@ -159,44 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "982b34fcdc709c23",
+  "active": "d22de2f394be7866",
   "lastOpenFiles": [
-    "coding/architecture/重拾面向对象软件设计.md",
-    "coding/cpp/learning/这种扯淡的嵌入式项目，尽量不要碰.md",
-    "coding/cpp/grammar/pointer/C++ 智能指针最佳实践&源码分析.md",
-    "coding/cpp/learning/一波书单，高薪有望.md",
-    "coding/cpp/opensource/C++ 20 协程 Coroutine（3，剖析）.md",
-    "coding/architecture/C++ 反射：反射信息的自动生成！.md",
-    "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
-    "coding/cpp/grammar/reflect/C++ 反射：全方位解读 Lura 库的前世今生！.md",
-    "coding/cpp/grammar/reflect",
-    "coding/cpp/grammar/reflect/C++ 反射：深入浅出剖析 ponder 库实现机制！.md",
-    "coding/cpp/grammar/终极 C++避坑指南.md",
-    "coding/cpp/learning/研究了一波RTTI，再介绍软件开发的201个原则，文末再送6本书.md",
-    "coding/cpp/learning/月薪2万+的C C++工程师需要掌握哪些技能？.md",
-    "coding/cpp/template/四万字长文，这是我见过最好的模板元编程文章！.md",
-    "coding/cpp/low-level/为什么指针被誉为现代编程语言的开山鼻祖的灵魂？.md",
-    "coding/cpp/low-level/底软驱动 大厂面试爱考的C++内存你学会了吗？.md",
-    "coding/cpp/opensource/有界队列 BoundedQueue.md",
-    "coding/cpp/low-level/多线程程序中操作的原子性.md",
-    "coding/cpp/low-level/为什么使用结构体效率会高？通过汇编代码给你讲透！.md",
-    "coding/cpp/learning/内推字节 Linux C C++ 开发的那位同学没通过面试.......md",
-    "coding/cpp/你一定要搞明白的C函数调用方式与栈原理.md",
-    "coding/cpp/冷门知识点：进程间通信如何加锁？.md",
-    "coding/cpp/opensource/coroutine/协程简史，一文讲清楚协程的起源、发展和实现.md",
-    "coding/cpp/新简化！typename在C++20不再必要.md",
-    "coding/cpp/opensource/详解C++高性能无锁队列的原理与实现.md",
-    "coding/cpp/low-level/谷歌正寻求提高 C++ 内存安全.md",
-    "coding/cpp/深入分析C++全局变量初始化 文末热门招聘.md",
+    "coding/compiler/编译乱序(Compiler Reordering).md",
+    "coding/java/MappedByteBuffer VS FileChannel：从内核层面对比两者的性能差异.md",
+    "coding/java/Java依赖冲突高效解决之道.md",
+    "coding/java/concurrent/深入理解并发编程艺术之内存模型.md",
+    "coding/java/opensource/记一次Quartz重复调度(任务重复执行)的问题排查及解决，被老大骂了！.md",
+    "coding/java/opensource/Dubbo 路由及负载均衡性能优化.md",
+    "coding/java/为什么不建议直接使用 Async 注解？.md",
+    "coding/java/JVM/深入理解Java内存架构.md",
+    "coding/java/opensource/Netty如何高效接收网络数据？一文聊透ByteBuffer动态自适应扩缩容机制.md",
+    "coding/java/关于java单线程经常占用cpu100%分析.md",
+    "coding/java/opensource/小小的引用计数，大大的性能考究.md",
+    "coding/java/opensource/用 Dubbo 传输文件，被老大一顿揍。。.md",
+    "coding/java/opensource/这些年背过的面试题——Netty篇.md",
+    "coding/java/opensource/抓到Netty一个隐藏很深的内存泄露Bug 详解Recycler对象池的精妙设计与实现.md",
+    "coding/java/opensource/阿里终面：Netty 如何做到单机百万并发？.md",
+    "coding/java/opensource/深入理解 Netty FastThreadLocal.md",
+    "coding/java/opensource/真正的缓存之王，Google Guava 只是弟弟.md",
+    "coding/java/JVM/Java 内存泄漏排查，新技能+1.md",
+    "coding/java/Java系列 远程热部署在美团的落地实践.md",
+    "coding/java/concurrent/Synchronized原理解析——如果你愿意一层一层剥开我的心.md",
+    "coding/database/十亿级流量下，我与Redis时延小突刺的战斗史.md",
+    "coding/java/看下有多少人对Java感兴趣？.md",
+    "coding/java/concurrent/指令重排序导致的可见性问题.md",
+    "coding/java/concurrent/打通 JAVA 与内核系列之 一 ReentrantLock 锁的实现原理.md",
+    "coding/java/JVM/带颜色的JVM：三色标记详解.md",
+    "coding/java/opensource",
+    "coding/java/concurrent/JUC 常用 4 大并发工具类.md",
+    "coding/java/concurrent",
+    "coding/reverse-engineering/windows-reverse",
+    "coding/reverse-engineering/linux-reverse",
+    "coding/reverse-engineering/android-reverse",
+    "coding/cpp/template",
     "coding/cpp/opensource/coroutine",
-    "coding/cpp/learning",
+    "coding/cpp/opensource",
     "coding/cpp/low-level",
-    "coding/cpp/grammar/pointer",
-    "coding/cpp/books",
-    "coding/cpp/comment/Untitled",
-    "coding/cpp/comment",
-    "coding/cpp/gramma/Untitled",
-    "coding/cpp/grammar",
+    "coding/cpp/learning",
     "0x99-image/Pasted image 20240902145755.png",
     "0x99-image/Pasted image 20240902145749.png",
     "0x99-image/Pasted image 20240902145736.png",
