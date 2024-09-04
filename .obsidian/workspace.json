@@ -13,13 +13,26 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/java/JVM/JVM内存空间（建议收藏）.md",
+                "file": "coding/cpp/opensource/coroutine/使用C++20协程和io_uring优雅地实现异步IO.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "982b34fcdc709c23",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "coding/cpp/template/C++模板总结.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -85,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/java/JVM/JVM内存空间（建议收藏）.md",
+                "file": "coding/cpp/template/C++模板总结.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/java/JVM/JVM内存空间（建议收藏）.md",
+                "file": "coding/cpp/template/C++模板总结.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/java/JVM/JVM内存空间（建议收藏）.md"
+                "file": "coding/cpp/template/C++模板总结.md"
               }
             }
           }
@@ -146,43 +159,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "d22de2f394be7866",
+  "active": "982b34fcdc709c23",
   "lastOpenFiles": [
-    "coding/os/linux/memory/userspace/用快速固定块内存分配器替换 malloc free.md",
-    "coding/java/JVM",
-    "coding/os/linux/device/DRAM/DRAM 原理 1 ：DRAM Storage Cell.md",
-    "coding/os/linux/device/DRAM",
-    "coding/os/linux/device/DRAM/DRAM 原理 4 ：DRAM Timing.md",
-    "coding/os/linux/memory/memory-debug/解决 Linux 内核 Section GC 失败问题 - Part 1.md",
-    "coding/os/linux/memory/memory-model/计算机科学基础知识（一）The Memory Hierarchy.md",
-    "coding/os/linux/memory/virtual-memory/深入理解TLB.md",
-    "coding/os/linux/memory/memory-manage/深入理解Linux内核之脏页跟踪.md",
-    "coding/os/linux/memory/userspace/深入探索共享内存：实现高效的多线程通信.md",
-    "coding/os/linux/memory/memory-manage/文件系统和裸块设备的page cache问题.md",
-    "coding/os/linux/memory/memory-manage/论好名字的重要性： Linux内核page到folio的变迁.md",
-    "coding/os/linux/memory/userspace/所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "coding/os/linux/memory/virtual-memory/虚拟内存 & IO & 零拷贝.md",
-    "coding/os/linux/memory/userspace/一例hardened_usercopy的bug解析.md",
-    "coding/os/linux/memory/userspace/万字长文图解 带你领略 glibc 内存管理精髓.md",
-    "coding/os/linux/memory/memory-model/聊聊内存模型与内存序.md",
-    "coding/os/linux/memory/virtual-memory/甄建勇：五分钟搞定MMU.md",
-    "coding/os/linux/memory/memory-debug/明明还有大量内存，为啥报错“无法分配内存”？.md",
-    "coding/os/linux/memory/cache/甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/memory/cache/甄建勇：五分钟搞定Cache（上）.md",
-    "coding/os/linux/memory/memory-manage/理解内存的Rank、位宽以及内存颗粒内部结构.md",
-    "coding/os/linux/memory/cache/这篇 CPU Cache，估计也没人看.md",
-    "coding/os/linux/memory/memory-manage/由Google、OPPO、ARM、华为等大厂程序员贡献的Linux Large Folios大页在社区和产品的现状和未来.md",
-    "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/memory/memory-performance/图解 Linux内存性能优化核心思想.md",
-    "coding/os/linux/memory/virtual-memory/深入了解iommu系列四：interrupt remapping 工作机制解析.md",
-    "coding/os/linux/memory/memory-debug",
-    "coding/os/linux/memory/virtual-memory",
-    "coding/os/linux/memory/memory-model",
-    "coding/os/linux/memory/memory-performance",
-    "0x01-leetcode/1-dimensional",
-    "0x01-leetcode",
-    "coding/os/linux/memory/memory-manage",
-    "coding/os/linux/memory/userspace",
+    "coding/architecture/重拾面向对象软件设计.md",
+    "coding/cpp/learning/这种扯淡的嵌入式项目，尽量不要碰.md",
+    "coding/cpp/grammar/pointer/C++ 智能指针最佳实践&源码分析.md",
+    "coding/cpp/learning/一波书单，高薪有望.md",
+    "coding/cpp/opensource/C++ 20 协程 Coroutine（3，剖析）.md",
+    "coding/architecture/C++ 反射：反射信息的自动生成！.md",
+    "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
+    "coding/cpp/grammar/reflect/C++ 反射：全方位解读 Lura 库的前世今生！.md",
+    "coding/cpp/grammar/reflect",
+    "coding/cpp/grammar/reflect/C++ 反射：深入浅出剖析 ponder 库实现机制！.md",
+    "coding/cpp/grammar/终极 C++避坑指南.md",
+    "coding/cpp/learning/研究了一波RTTI，再介绍软件开发的201个原则，文末再送6本书.md",
+    "coding/cpp/learning/月薪2万+的C C++工程师需要掌握哪些技能？.md",
+    "coding/cpp/template/四万字长文，这是我见过最好的模板元编程文章！.md",
+    "coding/cpp/low-level/为什么指针被誉为现代编程语言的开山鼻祖的灵魂？.md",
+    "coding/cpp/low-level/底软驱动 大厂面试爱考的C++内存你学会了吗？.md",
+    "coding/cpp/opensource/有界队列 BoundedQueue.md",
+    "coding/cpp/low-level/多线程程序中操作的原子性.md",
+    "coding/cpp/low-level/为什么使用结构体效率会高？通过汇编代码给你讲透！.md",
+    "coding/cpp/learning/内推字节 Linux C C++ 开发的那位同学没通过面试.......md",
+    "coding/cpp/你一定要搞明白的C函数调用方式与栈原理.md",
+    "coding/cpp/冷门知识点：进程间通信如何加锁？.md",
+    "coding/cpp/opensource/coroutine/协程简史，一文讲清楚协程的起源、发展和实现.md",
+    "coding/cpp/新简化！typename在C++20不再必要.md",
+    "coding/cpp/opensource/详解C++高性能无锁队列的原理与实现.md",
+    "coding/cpp/low-level/谷歌正寻求提高 C++ 内存安全.md",
+    "coding/cpp/深入分析C++全局变量初始化 文末热门招聘.md",
+    "coding/cpp/opensource/coroutine",
+    "coding/cpp/learning",
+    "coding/cpp/low-level",
+    "coding/cpp/grammar/pointer",
+    "coding/cpp/books",
+    "coding/cpp/comment/Untitled",
+    "coding/cpp/comment",
+    "coding/cpp/gramma/Untitled",
+    "coding/cpp/grammar",
     "0x99-image/Pasted image 20240902145755.png",
     "0x99-image/Pasted image 20240902145749.png",
     "0x99-image/Pasted image 20240902145736.png",
