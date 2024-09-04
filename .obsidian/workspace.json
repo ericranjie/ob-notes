@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/architecture/并发模拟的四种方式.md",
+                "file": "coding/reverse-engineering/Kernel从0开始.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/architecture/并发模拟的四种方式.md",
+                "file": "coding/reverse-engineering/Kernel从0开始.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/architecture/并发模拟的四种方式.md",
+                "file": "coding/reverse-engineering/Kernel从0开始.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/architecture/并发模拟的四种方式.md"
+                "file": "coding/reverse-engineering/Kernel从0开始.md"
               }
             }
           }
@@ -148,6 +148,12 @@
   },
   "active": "d22de2f394be7866",
   "lastOpenFiles": [
+    "coding/reverse-engineering/windows-reverse/dll注入&代码注入 学习总结.md",
+    "coding/reverse-engineering/Kernel从0开始.md",
+    "awesome-list/blog.md",
+    "awesome-list/zhihu.md",
+    "coding/architecture/并发模拟的四种方式.md",
+    "awesome-list",
     "coding/compiler/编译乱序(Compiler Reordering).md",
     "coding/java/MappedByteBuffer VS FileChannel：从内核层面对比两者的性能差异.md",
     "coding/java/Java依赖冲突高效解决之道.md",
@@ -169,12 +175,7 @@
     "coding/java/Java系列 远程热部署在美团的落地实践.md",
     "coding/java/concurrent/Synchronized原理解析——如果你愿意一层一层剥开我的心.md",
     "coding/database/十亿级流量下，我与Redis时延小突刺的战斗史.md",
-    "coding/java/看下有多少人对Java感兴趣？.md",
-    "coding/java/concurrent/指令重排序导致的可见性问题.md",
-    "coding/java/concurrent/打通 JAVA 与内核系列之 一 ReentrantLock 锁的实现原理.md",
-    "coding/java/JVM/带颜色的JVM：三色标记详解.md",
     "coding/java/opensource",
-    "coding/java/concurrent/JUC 常用 4 大并发工具类.md",
     "coding/java/concurrent",
     "coding/reverse-engineering/windows-reverse",
     "coding/reverse-engineering/linux-reverse",
@@ -183,7 +184,6 @@
     "coding/cpp/opensource/coroutine",
     "coding/cpp/opensource",
     "coding/cpp/low-level",
-    "coding/cpp/learning",
     "0x99-image/Pasted image 20240902145755.png",
     "0x99-image/Pasted image 20240902145749.png",
     "0x99-image/Pasted image 20240902145736.png",
