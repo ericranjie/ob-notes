@@ -8,8 +8,5 @@ https://coolshell.cn
 http://www.cppblog.com/Solstice/
 #### 阮一峰
 http://www.ruanyifeng.com/blog/
-
-
-
-#### 美团技术团队
-https://tech.meituan.com
+#### 张彦飞（开发内功修炼）
+https://kfngxl.cn

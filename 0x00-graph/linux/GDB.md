@@ -3,4 +3,4 @@
 [[使用 GDB + Qemu 调试 Linux 内核]]
 [[一文看懂 GDB底层实现原理]]
 [[自己动手写一个GDB 设置断点（原理篇）]]
-[[coding/reverse-engineering/GDB调试-从入门实践到原理|GDB调试-从入门实践到原理]]
+[[GDB调试-从入门实践到原理|GDB调试-从入门实践到原理]]

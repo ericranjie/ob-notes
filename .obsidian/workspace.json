@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "76cdcf27b971e749",
+        "id": "5b2ae0b9daddc4b6",
         "type": "tabs",
         "children": [
           {
-            "id": "d22de2f394be7866",
+            "id": "13b7a15a996b9045",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/grammar/C++反射TS初探.md",
+                "file": "coding/os/linux/filesystem/Linux文件系统十问.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/grammar/C++反射TS初探.md",
+                "file": "coding/os/linux/filesystem/Linux文件系统十问.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/grammar/C++反射TS初探.md",
+                "file": "coding/os/linux/filesystem/Linux文件系统十问.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/grammar/C++反射TS初探.md"
+                "file": "coding/os/linux/filesystem/Linux文件系统十问.md"
               }
             }
           }
@@ -146,35 +146,47 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "13b7a15a996b9045",
   "lastOpenFiles": [
-    "coding/cpp/grammar/C++反射 第一章：通识.md",
-    "coding/cpp/low-level/C++对象的底层原理都在这儿了，还敢说学不会？.md",
-    "coding/cpp/low-level/C++无锁队列的探索：多种实现方案及性能对比.md",
-    "coding/cpp/learning/C语言深度指南《Modern C》迎来再版，免费PDF资源一并放出书.md",
-    "coding/cpp/grammar/C++ 日期和时间编程.md",
-    "coding/cpp/grammar/C++ 按值返回对象那些事.md",
+    "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
+    "coding/os/linux/filesystem/F2FS技术拆解.md",
+    "coding/reverse-engineering/linux-reverse/保护模式学习笔记之分页机制.md",
+    "0x99-image/Pasted image 20240905163143.png",
+    "0x99-image/Pasted image 20240905164122.png",
+    "0x99-image/Pasted image 20240905164114.png",
+    "0x99-image/Pasted image 20240905164108.png",
+    "0x99-image/Pasted image 20240905163954.png",
+    "0x99-image/Pasted image 20240905163946.png",
+    "0x99-image/Pasted image 20240905163936.png",
+    "0x99-image/Pasted image 20240905163927.png",
+    "0x99-image/Pasted image 20240905163909.png",
+    "0x99-image/Pasted image 20240905163903.png",
+    "coding/database/Redis/为了拿捏 Redis 数据结构，我画了 40 张图.md",
+    "coding/database/Redis/亿级系统的Redis缓存如何设计？？？.md",
+    "coding/database/PostgreSQL/技术极简主义：一切皆用Postgres.md",
+    "coding/database/怎样把数据库排序做到全球第一？.md",
+    "awesome-list/community.md",
+    "coding/reverse-engineering/RISC-V架构系列之1：指令集和特权模式.md",
+    "coding/os/linux/debug/GDB调试-从入门实践到原理.md",
+    "coding/reverse-engineering/Chrom V8分析入门——Google CTF2018 justintime分析.md",
+    "Untitled.canvas",
+    "awesome-list/zhihu.md",
+    "awesome-list/celebrity.md",
+    "coding/architecture/异源数据同步 → DataX 为什么要支持 kafka？.md",
+    "coding/reverse-engineering/android-reverse/Android Linker详解.md",
+    "coding/reverse-engineering/android-reverse/Android Linker详解(二).md",
+    "coding/reverse-engineering/android-reverse/VX小程序逆向分析.md",
+    "coding/reverse-engineering/assembly/手撕汇编。。。.md",
+    "coding/reverse-engineering/assembly",
+    "coding/os/ARM/系统总结ARM基础.md",
+    "coding/reverse-engineering/Kernel从0开始.md",
     "coding/cpp/opensource/总结了一份Qt5 的开发经验.md",
     "coding/cpp/opensource/使用Boost库实现自动数量的虚函数.md",
-    "coding/cpp/grammar/C++ 反射：深入探究 function 实现机制！.md",
-    "coding/cpp/learning/C C++编码准则，可借鉴的东西还挺多！.md",
     "coding/cpp/opensource/C C++ 套接字通信类的封装.md",
-    "coding/cpp/grammar/alloctor.md",
-    "coding/cpp/深入分析C++全局变量初始化 文末热门招聘.md",
-    "coding/cpp/grammar/使用 C++ 中的 final 关键字，到底能否提升性能？.md",
-    "coding/reverse-engineering/Kernel从0开始.md",
-    "coding/reverse-engineering/windows-reverse/dll注入&代码注入 学习总结.md",
-    "awesome-list/blog.md",
-    "awesome-list/zhihu.md",
-    "coding/architecture/并发模拟的四种方式.md",
+    "coding/cpp/low-level/C++无锁队列的探索：多种实现方案及性能对比.md",
+    "coding/cpp/low-level/C++对象的底层原理都在这儿了，还敢说学不会？.md",
+    "coding/cpp/learning/C语言深度指南《Modern C》迎来再版，免费PDF资源一并放出书.md",
     "awesome-list",
-    "coding/compiler/编译乱序(Compiler Reordering).md",
-    "coding/java/MappedByteBuffer VS FileChannel：从内核层面对比两者的性能差异.md",
-    "coding/java/Java依赖冲突高效解决之道.md",
-    "coding/java/concurrent/深入理解并发编程艺术之内存模型.md",
-    "coding/java/opensource/记一次Quartz重复调度(任务重复执行)的问题排查及解决，被老大骂了！.md",
-    "coding/java/opensource/Dubbo 路由及负载均衡性能优化.md",
-    "coding/java/为什么不建议直接使用 Async 注解？.md",
     "coding/java/opensource",
     "coding/java/concurrent",
     "coding/reverse-engineering/windows-reverse",
@@ -182,17 +194,6 @@
     "coding/reverse-engineering/android-reverse",
     "coding/cpp/template",
     "coding/cpp/opensource/coroutine",
-    "coding/cpp/opensource",
-    "coding/cpp/low-level",
-    "0x99-image/Pasted image 20240902145755.png",
-    "0x99-image/Pasted image 20240902145749.png",
-    "0x99-image/Pasted image 20240902145736.png",
-    "0x99-image/Pasted image 20240902145726.png",
-    "0x99-image/Pasted image 20240902145719.png",
-    "0x99-image/Pasted image 20240902145712.png",
-    "0x99-image/Pasted image 20240902145655.png",
-    "0x99-image/Pasted image 20240902145646.png",
-    "0x99-image/Pasted image 20240902145638.png",
-    "0x99-image/Pasted image 20240902145627.png"
+    "coding/cpp/opensource"
   ]
 }

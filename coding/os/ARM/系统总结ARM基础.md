@@ -208,7 +208,7 @@ CPSR寄存器包含当前程序状态信息，包括：
 
 Arm-v8架构有31个通用寄存器X0-X30 (64位长），而Arm-v7架构仅有16个通用寄存器R0-R15（32位长）。
 
-  
+![[Pasted image 20240905151128.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -260,7 +260,7 @@ Arm-v8架构有31个通用寄存器X0-X30 (64位长），而Arm-v7架构仅有16
 
 ARM处理器几种工作模式
 
-  
+![[Pasted image 20240905151141.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -306,15 +306,7 @@ ARM处理器几种工作模式
 
 用于运行操作系统的内核代码，与用户模式共享相同的寄存器。
 
-#   
-
-  
-
-五  
-
-  
-
-ARM架构下的函数调用约定
+#  五  ARM架构下的函数调用约定
 
   
 
@@ -663,6 +655,8 @@ BNE label     ; 如果 r4 的值与 0x80 异或后不为零，则跳转到 label
 ## 比较值指令
 
 ##   
+
+![[Pasted image 20240905151238.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
