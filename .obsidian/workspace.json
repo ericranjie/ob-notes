@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/reverse-engineering/Kernel从0开始.md",
+                "file": "coding/cpp/grammar/C++反射TS初探.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/reverse-engineering/Kernel从0开始.md",
+                "file": "coding/cpp/grammar/C++反射TS初探.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/reverse-engineering/Kernel从0开始.md",
+                "file": "coding/cpp/grammar/C++反射TS初探.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/reverse-engineering/Kernel从0开始.md"
+                "file": "coding/cpp/grammar/C++反射TS初探.md"
               }
             }
           }
@@ -146,10 +146,24 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "d22de2f394be7866",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/reverse-engineering/windows-reverse/dll注入&代码注入 学习总结.md",
+    "coding/cpp/grammar/C++反射 第一章：通识.md",
+    "coding/cpp/low-level/C++对象的底层原理都在这儿了，还敢说学不会？.md",
+    "coding/cpp/low-level/C++无锁队列的探索：多种实现方案及性能对比.md",
+    "coding/cpp/learning/C语言深度指南《Modern C》迎来再版，免费PDF资源一并放出书.md",
+    "coding/cpp/grammar/C++ 日期和时间编程.md",
+    "coding/cpp/grammar/C++ 按值返回对象那些事.md",
+    "coding/cpp/opensource/总结了一份Qt5 的开发经验.md",
+    "coding/cpp/opensource/使用Boost库实现自动数量的虚函数.md",
+    "coding/cpp/grammar/C++ 反射：深入探究 function 实现机制！.md",
+    "coding/cpp/learning/C C++编码准则，可借鉴的东西还挺多！.md",
+    "coding/cpp/opensource/C C++ 套接字通信类的封装.md",
+    "coding/cpp/grammar/alloctor.md",
+    "coding/cpp/深入分析C++全局变量初始化 文末热门招聘.md",
+    "coding/cpp/grammar/使用 C++ 中的 final 关键字，到底能否提升性能？.md",
     "coding/reverse-engineering/Kernel从0开始.md",
+    "coding/reverse-engineering/windows-reverse/dll注入&代码注入 学习总结.md",
     "awesome-list/blog.md",
     "awesome-list/zhihu.md",
     "coding/architecture/并发模拟的四种方式.md",
@@ -161,20 +175,6 @@
     "coding/java/opensource/记一次Quartz重复调度(任务重复执行)的问题排查及解决，被老大骂了！.md",
     "coding/java/opensource/Dubbo 路由及负载均衡性能优化.md",
     "coding/java/为什么不建议直接使用 Async 注解？.md",
-    "coding/java/JVM/深入理解Java内存架构.md",
-    "coding/java/opensource/Netty如何高效接收网络数据？一文聊透ByteBuffer动态自适应扩缩容机制.md",
-    "coding/java/关于java单线程经常占用cpu100%分析.md",
-    "coding/java/opensource/小小的引用计数，大大的性能考究.md",
-    "coding/java/opensource/用 Dubbo 传输文件，被老大一顿揍。。.md",
-    "coding/java/opensource/这些年背过的面试题——Netty篇.md",
-    "coding/java/opensource/抓到Netty一个隐藏很深的内存泄露Bug 详解Recycler对象池的精妙设计与实现.md",
-    "coding/java/opensource/阿里终面：Netty 如何做到单机百万并发？.md",
-    "coding/java/opensource/深入理解 Netty FastThreadLocal.md",
-    "coding/java/opensource/真正的缓存之王，Google Guava 只是弟弟.md",
-    "coding/java/JVM/Java 内存泄漏排查，新技能+1.md",
-    "coding/java/Java系列 远程热部署在美团的落地实践.md",
-    "coding/java/concurrent/Synchronized原理解析——如果你愿意一层一层剥开我的心.md",
-    "coding/database/十亿级流量下，我与Redis时延小突刺的战斗史.md",
     "coding/java/opensource",
     "coding/java/concurrent",
     "coding/reverse-engineering/windows-reverse",
