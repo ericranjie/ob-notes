@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/148. Sort List.md",
+                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/148. Sort List.md",
+                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/148. Sort List.md",
+                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/148. Sort List.md"
+                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md"
               }
             }
           }
@@ -146,8 +146,11 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "13b7a15a996b9045",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/Linux内核同步机制之（二）：Per-CPU变量.md",
+    "books/os/linux/张天飞 - 奔跑吧 Linux内核 第二版 卷1.md",
+    "0x01-leetcode/1-dimensional/148. Sort List.md",
     "awesome-list/community.md",
     "awesome-list/zhihu.md",
     "coding/os/linux/schedule/barrier/Linux内核同步机制之（三）：memory barrier.md",
@@ -169,7 +172,7 @@
     "coding/os/linux/schedule/debug/关于numa loadbance的死锁分析.md",
     "coding/os/linux/schedule/甄建勇：五分钟搞定计算机体系结构（上）.md",
     "coding/os/linux/schedule/深入理解 Linux 调度（GPU）虚拟化.md",
-    "coding/os/linux/schedule/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
     "coding/os/linux/schedule/Why Memory Barriers？中文翻译（上）.md",
     "coding/os/linux/schedule/interrupt/中断上下文中调度会怎样？.md",
     "coding/os/linux/schedule/interrupt/一次触摸屏中断调试引发的深入探究.md",
@@ -180,10 +183,7 @@
     "coding/os/linux/schedule/Linux调度器：进程优先级.md",
     "coding/os/linux/schedule/lock/Linux内核同步机制之（四）：spin lock.md",
     "coding/os/linux/schedule/preempt/全方位剖析内核抢占机制.md",
-    "coding/os/linux/schedule/lock/如何利用CAS技术实现无锁队列.md",
-    "coding/os/linux/schedule/Linux调度器：用户空间接口.md",
     "coding/os/linux/schedule/preempt",
-    "coding/os/linux/schedule/interrupt/Linux中断虚拟化（二）.md",
     "0x99-image/Pasted image 20240906121156.png",
     "0x99-image/Pasted image 20240906122939.png",
     "coding/os/linux/schedule/workqueue",
