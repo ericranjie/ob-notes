@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/filesystem/Linux文件系统十问.md",
+                "file": "0x01-leetcode/1-dimensional/148. Sort List.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/filesystem/Linux文件系统十问.md",
+                "file": "0x01-leetcode/1-dimensional/148. Sort List.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/filesystem/Linux文件系统十问.md",
+                "file": "0x01-leetcode/1-dimensional/148. Sort List.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/filesystem/Linux文件系统十问.md"
+                "file": "0x01-leetcode/1-dimensional/148. Sort List.md"
               }
             }
           }
@@ -148,52 +148,52 @@
   },
   "active": "13b7a15a996b9045",
   "lastOpenFiles": [
-    "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
-    "coding/os/linux/filesystem/F2FS技术拆解.md",
-    "coding/reverse-engineering/linux-reverse/保护模式学习笔记之分页机制.md",
-    "0x99-image/Pasted image 20240905163143.png",
-    "0x99-image/Pasted image 20240905164122.png",
-    "0x99-image/Pasted image 20240905164114.png",
-    "0x99-image/Pasted image 20240905164108.png",
-    "0x99-image/Pasted image 20240905163954.png",
-    "0x99-image/Pasted image 20240905163946.png",
-    "0x99-image/Pasted image 20240905163936.png",
-    "0x99-image/Pasted image 20240905163927.png",
-    "0x99-image/Pasted image 20240905163909.png",
-    "0x99-image/Pasted image 20240905163903.png",
-    "coding/database/Redis/为了拿捏 Redis 数据结构，我画了 40 张图.md",
-    "coding/database/Redis/亿级系统的Redis缓存如何设计？？？.md",
-    "coding/database/PostgreSQL/技术极简主义：一切皆用Postgres.md",
-    "coding/database/怎样把数据库排序做到全球第一？.md",
     "awesome-list/community.md",
-    "coding/reverse-engineering/RISC-V架构系列之1：指令集和特权模式.md",
-    "coding/os/linux/debug/GDB调试-从入门实践到原理.md",
-    "coding/reverse-engineering/Chrom V8分析入门——Google CTF2018 justintime分析.md",
-    "Untitled.canvas",
     "awesome-list/zhihu.md",
-    "awesome-list/celebrity.md",
-    "coding/architecture/异源数据同步 → DataX 为什么要支持 kafka？.md",
-    "coding/reverse-engineering/android-reverse/Android Linker详解.md",
-    "coding/reverse-engineering/android-reverse/Android Linker详解(二).md",
-    "coding/reverse-engineering/android-reverse/VX小程序逆向分析.md",
-    "coding/reverse-engineering/assembly/手撕汇编。。。.md",
+    "coding/os/linux/schedule/barrier/Linux内核同步机制之（三）：memory barrier.md",
+    "coding/os/linux/schedule/Linux内核同步机制之（一）：原子操作.md",
+    "coding/os/linux/schedule/正确认识实时Linux内核.md",
+    "coding/os/linux/schedule/barrier",
+    "coding/os/linux/schedule/preempt/内核抢占，让世界变得更美好.md",
+    "0x99-image/Pasted image 20240906162125.png",
+    "0x99-image/Pasted image 20240906162327.png",
+    "0x99-image/Pasted image 20240906162322.png",
+    "0x99-image/Pasted image 20240906162314.png",
+    "0x99-image/Pasted image 20240906162255.png",
+    "0x99-image/Pasted image 20240906162216.png",
+    "0x99-image/Pasted image 20240906162140.png",
+    "0x99-image/Pasted image 20240906162132.png",
+    "coding/os/linux/schedule/一例centos7.6内核hardlock的解析.md",
+    "coding/os/linux/schedule/lock/Linux内核同步机制之（六）：Seqlock.md",
+    "coding/os/linux/schedule/Linux 最大并发数是多少？.md",
+    "coding/os/linux/schedule/debug/关于numa loadbance的死锁分析.md",
+    "coding/os/linux/schedule/甄建勇：五分钟搞定计算机体系结构（上）.md",
+    "coding/os/linux/schedule/深入理解 Linux 调度（GPU）虚拟化.md",
+    "coding/os/linux/schedule/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+    "coding/os/linux/schedule/Why Memory Barriers？中文翻译（上）.md",
+    "coding/os/linux/schedule/interrupt/中断上下文中调度会怎样？.md",
+    "coding/os/linux/schedule/interrupt/一次触摸屏中断调试引发的深入探究.md",
+    "coding/os/linux/schedule/lock/RCU synchronize原理分析.md",
+    "coding/os/linux/schedule/什么时候需要cpu_relax()锁.md",
+    "coding/os/linux/schedule/load_balance函数代码详解.md",
+    "coding/os/linux/schedule/PELT算法浅析.md",
+    "coding/os/linux/schedule/Linux调度器：进程优先级.md",
+    "coding/os/linux/schedule/lock/Linux内核同步机制之（四）：spin lock.md",
+    "coding/os/linux/schedule/preempt/全方位剖析内核抢占机制.md",
+    "coding/os/linux/schedule/lock/如何利用CAS技术实现无锁队列.md",
+    "coding/os/linux/schedule/Linux调度器：用户空间接口.md",
+    "coding/os/linux/schedule/preempt",
+    "coding/os/linux/schedule/interrupt/Linux中断虚拟化（二）.md",
+    "0x99-image/Pasted image 20240906121156.png",
+    "0x99-image/Pasted image 20240906122939.png",
+    "coding/os/linux/schedule/workqueue",
+    "Untitled.canvas",
     "coding/reverse-engineering/assembly",
-    "coding/os/ARM/系统总结ARM基础.md",
-    "coding/reverse-engineering/Kernel从0开始.md",
-    "coding/cpp/opensource/总结了一份Qt5 的开发经验.md",
-    "coding/cpp/opensource/使用Boost库实现自动数量的虚函数.md",
-    "coding/cpp/opensource/C C++ 套接字通信类的封装.md",
-    "coding/cpp/low-level/C++无锁队列的探索：多种实现方案及性能对比.md",
-    "coding/cpp/low-level/C++对象的底层原理都在这儿了，还敢说学不会？.md",
-    "coding/cpp/learning/C语言深度指南《Modern C》迎来再版，免费PDF资源一并放出书.md",
     "awesome-list",
     "coding/java/opensource",
     "coding/java/concurrent",
     "coding/reverse-engineering/windows-reverse",
     "coding/reverse-engineering/linux-reverse",
-    "coding/reverse-engineering/android-reverse",
-    "coding/cpp/template",
-    "coding/cpp/opensource/coroutine",
-    "coding/cpp/opensource"
+    "coding/reverse-engineering/android-reverse"
   ]
 }
