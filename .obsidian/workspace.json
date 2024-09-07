@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/process/Linux系统如何标识进程？.md",
+                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/process/Linux系统如何标识进程？.md",
+                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/process/Linux系统如何标识进程？.md",
+                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/process/Linux系统如何标识进程？.md"
+                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md"
               }
             }
           }
@@ -146,37 +146,45 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "13b7a15a996b9045",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/schedule/多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "coding/os/linux/schedule/schedutil governor情景分析.md",
-    "coding/os/linux/schedule/load_balance函数代码详解.md",
-    "coding/os/linux/schedule/Linux调度器：进程优先级.md",
-    "coding/os/linux/schedule/PELT/per-entity load tracking.md",
-    "coding/os/linux/schedule/Linux中常见同步机制设计原理.md",
-    "coding/os/linux/schedule/Linux内核同步机制之（一）：原子操作.md",
-    "coding/os/linux/schedule/PELT/PELT算法浅析.md",
+    "coding/database/MySQL/MySQL（锁篇）- 全局锁、表锁、行锁（记录锁、间隙锁、临键锁、插入意向锁）、意向锁、SQL加锁分析、死锁产生原因与排查.md",
+    "coding/java/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
+    "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
+    "coding/os/linux/performance/一次系统调用开销到底有多大？.md",
+    "coding/os/linux/CPU/一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
+    "coding/cpp/learning/C++高频面试题：网络编程核心技术详解.md",
+    "coding/architecture/高性能调度系统设计总结.md",
+    "coding/cpp/learning/大疆常见C++面试题，重点难点全方位解析.md",
+    "coding/cloud/container/10分钟了解OPPO中间件容器化实践.md",
+    "coding/architecture/又偷偷写了一个新项目，以实战角度聊聊用到的核心技术.md",
+    "coding/os/linux/memory/cache/伪共享问题初探：根源与检测.md",
+    "hardware/大疆最新硬件工程师面试题汇总（附答案）.md",
+    "hardware/百度最新硬件工程师面试题汇总（附答案）.md",
+    "coding/ai/一文搞懂大模型、RAG、函数调用、Agent、知识库、向量数据库、知识图谱、AGI的区别和联系！！.md",
+    "hardware",
+    "coding/architecture/ELK 性能优化.md",
+    "coding/cpp/Seastar：高性能C++库详解与应用.md",
+    "coding/cpp/Untitled",
+    "coding/cpp/大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
+    "coding/architecture/message-queue/我用了8年的MQ.md",
+    "coding/database/MySQL/MySQL 单表大数据量下的 B-tree 高度问题.md",
+    "coding/compiler/从编译器的角度来看循环优化.md",
+    "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "coding/java/美团二面拷打：如何设计一个动态线程池？.md",
+    "coding/cpp/learning/C++高频面试题：操作系统面试热点.md",
+    "coding/database/scalar-db/表格存储低成本向量检索服务助力 AI 检索.md",
+    "coding/os/linux/network/一个 TCP 发送缓冲区问题的解析.md",
+    "coding/database/scalar-db",
+    "coding/os/linux/network/Linux内核常见的网络丢包场景分析.md",
+    "coding/architecture/message-queue",
+    "coding/database/MySQL",
+    "0x99-image/Pasted image 20240907181006.png",
+    "coding/algorithm/greedy",
+    "coding/os/linux/process/coroutine",
+    "coding/os/linux/performance/flame-graph",
+    "coding/cloud/container",
     "coding/os/linux/schedule/PELT",
-    "coding/os/linux/schedule/lock/什么时候需要cpu_relax()锁.md",
-    "coding/os/linux/schedule/从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/schedule/Kernel同步机制的底层实现.md",
-    "coding/os/linux/schedule/signal/Linux内核-信号的传递过程.md",
-    "coding/os/linux/schedule/signal",
-    "coding/os/linux/schedule/barrier/Why Memory Barriers中文翻译（下）.md",
-    "coding/os/linux/schedule/barrier/Why Memory Barriers？中文翻译（上）.md",
-    "coding/os/linux/schedule/lock/Perf book 9.3章节翻译（上）.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）的中文翻译（上）.md",
-    "test/next_step.md",
-    "interview-resource.md",
-    "README.md",
-    "Welcome.md",
-    "test/2024-09-01.md",
-    "coding/os/linux/schedule/lock/Perf book 9.3章节翻译（下）.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
-    "coding/os/linux/schedule/Linux内核同步机制之（二）：Per-CPU变量.md",
-    "books/os/linux/张天飞 - 奔跑吧 Linux内核 第二版 卷1.md",
-    "0x01-leetcode/1-dimensional/148. Sort List.md",
-    "coding/os/linux/schedule/barrier",
     "0x99-image/Pasted image 20240906162125.png",
     "0x99-image/Pasted image 20240906162327.png",
     "0x99-image/Pasted image 20240906162322.png",
@@ -185,15 +193,7 @@
     "0x99-image/Pasted image 20240906162216.png",
     "0x99-image/Pasted image 20240906162140.png",
     "0x99-image/Pasted image 20240906162132.png",
-    "coding/os/linux/schedule/preempt",
     "0x99-image/Pasted image 20240906121156.png",
-    "0x99-image/Pasted image 20240906122939.png",
-    "coding/os/linux/schedule/workqueue",
-    "Untitled.canvas",
-    "coding/reverse-engineering/assembly",
-    "awesome-list",
-    "coding/java/opensource",
-    "coding/java/concurrent",
-    "coding/reverse-engineering/windows-reverse"
+    "Untitled.canvas"
   ]
 }

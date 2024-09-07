@@ -8,5 +8,5 @@ https://coolshell.cn
 http://www.cppblog.com/Solstice/
 #### 阮一峰
 http://www.ruanyifeng.com/blog/
-#### 张彦飞（开发内功修炼）
+#### 张彦飞（开发内功修炼）（Markdown友好）
 https://kfngxl.cn
