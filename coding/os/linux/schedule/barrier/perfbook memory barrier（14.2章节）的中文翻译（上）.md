@@ -200,12 +200,12 @@ Pair-wise memory barriers provide conditional ordering semantics. For example, i
 
 成对使用的memory barrier提供了有条件的顺序保证，我们用下面的例子来描述什么是有条件的顺序保证：
 
-|   |   |
-|---|---|
-|CPU1|CPU2|
-|access(A);|access(B);|
-|smp_mb();|smp_mb();|
-|access(B);|access(A)|
+|            |            |
+| ---------- | ---------- |
+| CPU1       | CPU2       |
+| access(A); | access(B); |
+| smp_mb();  | smp_mb();  |
+| access(B); | access(A)  |
 
 在上面的CPU1上执行的代码中，虽然使用了smp_mb()这个全功能的memory barrier，而且，从CPU1的角度看，对A的访问是先于B执行（即便没有smp_mb也是如此），但是，潜伏在总线上的其他CPU（例如CPU2）是如何看呢？其实从其他observer的角度看，即便使用了smp_mb这个memory barrier，也不能无条件的保证CPU1上对A的访问先于对B的访问。也就是，观察者必须满足一定条件才能保证这个memory访问顺序，这也就是“有条件的顺序保证”的含义。那么具体的条件是什么呢？如果从CPU2的角度观测B，cpu 1对B变量的访问结果已经被CPU2感知到，在这种条件下，cpu 1对A变量的访问结果那么确定会被CPU2观察到。尽管有些CPU的确是提供更强大的memory barrier来保证了无条件的的memory访问顺序的保证，但是可移植代码不能依赖这种强大工具，而只能是使用较弱的if-then类型的有条件的顺序保证，这才是被所有CPU支持的工具。
 

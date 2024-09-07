@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+                "file": "coding/os/linux/process/Linux系统如何标识进程？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+                "file": "coding/os/linux/process/Linux系统如何标识进程？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+                "file": "coding/os/linux/process/Linux系统如何标识进程？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md"
+                "file": "coding/os/linux/process/Linux系统如何标识进程？.md"
               }
             }
           }
@@ -146,18 +146,37 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "13b7a15a996b9045",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
+    "coding/os/linux/schedule/schedutil governor情景分析.md",
+    "coding/os/linux/schedule/load_balance函数代码详解.md",
+    "coding/os/linux/schedule/Linux调度器：进程优先级.md",
+    "coding/os/linux/schedule/PELT/per-entity load tracking.md",
+    "coding/os/linux/schedule/Linux中常见同步机制设计原理.md",
+    "coding/os/linux/schedule/Linux内核同步机制之（一）：原子操作.md",
+    "coding/os/linux/schedule/PELT/PELT算法浅析.md",
+    "coding/os/linux/schedule/PELT",
+    "coding/os/linux/schedule/lock/什么时候需要cpu_relax()锁.md",
+    "coding/os/linux/schedule/从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/schedule/Kernel同步机制的底层实现.md",
+    "coding/os/linux/schedule/signal/Linux内核-信号的传递过程.md",
+    "coding/os/linux/schedule/signal",
+    "coding/os/linux/schedule/barrier/Why Memory Barriers中文翻译（下）.md",
+    "coding/os/linux/schedule/barrier/Why Memory Barriers？中文翻译（上）.md",
+    "coding/os/linux/schedule/lock/Perf book 9.3章节翻译（上）.md",
+    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）的中文翻译（上）.md",
+    "test/next_step.md",
+    "interview-resource.md",
+    "README.md",
+    "Welcome.md",
+    "test/2024-09-01.md",
+    "coding/os/linux/schedule/lock/Perf book 9.3章节翻译（下）.md",
+    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
     "coding/os/linux/schedule/Linux内核同步机制之（二）：Per-CPU变量.md",
     "books/os/linux/张天飞 - 奔跑吧 Linux内核 第二版 卷1.md",
     "0x01-leetcode/1-dimensional/148. Sort List.md",
-    "awesome-list/community.md",
-    "awesome-list/zhihu.md",
-    "coding/os/linux/schedule/barrier/Linux内核同步机制之（三）：memory barrier.md",
-    "coding/os/linux/schedule/Linux内核同步机制之（一）：原子操作.md",
-    "coding/os/linux/schedule/正确认识实时Linux内核.md",
     "coding/os/linux/schedule/barrier",
-    "coding/os/linux/schedule/preempt/内核抢占，让世界变得更美好.md",
     "0x99-image/Pasted image 20240906162125.png",
     "0x99-image/Pasted image 20240906162327.png",
     "0x99-image/Pasted image 20240906162322.png",
@@ -166,23 +185,6 @@
     "0x99-image/Pasted image 20240906162216.png",
     "0x99-image/Pasted image 20240906162140.png",
     "0x99-image/Pasted image 20240906162132.png",
-    "coding/os/linux/schedule/一例centos7.6内核hardlock的解析.md",
-    "coding/os/linux/schedule/lock/Linux内核同步机制之（六）：Seqlock.md",
-    "coding/os/linux/schedule/Linux 最大并发数是多少？.md",
-    "coding/os/linux/schedule/debug/关于numa loadbance的死锁分析.md",
-    "coding/os/linux/schedule/甄建勇：五分钟搞定计算机体系结构（上）.md",
-    "coding/os/linux/schedule/深入理解 Linux 调度（GPU）虚拟化.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
-    "coding/os/linux/schedule/Why Memory Barriers？中文翻译（上）.md",
-    "coding/os/linux/schedule/interrupt/中断上下文中调度会怎样？.md",
-    "coding/os/linux/schedule/interrupt/一次触摸屏中断调试引发的深入探究.md",
-    "coding/os/linux/schedule/lock/RCU synchronize原理分析.md",
-    "coding/os/linux/schedule/什么时候需要cpu_relax()锁.md",
-    "coding/os/linux/schedule/load_balance函数代码详解.md",
-    "coding/os/linux/schedule/PELT算法浅析.md",
-    "coding/os/linux/schedule/Linux调度器：进程优先级.md",
-    "coding/os/linux/schedule/lock/Linux内核同步机制之（四）：spin lock.md",
-    "coding/os/linux/schedule/preempt/全方位剖析内核抢占机制.md",
     "coding/os/linux/schedule/preempt",
     "0x99-image/Pasted image 20240906121156.png",
     "0x99-image/Pasted image 20240906122939.png",
@@ -192,8 +194,6 @@
     "awesome-list",
     "coding/java/opensource",
     "coding/java/concurrent",
-    "coding/reverse-engineering/windows-reverse",
-    "coding/reverse-engineering/linux-reverse",
-    "coding/reverse-engineering/android-reverse"
+    "coding/reverse-engineering/windows-reverse"
   ]
 }
