@@ -43,7 +43,7 @@ std::vector是C++标准库中的一个动态数组容器，它能够存储任意
 
 其实vector和string的实现非常相似，都是利用了顺序表结构，在vector的实现上我们遵循底层用三个指针来完成，_statr，_finish，_end_fo_storage分别指向顺序表的头，顺序表存储数据的有效个数的位置，顺序表的结束
 
-```
+```cpp
 template<class T>class vector{public:	typedef T* iterator;	typedef const T* const_iterator;	private:	iterator _start;	iterator _finish;	iterator _endofstorage;};
 ```
 
@@ -53,7 +53,7 @@ template<class T>class vector{public:	typedef T* iterator;	typedef const T* cons
 
 ①最常用的无参默认构造vector()
 
-```
+```cpp
 vector():_strat(nullptr),_finish(nullptr),_endofstorage(nullptr){}
 ```
 

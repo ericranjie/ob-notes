@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
+                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
+                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
+                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md"
+                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md"
               }
             }
           }
@@ -148,6 +148,9 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/cpp/learning/C C++编码准则，可借鉴的东西还挺多！.md",
+    "coding/architecture/message-queue/三种使用 RocketMQ 达到消息一致的最佳实践.md",
+    "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
     "coding/database/MySQL/MySQL（锁篇）- 全局锁、表锁、行锁（记录锁、间隙锁、临键锁、插入意向锁）、意向锁、SQL加锁分析、死锁产生原因与排查.md",
     "coding/java/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
     "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
@@ -173,10 +176,7 @@
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
     "coding/java/美团二面拷打：如何设计一个动态线程池？.md",
     "coding/cpp/learning/C++高频面试题：操作系统面试热点.md",
-    "coding/database/scalar-db/表格存储低成本向量检索服务助力 AI 检索.md",
-    "coding/os/linux/network/一个 TCP 发送缓冲区问题的解析.md",
     "coding/database/scalar-db",
-    "coding/os/linux/network/Linux内核常见的网络丢包场景分析.md",
     "coding/architecture/message-queue",
     "coding/database/MySQL",
     "0x99-image/Pasted image 20240907181006.png",
