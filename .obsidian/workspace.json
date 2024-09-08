@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "5b2ae0b9daddc4b6",
+        "id": "3bde5ab5dfbf21bc",
         "type": "tabs",
         "children": [
           {
-            "id": "13b7a15a996b9045",
+            "id": "96d4d68be9f07772",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "test/2024-09-01.md",
+                "file": "coding/cpp/grammar/终极 C++避坑指南.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "test/2024-09-01.md",
+                "file": "coding/cpp/grammar/终极 C++避坑指南.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "test/2024-09-01.md",
+                "file": "coding/cpp/grammar/终极 C++避坑指南.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "test/2024-09-01.md"
+                "file": "coding/cpp/grammar/终极 C++避坑指南.md"
               }
             }
           }
@@ -146,36 +146,37 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "13b7a15a996b9045",
+  "active": "96d4d68be9f07772",
   "lastOpenFiles": [
+    "awesome-list/community.md",
+    "test/brain-waves.md",
+    "coding/cpp/grammar/C++20那些事之宇宙飞船运算符.md",
+    "coding/compiler/利用Makfile给多文件、多目录C源码建立工程.md",
+    "coding/cpp/learning/C++知识体系总结：语言核心与代码工程.md",
+    "coding/cpp/grammar/C++26 中的新功能.md",
+    "coding/cpp/grammar/reflect/C++反射TS初探.md",
+    "coding/cpp/grammar/C++20新特性—“宇宙飞船”运算符.md",
+    "coding/cpp/grammar/C++ 设计模式之 SFINAE：用来检测类中是否有某个成员函数.md",
+    "coding/cpp/learning/a_ C++八股文面经总结（含答案），收藏起来慢慢看.md",
+    "coding/cpp/grammar/C++ Trick：右值引用、万能引用傻傻分不清楚.md",
+    "test/阿卡西记录.md",
+    "coding/cpp/learning/C++ Best Practices (C++最佳实践)翻译与阅读笔记.md",
+    "coding/cpp/template/模版定义一定要写在头文件中吗.md",
+    "coding/cpp/template/四万字长文，这是我见过最好的模板元编程文章！.md",
+    "coding/cpp/template/C++模板总结.md",
+    "coding/os/linux/schedule/load_balance函数代码详解.md",
+    "coding/os/linux/schedule/Linux 最大并发数是多少？.md",
+    "coding/os/linux/syscall/Linux 多线程全面解析.md",
+    "coding/os/linux/syscall",
+    "test/2024-09-01.md",
     "coding/os/linux/init/systemd：为何要创建一个新的init系统软件.md",
     "coding/os/linux/init/linux 启动es init heap not equal.md",
     "coding/os/linux/init",
-    "coding/cpp/C++20新特性—“宇宙飞船”运算符.md",
-    "awesome-list/community.md",
     "awesome-list/zhihu.md",
     "awesome-list/celebrity.md",
     "coding/cpp/grammar/C++为什么要弄出虚表这个东西？.md",
     "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
-    "coding/cpp/learning/C C++编码准则，可借鉴的东西还挺多！.md",
-    "coding/architecture/message-queue/三种使用 RocketMQ 达到消息一致的最佳实践.md",
-    "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
-    "coding/database/MySQL/MySQL（锁篇）- 全局锁、表锁、行锁（记录锁、间隙锁、临键锁、插入意向锁）、意向锁、SQL加锁分析、死锁产生原因与排查.md",
-    "coding/java/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
-    "coding/os/linux/performance/一次系统调用开销到底有多大？.md",
-    "coding/os/linux/CPU/一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
-    "coding/cpp/learning/C++高频面试题：网络编程核心技术详解.md",
-    "coding/architecture/高性能调度系统设计总结.md",
-    "coding/cpp/learning/大疆常见C++面试题，重点难点全方位解析.md",
-    "coding/cloud/container/10分钟了解OPPO中间件容器化实践.md",
-    "coding/architecture/又偷偷写了一个新项目，以实战角度聊聊用到的核心技术.md",
-    "coding/os/linux/memory/cache/伪共享问题初探：根源与检测.md",
-    "hardware/大疆最新硬件工程师面试题汇总（附答案）.md",
-    "hardware/百度最新硬件工程师面试题汇总（附答案）.md",
-    "coding/ai/一文搞懂大模型、RAG、函数调用、Agent、知识库、向量数据库、知识图谱、AGI的区别和联系！！.md",
     "hardware",
-    "coding/architecture/ELK 性能优化.md",
-    "coding/cpp/Seastar：高性能C++库详解与应用.md",
     "coding/cpp/Untitled",
     "coding/database/scalar-db",
     "coding/architecture/message-queue",
@@ -184,7 +185,6 @@
     "coding/algorithm/greedy",
     "coding/os/linux/process/coroutine",
     "coding/os/linux/performance/flame-graph",
-    "coding/cloud/container",
     "0x99-image/Pasted image 20240906162125.png",
     "0x99-image/Pasted image 20240906162327.png",
     "0x99-image/Pasted image 20240906162322.png",

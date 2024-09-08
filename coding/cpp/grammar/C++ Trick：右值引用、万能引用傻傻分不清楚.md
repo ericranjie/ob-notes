@@ -15,9 +15,9 @@ Scott Meyers曾经说过：T&&并不总是表示右值引用（rvalue reference�
 没错。&& 这两个符号，可能是初学C++或者C++11的时候，把很多人劝退的一个点。但想理清其实也不难。
 
 首先在**非模板函数中**，&&肯定是表示右值引用，所以只能接收右值类型的参数。
-
+```cpp
 `class A {       ...   };   void foo(A&& a) {       ...   }   `
-
+```
 这个foo函数只能接受如下的右值参数。
 
 `foo(A{});      A a;   foo(std::move(a));      A get_a() {       A a;       ...       return a;   }   foo(get_a());   `
