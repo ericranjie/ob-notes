@@ -61,13 +61,13 @@ vector():_strat(nullptr),_finish(nullptr),_endofstorage(nullptr){}
 
 ②用n个val构造一个vector
 
-```
+```cpp
 explicit vector (size_type n, const value_type& val = value_type();
 ```
 
 库里面用explicit修饰构造函数，是为了防止构造函数发生隐式类型转换
 
-```
+```cpp
 vector(size_t n, const T& val = T()){	_start = new T[n];	_finish = _start;	while (_finish!=_start+n)	{		*_finish = val;		_finish++;	}	_endofstorage = _start + n;}
 ```
 
@@ -77,7 +77,7 @@ vector(size_t n, const T& val = T()){	_start = new T[n];	_finish = _start;	while
 
 拷贝构造：用一个已经存在的对象来初始化另一个正在创建的对象
 
-```
+```cpp
 vector(const vector& v){	_start = new T[v.size()];	memcpy(_start, v._start, sizeof(T) * v.size());	_finish = _start + v.size();	_endofstorage = _finish;}
 ```
 
@@ -85,7 +85,7 @@ vector(const vector& v){	_start = new T[v.size()];	memcpy(_start, v._start, size
 
 赋值构造：两个已经存在的对象，一个赋值给另一个`vector& operator= (const vector& v);`
 
-```
+```cpp
 void swap(vector& v){	std::swap(_start, v._start);	std::swap(_finish, v._finish);	std::swap(_endofstorage, v._endofstorage);}//v1=v2;vector& operator= (vector v){	swap(v);	return *this;}
 ```
 
@@ -97,16 +97,18 @@ void swap(vector& v){	std::swap(_start, v._start);	std::swap(_finish, v._finish)
 
 tips:这里的initializer_list实际是个类，C++底层将其封装了，里面也有begin，end，size
 
-```
-//vector<int> v={1,2,3,4,5};vector(initializer_list<T> il){	for (auto e : il)	{		push_back(e);	}}
+```cpp
+//vector<int> v={1,2,3,4,5};
+vector(initializer_list<T> il){	for (auto e : il)	{		push_back(e);	}}
 ```
 
 ### 2.5迭代器区间构造
 
 > `template <class InputIterator> vector(InputIterator first, InputIterator last);`
 
-```
-// 类模板的成员函数可以是函数模板template <class InputIterator>vector(InputIterator first, InputIterator last){	while (first != last)	{		push_back(*first);		++first;	}}
+```cpp
+// 类模板的成员函数可以是函数模板
+template <class InputIterator>vector(InputIterator first, InputIterator last){	while (first != last)	{		push_back(*first);		++first;	}}
 ```
 
 注意：如果加了迭代器区间构造会造成一个问题，就是在调用时和`vector(size_t n, const T& val = T())`会出现冲突，底层给出的解决方案就是加一个重载`vector(int n, const T& val = T())`
@@ -115,7 +117,7 @@ tips:这里的initializer_list实际是个类，C++底层将其封装了，里�
 
 ### 3.1vector的迭代器实现
 
-```
+```cpp
 Iteratot cend()const {			return final_end;		}		Iteratot cbegin()const {			return start;		}			Iteratot end() {			return final_end;		}		Iteratot begin() {			return start;		}
 ```
 
@@ -132,8 +134,9 @@ vector的迭代器是一个原生指针,他的迭代器和String相同都是操�
 
 ### 3.2reserve()扩容
 
-```
-void reserve(size_t n) {	if (n > capacity()) {			T* temp = new T  [n];			//把statrt中的数据拷贝到temp中			size_t size1 = size();			memcpy(temp, start, sizeof(T*) * size());						start = temp;		final_end = start + size1;		finally = start + n;			}		}
+```cpp
+void reserve(size_t n) {	if (n > capacity()) {			T* temp = new T  [n];			//把statrt中的数据拷贝到temp中
+												 size_t size1 = size();			memcpy(temp, start, sizeof(T*) * size());						start = temp;		final_end = start + size1;		finally = start + n;			}		}
 ```
 
 当 vector 的大小和容量相等（size==capacity）也就是满载时，如果再向其添加元素，那么 vector 就需要扩容。vector 容器扩容的过程需要经历以下 3 步：
@@ -155,7 +158,7 @@ vector 容器扩容时，不同的编译器申请更多内存空间的量是不�
 
 reserve扩容就是开辟新空间用memcpy将老空间的数据拷贝到新开空间中，假设模拟实现的vector中的reserve接口中，使用memcpy进行的拷贝，以下代码会发生什么问题？
 
-```
+```cpp
 int main(){bite::vector<bite::string> v;v.push_back("1111");v.push_back("2222");v.push_back("3333");return 0;}
 ```
 

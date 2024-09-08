@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
+                "file": "test/2024-09-01.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
+                "file": "test/2024-09-01.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
+                "file": "test/2024-09-01.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md"
+                "file": "test/2024-09-01.md"
               }
             }
           }
@@ -146,14 +146,22 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "13b7a15a996b9045",
   "lastOpenFiles": [
+    "coding/os/linux/init/systemd：为何要创建一个新的init系统软件.md",
+    "coding/os/linux/init/linux 启动es init heap not equal.md",
+    "coding/os/linux/init",
+    "coding/cpp/C++20新特性—“宇宙飞船”运算符.md",
+    "awesome-list/community.md",
+    "awesome-list/zhihu.md",
+    "awesome-list/celebrity.md",
+    "coding/cpp/grammar/C++为什么要弄出虚表这个东西？.md",
+    "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
     "coding/cpp/learning/C C++编码准则，可借鉴的东西还挺多！.md",
     "coding/architecture/message-queue/三种使用 RocketMQ 达到消息一致的最佳实践.md",
     "coding/database/redis/Redis 7.0 共享复制缓冲区的设计与实现.md",
     "coding/database/MySQL/MySQL（锁篇）- 全局锁、表锁、行锁（记录锁、间隙锁、临键锁、插入意向锁）、意向锁、SQL加锁分析、死锁产生原因与排查.md",
     "coding/java/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
-    "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
     "coding/os/linux/performance/一次系统调用开销到底有多大？.md",
     "coding/os/linux/CPU/一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
     "coding/cpp/learning/C++高频面试题：网络编程核心技术详解.md",
@@ -169,13 +177,6 @@
     "coding/architecture/ELK 性能优化.md",
     "coding/cpp/Seastar：高性能C++库详解与应用.md",
     "coding/cpp/Untitled",
-    "coding/cpp/大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
-    "coding/architecture/message-queue/我用了8年的MQ.md",
-    "coding/database/MySQL/MySQL 单表大数据量下的 B-tree 高度问题.md",
-    "coding/compiler/从编译器的角度来看循环优化.md",
-    "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
-    "coding/java/美团二面拷打：如何设计一个动态线程池？.md",
-    "coding/cpp/learning/C++高频面试题：操作系统面试热点.md",
     "coding/database/scalar-db",
     "coding/architecture/message-queue",
     "coding/database/MySQL",
@@ -184,7 +185,6 @@
     "coding/os/linux/process/coroutine",
     "coding/os/linux/performance/flame-graph",
     "coding/cloud/container",
-    "coding/os/linux/schedule/PELT",
     "0x99-image/Pasted image 20240906162125.png",
     "0x99-image/Pasted image 20240906162327.png",
     "0x99-image/Pasted image 20240906162322.png",
