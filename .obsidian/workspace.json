@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/grammar/终极 C++避坑指南.md",
+                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/grammar/终极 C++避坑指南.md",
+                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/grammar/终极 C++避坑指南.md",
+                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/grammar/终极 C++避坑指南.md"
+                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md"
               }
             }
           }
@@ -146,8 +146,13 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "96d4d68be9f07772",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/cpp/comment/C与C++的同与不同.md",
+    "coding/cpp/Seastar：高性能C++库详解与应用.md",
+    "coding/cpp/Scudo内存分配器介绍.md",
+    "coding/cpp/C++的全链路追踪方案，稍微有点高端.md",
+    "coding/cpp/grammar/终极 C++避坑指南.md",
     "awesome-list/community.md",
     "test/brain-waves.md",
     "coding/cpp/grammar/C++20那些事之宇宙飞船运算符.md",
@@ -170,12 +175,7 @@
     "coding/os/linux/syscall",
     "test/2024-09-01.md",
     "coding/os/linux/init/systemd：为何要创建一个新的init系统软件.md",
-    "coding/os/linux/init/linux 启动es init heap not equal.md",
     "coding/os/linux/init",
-    "awesome-list/zhihu.md",
-    "awesome-list/celebrity.md",
-    "coding/cpp/grammar/C++为什么要弄出虚表这个东西？.md",
-    "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
     "hardware",
     "coding/cpp/Untitled",
     "coding/database/scalar-db",
