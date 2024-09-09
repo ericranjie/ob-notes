@@ -31,30 +31,30 @@ std::span是一种轻量级、非拥有、不分配内存的容器，用于表�
 
 **查看传统数组**
 
-```
-void using_classic_array()
+```cpp
+void using_classic_array() { int arr[]={1,2,3,4,5}; std::span<int> s{arr}; std::cout <<"size "<< s.size()<<"\n"; std::cout <<"size byte "<< s.size_bytes() << "\n"; for (auto & data:s) { std::cout<<data<<"\t"; } std::cout<<"\n"; arr[0] = 500;//std::span同步更新 for (auto& data : s) { std::cout << data << "\t"; } std::cout << "\n"; }
 ```
 
 **查看连续内存**
 
-```
-constexpr int num=100;
+```cpp
+constexpr int num=100; void using_malloc() { float *f = (float*)malloc(num *sizeof(float)); memset(f,0, num*sizeof(float)); std::span<float> s(f, num); for (size_t i = 0; i < num; i++) { f[i]=(float)i/num; } std::cout << "size " << s.size() << "\n"; std::cout << "size byte " << s.size_bytes() << "\n"; for (const auto& data:s) { std::cout<<data<<"\t"; } std::cout<<"\n\n\n\n"; free(f); for (const auto& data : s) { std::cout << data << "\t"; } std::cout << "\n\n\n\n"; }
 ```
 
   
 
 **查看vector**
 
-```
-void using_vector()
+```cpp
+void using_vector() { std::vector<int> v{ 1,2,3,4,5 }; std::span<int> ss = v; std::cout << "size " << ss.size() << "\n"; std::cout << "size byte " << ss.size_bytes() << "\n"; for (auto& data : ss) { std::cout << data << "\t"; } std::cout << "\n"; v[3]=100;//std::span同步更新 for (auto& data : ss) { std::cout << data << "\t"; } std::cout << "\n"; }
 ```
 
   
 
 **查看非连续内存**
 
-```
-void using_non_conitnue()
+```cpp
+void using_non_conitnue() { std::list<int> l{1,2,3,4,5}; std::deque<int> d{ 1,2,3,4,5 }; //std::span<int> s{l,5};//编译错误 //std::span<int> sss = d;//编译错误 //std::span<int> sss{d,5};//编译错误 }
 ```
 
 由如上代码可知，std::span只能用于查看连续内存区域，同时std::span内涵区域长度信息，并可以通过其size或size_bytes方法获取，也支持for循环。

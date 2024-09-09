@@ -27,7 +27,7 @@
 继续沿着这个思路继续调研，我找到了gcc和clang编译器的一个编译参数：-finstrument-functions，编译时添加此参数会在函数的入口和出口处触发一个固定的回调函数，即：
 
 ```
-__cyg_profile_func_enter(void *callee, void *caller);
+__cyg_profile_func_enter(void *callee, void *caller); __cyg_profile_func_exit(void *callee, void *caller);
 ```
 
 参数就是callee和caller的地址，那怎么将地址解析成对应函数名？可以使用dladdr函数：
@@ -39,25 +39,25 @@ int dladdr(const void *addr, Dl_info *info);
 看下下面的代码：
 
 ```
-// tracing.cc
+// tracing.cc #include <cxxabi.h> #include <dlfcn.h>  // for dladdr #include <stdio.h> #include <stdlib.h> #include <string.h> #ifndef NO_INSTRUMENT #define NO_INSTRUMENT __attribute__((no_instrument_function)) #endif extern "C" __attribute__((no_instrument_function)) void __cyg_profile_func_enter(void *callee, void *caller) { Dl_info info; if (dladdr(callee, &info)) { int status; const char *name; char *demangled = abi::__cxa_demangle(info.dli_sname, NULL, 0, &status); if (status == 0) { name = demangled ? demangled : "[not demangled]"; } else { name = info.dli_sname ? info.dli_sname : "[no dli_sname nd std]"; } printf("enter %s (%s)\n", name, info.dli_fname); if (demangled) { free(demangled); demangled = NULL; } } } extern "C" __attribute__((no_instrument_function)) void __cyg_profile_func_exit(void *callee, void *caller) { Dl_info info; if (dladdr(callee, &info)) { int status; const char *name; char *demangled = abi::__cxa_demangle(info.dli_sname, NULL, 0, &status); if (status == 0) { name = demangled ? demangled : "[not demangled]"; } else { name = info.dli_sname ? info.dli_sname : "[no dli_sname and std]"; } printf("exit %s (%s)\n", name, info.dli_fname); if (demangled) { free((void *)demangled); demangled = NULL; } } }
 ```
 
 这是测试文件：
 
 ```
-// test_trace.cc
+// test_trace.cc void func1() {} void func() { func1(); } int main() { func(); } 将test_trace.cc和tracing.cc文件同时编译链接，即可达到链路追踪的目的： g++ test_trace.cc tracing.cc -std=c++14 -finstrument-functions -rdynamic -ldl;./a.out 输出：enter main (./a.out) enter func() (./a.out) enter func1() (./a.out) exit func1() (./a.out) exit func() (./a.out) exit main (./a.out)
 ```
 
 如果在func()中调用了一些其他的函数呢？
 
 ```
-#include <iostream>
+#include <iostream> #include <vector> void func1() {} void func() { std::vector<int> v{1, 2, 3}; std::cout << v.size(); func1(); } int main() { func(); }
 ```
 
 再重新编译后输出会是这样：
 
 ```
-enter [no dli_sname nd std] (./a.out)
+enter [no dli_sname nd std] (./a.out) enter [no dli_sname nd std] (./a.out) exit [no dli_sname and std] (./a.out) exit [no dli_sname and std] (./a.out) enter main (./a.out) enter func() (./a.out) enter std::allocator<int>::allocator() (./a.out) enter __gnu_cxx::new_allocator<int>::new_allocator() (./a.out) exit __gnu_cxx::new_allocator<int>::new_allocator() (./a.out) exit std::allocator<int>::allocator() (./a.out) enter std::vector<int, std::allocator<int> >::vector(std::initializer_list<int>, std::allocator<int> const&) (./a.out) enter std::_Vector_base<int, std::allocator<int> >::_Vector_base(std::allocator<int> const&) (./a.out) enter std::_Vector_base<int, std::allocator<int> >::_Vector_impl::_Vector_impl(std::allocator<int> const&) (./a.out) enter std::allocator<int>::allocator(std::allocator<int> const&) (./a.out) enter __gnu_cxx::new_allocator<int>::new_allocator(__gnu_cxx::new_allocator<int> const&) (./a.out) exit __gnu_cxx::new_allocator<int>::new_allocator(__gnu_cxx::new_allocator<int> const&) (./a.out) exit std::allocator<int>::allocator(std::allocator<int> const&) (./a.out) exit std::_Vector_base<int, std::allocator<int> >::_Vector_impl::_Vector_impl(std::allocator<int> const&) (./a.out) exit std::_Vector_base<int, std::allocator<int> >::_Vector_base(std::allocator<int> const&) (./a.out)
 ```
 
 上面我只贴出了部分信息，这显然不是我们想要的，我们只想要显示自定义的函数调用路径，其他的都想要过滤掉，怎么办？
@@ -71,18 +71,18 @@ enter [no dli_sname nd std] (./a.out)
 下面是我过滤掉std和gnu子串的代码：
 
 ```
-if (!strcasestr(name, "std") && !strcasestr(name, "gnu")) {
+if (!strcasestr(name, "std") && !strcasestr(name, "gnu")) { printf("enter %s (%s)\n", name, info.dli_fname); } if (!strcasestr(name, "std") && !strcasestr(name, "gnu")) { printf("exit %s (%s)\n", name, info.dli_fname); }
 ```
 
 重新编译后就会输出我想要的结果：
 
-```
-g++ test_trace.cc tracing.cc -std=c++14 -finstrument-functions -rdynamic -ldl;./a.out
+```bash
+g++ test_trace.cc tracing.cc -std=c++14 -finstrument-functions -rdynamic -ldl;./a.out 输出：enter main (./a.out) enter func() (./a.out) enter func1() (./a.out) exit func1() (./a.out) exit func() (./a.out) exit main (./a.out)
 ```
 
 还有一种方式是在编译时使用下面的参数：
 
-```
+```bash
 -finstrument-functions-exclude-file-list
 ```
 

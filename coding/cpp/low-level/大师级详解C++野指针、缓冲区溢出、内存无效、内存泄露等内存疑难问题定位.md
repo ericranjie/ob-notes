@@ -24,14 +24,14 @@ Original QtCpp大师 QtCpp大师
     
 -   
     
-
+![[Pasted image 20240909080003.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 # 释放后使用(空悬指针)
 
 内存被释放后，该内存还继续被使用，导致访问异常。
 
-```
+```cpp
 int main(int argc, char** argv){    int* array = new int[100];    delete[] array;    return array[argc];  // 异常}
 ```
 
@@ -40,7 +40,7 @@ int main(int argc, char** argv){    int* array = new int[100];   
 但是在大型项目中，涉及到系统，子系统，模块等等，这样的问题就很难从代码层面发现了。
 
 那么使用ASan运行后，因为有影子内存以及红区检测技术，问题很快会被发现而且定位到，详细分析如下
-
+![[Pasted image 20240909080014.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 1.第一段表示heap-use-after-free类型的内存错误，在main.cpp的第六行，即`return array[argc];`语句访问了0x03603a44地址。
@@ -56,10 +56,10 @@ int main(int argc, char** argv){    int* array = new int[100];   
 
 内存访问发生在堆分配区域的边界之外。
 
-```
+```cpp
 int main(int argc, char** argv){    int* array =new int[100];    array[0]=0;    int res = array[argc +100];// 异常？    delete[] array;    printf("run here");    getchar();    return res;}
 ```
-
+![[Pasted image 20240909080024.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 1.第一段表示heap-buffer-overflow类型的内存错误，在main.cpp的第七行，即`int res = array[argc + 100];`语句越界访问0x02f03bd4地址。
@@ -73,10 +73,10 @@ int main(int argc, char** argv){    int* array =new int[100];    a
 
 内存访问发生在栈分配区域的边界之外。
 
-```
+```cpp
 int main(int argc, char** argv){    int stack_array[100];    stack_array[1]=0;    int res = stack_array[argc +100];// 异常？    printf("run here");    getchar();    return res;}
 ```
-
+![[Pasted image 20240909080031.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 1.第一段表示stack-buffer-overflow类型的内存错误，在main.cpp的第七行，即`int res = stack_array[argc + 100];`语句越界访问0x0026fc2c地址。
@@ -88,7 +88,7 @@ int main(int argc, char** argv){    int stack_array[100];    stack_
 
 内存访问发生在全局分配区域的边界之外。
 
-```
+```cpp
 int global_array[100]={-1};int main(int argc, char** argv){    int res = global_array[argc +100];// 异常？    printf("run here");    getchar();    return res;}
 ```
 
@@ -97,7 +97,7 @@ int global_array[100]={-1};int main(int argc, char** argv){    int res
 因为其隐晦的访问了非预期内存中的四个字节，非常难定位。
 
 那么使用ASan运行后，因为有影子内存以及红区检测技术，问题很快会被发现而且定位到，详细分析如下
-
+![[Pasted image 20240909080042.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 1.第一段表示是global-buffer-overflow类型的内存错误，由main.cpp的第六行触发，即`int res = global_array[argc + 100];`语句访问了0x0083b254地址。
@@ -109,10 +109,10 @@ int global_array[100]={-1};int main(int argc, char** argv){    int res
 
 在函数内把函数变量栈内存地址返回给外部使用。
 
-```
+```cpp
 int* ptr =nullptr;void Fun(){    int local[100];    ptr =&local[0];}int main(int argc, char** argv){    Fun();    int value =*ptr;    printf("value = %d\n", value);    printf("run here");    getchar();    return value;}
 ```
-
+![[Pasted image 20240909080058.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 1.第一段表示stack-use-after-return类型的内存错误，在main.cpp的第14行，即`int value = *ptr;`语句访问0x01809000地址。
@@ -124,10 +124,10 @@ int* ptr =nullptr;void Fun(){    int local[100];    ptr =&local[0];
 
 在栈变量生命周期的范围之外对该变量地址进行访问。
 
-```
+```cpp
 int* p =nullptr;int main(){    {        int x =0;        p =&x;    }    *p =5;    printf("run here");    getchar();    return0;}
 ```
-
+![[Pasted image 20240909080106.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 1.第一段表示stack-use-after-scope类型的内存错误，在main.cpp的第11行，即`*p = 5;`语句访问0x0055fc58地址。

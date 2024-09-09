@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md",
+                "file": "coding/os/linux/memory/cache/浅谈Cache Memory.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "C++反射：反射信息的自动生成！",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md",
+                "file": "coding/os/linux/memory/cache/浅谈Cache Memory.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md",
+                "file": "coding/os/linux/memory/cache/浅谈Cache Memory.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/comment/C语言中三块难啃的硬骨头.md"
+                "file": "coding/os/linux/memory/cache/浅谈Cache Memory.md"
               }
             }
           }
@@ -133,8 +133,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -146,54 +145,54 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "96d4d68be9f07772",
   "lastOpenFiles": [
-    "coding/cpp/comment/C与C++的同与不同.md",
-    "coding/cpp/Seastar：高性能C++库详解与应用.md",
-    "coding/cpp/Scudo内存分配器介绍.md",
-    "coding/cpp/C++的全链路追踪方案，稍微有点高端.md",
-    "coding/cpp/grammar/终极 C++避坑指南.md",
-    "awesome-list/community.md",
-    "test/brain-waves.md",
-    "coding/cpp/grammar/C++20那些事之宇宙飞船运算符.md",
-    "coding/compiler/利用Makfile给多文件、多目录C源码建立工程.md",
-    "coding/cpp/learning/C++知识体系总结：语言核心与代码工程.md",
-    "coding/cpp/grammar/C++26 中的新功能.md",
-    "coding/cpp/grammar/reflect/C++反射TS初探.md",
-    "coding/cpp/grammar/C++20新特性—“宇宙飞船”运算符.md",
-    "coding/cpp/grammar/C++ 设计模式之 SFINAE：用来检测类中是否有某个成员函数.md",
-    "coding/cpp/learning/a_ C++八股文面经总结（含答案），收藏起来慢慢看.md",
+    "0x99-image/Pasted image 20240909083246.png",
+    "coding/cpp/opensource/STL/万字长文 STL 算法总结.md",
+    "coding/cpp/opensource/STL",
+    "coding/cpp/冷门知识点：进程间通信如何加锁？.md",
+    "coding/cpp/grammar/深入分析C++全局变量初始化 文末热门招聘.md",
+    "0x99-image/Pasted image 20240909084248.png",
+    "0x99-image/Pasted image 20240909084225.png",
+    "0x99-image/Pasted image 20240909084220.png",
+    "0x99-image/Pasted image 20240909084213.png",
+    "0x99-image/Pasted image 20240909084209.png",
+    "0x99-image/Pasted image 20240909084103.png",
+    "0x99-image/Pasted image 20240909084041.png",
+    "0x99-image/Pasted image 20240909084036.png",
+    "0x99-image/Pasted image 20240909084030.png",
+    "0x99-image/Pasted image 20240909084025.png",
+    "awesome-list/wechat.md",
+    "coding/cpp/comment/祝贺龙蜥社区理事单位成员入选C++ 标准委员会，首个国内企业代表加入.md",
+    "coding/cpp/learning/Hands-On Design Patterns with C++ 讲义 第0章：开篇.md",
+    "coding/cpp/grammar/C++嵌入式编程习语 MMIO 建模.md",
+    "coding/cpp/grammar/C++17 在业务代码中最好用的十个特性.md",
+    "coding/cpp/comment/我的引擎之路：从苹果生态到逃离回归C++.md",
+    "coding/cpp/performance/C++的全链路追踪方案，稍微有点高端.md",
+    "coding/cpp/performance/C++服务性能优化的道与术-道篇：阿姆达尔定律.md",
+    "coding/cpp/low-level/大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
+    "coding/cpp/performance",
+    "coding/cpp/opensource/Seastar：高性能C++库详解与应用.md",
+    "coding/cpp/grammar/std span查看连续内存.md",
+    "coding/cpp/opensource/Scudo内存分配器介绍.md",
+    "coding/cpp/learning/C++，YYDS！.md",
+    "coding/cpp/grammar/C++异步从理论到实践总览篇.md",
+    "coding/cpp/grammar/C++协程在阿里的推广和大规模应用.md",
+    "coding/cpp/comment/新简化！typename在C++20不再必要.md",
+    "coding/cpp/opensource/压箱底的音视频学习资料以及面经整理.md",
+    "coding/cpp/opensource/Glibc.md",
+    "coding/cpp/low-level/你一定要搞明白的C函数调用方式与栈原理.md",
+    "coding/cpp/learning/Scott Meyers大师课系列之《C++嵌入式编程最佳实践》.md",
+    "coding/cpp/learning/Effective C++ 高阶笔记.md",
     "coding/cpp/grammar/C++ Trick：右值引用、万能引用傻傻分不清楚.md",
-    "test/阿卡西记录.md",
-    "coding/cpp/learning/C++ Best Practices (C++最佳实践)翻译与阅读笔记.md",
-    "coding/cpp/template/模版定义一定要写在头文件中吗.md",
-    "coding/cpp/template/四万字长文，这是我见过最好的模板元编程文章！.md",
-    "coding/cpp/template/C++模板总结.md",
-    "coding/os/linux/schedule/load_balance函数代码详解.md",
-    "coding/os/linux/schedule/Linux 最大并发数是多少？.md",
-    "coding/os/linux/syscall/Linux 多线程全面解析.md",
     "coding/os/linux/syscall",
-    "test/2024-09-01.md",
-    "coding/os/linux/init/systemd：为何要创建一个新的init系统软件.md",
     "coding/os/linux/init",
     "hardware",
-    "coding/cpp/Untitled",
     "coding/database/scalar-db",
     "coding/architecture/message-queue",
     "coding/database/MySQL",
-    "0x99-image/Pasted image 20240907181006.png",
     "coding/algorithm/greedy",
     "coding/os/linux/process/coroutine",
-    "coding/os/linux/performance/flame-graph",
-    "0x99-image/Pasted image 20240906162125.png",
-    "0x99-image/Pasted image 20240906162327.png",
-    "0x99-image/Pasted image 20240906162322.png",
-    "0x99-image/Pasted image 20240906162314.png",
-    "0x99-image/Pasted image 20240906162255.png",
-    "0x99-image/Pasted image 20240906162216.png",
-    "0x99-image/Pasted image 20240906162140.png",
-    "0x99-image/Pasted image 20240906162132.png",
-    "0x99-image/Pasted image 20240906121156.png",
     "Untitled.canvas"
   ]
 }

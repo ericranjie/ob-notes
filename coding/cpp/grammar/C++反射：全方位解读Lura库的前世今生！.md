@@ -245,8 +245,8 @@ Ponder本身的Lua导出并不完备，使用的便利性和周边设施，相�
 
   
 
-```
-__register_type<rstudio::math::Vector3>("rstudio::math::Vector3")
+```cpp
+__register_type<rstudio::math::Vector3>("rstudio::math::Vector3") //member fields export here .property("x", &rstudio::math::Vector3::x) .property("y", &rstudio::math::Vector3::y) .property("z", &rstudio::math::Vector3::z) .static_property("ZERO", [](){ return rstudio::math::Vector3::ZERO; }) //member properties export here //constructor export here .constructor<double, double, double>() .constructor<const rstudio::math::Vector3&>() .constructor<double>() .constructor<>() //methods export here .overload("__assign" ,[](rstudio::math::Vector3* self, double fScalar){return self->operator=(fScalar); } ,[](rstudio::math::Vector3* self, const rstudio::math::Vector3& rhs){return self->operator=(rhs); } ) .function("Length", &rstudio::math::Vector3::Length) ;
 ```
 
   
@@ -255,8 +255,8 @@ Lua注册:
 
   
 
-```
-lura::get_global_namespace(L).begin_namespace("math3d")
+```cpp
+lura::get_global_namespace(L).begin_namespace("math3d").begin_class<rstudio::math::Vector3>("Vector3").end_class().end_namespace();
 ```
 
   
@@ -331,7 +331,7 @@ __call用于直接在lua中构造一个对应的c++对象，我们将class table
 
   
 
-```
+```cpp
 local vec =  math3d.Vecto3()
 ```
 
@@ -341,8 +341,8 @@ local vec =  math3d.Vecto3()
 
   
 
-```
-void LuaCFunctions::CreateClassContentTable(lua_State* L, const rstudio::reflection::MetaClass& cls,
+```cpp
+void LuaCFunctions::CreateClassContentTable(lua_State* L, const rstudio::reflection::MetaClass& cls, const std::string_view name, const std::string_view cppName, const void* classMetaTableKey, bool needMetaCallMethod, const void* instanceMetaTableKey) { lua_createtable(L, 0, 20);  // Stack: class table (cl) lua_pushvalue(L, -1);       // Stack: cl, cl lua_setmetatable(L, -2);    // Stack: cl        ->cl.__mt = cl lua_pushlstring(L, name.data(), name.length()); lua_rawsetp(L, -2, GetTypeKey());  // Stack: cl        -> cl[typeKey] = name lua_pushlstring(L, cppName.data(), name.length()); lua_rawsetp(L, -2, GetCppTypeNameKey());  // Stack: cl        -> cl[cppTypeNameKey] = cppName lua_pushliteral(L, "__index");                              // Stack: cl, "__index" lua_pushlightuserdata(L, (void*)&cls);                      // Stack: cl, "__index", cls lua_pushvalue(L, -3);                                       // Stack: cl, "__index", cls, cl lua_pushcclosure(L, LuaCFunctions::StaticMemberMetaIndex, 2);  // Stack: cl, "__index", get_static_func lua_rawset(L, -3);                                          // Stack: cl // Help name lua_pushliteral(L, "__tostring");                        // Stack: cl, "__tostring" lua_pushlightuserdata(L, (void*)&cls);                   // Stack: cl, "__tostring", cls_p        -> +1 lua_pushcclosure(L, ClassContentTableToString, 1);  // Stack: cl, "__tostring", l_class_content_table_tostring lua_rawset(L, -3);                                       // Stack: cl // Bind class table to registry table lua_pushvalue(L, -1);  // Stack: cl, cl lua_rawsetp(L, LUA_REGISTRYINDEX, classMetaTableKey);  // Stack: cl        -> _R[classMetaTableKey] = cl // Namespace bind static class do not need "__call" method if (needMetaCallMethod) { lua_pushliteral(L, "__call");                           // Stack: cl, "__call" lua_pushlightuserdata(L, (void*)&cls);                  // Stack: cl, "__call", cls lua_pushcclosure(L, LuaCFunctions::InstanceMetaCreate, 1);  // Stack: cl, create_func lua_rawset(L, -3);                                      // Stack: cl int clTableIndex = lua_absindex(L, -1); CreateInstanceMetaTable(L, cls, clTableIndex);  // Stack: cl, instance meta table(ins_meta) lua_rawsetp(L, LUA_REGISTRYINDEX, instanceMetaTableKey);  // Stack: cl        -> _R[instanceMetaTableKey] = ins_meta // Register key to MetaClass cls.SetUserdata<rstudio::reflection::ClassUserdata::eLura>(instanceMetaTableKey); } }
 ```
 
   
@@ -359,7 +359,7 @@ void LuaCFunctions::CreateClassContentTable(lua_State* L, const rstudio::reflect
     
 
   
-
+![[Pasted image 20240909065815.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -387,8 +387,8 @@ void LuaCFunctions::CreateClassContentTable(lua_State* L, const rstudio::reflect
 
   
 
-```
-void LuaCFunctions::CreateInstanceMetaTable(lua_State* L, const MetaClass& cls, int clTableIndex) {
+```cpp
+void LuaCFunctions::CreateInstanceMetaTable(lua_State* L, const MetaClass& cls, int clTableIndex) { lua_createtable(L, 0, 3);  // Stack: mt                  -> +1 mt lua_pushliteral(L, "__index");             // Stack: mt, "__index"            -> +1 lua_pushlightuserdata(L, (void*)&cls);     // Stack: mt, "__index", cls_p        -> +1 lua_pushvalue(L, clTableIndex);            // Stack: mt, "__index", cls_p, cl lua_pushcclosure(L, InstanceMetaIndex, 2);  // Stack: mt, "__index", func[1u=cls_p, 2u=cl],      -> 0 +- lua_rawset(L, -3);                         // Stack: mt                  -> mt[__index] = // l_inst_index lua_pushliteral(L, "__newindex");             // Stack: mt, "__newindex"          -> +1 lua_pushlightuserdata(L, (void*)&cls);        // Stack: mt, "__newindex", cls_p      -> +1 lua_pushvalue(L, clTableIndex);               // Stack: mt, "__newindex", cls_p, cl    -> +1 lua_pushcclosure(L, InstanceMetaNewIndex, 2);  // Stack: mt, "__newindex", func[1u]      -> 0 +- lua_rawset(L, -3);                            // Stack: mt                  -> mt[__newindex] = // l_inst_newindex   -2 lua_pushliteral(L, "__gc");        // Stack: mt, "__gc"              -> +1 lua_pushcfunction(L, InstanceMetaGc);  // Stack: mt, func[0u]            ->  0 +- lua_rawset(L, -3);                 // Stack: mt                  -> mt[__gc] = // l_finalize  -2 // Help name lua_pushliteral(L, "__tostring");             // Stack: mt, "__tostring" lua_pushlightuserdata(L, (void*)&cls);        // Stack: mt, "__tostring", cls_p        -> +1 lua_pushcclosure(L, InstanceMetaToString, 1);  // Stack: mt, "__tostring", l_inst_tostring lua_rawset(L, -3);                            // Stack: mt InstanceRegisterCustomMetaMethod(L, cls, "__add"); InstanceRegisterCustomMetaMethod(L, cls, "__sub"); InstanceRegisterCustomMetaMethod(L, cls, "__mul"); InstanceRegisterCustomMetaMethod(L, cls, "__div"); }
 ```
 
   
@@ -397,8 +397,8 @@ void LuaCFunctions::CreateInstanceMetaTable(lua_State* L, const MetaClass& cls, 
 
   
 
-```
-// obj[key]
+```cpp
+// obj[key] int LuaCFunctions::InstanceMetaIndex(lua_State* L) { lua_pushvalue(L, lua_upvalueindex(1)); const auto* cls = (const ::framework::reflection::MetaClass*)lua_touserdata(L, -1); void* ud = lua_touserdata(L, 1);  // userobj - (obj, key) -> obj[key] //if obj is nothing, just return nil ::framework::reflection::UserObject* uobj = (::framework::reflection::UserObject*)ud; if(uobj == nullptr || *uobj == ::framework::reflection::UserObject::nothing) { return 0; } if (FRAMEWORK_UNLIKELY(lua_isinteger(L, 2))) { // try to handle as ArrayObject first return InstanceMetaIndexForArrayObject(L, cls, ud); } const char* skey = lua_tostring(L, 2); const ::framework::reflection::IdRef key(skey ? skey : ""); // check if getting property value const framework::reflection::Property* pp = nullptr; if (cls->TryGetProperty(key, pp)) { ::framework::reflection::UserObject* uobj = (::framework::reflection::UserObject*)ud; return LuraHelper::PushValue(L, pp->Get(*uobj)); } // check if calling function object const ::framework::reflection::Function* fp = nullptr; if (cls->TryGetFunction(key, fp)) { return PushReflectionFunction(L, fp); } // for pure lua function support here lua_pushvalue(L, lua_upvalueindex(2));       // cl lua_rawgetp(L, -1, GetClassCFunctionKey());  // cl, cft if (lua_istable(L, -1)) { // cfunction table not null lua_pushvalue(L, 2);  // cl, cft, key lua_rawget(L, -2);    // cl, cft, func return 1; } return 0; }
 ```
 
   
@@ -416,8 +416,8 @@ void LuaCFunctions::CreateInstanceMetaTable(lua_State* L, const MetaClass& cls, 
 
   
 
-```
-local vec =  math3d.Vecto3()
+```cpp
+local vec =  math3d.Vecto3() print("vec:", vec.x, vec.y, vec.z) print("len:", vec:Length())
 ```
 
   
@@ -425,13 +425,13 @@ local vec =  math3d.Vecto3()
 vec是什么，怎么支撑上面的.x，.y，.z成员获取和Length()函数的调用的呢? 答案就在上面提到过的LuaCFunctions::InstanceMetaCreate()函数上，我们结合相关的代码和图来了解一下实现原理:
 
   
-
+![[Pasted image 20240909065932.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
 
-```
-int LuaCFunctions::InstanceMetaCreate(lua_State* L) {
+```cpp
+int LuaCFunctions::InstanceMetaCreate(lua_State* L) { // get Class* from class object lua_pushvalue(L, lua_upvalueindex(1)); if (!lua_isuserdata(L, -1)) { lua_pop(L, 1); luaL_error(L, "Can not find upvalue for create object!"); return 0; } const MetaClass* cls = (const MetaClass*)lua_touserdata(L, -1); lua_pop(L, 1); framework::reflection::Args args; constexpr int c_argOffset = 2;  // 1st arg is userdata object const int nargs = lua_gettop(L) - (c_argOffset - 1); for (int i = c_argOffset; i < c_argOffset + nargs; ++i) { // there may be multiple constructors so don't check types args += LuraHelper::GetValue(L, i); } // Search an arguments match among the list of available constructors framework::reflection::UserObject obj; for (size_t nb = cls->GetConstructorCount(), i = 0; i < nb; ++i) { const auto& constructor = *(cls->GetConstructor(i)); if (constructor.CheckLuaSignatureMatchs(L, 1, nargs)) { // Match found: use the constructor to create the new instance obj = constructor.CreateFromLua(L, nullptr, 1); } } // framework::reflection::runtime::ObjectFactory fact(*cls); // framework::reflection::UserObject obj(fact.construct(args)); if (obj == framework::reflection::UserObject::nothing) { lua_pop(L, 1);  // pop new user data luaL_error(L, "Matching constructor not found"); return 0; } void* ud = lua_newuserdata(L, sizeof(UserObject));  // Stack: ud        +1 new (ud) UserObject(obj); const void* insMetaKey = cls->GetUserdata<ClassUserdata::eLura>(); lua_rawgetp(L, LUA_REGISTRYINDEX, insMetaKey);  // Stack: ud, ins_meta_tbl lua_setmetatable(L, -2);                        // Stack: ud return 1; }
 ```
 
   
@@ -503,7 +503,7 @@ lura的协程处理主要完成了两件事:
 lura本体是直接选择了商用的FramePro，集成了它的SDK。因为跨语言边界处理的代码都非常集中，所以接入其他第三方的profiler也相对容易，这里直接上最后的效果图了:
 
   
-
+![[Pasted image 20240909070009.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
