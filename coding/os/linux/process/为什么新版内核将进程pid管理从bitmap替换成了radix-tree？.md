@@ -36,7 +36,7 @@ bitmap 可以极大地压缩整数的存储。如果使用 bitmap 来存储使�
 
 内核中创建进程时申请 pid 的核心函数是 alloc_pid。在 3.10 版本中的时候，分配 pid 调用 pidmap 的接口函数 alloc_pidmap 来完成。它的源码是下面这个样子的：
 
-```
+```c
 //file:kernel/pid.c
 struct pid *alloc_pid(struct pid_namespace *ns)
 {
@@ -58,7 +58,7 @@ struct pid *alloc_pid(struct pid_namespace *ns)
 
 如前面所述，bitmap 的最大好处是节约内存。但其也有个比较大的缺点，分配一个新的 pid 时的计算复杂度比较高。如果在进程数量比较多的，几乎需要把整个 bitmap 中的每一个 bit 位都遍历一遍才行。
 
-```
+```c
 // file:kernel/pid.c
 static int alloc_pidmap(struct pid_namespace *pid_ns)
 {
@@ -90,7 +90,7 @@ static int alloc_pidmap(struct pid_namespace *pid_ns)
 
 基数树节点的数据结构定义中，有几个非常重要的字段，分别是 shift、slots 和 tags。
 
-```
+```c
 //file:include/linux/xarray.h
 struct xa_node {
     ...
@@ -151,7 +151,7 @@ tags 用来记录 slog 数组中每一个下标的存储状态。其中每个树
 
 使用了基数树后，内核源码也就发生了变化。在比较新的 6.1 版本的内核中，alloc_pid 变成了下面这个样子，通过调用 idr_alloc 来申请一个未使用过的进程 ID 出来。
 
-```
+```c
 //file:kernel/pid.c
 struct pid *alloc_pid(struct pid_namespace *ns, ...)
 {
@@ -175,7 +175,7 @@ struct pid *alloc_pid(struct pid_namespace *ns, ...)
 
 其申请的核心过程是 idr_get_free，主要就是遍历这颗基数树的若干节点，并根据每个节点的 tag、slot 等字段找出还未被占用的整数 ID。
 
-```
+```c
 //file:lib/radix-tree.c
 void __rcu **idr_get_free(struct radix_tree_root *root, ...)
 {

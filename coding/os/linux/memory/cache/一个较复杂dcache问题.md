@@ -31,7 +31,7 @@ oppo云内核团队发现集群的snmpd的cpu消耗冲高,
 
 snmpd几乎长时间占用一个核，perf发现热点如下：
 
-```
+```c
 
 +   92.00%     3.96%  [kernel]    [k]    __d_lookup 
 
@@ -129,7 +129,7 @@ sys 0m0.000s
 
 proc_sys_compare只有一个调用路径，那就是d_compare回调，从调用链看：
 
-```
+```c
 
 __d_lookup--->if (parent->d_op->d_compare(parent, dentry, tlen, tname, name))
 
@@ -403,7 +403,7 @@ ffff89db7fd3c800
 
 继续使用命令看一下dentry对应的d_inode的情况：
 
-```
+```c
 
 ...
 
@@ -447,7 +447,7 @@ ffff89edf5324b40
 
 /proc/sys/net/ipv6路径的形成，简单地说分为了如下几个步骤：
 
-```
+```c
 
 start_kernel-->proc_root_init()//caq:注册proc fs
 
@@ -481,7 +481,7 @@ ops_init-->ipv6_sysctl_net_init
 
 常见的调用栈如下：
 
-```
+```c
 
  :Fri Mar  5 11:18:24 2021,runc:[1:CHILD],tid=125338.path=net/ipv6
 
@@ -515,7 +515,7 @@ ops_init-->ipv6_sysctl_net_init
 
 内的dentry隔离呢？我们来看对应的__register_sysctl_table函数：
 
-```
+```c
 
 struct ctl_table_header *register_net_sysctl(struct net *net,
 
@@ -583,7 +583,7 @@ struct ctl_table_header *__register_sysctl_table(
 
 然后在查找的时候，比较如下：
 
-```
+```c
 
 static int proc_sys_compare(const struct dentry *parent, const struct dentry *dentry,
 
@@ -655,7 +655,7 @@ set其实是init_net的sysctls，而经过查看冲突链中的各个前面绝�
 
 那个是因为下面的代码导致的：
 
-```
+```c
 
 static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
 
@@ -709,7 +709,7 @@ static inline void hlist_bl_add_head_rcu(struct hlist_bl_node *n,
 
 都是一样的，那么查看一下这个父parent有多少个子dentry呢?
 
-```
+```c
 
 然后看 hash表里面的dentry，d_parent很多都指向 0xffff8a0a7739fd40 这个dentry。
 
@@ -737,7 +737,7 @@ crash> list 0xffff8a07a3c6f710 |wc -l
 
 然后查看集群其他机器，也发现类型现象，截取的打印如下：
 
-```
+```c
 
  count=158505,d_name=net,d_len=3,name=ipv6/conf/all/disable_ipv6,hash=913731689,len=4
 
@@ -753,7 +753,7 @@ hlist_bl_head=ffffbd9d429a7498,count=158506
 
 先分析ipv6 链，core链的分析其实是一样的，挑取冲突链的数据分析如下：
 
-```
+```c
 
 crash> dentry.d_parent,d_name.name,d_lockref.count,d_inode,d_subdirs ffff9b867904f500
 
@@ -879,7 +879,7 @@ crash> dentry.d_parent,d_lockref.count,d_name.name,d_subdirs,d_flags,d_inode -
 
 针对 d_flags ，分析如下：
 
-```
+```c
 
 #define DCACHE_FILE_TYPE        0x04000000 /* Other file type */
 
@@ -907,7 +907,7 @@ crash> dentry.d_parent,d_lockref.count,d_name.name,d_subdirs,d_flags,d_inode -
 
 根据如下函数：
 
-```
+```c
 
 static void dentry_lru_add(struct dentry *dentry)
 
@@ -939,7 +939,7 @@ echo 2 >/proc/sys/vm/drop_caches
 
 然后编写一个模块去释放，模块的主代码如下,参考 shrink_slab：
 
-```
+```c
 
   spin_lock(orig_sb_lock);
 
@@ -1001,7 +1001,7 @@ echo 2 >/proc/sys/vm/drop_caches
 
 比如某个节点在释放前：
 
-```
+```c
 
 [3435957.357026] hlist_bl_head=ffffbd9d5a7a6cc0,count=34686
 
@@ -1031,7 +1031,7 @@ echo 2 >/proc/sys/vm/drop_caches
 
 单独释放后：
 
-```
+```c
 
 [3436042.407051] hlist_bl_head=ffffbd9d466aed58,count=101
 
@@ -1093,7 +1093,7 @@ core/somaxconn 导致的，这两个dentry 都被放在了归属的super_block
 
 最后一个疑问，是什么调用访问了这些dentry呢?触发的机制如下：
 
-```
+```c
 
 pid=16564,task=exe,par_pid=366883,task=dockerd,count=1958,d_name=net,d_len=3,name=ipv6/conf/all/disable_ipv6,hash=913731689,len=4,hlist_bl_head=ffffbd9d429a7498
 
@@ -1131,7 +1131,7 @@ drop_caches ，这个会导致sys 冲高，影响一些时延敏感型的业�
 
 中频繁地看到如下日志：
 
-```
+```c
 
 IPVS: Creating netns size=2048 id=866615
 
