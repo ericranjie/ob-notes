@@ -13,7 +13,7 @@
             "state": {
               "type": "image",
               "state": {
-                "file": "0x99-image/Pasted image 20240910195155.png"
+                "file": "0x99-image/Pasted image 20240910233414.png"
               }
             }
           }
@@ -46,7 +46,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "深入理解TLB",
+                "query": "写一个使用perf分析cache的示例",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -83,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240910195155.png",
+                "file": "0x99-image/Pasted image 20240910233414.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240910195155.png",
+                "file": "0x99-image/Pasted image 20240910233414.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240910195155.png"
+                "file": "0x99-image/Pasted image 20240910233414.png"
               }
             }
           }
@@ -146,52 +146,52 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/debug/《Load高故障分析》学习笔记.md",
+    "0x99-image/Pasted image 20240911001200.png",
+    "0x99-image/Pasted image 20240911001155.png",
+    "0x99-image/Pasted image 20240911001142.png",
+    "0x99-image/Pasted image 20240911001137.png",
+    "0x99-image/Pasted image 20240911001132.png",
+    "0x99-image/Pasted image 20240911001125.png",
+    "0x99-image/Pasted image 20240911001121.png",
+    "0x99-image/Pasted image 20240911001116.png",
+    "0x99-image/Pasted image 20240911001103.png",
+    "0x99-image/Pasted image 20240911001054.png",
+    "coding/java/Spring/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
+    "coding/cpp/opensource/memory/高性能C++内存池：解密并发环境下的内存管理.md",
+    "coding/java/Spring",
+    "coding/cpp/opensource/memory/【性能优化】高效内存池的设计与实现.md",
+    "coding/cpp/opensource/memory",
+    "coding/cpp/opensource/qt/总结了一份Qt5 的开发经验.md",
+    "coding/cpp/opensource/protobuf/更快更小！ProtoBuf 入门详解.md",
+    "coding/cpp/opensource/qt",
+    "coding/cpp/opensource/工作多年，那些曾经帮我成长的开源 C++ 项目、学习方法，现在全部分享给你.md",
+    "coding/cpp/opensource/protobuf",
+    "coding/cpp/opensource/boost",
+    "coding/cpp/opensource/探索C++世界：最流行的开源框架大全.md",
+    "coding/cpp/opensource/boost/d_ 使用Boost库实现自动数量的虚函数.md",
+    "coding/cpp/opensource/Seastar：高性能C++库详解与应用.md",
+    "coding/cpp/opensource/coroutine/微信著名libco协程库原理剖析.md",
+    "coding/cpp/opensource/coroutine/深入探索C++20的重要特性：从模块化到协程.md",
+    "coding/cpp/opensource/coroutine/如何使用 GDB 分析 C C++ Coroutine.md",
+    "coding/cpp/opensource/coroutine/C++ 20 协程 Coroutine（3，剖析）.md",
+    "awesome-list/wechat.md",
+    "awesome-list/zhihu.md",
+    "awesome-list/community.md",
+    "coding/os/linux/memory/cache/写一个使用perf分析cache的示例.md",
     "coding/algorithm/other/时间轮原理及其在框架中的应用.md",
     "coding/algorithm/无锁队列的实现.md",
     "coding/algorithm/TensorFlow在推荐系统中的分布式训练优化实践.md",
     "coding/algorithm/还在用策略模式解决 if-else？Map+函数式接口方法才是YYDS！.md",
-    "0x99-image/Pasted image 20240910195313.png",
-    "0x99-image/Pasted image 20240910195155.png",
     "coding/algorithm/软件分析与设计：分析什么？如何设计？.md",
     "coding/os/linux/io/以小窥大：IO 卡顿探寻苹果文件系统.md",
     "coding/os/linux/io/epoll背后的原理.md",
-    "0x99-image/Pasted image 20240910190825.png",
     "coding/os/linux/io/block io生命历程.md",
-    "0x99-image/Pasted image 20240910191613.png",
-    "0x99-image/Pasted image 20240910191607.png",
-    "0x99-image/Pasted image 20240910191601.png",
-    "0x99-image/Pasted image 20240910191551.png",
-    "0x99-image/Pasted image 20240910191545.png",
-    "0x99-image/Pasted image 20240910191346.png",
-    "0x99-image/Pasted image 20240910191336.png",
-    "coding/os/linux/memory/virtual-memory/TLB flush操作.md",
-    "coding/os/linux/memory/virtual-memory/深入理解TLB原理.md",
-    "coding/os/linux/memory/virtual-memory/深入理解TLB.md",
-    "coding/algorithm/tree/如何基于LSM-tree架构实现一写多读.md",
-    "coding/algorithm/sort/在排序数组中查找元素的第一个和最后一个位置.md",
     "coding/algorithm/sort",
-    "coding/algorithm/comment/新手程序员靠刷题真的能进大厂吗？.md",
-    "coding/algorithm/干掉布隆过滤器：布谷鸟过滤器有哪些神奇的魔法.md",
-    "coding/database/解决文件存储难题 openGauss隆重推出段页式特性.md",
-    "coding/database/redis/分布式一致性协议 Gossip 和 Redis 集群原理解析.md",
-    "coding/database/redis/Redis大集群扩容性能优化实践.md",
-    "coding/database/MySQL/女朋友问我：为什么 MySQL 喜欢 B+ 树？我笑着画了 20 张图.md",
-    "coding/database/MySQL/庖丁解牛-图解MySQL 8.0优化器查询解析篇.md",
-    "coding/database/面试官：聊聊 order by.md",
     "coding/database/grammar",
-    "coding/database/聊聊 Mybatis 动态 SQL.md",
-    "coding/database/MySQL/腾讯一面：说一说 MySQL 中索引的底层原理.md",
-    "coding/architecture/年终总结：补齐短板，继续扬帆起航！！！.md",
-    "awesome-list/wechat.md",
-    "coding/algorithm/other/Kafka的心跳处理机制竟然用到了时间轮算法？.md",
     "coding/algorithm/other",
     "coding/algorithm/hash",
     "coding/algorithm/tree",
-    "coding/algorithm/comment",
-    "coding/algorithm/binary_search",
-    "coding/algorithm/bfs_dfs",
-    "coding/algorithm/graph",
-    "coding/algorithm/dp",
     "Untitled.canvas"
   ]
 }

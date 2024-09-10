@@ -19,13 +19,6 @@
 **01**
 
 **如何观察load指标**
-
-  
-
-  
-
-  
-
   
 
 load指标代表系统运行负载，表示在一段时间内，系统又多少个正在运行的任务。
@@ -35,25 +28,17 @@ load指标代表系统运行负载，表示在一段时间内，系统又多少�
 #### 可利用如下指令去模拟高负载场景
 
 使用`while :;do :;done &`命令来模拟CPU密集型任务：
-
+![[Pasted image 20240911000853.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 `sudo sh -c "while :; do fio -name=mytest -filename=test.data -direct=0 -thread -rw=randread -ioengine=psync -bs=4k -size=1M -numjobs=2 -runtime=10 -group_reporting;echo 1 > /proc/sys/vm/drop_caches; done"`利用fio工具来模拟IO密集型任务：
-
+![[Pasted image 20240911000859.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **02**
 
 **编写工具**
-
-  
-
-  
-
-  
-
-  
-
+```c
 Makefile
 
 OS_VER := UNKNOWN  
@@ -78,7 +63,7 @@ make CFLAGS_MODULE=-D$(OS_VER) -C /lib/modules/`uname -r`/build M=`pwd` modul
 clean:              
 make -C $(KERNEL_BUILD_PATH) M=$(PWD) clean  
 endif
-
+```
 main.c
 
 #include <linux/version.h>  
@@ -197,16 +182,8 @@ load.h
 
 **报错解决**
 
-  
-
-  
-
-  
-
-  
-
 在插入模块时会导致虚拟机崩溃。  
-
+![[Pasted image 20240911000944.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 认为是没有对ptr_avenrun进行初始化
@@ -218,7 +195,7 @@ ptr_avenrun = (void *)kallsyms_lookup_name("avenrun")，在低版本中可用，
 **直接获取**
 
 查看源码，可以看到
-
+![[Pasted image 20240911000955.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们将ptr_avenrun这层嵌套去掉，直接引入头文件后`\#include <linux/sched/loadavg.h>`直接读取avenrun
@@ -236,15 +213,15 @@ avenrun中低11位存放load的小数部分，第11位开始存放load的整数�
 (x) & (FIXED_1-1): 通过与运算将x的整数部分清零，只保留小数部分。((x) & (FIXED_1-1)) * 100: 将保留的小数部分乘以100，以将其转换为0到99之间的值。LOAD_INT(...): 通过调用LOAD_INT宏将结果转换为整数即固定点数的小数部分转换为0到99之间的整数。比如说x=123456，那么我们左移动11位即* 2^11 = 2073600，可以知道它的固定点数是1.23456，通过LOAD_INT宏将它右移11位提取整数部分1，通过LOAD_FRAC宏首先通过与运算将x的整数部分清零，只保留小数部分23456。将它保留的小数部分乘以100，以将其转换为0到99之间的值。最后，它调用LOAD_INT`宏将结果转换为整数。
 
 **报错**
-
+![[Pasted image 20240911001003.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 提示不知道trace的空间，查看源码
-
+![[Pasted image 20240911001006.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 查看`CONFIG_ARCH_STACKWALK`宏定义
-
+![[Pasted image 20240911001012.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发现`CONFIG_ARCH_STACKWALK`值为y，判断时会跳过编译此段定义，于是尝试性的将源码复制到代码中，发现即可使用
@@ -254,15 +231,15 @@ avenrun中低11位存放load的小数部分，第11位开始存放load的整数�
 //编译后报错  
 save_stack_trace_tsk(p, &trace);            
 print_stack_trace(&trace, 0)
-
+![[Pasted image 20240911001022.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在源码中查看相关函数，以第一个为例
-
+![[Pasted image 20240911001031.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发现其在`stacktrace.h`文件中有声明，但没有在x86架构下的相关实现，通过查看https://github.com/torvalds/linux 相关文件对应的history，发现其在Linux 5.1版本中已被删除，且经尝试发现其中有相应的内部函数没有实现，不能复现其函数内容。
-
+![[Pasted image 20240911001037.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过查找资料和阅读源码后，找到有类似的功能的函数，其函数原型如下
@@ -270,19 +247,19 @@ print_stack_trace(&trace, 0)
 `stack_trace_save_tsk(struct task_struct *task, unsigned long *store, unsigned int size, unsigned int skipnr)`
 
 在源码中进行查找，可以看到有两组实现，其是由`CONFIG_ARCH_STACKWALK`这个宏的值决定的
-
+![[Pasted image 20240911001042.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当`CONFIG_ARCH_STACKWALK`值为0时
-
+![[Pasted image 20240911001049.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当`CONFIG_ARCH_STACKWALK`值为1时
-
+![[Pasted image 20240911001054.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过`cat config-6.2.0-34-generic | grep CONFIG_ARCH_STACKWALK`命令查看配置文件获取其值
-
+![[Pasted image 20240911001103.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 所以我们对其对应的实现进行分析，并加以注释
@@ -426,15 +403,15 @@ kprobe：实现jprobe和kretprobe的基础。可以在内核中任意位置放�
 jprobe：获取被探测函数的入参值。函数入口插入探测点，当函数被调用时，jprobe会捕获到函数的参数，并在pre_handler中将这些参数传递给用户定义的回调函数。
 
 kretprobe：获取被探测函数的返回值。函数出口插入探测点，当函数执行完毕返回时，kretprobe会捕获到函数的返回值，并在post_handler中将返回值传递给用户定义的回调函数。
-
+![[Pasted image 20240911001116.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们首先要用kprobe找到函数的入口地址，并定义需要用到的结构体，我们预期是将struc kprobe结构体引申到内核kprobes子系统上以实现我们跟踪探测进程的目的，那么我们可以采用kprobes提供的接口即register_kprobe向内核中注册kprobe探测点，并进行判断返回值<0我们就返回空指针打印错误报告，返回0则注册成功。
-
+![[Pasted image 20240911001121.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们可以查看struct kprobe结构体并选择打印内核函数名称以及内核函数的地址
-
+![[Pasted image 20240911001125.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 探测完成后我们调用 unregister_kprobe函数从内核中卸载kprobe探测点，在整个探测过程中，当产生中断异常的时候，我们为了让kprobe执行pre_handler以及单步执行指令，那么我们探测的内核函数的执行就会被暂停中断，所以说当kprobe执行完成之后，我们探测的内核函数的执行继续后可以成功运行，可以找到stack_trace_save_tsk的地址，可以打印出相关load指标和相关进程及其调用栈
@@ -442,24 +419,17 @@ kretprobe：获取被探测函数的返回值。函数出口插入探测点，�
 同样的，先前的kallsyms_lookup_name函数我们也可以通过kprobe方法进行调用
 
 运行结果如下图所示
-
+![[Pasted image 20240911001132.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到相应进程对应的函数调用栈被打印了出来，其具体各个字段的含义如下，每个进程会从下至上依次调用相应函数
-
+![[Pasted image 20240911001142.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **04**
 
 **问题解答**
 
-  
-
-  
-
-  
-
-  
 
 **1、为什么要定义OS_VER这个变量？**
 
@@ -494,13 +464,13 @@ OS_VER用于在编译时指定某个操作系统的版本或其他相关信息�
 （2）查看System.map，其为内核的符号表，在内核编译时被构建
 
 `sudo cat System.map-6.2.0-34-generic |grep kallsyms_lookup_name`
-
+![[Pasted image 20240911001155.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 （3）使用 /proc/kallsyms
 
 `cat /proc/kallsyms |grep "name"`
-
+![[Pasted image 20240911001200.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **5、模块代码还有哪些值得改进的地方？**

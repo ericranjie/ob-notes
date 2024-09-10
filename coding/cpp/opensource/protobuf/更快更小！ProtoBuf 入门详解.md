@@ -86,7 +86,7 @@ Proto Buffer 是一种语言中立的、平台中立的、可扩展的**序列�
     
 - 对于二进制串，使用 `decode` 解码为消息实例，随后通过 `toObject` 转换为原始的 JavaScript 对象。
     
-
+![[Pasted image 20240911000005.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 编写 `index.ts` 代码如下：该代码展示了将 JavaScript 对象序列化并进行网络传输的过程，也模拟了收到 protobuf 数据后将其反序列化的过程。
@@ -189,7 +189,7 @@ Protobuf 采用了一种称为 Tag-Length-Value（TLV）的编码方案，在开
 `function toBinaryString(uint8Array) {     return Array.from(uint8Array).map(byte => byte.toString(2).padStart(8, '0'));   }   /*   const payload = {       name: 'dora',   }   const message = root.User.create(payload);   const buffer = root.User.encode(message).finish();   console.log(toBinaryString(buffer));   */   `
 
 现在让我们对一个 string 类型的数据 `t` 进行编码，可以得到序列： `00001010 00000001 01110100` 。
-
+![[Pasted image 20240911000021.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这三个字节分别对应了 protobuf 编码的三个内容：（**在 protobuf 中每个字节的首位都是控制位，用于表示随后的字节是否需要和自己属于同一个字段**)
@@ -203,7 +203,7 @@ Protobuf 采用了一种称为 Tag-Length-Value（TLV）的编码方案，在开
 那么**字段类型**是什么呢？
 
 字段类型用于告诉解析器它后面的有效载荷有多大，从而允许旧的解析起跳过他们不理解的新字段。前面这句话其实是官方文档做出的解释，当个人认为理解起来较为困难。最好结合实际来看，例如对于 `I32` 类型 ，其有效载荷是固定 4 个字节的，也就是说 Tag 之后的 4 个字节是属于当前字段的；对于 `LEN` 类型，其有效载荷则需要通过后续 length 部分的编码才能确定；而对于 `VARINT` 类型，其有效载荷长度由编码后的数字长度决定（并不需要由 length 部分决定）。那么旧的解析器遇到未知的字段时，只需要根据不同字段类型的规则跳过特定长度的有效载荷就能够跳过那些无法理解的字段了。所有字段类型如下：
-
+![[Pasted image 20240911000027.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### Length
