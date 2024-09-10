@@ -32,13 +32,13 @@
 #### 构造必现代码
 
 大概知道了必现路径后，我们构造出了一个必现代码，打开 Instruments 的 System Trace 分析，结果如下：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBianYnT2ldkOUKUyHqia9Fcs3YFD0mVB5ggu2qAKZXtLBicK9sjX9hW51dQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发现 access 等常规 I/O 接口的平均耗时依旧很低只有几十 us，但等待耗时波动很大，可以达到140 ms，也就导致了主线程每次查询图片存在状态时，单次调用耗时超过了140 ms，而滑动过程中大概存在十几次这样的行为，那最终就是每次滑动都要因为这些 I/O wait time 导致滑动耗时数秒之久，甚至个别情况下还会因此滑动卡死触发 watchdog。
 
 继续分析 Instruments 报告，发现等待的主因如下：will wait for event/lock xxx.
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiavwEBa6uibicabDp4IicV0nCOAiaF0RX5ia3iabM5ceqL03Z89iaEOy9VaTg5A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 经过前面的研究，我们已经能够构造一个必现 demo 了。大概如下：
@@ -54,13 +54,13 @@
 
 测试工程跑在 MacBook Pro(2019) macOS 12.3 上，会定时 benchmark 测 access 接口耗时。
 
-```
+```c
   int retry = 5;  long long duration = benchmark(retry,^{    access(path.UTF8String, F_OK);  });  if(duration > 1000 * retry) {    //avg >1 ms.    LOG_P("lag: avg access %.3f ms",duration*1.f/1000/retry);  }
 ```
 
 在 APFS 分区的该目录下会频繁因大目录并发 I/O 遍历导致 access 超时问题，log输出如下：
 
-```
+```c
   lag: avg access 2.134 ms  lag: avg access 11.859 ms  lag: avg access 5.483 ms  lag: avg access 5.259 ms  lag: avg access 4.634 ms
 ```
 
@@ -80,11 +80,11 @@ sudo dtrace -n 'lockstat:::adaptive-block { @[stack()] = sum(arg1); }' 
 
 得到的 dtrace 相关数据如下：
 
-```
+```c
   kernel`0xffffff8005aa6990+0x72  apfs`apfs_vnop_rename+0x94  kernel`vn_rename+0x4ae  kernel`0xffffff8005d42020+0xb12  kernel`unix_syscall64+0x1fb  kernel`hndl_unix_scall64+0x16  1367  kernel`lck_mtx_lock_spinwait_x86+0x2be  kernel`vn_rename+0x4ae  kernel`0xffffff8005d42020+0xb12  kernel`unix_syscall64+0x1fb  kernel`hndl_unix_scall64+0x16  2242  kernel`0xffffff8005aa67f0+0x7e  kernel`namei+0x9f7  kernel`0xffffff8005d375a0+0x79  kernel`0xffffff8005d42020+0x35b  kernel`unix_syscall64+0x1fb  kernel`hndl_unix_scall64+0x16  2262
 ```
 
-```
+```c
 R/W writer blocked by readers: 239 events in 10.048 seconds (24 events/sec)Count indv cuml rcnt      abs Lock                   Caller                  -------------------------------------------------------------------------------  227  95%  95% 0.00 13385718 0xffffff8b638223e0     apfs_vnop_lookup+0x2f6     11   5% 100% 0.00  8140855 0xffffff8b638223e0     apfs_vnop_getattr+0xc4      1   0% 100% 0.00  2610265 0xffffff90339a97b0     omap_get+0x7c           -------------------------------------------------------------------------------R/W reader blocked by writer: 192 events in 10.021 seconds (19 events/sec)Count indv cuml rcnt      abs Lock                   Caller                  -------------------------------------------------------------------------------  129  67%  67% 0.00  6408120 0xffffff8b638223e0     IORWLockWrite+0x90         22  11%  79% 0.00    23902 0xffffff99cd1fbc00     IORWLockWrite+0x90         12   6%  85% 0.00    28194 0xffffff804e970608     IORWLockWrite+0x90          4   2%  87% 0.00    18808 0xffffff8048892e08     IORWLockWrite+0x90          3   2%  89% 0.00    41491 0xffffff803825e608     lck_rw_lock_exclusive_check_contended+0x93    2   1%  90% 0.00    22725 0xffffff99cd1fbc80     IORWLockWrite+0x90          2   1%  91% 0.00    78215 0xffffff8b666c2610     IORWLockWrite+0x90          2   1%  92% 0.00    34049 0xffffff8b666c22c8     IORWLockWrite+0x90          2   1%  93% 0.00    23949 0xffffff8b666bc4c0     IORWLockWrite+0x90          2   1%  94% 0.00    28546 0xffffff8b666b94c0     IORWLockWrite+0x90          2   1%  95% 0.00    38088 0xffffff804e97ab08     lck_rw_lock_exclusive_check_contended+0x93    2   1%  96% 0.00    17158 0xffffff803dc78d08     0xffffff8005aa77d0          2   1%  97% 0.00    18658 0xffffff803dc78d08     IORWLockWrite+0x90          2   1%  98% 0.00    29096 tcbinfo+0x38           IORWLockWrite+0x90          1   1%  98% 0.00    52994 0xffffff8b666be7a0     IORWLockWrite+0x90          1   1%  99% 0.00    20135 0xffffff8048892e08     0xffffff8005aa77d0          1   1%  99% 0.00    18584 0xffffff80345de608     IORWLockWrite+0x90          1   1% 100% 0.00    13805 0xffffff803825e608     IORWLockWrite+0x90      -------------------------------------------------------------------------------
 ```
 
@@ -94,8 +94,11 @@ R/W writer blocked by readers: 239 events in 10.048 seconds (24 event
 
 rename 和 access 都是系统调用，他们都是 XNU 里 VFS 注册的系统服务。APFS 的系统支持是通过系统的 apfs.kext 内核扩展载入的，我们通过 Hopper 打开 apfs.kext，分析下 APFS 对应的 rename 或 access 里到底干了什么
 
-```
-_apfs_vnop_renamex{    r12 = arg0;    r14 = *(int32_t *)(arg0 + 0x40);    r14 = r14 & 0xfffffff7;    if (r14 < 0x3) goto loc_5ad56;loc_5ad47:    rax = 0x2d;    if (r14 != 0x4) goto .l17;loc_5ad56:    var_C8 = 0x0;    var_170 = 0x0;    var_190 = 0x0;    r15 = _vfs_fsprivate(_vnode_mount(*(r12 + 0x8))); //获取目录    r13 = _vnode_fsnode(*(r12 + 0x8));    var_58 = _vnode_fsnode(*(r12 + 0x20));    //... ....    rax = _current_thread();    var_120 = rax;    if (rbx != rax) {            _lck_rw_lock_shared(var_108); // 获取锁    }
+```c
+_apfs_vnop_renamex{    r12 = arg0;    r14 = *(int32_t *)(arg0 + 0x40);    r14 = r14 & 0xfffffff7;    if (r14 < 0x3) goto loc_5ad56;loc_5ad47:    rax = 0x2d;    if (r14 != 0x4) goto .l17;loc_5ad56:    var_C8 = 0x0;    var_170 = 0x0;    var_190 = 0x0;    r15 = _vfs_fsprivate(_vnode_mount(*(r12 + 0x8))); //获取目录
+				   r13 = _vnode_fsnode(*(r12 + 0x8));    var_58 = _vnode_fsnode(*(r12 + 0x20));    //... ....
+				       rax = _current_thread();    var_120 = rax;    if (rbx != rax) {            _lck_rw_lock_shared(var_108); // 获取锁
+				           }
 ```
 
 apf.kext 的代码里 vfs_fsprivate 返回了一个结构，这个结构存了每个 vnode 相关的附加字段，比如这里会疑似返回一个目录相关的锁，每次执行 rename 接口时，会取出目录锁，尝试加锁处理，而在 apfs.kext 代码里还有很多处额外的高频加锁逻辑。
@@ -107,11 +110,11 @@ apf.kext 的代码里 vfs_fsprivate 返回了一个结构，这个结构存了�
 我们在同一台电脑上构造了两个不同的磁盘分区：APFS 和 HFS+，分别在各自分区下的同一路径下写入了相同数据的10万个文件，接着开始跑同样的测试程序，又发现了更出人意料的结论：
 
 HFS+ 测试如下：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiaQ0kuw3PUuxz1GoDsgHrEXqkUB3XzibLVmut90OvUWwkBp0iarN3icoIFw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 APFS 测试如下：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiaU6JC0QOynViaA0ibnYeicb1LvBhKpJPvn6vHQRyhdytL3KfERDTdicF0TA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过多次对比测试，发现在这种超大目录文件遍历的并发 I/O 情况下，HFS+ 的平均读写速度要比 APFS 快 8~20 倍，想不到 APFS 竟然反而比 HFS+ 要慢那么多。这个问题在 macOS 12.3 和 iOS 15.4 上都可以稳定构造出必现测试用例。
@@ -175,7 +178,7 @@ VFS 统一并抽象了不同文件系统的接口，使得用户可以通过统�
 
 XNU 中主要使用 vfstbllist 来注册管理多个文件系统，典型的 vfstlblist 如下：
 
-```
+```c
 /* * Set up the filesystem operations for vnodes. */static struct vfstable vfstbllist[] = { /* HFS/HFS+ Filesystem */#if HFS { &hfs_vfsops, "hfs", 17, 0, (MNT_LOCAL | MNT_DOVOLFS), hfs_mountroot, NULL, 0, 0, VFC_VFSLOCALARGS | VFC_VFSREADDIR_EXTENDED | VFS_THREAD_SAFE_FLAG | VFC_VFS64BITREADY | VFC_VFSVNOP_PAGEOUTV2 | VFC_VFSVNOP_PAGEINV2, NULL, 0},#endif /* Sun-compatible Network Filesystem */#if NFSCLIENT { &nfs_vfsops, "nfs", 2, 0, 0, NULL, NULL, 0, 0, VFC_VFSGENERICARGS | VFC_VFSPREFLIGHT | VFS_THREAD_SAFE_FLAG | VFC_VFS64BITREADY | VFC_VFSREADDIR_EXTENDED, NULL, 0},#endif#ifndef __LP64__#endif /* __LP64__ */    ... ... {NULL, "<unassigned>", 0, 0, 0, NULL, NULL, 0, 0, 0, NULL, 0}, {NULL, "<unassigned>", 0, 0, 0, NULL, NULL, 0, 0, 0, NULL, 0}};
 ```
 
@@ -185,7 +188,7 @@ XNU 中主要使用 vfstbllist 来注册管理多个文件系统，典型的 vfs
     
 
 文件系统只有被 mount 挂载后才可以被访问。对于内核支持的文件系统，macOS 会自动 从 /System/Library/FileSystems 里找到对应的内核扩展并挂载，而对于内核不支持的文件系统，则需要触发一次 kext 加载操作以支持对应的文件系统。macOS 上常见的 mount 操作如下图：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiaENc8cvZLf5xibMy2QbhbOFG82Y2l9gktHJARwvu9c3tHrw1MM8AROlw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - vnode

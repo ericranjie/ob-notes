@@ -23,48 +23,69 @@ hashmap 之链地址法
 
 # 1、定义哈希表 及 哈希桶 结构体
 
-```
-#include <stdio.h>#include <stdlib.h>#include <string.h>// 定义哈希桶的节点结构体typedef struct Node {    char* key;    int value;    struct Node* next;} Node;// 定义哈希表结构体typedef struct HashMap {    int size;    Node** buckets;} HashMap;
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>// 定义哈希桶的节点结构体
+typedef struct Node {
+char* key;
+int value;
+struct Node* next;}
+Node;// 定义哈希表结构体
+typedef struct HashMap {
+int size;
+Node** buckets;
+} HashMap;
 ```
 
 # 2、创建指定大小的哈希表
 
-```
-// 创建指定大小的哈希表HashMap* createHashMap(int size) {    HashMap* map = (HashMap*)malloc(sizeof(HashMap));    map->size = size;    map->buckets = (Node**)calloc(size, sizeof(Node*));    return map;}
+```c
+// 创建指定大小的哈希表
+HashMap* createHashMap(int size) {
+HashMap* map = (HashMap*)malloc(sizeof(HashMap));
+map->size = size;
+map->buckets = (Node**)calloc(size, sizeof(Node*));
+return map;
+}
 ```
 
 # 3、哈希函数
 
-```
-// 哈希函数int hash(HashMap* map, char* key) {    int sum = 0;    for (int i = 0; i < strlen(key); i++) {        sum += key[i];    }    return sum % map->size;}
+```c
+// 哈希函数
+int hash(HashMap* map, char* key) {    int sum = 0;    for (int i = 0; i < strlen(key); i++) {        sum += key[i];    }    return sum % map->size;}
 ```
 
 # 4、HashMap put操作
 
-```
+```c
 void put(HashMap* map, char* key, int value) {    Node* newNode = (Node*)malloc(sizeof(Node));    newNode->key = strdup(key);    newNode->value = value;    newNode->next = NULL;    int index = hash(map, key);    Node* curr = map->buckets[index];    if (curr == NULL) {        map->buckets[index] = newNode;    } else {        while (curr->next != NULL) {            curr = curr->next;        }        curr->next = newNode;    }}
 ```
 
 # 5、HashMap get操作
 
-```
-// 从哈希表中获取指定键的值int get(HashMap* map, char* key) {    int index = hash(map, key);    Node* curr = map->buckets[index];    while (curr != NULL) {        if (strcmp(curr->key, key) == 0) {            return curr->value;        }        curr = curr->next;    }    return -1;  // 如果没有找到，返回 -1}
+```c
+// 从哈希表中获取指定键的值
+int get(HashMap* map, char* key) {    int index = hash(map, key);    Node* curr = map->buckets[index];    while (curr != NULL) {        if (strcmp(curr->key, key) == 0) {            return curr->value;        }        curr = curr->next;    }    return -1;  // 如果没有找到，返回 -1
+}
 ```
 
 # 6、释放内存
 
-```
-// 释放哈希表的内存void freeHashMap(HashMap* map) {    for (int i = 0; i < map->size; i++) {        Node* curr = map->buckets[i];        while (curr != NULL) {            Node* temp = curr;            curr = curr->next;            free(temp->key);            free(temp);        }    }    free(map->buckets);    free(map);}
+```c
+// 释放哈希表的内存
+void freeHashMap(HashMap* map) {    for (int i = 0; i < map->size; i++) {        Node* curr = map->buckets[i];        while (curr != NULL) {            Node* temp = curr;            curr = curr->next;            free(temp->key);            free(temp);        }    }    free(map->buckets);    free(map);}
 ```
 
 # 7、main方法测试
 
-```
+```c
 int main() {    HashMap* map = createHashMap(10);char a[] = "apple",b[] = "banana",o[] = "orange",w[] = "watermelon";    put(map, a, 1);    put(map, b, 2);    put(map, o, 3);    printf("Value of 'apple': %d\n", get(map, a));    printf("Value of 'banana': %d\n", get(map, b));    printf("Value of 'orange': %d\n", get(map, o));    printf("Value of 'watermelon': %d\n", get(map, w));    freeHashMap(map);    return 0;}
 ```
 
 运行结果：
-
+![[Pasted image 20240910125425.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 result

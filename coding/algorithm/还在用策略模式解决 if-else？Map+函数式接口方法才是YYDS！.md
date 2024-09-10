@@ -44,7 +44,7 @@ ImportNew
 
 第一个能想到的思路就是if-else或者switch case：
 
-```
+```c
 switch(resourceType){ case "红包":   查询红包的派发方式   break; case "购物券":   查询购物券的派发方式  break; case "QQ会员" :  break; case "外卖会员" :  break; ...... default : logger.info("查找不到该优惠券类型resourceType以及对应的派发方式");  break;}
 ```
 
@@ -57,12 +57,12 @@ switch(resourceType){ case "红包":   查询红包的派发方式   bre
 策略模式是把 if语句里面的逻辑抽出来写成一个类，如果要修改某个逻辑的话，仅修改一个具体的实现类的逻辑即可，可维护性会好不少。
 
 以下是策略模式的具体结构
-
+![[Pasted image 20240910195155.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 策略模式在业务逻辑分派的时候还是if-else，只是说比第一种思路的if-else 更好维护一点。
 
-```
+```c
 switch(resourceType){ case "红包":   String grantType=new Context(new RedPaper()).ContextInterface();  break; case "购物券":   String grantType=new Context(new Shopping()).ContextInterface();  break;  ...... default : logger.info("查找不到该优惠券类型resourceType以及对应的派发方式");  break;
 ```
 
@@ -88,24 +88,32 @@ switch(resourceType){ case "红包":   String grantType=new Context(new 
 
 上代码：
 
-```
-@Servicepublic class QueryGrantTypeService {     @Autowired    private GrantTypeSerive grantTypeSerive;    private Map<String, Function<String,String>> grantTypeMap=new HashMap<>();    /**     *  初始化业务分派逻辑,代替了if-else部分     *  key: 优惠券类型     *  value: lambda表达式,最终会获得该优惠券的发放方式     */    @PostConstruct    public void dispatcherInit(){        grantTypeMap.put("红包",resourceId->grantTypeSerive.redPaper(resourceId));        grantTypeMap.put("购物券",resourceId->grantTypeSerive.shopping(resourceId));        grantTypeMap.put("qq会员",resourceId->grantTypeSerive.QQVip(resourceId));    }     public String getResult(String resourceType){        //Controller根据 优惠券类型resourceType、编码resourceId 去查询 发放方式grantType        Function<String,String> result=getGrantTypeMap.get(resourceType);        if(result!=null){         //传入resourceId 执行这段表达式获得String型的grantType            return result.apply(resourceId);        }        return "查询不到该优惠券的发放方式";    }}
+```c
+@Servicepublic class QueryGrantTypeService {     @Autowired    private GrantTypeSerive grantTypeSerive;    private Map<String, Function<String,String>> grantTypeMap=new HashMap<>();    /**     *  初始化业务分派逻辑,代替了if-else部分     *  key: 优惠券类型     *  value: lambda表达式,最终会获得该优惠券的发放方式     */    @PostConstruct    public void dispatcherInit(){        grantTypeMap.put("红包",resourceId->grantTypeSerive.redPaper(resourceId));        grantTypeMap.put("购物券",resourceId->grantTypeSerive.shopping(resourceId));        grantTypeMap.put("qq会员",resourceId->grantTypeSerive.QQVip(resourceId));    }     public String getResult(String resourceType){        //Controller根据 优惠券类型resourceType、编码resourceId 去查询 发放方式grantType
+Function<String,String> result=getGrantTypeMap.get(resourceType);        if(result!=null){         //传入resourceId 执行这段表达式获得String型的grantType
+return result.apply(resourceId);        }        return "查询不到该优惠券的发放方式";    }}
 ```
 
 如果单个 if 语句块的业务逻辑有很多行的话，我们可以把这些 业务操作抽出来，写成一个单独的Service，即：
 
-```
-//具体的逻辑操作@Servicepublic class GrantTypeSerive {    public String redPaper(String resourceId){        //红包的发放方式        return "每周末9点发放";    }    public String shopping(String resourceId){        //购物券的发放方式        return "每周三9点发放";    }    public String QQVip(String resourceId){        //qq会员的发放方式        return "每周一0点开始秒杀";    }}
+```java
+//具体的逻辑操作
+@Servicepublic class GrantTypeSerive {    public String redPaper(String resourceId){        //红包的发放方式
+return "每周末9点发放";
+}								  public String shopping(String resourceId){        //购物券的发放方式
+return "每周三9点发放";
+}    public String QQVip(String resourceId){        //qq会员的发放方式
+return "每周一0点开始秒杀";    }}
 ```
 
 入参String resourceId是用来查数据库的，这里简化了，传参之后不做处理。
 
 用http调用的结果：
 
-```
+```java
 @RestControllerpublic class GrantTypeController {    @Autowired    private QueryGrantTypeService queryGrantTypeService;    @PostMapping("/grantType")    public String test(String resourceName){        return queryGrantTypeService.getResult(resourceName);    }}
 ```
-
+![[Pasted image 20240910195313.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 用Map+函数式接口也有弊端：
