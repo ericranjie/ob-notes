@@ -57,7 +57,7 @@ CFS 调度器的目标是让每个任务尽量公平获得 CPU 资源：
     
 
 CFS 采用红黑树实现进行优先级选择，红黑树是一种平衡二叉树，能够高效地插入、删除和查找任务：
-
+![[Pasted image 20240911193216.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -90,7 +90,7 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 调度器在内核中的实现通过**调度类**实现具体场景的功能，调度类可以理解为一个通用抽象结构，这在面向对象语言中通常称之为理解为基类。不同场景的调度实现通过不同的调度类来实现，具体的调度类实现调度类定义的函数，不同调度类有优先级概念。任务的对应的具体调度类由进程创建时默认设定或者通过函数 `sched_setscheduler` 调整。
 
 `SCHED_EXT` 是一个非特权类，这意味着任何进程都可设置为 `SCHED_EXT` 。`SCHED_EXT` 放置在优先级位于的 `SCHED_IDLE` 和 `SCHED_NORMAL` 之间。因此， `SCHED_EXT` 调度程序无法以阻止（例如）以 `SCHED_NORMAL` 运行的普通 shell 会话运行的方式接管系统。调度类的接口、调度器类和新增的 ext_sched_cls 的整体关系如下图所示：
-
+![[Pasted image 20240911193226.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 新版本废弃 scx_bpf_switch_all() 函数：早期版本有个神奇的增强函数 scx_bpf_switch_all()，用于将新创建出来的任务都会被添加到 scs_tasks 全局列表中，当用户定义的 BPF 调度器注册的时候，可以一键将非 dl_sched_cls/rt_shec_cls 等进程切换为 ext_sched_cls 的功能。详细参见移除 scx_bpf_switch_all[7]。
@@ -98,7 +98,7 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 ### 新增 2：eBPF 自定义调度器函数
 
 在 `SCHED_EXT` 调度类实现中，增加了针对用户自定义扩展接口定义。`SCHED_EXT` 类的函数实现中，定义了一组基于 eBPF 的扩展函数，以 `enqueue_task_scx` 为例，在运行过中会判断是否注册了对应的 `sched_ext_ops` 结构中的 `runnable` 接口（一般简称为 `ops.runnable`），如加载的 BPF 程序定义了该操作函数则调用执行，如果没有定义则继续原来的流程。
-
+![[Pasted image 20240911193233.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 以 `ext_sched_cls.enqueue_task_scx` 函数实现为例：
@@ -132,7 +132,7 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 当 CPU 就绪时会优先从本地选择任务，如果本地 DSQ 不为空，则选择第一个任务。否则，CPU 会尝试使用内置的全局 DSQ。如最后仍然没有产生可运行的任务，则调用 `ops.dispatch()` 进行调度或消费任务。
 
 `sched_ext` 中的 BPF 调度器工作流程可从任务唤醒和 CPU 就绪两个维度进行分析，这仅给出核心流程示意图[8]。
-
+![[Pasted image 20240911193245.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 当任务唤醒时， `ops.select_cpu()` 是调用的第一个操作函数。

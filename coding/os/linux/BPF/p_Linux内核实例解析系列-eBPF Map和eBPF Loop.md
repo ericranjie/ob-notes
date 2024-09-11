@@ -24,8 +24,8 @@ selftests/bpf/progs/test_map_lookup_percpu_elem.c
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/Bh66jm0ozvYQibbY6ZPp4rEd7I6SdZyxTvliatGpocszo69g1VarPQOI4zR6xibNzicgBGycNhsMYHfa7hZgycF6eA/640?wx_fmt=png&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-```
-struct {
+```c
+struct { __uint(type, BPF_MAP_TYPE_PERCPU_ARRAY); __uint(max_entries, 1); __type(key, __u32); __type(value, __u64); } percpu_array_map SEC(".maps");
 ```
 
 - **哈希类型的Map**
@@ -35,8 +35,8 @@ struct {
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/Bh66jm0ozvYQibbY6ZPp4rEd7I6SdZyxTxcMCTjKshuT2O07u7Xlfn5vvG8vEfQCYibGmjBDTMA3hC5BSic1qyMrA/640?wx_fmt=png&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-```
-struct {
+```c
+struct { __uint(type, BPF_MAP_TYPE_PERCPU_HASH); __uint(max_entries, 1); __type(key, __u64); __type(value, __u64); } percpu_hash_map SEC(".maps");
 ```
 
 - **LRU哈希类型的Map**
@@ -44,15 +44,15 @@ struct {
 
    普通hash map的问题是有大小限制，超过最大数量后就无法再插入了。LRU哈希map可以解决这个问题，如果map满了，再插入时它会自动将最久未被使用(least recently used)的元素从map中移除，为新元素提供空间 。
 
-```
-struct {
+```c
+struct { __uint(type, BPF_MAP_TYPE_LRU_PERCPU_HASH); __uint(max_entries, 1); __type(key, __u64); __type(value, __u64); } percpu_lru_hash_map SEC(".maps");
 ```
 
 2  eBPF Loop
 
     内核5.17版本，引入了一个新的辅助函数bpf_loop;  bpf_loop()通过接收一个static函数loop_fn()和iterations，可让loop_fn执行iterations次。
 
-```
+```c
 int bpf_loop(int nr, int (*fn)(__u32, void *), void *ctx, int flags);
 ```
 

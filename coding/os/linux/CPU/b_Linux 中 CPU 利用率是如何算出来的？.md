@@ -104,7 +104,7 @@ show me the code!
 
 通过使用 strace 跟踪 top 命令的各种系统调用，可以看的到它对该文件的调用。
 
-```
+```c
 # strace top
 ...
 openat(AT_FDCWD, "/proc/stat", O_RDONLY) = 4
@@ -117,7 +117,7 @@ openat(AT_FDCWD, "/proc/2393539/stat", O_RDONLY) = 8
 
 内核为各个伪文件都定义了处理函数，/proc/stat 文件的处理方法是 proc_stat_operations。
 
-```
+```c
 //file:fs/proc/stat.c
 static int __init proc_stat_init(void)
 {
@@ -133,7 +133,7 @@ static const struct file_operations proc_stat_operations = {
 
 proc_stat_operations 中包含了该文件时对应的操作方法。当打开 /proc/stat 文件的时候，stat_open 就会被调用到。stat_open 依次调用 single_open_size，show_stat 来输出数据内容。我们来看看它的代码：
 
-```
+```c
 //file:fs/proc/stat.c
 static int show_stat(struct seq_file *p, void *v)
 {
@@ -184,7 +184,7 @@ Linux 内核每隔固定周期会发出 timer interrupt (IRQ 0)，这有点像�
 
 一个节拍的长度是多长时间，是通过 CONFIG_HZ 来定义的。它定义的方式是每一秒有几次 timer interrupts。不同的系统中这个节拍的大小可能不同，通常在 1 ms 到 10 ms 之间。可以在自己的 Linux config 文件中找到它的配置。
 
-```
+```c
 # grep ^CONFIG_HZ /boot/config-5.4.56.bsk.10-amd64
 CONFIG_HZ=1000
 ```
@@ -197,7 +197,7 @@ CONFIG_HZ=1000
 
 我们来详细看下汇总过程 update_process_times 的源码，它位于 kernel/time/timer.c 文件中。
 
-```
+```c
 //file:kernel/time/timer.c
 void update_process_times(int user_tick)
 {
@@ -211,7 +211,7 @@ void update_process_times(int user_tick)
 
 这个函数的参数 user_tick 值得是采样的瞬间是处于内核态还是用户态。接下来调用 account_process_tick。
 
-```
+```c
 //file:kernel/sched/cputime.c
 void account_process_tick(struct task_struct *p, int user_tick)
 {
@@ -234,7 +234,7 @@ void account_process_tick(struct task_struct *p, int user_tick)
 
 ### 3.1 用户态时间统计
 
-```
+```c
 //file:kernel/sched/cputime.c
 void account_user_time(struct task_struct *p, u64 cputime)
 {
@@ -259,7 +259,7 @@ account_user_time 函数主要分两种情况统计：
 
 接着调用 task_group_account_field 来把时间加到前面我们用到的 kernel_cpustat 内核变量中。
 
-```
+```c
 //file:kernel/sched/cputime.c
 static inline void task_group_account_field(struct task_struct *p, int index,
                         u64 tmp)
@@ -273,7 +273,7 @@ static inline void task_group_account_field(struct task_struct *p, int index,
 
 我们再来看内核态时间是如何统计的，找到 account_system_time 的代码。
 
-```
+```c
 //file:kernel/sched/cputime.c
 void account_system_time(struct task_struct *p, int hardirq_offset, u64 cputime)
 {
@@ -296,7 +296,7 @@ void account_system_time(struct task_struct *p, int hardirq_offset, u64 cputime)
 
 判断好要加到哪个统计项中后，依次调用 account_system_index_time、task_group_account_field 来将这段时间加到内核变量 kernel_cpustat 中
 
-```
+```c
 //file:kernel/sched/cputime.c
 static inline void task_group_account_field(struct task_struct *p, int index,
                         u64 tmp)
@@ -311,7 +311,7 @@ static inline void task_group_account_field(struct task_struct *p, int index,
 
 如果在采样的瞬间，cpu 既不在内核态也不在用户态的话，就将当前节拍的时间都累加到 idle 中。
 
-```
+```c
 //file:kernel/sched/cputime.c
 void account_idle_time(u64 cputime)
 {

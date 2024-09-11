@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/CPU/ARM CPU性能实验.md",
+                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/CPU/ARM CPU性能实验.md",
+                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/CPU/ARM CPU性能实验.md",
+                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/CPU/ARM CPU性能实验.md"
+                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md"
               }
             }
           }
@@ -148,6 +148,34 @@
   },
   "active": "36c876f1da30a788",
   "lastOpenFiles": [
+    "coding/os/linux/CPU/b_Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
+    "coding/os/linux/CPU/b_Linux 中 CPU 利用率是如何算出来的？.md",
+    "coding/os/linux/CPU/p_CPU 是如何与内存交互的.md",
+    "0x99-image/Pasted image 20240911195408.png",
+    "0x99-image/Pasted image 20240911195525.png",
+    "0x99-image/Pasted image 20240911195519.png",
+    "0x99-image/Pasted image 20240911195512.png",
+    "0x99-image/Pasted image 20240911195502.png",
+    "0x99-image/Pasted image 20240911195456.png",
+    "0x99-image/Pasted image 20240911195451.png",
+    "0x99-image/Pasted image 20240911195446.png",
+    "0x99-image/Pasted image 20240911195440.png",
+    "0x99-image/Pasted image 20240911195434.png",
+    "coding/os/linux/CPU/CPU 多核指令 —— WFE 原理.md",
+    "coding/os/linux/build/计算机科学基础知识（三）静态库和静态链接.md",
+    "coding/os/linux/build/Docker镜像瘦身：从1.43G到22.4MB.md",
+    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
+    "coding/os/linux/BPF/基于 eBPF 的软件网络功能实现.md",
+    "coding/os/linux/BPF/b_BPF C 编程入门.md",
+    "coding/os/linux/BPF/b_eBPF 简史.md",
+    "coding/os/linux/BPF/eBPF动手实践系列三：基于原生libbpf库的eBPF编程改进方案.md",
+    "coding/os/linux/BPF/p_BPF 赋能调度器：万字详解 sched_ext 实现机制与工作流程【建议收藏】.md",
+    "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
+    "coding/os/linux/BPF/p_eBPF Talk ringbuf 经验分享.md",
+    "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
+    "coding/os/linux/BPF/Linux eBPF学习路径.md",
+    "coding/os/linux/memory/cache/深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+    "coding/os/linux/CPU/ARM CPU性能实验.md",
     "coding/os/linux/CPU/“DPU”非DPU.md",
     "coding/os/linux/device/device_tree/Device Tree（一）：背景介绍.md",
     "coding/os/linux/device/eMMC/Linux MMC framework(2)_host controller driver.md",
@@ -159,35 +187,7 @@
     "coding/os/linux/device/GPIO",
     "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（4）：pinctrl驱动的理解和总结.md",
     "coding/os/linux/device/Linux V4L2子系统与视频编解码设备介绍.md",
-    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
-    "coding/os/linux/filesystem/一例ext4使用的jbd2模块死锁分析.md",
-    "coding/os/linux/filesystem/Linux文件系统十问.md",
-    "coding/os/linux/io/以小窥大：IO 卡顿探寻苹果文件系统.md",
-    "coding/os/linux/io/p_架构必知：深入理解Linux IO系统.md",
-    "coding/os/linux/io/直播回顾：如何对付臭名昭著的 IO 夯？诊断利器来了 龙蜥技术.md",
-    "coding/os/linux/io/epoll/p_盘点Linux Epoll那些致命弱点.md",
-    "coding/os/linux/io/epoll/a_大疆一面：请说出水平触发和边缘触发的区别？.md",
-    "coding/os/linux/io/p_深入理解 Linux的 I O 系统.md",
-    "coding/os/linux/io/深入理解 Linux 异步 IO 框架 io_uring.md",
-    "0x99-image/Pasted image 20240911163105.png",
-    "0x99-image/Pasted image 20240911163906.png",
-    "coding/os/linux/io/深入理解SR-IOV和IO虚拟化.md",
-    "coding/os/linux/io/epoll/深入理解 Linux 的 epoll 机制.md",
-    "coding/os/linux/io/浅析Linux sockfs文件系统.md",
-    "0x99-image/Pasted image 20240911163443.png",
-    "0x99-image/Pasted image 20240911163207.png",
-    "0x99-image/Pasted image 20240911163159.png",
-    "0x99-image/Pasted image 20240911163154.png",
-    "0x99-image/Pasted image 20240911163150.png",
-    "0x99-image/Pasted image 20240911163111.png",
-    "coding/os/linux/io/关于linux io_uring性能测试及其 实现原理的一些探索.md",
-    "coding/os/linux/io/图解 Linux  管道通信的原理？.md",
-    "README.md",
-    "test/2024-09-01.md",
-    "coding/os/linux/io/epoll/a_ 深入揭秘 epoll 是如何实现 IO 多路复用的.md",
     "coding/os/linux/io/epoll",
-    "0x99-image/Pasted image 20240911093408.png",
-    "0x99-image/Pasted image 20240911093626.png",
     "coding/java/Spring",
     "coding/cpp/opensource/qt",
     "coding/cpp/opensource/protobuf",

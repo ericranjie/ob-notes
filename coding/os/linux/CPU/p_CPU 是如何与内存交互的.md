@@ -31,7 +31,7 @@ SRAM 被称为“静态”存储器，是因为只要处在通电状态，里面
     
 - • DRAM 内存的存取速度**：107 个 CPU 时钟周期**
     
-
+![[Pasted image 20240911195408.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### CPU cache
@@ -43,7 +43,7 @@ SRAM 被称为“静态”存储器，是因为只要处在通电状态，里面
 一种简单的方式是**直接映射**，有点像我们把数据找出来，直接放入到 map 中进行存储一样，映射通过地址和 cache 的数量进行取模后获取到 cache 中主存的地址去获取数据。
 
 `（地址）mod（cache 中的块数）   `
-
+![[Pasted image 20240911195418.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图中画了一个地址去找 cache 的情况。对于 cache 来说可以划分为：
@@ -63,7 +63,7 @@ SRAM 被称为“静态”存储器，是因为只要处在通电状态，里面
 除了上面说的**直接映射**以外还有**组相联**和**全相联**。
 
 **组相联**就是使用组索引代替了原来的索引，下图中表示每组有 2 行数据，通过组索引找到对应的数据行之后通过有效位和标记对组中每一行进行检索，如果能匹配上就说明命中。
-
+![[Pasted image 20240911195425.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### cache 读写操作
@@ -106,19 +106,19 @@ MESI 协议对应的四个不同的标记，分别是：
 #### 虚拟内存映射
 
 在我们日常使用的 Linux 或者 Windows 操作系统下，程序并不能直接访问物理内存。程序都是通过虚拟地址 VA（virtual address）用地址转换翻译成 PA 物理地址（physical address）才能获取到数据。也就是说 CPU 操作的实际上是一个虚拟地址 VA。
-
+![[Pasted image 20240911195434.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如上图，CPU 访问主存的时候会将一个虚拟地址（virtual address）被内存管理单元（Memory Management Unint, MMU）进行翻译成物理地址 PA（physical address） 才能访问。
 
 想要把虚拟内存地址，映射到物理内存地址，最直观的办法，就是来建一张映射表。这个映射表在计算机中叫页表（Page Table）。
-
+![[Pasted image 20240911195440.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在查找页表的时候，会将虚拟地址分成页号（Directory）和偏移量（Offset）两个部分。前面的高位，表示内存地址的页号。后面的低位，表示内存地址里面的偏移量。
 
 查找方式和上面说的组相联类似，首先使用虚拟页号作为索引去页表中找到对应的物理页号，页表中还会有 1 位表示有效位，如果该位无效就不在主存中，发生一次缺页；如果有效，那么就可以拿到对应的物理页号获取到对应的物理页位置，再根据偏移量得到物理内存地址。
-
+![[Pasted image 20240911195446.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果有效位关闭，那么该页就只存在磁盘上的某个指定的磁盘地址。缺页会触发缺页异常，然后在闪存或磁盘中找到该页，将其放入到主存 DRAM 中。
@@ -126,7 +126,7 @@ MESI 协议对应的四个不同的标记，分别是：
 如果主存满了，那么会选择一个牺牲页，大多数操作系统会使用 LRU 替换策略来进行页的替换。操作系统会查找最少使用的页，被替换的页会写入磁盘的交换区（swap 分区）。swap 分区通常被称为交换分区，这是一块特殊的硬盘空间，即当实际内存不够用的时候，操作系统会从内存中取出一部分暂时不用的数据，放在交换分区中，从而为当前运行的程序腾出足够的内存空间。
 
 在下图中假设选择将存放在主存中的 VP6 进行替换，将 VP6 替换为 VP3。如果被替代的 VP6 已经被修改了，那么内核会将它复制回磁盘。
-
+![[Pasted image 20240911195451.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于局部性（locality）的存在，程序一般而言会在一个较小的活动页面集合上工作，页的切换开销只存在于程序启动时将页面调度到内存中，接下来的程序都会页命中。但是如果代码的工作集太大，超过了物理内存大小，那么页面就会不停地换进换出，产生抖动。
@@ -136,7 +136,7 @@ MESI 协议对应的四个不同的标记，分别是：
 假设我们现在是一个 32 位的地址空间、4KB 的页面和一个 4 字节的 PTE，那么需要一个 4MB 的页表常驻在内存中，并且这个页表是每个进程都独占一份，所以会造成很大的内存浪费，我们需要一种方式来优化我们的页表空间存储。
 
 想一下虚拟内存空间结构，整个 4 GB 的空间，操作系统用了 1 GB，从地址 `0XC0000000` 到 `0XFFFFFFFF`, 剩余 3 GB 留给用户空间，其实很多程序根本用不到这么大的空间，对于 64 位系统，每个进程都会拥有 256 TiB 的内存空间，那就更加用不上了。
-
+![[Pasted image 20240911195456.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么对于用不上的空间，我们可以不可以不把它加载到页表里面，等到用这块空间的时候才在页表里面给它分配一个页表项，是不是就可以节省大量空间。
@@ -146,13 +146,13 @@ MESI 协议对应的四个不同的标记，分别是：
 假设 32 位虚拟地址空间被划分位 4KB 每页，每个条目都是 4 字节，那么我们可以让第一级页表中的每个 PTE （页表项 page table entry）负责映射虚拟地址空间中一个 4MB 的片，这个片由 1024 个连续页面组成，表示二级页表。如果地址空间是 4GB，那么 1024 个一级页表项就可以覆盖整个空间。
 
 如下图所示，内存前 2K 个页面给代码和数据，接下来 6K 个页面未分配，在接下来 1023 个页面也未分配，接下来一个页面分配给用户栈。
-
+![[Pasted image 20240911195502.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这种方法从两个方面减少了内存占用。第一，如果一级页表中的一个 PTE 是空的，那么相应的二级页表就根本不会存在。由于很多程序占用内存实际远小于页表所能表示的大小，所以可以节约很大空间的页表项资源；第二，只有一级页表才需要总是在主存中，二级页表会在需要的时候创建或销毁，只有最经常使用的二级页表才需要缓存在主存中，这就减少了主存的压力。
 
 Linux 在 2.6.10 中引入了四层的页表辅助虚拟地址的转换：
-
+![[Pasted image 20240911195512.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 首先会找到 4 级页表里面对应的条目（Entry）。这个条目里存放的是一张 3 级页表所在的位置。4 级页面里面的每一个条目，都对应着一张 3 级页表，所以我们可能有多张 3 级页表。
@@ -173,7 +173,7 @@ Linux 在 2.6.10 中引入了四层的页表辅助虚拟地址的转换：
     
 5. 高速缓存/主存返回所请求的数据给 CPU。
     
-
+![[Pasted image 20240911195519.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一次简单的数据获取需要多次经过多次与内存的交互，如果是 4 级页表，那么就需要访问 4 次内存才能获取到对应的物理页号。如果是缺页，还需要有一个 PTE 的置换或加载过程。在开头也讲了，访问内存的性能其实很低的，实际上这严重影响了 CPU 处理性能。
@@ -192,7 +192,7 @@ Linux 在 2.6.10 中引入了四层的页表辅助虚拟地址的转换：
     
 4. 高速缓存/主存将所请求的数据字返回给 CPU；
     
-
+![[Pasted image 20240911195525.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 最后来看看为什么需要虚拟内存？
