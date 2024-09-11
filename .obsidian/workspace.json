@@ -13,7 +13,7 @@
             "state": {
               "type": "image",
               "state": {
-                "file": "0x99-image/Pasted image 20240910233414.png"
+                "file": "0x99-image/Pasted image 20240911001423.png"
               }
             }
           }
@@ -83,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240910233414.png",
+                "file": "0x99-image/Pasted image 20240911001423.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240910233414.png",
+                "file": "0x99-image/Pasted image 20240911001423.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240910233414.png"
+                "file": "0x99-image/Pasted image 20240911001423.png"
               }
             }
           }
@@ -146,17 +146,19 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/ARM/ARMv8之Observability.md",
+    "coding/os/ARM/Arm64 栈回溯.md",
+    "0x99-image/Pasted image 20240911001451.png",
+    "0x99-image/Pasted image 20240911001445.png",
+    "0x99-image/Pasted image 20240911001439.png",
+    "0x99-image/Pasted image 20240911001434.png",
+    "0x99-image/Pasted image 20240911001423.png",
+    "0x99-image/Pasted image 20240910233414.png",
     "coding/os/linux/debug/《Load高故障分析》学习笔记.md",
     "0x99-image/Pasted image 20240911001200.png",
     "0x99-image/Pasted image 20240911001155.png",
     "0x99-image/Pasted image 20240911001142.png",
     "0x99-image/Pasted image 20240911001137.png",
-    "0x99-image/Pasted image 20240911001132.png",
-    "0x99-image/Pasted image 20240911001125.png",
-    "0x99-image/Pasted image 20240911001121.png",
-    "0x99-image/Pasted image 20240911001116.png",
-    "0x99-image/Pasted image 20240911001103.png",
-    "0x99-image/Pasted image 20240911001054.png",
     "coding/java/Spring/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
     "coding/cpp/opensource/memory/高性能C++内存池：解密并发环境下的内存管理.md",
     "coding/java/Spring",
@@ -185,8 +187,6 @@
     "coding/algorithm/还在用策略模式解决 if-else？Map+函数式接口方法才是YYDS！.md",
     "coding/algorithm/软件分析与设计：分析什么？如何设计？.md",
     "coding/os/linux/io/以小窥大：IO 卡顿探寻苹果文件系统.md",
-    "coding/os/linux/io/epoll背后的原理.md",
-    "coding/os/linux/io/block io生命历程.md",
     "coding/algorithm/sort",
     "coding/database/grammar",
     "coding/algorithm/other",
