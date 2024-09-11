@@ -37,11 +37,11 @@
 ### 一、accept 创建新 socket
 
 我们直接从服务器端的 accept 讲起。当 accept 之后，进程会创建一个新的 socket 出来，专门用于和对应的客户端通信，然后把它放到当前进程的打开文件列表中。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsFdRcRAg6n2bib68a2sr9JUlxexbibclVfEYvj7393JK4diaJcVmkEEpwg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中一条连接的 socket 内核对象更为具体一点的结构图如下。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsr3H3gJgmtZJotxlWrooyrfEib8X6NvCyRVicfr4kibgCKIHxzf8Ktq6Mw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 接下来我们来看一下接收连接时 socket 内核对象的创建源码。accept 的系统调用代码位于源文件 net/socket.c 下。
@@ -51,7 +51,7 @@
 #### 1.1 初始化 struct socket 对象
 
 在上述的源码中，首先是调用 sock_alloc 申请一个 struct socket 对象出来。然后接着把 listen 状态的 socket 对象上的协议操作函数集合 ops 赋值给新的 socket。（对于所有的 AF_INET 协议族下的 socket 来说，它们的 ops 方法都是一样的，所以这里可以直接复制过来）
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsbjZreGlqj8sibSufEqLVuItTk8oOGSz6XRlvuLJDZr21YkiceUyHIbyw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中 inet_stream_ops 的定义如下
@@ -61,7 +61,7 @@
 #### 1.2 为新 socket 对象申请 file
 
 struct socket 对象中有一个重要的成员 -- file 内核对象指针。这个指针初始化的时候是空的。在 accept 方法里会调用 sock_alloc_file 来申请内存并初始化。然后将新 file 对象设置到 sock->file 上。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsPZvnTHicv9m6zibkT5vVx2ib76tNv5OIpq5ta39Jr6gqA4kDgebpLKy6g/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 来看 sock_alloc_file 的实现过程：
@@ -107,13 +107,13 @@ socket_file_ops 的具体定义如下：
 ### 二、epoll_create 实现
 
 在用户进程调用 epoll_create 时，内核会创建一个 struct eventpoll 的内核对象。并同样把它关联到当前进程的已打开文件列表中。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsp4RL6icgUEfOXWTAUIT4bSY0bib0faI0r3hkC2zg3zpaJ5dcLklrGoFw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2_files
 
 对于 struct eventpoll 对象，更详细的结构如下（同样只列出和今天主题相关的成员）。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsJLspzNlUC9jTCDUhv65QT5zWfstLRpQRbh9xagZxEzmFeTbgGo5IMw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2_eventepoll
@@ -157,7 +157,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
     
 
 通过 epoll_ctl 添加两个 socket 以后，这些内核数据结构最终在进程中的关系图大致如下：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsnUXfFSJicPBVA9F3MEGhZvoGTgA9mCYicqFh5eHZCVT00J1YN265QtPA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们来详细看看 socket 是如何添加到 epoll 对象里的，找到 epoll_ctl 的源码。
@@ -175,7 +175,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 `//file: fs/eventpoll.c   struct epitem {          //红黑树节点       struct rb_node rbn;          //socket文件描述符信息       struct epoll_filefd ffd;          //所归属的 eventpoll 对象       struct eventpoll *ep;          //等待队列       struct list_head pwqlist;   }   `
 
 对 epitem 进行了一些初始化，首先在 `epi->ep = ep` 这行代码中将其 ep 指针指向 eventpoll 对象。另外用要添加的 socket 的 file、fd 来填充 epitem->ffd。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYs291KpKJW0iaXXHiaPaTe6cuEr7RgAJkLQ8ZuTk9z7xYwZBlZcbZKLbKg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3_epitem
@@ -187,7 +187,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 #### 3.2 设置 socket 等待队列
 
 在创建 epitem 并初始化之后，ep_insert 中第二件事情就是设置 socket 对象上的等待任务队列。并把函数 fs/eventpoll.c 文件下的 ep_poll_callback 设置为数据就绪时候的回调函数。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsVbzaGY6ibpl1PdibGyJE0Ibqgxbqb1iacicdUdbERx5AVZVQUkBJ8E3Wbg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3_wq
@@ -233,7 +233,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 #### 3.3 插入红黑树
 
 分配完 epitem 对象后，紧接着并把它插入到红黑树中。一个插入了一些 socket 描述符的 epoll 里的红黑树的示意图如下：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYs4skMviaLYyM4pZbia7KAic0tHcgI3e6ncvVRwkrqZC9QImnq3Z2OdR2Dg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3_rbtree
@@ -243,7 +243,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 ### 四、epoll_wait 等待接收
 
 epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllist 链表里有没有数据即可。有数据就返回，没有数据就创建一个等待队列项，将其添加到 eventpoll 的等待队列上，然后把自己阻塞掉就完事。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsfIa3ib9BfYEicLneQXSYeAHRJic5llxZicp0hZdaP3aPXEcCawML9x8s0A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 4_epollwait
@@ -289,7 +289,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 ### 五、数据来啦
 
 在前面 epoll_ctl 执行的时候，内核为每一个 socket 上都添加了一个等待队列项。在 epoll_wait 运行完的时候，又在 event poll 对象上添加了等待队列元素。在讨论数据开始接收之前，我们把这些队列项的内容再稍微总结一下。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsN5zMZy3gibibI1XsBsKNRrchiadiaJj4fssyiaVia4gyRZOYv6XRxYRAmmsg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - socket->sock->sk_data_ready 设置的就绪处理函数是 sock_def_readable
@@ -316,7 +316,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 `//file: net/ipv4/tcp_input.c   int tcp_rcv_established(struct sock *sk, struct sk_buff *skb,               const struct tcphdr *th, unsigned int len)   {       ......          //接收数据到队列中       eaten = tcp_queue_rcv(sk, skb, tcp_header_len,                                       &fragstolen);          //数据 ready，唤醒 socket 上阻塞掉的进程       sk->sk_data_ready(sk, 0);   `
 
 在 tcp_rcv_established 中通过调用 tcp_queue_rcv 函数中完成了将接收数据放到 socket 的接收队列上。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsEI3sVHK8Ef9vkibn8U41fN1NqUYpicqnyp6wVepYqiaKziajLJ9R2I1oHA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如下源码所示：
@@ -328,7 +328,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 调用 tcp_queue_rcv 接收完成之后，接着再调用 sk_data_ready 来唤醒在 socket 上等待的用户进程。这又是一个函数指针。回想上面第一节我们在 accept 函数创建 socket 流程里提到的 sock_init_data 函数，在这个函数里已经把 sk_data_ready 设置成 sock_def_readable 函数了。它是默认的数据就绪处理函数。
 
 当 socket 上数据就绪时候，内核将以 sock_def_readable 这个函数为入口，找到 epoll_ctl 添加 socket 时在其上设置的回调函数 ep_poll_callback。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYseAs3qcuIXJAd2nofZXJgV3cNLbTFURV8ygKMfmnpvXZU21ruOFXzxw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们来详细看下细节：
@@ -369,7 +369,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 接着它又会查看 eventpoll 对象上的等待队列里是否有等待项（epoll_wait 执行的时候会设置）。
 
 如果没执行软中断的事情就做完了。如果有等待项，那就查找到等待项里设置的回调函数。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsVz4OEKwBpMbSegdbrgIj81YPE50LOC5JfOzanuoFfhxJJNiaw1HdcbQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 调用 wake_up_locked() => __wake_up_locked() => __wake_up_common。
@@ -381,7 +381,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 #### 5.4 执行 epoll 就绪通知
 
 在 default_wake_function 中找到等待队列项里的进程描述符，然后唤醒之。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYso21lzFPaWZ7A9yRc0jqh090K8CVcUN9g3sysWhRQW3SuZe0kwYAj8g/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 源代码如下：
@@ -401,7 +401,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 ### 总结
 
 我们来用一幅图总结一下 epoll 的整个工作路程。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYs4KWxl9jibCyz7lu0kXBm27uzokTJwB0nxP2Rt45TqicstpOkTGAeG7iaQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中软中断回调的时候回调函数也整理一下：  

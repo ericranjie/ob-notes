@@ -11,9 +11,11 @@
             "id": "36c876f1da30a788",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "0x99-image/Pasted image 20240911001423.png"
+                "file": "coding/os/linux/CPU/ARM CPU性能实验.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -46,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "写一个使用perf分析cache的示例",
+                "query": "图解 Linux  管道通信的原理？",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240911001423.png",
+                "file": "coding/os/linux/CPU/ARM CPU性能实验.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240911001423.png",
+                "file": "coding/os/linux/CPU/ARM CPU性能实验.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240911001423.png"
+                "file": "coding/os/linux/CPU/ARM CPU性能实验.md"
               }
             }
           }
@@ -144,54 +146,54 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "36c876f1da30a788",
   "lastOpenFiles": [
-    "coding/os/ARM/ARMv8之Observability.md",
-    "coding/os/ARM/Arm64 栈回溯.md",
-    "0x99-image/Pasted image 20240911001451.png",
-    "0x99-image/Pasted image 20240911001445.png",
-    "0x99-image/Pasted image 20240911001439.png",
-    "0x99-image/Pasted image 20240911001434.png",
-    "0x99-image/Pasted image 20240911001423.png",
-    "0x99-image/Pasted image 20240910233414.png",
-    "coding/os/linux/debug/《Load高故障分析》学习笔记.md",
-    "0x99-image/Pasted image 20240911001200.png",
-    "0x99-image/Pasted image 20240911001155.png",
-    "0x99-image/Pasted image 20240911001142.png",
-    "0x99-image/Pasted image 20240911001137.png",
-    "coding/java/Spring/字节二面：为什么SpringBoot的 jar 可以直接运行？我说因为内嵌了Tomcat容器，他让我出门左转。。.md",
-    "coding/cpp/opensource/memory/高性能C++内存池：解密并发环境下的内存管理.md",
-    "coding/java/Spring",
-    "coding/cpp/opensource/memory/【性能优化】高效内存池的设计与实现.md",
-    "coding/cpp/opensource/memory",
-    "coding/cpp/opensource/qt/总结了一份Qt5 的开发经验.md",
-    "coding/cpp/opensource/protobuf/更快更小！ProtoBuf 入门详解.md",
-    "coding/cpp/opensource/qt",
-    "coding/cpp/opensource/工作多年，那些曾经帮我成长的开源 C++ 项目、学习方法，现在全部分享给你.md",
-    "coding/cpp/opensource/protobuf",
-    "coding/cpp/opensource/boost",
-    "coding/cpp/opensource/探索C++世界：最流行的开源框架大全.md",
-    "coding/cpp/opensource/boost/d_ 使用Boost库实现自动数量的虚函数.md",
-    "coding/cpp/opensource/Seastar：高性能C++库详解与应用.md",
-    "coding/cpp/opensource/coroutine/微信著名libco协程库原理剖析.md",
-    "coding/cpp/opensource/coroutine/深入探索C++20的重要特性：从模块化到协程.md",
-    "coding/cpp/opensource/coroutine/如何使用 GDB 分析 C C++ Coroutine.md",
-    "coding/cpp/opensource/coroutine/C++ 20 协程 Coroutine（3，剖析）.md",
-    "awesome-list/wechat.md",
-    "awesome-list/zhihu.md",
-    "awesome-list/community.md",
-    "coding/os/linux/memory/cache/写一个使用perf分析cache的示例.md",
-    "coding/algorithm/other/时间轮原理及其在框架中的应用.md",
-    "coding/algorithm/无锁队列的实现.md",
-    "coding/algorithm/TensorFlow在推荐系统中的分布式训练优化实践.md",
-    "coding/algorithm/还在用策略模式解决 if-else？Map+函数式接口方法才是YYDS！.md",
-    "coding/algorithm/软件分析与设计：分析什么？如何设计？.md",
+    "coding/os/linux/CPU/“DPU”非DPU.md",
+    "coding/os/linux/device/device_tree/Device Tree（一）：背景介绍.md",
+    "coding/os/linux/device/eMMC/Linux MMC framework(2)_host controller driver.md",
+    "coding/os/linux/device/device_tree",
+    "coding/os/linux/device/device_model/Linux设备模型(1)_基本概念.md",
+    "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（1）：软件框架.md",
+    "coding/os/linux/device/device_model",
+    "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（5）：gpio subsysem和pinctrl subsystem之间的耦合.md",
+    "coding/os/linux/device/GPIO",
+    "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（4）：pinctrl驱动的理解和总结.md",
+    "coding/os/linux/device/Linux V4L2子系统与视频编解码设备介绍.md",
+    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
+    "coding/os/linux/filesystem/一例ext4使用的jbd2模块死锁分析.md",
+    "coding/os/linux/filesystem/Linux文件系统十问.md",
     "coding/os/linux/io/以小窥大：IO 卡顿探寻苹果文件系统.md",
+    "coding/os/linux/io/p_架构必知：深入理解Linux IO系统.md",
+    "coding/os/linux/io/直播回顾：如何对付臭名昭著的 IO 夯？诊断利器来了 龙蜥技术.md",
+    "coding/os/linux/io/epoll/p_盘点Linux Epoll那些致命弱点.md",
+    "coding/os/linux/io/epoll/a_大疆一面：请说出水平触发和边缘触发的区别？.md",
+    "coding/os/linux/io/p_深入理解 Linux的 I O 系统.md",
+    "coding/os/linux/io/深入理解 Linux 异步 IO 框架 io_uring.md",
+    "0x99-image/Pasted image 20240911163105.png",
+    "0x99-image/Pasted image 20240911163906.png",
+    "coding/os/linux/io/深入理解SR-IOV和IO虚拟化.md",
+    "coding/os/linux/io/epoll/深入理解 Linux 的 epoll 机制.md",
+    "coding/os/linux/io/浅析Linux sockfs文件系统.md",
+    "0x99-image/Pasted image 20240911163443.png",
+    "0x99-image/Pasted image 20240911163207.png",
+    "0x99-image/Pasted image 20240911163159.png",
+    "0x99-image/Pasted image 20240911163154.png",
+    "0x99-image/Pasted image 20240911163150.png",
+    "0x99-image/Pasted image 20240911163111.png",
+    "coding/os/linux/io/关于linux io_uring性能测试及其 实现原理的一些探索.md",
+    "coding/os/linux/io/图解 Linux  管道通信的原理？.md",
+    "README.md",
+    "test/2024-09-01.md",
+    "coding/os/linux/io/epoll/a_ 深入揭秘 epoll 是如何实现 IO 多路复用的.md",
+    "coding/os/linux/io/epoll",
+    "0x99-image/Pasted image 20240911093408.png",
+    "0x99-image/Pasted image 20240911093626.png",
+    "coding/java/Spring",
+    "coding/cpp/opensource/qt",
+    "coding/cpp/opensource/protobuf",
+    "coding/cpp/opensource/memory",
+    "coding/cpp/opensource/boost",
     "coding/algorithm/sort",
-    "coding/database/grammar",
-    "coding/algorithm/other",
-    "coding/algorithm/hash",
-    "coding/algorithm/tree",
     "Untitled.canvas"
   ]
 }

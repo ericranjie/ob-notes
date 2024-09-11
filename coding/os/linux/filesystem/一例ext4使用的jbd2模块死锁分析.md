@@ -31,7 +31,7 @@ oppo云内核团队接到运维兄弟收集的测试环境一例crash,
 
 现象是load很高,卡得没法操作：
 
-```
+```c
 
       KERNEL: /usr/lib/debug/lib/modules/3.10.0-957.27.2.el7.x86_64/vmlinux
 
@@ -51,7 +51,7 @@ LOAD AVERAGE: 72886.67, 72873.82, 72735.93
 
 我们授权后登陆oppo云宿主，查看最早报hung的日志如下：
 
-```
+```c
 
 Apr 16 19:46:22 [ERR] :  - [26652536.550311] INFO: task jbd2/dm-12-8:547025 blocked for more than 120 seconds.
 
@@ -97,7 +97,7 @@ Apr 16 19:46:22 [ERR] :  - [26652536.550467] INFO: task java:12610 bl
 
   
 
-```
+```c
 
 crash> bt 547025
 
@@ -133,7 +133,7 @@ crash> ps -m 547025
 
 下面就需要看，这个进程卡在什么地方,代码如下
 
-```
+```c
 
 void jbd2_update_log_tail(journal_t *journal, tid_t tid, unsigned long block)
 
@@ -155,7 +155,7 @@ void jbd2_update_log_tail(journal_t *journal, tid_t tid, unsigned long bl
 
 然后看mutex放在栈里的位置：
 
-```
+```c
 
 crash> dis -l jbd2_update_log_tail |grep mutex_lock
 
@@ -189,7 +189,7 @@ crash> dis -l jbd2_update_log_tail |grep mutex_lock -B 10
 
 然后看mutex_lock里面，并没有人动r12寄存器，
 
-```
+```c
 
 dis -l mutex_lock|grep r12 ---没有输出，说明这个函数里面没有人动r12
 
@@ -197,7 +197,7 @@ dis -l mutex_lock|grep r12 ---没有输出，说明这个函数里面没有�
 
 再往下面调用链看：
 
-```
+```c
 
 crash> dis -l __mutex_lock_slowpath |head -12
 
@@ -229,7 +229,7 @@ crash> dis -l __mutex_lock_slowpath |head -12
 
 根据上面分析，从栈中取得mutex如下：
 
-```
+```c
 
 crash> struct mutex ffff91793cbbe0f0----从栈中取的mutex
 
@@ -301,7 +301,7 @@ struct mutex {----从源码的上下文看，这个其实就是journal_t.j_che
 
 下面，就需要根据mutex的owner，看一下对应的进程为什么持有锁之后，长时间不放锁了。
 
-```
+```c
 
 crash> bt 0xffff9178e0ad1040----对应的进程为13027
 
@@ -361,7 +361,7 @@ PID: 13027  TASK: ffff9178e0ad1040  CPU: 10  COMMAND: "java"
 
 13027也在等待，处于UN状态，它的最后一次调度时间为：
 
-```
+```c
 
 crash> ps -m 13027
 
@@ -383,7 +383,7 @@ crash> ps -m 547025
 
 从代码分析 __jbd2_log_wait_for_space
 
-```
+```c
 
 void __jbd2_log_wait_for_space(journal_t *journal)
 
@@ -469,7 +469,7 @@ jbd2_log_do_checkpoint并在等待log提交，等待完成的条件是当前提�
 
 tid必须要不大于 j_commit_sequence。
 
-```
+```c
 
 int jbd2_log_wait_commit(journal_t *journal, tid_t tid)
 
@@ -529,7 +529,7 @@ int jbd2_log_wait_commit(journal_t *journal, tid_t tid)
 
 根据栈中的详细数据：
 
-```
+```c
 
 crash> bt -f 13027
 
@@ -583,7 +583,7 @@ PID: 13027  TASK: ffff9178e0ad1040  CPU: 10  COMMAND: "java"
 
 当前的tid值，可以从栈中取出为：
 
-```
+```c
 
 查看当前tid为：
 
@@ -617,7 +617,7 @@ jbd2_log_do_checkpoint-->jbd2_log_wait_commit，是先释放了j_checkpoint_mute
 
 jbd2_log_wait_commit。
 
-```
+```c
 
 void __jbd2_log_wait_for_space(journal_t *journal)
 
@@ -761,7 +761,7 @@ void __jbd2_log_wait_for_space(journal_t *journal)
 
 而在linux主线中，有一个14年的补丁其实是去掉了__process_buffer中复杂的持锁流程的。
 
-```
+```c
 
 [root@custom-16-126 jbd2]# git log -p be1158cc615fd723552f0d9912087423c7cadda5
 
@@ -811,7 +811,7 @@ Date:   Mon Sep 1 21:19:01 2014 -0400
 
   
 
-```
+```c
 
 commit 53cf978457325d8fb2cdecd7981b31a8229e446e
 
