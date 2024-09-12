@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
+                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
+                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
+                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md"
+                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md"
               }
             }
           }
@@ -148,6 +148,7 @@
   },
   "active": "36c876f1da30a788",
   "lastOpenFiles": [
+    "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
     "coding/os/linux/CPU/p_linux cpufreq framework(5)_ARM big Little driver.md",
     "coding/os/linux/CPU/p_一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
     "coding/os/linux/CPU/p_linux cpufreq framework(3)_cpufreq core.md",
@@ -164,7 +165,7 @@
     "0x99-image/Pasted image 20240911195446.png",
     "0x99-image/Pasted image 20240911195440.png",
     "0x99-image/Pasted image 20240911195434.png",
-    "coding/os/linux/CPU/CPU 多核指令 —— WFE 原理.md",
+    "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
     "coding/os/linux/build/计算机科学基础知识（三）静态库和静态链接.md",
     "coding/os/linux/build/Docker镜像瘦身：从1.43G到22.4MB.md",
     "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
@@ -184,7 +185,6 @@
     "coding/os/linux/device/eMMC/Linux MMC framework(2)_host controller driver.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model/Linux设备模型(1)_基本概念.md",
-    "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（1）：软件框架.md",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",
     "coding/os/linux/io/epoll",
