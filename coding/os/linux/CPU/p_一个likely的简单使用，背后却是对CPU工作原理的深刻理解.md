@@ -20,7 +20,7 @@ show me the code!
 
 在内核中很多地方都充斥着 likely、unlikely 这一对儿函数的使用。随便揪两处，比如在 TCP 连接建立的过程中的这两个函数。
 
-```
+```c
 //file: net/ipv4/tcp_ipv4.c
 int tcp_v4_conn_request(struct sock *sk, struct sk_buff *skb)
 {
@@ -41,7 +41,7 @@ int tcp_rcv_established(struct sock *sk, ...)
 
 咱们先来挖挖这对儿函数的底层实现。
 
-```
+```c
 //file: include/linux/compiler.h
 #define likely(x)   __builtin_expect(!!(x),1)
 #define unlikely(x) __builtin_expect(!!(x),0)
@@ -60,7 +60,7 @@ int tcp_rcv_established(struct sock *sk, ...)
 
 那我们实际动手写两个例子，来窥探一下编译器是如何进行优化的。为此我写了一段简单的测试代码，如下：
 
-```
+```c
 #include <stdio.h>
 #define likely(x) __builtin_expect(!!(x), 1)
 #define unlikely(x)  __builtin_expect(!!(x), 0)

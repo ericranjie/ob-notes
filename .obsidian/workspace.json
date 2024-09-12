@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
+                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
+                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md",
+                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/CPU/linux cpufreq framework(3)_cpufreq core.md"
+                "file": "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md"
               }
             }
           }
@@ -148,6 +148,9 @@
   },
   "active": "36c876f1da30a788",
   "lastOpenFiles": [
+    "coding/os/linux/CPU/p_linux cpufreq framework(5)_ARM big Little driver.md",
+    "coding/os/linux/CPU/p_一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
+    "coding/os/linux/CPU/p_linux cpufreq framework(3)_cpufreq core.md",
     "coding/os/linux/CPU/b_Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
     "coding/os/linux/CPU/b_Linux 中 CPU 利用率是如何算出来的？.md",
     "coding/os/linux/CPU/p_CPU 是如何与内存交互的.md",
@@ -183,10 +186,7 @@
     "coding/os/linux/device/device_model/Linux设备模型(1)_基本概念.md",
     "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（1）：软件框架.md",
     "coding/os/linux/device/device_model",
-    "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（5）：gpio subsysem和pinctrl subsystem之间的耦合.md",
     "coding/os/linux/device/GPIO",
-    "coding/os/linux/device/GPIO/linux内核中的GPIO系统之（4）：pinctrl驱动的理解和总结.md",
-    "coding/os/linux/device/Linux V4L2子系统与视频编解码设备介绍.md",
     "coding/os/linux/io/epoll",
     "coding/java/Spring",
     "coding/cpp/opensource/qt",
