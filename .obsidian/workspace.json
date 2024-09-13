@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
+                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
+                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
+                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md"
+                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md"
               }
             }
           }
@@ -148,41 +148,41 @@
   },
   "active": "36c876f1da30a788",
   "lastOpenFiles": [
+    "0x99-image/Pasted image 20240913201821.png",
+    "coding/os/linux/memory/virtual-memory/b_深入理解Linux内核之mmu-gather操作.md",
+    "0x99-image/Pasted image 20240913201921.png",
+    "0x99-image/Pasted image 20240913201905.png",
+    "0x99-image/Pasted image 20240913201851.png",
+    "0x99-image/Pasted image 20240913201846.png",
+    "0x99-image/Pasted image 20240913201840.png",
+    "0x99-image/Pasted image 20240913201833.png",
+    "coding/os/linux/memory/virtual-memory/b_虚拟内存 & IO & 零拷贝.md",
+    "coding/os/linux/memory/virtual-memory/d_深入了解iommu系列四：interrupt remapping 工作机制解析.md",
+    "coding/os/linux/memory/virtual-memory/b_TLB flush操作.md",
+    "coding/os/linux/memory/virtual-memory/k_深入理解TLB原理.md",
+    "coding/os/linux/memory/virtual-memory/t_深入理解TLB.md",
+    "coding/os/linux/memory/virtual-memory/b_RISC-V 内存虚拟化简析（一）.md",
+    "0x99-image/Pasted image 20240913184925.png",
+    "coding/os/linux/memory/virtual-memory/d_Linux vm运行参数之（二）：OOM相关的参数.md",
+    "coding/os/linux/memory/virtual-memory/d_Linux vm运行参数之（一）：overcommit相关的参数.md",
+    "README.md",
+    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
+    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
+    "0x99-image/Pasted image 20240913161953.png",
+    "0x99-image/Pasted image 20240913162844.png",
+    "awesome-list/wechat.md",
+    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
+    "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
+    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
+    "coding/os/linux/memory/cache/p_伪共享问题初探：根源与检测.md",
+    "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
     "coding/os/linux/memory/cache/a_一篇论文讲透Cache优化.md",
-    "0x99-image/Pasted image 20240913120135.png",
-    "0x99-image/Pasted image 20240913120724.png",
-    "0x99-image/Pasted image 20240913120717.png",
-    "0x99-image/Pasted image 20240913120708.png",
-    "0x99-image/Pasted image 20240913120702.png",
-    "0x99-image/Pasted image 20240913120648.png",
-    "0x99-image/Pasted image 20240913120642.png",
-    "0x99-image/Pasted image 20240913120636.png",
-    "0x99-image/Pasted image 20240913120630.png",
-    "0x99-image/Pasted image 20240913120625.png",
     "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
     "coding/os/linux/memory/cache/ap_一个较复杂dcache问题.md",
-    "README.md",
     "coding/os/linux/memory/cache/a_cache的58问，您能回答上来几个？.md",
     "coding/os/linux/memory/cache/k_arm64 cache机制分析.md",
     "test/self_notes.md",
-    "test/next_step.md",
-    "coding/os/linux/build/p_Debian8 内核升级实验.md",
-    "interview-resource.md",
-    "coding/os/linux/CPU/c_“DPU”非DPU.md",
-    "coding/os/linux/CPU/b_ARM CPU性能实验.md",
-    "coding/os/linux/CPU/a_CPU 多核指令 —— WFE 原理.md",
-    "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
-    "coding/os/linux/CPU/p_linux cpufreq framework(5)_ARM big Little driver.md",
-    "coding/os/linux/CPU/p_一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
-    "coding/os/linux/CPU/p_linux cpufreq framework(3)_cpufreq core.md",
-    "coding/os/linux/CPU/b_Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
-    "coding/os/linux/CPU/b_Linux 中 CPU 利用率是如何算出来的？.md",
-    "coding/os/linux/CPU/p_CPU 是如何与内存交互的.md",
-    "coding/os/linux/build/计算机科学基础知识（三）静态库和静态链接.md",
-    "coding/os/linux/build/Docker镜像瘦身：从1.43G到22.4MB.md",
-    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
-    "coding/os/linux/BPF/基于 eBPF 的软件网络功能实现.md",
-    "coding/os/linux/BPF/b_BPF C 编程入门.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",

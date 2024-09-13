@@ -74,7 +74,7 @@ Linux爱好者
     
 - 为了避免上述的两种方案的问题，于是就要容忍一定的hash冲突，也就出现了 N-Way 关联。也就是把连续的N 个 Cache Line 绑成一组，然后，先把找到相关的组，然后再在这个组内找到相关的 Cache Line。这叫 Set Associativity。如下图所示。
     
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/A3ibcic1Xe0iaQvceichLrJnPiaBBomm585wibDcY0Z5Wic6maJW0gVpEfUtwo5b6Yq9yYqqgjh9w9GMeqRQ0d1dgcFhg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于 N-Way 组关联，可能有点不好理解，这里个例子，并多说一些细节（不然后面的代码你会不能理解），Intel 大多数处理器的 L1 Cache 都是 32KB，8-Way 组相联，Cache Line 是 64 Bytes。这意味着，
@@ -98,13 +98,13 @@ Linux爱好者
 如下图所示：（图片来自《Cache: a place for concealment and safekeeping》）
 
 当拿到一个内存地址的时候，先拿出中间的 6bits 来，找到是哪组。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/A3ibcic1Xe0iaQvceichLrJnPiaBBomm585wiblsmZZWjXpuCyia7Ad67485ET4Mwfib40akKiaUrlibcRCQWXEkJVXcq3rQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 然后，在这一个 8 组的 cache line 中，再进行 O(n) n=8 的遍历，主是要匹配前 24bits 的 tag。如果匹配中了，就算命中，如果没有匹配到，那就是 cache miss，如果是读操作，就需要进向后面的缓存进行访问了。
 
 L2/L3 同样是这样的算法。而淘汰算法有两种，一种是随机一种是 LRU。现在一般都是以 LRU 的算法（通过增加一个访问计数器来实现）
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/A3ibcic1Xe0iaQvceichLrJnPiaBBomm585wibnuLNoUSldF4oN6pSOVb0HkINibRSrvEZSYfiaWhJEeUpFLLBKzWQthZg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这也意味着：
@@ -143,7 +143,7 @@ L2/L3 同样是这样的算法。而淘汰算法有两种，一种是随机一�
     
 - **Snoopy 协议**。这种协议更像是一种数据通知的总线型的技术。CPU Cache 通过这个协议可以识别其它Cache上的数据状态。如果有数据共享的话，可以通过广播机制将共享数据的状态通知给其它 CPU Cache。这个协议要求每个 CPU Cache 都可以**窥探**数据事件的通知并做出相应的反应。如下图所示，有一个 Snoopy Bus 的总线。
     
-
+**![Image](https://mmbiz.qpic.cn/mmbiz_png/A3ibcic1Xe0iaQvceichLrJnPiaBBomm585wib7sjqqo3pbsPo9mO62XyegHTpnaNwKF6BAfcTaOZnbxxJS6GAcj3GbQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)**
 **![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
 
 因为 Directory 协议是一个中心式的，会有性能瓶颈，而且会增加整体设计的复杂度。而 Snoopy 协议更像是微服务+消息通讯，所以，现在基本都是使用 Snoopy 的总线的设计。
@@ -155,7 +155,7 @@ L2/L3 同样是这样的算法。而淘汰算法有两种，一种是随机一�
 这里介绍几个状态协议，先从最简单的开始，MESI 协议，这个协议跟那个著名的足球运动员梅西没什么关系，其主要表示缓存数据有四个状态：Modified（已修改）, Exclusive（独占的）,Shared（共享的），Invalid（无效的）。
 
 这些状态的状态机如下所示（有点复杂，你可以先不看，这个图就是想告诉你状态控制有多复杂）：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/A3ibcic1Xe0iaQvceichLrJnPiaBBomm585wibASWBLzFXqlh8KBMeF7PvwbM4I727ta4gQPias0GtRenkibHS9f8tY03A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 下面是个示例（如果你想看一下动画演示的话，这里有一个网页（MESI Interactive Animations），你可以进行交互操作，这个动画演示中使用的 Write Through 算法）：
@@ -253,7 +253,7 @@ MOESI 协议的状态机和演示示例我就不贴了（有兴趣可以上Berke
  `void thread_func (int id) {        result[id] = 0;        int chunk_size = total_size / nthread + 1;        int start = id * chunk_size;        int end = min(start + chunk_size, total_size);            int c = 0; //使用临时变量，没有cache line的同步了        for ( int i = start; i < end; ++i ) {            if (test_data[i] % 2 != 0 ) ++c;       }        result[id] = c;    }`
 
 我们把两个程序分别在 1 到 32 个线程上跑一下，得出的结果画一张图如下所示（横轴是线程数，纵轴是完成统的时间，单位是微秒）：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/A3ibcic1Xe0iaQvceichLrJnPiaBBomm585wibUaFHLIEnjNg1mqgpTFUGSA1cp1cNOU5ykqicvQS55GKYuZssJP68GGg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图中，我们可以看到，灰色的曲线就是第一种方法，橙色的就是第二种（用局部变量的）方法。当只有一个线程的时候，两个方法相当，基本没有什么差别，但是在线程数增加的时候的时候，你会发现，第二种方法的性能提高的非常快。直到到达 6 个线程的时候，开始变得稳定（前面说过，我的 CPU 是6核的）。

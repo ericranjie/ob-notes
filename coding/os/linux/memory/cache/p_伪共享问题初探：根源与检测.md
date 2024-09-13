@@ -163,7 +163,7 @@ perf c2c
 perf c2c record
 
 查看结果：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqI1V6enj9gYp0HWOxbq3dPOhlf90XJEcw2icm7XI4s8Z5P7ibNhIVo5xUg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 perf c2c report
@@ -171,19 +171,19 @@ perf c2c report
 这里我们重点看`HITM`(`LLC Misses to Remote cache`)，表示的是由`cache`的修改导致远端的`cache`失效的占比，由`Load Remote HITM/Load LLC Misses`得到，值越大说明伪共享的问题越严重。**判断可能存在伪共享问题**。
 
 再往下看，我们可以看到缓存行里面具体的数据：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIIxaz7WicGVhW6mZJPcESd9aJ8Xggtex8AawZd0VzfzOeFM8tvrra03A/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cache line具体情况
 
 我们去查看针对的代码地址：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqItCm52VleCgefg8Wwv6AFXHqQ7dV9Ib4FEibU10j7uRuSicPYI5naYW1g/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 相关源代码
 
 这里汇编的逻辑就是先从数组中把数据取到寄存器，然后操作以后再写回到对应的内存地址中去(`data[index].value++`)。这样我们就定位到了伪共享发生的位置，就是我们申明的这个结构体数组：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIbScUibf64UbCXBglAScdOYuMOMqMP3HdZicl0m54PQcp8fkOLFl4dXeA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 伪共享地址
@@ -191,41 +191,41 @@ cache line具体情况
 ### 原理解析与修复
 
 知道了是哪里形成了伪共享以后，我们用一张图来直观的展示当前伪共享的过程：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqI5R2Kbx8sjd2rAvjBs99YkGAcEibd0u9BGDoxpBCJvlUbkyNficaYI9IA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 false sharing图示
 
 如果想减少伪共享，最简单的就是将这几个数据放到不同的`cache line`中：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIG5BibaqUGxN2z90W7D2d6AIWVia5oyod9nMolribKjvrRoJuDkibNuq39A/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 分开cache line
 
 为了放到不同的`cache line`中，我们需要先查看系统上缓存行的大小：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIXe3bEvUQnuDLSCT119sM4MqX6oGdJicaTaNfNKWSmJqqfJF9oqtk3uw/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 查看cache line大小
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIOEp8FAicBT2fRunDbvGYicDbowbuTyzG314CY4p1Un5U1MxSYGZiaTCZA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cache line = 64bytes
 
 接着我们可以进行如下的尝试：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqI2bdjhnACAibKdb5bGZnJeSyiazQyshkjW2iasonxJZpyh9kFh6ShDmJxQ/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 按照64字节对齐
 
 简单来说，就是让数据按照64字节进行对齐，这样每一个进程都可以独享一个缓存行，从而减少伪共享导致的`cache miss`。在完成修改后，我们重新运行尝试：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIicQwibwLSUpia4ibyQIqxE2MgPwuXeuE8Vic2OQPichd7822NbpkJL9YNVoA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 修改后重新运行
 
 查看`cache miss`情况：
-
+![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIxNNKuuDNPicX8EicfkOtlbwaOMPUicQIYZ1RTI5GSndBCvY1gEHNSKCGw/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ipc明显提升

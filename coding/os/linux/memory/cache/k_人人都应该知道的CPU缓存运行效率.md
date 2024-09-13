@@ -116,7 +116,7 @@ List of pre-defined events (to be used in -e):
 
 使用 perf stat 命令可以统计当前系统或者指定进程的上面这些指标。直接使用 perf stat 可以统计到CPI。（如果要统计指定进程的话只需要多个 -p 参数，写名 pid 就可以了）
 
-```
+```c
 # perf stat sleep 5
 Performance counter stats for 'sleep 5':
     ......
@@ -128,7 +128,7 @@ Performance counter stats for 'sleep 5':
 
 我们再来看看L1和dTLB的缓存命中率情况，这次需要在 perf stat 后面跟上 -e 选项来指定要观测的指标了，因为这几个指标默认都不输出。
 
-```
+```c
 # perf stat -e L1-dcache-load-misses,L1-dcache-loads,dTLB-load-misses,dTLB-loads sleep 5
 Performance counter stats for 'sleep 5':
     22,578      L1-dcache-load-misses     #   10.22% of all L1-dcache accesses
@@ -150,7 +150,7 @@ Performance counter stats for 'sleep 5':
 
 其核心代码大概如下。为了避免干扰，我只保留了主干。完整的源码我放到咱们开发内功修炼的Github上了。
 
-```
+```c
 int main()
 {
     // 第一步：创建perf文件描述符
@@ -181,7 +181,7 @@ int main()
 
 将完整的源码编译运行后。
 
-```
+```c
 # gcc main.c -o main
 # ./main
 instructions=1799
@@ -211,7 +211,7 @@ Linux 的 PMU （Performance Monitoring Unit）子系统是一种用于监视和
 
 其中对于 CPU 来说，定义了一个针对 x86 架构 CPU 的 PMU，并在开机启动的时候就会注册到系统中。
 
-```
+```c
 //file:arch/x86/events/core.c
 static struct pmu pmu = {
     .pmu_enable     = x86_pmu_enable,
@@ -230,7 +230,7 @@ static int __init init_hw_perf_events(void)
 
 在前面的实例代码中，我们看到是通过 perf_event_open 系统调用来创建了一个 perf 文件。我们来看下这个创建过程都做了啥？
 
-```
+```c
 //file:kernel/events/core.c
 SYSCALL_DEFINE5(perf_event_open,
         struct perf_event_attr __user *, attr_uptr,
@@ -265,7 +265,7 @@ SYSCALL_DEFINE5(perf_event_open,
 
 上面的代码是 perf_event_open 的核心源码。 其中最关键的是 perf_event_alloc 的调用。在这个函数中，根据用户传入的 attr 来查找 pmu 对象。回忆本文的实例代码，我们指定的是要监测CPU硬件中的指令数。
 
-```
+```c
     struct perf_event_attr attr;
     attr.type=PERF_TYPE_HARDWARE; // 表示监测硬件
     attr.config=PERF_COUNT_HW_INSTRUCTIONS; // 标志监测指令数
@@ -273,7 +273,7 @@ SYSCALL_DEFINE5(perf_event_open,
 
 所以这里就会定位到我们3.1节提到的 CPU PMU 对象，并用这个 pmu 初始化 新event。 接着再调用 anon_inode_getfile 创建一个真正的文件对象，并指定该文件的操作方法是 perf_fops。perf_fops 定义的操作函数如下：
 
-```
+```c
 //file:kernel/events/core.c
 static const struct file_operations perf_fops = {
     ...
@@ -285,14 +285,14 @@ static const struct file_operations perf_fops = {
 
 在创建完 perf 内核对象后。还会触发在perf_pmu_enable，经过一系列的调用，最终会指定要监测的寄存器。
 
-```
+```c
 perf_pmu_enable
 -> pmu_enable
   -> x86_pmu_enable
     -> x86_assign_hw_event
 ```
 
-```
+```c
 //file:arch/x86/events/core.c
 static inline void x86_assign_hw_event(struct perf_event *event,
                 struct cpu_hw_events *cpuc, int i)
@@ -318,7 +318,7 @@ static inline void x86_assign_hw_event(struct perf_event *event,
 
 在实例代码的第二步中，就是定时调用 read 系统调用来读取指标计数。 在 3.2 节中我们看到了新创建出来的 perf 文件对象在内核中的操作方法是 perf_read。
 
-```
+```c
 //file:kernel/events/core.c
 static const struct file_operations perf_fops = {
     ...
@@ -330,7 +330,7 @@ static const struct file_operations perf_fops = {
 
 perf_read 函数实际上支持可以同时读取多个指标出来。但为了描述起来简单，我只描述其读取一个指标时的工作流程。其调用链如下：
 
-```
+```c
 perf_read
     __perf_read
         perf_read_one
@@ -342,7 +342,7 @@ perf_read
 
 其中在 perf_event_read 中是要读取硬件寄存器中的值。
 
-```
+```c
 static int perf_event_read(struct perf_event *event, bool group)
 {
     enum perf_event_state state = READ_ONCE(event->state);
@@ -379,7 +379,7 @@ __perf_event_read
 
 其中 \_\_perf_event_read 调用到 x86 架构这块是通过函数指针指过来的。
 
-```
+```c
 //file:kernel/events/core.c
 static void __perf_event_read(void *info)
 {
@@ -390,7 +390,7 @@ static void __perf_event_read(void *info)
 
 在 3.1 中我们介绍过 CPU 的这个 pmu，它的 read 函数指针是指向 x86_pmu_read 的。
 
-```
+```c
 //file:arch/x86/events/core.c
 static struct pmu pmu = {
     ...
@@ -400,7 +400,7 @@ static struct pmu pmu = {
 
 这样就会执行到 x86_pmu_read，最后就会调用到 x86_perf_event_update。在 x86_perf_event_update 中调用 rdpmcl 汇编指令来获取寄存器中的值。
 
-```
+```c
 //file:arch/x86/events/core.c
 u64 x86_perf_event_update(struct perf_event *event)
 {
@@ -412,7 +412,7 @@ u64 x86_perf_event_update(struct perf_event *event)
 
 最后返回到 perf_read_one 中会调用 copy_to_user 将值真正拷贝到用户空间中，这样我们的进程就读取到了寄存器中的硬件执行计数了。
 
-```
+```c
 //file:kernel/events/core.c
 static int perf_read_one(struct perf_event *event,
                  u64 read_format, char __user *buf)

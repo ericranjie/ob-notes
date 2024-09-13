@@ -24,7 +24,7 @@ Original 晓泰 泰晓科技
 ## RISC-V 特权指令集总览
 
 RISC-V 特权指令集如下表所示，包括 Trap 返回指令（`sret`, `mret`）、中断管理指令、S-Mode 内存管理指令和 H-Mode 指令（包含内存管理指令和加载、保存指令），其中 S-Mode 和 H-Mode 的内存管理指令功能类似。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CuRxmicjibRWia0MxQRaN3E88B5fATF1bVebzQpGTfeu71gjLgP5UbNmrA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 priv-insts
@@ -48,7 +48,7 @@ H 扩展的指令包括内存管理和数据加载存储指令两部分，其中
 ### S 模式内存管理指令
 
 #### SFENCE.VMA 解读
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CmsiaDly52eUHts4QyMibARF9muiaGYqOg1gPKghUBWPxwfZsc0wYnhtEg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 sfence.vma
@@ -65,6 +65,7 @@ sfence.vma
  表示 0。
 
 具体功能如下表所示：
+
 
 |操作（Order/Invalidate）|||||
 |---|---|---|---|---|
@@ -96,21 +97,21 @@ Trap 相关的定义如下所示，上述 `require_novirt()` 函数实际上�
 ### H 扩展内存管理指令
 
 #### HFENCE.VVMA & HFENCE.GVMA
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CE5q4Lkux5Foh4gZQyAFiaxCjOBBXVoWon3wGFibdVnoADwYMcbksxmDg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hfence
 
 `HFENCE.xVMA` 指令格式与 `SFENCE.VMA` 完全相同，不同之处在于指令有效时所在的特权级不同，所处理的特权级也各有不同。下方表格比较了这三条指令的特权级、CSR、功能、实现以及对应 Trap 的不同。
 
-|指令|`SFENCE.VMA`|`HFENCE.VVMA`|`HFENCE.GVMA`|
-|---|---|---|---|
-|指令生效所需的特权级|M|M/HS|HS (`mstatus.TVM=0`) / M|
-|作用于某特权级|S|VS|HS|
-|对应的 **atp** (Address Translation and Protection) CSR|the current `satp` (either the HS-level `satp` when V=0 or `vsatp` when V=1)|`vsatp`|`hgatp`|
-|指令作用：控制读写顺序，无效化 TLB 特定项|to guarantee writing finishes before reading; to invalidate TLB|much the same as temporarily entering VS-mode and executing `SFENCE.VMA`; applies only to a single virtual machine, identified by the setting of `hgatp.VMID`|to guarantee stores of current hart finishes before reading of the guest hart|
-|简化版实现：Over-Fence|ignore `rs1` and `rs2`, always perform a global fence (with no exception for invalid `rs1`)|ignore `rs1` and `rs2` as well as `hgatp.VMID`, always perform a **global fence for the VS-level memory management of all virtual machines**, or even a **global fence for all memory-management data structures**|ignore `rs1` and `VMID` in `rs2`, always perform a **global fence for the guest-physical memory management of all virtual machines**, or even a **global fence for all memory-management data structures**|
-|Trap|For implementations that make `satp.MODE` read-only zero (always Bare), attempts to execute an `SFENCE.VMA` instruction might raise an _illegal instruction exception_|Neither `mstatus.TVM` nor `hstatus.VTVM` causes `HFENCE.VVMA` to trap|Attempts to execute `HFENCE.VVMA` or `HFENCE.GVMA` when V=1 cause a _virtual instruction trap_, while attempts to do the same in U-mode cause an _illegal instruction trap_; Attempting to execute `HFENCE.GVMA` in HS-mode when `mstatus.TVM=1` also causes an _illegal instruction trap_.|
+| 指令                                                   | `SFENCE.VMA`                                                                                                                                                           | `HFENCE.VVMA`                                                                                                                                                                                                      | `HFENCE.GVMA`                                                                                                                                                                                                                                                                               |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 指令生效所需的特权级                                           | M                                                                                                                                                                      | M/HS                                                                                                                                                                                                               | HS (`mstatus.TVM=0`) / M                                                                                                                                                                                                                                                                    |
+| 作用于某特权级                                              | S                                                                                                                                                                      | VS                                                                                                                                                                                                                 | HS                                                                                                                                                                                                                                                                                          |
+| 对应的 **atp** (Address Translation and Protection) CSR | the current `satp` (either the HS-level `satp` when V=0 or `vsatp` when V=1)                                                                                           | `vsatp`                                                                                                                                                                                                            | `hgatp`                                                                                                                                                                                                                                                                                     |
+| 指令作用：控制读写顺序，无效化 TLB 特定项                              | to guarantee writing finishes before reading; to invalidate TLB                                                                                                        | much the same as temporarily entering VS-mode and executing `SFENCE.VMA`; applies only to a single virtual machine, identified by the setting of `hgatp.VMID`                                                      | to guarantee stores of current hart finishes before reading of the guest hart                                                                                                                                                                                                               |
+| 简化版实现：Over-Fence                                     | ignore `rs1` and `rs2`, always perform a global fence (with no exception for invalid `rs1`)                                                                            | ignore `rs1` and `rs2` as well as `hgatp.VMID`, always perform a **global fence for the VS-level memory management of all virtual machines**, or even a **global fence for all memory-management data structures** | ignore `rs1` and `VMID` in `rs2`, always perform a **global fence for the guest-physical memory management of all virtual machines**, or even a **global fence for all memory-management data structures**                                                                                  |
+| Trap                                                 | For implementations that make `satp.MODE` read-only zero (always Bare), attempts to execute an `SFENCE.VMA` instruction might raise an _illegal instruction exception_ | Neither `mstatus.TVM` nor `hstatus.VTVM` causes `HFENCE.VVMA` to trap                                                                                                                                              | Attempts to execute `HFENCE.VVMA` or `HFENCE.GVMA` when V=1 cause a _virtual instruction trap_, while attempts to do the same in U-mode cause an _illegal instruction trap_; Attempting to execute `HFENCE.GVMA` in HS-mode when `mstatus.TVM=1` also causes an _illegal instruction trap_. |
 
 #### Spike 模拟器实现
 
@@ -146,7 +147,7 @@ hfence
 |---|---|---|
 |`mstatus` to keep track of and controls the **hart’s current operating state**|`sstatus` to keeps track of the **processor’s current operating state**|`vsstatus` is **VS-mode’s version of `sstatus`**, when V=1, `vsstatus` substitutes for `sstatus`|
 ||`hstatus` provides facilities analogous to the `mstatus` register for tracking and controlling the **exception behavior of a VS-mode guest**||
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CVdrd0k2402jhibAKXW8oYA7N2hahvGk6lErU1picEcHiaHibs4BHFFvQBA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此图由 Mermaid 生成
@@ -160,7 +161,7 @@ hfence
 |TVM|Trap Virtual Memory|supervisor virtual-memory management operations（内核态虚拟内存管理操作）|TVM=1, write to `satp` or execution of `SFENCE.VMA` or `SINVAL.VMA` in **S-mode** will cause _illegal instruction exception_; TVM=0, permitted in S-mode; 0 if S-mode not supported|
 |TW|Timeout Wait|`WFI` (Wait For Interrupt)|TW=0, execute `WFI` in lower-privileged mode directly; TW=1, execute as before within time limit, if out of time limit, cause _illegal instruction exception_; 0 if only M-mode support|
 |TSR|Trap `SRET`|`sret` (Supervisor RETurn)|TSR=1, execute `sret` in S-mode causes _illegal instruction exception_; TSR=0, permitted; 0 if no S-mode support|
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CJlDrWd33rSB9iaafU6tZGqwROr7KEAqrKjllNIW4DtxoreRH0nWxKQg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 mstatus
@@ -168,7 +169,7 @@ mstatus
 #### hstatus
 
 `hstatus` 是 H 扩展引入的一个处理 HS 和 VS 特权级 Trap 的 CSR，与 `mstatus` 一同完成 H 扩展支持下的 Trap 处理。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CrMz8ME6duuMP9mkRib4LxY6u3obUcmicAZkHTGNIOmkH1trjd6Lic03Bg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hstatus
@@ -201,11 +202,11 @@ hstatus
 #### sstatus 和 vsstatus
 
 `sstatus` 可以视为 `mstatus` 的一个子集，保存的是作用于 S 特权级的信息。在简化版的 `sstatus` 的实现中，对于 `sstatus` 对应区域的读写等同于对 `mstatus` 对应区域的读写（这一点在 QEMU 和 Spike 对 `sret` 指令的实现中有所体现，详情参见 此文 中的 **返回指令与虚拟化** 一节）。
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9C37t7XzGyllJSMicRMDam4kCdrAhRvQ2YYZQc7ZpEfCUoZTaqOuUbAbA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 sstatus
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CKvbqNGiaTcTJibK5EMRlXt38ZvsFyG2n8cya5yU8xxTBTnHg2ulgIQAw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 vsstatus
@@ -227,7 +228,7 @@ vsstatus
 #### 小结
 
 从 CSR 的分区来看，`mstatus`, `hstatus`, `sstatus/vsstatus` 的关系如下：
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CJ2IDaA3abtibricVI45fIu1krJwqhOicw61TJrpacexaatsL1eNT24Jibg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此图由 Mermaid 生成
@@ -244,17 +245,19 @@ vsstatus
 
 _S-Mode_ Address Translation and Protection (_satp_) Registers: 用于控制 S-Mode 下的地址转换和保护。
 
-|Field Name|Width (32)|Range (32)|Width (64)|Range (64)|Function|
-|---|---|---|---|---|---|
-|MODE|1|31|4|63:60|selects the address-translation scheme|
-|ASID|9|30:22|16|59:44|**address space identifier**, which facilitates address-translation fences on a per-address-space basis|
-|PPN|22|21:0|44|43:0|hold the **page table number** of the root page table, i.e., its supervisor physical address divided by 4 KiB|
+| Field Name | Width (32) | Range (32) | Width (64) | Range (64) | Function                                                                                                      |
+| ---------- | ---------- | ---------- | ---------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
+| MODE       | 1          | 31         | 4          | 63:60      | selects the address-translation scheme                                                                        |
+| ASID       | 9          | 30:22      | 16         | 59:44      | **address space identifier**, which facilitates address-translation fences on a per-address-space basis       |
+| PPN        | 22         | 21:0       | 44         | 43:0       | hold the **page table number** of the root page table, i.e., its supervisor physical address divided by 4 KiB |
+|            |            |            |            |            |                                                                                                               |
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913184925.png]]![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - MODE
     
-    MODE 位用来标记当前系统所支持的内存模式，32 位和 64 位有所不同。Bare 为裸机模式，不存在 VA 和 PA 的转换以及内存保护机制。用 1 和 8-10 表示 64 位系统下基于页表的采用不同虚拟地址位宽的内存系统。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+    MODE 位用来标记当前系统所支持的内存模式，32 位和 64 位有所不同。Bare 为裸机模式，不存在 VA 和 PA 的转换以及内存保护机制。用 1 和 8-10 表示 64 位系统下基于页表的采用不同虚拟地址位宽的内存系统。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CU6T40icCAMYj5AZZ9rnk90eSUcLVY108dL5xP4nibnyeibaf3DJ0ZpSbg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
     
 - _Active_ Status
     
@@ -262,7 +265,7 @@ _S-Mode_ Address Translation and Protection (_satp_) Registers: 用于控制 S-
     
 
 #### hgatp
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CxGFw8RfQTekX0FuWcMLoTxO7jRgt51cfO6ykXp7b0hYtyh6UzcHpiag/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hgatp
@@ -273,7 +276,7 @@ hgatp
     
 - MODE：与 `satp` 相同，指示系统采用的内存模式
     
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CiczQ575mbITghbKlqIUkibs6WHZibTrwtrp3uJHULKicsBnPI7CUy2eyFw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hgatp-MODE
@@ -281,7 +284,7 @@ hgatp-MODE
 仅当处于 U 特权模式且 `hstatus.HU=0` 时，`vsatp` 才被视作无效状态。
 
 #### vsatp
-
+![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CK58A1micDDqiaQl4rmeTexO9han3Z0hYHbM8C7hjcCxRTelMaKRlzKlw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 vsatp
