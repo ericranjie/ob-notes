@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
+                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
+                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
+                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md"
+                "file": "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md"
               }
             }
           }
@@ -148,6 +148,29 @@
   },
   "active": "36c876f1da30a788",
   "lastOpenFiles": [
+    "coding/os/linux/memory/cache/a_一篇论文讲透Cache优化.md",
+    "0x99-image/Pasted image 20240913120135.png",
+    "0x99-image/Pasted image 20240913120724.png",
+    "0x99-image/Pasted image 20240913120717.png",
+    "0x99-image/Pasted image 20240913120708.png",
+    "0x99-image/Pasted image 20240913120702.png",
+    "0x99-image/Pasted image 20240913120648.png",
+    "0x99-image/Pasted image 20240913120642.png",
+    "0x99-image/Pasted image 20240913120636.png",
+    "0x99-image/Pasted image 20240913120630.png",
+    "0x99-image/Pasted image 20240913120625.png",
+    "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
+    "coding/os/linux/memory/cache/ap_一个较复杂dcache问题.md",
+    "README.md",
+    "coding/os/linux/memory/cache/a_cache的58问，您能回答上来几个？.md",
+    "coding/os/linux/memory/cache/k_arm64 cache机制分析.md",
+    "test/self_notes.md",
+    "test/next_step.md",
+    "coding/os/linux/build/p_Debian8 内核升级实验.md",
+    "interview-resource.md",
+    "coding/os/linux/CPU/c_“DPU”非DPU.md",
+    "coding/os/linux/CPU/b_ARM CPU性能实验.md",
+    "coding/os/linux/CPU/a_CPU 多核指令 —— WFE 原理.md",
     "coding/os/linux/CPU/p_linux cpufreq framework(4)_cpufreq governor.md",
     "coding/os/linux/CPU/p_linux cpufreq framework(5)_ARM big Little driver.md",
     "coding/os/linux/CPU/p_一个likely的简单使用，背后却是对CPU工作原理的深刻理解.md",
@@ -155,36 +178,12 @@
     "coding/os/linux/CPU/b_Linux CPU core的电源管理(5)_cpu control及cpu hotplug.md",
     "coding/os/linux/CPU/b_Linux 中 CPU 利用率是如何算出来的？.md",
     "coding/os/linux/CPU/p_CPU 是如何与内存交互的.md",
-    "0x99-image/Pasted image 20240911195408.png",
-    "0x99-image/Pasted image 20240911195525.png",
-    "0x99-image/Pasted image 20240911195519.png",
-    "0x99-image/Pasted image 20240911195512.png",
-    "0x99-image/Pasted image 20240911195502.png",
-    "0x99-image/Pasted image 20240911195456.png",
-    "0x99-image/Pasted image 20240911195451.png",
-    "0x99-image/Pasted image 20240911195446.png",
-    "0x99-image/Pasted image 20240911195440.png",
-    "0x99-image/Pasted image 20240911195434.png",
-    "coding/os/linux/CPU/p_CPU 多核指令 —— WFE 原理.md",
     "coding/os/linux/build/计算机科学基础知识（三）静态库和静态链接.md",
     "coding/os/linux/build/Docker镜像瘦身：从1.43G到22.4MB.md",
     "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
     "coding/os/linux/BPF/基于 eBPF 的软件网络功能实现.md",
     "coding/os/linux/BPF/b_BPF C 编程入门.md",
-    "coding/os/linux/BPF/b_eBPF 简史.md",
-    "coding/os/linux/BPF/eBPF动手实践系列三：基于原生libbpf库的eBPF编程改进方案.md",
-    "coding/os/linux/BPF/p_BPF 赋能调度器：万字详解 sched_ext 实现机制与工作流程【建议收藏】.md",
-    "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
-    "coding/os/linux/BPF/p_eBPF Talk ringbuf 经验分享.md",
-    "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
-    "coding/os/linux/BPF/Linux eBPF学习路径.md",
-    "coding/os/linux/memory/cache/深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "coding/os/linux/CPU/ARM CPU性能实验.md",
-    "coding/os/linux/CPU/“DPU”非DPU.md",
-    "coding/os/linux/device/device_tree/Device Tree（一）：背景介绍.md",
-    "coding/os/linux/device/eMMC/Linux MMC framework(2)_host controller driver.md",
     "coding/os/linux/device/device_tree",
-    "coding/os/linux/device/device_model/Linux设备模型(1)_基本概念.md",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",
     "coding/os/linux/io/epoll",

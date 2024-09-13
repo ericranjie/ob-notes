@@ -2,11 +2,22 @@
 # ob-notes
 
 ## Priority
-a_: Alpha 等级 好文
-d_: Deprecated 待废弃文章（可能过时）
-f_ : Finished 已读
-p_: In-Process 正在阅读
+a_: **alpha** 等级 深度好文 or **analyze** 深度分析好文
+b_: beta 等级 好文
+c_: 一般文章 or comment等级文章
+
+d_: deprecated 待废弃文章（可能已经过时） or  data 数据文章（DIKW模型）
+f_ : finished 已读
+
+i_: information 信息等级文章（DIKW模型）
+k_: knowledge 知识等级文章（DIKW模型）
+w_: wisdom 智慧等级文章（DIKW模型）
+
+p_: in-process 正在阅读 or practice 实践实操型文章
 z_: 无价值文章
+
+DIKW模型:
+
 
 ## Tags
 0x01 - Books

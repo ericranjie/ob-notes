@@ -81,11 +81,12 @@ snmpd几乎长时间占用一个核，perf发现热点如下：
 
 几乎都消耗在内核态 __d_lookup的调用中，然后strace看到的消耗为：
 
-```
+```c
 
 open("/proc/sys/net/ipv4/neigh/kube-ipvs0/retrans_time_ms", O_RDONLY) = 8 <0.000024>------v4的比较快
 
-open("/proc/sys/net/ipv6/neigh/ens7f0_58/retrans_time_ms", O_RDONLY) = 8 <0.456366>-------v6很慢
+open("/proc/sys/net/ipv6/ne
+igh/ens7f0_58/retrans_time_ms", O_RDONLY) = 8 <0.456366>-------v6很慢
 
 ```
 
@@ -215,7 +216,7 @@ next:
 
 太多的链表元素，则有可能触发这种情况，下面需要验证下：
 
-```
+```c
 
 static inline long hlist_count(const struct dentry *parent, const struct qstr *name)
 
@@ -254,14 +255,11 @@ static inline long hlist_count(const struct dentry *parent, const struct
   return count;
 
 }
-
-  
-
 ```
 
 kprobe的结果如下：
 
-```
+```c
 
 [20327461.948219] hlist_bl_head=ffffb0d7029ae3b0 count = 799259,name=ipv6/neigh/ens7f1_46/base_reachable_time_ms,hash=913731689
 
@@ -281,7 +279,7 @@ kprobe的结果如下：
 
 的dentry加上那么的hash值形成最终的hash值：
 
-```
+```c
 
 static inline struct hlist_bl_head *d_hash(const struct dentry *parent,
 
@@ -300,7 +298,6 @@ static inline struct hlist_bl_head *d_hash(const struct dentry *parent,
 高版本的内核是：
 
 static inline struct hlist_bl_head *d_hash(unsigned int hash)
-
 {
 
   return dentry_hashtable + (hash >> d_hash_shift);
@@ -315,7 +312,7 @@ hash存放在dentry->d_name.hash的时候，已经加了helper，具体可以参
 
 如下补丁：
 
-```
+```c
 
 commit 8387ff2577eb9ed245df9a39947f66976c6bcd02
 
@@ -357,7 +354,7 @@ Date:   Fri Jun 10 07:51:30 2016 -0700
 
 我们根据上面kprobe打印的hash头，可以进一步分析其中的dentry如下：
 
-```
+```c
 
 crash> list dentry.d_hash -H 0xffff8a29269dc608 -s dentry.d_sb
 
@@ -385,7 +382,7 @@ ffff89edf5382a80
 
 都是属于同一个super_block，也就是 0xffff89db7fd3c800,
 
-```
+```c
 
 crash> list super_block.s_list -H super_blocks -s super_block.s_id,s_nr_dentry_unused >/home/caq/super_block.txt
 
@@ -404,7 +401,6 @@ ffff89db7fd3c800
 继续使用命令看一下dentry对应的d_inode的情况：
 
 ```c
-
 ...
 
 ffff89edf5375b00
@@ -448,7 +444,6 @@ ffff89edf5324b40
 /proc/sys/net/ipv6路径的形成，简单地说分为了如下几个步骤：
 
 ```c
-
 start_kernel-->proc_root_init()//caq:注册proc fs
 
 由于proc是linux系统默认挂载的，所以查找 kern_mount_data 函数
@@ -908,7 +903,6 @@ crash> dentry.d_parent,d_lockref.count,d_name.name,d_subdirs,d_flags,d_inode -
 根据如下函数：
 
 ```c
-
 static void dentry_lru_add(struct dentry *dentry)
 
 {

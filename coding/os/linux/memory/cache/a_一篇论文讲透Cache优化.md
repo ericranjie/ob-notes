@@ -136,7 +136,7 @@ L1d：2^13 L2：2^20
   
 
 - 多路组相连。一个Set里面有多个CacheLine，给定Set值可以选择出多个Tag，再通过Tag，拿到数据。
-
+![[Pasted image 20240913120135.png]]
   
 
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='934' height='666'></svg>)
@@ -149,7 +149,7 @@ L1d：2^13 L2：2^20
 - 组数的提升有利于CacheMiss的减少
 
   
-
+![[Pasted image 20240913120141.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='874' height='876'></svg>)
 
   
@@ -159,7 +159,7 @@ L1d：2^13 L2：2^20
 ### 1.4.1 实验设计
 
   
-
+![[Pasted image 20240913120148.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='870' height='266'></svg>)
 
   
@@ -174,7 +174,7 @@ L1d：2^13 L2：2^20
 - 填充数据pad：用于增加减少两个item的内存距离
 
   
-
+![[Pasted image 20240913120156.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='888' height='572'></svg>)
 
   
@@ -184,7 +184,7 @@ L1d：2^13 L2：2^20
 ### NPAD=0顺序读
 
   
-
+![[Pasted image 20240913120203.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='910' height='874'></svg>)
 
   
@@ -197,7 +197,7 @@ L1d：2^13 L2：2^20
 ### 不同NPAD的顺序读
 
   
-
+![[Pasted image 20240913120211.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='844' height='918'></svg>)
 
   
@@ -223,7 +223,7 @@ NPAD的增加，意味着顺序访问的步长增加：
 ### 触发TLB表Miss的场景
 
   
-
+![[Pasted image 20240913120221.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='910' height='948'></svg>)
 
   
@@ -245,7 +245,7 @@ NPAD的增加，意味着顺序访问的步长增加：
 ### 随机读
 
   
-
+![[Pasted image 20240913120230.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='936' height='906'></svg>)
 
   
@@ -266,7 +266,7 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 “写穿”需要进行内存访问，所以很慢，但是现代CPU有“write-combining”机制可以解决这个问题。设计实验如下：
 
   
-
+![[Pasted image 20240913120240.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='956' height='616'></svg>)
 
   
@@ -274,7 +274,7 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 分配一个二维数组，每一行的数据在物理内存上连续，每列数据在物理内存上不连续（也就是按行存）。左边是行优先遍历，右边是列优先遍历。
 
   
-
+![[Pasted image 20240913120248.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='746' height='346'></svg>)
 
   
@@ -296,13 +296,13 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 主要是调整算法，提升代码的时间和空间局部性。以[矩阵乘法](https://zhida.zhihu.com/search?q=%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95&zhida_source=entity&is_preview=1)为例：
 
   
-
+![[Pasted image 20240913120256.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='902' height='110'></svg>)
 
   
 
   
-
+![[Pasted image 20240913120306.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='868' height='222'></svg>)
 
   
@@ -312,13 +312,13 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 根据数学变化，调整代码如下：
 
   
-
+![[Pasted image 20240913120313.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='892' height='130'></svg>)
 
   
 
   
-
+![[Pasted image 20240913120321.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='856' height='328'></svg>)
 
   
@@ -326,7 +326,7 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 首先对mul2进行了[矩阵转置](https://zhida.zhihu.com/search?q=%E7%9F%A9%E9%98%B5%E8%BD%AC%E7%BD%AE&zhida_source=entity&is_preview=1)运算，用一块临时内存tmp存下来。然后使用tmp矩阵和mul1进行运算。mul1和tmp都是行优先遍历。前面做转置的时候，mul2也是行优先遍历。整个算法都是行优先，访存友好。效果很好，提速了76%
 
   
-
+![[Pasted image 20240913120328.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='768' height='196'></svg>)
 
   
@@ -334,7 +334,7 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 转置算法消耗了额外的内存，我们希望可以不消耗额外内存进行优化，如下：
 
   
-
+![[Pasted image 20240913120335.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='830' height='448'></svg>)
 
   
@@ -342,7 +342,7 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 SM通过[宏定义](https://zhida.zhihu.com/search?q=%E5%AE%8F%E5%AE%9A%E4%B9%89&zhida_source=entity&is_preview=1)，代表一个CacheLine可以装下的double个数。将一个大矩阵拆分成了长宽为SM的小矩阵进行分治计算。小矩阵中非连续访问的内存距离不超过一个CacheLine的大小。效果略好过转置方案。
 
   
-
+![[Pasted image 20240913120341.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1314' height='312'></svg>)
 
   
@@ -352,7 +352,7 @@ SM通过[宏定义](https://zhida.zhihu.com/search?q=%E5%AE%8F%E5%AE%9A%E4%B9%89
 ### 2.2.2.1 结构体内部对齐
 
   
-
+![[Pasted image 20240913120346.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='858' height='278'></svg>)
 
   
@@ -360,7 +360,7 @@ SM通过[宏定义](https://zhida.zhihu.com/search?q=%E5%AE%8F%E5%AE%9A%E4%B9%89
 对如上结构体，使用pahole分析出具体的内存布局：
 
   
-
+![[Pasted image 20240913120351.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1576' height='640'></svg>)
 
   
@@ -388,7 +388,7 @@ SM通过[宏定义](https://zhida.zhihu.com/search?q=%E5%AE%8F%E5%AE%9A%E4%B9%89
 
 Malloc分配出来的结构体是8（32bit系统）或者16Byte（64bit系统）对齐的。也就是说Malloc出来的对象在64bit系统中的起始地址一定是16的倍数，用[十六进制](https://zhida.zhihu.com/search?q=%E5%8D%81%E5%85%AD%E8%BF%9B%E5%88%B6&zhida_source=entity&is_preview=1)表示，结尾一定是0，简单实验一下：
 
-```text
+```c
 printf("address t: %x\n",malloc(sizeof(st)));
 printf("address c: %x\n",malloc(sizeof(char)));
 printf("address x: %x\n",malloc(sizeof(int)));
@@ -398,7 +398,7 @@ printf("address y: %x\n",malloc(sizeof(long)));
 输出：
 
   
-
+![[Pasted image 20240913120407.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='322' height='186'></svg>)
 
   
@@ -406,7 +406,7 @@ printf("address y: %x\n",malloc(sizeof(long)));
 按照16Byte外部对齐可能跨CacheLine，进而导致性能问题。如下，一个结构体的size为32Byte，Malloc可能把它放在地址48上（16Byte对齐）。但这跨CacheLine了，需要加载两个CacheLine才能读取这个数据。
 
   
-
+![[Pasted image 20240913120414.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='786' height='760'></svg>)
 
   
@@ -414,12 +414,12 @@ printf("address y: %x\n",malloc(sizeof(long)));
 ### 直接使用接口指定对齐字节
 
   
-
+![[Pasted image 20240913120540.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='212'></svg>)
 
   
 
-```text
+```c
 void * x2;
 posix_memalign(&x2,64,sizeof(int));
 printf("address x2: %x\n",x2);
@@ -432,7 +432,7 @@ return 0;
 结果如下，地址一定是64的倍数，也就是6个0结尾
 
   
-
+![[Pasted image 20240913120549.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='348' height='70'></svg>)
 
   
@@ -442,12 +442,12 @@ return 0;
 如果是零时变量怎么对齐呢？
 
   
-
+![[Pasted image 20240913120555.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='572' height='132'></svg>)
 
   
 
-```text
+```c
 struct _st st3 __attribute((aligned(64)));
 char c3 __attribute((aligned(64)));
 printf("address st3: %x\n",&st3); 
@@ -473,7 +473,7 @@ printf("address st3: %x\n",&st3[1]);
 第二个元素没有64byte对齐
 
   
-
+![[Pasted image 20240913120611.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='374' height='64'></svg>)
 
   
@@ -481,12 +481,12 @@ printf("address st3: %x\n",&st3[1]);
 解法是在定义出指定对齐字节
 
   
-
+![[Pasted image 20240913120617.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='594' height='182'></svg>)
 
   
 
-```text
+```c
 typedef struct _st
 {
     int a;
@@ -502,7 +502,7 @@ printf("address st3: %x\n",&st3[1]);
 输出如下，每个元素都是对齐的
 
   
-
+![[Pasted image 20240913120625.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='374' height='74'></svg>)
 
   
@@ -516,7 +516,7 @@ CacheLine对齐不是没有代价的，会产生大量空洞，消耗更多的�
 未对齐较之于对齐后的性能回退如下图，未对齐的耗时都会增加，在Cache大小内的耗时增加更大。Random在L2中没有对齐的时间增加较少，这是因为随机访问本来的耗时基数较大，对齐与否的影响层度减弱。
 
   
-
+![[Pasted image 20240913120630.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='902' height='904'></svg>)
 
   
@@ -526,7 +526,7 @@ CacheLine对齐不是没有代价的，会产生大量空洞，消耗更多的�
 如下图，通常我们会按照业务逻辑封装对象。
 
   
-
+![[Pasted image 20240913120636.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='558' height='332'></svg>)
 
   
@@ -538,7 +538,7 @@ CacheLine对齐不是没有代价的，会产生大量空洞，消耗更多的�
 现代CPU都采用多路组相连，在没有占满整个Cache的情况下，由于占满了一个set，导致的Cache的淘汰。
 
   
-
+![[Pasted image 20240913120642.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1872' height='988'></svg>)
 
   
@@ -564,7 +564,7 @@ CacheLine对齐不是没有代价的，会产生大量空洞，消耗更多的�
 - inline可能加剧代码空洞，如下图，如果代码块B不是经常走到，inline后会增加A和C之间的代码距离
 
   
-
+![[Pasted image 20240913120648.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='764' height='268'></svg>)
 
   
@@ -574,7 +574,7 @@ CacheLine对齐不是没有代价的，会产生大量空洞，消耗更多的�
 - 两次编译，第一次收集分支统计信息，第二次正式编译利用统计信息选择概率更大的分支。
 - 手动指定预测分支：
 
-```text
+```c
 //接口
 long __builtin_expect(long EXP, long C);
 
@@ -600,7 +600,7 @@ if (likely(a > 1))
 这两种方式都是有开销的，所以，只有当循环次数很大时才有必要循环对齐。
 
   
-
+![[Pasted image 20240913120702.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1776' height='530'></svg>)
 
   
@@ -629,7 +629,7 @@ L2Cache（在文中是最后一个Level的Cache）的优化和L1基本一致，�
 ### 2.4.2 软件预取
 
   
-
+![[Pasted image 20240913120708.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='778' height='464'></svg>)
 
   
@@ -640,7 +640,7 @@ L2Cache（在文中是最后一个Level的Cache）的优化和L1基本一致，�
 随机访问的软件预取效果如下，有一定的提升。
 
   
-
+![[Pasted image 20240913120717.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='900' height='856'></svg>)
 
   
@@ -655,7 +655,7 @@ Helper-Thread方法的效果如下，收益明显，但是也有自己的问题�
 - Helper线程本来可以用来做其他的计算任务，两种方式需要权衡
 
   
-
+![[Pasted image 20240913120724.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='918' height='884'></svg>)
 
 编辑于 2023-11-07 20:05・IP 属地浙江
