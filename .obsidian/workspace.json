@@ -11,9 +11,11 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "0x99-image/Pasted image 20240914191904.png"
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240914191904.png",
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240914191904.png",
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240914191904.png"
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md"
               }
             }
           }
@@ -144,21 +146,28 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/memory/memory-performance/zRAM内存压缩技术原理与应用.md",
+    "coding/os/linux/memory/MMU/k_【万字长文】带你搞定MMU&TLB&TWU.md",
+    "0x99-image/Pasted image 20240914200542.png",
+    "0x99-image/Pasted image 20240914200803.png",
+    "0x99-image/Pasted image 20240914200757.png",
+    "0x99-image/Pasted image 20240914200753.png",
+    "0x99-image/Pasted image 20240914200744.png",
+    "0x99-image/Pasted image 20240914200738.png",
+    "0x99-image/Pasted image 20240914200731.png",
+    "0x99-image/Pasted image 20240914200723.png",
+    "0x99-image/Pasted image 20240914200717.png",
+    "0x99-image/Pasted image 20240914200711.png",
+    "coding/os/linux/memory/MMU/p_甄建勇：五分钟搞定MMU.md",
+    "coding/os/linux/memory/MMU/d_MMU内存管理单元.md",
+    "coding/os/linux/memory/MMU/d_Arm MMU深度解读.md",
+    "self-improvement/health/三位患友亲历记：民间中医—最不靠谱的一类中医.md",
+    "self-improvement/伤痛慢慢的好一些，相信一切都会好起来.md",
     "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
     "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
-    "0x99-image/Pasted image 20240914192241.png",
-    "0x99-image/Pasted image 20240914192234.png",
-    "0x99-image/Pasted image 20240914192223.png",
-    "0x99-image/Pasted image 20240914192211.png",
-    "0x99-image/Pasted image 20240914192146.png",
-    "0x99-image/Pasted image 20240914192139.png",
-    "0x99-image/Pasted image 20240914192045.png",
-    "0x99-image/Pasted image 20240914192036.png",
-    "0x99-image/Pasted image 20240914191904.png",
     "test/self_notes.md",
-    "0x99-image/Pasted image 20240914164257.png",
     "coding/os/linux/memory/userspace/d_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
     "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
     "coding/os/linux/memory/userspace/万字长文图解 带你领略 glibc 内存管理精髓.md",
@@ -175,13 +184,6 @@
     "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
     "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
     "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
-    "self-improvement/meditation/觉性的奇迹（六）.md",
-    "coding/os/linux/memory/virtual-memory/b_深入理解Linux内核之mmu-gather操作.md",
-    "coding/os/linux/memory/virtual-memory/b_虚拟内存 & IO & 零拷贝.md",
-    "coding/os/linux/memory/virtual-memory/d_深入了解iommu系列四：interrupt remapping 工作机制解析.md",
-    "coding/os/linux/memory/virtual-memory/b_TLB flush操作.md",
-    "coding/os/linux/memory/virtual-memory/k_深入理解TLB原理.md",
-    "coding/os/linux/memory/virtual-memory/t_深入理解TLB.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",

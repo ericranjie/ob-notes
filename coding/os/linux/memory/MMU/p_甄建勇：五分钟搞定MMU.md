@@ -74,7 +74,7 @@
 数据，可分为指令和普通数据。如果取指令和取普通数据各自使用一套memoryhierarchy，就有了ITLB，DTLB，icache,dcache。这就有点哈佛体系结构的意思了。即core内部采用哈佛体系结构，core外部采用冯-诺依曼体系结构。
 
 下面是整体的流程。
-
+![[Pasted image 20240914195551.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -156,7 +156,7 @@ bss段，1页；
 有了上面的假设，那么MMU是如何工作的呢？
 
 MMU的功能主要是虚实地址转换，PTE的cache（也就是TLB）。其具体过程，如下图所示：
-
+![[Pasted image 20240914200402.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图 2 MMU工作的具体过程_ 
@@ -176,7 +176,7 @@ _图 2 MMU工作的具体过程_ 
 如果TLB miss（对应的pte_2），那么OS查看异常寄存器，得到具体的异常信息，并最终将pte_2更新到TLB中，重新执行MMU操作，则TLB hit，完成转换过程。
 
 上面的过程，如果用一幅图来展示的话，如下所示：
-
+![[Pasted image 20240914200408.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图 3  虚实地址转换_  
@@ -188,7 +188,7 @@ _图 3  虚实地址转换_  
 这样，在搜索时，先确定其所在的页表目录，然后只需要遍历本目录中的PTE就可以了。
 
 其操作过程和单级页表相似，如下图所示：
-
+![[Pasted image 20240914200414.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图4      两级页表的虚实地址转换_ 
