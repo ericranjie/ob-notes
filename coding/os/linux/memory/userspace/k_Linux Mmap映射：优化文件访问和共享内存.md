@@ -45,7 +45,7 @@ Linux中的Mmap（Memory Map）是一种内存映射机制，它允许将文件�
 
 （1）使用普通文件提供的内存映射：适用于任何进程之间；此时，需要打开或创建一个文件，然后再调用mmap()；典型调用代码如下：
 
-```
+```c
 fd=open(name, flag, mode);if(fd<0)...ptr=mmap(NULL, len , PROT_READ|PROT_WRITE, MAP_SHARED , fd , 0);
 ```
 
@@ -81,8 +81,10 @@ Linux给我们提供了丰富的内部进程通信机制，包括共享内存、
 
 下面是个例子:
 
-```
-　//建立共享内存区域　　intshared_id;　　char *region;　　const intshm_size = 1024;　　　　shared_id = shmget(IPC_PRIVATE,//保证使用唯一ID　　　　　　　　　　　 shm_size,　　　　　　　　　　　 IPC_CREAT | IPC_EXCL |//创建一个新的内存区域　　　　　　　　　　　 S_IRUSR | S_IWUSR);//使当前用户可以读写这个区域　　　　//交叉进程或生成进程.　　　　//将新建的内存区域放入进程/线程　　region = (char*) shmat(segment_id, 0, 0);　　　　//其他程序代码　　...　　　　//将各个进程/线程分离出来　　shmdt(region);　　　　//破坏掉共享内存区域　　shmctl(shared_id, IPC_RMID, 0);
+```c
+　//建立共享内存区域
+　　　intshared_id;　　char *region;　　const intshm_size = 1024;　　　　shared_id = shmget(IPC_PRIVATE,//保证使用唯一ID
+　　　　　　　　　　　　　　 shm_size,　　　　　　　　　　　 IPC_CREAT | IPC_EXCL |//创建一个新的内存区域　　　　　　　　　　　 S_IRUSR | S_IWUSR);//使当前用户可以读写这个区域　　　　//交叉进程或生成进程.　　　　//将新建的内存区域放入进程/线程　　region = (char*) shmat(segment_id, 0, 0);　　　　//其他程序代码　　...　　　　//将各个进程/线程分离出来　　shmdt(region);　　　　//破坏掉共享内存区域　　shmctl(shared_id, IPC_RMID, 0);
 ```
 
 共享内存是Linux中最快速的IPC方法。他也是一个双向过程，共享区域内的任何进程都可以读写内存。这个机制的不利方面是其同步和协议都不受程序员控制，你必须确保将句柄传递给了子进程和线程。
@@ -91,7 +93,7 @@ Linux给我们提供了丰富的内部进程通信机制，包括共享内存、
 
 内存映射文件不仅仅用于IPC，在其他进程中它也有很大作用。如果你需要将一个分配的缓冲区初始化为零，只要记住/dev/zero 。你也可以通过将文件映射到内存中以提高其性能。它使你可以像读写字符串一样读写文件。下面是个例子：
 
-```
+```c
 const char filename[] = "testfile";　　intfd;　　char *mapped_mem;　　const intflength = 1024;　　fd = open(filename, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);　　lseek(fd, flength + 1, SEEK_SET);　　write(fd, "\0", 1);　　lseek(fd, 0, SEEK_SET);　　　　mapped_mem = mmap(0,　　　　　　　　　　　flength,　　　　　　　　　　　PROT_WRITE, //允许写入　　　　　　　　　　　MAP_SHARED,//写入内容被立即写入到文件　　　　　　　　　　　fd,　　　　　　　　　　　0);　　　　close(fd);　　　　//使用映射区域.　　...　　　　munmap(file_memory, flength);
 ```
 
@@ -102,7 +104,7 @@ const char filename[] = "testfile";　　intfd;　　char *mapped_mem;　　cons
 ## 二、mmap共享内存
 
 mmap是一种内存映射的方法，即将一个文件或其他对象映射到进程的地址空间，实现文件磁盘地址和进程虚拟地址空间中的一段虚拟地址的一一映射关系。实现这样的映射之后，进程就可以采用指针的方式读写操作这一段内存，而系统会自动回写脏页面到对应的文件磁盘上，即完成了对文件的操作而不必调用read、write等函数调用。相反，内核空间对这段区域的修改也直接反映到用户空间，从而实现不同进程之间的文件共享。如下图所示：
-
+![[Pasted image 20240914154443.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 虚拟内存区域（vm_area_struct）是进程的虚拟地址空间中的一个同质区间，即具有同样特性的连续地址范围。上图中所示的text数据段（代码段）、初始数据段、BSS数据段、堆、栈和内存映射，都是一个独立的虚拟内存区域。由上图可以看出，进程的虚拟地址空间，由多个虚拟内存区域构成。
@@ -246,7 +248,7 @@ mmap内存映射的实现过程，总的来说可以分为三个阶段：
 > 情形一：一个文件的大小是5000字节，mmap函数从一个文件的起始位置开始，映射5000字节到虚拟内存中。
 
 分析：因为单位物理页面的大小是4096字节，虽然被映射的文件只有5000字节，但是对应到进程虚拟地址区域的大小需要满足整页大小，因此mmap函数执行后，实际映射到虚拟内存区域8192个 字节，5000~8191的字节部分用零填充。映射后的对应关系如下图所示：
-
+![[Pasted image 20240914154725.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此时：
@@ -261,7 +263,7 @@ mmap内存映射的实现过程，总的来说可以分为三个阶段：
 > 情形二：一个文件的大小是5000字节，mmap函数从一个文件的起始位置开始，映射15000字节到虚拟内存中，即映射大小超过了原始文件的大小。
 
 分析：由于文件的大小是5000字节，和情形一一样，其对应的两个物理页。那么这两个物理页都是合法可以读写的，只是超出5000的部分不会体现在原文件中。由于程序要求映射15000字节，而文件只占两个物理页，因此8192字节~15000字节都不能读写，操作时会返回异常。如下图所示：
-
+![[Pasted image 20240914154731.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此时：

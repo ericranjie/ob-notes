@@ -36,7 +36,7 @@
   
 
 对于 64 位的对应关系，只是稍有区别，我这里也画了一个图，方便你对比理解。
-
+![[Pasted image 20240914164616.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -47,13 +47,13 @@
 
 进程的虚拟地址空间，其实就是站在项目组的角度来看内存，所以我们就从 task_struct 出发来看。这里面有一个 struct mm_struct 结构来管理内存。
 
-```
+```c
 struct mm_struct		*mm;
 ```
 
 在 struct mm_struct 里面，有这样一个成员变量：
 
-```
+```c
 unsigned long task_size;		/* size of task vm space */
 ```
 
@@ -61,20 +61,20 @@ unsigned long task_size;		/* size of task vm space */
 
 对于 32 未来的系统，内核里面是这样定义 TASK_SIZE 答：
 
-```
+```c
 #ifdef CONFIG_X86_32/* * User space process size: 3GB (default). */#define TASK_SIZE		PAGE_OFFSET#define TASK_SIZE_MAX		TASK_SIZE/*config PAGE_OFFSET        hex        default 0xC0000000        depends on X86_32*/#else/* * User space process size. 47bits minus one guard page.*/#define TASK_SIZE_MAX	((1UL << 47) - PAGE_SIZE)#define TASK_SIZE		(test_thread_flag(TIF_ADDR32) ? \					IA32_PAGE_OFFSET : TASK_SIZE_MAX)......
 ```
 
 当执行一个新的进程的时候，会做以下的设置：
 
-```
+```c
 current->mm->task_size = TASK_SIZE;
 ```
 
 对于 32 位系统，最大能够寻址 2^32=4G，其中用户态虚拟地址空间是 3G，内核态是 1G。
 
 对于 64 位置系统，虚拟地址只使用了 48 位。就像代码里面写的一样，1 左移了 47 位，就相当于 48 位地址空间一半的位置，0x0000800000000000，然后减去一个页，就是 0x00007FFFFFFFF000，共 128T。同样，内核空间也是 128T。内核空间和用户空间之间隔着很大的空隙，以此来进行隔离。
-
+![[Pasted image 20240914164638.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 用户态布局
@@ -83,7 +83,7 @@ current->mm->task_size = TASK_SIZE;
 
 之前我们讲了用户态虚拟空间里面有几类数据，例如代码、全局变量、堆、栈、内存映射区等。在 struct mm_struct 里面，有下面这些变量定义了这些区域的统计信息和位置。
 
-```
+```c
 unsigned long mmap_base;	/* base of mmap area */unsigned long total_vm;		/* Total pages mapped */unsigned long locked_vm;	/* Pages that have PG_mlocked set */unsigned long pinned_vm;	/* Refcount permanently increased */unsigned long data_vm;		/* VM_WRITE & ~VM_SHARED & ~VM_STACK */unsigned long exec_vm;		/* VM_EXEC & ~VM_WRITE & ~VM_STACK */unsigned long stack_vm;		/* VM_STACK */unsigned long start_code, end_code, start_data, end_data;unsigned long start_brk, brk, start_stack;unsigned long arg_start, arg_end, env_start, env_end;
 ```
 
@@ -102,7 +102,7 @@ arg_start 和 arg_end 是参数列表的位置， env_start 和 env_end 是环�
 mmap_base 表示虚拟地址空间中用于内存映射的起始地址。一般情况下，这个空间是从高地址到低地址增长的。前面咱们讲 malloc 申请一大块内存的时候，就是通过 mmap 在这里映射一块区域到物理内存。咱们加载动态链接库 so 文件，也是在这个区域里面，映射一块区域到 so 文件。
 
 这下所有用户状态的区域的位置基本上都描述清楚了。整个布局就像下面这张图这样。虽然 32 位和 64 位置的空间相差很大，但是区域的类别和布局是相似的。
-
+![[Pasted image 20240914164651.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -187,7 +187,7 @@ static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	
 在内核态，32 位和 64 位的布局差别比较大，主要是因为 32 位内核态空间太小了。
 
 我们来看 32 位的内核态的布局。
-
+![[Pasted image 20240914164710.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -240,7 +240,7 @@ FIXADDR_START 到 FIXADDR_TOP(0xFFFF F000) 的空间，称为固定映射区域�
 其实 64 位的内核布局反而简单，因为虚拟空间实在是太大了，根本不需要所谓的高端内存，因为内核是 128T，根本不可能有物理内存超过这个值。
 
 64 位的内存布局如图所示。
-
+![[Pasted image 20240914164720.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   

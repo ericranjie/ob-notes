@@ -16,7 +16,7 @@ Original songsong001 Linux内核那些事
 > 管道的实现可以参考：《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》
 
 我们在《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》一文中介绍过，管道有个 `环形缓冲区`，这个 `环形缓冲区` 需要绑定真实的物理内存页。而 splice 就是将管道的 `环形缓冲区` 绑定到文件的 `页缓存`，如下图所示：
-
+![[Pasted image 20240914164257.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过将文件页缓存绑定到管道的环形缓冲区后，就可以通过管道的读端读取文件页缓存的数据。
@@ -99,7 +99,11 @@ static longdo_splice_to(struct file *in, loff_t *ppos, struct pipe_inode_
 下面将以 `generic_file_splice_read()` 函数作为分析对象，`generic_file_splice_read()` 函数会调用 `__generic_file_splice_read()` 进行下一步处理，如下所示：
 
 ```c
-static int__generic_file_splice_read(struct file *in, loff_t *ppos,                           struct pipe_inode_info *pipe,                           size_t len, unsigned int flags){    ...    struct page *pages[PIPE_BUFFERS];    struct splice_pipe_desc spd = {        .pages = pages,        ...    };    ...    // 1. 查找已经存在页缓存的页面    spd.nr_pages = find_get_pages_contig(mapping, index, nr_pages, pages);    index += spd.nr_pages;    ...    // 2. 如果有些页缓存还不存在，那么申请新的页缓存    while (spd.nr_pages < nr_pages) {        page = find_get_page(mapping, index);        ...        pages[spd.nr_pages++] = page;        index++;    }    // 3. 如果页缓存与硬盘的数据不一致，那么先从硬盘同步到页缓存    for (page_nr = 0; page_nr < nr_pages; page_nr++) {        ...        page = pages[page_nr];        ...        if (!PageUptodate(page)) {            ...            error = mapping->a_ops->readpage(in, page); // 从硬盘读取数据            ...        }        ...        spd.nr_pages++;        index++;    }    ...    // 4. 将页缓存与管道绑定    if (spd.nr_pages)        return splice_to_pipe(pipe, &spd);    return error;}
+static int__generic_file_splice_read(struct file *in, loff_t *ppos,                           struct pipe_inode_info *pipe,                           size_t len, unsigned int flags){    ...    struct page *pages[PIPE_BUFFERS];    struct splice_pipe_desc spd = {        .pages = pages,        ...    };    ...    // 1. 查找已经存在页缓存的页面
+spd.nr_pages = find_get_pages_contig(mapping, index, nr_pages, pages);    index += spd.nr_pages;    ...    // 2. 如果有些页缓存还不存在，那么申请新的页缓存
+while (spd.nr_pages < nr_pages) {        page = find_get_page(mapping, index);        ...        pages[spd.nr_pages++] = page;        index++;    }    // 3. 如果页缓存与硬盘的数据不一致，那么先从硬盘同步到页缓存
+																																													  for (page_nr = 0; page_nr < nr_pages; page_nr++) {        ...        page = pages[page_nr];        ...        if (!PageUptodate(page)) {            ...            error = mapping->a_ops->readpage(in, page); // 从硬盘读取数据
+																																													              ...        }        ...        spd.nr_pages++;        index++;    }    ...    // 4. 将页缓存与管道绑定    if (spd.nr_pages)        return splice_to_pipe(pipe, &spd);    return error;}
 ```
 
 `__generic_file_splice_read()` 函数的代码比较长，为了更易于分析，所以对其进行了精简。从精简后的代码可以看出，`__generic_file_splice_read()` 函数主要完成 4 个步骤：

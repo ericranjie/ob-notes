@@ -8,12 +8,12 @@ a_: **alpha** 等级 深度好文 or **analyze** 深度分析好文
 b_: **beta** 等级 好文
 c_: 一般文章 or comment等级文章
 
-d_: **detail** 细节文章 or  data 数据文章（DIKW模型）
+d_: **detail** & **deeper** 细节 深度文章 or  **data** 数据文章（DIKW模型）
 f_ : finished 已读
 
 t_: trash 垃圾桶 待废弃文章（可能已经过时）
 
-i_: information 信息等级文章（DIKW模型）
+i_: **information** 信息等级文章（DIKW模型）
 k_: knowledge 知识等级文章（DIKW模型）
 w_: wisdom 智慧等级文章（DIKW模型）
 

@@ -73,7 +73,7 @@ C++ 语言中提供了大量的类库和编程接口，虽然可以帮助开发�
 **Buddy allocation**
 
   
-
+![[Pasted image 20240914155126.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Buddy 算法简单来说如上图，一般 2 的 n 次幂大小来管理内存，当申请的内存 size 较小，且当前空闲内存块均大于 size 的两倍，那么会将较大的块分裂，直到分裂出大于size，并小于 size * 2的块为止；当内存 size 较大时则相反，会将空闲块不断合并。
@@ -159,7 +159,7 @@ extent 本身设置 bitmap，来记录内存占用情况，以及自身的各种
   
 
 如下图，框中的 4个是同一个 group 中 4 种 mod 在 align 后的 size，其中 160 表示包含了 129B 到 160B 在对齐后的大小：
-
+![[Pasted image 20240914155304.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 计算出 aligned size 后，就需要计算 slab size，每个 slab size 为 pagesize 和 aligned size 的最小公倍数，以防止跨 slab 的 size 或者 slab 无法被填满的情况出现。以 4K page 为例，128B 的 slab size 即 4K，160B 的 slab size 为 20K。
@@ -171,11 +171,11 @@ extent 本身设置 bitmap，来记录内存占用情况，以及自身的各种
 **Tcache and arena**
 
 为了减少多线程下锁的竞争，Jemalloc 参考 lkmalloc 和 tcmalloc，实现了一套由多个 arena 独立管理内存加 thread cache 的机制，形成 tcache 有空余空间时不需要加锁分配，没有空余空间时将锁控制在线程所属 arena 管理的几个线程之间的模式。
-
+![[Pasted image 20240914155317.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 tcache 中每一个 size 对应一个 bin，当 tcache 需要填充时，在 arena 中发生的如下图：  
-
+![[Pasted image 20240914155323.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -196,7 +196,7 @@ tcache 以 thread local storage对象的形式存储，主要服务于 small siz
     
 
 每个 bin 的结构如下图，avail 指向 bin 的起始地址，ncached 初始为 bin 的最大值 ncached_max (与 slab size 相关，最小为 20 最大为 200)，每次申请内存会返回 ncached 指向的地址并自减1，直到小于限制值。
-
+![[Pasted image 20240914155331.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 释放的时候相反，当 tcache 不为空，即 ncached 不等于 bin 的 ncached_max 时，ncached 自加1，并且将 free 的地址填入 bin 中。
@@ -242,7 +242,7 @@ Slab size 的大小如上所述，为 usize 大小和 pagesize 的最小公倍�
   
 
 下面是一张 jemalloc 和 ptmalloc 的对比图，可以看到在 1024 以下的性能 jemalloc 都优于 ptmalloc，但是jemalloc 自身的性能明显存在波动，几个波动出现在 128B、256B、512B 以及 1024B 周围，因为这些 size 本身就是 pagesize 的因子或者公因子较多，所以 slab size 占用的 page 数也相对较少，fill 和 flush 所需要的slab数也越多。
-
+![[Pasted image 20240914155508.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
@@ -277,20 +277,21 @@ tcache 中每一个 bin 的 slots 数量由 ncached_max 决定，当 tcache 中 
 
 在 long exist 的程序中可调用 jemalloc 的 malloc_stats_print 函数，dump 出应用当前内存分配信息：
 
-```
+```c
 // reference: https://jemalloc.net/jemalloc.3.html
+void malloc_stats_print(void (*write_cb)(void *, const char *), // 回调函数，可以写入文件                         void *cbopaque, // 回调函数参数                         const char *opts); // stats的一些选项，如"J"是导出json格式
 ```
 
 或通过设置 malloc_conf，在程序运行结束后自动 dump stats：
 
-```
+```c
 export MALLOC_CONF=stats_print:true
 ```
 
 **stats 分析**
 
 用 Json 格式 dump stats 后，可以得到如下图所示结构的 json 文件：
-
+![[Pasted image 20240914155431.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 各字段含义可参考：  
@@ -345,20 +346,20 @@ MALLOC_CONF 是 jemalloc 中用来动态设置参数的途径，无须重新编�
 
 narenas 设置：
 
-```
+```c
 export MALLOC_CONF=narenas:xxx  # xxx最大为1024
 ```
 
 或
 
-```
+```c
 ln -s "narenas:xxx" /etc/malloc_conf
 ```
 
 设置线程独占的 arena：
 
-```
-unsigned thread_set_je_exclusive_arena() {
+```c
+unsigned thread_set_je_exclusive_arena() {   unsigned arena_old, arena_new;   size_t sz = sizeof(unsigned);    /* Bind to a manual arena. */   if (mallctl("arenas.create", &arena_new, &sz, NULL, 0)) {     std::cout << "Jemalloc arena create error\n";     return 0;   }   if (mallctl("thread.arena", &arena_old, &sz, &arena_new, sizeof(arena_new))) {     std::cout << "Thread bind to jemalloc arena error\n";     return 0;   }   return arena_new; }
 ```
 
   
@@ -367,19 +368,19 @@ unsigned thread_set_je_exclusive_arena() {
 
 dirty extents：
 
-```
+```c
 export MALLOC_CONF=dirty_decay_ms:xxx  # -1为不释放dirty extents，易发生OOM
 ```
 
 muzzy extents：
 
-```
+```c
 export MALLOC_CONF=muzzy_decay_ms:xxx  # -1为不释放muzzy extents，易发生OOM
 ```
 
 tcache ncached_max 调整，ncached_max 与 slab size 相关，计算方式为
 
-```
+```c
 (slab_size / region_size) << lg_tcache_nslots_mul (默认值1)
 ```
 
@@ -389,7 +390,7 @@ tcache ncached_max 调整，ncached_max 与 slab size 相关，计算方式为
 
 如调整 32B 的 ncached_max，当前系统 page size 为 4K，计算默认的 ncached_max 的方法：
 
-```
+```c
 (slab_size / region_size) << lg_tcache_nslots_mul = (4096 / 32) << 1 = 256
 ```
 
@@ -399,13 +400,13 @@ tcache ncached_max 调整，ncached_max 与 slab size 相关，计算方式为
 
 调整 ncached_max 默认值相关参数：
 
-```
-export 
+```c
+export  MALLOC_CONF=tcache_nslots_small_min:xxx,tcache_nslots_small_max:xxx,lg_tcache_nslots_mul:xxx
 ```
 
 Slab size 设置方法：
 
-```
+```c
 export MALLOC_CONF="slab_sizes:1-4096:17|100-200:1|128-128:2" # -左右表示size范围，:后设置page数，|分割各个不同的size范围
 ```
 
@@ -414,11 +415,11 @@ export MALLOC_CONF="slab_sizes:1-4096:17|100-200:1|128-128:2" # -左右表示siz
 **字节业务优化案例**
 
 Jemalloc 的 stats dump 已经集成到监控系统中，经过分析发现，字节内部的应用普遍线程数量较多，在 arena 中的锁竞争比较激烈，并且 allocte/deallocte 集中在某些线程中，因此可以通过让核心线程独占 arena 来完成优化。以其中一个业务在平台上的 stats 数据为例：
-
+![[Pasted image 20240914155442.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到进程总线程数为 1776 个，arenas 数量为 256 个，平均每个 arena 中的内存需要有 7-8 个线程共享，再查看 mutexs 的 stats ：
-
+![[Pasted image 20240914155447.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到在 extents 中产生锁的开销并不小，首先选择扩大 arenas 的数量，从 256 扩大到 1024 个，发现 CPU 相对下降了 4.5%，但是相对的内存上涨了 10%，在分析代码后，发现 allocate/deallocate 较多的线程总数量只有80+，针对这些线程通过 mallctl 单独创建了 arena，并绑定 tcache，并调小其他线程的 muzzy_decay_ms，**最终为该业务节省了 4% 的 CPU 收益**，内存基本持平。

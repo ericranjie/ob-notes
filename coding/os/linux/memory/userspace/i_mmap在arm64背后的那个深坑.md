@@ -41,7 +41,7 @@ A核负责扫描，B核负责利用该寄存器答复A核。AB两个核是inner 
 
 超时的记录为：
 
-```text
+```c
 [  329.135578] pci_bus 0001:c2: before scan 0 
 [  329.525806] pci_bus 0001:c2: after scan 0 
 ```

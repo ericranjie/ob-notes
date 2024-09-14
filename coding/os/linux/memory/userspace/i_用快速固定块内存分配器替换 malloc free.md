@@ -57,8 +57,8 @@ https://www.codeproject.com/Articles/1084801/Replace-malloc-free-with-a-Fast-Fix
 
     Allocator 构造函数控制操作模式。
 
-```
-class Allocator
+```c++
+class Allocator { public:     Allocator(size_t size, UINT objects=0, CHAR* memory=NULL, const CHAR* name=NULL); ...
 ```
 
 有关Allocator的更多信息，请参阅“高效的 C++ 固定块内存分配器”。
@@ -82,7 +82,7 @@ xallocator 模块有六个主要 API：
 
     xmalloc() 与 malloc() 等效，并且使用方式完全相同。给定多个字节，该函数返回一个指向请求大小的内存块的指针。
 
-```
+```c
 void* memory1 = xmalloc(100);
 ```
 
@@ -90,14 +90,14 @@ void* memory1 = xmalloc(100);
 
     xfree() 是 free() 的 CRT 等价物。只需向 xfree() 传递一个指向先前分配的 xmalloc() 块的指针即可释放内存以供重用。
 
-```
+```c
 xfree(memory1);
 ```
 
     xrealloc() 的行为与 realloc() 相同，它扩展或收缩内存块，同时保留内存块内容。
 
-```
-char* memory2 = (char*)xmalloc(24);    
+```c++
+char* memory2 = (char*)xmalloc(24);     strcpy(memory2, "TEST STRING"); memory2 = (char*)xrealloc(memory2, 124); xfree(memory2);   
 ```
 
     xalloc_stats() 将分配器使用统计信息输出到标准输出流。输出可让您深入了解正在使用的分配器实例数量、正在使用的块、块大小等。
@@ -108,13 +108,13 @@ char* memory2 = (char*)xmalloc(24);
 
     现在，何时在 C++ 应用程序中调用 xalloc_init() 和 xalloc_destroy() 并不那么容易。静态对象会出现问题。如果过早调用 xalloc_destroy()，则当在程序退出时调用静态对象析构函数时，可能仍然需要 xallocator。以这个类为例：
 
-```
-class MyClassStatic
+```c++
+class MyClassStatic { public:     MyClassStatic()      {          memory = xmalloc(100);      }     ~MyClassStatic()      {          xfree(memory);      } private:     void* memory; };
 ```
 
     现在在文件范围内创建此类的静态实例。
 
-```
+```c
 static MyClassStatic myClassStatic;
 ```
 
@@ -128,20 +128,22 @@ static MyClassStatic myClassStatic;
 
     换句话说，static 对象构造函数的调用顺序与文件（翻译单元）中定义的顺序相同。破坏将颠倒这个顺序。因此，xallocator.h 定义了一个 XallocInitDestroy 类并创建它的 static 实例。
 
-```
-class XallocInitDestroy
+```c++
+class XallocInitDestroy { public:     XallocInitDestroy();     ~XallocInitDestroy(); private:     static INT refCount; }; static XallocInitDestroy xallocInitDestroy;
 ```
 
     构造函数跟踪创建的静态实例的总数，并在第一次构造时调用 xalloc_init()。
 
-```
-INT XallocInitDestroy::refCount = 0;
+```c++
+INT XallocInitDestroy::refCount = 0; XallocInitDestroy::XallocInitDestroy()  {      // Track how many static instances of XallocInitDestroy are created     
+if (refCount++ == 0)         xalloc_init(); }
 ```
 
 当最后一个实例被销毁时，析构函数会自动调用 xalloc_destroy()。
 
-```
-XallocDestroy::~XallocDestroy()
+```c++
+XallocDestroy::~XallocDestroy() {     // Last static instance to have destructor called?     
+if (--refCount == 0)         xalloc_destroy(); }
 ```
 
 当在翻译单元中包含 xallocator.h 时，将首先声明 xallocInitDestroy，因为 #include 位于用户代码之前。这意味着依赖 xallocator 的任何其他静态用户类都将在#include“xallocator.h”之后声明。这保证了在执行所有用户静态类析构函数之后调用 ~XallocInitDestroy()。使用这种技术，当程序退出时，xalloc_destroy() 会被安全地调用，而不会有 xallocator 过早销毁的危险。
@@ -155,7 +157,7 @@ XallocInitDestroy 是一个空类，因此大小为 1 字节。对于包含 xall
 
 要启用或禁用自动 xallocator 初始化和销毁，请使用下面的#define：
 
-```
+```c
 #define AUTOMATIC_XALLOCATOR_INIT_DESTROY
 ```
 
@@ -165,20 +167,23 @@ XallocInitDestroy 是一个空类，因此大小为 1 字节。对于包含 xall
 
     为了使 xallocator 真正易于使用，我创建了一个宏来重载类中的 new/delete 并将内存请求路由到 xmalloc()/xfree()。只需在类定义中的任意位置添加宏 XALLOCATOR 即可。
 
-```
-class MyClass 
+```c++
+class MyClass  {     XALLOCATOR     // remaining class definition
+				};
 ```
 
     使用宏，类的 new/delete 通过重载的 new/delete 将请求路由到 xallocator。
 
-```
-// Allocate MyClass using fixed block allocator
+```c++
+// Allocate MyClass using fixed block allocator 
+MyClass* myClass = new MyClass(); delete myClass;
 ```
 
     一个巧妙的技巧是将 XALLOCATOR 放置在继承层次结构的基类中，以便所有派生类都使用 xallocator 进行分配/释放。例如，假设您有一个带有基类的 GUI 库。
 
-```
-class GuiBase 
+```c++
+class GuiBase  {     XALLOCATOR     // remaining class definition 
+				};
 ```
 
     现在，任何 GuiBase 派生类（按钮、小部件等）在调用 new/delete 时都使用 xallocator，而无需向每个派生类添加 XALLOCATOR。这是一种强大的方法，可以使用单个宏语句为整个层次结构启用固定块分配。

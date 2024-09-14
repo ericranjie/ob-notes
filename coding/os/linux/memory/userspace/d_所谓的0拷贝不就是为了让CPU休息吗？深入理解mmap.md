@@ -59,9 +59,9 @@ Makefile文件：
 `export ARCH=arm64   export CROSS_COMPILE=aarch64-linux-gnu-      KERNEL_DIR ?= ~/kernel/linux-5.11   obj-m := 0copy_demo.o      modules:    $(MAKE) -C $(KERNEL_DIR) M=$(PWD) modules      app:    aarch64-linux-gnu-gcc test.c -o test    cp test $(KERNEL_DIR)/kmodules      clean:    $(MAKE) -C $(KERNEL_DIR) M=$(PWD) clean      install:    cp *.ko $(KERNEL_DIR)/kmodules      `
 
 编译驱动代码和应用代码，然后拷贝到qemu中运行：
-
+```c
 `编译驱动模块代码：   $ make modules      编译并拷贝应用：   $ make app      拷贝驱动模块到qemu：   $ make install       加载驱动代码：   # insmod 0copy_demo.ko   [23328.532194] ###### misc_demo_init:91 ######      查看生成的设备节点：   # ls -l /dev/misc_dev    crw-rw----    1 0        0          10,   5 Apr  7 19:26 /dev/misc_dev      后台运行应用程序：   # ./test&   # [23415.280501] ###### misc_dev_open:56 ######   [23415.281052] ###### misc_dev_read:20 kbuff:hello world!!! ######   hello world!!!      查看test的pid：   # pidof test   1768         查看内存映射：   # cat /proc/1768/maps    aaaabc5a0000-aaaabc5a1000 r-xp 00000000 00:19 8666193                    /mnt/test   aaaabc5b0000-aaaabc5b1000 r--p 00000000 00:19 8666193                    /mnt/test   aaaabc5b1000-aaaabc5b2000 rw-p 00001000 00:19 8666193                    /mnt/test   aaaacf033000-aaaacf054000 rw-p 00000000 00:00 0                          [heap]   ffff8a911000-ffff8aa52000 r-xp 00000000 fe:00 152                        /lib/libc-2.27.so   ffff8aa52000-ffff8aa61000 ---p 00141000 fe:00 152                        /lib/libc-2.27.so   ffff8aa61000-ffff8aa65000 r--p 00140000 fe:00 152                        /lib/libc-2.27.so   ffff8aa65000-ffff8aa67000 rw-p 00144000 fe:00 152                        /lib/libc-2.27.so   ffff8aa67000-ffff8aa6b000 rw-p 00000000 00:00 0    ffff8aa6b000-ffff8aa88000 r-xp 00000000 fe:00 129                        /lib/ld-2.27.so   ffff8aa91000-ffff8aa92000 rw-s 00000000 00:05 152                        /dev/misc_dev      //映射设备文件到用户空间   ffff8aa92000-ffff8aa94000 rw-p 00000000 00:00 0    ffff8aa94000-ffff8aa96000 r--p 00000000 00:00 0                          [vvar]   ffff8aa96000-ffff8aa97000 r-xp 00000000 00:00 0                          [vdso]   ffff8aa97000-ffff8aa98000 r--p 0001c000 fe:00 129                        /lib/ld-2.27.so   ffff8aa98000-ffff8aa9a000 rw-p 0001d000 fe:00 129                        /lib/ld-2.27.so   ffffecb5a000-ffffecb7b000 rw-p 00000000 00:00 0                          [stack]      `
-
+```
 执行了以上步骤可以发现最终内核中出现了我在应用程序中写入的“hello world!!!“  字符串，应用程序也能成功读取到（当然本文讲解的0拷贝实现的驱动接口是mmap，而我们读取使用的是read接口，里面我们用copy_to_user来实现的，当然我们可以直接操作mmap映射的内存不需要任何拷贝操作）。
 
 查看应用程序的内存映射发现，/dev/misc_dev设备被映射到了ffff8aa91000-ffff8aa92000这段用户空间地址范围，而且权限为rw-s（可读可写共享）。
@@ -99,7 +99,7 @@ remap_pfn_range实现主要如下代码段：
 **2.同样，物理页面到用户空间虚拟页面的映射也在调用mmap的时候，驱动调用mmap接口的remap_pfn_range映射好了，也不需要在访问的时候发生缺页异常来建立映射。所以，只要用户进程通过mmap映射之后就可以正常访问，访问过程中不会发生缺页异常，映射虚拟页对应的物理页面已经在驱动中申请好映射好。**
 
 下面给出mmap映射原理的图示：
-
+![[Pasted image 20240914165043.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -109,13 +109,13 @@ remap_pfn_range实现主要如下代码段：
 # 4.应用场景
 
 最后，我们来看下使用**framebuffer的lcd对0拷贝的使用情况**：
-
+```c
 `fbmem_init    //drivers/video/fbdev/core/fbmem.c   ->register_chrdev(FB_MAJOR, "fb", &fb_fops)  //注册framebuffer字符设备            -> struct file_operations fb_fops = {      ->.mmap =         fb_mmap               -> fb_mmap    //framebuffer的实现               ->vm_iomap_memory                   ->io_remap_pfn_range                       ->remap_pfn_range                          ->  fb_class = class_create(THIS_MODULE, "graphics")  //创建设备类   `
 
 lcd驱动代码中会设置好最终注册framebuffer：
 
 `xxxfb_probe   ->register_framebuffer       ->do_register_framebuffer           -> fb_info->dev = device_create(fb_class, fb_info->device,                            ¦    MKDEV(FB_MAJOR, i), NULL, "fb%d", i);  //创建设备  会出现/dev/fdx 设备节点      `
-
+```
 可以看到当系统支持framebuffer设备时，在fbmem_init中会创建framebuffer设备类关联字符设备操作集fb_fops，lcd的驱动代码中会调用register_framebuffer创建framebuffer设备（就会创建出了/dev/fdx 设备节点），应用程序就可以通过mmap来映射framebuffer设备到用户空间，然后进行屏幕绘制操作，不需要任何数据拷贝。
 
 # 5.总结

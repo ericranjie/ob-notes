@@ -11,11 +11,9 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
-                "mode": "source",
-                "source": false
+                "file": "0x99-image/Pasted image 20240914191904.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
+                "file": "0x99-image/Pasted image 20240914191904.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
+                "file": "0x99-image/Pasted image 20240914191904.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md"
+                "file": "0x99-image/Pasted image 20240914191904.png"
               }
             }
           }
@@ -146,22 +144,37 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "0x99-image/Pasted image 20240914115912.png",
-    "0x99-image/80c0f5a70583f670c050228034d0070a.jpg",
-    "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
-    "0x99-image/Pasted image 20240914120001.png",
-    "0x99-image/Pasted image 20240914115955.png",
-    "0x99-image/Pasted image 20240914115948.png",
-    "0x99-image/Pasted image 20240914115936.png",
-    "0x99-image/Pasted image 20240914115930.png",
-    "0x99-image/Pasted image 20240914115924.png",
-    "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
-    "0x99-image/Pasted image 20240914112117.png",
-    "0x99-image/Pasted image 20240914112602.png",
-    "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+    "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
+    "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+    "0x99-image/Pasted image 20240914192241.png",
+    "0x99-image/Pasted image 20240914192234.png",
+    "0x99-image/Pasted image 20240914192223.png",
+    "0x99-image/Pasted image 20240914192211.png",
+    "0x99-image/Pasted image 20240914192146.png",
+    "0x99-image/Pasted image 20240914192139.png",
+    "0x99-image/Pasted image 20240914192045.png",
+    "0x99-image/Pasted image 20240914192036.png",
+    "0x99-image/Pasted image 20240914191904.png",
     "test/self_notes.md",
+    "0x99-image/Pasted image 20240914164257.png",
+    "coding/os/linux/memory/userspace/d_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
+    "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
+    "coding/os/linux/memory/userspace/万字长文图解 带你领略 glibc 内存管理精髓.md",
+    "coding/os/linux/memory/userspace/k_从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
+    "coding/os/linux/debug/p_一例hardened_usercopy的bug解析.md",
+    "coding/os/linux/memory/userspace/p_Jemalloc内存分配与优化实践.md",
+    "coding/os/linux/memory/userspace/k_一文读懂零拷贝技术｜splice原理与实现.md",
+    "coding/os/linux/memory/userspace/i_mmap在arm64背后的那个深坑.md",
+    "coding/os/linux/memory/userspace/k_Linux Mmap映射：优化文件访问和共享内存.md",
+    "coding/os/linux/memory/userspace/free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
+    "coding/os/linux/memory/userspace/d_copy_{to,from}_user()的思考.md",
+    "self-improvement/learning-method/a_s如何构建知识体系？.md",
+    "README.md",
+    "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
+    "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
+    "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
     "self-improvement/meditation/觉性的奇迹（六）.md",
     "coding/os/linux/memory/virtual-memory/b_深入理解Linux内核之mmu-gather操作.md",
     "coding/os/linux/memory/virtual-memory/b_虚拟内存 & IO & 零拷贝.md",
@@ -169,20 +182,6 @@
     "coding/os/linux/memory/virtual-memory/b_TLB flush操作.md",
     "coding/os/linux/memory/virtual-memory/k_深入理解TLB原理.md",
     "coding/os/linux/memory/virtual-memory/t_深入理解TLB.md",
-    "coding/os/linux/memory/virtual-memory/b_RISC-V 内存虚拟化简析（一）.md",
-    "coding/os/linux/memory/virtual-memory/d_Linux vm运行参数之（二）：OOM相关的参数.md",
-    "coding/os/linux/memory/virtual-memory/d_Linux vm运行参数之（一）：overcommit相关的参数.md",
-    "README.md",
-    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
-    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
-    "awesome-list/wechat.md",
-    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
-    "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
-    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
-    "coding/os/linux/memory/cache/p_伪共享问题初探：根源与检测.md",
-    "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
-    "coding/os/linux/memory/cache/a_一篇论文讲透Cache优化.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",

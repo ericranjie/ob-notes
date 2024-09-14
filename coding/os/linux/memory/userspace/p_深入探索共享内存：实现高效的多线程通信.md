@@ -29,7 +29,7 @@
 在Linux中，每个进程都有属于自己的进程控制块（PCB）和地址空间（Addr Space），并且都有一个与之对应的页表，负责将进程的虚拟地址与物理地址进行映射，通过内存管理单元（MMU）进行管理。两个不同的虚拟地址通过页表映射到物理空间的同一区域，它们所指向的这块区域即共享内存。
 
 共享内存的通信原理示意图：
-
+![[Pasted image 20240914191904.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于上图我的理解是：当两个进程通过页表将虚拟地址映射到物理地址时，在物理地址中有一块共同的内存区，即共享内存，这块内存可以被两个进程同时看到。这样当一个进程进行写操作，另一个进程读操作就可以实现进程间通信。但是，我们要确保一个进程在写的时候不能被读，因此我们使用信号量来实现同步与互斥。
@@ -40,7 +40,7 @@
 
 借助上图说明：Proc A 进程给内存中写数据， Proc B 进程从内存中读取数据，在此期间一共发生了两次复制
 
-```
+```c
 （1）Proc A 到共享内存       （2）共享内存到 Proc B
 ```
 
@@ -50,19 +50,19 @@
 
 1.查看系统中的共享存储段
 
-```
+```c
 ipcs -m
 ```
 
 2.删除系统中的共享存储段
 
-```
+```c
 ipcrm -m [shmid]
 ```
 
 3.shmget ( )：创建共享内存
 
-```
+```c
 int shmget(key_t key, size_t size, int shmflg);
 ```
 
@@ -76,7 +76,7 @@ int shmget(key_t key, size_t size, int shmflg);
 
 4.shmat ( )：挂接共享内存
 
-```
+```c
 void *shmat(int shmid, const void *shmaddr, int shmflg);
 ```
 
@@ -92,7 +92,7 @@ void *shmat(int shmid, const void *shmaddr, int shmflg);
 
 当一个进程不需要共享内存的时候，就需要去关联。该函数并不删除所指定的共享内存区，而是将之前用shmat函数连接好的共享内存区脱离目前的进程。
 
-```
+```c
 int shmdt(const void *shmaddr);
 ```
 
@@ -102,7 +102,7 @@ int shmdt(const void *shmaddr);
 
 6.shmctl ( )：销毁共享内存
 
-```
+```c
 int shmctl(int shmid, int cmd, struct shmid_ds *buf);
 ```
 
@@ -120,36 +120,52 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf);
 
 comm.h
 
-```
-//comm.h#ifndef _COMM_H__#define _COMM_H__ #include<stdio.h>#include<sys/types.h>#include<sys/ipc.h>#include<sys/shm.h> #define PATHNAME "."#define PROJ_ID 0x6666 int CreateShm(int size);int DestroyShm(int shmid);int GetShm(int size);#endif
+```c
+//comm.h
+#ifndef _COMM_H__
+#define _COMM_H__ #include<stdio.h>
+#include<sys/types.h>
+#include<sys/ipc.h>
+#include<sys/shm.h> 
+#define PATHNAME "."
+#define PROJ_ID 0x6666
+int CreateShm(int size);int DestroyShm(int shmid);int GetShm(int size);#endif
 ```
 
 comm.c
 
-```
-//comm.c#include"comm.h" static int CommShm(int size,int flags){	key_t key = ftok(PATHNAME,PROJ_ID);	if(key < 0)	{		perror("ftok");		return -1;	}	int shmid = 0;	if((shmid = shmget(key,size,flags)) < 0)	{		perror("shmget");		return -2;	}	return shmid;}int DestroyShm(int shmid){	if(shmctl(shmid,IPC_RMID,NULL) < 0)	{		perror("shmctl");		return -1;	}	return 0;}int CreateShm(int size){	return CommShm(size,IPC_CREAT | IPC_EXCL | 0666);}int GetShm(int size){	return CommShm(size,IPC_CREAT);}
+```c
+//comm.c
+#include"comm.h"
+static int CommShm(int size,int flags){	key_t key = ftok(PATHNAME,PROJ_ID);	if(key < 0)	{		perror("ftok");		return -1;	}	int shmid = 0;	if((shmid = shmget(key,size,flags)) < 0)	{		perror("shmget");		return -2;	}	return shmid;}int DestroyShm(int shmid){	if(shmctl(shmid,IPC_RMID,NULL) < 0)	{		perror("shmctl");		return -1;	}	return 0;}int CreateShm(int size){	return CommShm(size,IPC_CREAT | IPC_EXCL | 0666);}int GetShm(int size){	return CommShm(size,IPC_CREAT);}
 ```
 
 client.c
 
-```
-//client.c#include"comm.h" int main(){	int shmid = GetShm(4096);	sleep(1);	char *addr = shmat(shmid,NULL,0);	sleep(2);	int i = 0;	while(i < 26)	{		addr[i] = 'A' + i;		i++;		addr[i] = 0;		sleep(1);	}	shmdt(addr);	sleep(2);	return 0;}
+```c
+//client.c
+#include"comm.h"
+int main(){	int shmid = GetShm(4096);	sleep(1);	char *addr = shmat(shmid,NULL,0);	sleep(2);	int i = 0;	while(i < 26)	{		addr[i] = 'A' + i;		i++;		addr[i] = 0;		sleep(1);	}	shmdt(addr);	sleep(2);	return 0;}
 ```
 
 server.c
 
-```
-//server.c#include"comm.h" int main(){	int shmid = CreateShm(4096); 	char *addr = shmat(shmid,NULL,0);	sleep(2);	int i = 0;	while(i++ < 26)	{		printf("client# %s\n",addr);		sleep(1);	}	shmdt(addr);	sleep(2);	DestroyShm(shmid);	return 0;}
+```c
+//server.c
+#include"comm.h" 
+int main(){	int shmid = CreateShm(4096); 	char *addr = shmat(shmid,NULL,0);	sleep(2);	int i = 0;	while(i++ < 26)	{		printf("client# %s\n",addr);		sleep(1);	}	shmdt(addr);	sleep(2);	DestroyShm(shmid);	return 0;}
 ```
 
 Makefile
 
-```
-//Makefile.PHONY:allall:server client client:client.c comm.c	gcc -o $@ $^server:server.c comm.c	gcc -o $@ $^ .PHONY:cleanclean:rm -f client server
+```c
+//Makefile
+.PHONY:all
+all:server client client:client.c comm.c	gcc -o $@ $^server:server.c comm.c	gcc -o $@ $^ .PHONY:cleanclean:rm -f client server
 ```
 
 运行结果：
-
+![[Pasted image 20240914192036.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 （1）优点：我们可以看到使用共享内存进行进程之间的通信是非常方便的，而且函数的接口也比较简单，数据的共享还使进程间的数据不用传送，而是直接访问内存，加快了程序的效率。
@@ -167,7 +183,7 @@ Linux提供了内存映射函数mmap, 它把文件内容映射到一段内存上
 mmap系统调用并不完全是为了共享内存来设计的，它本身提供了不同于一般对普通文件的访问的方式，进程可以像读写内存一样对普通文件进行操作，IPC的共享内存是纯粹为了共享。
 
 内存映射指的是将 ：进程中的1个虚拟内存区域 & 1个磁盘上的对象，使得二者存在映射关系。当然，也可以多个进程同时映射到一个对象上面。
-
+![[Pasted image 20240914192045.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 实现过程
@@ -179,7 +195,7 @@ mmap系统调用并不完全是为了共享内存来设计的，它本身提供�
 - 其函数原型、具体使用 & 内部流程 如下
     
 
-```
+```c
 /** * 函数原型 */ void *mmap(void *start, size_t length, int prot, int flags, int fd, off_t offset); /** * 具体使用（用户进程调用mmap（）） * 下述代码即常见了一片大小 = MAP_SIZE的接收缓存区 & 关联到共享对象中（即建立映射） */ mmap(NULL, MAP_SIZE, PROT_READ, MAP_PRIVATE, fd, 0); /** * 内部原理 * 步骤1：创建虚拟内存区域 * 步骤2：实现地址映射关系，即：进程的虚拟地址空间 ->> 共享对象 * 注：* a. 此时，该虚拟地址并没有任何数据关联到文件中，仅仅只是建立映射关系 * b. 当其中1个进程对虚拟内存写入数据时，则真正实现了数据的可见 */
 ```
 
@@ -195,7 +211,7 @@ mmap系统调用并不完全是为了共享内存来设计的，它本身提供�
 
 ### 2.1mmap系统调用
 
-```
+```c
  void *mmap(void *addr, size_t length, int prot, int flags,                  int fd, off_t offset);
 ```
 
@@ -208,14 +224,19 @@ mmap系统调用并不完全是为了共享内存来设计的，它本身提供�
 - prot是用来设定内存段的访问权限。
     
 
-```
-PROT_READ	内存段可读PROT_WRITE	内存段可写PROT_EXEC	内存段可执行PROT_NONE	内存段不能被访问
+```c
+PROT_READ	内存段可读
+PROT_WRITE	内存段可写
+PROT_EXEC	内存段可执行
+PROT_NONE	内存段不能被访问
 ```
 
 flags参数控制内存段内容被修改以后程序的行为。
 
-```
-MAP_SHARED	进程间共享内存，对该内存段修改反映到映射文件中。提供了POSIX共享内存MAP_PRIVATE	内存段为调用进程所私有。对该内存段的修改不会反映到映射文件MAP_ANNOYMOUS	这段内存不是从文件映射而来的。内容被初始化为全0MAP_FIXED	内存段必须位于start参数指定的地址处，start必须是页大小的整数倍（4K整数倍）MAP_HUGETLB	按照大内存页面来分配内存空间
+```c
+MAP_SHARED	进程间共享内存，对该内存段修改反映到映射文件中。提供了POSIX共享内存MAP_PRIVATE	内存段为调用进程所私有。对该内存段的修改不会反映到映射文件MAP_ANNOYMOUS	这段内存不是从文件映射而来的。内容被初始化为全0
+MAP_FIXED	内存段必须位于start参数指定的地址处，start必须是页大小的整数倍（4K整数倍）
+MAP_HUGETLB	按照大内存页面来分配内存空间
 ```
 
 fd参数是用来被映射文件对应的文件描述符，通过open系统调用得到，offset设定从何处进行映射。
@@ -231,11 +252,11 @@ fd参数是用来被映射文件对应的文件描述符，通过open系统调�
 ## 三、mmap和System V共享内存的比较
 
 共享内存：
-
+![[Pasted image 20240914192139.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这是System V版本的共享内存（以下我们统称为shm），下面看下mmap的：
-
+![[Pasted image 20240914192146.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 mmap是在磁盘上建立一个文件，每个进程地址空间中开辟出一块空间进行映射。而shm共享内存，每个进程最终会映射到同一块物理内存。shm保存在物理内存，这样读写的速度肯定要比磁盘要快，但是存储量不是特别大，相对于shm来说，mmap更加简单，调用更加方便，所以这也是大家都喜欢用的原因。
@@ -260,8 +281,13 @@ mmap是在磁盘上建立一个文件，每个进程地址空间中开辟出一�
 
 使用POSIX共享内存需要用到下面这些API：
 
-```
-#include <sys/types.h>#include <sys/stat.h>        /* For mode constants */#include <sys/mman.h>#include <fcntl.h>           /* For O_* constants */#include <unistd.h>int shm_open(const char *name, int oflag, mode_t mode);int shm_unlink(const char *name);int ftruncate(int fildes, off_t length);void *mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off);int munmap(void *addr, size_t len);int close(int fildes);int fstat(int fildes, struct stat *buf);int fchown(int fildes, uid_t owner, gid_t group);int fchmod(int fildes, mode_t mode);
+```c
+#include <sys/types.h>
+#include <sys/stat.h>        /* For mode constants */
+#include <sys/mman.h>
+#include <fcntl.h>           /* For O_* constants */
+#include <unistd.h>
+int shm_open(const char *name, int oflag, mode_t mode);int shm_unlink(const char *name);int ftruncate(int fildes, off_t length);void *mmap(void *addr, size_t len, int prot, int flags, int fildes, off_t off);int munmap(void *addr, size_t len);int close(int fildes);int fstat(int fildes, struct stat *buf);int fchown(int fildes, uid_t owner, gid_t group);int fchmod(int fildes, mode_t mode);
 ```
 
 - shm_open：穿件并打开一个新的共享内存对象或者打开一个既存的共享内存对象, 与函数open的用法是类似的函数返回值是一个文件描述符,会被下面的API使用。
@@ -292,39 +318,56 @@ mmap是在磁盘上建立一个文件，每个进程地址空间中开辟出一�
 ```
 
 运行结果：
-
+![[Pasted image 20240914192211.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (2)共享内存映射(attach)
 
-```
-#include <sys/types.h>#include <sys/shm.h>void *shmat(int shmid,const void *shmaddr， int shmflg);功能:映射共享内存参数    shmid：共享内存的id    shmaddr：映射的地址，设置为NULL为系统自动分配    shmflg：标志位        0：共享内存具有可读可写权限。        SHM_RDONLY：只读。返回值:       成功：映射的地址	失败：-1
+```c
+#include <sys/types.h>
+#include <sys/shm.h>
+void *shmat(int shmid,const void *shmaddr， int shmflg);功能:映射共享内存参数    shmid：共享内存的id    shmaddr：映射的地址，设置为NULL为系统自动分配    shmflg：标志位        0：共享内存具有可读可写权限。        SHM_RDONLY：只读。返回值:       成功：映射的地址	失败：-1
 ```
 
 注意：shmat函数使用的时候第二个和第三个参数一般设为NULL和0，即系统自动指定共享内存地址，并且共享内存可读可写。
 
 (3)解除共享内存映射(detach)
 
-```
-#include <sys/types.h>#include <sys/shm.h>int shmdt ( const void *shmaddr );功能:    解除共享内存的映射参数:    shmaddr：映射的地址，shmat的返回值返回值:    成功:0	失败:-1
+```c
+#include <sys/types.h>
+#include <sys/shm.h>
+int shmdt ( const void *shmaddr );功能:    解除共享内存的映射参数:    shmaddr：映射的地址，shmat的返回值返回值:    成功:0	失败:-1
 ```
 
 (4)共享内存的实现
 
 测试：打开一个共享内存并放入数据（发送端）
 
-```
-#include <stdio.h>#include <stdlib.h>#include <unistd.h>#include <sys/ipc.h>#include <sys/shm.h>#include <string.h>int main(int argc, char const *argv[]){ //使用ftok函数获取键值key_t mykey;if((mykey=ftok(".",100))==-1){    perror( "fail to ftok");    exit(1);}//通过shmget函数创建或者打开一个共享内存，返回一个共享内存的标识符int shmid;if((shmid = shmget(mykey,500,IPC_CREAT | 0666))==-1){    perror("fail to shmget");    exit(1);}    printf( "shmid = %d\n", shmid);    system("ipcs -m");    //使用shmat函数映射共享内存的地址    //声明一个指针变量指向共享内存，则操作指针变量text，就相当于操作共享内存    char *text;    if((text = shmat(shmid,NULL,0)) == (void *)-1){    perror( "fail to shmat");    exit(1);}//通过shmat的返回值对共享内存操作strcpy(text,"hello world");//操作完毕后要接触共享内存的映射if(shmdt(text) == -1){perror("fail to shmdt");exit(1);}  system("ipcs -m");return 0;}
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <string.h>
+int main(int argc, char const *argv[]){ //使用ftok函数获取键值key_t mykey;
+if((mykey=ftok(".",100))==-1){    perror( "fail to ftok");    exit(1);}//通过shmget函数创建或者打开一个共享内存，返回一个共享内存的标识符int shmid;if((shmid = shmget(mykey,500,IPC_CREAT | 0666))==-1){    perror("fail to shmget");    exit(1);}    printf( "shmid = %d\n", shmid);    system("ipcs -m");    //使用shmat函数映射共享内存的地址    //声明一个指针变量指向共享内存，则操作指针变量text，就相当于操作共享内存    char *text;    if((text = shmat(shmid,NULL,0)) == (void *)-1){    perror( "fail to shmat");    exit(1);}//通过shmat的返回值对共享内存操作strcpy(text,"hello world");//操作完毕后要接触共享内存的映射if(shmdt(text) == -1){perror("fail to shmdt");exit(1);}  system("ipcs -m");return 0;}
 ```
 
 测试：打开一个共享内存并放入数据（接收端）
 
-```
-#include <stdio.h>#include <stdlib.h>#include <unistd.h>#include <sys/ipc.h>#include <sys/shm.h>#include <string.h>int main(int argc, char const *argv[]){ //使用ftok函数获取键值key_t mykey;if((mykey=ftok(".",100))==-1){    perror( "fail to ftok");    exit(1);}//通过shmget函数创建或者打开一个共享内存，返回一个共享内存的标识符int shmid;if((shmid = shmget(mykey,500,IPC_CREAT | 0666))==-1){    perror("fail to shmget");    exit(1);}    printf( "shmid = %d\n", shmid);    system("ipcs -m"); char *text;if((text = shmat(shmid,NULL,0)) == (void*)-1){perror( "fail to shmat");exit(1);}//获取共享内存中的数据printf( "text = %s\n", text);//解除共享内存映射if(shmdt(text)==-1){perror( "fail to shmdt");exit(1);}  system("ipcs -m");return 0;}
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+#include <string.h>
+int main(int argc, char const *argv[]){ //使用ftok函数获取键值key_t mykey;if((mykey=ftok(".",100))==-1){    perror( "fail to ftok");    exit(1);}//通过shmget函数创建或者打开一个共享内存，返回一个共享内存的标识符int shmid;if((shmid = shmget(mykey,500,IPC_CREAT | 0666))==-1){    perror("fail to shmget");    exit(1);}    printf( "shmid = %d\n", shmid);    system("ipcs -m"); char *text;if((text = shmat(shmid,NULL,0)) == (void*)-1){perror( "fail to shmat");exit(1);}//获取共享内存中的数据printf( "text = %s\n", text);//解除共享内存映射if(shmdt(text)==-1){perror( "fail to shmdt");exit(1);}  system("ipcs -m");return 0;}
 ```
 
 运行如下：
-
+![[Pasted image 20240914192223.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 用结构体指针来实现：
@@ -334,7 +377,7 @@ mmap是在磁盘上建立一个文件，每个进程地址空间中开辟出一�
 ```
 
 运行如下：
-
+![[Pasted image 20240914192234.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 shmctl函数
@@ -350,7 +393,7 @@ shmctl函数
 ```
 
 运行结果：
-
+![[Pasted image 20240914192241.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2023年往期回顾

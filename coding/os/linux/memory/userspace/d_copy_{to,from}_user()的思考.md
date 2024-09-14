@@ -99,7 +99,7 @@
 
 当我们进入内核态后会通过`__uaccess_ttbr0_disable`切换ttbr0_el1以关闭用户空间地址访问，在需要访问的时候通过`__uaccess_ttbr0_enable`打开用户空间地址访问。这两个宏定义也不复杂，就以__uaccess_ttbr0_disable为例说明原理。其[定义](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/include/asm/asm-uaccess.h#L15)如下：
 
-```assembly
+```c
  
 .macro	__uaccess_ttbr0_disable, tmp1    mrs	\tmp1, ttbr1_el1                        // swapper_pg_dir (1)    bic	\tmp1, \tmp1, #TTBR_ASID_MASK    sub	\tmp1, \tmp1, #RESERVED_TTBR0_SIZE      // reserved_ttbr0 just before                                                // swapper_pg_dir (2)    msr	ttbr0_el1, \tmp1                        // set reserved TTBR0_EL1 (3)    isb    add	\tmp1, \tmp1, #RESERVED_TTBR0_SIZE    msr	ttbr1_el1, \tmp1                       // set reserved ASID    isb.endm
 ```
@@ -171,7 +171,6 @@ struct exception_table_entry {	unsigned long insn, fixup;};
 有一点需要明确，在32位处理器上，unsigned long是4 bytes。insn和fixup分别存储异常发生地址及其对应的修复地址。根据异常地址ex_addr查找对应的修复地址（未找到返回0），其示意代码如下：
 
 ```c
- 
 unsigned long search_fixup_addr32(unsigned long ex_addr){	const struct exception_table_entry *e; 	for (e = __start___ex_table; e < __stop___ex_table; e++)		if (ex_addr == e->insn)			return e->fixup; 	return 0;}
 ```
 
