@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "05be670b1340e2ed",
+        "id": "30d24f811d1b06b5",
         "type": "tabs",
         "children": [
           {
-            "id": "36c876f1da30a788",
+            "id": "550c24418126d846",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/rmap/郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md"
+                "file": "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md"
               }
             }
           }
@@ -146,30 +146,35 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "36c876f1da30a788",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x99-image/Pasted image 20240913201821.png",
+    "0x99-image/Pasted image 20240914115912.png",
+    "0x99-image/80c0f5a70583f670c050228034d0070a.jpg",
+    "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
+    "0x99-image/Pasted image 20240914120001.png",
+    "0x99-image/Pasted image 20240914115955.png",
+    "0x99-image/Pasted image 20240914115948.png",
+    "0x99-image/Pasted image 20240914115936.png",
+    "0x99-image/Pasted image 20240914115930.png",
+    "0x99-image/Pasted image 20240914115924.png",
+    "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
+    "0x99-image/Pasted image 20240914112117.png",
+    "0x99-image/Pasted image 20240914112602.png",
+    "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+    "test/self_notes.md",
+    "self-improvement/meditation/觉性的奇迹（六）.md",
     "coding/os/linux/memory/virtual-memory/b_深入理解Linux内核之mmu-gather操作.md",
-    "0x99-image/Pasted image 20240913201921.png",
-    "0x99-image/Pasted image 20240913201905.png",
-    "0x99-image/Pasted image 20240913201851.png",
-    "0x99-image/Pasted image 20240913201846.png",
-    "0x99-image/Pasted image 20240913201840.png",
-    "0x99-image/Pasted image 20240913201833.png",
     "coding/os/linux/memory/virtual-memory/b_虚拟内存 & IO & 零拷贝.md",
     "coding/os/linux/memory/virtual-memory/d_深入了解iommu系列四：interrupt remapping 工作机制解析.md",
     "coding/os/linux/memory/virtual-memory/b_TLB flush操作.md",
     "coding/os/linux/memory/virtual-memory/k_深入理解TLB原理.md",
     "coding/os/linux/memory/virtual-memory/t_深入理解TLB.md",
     "coding/os/linux/memory/virtual-memory/b_RISC-V 内存虚拟化简析（一）.md",
-    "0x99-image/Pasted image 20240913184925.png",
     "coding/os/linux/memory/virtual-memory/d_Linux vm运行参数之（二）：OOM相关的参数.md",
     "coding/os/linux/memory/virtual-memory/d_Linux vm运行参数之（一）：overcommit相关的参数.md",
     "README.md",
     "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
     "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
-    "0x99-image/Pasted image 20240913161953.png",
-    "0x99-image/Pasted image 20240913162844.png",
     "awesome-list/wechat.md",
     "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
     "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
@@ -178,11 +183,6 @@
     "coding/os/linux/memory/cache/p_伪共享问题初探：根源与检测.md",
     "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
     "coding/os/linux/memory/cache/a_一篇论文讲透Cache优化.md",
-    "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
-    "coding/os/linux/memory/cache/ap_一个较复杂dcache问题.md",
-    "coding/os/linux/memory/cache/a_cache的58问，您能回答上来几个？.md",
-    "coding/os/linux/memory/cache/k_arm64 cache机制分析.md",
-    "test/self_notes.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",
