@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md"
+                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md"
               }
             }
           }
@@ -148,6 +148,21 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/ARM/i_ARMv8-a架构简介.md",
+    "coding/os/ARM/i_ARM WFI和WFE指令.md",
+    "coding/os/ARM/k_ARM64架构下地址翻译相关的宏定义.md",
+    "coding/os/ARM/i_Atomic operation in aarch64.md",
+    "coding/os/ARM/i_ARM概念梳理：Architecture, Core, CPU，SOC.md",
+    "coding/os/ARM/k_系统总结ARM基础.md",
+    "coding/os/ARM/i_Linux kernel中栈的介绍.md",
+    "coding/os/ARM/i_ARMv8之Atomicity.md",
+    "coding/os/ARM/i_ARMv8之Observability.md",
+    "coding/os/ARM/init/ARM64的启动过程之（二）：创建启动阶段的页表.md",
+    "coding/os/ARM/init/ARM64的启动过程之（四）：打开MMU.md",
+    "coding/os/ARM/init/ARM64的启动过程之（一）：内核第一个脚印.md",
+    "coding/os/ARM/init",
+    "coding/os/ARM/i_Arm64 栈回溯.md",
+    "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
     "coding/os/linux/memory/memory-performance/zRAM内存压缩技术原理与应用.md",
     "coding/os/linux/memory/MMU/k_【万字长文】带你搞定MMU&TLB&TWU.md",
     "0x99-image/Pasted image 20240914200542.png",
@@ -170,20 +185,6 @@
     "test/self_notes.md",
     "coding/os/linux/memory/userspace/d_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
     "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
-    "coding/os/linux/memory/userspace/万字长文图解 带你领略 glibc 内存管理精髓.md",
-    "coding/os/linux/memory/userspace/k_从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
-    "coding/os/linux/debug/p_一例hardened_usercopy的bug解析.md",
-    "coding/os/linux/memory/userspace/p_Jemalloc内存分配与优化实践.md",
-    "coding/os/linux/memory/userspace/k_一文读懂零拷贝技术｜splice原理与实现.md",
-    "coding/os/linux/memory/userspace/i_mmap在arm64背后的那个深坑.md",
-    "coding/os/linux/memory/userspace/k_Linux Mmap映射：优化文件访问和共享内存.md",
-    "coding/os/linux/memory/userspace/free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
-    "coding/os/linux/memory/userspace/d_copy_{to,from}_user()的思考.md",
-    "self-improvement/learning-method/a_s如何构建知识体系？.md",
-    "README.md",
-    "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
-    "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
-    "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",
@@ -193,7 +194,6 @@
     "coding/cpp/opensource/protobuf",
     "coding/cpp/opensource/memory",
     "coding/cpp/opensource/boost",
-    "coding/algorithm/sort",
     "Untitled.canvas"
   ]
 }
