@@ -18,3 +18,10 @@
 人之所有痛苦都是因为有“我”，把“我”拉出去砍了，就没有任何痛苦了 -- 岩松老师
 
 游戏，哪怕是看似无害的手机游戏《重生细胞》，也不适合我，说不出为什么不适合，哪怕其他行为也是浪费时间（其实也不是，是和熵增的对抗），但游戏就是破坏了我的好心情。
+
+
+“Our study found that creative individuals exhibited more random connectivity in their brains,” Anderson told PsyPost. “This suggests that to be creative, we need to focus less and relax more.” This is a super interesting study on mechanisms underlying exceptional creativity [https://psypost.org/neuroscience-sheds-light-on-brain-mechanisms-underlying-exceptional-creativity/](https://t.co/bntc3WQblx)
+
+由 [](https://translate.google.com/)翻译自 英语
+
+安德森告诉 PsyPost：“我们的研究发现，富有创造力的人大脑中表现出更多的随机连接。这表明，要想富有创造力，我们需要减少注意力，多放松。” 这是一项关于卓越创造力背后机制的非常有趣的研究

@@ -40,8 +40,9 @@ KSM 应用程序编程接口（API）通过 `madvise` 系统调用（见清单
 
 清单 1. madvise 系统调用
 
-```
-#include <sys/mman.h>int madvise( void *start, size_t length, int advice );
+```c
+#include <sys/mman.h>
+int madvise( void *start, size_t length, int advice );
 ```
 
 一旦某个区域被定义为 “可合并”，KSM 将把该区域添加到它的工作内存列表。启用 KSM 时，它将搜索相同的页面，以写保护的 CoW 方式保留一个页面，释放另一个页面以供它用。
@@ -57,7 +58,7 @@ KSM 应用程序编程接口（API）通过 `madvise` 系统调用（见清单
 进程处理一个单一的页面时，第一步是检查是否能够在稳定树中发现该页面。搜索稳定树的过程很有趣，因为每个页面都被视为一个非常大的数字（页面的内容）。
 
 一个 `memcmp`（内存比较）操作将在该页面和相关节点的页面上执行。如果 memcmp 返回 0，则页面相同，发现一个匹配值。反之，如果 `memcmp` 返回 -1，则表示候选页面小于当前节点的页面；如果返回 1，则表示候选页面大于当前节点的页面。尽管比较 4KB 的页面似乎是相当重量级的比较，但是在多数情况下，一旦发现一个差异，memcmp 将提前结束。请参见图 3 查看这个过程的视觉呈现。
-
+![[Pasted image 20240915164943.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3. 搜索树中的页面的搜索过程

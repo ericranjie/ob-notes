@@ -32,13 +32,14 @@ C语言与CPP编程
 
 首先，我们看一段代码，如下：
 
-```
-int A = 0;int B = 0;void fun() {    A = B + 1; // L5    B = 1; // L6}int main() {    fun();    return 0;}
+```c
+int A = 0;int B = 0;void fun() {    A = B + 1; // L5    B = 1; // L6
+							   }int main() {    fun();    return 0;}
 ```
 
 如果使用 `g++ test.cc`，则生成的汇编指令如下：
 
-```
+```c
 movl    B(%rip), %eaxaddl    $1, %eaxmovl    %eax, A(%rip)movl    $1, B(%rip)
 ```
 
@@ -46,7 +47,7 @@ movl    B(%rip), %eaxaddl    $1, %eaxmovl    %eax, A(%rip)movl �
 
 而如果我们使用`g++ -O2 test.cc`，则生成的汇编指令如下：
 
-```
+```c
 movl    B(%rip), %eaxmovl    $1, B(%rip)addl    $1, %eaxmovl    %eax, A(%rip)
 ```
 
@@ -60,13 +61,13 @@ movl    B(%rip), %eaxmovl    $1, B(%rip)addl    $1, %eaxmovl  �
 
 可以使用编译选项停止此类优化，或者使用预编译指令将不希望被重排的代码分隔开，比如在gcc下可用`asm volatile`，如下：
 
-```
+```c
 void fun() {    A = B + 1;    asm volatile("" ::: "memory");    B = 0;}
 ```
 
 类似的，处理器也会提供指令给开发人员使用，以避免乱序控制，例如，x86，x86-64上的指令如下：
 
-```
+```c
 lfence (asm), void _mm_lfence(void)sfence (asm), void _mm_sfence(void)mfence (asm), void _mm_mfence(void)
 ```
 
@@ -118,7 +119,7 @@ sequenced-before是一种单线程上的关系，这是一个非对称，可传�
 
 经常可以看到如下这种代码：
 
-```
+```c
 i = i++ + i;
 ```
 
@@ -151,7 +152,7 @@ happens-before是sequenced-before的扩展，因为它还包含了不同线程�
 
 假设有一个变量x，其初始化为0，如下：
 
-```
+```c
 int x = 0;
 ```
 
@@ -281,7 +282,12 @@ Relax模型对应的是memory_order中的`memory_order_relaxed`。从其字面�
 那么既然`memory_order_relaxed不能保证执行顺序`，它们的使用场景又是什么呢？这就需要用到其特性即**只保证当前的数据访问是原子操作**，通常用于一些统计计数的需求场景，代码如下：
 
 ```c
-#include <cassert>#include <vector>#include <iostream>#include <thread>#include <atomic>std::atomic<int> cnt = {0};void fun1() {  for (int n = 0; n < 100; ++n) {    cnt.fetch_add(1, std::memory_order_relaxed);  }}void fun2() {  for (int n = 0; n < 900; ++n) {    cnt.fetch_add(1, std::memory_order_relaxed);  }}int main() {  std::thread t1(fun1);  std::thread t2(fun2);  t1.join();  t2.join();    return 0;}
+#include <cassert>
+#include <vector>
+#include <iostream>
+#include <thread>
+#include <atomic>
+std::atomic<int> cnt = {0};void fun1() {  for (int n = 0; n < 100; ++n) {    cnt.fetch_add(1, std::memory_order_relaxed);  }}void fun2() {  for (int n = 0; n < 900; ++n) {    cnt.fetch_add(1, std::memory_order_relaxed);  }}int main() {  std::thread t1(fun1);  std::thread t2(fun2);  t1.join();  t2.join();    return 0;}
 ```
 
 在上述代码执行完成后，cnt == 1000。
@@ -360,7 +366,26 @@ Acquire-Release模型中的其它三个约束符，要么用来约束读，要�
 `cppreference`中使用了3个线程的例子来解释memory_order_acq_rel约束符，代码如下：
 
 ```c
-#include <thread>#include <atomic>#include <cassert>#include <vector> std::vector<int> data;std::atomic<int> flag = {0}; void thread_1() {    data.push_back(42); // L10    flag.store(1, std::memory_order_release); // L11} void thread_2() {    int expected=1; // L15    // memory_order_relaxed is okay because this is an RMW,    // and RMWs (with any ordering) following a release form a release sequence    while (!flag.compare_exchange_strong(expected, 2, std::memory_order_relaxed)) { // L18        expected = 1;    }} void thread_3() {    while (flag.load(std::memory_order_acquire) < 2); // L24    // if we read the value 2 from the atomic flag, we see 42 in the vector    assert(data.at(0) == 42); // L26} int main() {    std::thread a(thread_1);    std::thread b(thread_2);    std::thread c(thread_3);    a.join();     b.join();     c.join();        return 0;}
+#include <thread>
+#include <atomic>
+#include <cassert>
+#include <vector>
+std::vector<int> data;
+std::atomic<int> flag = {0}; 
+void thread_1() {
+data.push_back(42); // L10    
+																	flag.store(1, std::memory_order_release); // L11
+																	} 
+																	void thread_2() {
+																	    int expected=1; // L15
+																	        // memory_order_relaxed is okay because this is an RMW,
+																	            // and RMWs (with any ordering) following a release form a release sequence    
+																	            while (!flag.compare_exchange_strong(expected, 2, std::memory_order_relaxed)) { // L18
+																	                    expected = 1;
+																	                        }
+																	                        } 
+																	                        void thread_3() {
+																	                            while (flag.load(std::memory_order_acquire) < 2); // L24    // if we read the value 2 from the atomic flag, we see 42 in the vector    assert(data.at(0) == 42); // L26} int main() {    std::thread a(thread_1);    std::thread b(thread_2);    std::thread c(thread_3);    a.join();     b.join();     c.join();        return 0;}
 ```
 
 线程thread_2中，对原子变量flag的compare_exchange操作使用了memory_order_acq_rel约束符，这就意味着L15不能重排到L18之后，也就是说当compare_exchange操作发生的时候，能确保expected的值是1，使得这个 compare_exchange_strong操作能够完成将flag替换成2的动作；thread_1线程中对flag使用了带memory_order_release约束符的store，这意味着当thread_2线程中取flag的值的时候，L10已经完成（不会被重排到L11之后）。当thread_2线程compare_exchange操作将2写入flag的时候，thread_3线程中带memory_order_acquire标记的load操作能看到L18之前的内存写入，自然也包括L10的内存写入，所以L26的断言始终是成立的。
@@ -368,13 +393,23 @@ Acquire-Release模型中的其它三个约束符，要么用来约束读，要�
 上面例子中，memory_order_acq_rel约束符用于同时存在读和写的场景，这个时候，相当于使用了memory_order_acquire&memory_order_acquire组合组合。其实，它也可以单独用于读或者单独用于写，示例如下：
 
 ```c
-// Thread-1:a = y.load(memory_order_acq_rel); // Ax.store(a, memory_order_acq_rel); // B// Thread-2:b = x.load(memory_order_acq_rel); // Cy.store(1, memory_order_acq_rel); // D
+// Thread-1:
+a = y.load(memory_order_acq_rel); // A
+x.store(a, memory_order_acq_rel); // B
+// Thread-2:
+b = x.load(memory_order_acq_rel); // C
+y.store(1, memory_order_acq_rel); // D
 ```
 
 另外一个实例：
 
 ```c
-// Thread-1:                              a = y.load(memory_order_acquire); // Ax.store(a, memory_order_release); // B// Thread-2:b = x.load(memory_order_acquire); // Cy.store(1, memory_order_release); // D
+// Thread-1:
+a = y.load(memory_order_acquire); // A
+x.store(a, memory_order_release); // B
+// Thread-2:
+b = x.load(memory_order_acquire); // C
+y.store(1, memory_order_release); // D
 ```
 
 上述两个示例，效果完全一样，都可以保证A先于B执行，C先于D执行。
@@ -406,7 +441,7 @@ C++的内存模型则是依赖上面六种内存约束符来实现的：
     
 
 下面这幅图大致梳理了内存模型的核心概念，可以帮我们快速回顾。
-
+![[Pasted image 20240915164551.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
 
 ## 后记

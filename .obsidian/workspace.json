@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md",
+                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md",
+                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md",
+                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/ARM/ARM64 Kernel Image Mapping的变化.md"
+                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md"
               }
             }
           }
@@ -148,6 +148,29 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/memory/memory-manage/b_linux内存回收(一）---kswapd回收.md",
+    "test/next_step.md",
+    "0x99-image/Pasted image 20240915164551.png",
+    "0x99-image/Pasted image 20240915195922.png",
+    "0x99-image/Pasted image 20240915195915.png",
+    "0x99-image/Pasted image 20240915195910.png",
+    "0x99-image/Pasted image 20240915195905.png",
+    "0x99-image/Pasted image 20240915195859.png",
+    "0x99-image/Pasted image 20240915195853.png",
+    "0x99-image/Pasted image 20240915195847.png",
+    "0x99-image/Pasted image 20240915195840.png",
+    "0x99-image/Pasted image 20240915195818.png",
+    "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
+    "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
+    "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
+    "coding/os/linux/memory/memory-manage/i_KSM机制剖析 — Linux 内核中的内存去耦合.md",
+    "test/self_notes.md",
+    "coding/os/linux/memory/memory-manage/k_Linux 内存管理窥探：页面回收 (LRU).md",
+    "coding/os/linux/memory/memory-model/k_计算机科学基础知识（一）The Memory Hierarchy.md",
+    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
+    "coding/os/linux/memory/memory-model/i_内存一致性模型.md",
+    "coding/os/linux/memory/memory-model/i_ARMv8之memory model.md",
+    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
     "coding/os/ARM/i_ARMv8-a架构简介.md",
     "coding/os/ARM/i_ARM WFI和WFE指令.md",
     "coding/os/ARM/k_ARM64架构下地址翻译相关的宏定义.md",
@@ -161,30 +184,6 @@
     "coding/os/ARM/init/ARM64的启动过程之（四）：打开MMU.md",
     "coding/os/ARM/init/ARM64的启动过程之（一）：内核第一个脚印.md",
     "coding/os/ARM/init",
-    "coding/os/ARM/i_Arm64 栈回溯.md",
-    "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/memory/memory-performance/zRAM内存压缩技术原理与应用.md",
-    "coding/os/linux/memory/MMU/k_【万字长文】带你搞定MMU&TLB&TWU.md",
-    "0x99-image/Pasted image 20240914200542.png",
-    "0x99-image/Pasted image 20240914200803.png",
-    "0x99-image/Pasted image 20240914200757.png",
-    "0x99-image/Pasted image 20240914200753.png",
-    "0x99-image/Pasted image 20240914200744.png",
-    "0x99-image/Pasted image 20240914200738.png",
-    "0x99-image/Pasted image 20240914200731.png",
-    "0x99-image/Pasted image 20240914200723.png",
-    "0x99-image/Pasted image 20240914200717.png",
-    "0x99-image/Pasted image 20240914200711.png",
-    "coding/os/linux/memory/MMU/p_甄建勇：五分钟搞定MMU.md",
-    "coding/os/linux/memory/MMU/d_MMU内存管理单元.md",
-    "coding/os/linux/memory/MMU/d_Arm MMU深度解读.md",
-    "self-improvement/health/三位患友亲历记：民间中医—最不靠谱的一类中医.md",
-    "self-improvement/伤痛慢慢的好一些，相信一切都会好起来.md",
-    "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
-    "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
-    "test/self_notes.md",
-    "coding/os/linux/memory/userspace/d_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",

@@ -133,8 +133,9 @@ Linux 中实现在 LRU 链表之间移动页面的关键函数如下所示：
 
 LRU 缓存用到了 pagevec 结构，如下所示 :
 
-```
-#define PAGEVEC_SIZE	14struct pagevec {unsigned long nr;unsigned long cold;struct page *pages[PAGEVEC_SIZE];};
+```c
+#define PAGEVEC_SIZE	14
+struct pagevec {unsigned long nr;unsigned long cold;struct page *pages[PAGEVEC_SIZE];};
 ```
 
 pagevec 这个结构就是用来管理 LRU 缓存中的这些页面的。该结构定义了一个数组，这个数组中的项是指向 page 结构的指针。一个 pagevec 结构最多可以存在 14 个这样的项（PAGEVEC_SIZE 的默认值是 14）。当一个 pagevec 的结构满了，那么该 pagevec 中的所有页面会一次性地被移动到相应的 LRU 链表上去。
@@ -142,7 +143,7 @@ pagevec 这个结构就是用来管理 LRU 缓存中的这些页面的。该结�
 用来实现 LRU 缓存的两个关键函数是 lru_cache_add() 和 lru_cache_add_active()。前者用于延迟将页面添加到 inactive 链表上去，后者用于延迟将页面添加到 active 链表上去。这两个函数都会将要移动的页面先放到页向量 pagevec 中，当 pagevec 满了（已经装了 14 个页面的描述符指针），pagevec 结构中的所有页面才会被一次性地移动到相应的链表上去。
 
 下图概括总结了上文介绍的如何在两个链表之间移动页面，以及 LRU 缓存在其中起到的作用：
-
+![[Pasted image 20240915164742.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 5.4 回收过程 LRU 的扫描
