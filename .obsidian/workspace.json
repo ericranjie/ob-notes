@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
+                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
+                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
+                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md"
+                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md"
               }
             }
           }
@@ -148,6 +148,12 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "0x99-image/Pasted image 20240915201541.png",
+    "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
+    "0x99-image/Pasted image 20240915201600.png",
+    "0x99-image/Pasted image 20240915201554.png",
+    "0x99-image/Pasted image 20240915201548.png",
+    "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
     "coding/os/linux/memory/memory-manage/b_linux内存回收(一）---kswapd回收.md",
     "test/next_step.md",
     "0x99-image/Pasted image 20240915164551.png",
@@ -156,10 +162,6 @@
     "0x99-image/Pasted image 20240915195910.png",
     "0x99-image/Pasted image 20240915195905.png",
     "0x99-image/Pasted image 20240915195859.png",
-    "0x99-image/Pasted image 20240915195853.png",
-    "0x99-image/Pasted image 20240915195847.png",
-    "0x99-image/Pasted image 20240915195840.png",
-    "0x99-image/Pasted image 20240915195818.png",
     "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
     "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
     "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
@@ -181,8 +183,6 @@
     "coding/os/ARM/i_ARMv8之Atomicity.md",
     "coding/os/ARM/i_ARMv8之Observability.md",
     "coding/os/ARM/init/ARM64的启动过程之（二）：创建启动阶段的页表.md",
-    "coding/os/ARM/init/ARM64的启动过程之（四）：打开MMU.md",
-    "coding/os/ARM/init/ARM64的启动过程之（一）：内核第一个脚印.md",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
