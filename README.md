@@ -1,6 +1,7 @@
 
 # ob-notes
 
+
 ## Priority
 s_: **super** 等级 极品好文 or **specific** 深度细节好文
 

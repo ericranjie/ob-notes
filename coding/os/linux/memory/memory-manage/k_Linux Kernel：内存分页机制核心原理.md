@@ -143,7 +143,7 @@ typedef struct { pgdval_t pgd; } pgd_t;static inline pgd_t native_make_pgd(pgdva
 
 另外的五个类型转换宏（pte_val，pmd_val， pud_val， pgd_val和pgprot_val）执行相反的转换，即把上面提到的四种特殊的类型转换成一个无符号整数。
 
-```
+```c
 #define pgd_val(x)      native_pgd_val(x)#define __pgd(x)        native_make_pgd(x)#ifndef __PAGETABLE_PUD_FOLDED#define pud_val(x)      native_pud_val(x)#define __pud(x)        native_make_pud(x)#endif#ifndef __PAGETABLE_PMD_FOLDED#define pmd_val(x)      native_pmd_val(x)#define __pmd(x)        native_make_pmd(x)#endif#define pte_val(x)      native_pte_val(x)#define __pte(x)        native_make_pte(x)
 ```
 
@@ -180,8 +180,11 @@ linux中使用下列宏简化了页表处理，对于每一级页表都使用有
 
 定义如下，在`/arch/x86/include/asm/page_types.h`文件中
 
-```
-/* PAGE_SHIFT determines the page size */ #define PAGE_SHIFT      12 #define PAGE_SIZE       (_AC(1,UL) << PAGE_SHIFT) #define PAGE_MASK       (~(PAGE_SIZE-1))
+```c
+/* PAGE_SHIFT determines the page size */ 
+#define PAGE_SHIFT      12 
+#define PAGE_SIZE       (_AC(1,UL) << PAGE_SHIFT) 
+#define PAGE_MASK       (~(PAGE_SIZE-1))
 ```
 
 当用于80x86处理器时，PAGE_SHIFT返回的值为12，由于页内所有地址都必须放在Offset字段， 因此80x86系统的页的大小PAGE_SIZE是`2^12=4096`字节，PAGE_MASK宏产生的值为0xfffff000，用以屏蔽Offset字段的所有位。

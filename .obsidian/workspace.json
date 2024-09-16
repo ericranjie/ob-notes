@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
+                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
+                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
+                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md"
+                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md"
               }
             }
           }
@@ -148,8 +148,14 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
+    "README.md",
+    "coding/os/linux/memory/memory-manage/五万字 深入理解Linux内存管理.md",
+    "coding/os/linux/memory/memory-manage/i_Linux kernel内存管理的基本概念.md",
+    "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
+    "coding/os/linux/memory/memory-manage/i_linux kernel内存回收机制.md",
+    "coding/os/linux/memory/memory-manage/k_Linux Kernel：内存分页机制核心原理.md",
     "0x99-image/Pasted image 20240915201541.png",
-    "coding/os/linux/memory/memory-manage/Linux Kernel：内存分页机制核心原理.md",
     "0x99-image/Pasted image 20240915201600.png",
     "0x99-image/Pasted image 20240915201554.png",
     "0x99-image/Pasted image 20240915201548.png",
@@ -178,11 +184,6 @@
     "coding/os/ARM/k_ARM64架构下地址翻译相关的宏定义.md",
     "coding/os/ARM/i_Atomic operation in aarch64.md",
     "coding/os/ARM/i_ARM概念梳理：Architecture, Core, CPU，SOC.md",
-    "coding/os/ARM/k_系统总结ARM基础.md",
-    "coding/os/ARM/i_Linux kernel中栈的介绍.md",
-    "coding/os/ARM/i_ARMv8之Atomicity.md",
-    "coding/os/ARM/i_ARMv8之Observability.md",
-    "coding/os/ARM/init/ARM64的启动过程之（二）：创建启动阶段的页表.md",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
