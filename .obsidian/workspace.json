@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
+                "file": "coding/os/linux/network/debug/用户态 tcpdump 如何实现抓到内核网络包的?.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
+                "file": "coding/os/linux/network/debug/用户态 tcpdump 如何实现抓到内核网络包的?.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
+                "file": "coding/os/linux/network/debug/用户态 tcpdump 如何实现抓到内核网络包的?.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md"
+                "file": "coding/os/linux/network/debug/用户态 tcpdump 如何实现抓到内核网络包的?.md"
               }
             }
           }
@@ -146,44 +146,45 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
+    "coding/os/linux/network/深入理解 Linux socket.md",
+    "coding/os/linux/network/向左向右 网络IO卸载.md",
+    "coding/os/linux/network/debug/p_Linux内核常见的网络丢包场景分析.md",
+    "coding/os/linux/network/debug/p_Wireshark的抓包和分析，看这篇就够了！.md",
+    "coding/os/linux/network/debug/p_virtio-net 的前后端延迟高分析.md",
+    "coding/os/linux/network/debug/一个 TCP 发送缓冲区问题的解析.md",
+    "coding/os/linux/network/debug/mellanox的网卡故障分析.md",
+    "0x99-image/Pasted image 20240918132659.png",
+    "coding/os/linux/network/debug",
+    "0x99-image/Pasted image 20240918134755.png",
+    "0x99-image/Pasted image 20240918134750.png",
+    "0x99-image/Pasted image 20240918134745.png",
+    "0x99-image/Pasted image 20240918134738.png",
+    "0x99-image/Pasted image 20240918134734.png",
+    "0x99-image/Pasted image 20240918134728.png",
+    "0x99-image/Pasted image 20240918134723.png",
+    "0x99-image/Pasted image 20240918134718.png",
+    "0x99-image/Pasted image 20240918134712.png",
+    "coding/os/linux/network/t_linux loop device 机制介绍.md",
+    "coding/os/linux/network/d_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+    "coding/os/linux/virtual-machine/b_深入理解虚拟化.md",
+    "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
+    "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
+    "coding/os/linux/virtual-machine/p_QEMU虚拟机管理器：一种高效硬件模拟器.md",
+    "coding/os/linux/virtual-machine/d_Linux系统虚拟化模型及障碍.md",
+    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
+    "test/self_notes.md",
     "README.md",
+    "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
+    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
     "coding/os/linux/memory/memory-manage/五万字 深入理解Linux内存管理.md",
     "coding/os/linux/memory/memory-manage/i_Linux kernel内存管理的基本概念.md",
     "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
     "coding/os/linux/memory/memory-manage/i_linux kernel内存回收机制.md",
     "coding/os/linux/memory/memory-manage/k_Linux Kernel：内存分页机制核心原理.md",
-    "0x99-image/Pasted image 20240915201541.png",
-    "0x99-image/Pasted image 20240915201600.png",
-    "0x99-image/Pasted image 20240915201554.png",
-    "0x99-image/Pasted image 20240915201548.png",
     "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
     "coding/os/linux/memory/memory-manage/b_linux内存回收(一）---kswapd回收.md",
-    "test/next_step.md",
-    "0x99-image/Pasted image 20240915164551.png",
-    "0x99-image/Pasted image 20240915195922.png",
-    "0x99-image/Pasted image 20240915195915.png",
-    "0x99-image/Pasted image 20240915195910.png",
-    "0x99-image/Pasted image 20240915195905.png",
-    "0x99-image/Pasted image 20240915195859.png",
-    "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
-    "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
-    "coding/os/linux/memory/memory-manage/i_KSM机制剖析 — Linux 内核中的内存去耦合.md",
-    "test/self_notes.md",
-    "coding/os/linux/memory/memory-manage/k_Linux 内存管理窥探：页面回收 (LRU).md",
-    "coding/os/linux/memory/memory-model/k_计算机科学基础知识（一）The Memory Hierarchy.md",
-    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
-    "coding/os/linux/memory/memory-model/i_内存一致性模型.md",
-    "coding/os/linux/memory/memory-model/i_ARMv8之memory model.md",
-    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
-    "coding/os/ARM/i_ARMv8-a架构简介.md",
-    "coding/os/ARM/i_ARM WFI和WFE指令.md",
-    "coding/os/ARM/k_ARM64架构下地址翻译相关的宏定义.md",
-    "coding/os/ARM/i_Atomic operation in aarch64.md",
-    "coding/os/ARM/i_ARM概念梳理：Architecture, Core, CPU，SOC.md",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
@@ -193,7 +194,6 @@
     "coding/cpp/opensource/qt",
     "coding/cpp/opensource/protobuf",
     "coding/cpp/opensource/memory",
-    "coding/cpp/opensource/boost",
     "Untitled.canvas"
   ]
 }
