@@ -97,12 +97,11 @@ PTO则是在QUIC协议中引入的一个新概念，用于解决在丢包检测�
 
 RTT样本（latest_rtt）是生成的，作为发送最大已确认数据包后所经过的时间：
 
-```
+```c
 latest_rtt = ack_time - send_time_of_largest_acked
 ```
 
   
-
 **3.2 最小RTT**
 
 TCP中没有显式地记录min_rtt，QUIC中显式记录了min_rtt，并在拥塞控制算法中用到了它。
@@ -129,29 +128,29 @@ rttvar（RTT方差）是度量 RTT 总体波动情况的指标，表示往返时
 我们来看nginx中对这平滑RTT和RTT方差是如何计算的。
 
 初始状态计算方式如下：
-
+![[Pasted image 20240918174046.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在nginx中，smoothed_rtt用变量avg_rtt表示。初始值是333ms，最小rtt的初始值是-1，rtt方差（rttvar）是116ms。  
 
 当得到第一个RTT样本后，计算方式如下：
-
+![[Pasted image 20240918174051.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在得到后续RTT样本后，计算方式如下：  
-
+![[Pasted image 20240918174057.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这段代码需要解释一下：ack_delay（确认延迟）在平滑RTT的计算过程中起到了重要作用。如果发现本次采样得到的RTT过大，那么有理由怀疑是ack_delay导致的RTT膨胀，所以此次RTT采样需要将ack_delay减掉。减掉之后的采样RTT用adjusted_rtt来表达。那么如何判断RTT是否过大？
 
-```
-        if (qc->min_rtt + ack_delay < latest_rtt) {
+```c
+        if (qc->min_rtt + ack_delay < latest_rtt) {             adjusted_rtt -= ack_delay;         }
 ```
 
 然后再来计算平滑RTT和方差RTT
 
-```
-qc->avg_rtt += (adjusted_rtt >> 3) - (qc->avg_rtt >> 3);
+```c
+qc->avg_rtt += (adjusted_rtt >> 3) - (qc->avg_rtt >> 3); /* 翻译成数学公式如下： avg_rtt = 7/8 * avg_rtt + 1/8 * adjusted_rtt */ qc->avg_rtt += (adjusted_rtt >> 3) - (qc->avg_rtt >> 3); /* 翻译成数学公式如下： rttvar_sample = abs(avg_rtt - adjusted_rtt) rttvar = 3/4 * rttvar + 1/4 * rttvar_sample */
 ```
 
   
@@ -167,15 +166,15 @@ QUIC的数据发送方使用ACK机制来检测数据包是否丢失。而ACK机�
 - 某个已发送的数据包，在其后发送的两个数据包都已经被ACK了，但仍未收到该数据包的ACK，那么就认为这个数据包丢了。这个叫数据包数量阈值，一般设置为3，代表当前数据包的后面两个数据包被ACK了。这种情况多发生在包乱序的网络中。数据包乱序在QUIC中比在TCP中更为常见。在nginx中宏定义如下：
     
 
-```
-/* RFC 9002, 6.1.1. Packet Threshold: kPacketThreshold */
+```c
+/* RFC 9002, 6.1.1. Packet Threshold: kPacketThreshold */ #define NGX_QUIC_PKT_THR                     3 /* packets */
 ```
 
 - 某个已发送的数据包，超过了一定的时间仍未收到它的ACK，也会被认定为丢包了。这个数据包超时时间阈值不是一个固定值，它是由我们在第3章中提到的平滑RTT 以及 最近一次采样的RTT来决定的。  
     
 
-```
-/* RFC 9002, 6.1.2. Time Threshold: kTimeThreshold, kGranularity */
+```c
+/* RFC 9002, 6.1.2. Time Threshold: kTimeThreshold, kGranularity */ static ngx_inline ngx_msec_t ngx_quic_lost_threshold(ngx_quic_connection_t *qc) {     ngx_msec_t  thr;      thr = ngx_max(qc->latest_rtt, qc->avg_rtt);     thr += thr >> 3;      return ngx_max(thr, NGX_QUIC_TIME_GRANULARITY); }
 ```
 
 这里需要解释一下：上面代码是计算这个阈值的，可以翻译成公式：
@@ -186,8 +185,8 @@ kTimeThreshold被称之为RTT倍率，在nginx当中，被设定为9/8（而在T
 
 丢包检测代码实现如下：
 
-```
-static ngx_int_t
+```c
+static ngx_int_t ngx_quic_detect_lost(ngx_connection_t *c, ngx_quic_ack_stat_t *st) {     ngx_uint_t              i, nlost;     ngx_msec_t              now, wait, thr, oldest, newest;     ngx_queue_t            *q;     ngx_quic_frame_t       *start;     ngx_quic_send_ctx_t    *ctx;     ngx_quic_connection_t  *qc;      qc = ngx_quic_get_connection(c);     now = ngx_current_msec;     thr = ngx_quic_lost_threshold(qc);      /* send time of lost packets across all send contexts */     oldest = NGX_TIMER_INFINITE;     newest = NGX_TIMER_INFINITE;      nlost = 0;      for (i = 0; i < NGX_QUIC_SEND_CTX_LAST; i++) {          ctx = &qc->send_ctx[i];          if (ctx->largest_ack == NGX_QUIC_UNSET_PN) {             continue;         }          while (!ngx_queue_empty(&ctx->sent)) {              q = ngx_queue_head(&ctx->sent);             start = ngx_queue_data(q, ngx_quic_frame_t, queue);              if (start->pnum > ctx->largest_ack) {                 break;             }              wait = start->last + thr - now;              ngx_log_debug4(NGX_LOG_DEBUG_EVENT, c->log, 0,                            "quic detect_lost pnum:%uL thr:%M wait:%i level:%d",                            start->pnum, thr, (ngx_int_t) wait, start->level);              if ((ngx_msec_int_t) wait > 0                 && ctx->largest_ack - start->pnum < NGX_QUIC_PKT_THR)             {                 break;             }              if (start->last > qc->first_rtt) {                  if (oldest == NGX_TIMER_INFINITE || start->last < oldest) {                     oldest = start->last;                 }                  if (newest == NGX_TIMER_INFINITE || start->last > newest) {                     newest = start->last;                 }                  nlost++;             }              ngx_quic_resend_frames(c, ctx);         }     }       /* RFC 9002, 7.6.2.  Establishing Persistent Congestion */      /*      * Once acknowledged, packets are no longer tracked. Thus no send time      * information is available for such packets. This limits persistent      * congestion algorithm to packets mentioned within ACK ranges of the      * latest ACK frame.      */      if (st && nlost >= 2 && (st->newest < oldest || st->oldest > newest)) {          if (newest - oldest > ngx_quic_pcg_duration(c)) {             ngx_quic_persistent_congestion(c);         }     }      ngx_quic_set_lost_timer(c);      return NGX_OK; }
 ```
 
 **4.2 探测包超时（PTO）**  
@@ -196,8 +195,8 @@ static ngx_int_t
 
 **4.2.1 PTO的计算**  
 
-```
-ngx_msec_t
+```c
+ngx_msec_t ngx_quic_pto(ngx_connection_t *c, ngx_quic_send_ctx_t *ctx) {     ngx_msec_t              duration;     ngx_quic_connection_t  *qc;      qc = ngx_quic_get_connection(c);      /* RFC 9002, Appendix A.8.  Setting the Loss Detection Timer */      duration = qc->avg_rtt;     duration += ngx_max(4 * qc->rttvar, NGX_QUIC_TIME_GRANULARITY);      if (ctx->level == ssl_encryption_application && c->ssl->handshaked) {         duration += qc->ctp.max_ack_delay;     }      return duration; }
 ```
 
   
@@ -212,8 +211,8 @@ PTO = 平滑RTT + max(4*rtt方差, 1ms) 
 
 数据发送方在每次发送数据之后，PTO计时器都会被重启。当PTO超时后，那么PTO将会被设置为当前的两倍，这就意味着如果发生连续的PTO超时，那么PTO将会指数增长，但PTO不会无限制的增长，最终会受到空闲超时时间的限制。代码如下：
 
-```
-void
+```c
+void ngx_quic_pto_handler(ngx_event_t *ev) {     ngx_uint_t              i;     ngx_msec_t              now;     ngx_queue_t            *q, *next;     ngx_connection_t       *c;     ngx_quic_frame_t       *f;     ngx_quic_send_ctx_t    *ctx;     ngx_quic_connection_t  *qc;      ngx_log_debug0(NGX_LOG_DEBUG_EVENT, ev->log, 0, "quic pto timer");      c = ev->data;     qc = ngx_quic_get_connection(c);     now = ngx_current_msec;      for (i = 0; i < NGX_QUIC_SEND_CTX_LAST; i++) {          ctx = &qc->send_ctx[i];          if (ngx_queue_empty(&ctx->sent)) {             continue;         }          q = ngx_queue_head(&ctx->sent);         f = ngx_queue_data(q, ngx_quic_frame_t, queue);          if (f->pnum <= ctx->largest_ack             && ctx->largest_ack != NGX_QUIC_UNSET_PN)         {             continue;         }          if ((ngx_msec_int_t) (f->last + (ngx_quic_pto(c, ctx) << qc->pto_count)                               - now) > 0)         {             continue;         }          ngx_log_debug2(NGX_LOG_DEBUG_EVENT, c->log, 0,                        "quic pto %s pto_count:%ui",                        ngx_quic_level_name(ctx->level), qc->pto_count);          for (q = ngx_queue_head(&ctx->frames);              q != ngx_queue_sentinel(&ctx->frames);              /* void */)         {             next = ngx_queue_next(q);             f = ngx_queue_data(q, ngx_quic_frame_t, queue);              if (f->type == NGX_QUIC_FT_PING) {                 ngx_queue_remove(q);                 ngx_quic_free_frame(c, f);             }              q = next;         }          for (q = ngx_queue_head(&ctx->sent);              q != ngx_queue_sentinel(&ctx->sent);              /* void */)         {             next = ngx_queue_next(q);             f = ngx_queue_data(q, ngx_quic_frame_t, queue);              if (f->type == NGX_QUIC_FT_PING) {                 ngx_quic_congestion_lost(c, f);                 ngx_queue_remove(q);                 ngx_quic_free_frame(c, f);             }              q = next;         }          /* enforce 2 udp datagrams */          f = ngx_quic_alloc_frame(c);         if (f == NULL) {             break;         }          f->level = ctx->level;         f->type = NGX_QUIC_FT_PING;         f->flush = 1;          ngx_quic_queue_frame(qc, f);          f = ngx_quic_alloc_frame(c);         if (f == NULL) {             break;         }          f->level = ctx->level;         f->type = NGX_QUIC_FT_PING;          ngx_quic_queue_frame(qc, f);     }      qc->pto_count++;      ngx_quic_connstate_dbg(c); }
 ```
 
   
@@ -222,8 +221,8 @@ void
 
 当PTO超时的时候，数据发送方需要发送探测包，而且一般需要发送两个探测包，所谓探测包，就是需要数据接收方返回ACK的包，在nginx的实现中，这个探测包是使用PING帧实现的。具体代码如下：
 
-```
-        /* enforce 2 udp datagrams */
+```c
+        /* enforce 2 udp datagrams */          f = ngx_quic_alloc_frame(c);         if (f == NULL) {             break;         }          f->level = ctx->level;         f->type = NGX_QUIC_FT_PING;         f->flush = 1;          ngx_quic_queue_frame(qc, f);          f = ngx_quic_alloc_frame(c);         if (f == NULL) {             break;         }          f->level = ctx->level;         f->type = NGX_QUIC_FT_PING;          ngx_quic_queue_frame(qc, f);
 ```
 
   
@@ -235,7 +234,7 @@ void
 QUIC的拥塞控制算法，在QUIC的RFC文档中定义了一种与TCP的NewReno算法类似的一种拥塞控制算法，但原则上我们是可以按照TCP的Reno、Cubic、BBR等拥塞控制算法来实现针对QUIC协议的拥塞控制算法的。
 
 Nginx的官方实现，是根据QUIC的RFC文档中所描述的拥塞控制算法来实现的，本章将介绍这一算法的实现原理。  
-
+![[Pasted image 20240919092659.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图为拥塞控制算法的状态机。  
@@ -253,22 +252,22 @@ Nginx的官方实现，是根据QUIC的RFC文档中所描述的拥塞控制算�
 
 初始状态中，拥塞窗口初始值一般被设置为10（与TCP保持一致），最小拥塞窗口被设置为2；随着数据包的发送，拥塞窗口会呈指数增长，直到出现了丢包，则进入恢复阶段。  
 
-```
-    qc->congestion.window = ngx_min(10 * qc->tp.max_udp_payload_size,
+```c
+    qc->congestion.window = ngx_min(10 * qc->tp.max_udp_payload_size,                                     ngx_max(2 * qc->tp.max_udp_payload_size,                                             14720));
 ```
 
 拥塞窗口有一个阈值，如果慢启动阶段没有出现丢包，但拥塞窗口超过了慢启动阈值，也会进入拥塞恢复阶段。这个阈值的初始值是无穷大的，只有经历过丢包后，这个阈值才会被重新赋值。
 
-```
-    qc->congestion.ssthresh = (size_t) -1;
+```c
+   qc->congestion.ssthresh = (size_t) -1;     qc->congestion.recovery_start = ngx_current_msec;
 ```
 
 **5.2 拥塞恢复**  
 
 当出现丢包时，进入恢复阶段，发送方将慢启动阈值设置为当前拥塞窗口的1/2.一旦在恢复期中发送的数据包有得到ACK，那么恢复期会立即进入拥塞避免阶段，这与TCP是有些不同的，TCP是只有当引发恢复期的那个丢了的包得到了ACK，才会进入拥塞避免阶段。如何检测丢包了？见第4章。  
 
-```
-static void
+```c
+static void ngx_quic_congestion_lost(ngx_connection_t *c, ngx_quic_frame_t *f) {     ngx_uint_t              blocked;     ngx_msec_t              timer;     ngx_quic_congestion_t  *cg;     ngx_quic_connection_t  *qc;      if (f->plen == 0) {         return;     }      qc = ngx_quic_get_connection(c);     cg = &qc->congestion;      blocked = (cg->in_flight >= cg->window) ? 1 : 0;      cg->in_flight -= f->plen;     f->plen = 0;      timer = f->last - cg->recovery_start;      if ((ngx_msec_int_t) timer <= 0) {         ngx_log_debug3(NGX_LOG_DEBUG_EVENT, c->log, 0,                        "quic congestion lost recovery win:%uz ss:%z if:%uz",                        cg->window, cg->ssthresh, cg->in_flight);          goto done;     }      cg->recovery_start = ngx_current_msec;     cg->window /= 2;      if (cg->window < qc->tp.max_udp_payload_size * 2) {         cg->window = qc->tp.max_udp_payload_size * 2;     }      cg->ssthresh = cg->window;      ngx_log_debug3(NGX_LOG_DEBUG_EVENT, c->log, 0,                    "quic congestion lost win:%uz ss:%z if:%uz",                    cg->window, cg->ssthresh, cg->in_flight);  done:      if (blocked && cg->in_flight < cg->window) {         ngx_post_event(&qc->push, &ngx_posted_events);     } }
 ```
 
   
@@ -279,8 +278,8 @@ static void
 
 也即是说，如果是发生过丢包，后来进入了拥塞避免阶段，则拥塞窗口的递增是加法的，不再是指数增长了。但是一旦再次发生丢包，则会进入拥塞恢复阶段，那就是拥塞窗口被减一半，即是乘法递减。
 
-```
-    if (cg->window < cg->ssthresh) {
+```c
+   if (cg->window < cg->ssthresh) {         cg->window += f->plen;          ngx_log_debug3(NGX_LOG_DEBUG_EVENT, c->log, 0,                        "quic congestion slow start win:%uz ss:%z if:%uz",                        cg->window, cg->ssthresh, cg->in_flight);      } else {         cg->window += qc->tp.max_udp_payload_size * f->plen / cg->window;          ngx_log_debug3(NGX_LOG_DEBUG_EVENT, c->log, 0,                        "quic congestion avoidance win:%uz ss:%z if:%uz",                        cg->window, cg->ssthresh, cg->in_flight);     }
 ```
 
   
@@ -289,7 +288,7 @@ static void
 
 当在一段足够长的时间内的所有数据包都被发送方认定为丢包时，就可以认为网络正在经历持续拥塞。判定是否是持续拥塞的时长公式如下：
 
-```
+```c
 (smoothed_rtt + max(4*rttvar, kGranularity) + max_ack_delay) * kPersistentCongestionThreshold
 ```
 
@@ -321,8 +320,8 @@ smoothed_rtt是平滑rtt，max_ack_delay是最大确认延迟（在传输参数�
 
 Nginx中实现代码如下：  
 
-```
-static ngx_msec_t
+```c
+static ngx_msec_t ngx_quic_pcg_duration(ngx_connection_t *c) {     ngx_msec_t              duration;     ngx_quic_connection_t  *qc;      qc = ngx_quic_get_connection(c);      duration = qc->avg_rtt;     duration += ngx_max(4 * qc->rttvar, NGX_QUIC_TIME_GRANULARITY);     duration += qc->ctp.max_ack_delay;     duration *= NGX_QUIC_PERSISTENT_CONGESTION_THR;      return duration; }
 ```
 
   
