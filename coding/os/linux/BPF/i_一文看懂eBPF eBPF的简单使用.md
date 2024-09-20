@@ -135,7 +135,7 @@ BCC 工具可以让你使用 Python 和 C 语言组合来编写 eBPF 程序。
 
 新建一个 hello.c 文件，并输入下面的内容：
 
-```
+```c
 int hello_world(void *ctx){    bpf_trace_printk("Hello, World!");    return 0;}
 ```
 
@@ -143,8 +143,10 @@ int hello_world(void *ctx){    bpf_trace_printk("Hello, World!");    
 
 新建一个 hello.py 文件，并输入下面的内容：
 
-```
-#!/usr/bin/env python3# 1) 加载 BCC 库from bcc import BPF# 2) 加载 eBPF 内核态程序b = BPF(src_file="hello.c")# 3) 将 eBPF 程序挂载到 kprobeb.attach_kprobe(event="do_sys_openat2", fn_name="hello_world")# 4) 读取并且打印 eBPF 内核态程序输出的数据b.trace_print()
+```c
+#!/usr/bin/env python3
+# 1) 加载 BCC 库
+from bcc import BPF# 2) 加载 eBPF 内核态程序b = BPF(src_file="hello.c")# 3) 将 eBPF 程序挂载到 kprobeb.attach_kprobe(event="do_sys_openat2", fn_name="hello_world")# 4) 读取并且打印 eBPF 内核态程序输出的数据b.trace_print()
 ```
 
 下面我们来看看每一行代码的具体含义：
@@ -162,13 +164,13 @@ int hello_world(void *ctx){    bpf_trace_printk("Hello, World!");    
 
 用户态程序开发完成之后，最后一步就是执行它了。需要注意的是，eBPF 程序需要以 `root` 用户来运行：
 
-```
+```c
 $ sudo python3 hello.py
 ```
 
 运行后，可以看到如下输出：
 
-```
+```c
 $ sudo python3 hello.pyb'         python3-31683   [001] .... 614653.225903: 0: Hello, World!'b'         python3-31683   [001] .... 614653.226093: 0: Hello, World!'b'         python3-31683   [001] .... 614653.226606: 0: Hello, World!'b'           <...>-31684   [000] .... 614654.387288: 0: Hello, World!'b'      irqbalance-669     [000] .... 614658.232433: 0: Hello, World!'...
 ```
 

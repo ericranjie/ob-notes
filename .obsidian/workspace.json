@@ -11,11 +11,9 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
-                "mode": "source",
-                "source": false
+                "file": "0x99-image/Pasted image 20240920195200.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
+                "file": "0x99-image/Pasted image 20240920195200.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
+                "file": "0x99-image/Pasted image 20240920195200.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md"
+                "file": "0x99-image/Pasted image 20240920195200.png"
               }
             }
           }
@@ -146,21 +144,27 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
+    "0x99-image/Pasted image 20240920195221.png",
+    "0x99-image/Pasted image 20240920195216.png",
+    "0x99-image/Pasted image 20240920195212.png",
+    "0x99-image/Pasted image 20240920195205.png",
+    "0x99-image/Pasted image 20240920195200.png",
+    "coding/os/linux/BPF/i_深入理解DPDK架构 经典PDF分享.md",
+    "coding/os/linux/BPF/i_抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
+    "coding/os/linux/BPF/c_Linux eBPF学习路径.md",
+    "coding/os/linux/BPF/i_揭秘 vmlinux.h 对eBPF 程序的重要意义.md",
+    "0x99-image/Pasted image 20240920190924.png",
+    "coding/os/linux/BPF/a_浅谈一下，Linux中基于eBPF的恶意利用与检测机制.md",
+    "0x99-image/Pasted image 20240920192158.png",
+    "0x99-image/Pasted image 20240920192144.png",
+    "0x99-image/Pasted image 20240920192139.png",
+    "0x99-image/Pasted image 20240920192121.png",
+    "coding/os/linux/BPF/i_一文看懂eBPF eBPF的简单使用.md",
     "coding/os/linux/BPF/Tetragon进程阻断原理.md",
-    "0x99-image/Pasted image 20240920144340.png",
-    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
     "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
-    "0x99-image/Pasted image 20240920141231.png",
-    "0x99-image/Pasted image 20240920141349.png",
-    "0x99-image/Pasted image 20240920141342.png",
-    "0x99-image/Pasted image 20240920141336.png",
-    "0x99-image/Pasted image 20240920141329.png",
-    "0x99-image/Pasted image 20240920141317.png",
-    "0x99-image/Pasted image 20240920141310.png",
-    "0x99-image/Pasted image 20240920141303.png",
-    "0x99-image/Pasted image 20240920141250.png",
     "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
     "coding/os/linux/BPF/i_bpf在android逆向中的辅助效果.md",
     "coding/os/linux/BPF/a_BPF内核实现详解.md",
@@ -178,11 +182,6 @@
     "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
     "coding/os/linux/network/多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
-    "coding/os/linux/network/b_性能神器的碰撞：io_uring与高性能网络IO框架Netpoll的邂逅.md",
-    "coding/os/linux/network/i_比 netstat 好用？Linux 网络状态工具 ss 详解.md",
-    "coding/os/linux/network/d_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
-    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
-    "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
     "coding/os/linux/network/debug",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
