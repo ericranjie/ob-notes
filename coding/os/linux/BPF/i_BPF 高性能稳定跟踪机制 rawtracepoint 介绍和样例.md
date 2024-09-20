@@ -70,7 +70,7 @@ eBPF 的作者 Alexei Starovoitov 在 Linux 内核 4.17 版本中添加了一个
 `tracepoint    base  kprobe+bpf tracepoint+bpf raw_tracepoint+bpf   task_rename   1.1M   769K        947K            1.0M   urandom_read  789K   697K        750K            755K   `
 
 下图的数据是我基于内核代码中官方提供的 bench 工具运行并绘制的（运行需要提前编译内核代码），纵坐标是每秒运行的指令数：
-
+![[Pasted image 20240920131424.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 perf comparision of linux trace

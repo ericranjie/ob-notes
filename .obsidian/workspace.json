@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+                "file": "coding/os/linux/BPF/a_BPF内核实现详解.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+                "file": "coding/os/linux/BPF/a_BPF内核实现详解.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+                "file": "coding/os/linux/BPF/a_BPF内核实现详解.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md"
+                "file": "coding/os/linux/BPF/a_BPF内核实现详解.md"
               }
             }
           }
@@ -148,6 +148,12 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "Pasted image 20240920132031.png",
+    "Pasted image 20240920131635.png",
+    "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
+    "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+    "Pasted image 20240920131424.png",
+    "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "coding/os/linux/performance/一文说清linux system load.md",
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
     "Pasted image 20240920125058.png",
@@ -163,8 +169,6 @@
     "0x99-image/Pasted image 20240920123404.png",
     "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
     "0x99-image/Pasted image 20240920123546.png",
-    "0x99-image/Pasted image 20240920123535.png",
-    "0x99-image/Pasted image 20240920123523.png",
     "coding/os/linux/network/Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
@@ -180,10 +184,6 @@
     "coding/os/linux/network/最后一天，继续卷！.md",
     "coding/os/linux/network/QUIC/b_跟我一起学QUIC（十五）：QUIC的传输机制详解.md",
     "coding/os/linux/network/debug/用户态 tcpdump 如何实现抓到内核网络包的?.md",
-    "coding/os/linux/network/深入理解 Linux socket.md",
-    "coding/os/linux/network/debug/p_Linux内核常见的网络丢包场景分析.md",
-    "coding/os/linux/network/debug/p_Wireshark的抓包和分析，看这篇就够了！.md",
-    "coding/os/linux/network/debug/p_virtio-net 的前后端延迟高分析.md",
     "coding/os/linux/network/debug",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
