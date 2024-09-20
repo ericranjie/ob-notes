@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
+                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
+                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
+                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md"
+                "file": "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md"
               }
             }
           }
@@ -148,43 +148,43 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/performance/一文说清linux system load.md",
+    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
+    "Pasted image 20240920125058.png",
+    "Pasted image 20240920124951.png",
+    "Pasted image 20240920124937.png",
+    "Pasted image 20240920124925.png",
+    "coding/os/linux/performance/i_性能提升 8450%，Linux 内核函数获大幅改进.md",
+    "Pasted image 20240920124507.png",
+    "Pasted image 20240920124501.png",
+    "coding/os/linux/performance/t_性能优化的路有多远？.md",
+    "coding/os/linux/network/服务器性能优化之网络性能优化.md",
+    "coding/os/linux/network/k_如果让你来设计网络，你会把它弄成啥样？.md",
+    "0x99-image/Pasted image 20240920123404.png",
+    "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
+    "0x99-image/Pasted image 20240920123546.png",
+    "0x99-image/Pasted image 20240920123535.png",
+    "0x99-image/Pasted image 20240920123523.png",
+    "coding/os/linux/network/Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
+    "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
+    "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
+    "coding/os/linux/network/多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
+    "coding/os/linux/network/b_性能神器的碰撞：io_uring与高性能网络IO框架Netpoll的邂逅.md",
+    "coding/os/linux/network/i_比 netstat 好用？Linux 网络状态工具 ss 详解.md",
+    "coding/os/linux/network/d_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
+    "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
+    "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
     "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
     "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
     "coding/os/linux/network/最后一天，继续卷！.md",
-    "Pasted image 20240919095434.png",
-    "Pasted image 20240919095426.png",
     "coding/os/linux/network/QUIC/b_跟我一起学QUIC（十五）：QUIC的传输机制详解.md",
-    "Pasted image 20240919092659.png",
-    "Pasted image 20240918174057.png",
-    "Pasted image 20240918174051.png",
-    "Pasted image 20240918174046.png",
-    "coding/os/linux/network/Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "coding/os/linux/network/debug/用户态 tcpdump 如何实现抓到内核网络包的?.md",
     "coding/os/linux/network/深入理解 Linux socket.md",
-    "coding/os/linux/network/向左向右 网络IO卸载.md",
     "coding/os/linux/network/debug/p_Linux内核常见的网络丢包场景分析.md",
     "coding/os/linux/network/debug/p_Wireshark的抓包和分析，看这篇就够了！.md",
     "coding/os/linux/network/debug/p_virtio-net 的前后端延迟高分析.md",
-    "coding/os/linux/network/debug/一个 TCP 发送缓冲区问题的解析.md",
-    "coding/os/linux/network/debug/mellanox的网卡故障分析.md",
-    "0x99-image/Pasted image 20240918132659.png",
     "coding/os/linux/network/debug",
-    "0x99-image/Pasted image 20240918134755.png",
-    "0x99-image/Pasted image 20240918134750.png",
-    "0x99-image/Pasted image 20240918134745.png",
-    "coding/os/linux/network/t_linux loop device 机制介绍.md",
-    "coding/os/linux/network/d_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
-    "coding/os/linux/virtual-machine/b_深入理解虚拟化.md",
-    "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
-    "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
-    "coding/os/linux/virtual-machine/p_QEMU虚拟机管理器：一种高效硬件模拟器.md",
-    "coding/os/linux/virtual-machine/d_Linux系统虚拟化模型及障碍.md",
-    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
-    "test/self_notes.md",
-    "README.md",
-    "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
-    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
-    "coding/os/linux/memory/memory-manage/五万字 深入理解Linux内存管理.md",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",

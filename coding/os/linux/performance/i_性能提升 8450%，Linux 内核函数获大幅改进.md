@@ -46,7 +46,7 @@ Ts'o认为今后这里肯定会有问题，必须得找个方法，要么能让u
 虽然在 Linux 5.17 中有了速度上的大幅提升，但 Jason Donenfeld 对此并没满足。因此在 Linux 5.18 中他对随机代码作出了更多的改进。
 
   
-
+![[Pasted image 20240920124501.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -54,7 +54,7 @@ Ts'o认为今后这里肯定会有问题，必须得找个方法，要么能让u
 通过查看 Linux 的 random.git 仓库的日志能够看出（上图），开发者 Jason Donenfeld 在最近两天时间里进行了大量的代码提交。这些提交内容都将在 3 月下旬 Linux 5.18 的合并窗口启动时引入内核。
 
   
-
+![[Pasted image 20240920124507.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   

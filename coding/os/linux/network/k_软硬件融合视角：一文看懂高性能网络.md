@@ -47,7 +47,7 @@
 高性能网络，就是要在低延迟（越低越好）、低抖动的情况下，（不管大包小包，任意网络节点，都要）实现最高的吞吐量（无限接近于网络带宽）。当然了，这些参数是相互影响的，实际的系统是在这些参数之间取得的平衡。   
 
 ## **1.2 复杂的网络分层**
-
+![[Pasted image 20240920122820.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 OSI定义了七层网络协议，实际工程应用的TCP/IP网络协议一般为五层：
@@ -60,7 +60,7 @@ OSI定义了七层网络协议，实际工程应用的TCP/IP网络协议一般�
     
 - 以太网（Ethernet）是为了实现局域网通信而设计的一种技术，它规定了包括物理层的连线、电子信号和介质访问层协议的内容。以太网是目前应用最普遍的网络技术。
     
-
+![[Pasted image 20240920122826.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 数据中心网络要更加复杂，会分为Overlay网络和Underlay网络。如果按照功能逻辑把网络分层，云计算数据中心网络可以分成三层：   
@@ -73,7 +73,7 @@ OSI定义了七层网络协议，实际工程应用的TCP/IP网络协议一般�
     
 
 物理的数据中心是一个局域网，通过Overlay网络分割成数以万计的虚拟私有网；域间隔离后，再需要一定的网络安全机制实现高性能的跨域访问。
-
+![[Pasted image 20240920122837.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 依据网络处理逻辑，网络可以分为三部分：
@@ -109,7 +109,7 @@ OSI定义了七层网络协议，实际工程应用的TCP/IP网络协议一般�
     
 
 ## **1.4 网络拥塞控制**
-
+![[Pasted image 20240920122844.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 网络中如果存在太多的数据包，会导致包延迟，并且会因为超时而丢弃，从而降低传输性能，这称为拥塞。高性能网络，就是要充分利用网络容量，提供低延迟网络传输的同时，尽可能的避免网络拥塞。
@@ -179,7 +179,7 @@ TCP/IP协议栈主要指Ethernet+TCP/IP+Socket的整个系统栈。
     
 
 **第二类，TCP/IP协议栈卸载（TCP/IP Offload Engine，TOE）**
-
+![[Pasted image 20240920122854.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)    
 
 传统软件网络栈的处理开销很大，把整个TCP/IP协议栈卸载到硬件，可以提升网络处理的性能，显著降低CPU代价。
@@ -200,7 +200,7 @@ Linux 标准内核不支持 TOE网卡，原因主要是：
 因此，受上述原因影响，TOE并没有大规模使用起来。   
 
 ## **2.2 应用层TCP/IP协议栈Onload**
-
+![[Pasted image 20240920122901.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Onload是Solarflare（Solarflare已被Xilinx收购，Xilinx又被AMD收购）加速网络中间件。主要特征包括：
@@ -217,7 +217,7 @@ Onload是Solarflare（Solarflare已被Xilinx收购，Xilinx又被AMD收购）加
 Onload核心技术可以总结为：硬件虚拟化SR-IOV，内核bypass，以及应用SocketAPI。   
 
 ## **2.3 传输协议优化：从TCP到QUIC**
-
+![[Pasted image 20240920122907.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 QUIC（Quick UDP Internet Connections，快速UDP互联网连接）是一种新的互联网传输协议，对L4、L5（安全）、L7进行部分或全部的优化和替代。
@@ -240,7 +240,7 @@ QUIC是一个应用自包含的协议，允许创新。这在现有协议中不�
 # **3 高性能网络协议栈综述，以IB为例**
 
 ## **3.1 IB网络协议简介**
-
+![[Pasted image 20240920122913.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 InfiniBand (IB)是一种用于高性能计算的网络通信标准，具有极高的吞吐量和极低的延迟。
@@ -257,15 +257,15 @@ IB的主要优点：
     
 - 高效率，IB原生支持RDMA等协议，帮助客户提高工作负载处理效率。
     
-
+![[Pasted image 20240920122920.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 IB也是五层网络分层：物理层、链路层、网络层、传输层和应用层。传统网络的L1&L2硬件实现，而L3/L4软件实现；而IB则是L1-L4均在硬件实现。IB传输层API即HCA网卡和CPU之间的软硬件接口。Socket API是传统TCP/IP网络的应用网络接口，而Verbs API是IB的应用网络接口。MPI是一种通过提供并行库来实现并行化的方法库，MPI可以基于OFA Verbs API，也可以基于TCP/IP Socket。
 
 ## **3.2 IB为什么能够高性能？**
-
+![[Pasted image 20240920122927.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)    
-
+![[Pasted image 20240920123030.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 传统网络协议栈的问题：  
@@ -289,7 +289,7 @@ IB也是五层网络分层：物理层、链路层、网络层、传输层和应
     
 
 ## **3.3 InfiniBand vs Ethernet** 
-
+![[Pasted image 20240920123036.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Infiniband和Ethernet从多种方面的比较：
@@ -308,7 +308,7 @@ Infiniband和Ethernet从多种方面的比较：
 # **4 RDMA高性能网络**
 
 ## **4.1 RDMA综述**
-
+![[Pasted image 20240920123044.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 RDMA，是一种高带宽、低延迟、低CPU消耗的网络互联技术，克服了传统TCP/IP网络的许多问题。RDMA技术特点：
@@ -332,7 +332,7 @@ RDMA的其他一些特征：
     
 
 ## 4.2 RDMA/RoCEv2系统栈分层  
-
+![[Pasted image 20240920123049.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 RoCEv2是当前数据中心比较流行的RDMA技术，我们以RoCEv2为例，介绍RoCE的系统分层：
@@ -357,7 +357,7 @@ RoCEv2是当前数据中心比较流行的RDMA技术，我们以RoCEv2为例，�
     
 
 ## **4.3 RDMA工作队列**
-
+![[Pasted image 20240920123054.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 RDMA并没有约束严格的软硬件接口，各家的实现可以有所不同，只需要支持RDMA的队列机制即可。
@@ -371,7 +371,7 @@ RDMA并没有约束严格的软硬件接口，各家的实现可以有所不同�
 RDMA Queue类型有：发送队列、接收队列、完成队列以及队列对。发送队列和接收队列组成一组队列对。SRQ，共享接收队列。把一个RQ共享给所有关联的QP使用，这个公用的RQ就称为SRQ。
 
 ## **4.4 RDMA Verbs API**
-
+![[Pasted image 20240920123100.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 RDMA Verbs是提供给应用使用的RDMA功能和动作抽象。Verbs API则是Verbs具体实现，提供标准接口供应用调用。
@@ -386,7 +386,7 @@ RoCEv2中的Verbs操作主要有两类：
 # **5 AWS SRD高性能网络**
 
 ## **5.1 AWS SRD和EFA综述**
-
+![[Pasted image 20240920123105.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 SRD（Scalable Reliable Datagram，可扩展可靠数据报），是AWS设计的可靠的、高性能的、低延迟的网络传输协议；EFA（Elastic Fabric Adapter，弹性互联适配器），是AWS EC2实例提供的一种高性能网络接口。
@@ -420,7 +420,7 @@ AWS认为：
     
 
 ## **5.3 SRD特征之一：多路负载均衡**
-
+![[Pasted image 20240920123111.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 为了更好的多路负载均衡，AWS的SRD遵循如下原则：
@@ -447,7 +447,7 @@ SRD设计为：将可能乱序的数据包，不做处理，直接传送到主�
 应用程序处理乱序数据包，在字节流协议，如TCP，是不可行的，但在基于消息的语义时很容易。每个流的排序或其他类型的依赖追踪由SRD之上的消息传递层完成；消息层排序信息与数据包一起传输到另一端，SRD是不可见的。
 
 ## **5.5 SRD特征之三：拥塞控制**
-
+![[Pasted image 20240920123130.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Incast，是一种流量模式，许多流量汇聚到交换机的同一接口，耗尽该接口的缓冲空间，导致数据包丢失。
@@ -459,7 +459,7 @@ Incast，是一种流量模式，许多流量汇聚到交换机的同一接口�
 # **6 其他高性能网络技术**
 
 ## **6.1 微软Fungible的Truefabric**
-
+![[Pasted image 20240920123136.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 TrueFabric是开放标准的网络技术，提高数据中心的性能、经济性、可靠性和安全性，单集群规模从几个到数千机架。
@@ -495,13 +495,13 @@ TrueFabric/FCP的特性
     
 - 开放标准：FCP建立在基于以太网的标准IP之上，可以与以太网上的标准TCP/IP完全互操作。   
     
-
+![[Pasted image 20240920123143.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图是TrueFabric和RoCEv2在10:1 Incast下的性能比较。右上图可以看到，Truefabric在P99长尾延迟方面，相比ROCEv2有非常显著的提升。从下面两张图的RoCEv2和Truefabric性能抖动对比来看，Truefabric的性能稳定性要显著优于RoCEv2。
 
 ## **6.2 阿里云HPCC和eRDMA**
-
+![[Pasted image 20240920123149.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阿里云的HPCC（High Precision Congestion Control，高精度拥塞控制），其关键方法是利用INT（In-Network Telemetry，网络内遥测）提供的精确的链路负载信息来计算准确的流量更新。
@@ -565,7 +565,7 @@ UEC传输协议:
     
 
 # **7 全球互联网络的高性能**
-
+![[Pasted image 20240920123157.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 随着5G通信基础设施的大规模覆盖，短视频、视频会议等多媒体应用的大量使用，自动驾驶和智能网联汽车的广泛落地，以及VR/AR元宇宙的快速发展，对整个全球互联网络的吞吐量、实时性、稳定性等各个方面提出了更高的要求。

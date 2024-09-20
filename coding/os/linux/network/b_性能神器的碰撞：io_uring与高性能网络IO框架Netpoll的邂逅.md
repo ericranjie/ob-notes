@@ -35,7 +35,7 @@ Netpoll 目前的架构设计如下。
 **Poller contexts**
 
 在初始化阶段，Netpoll 会创建一个主服务器 poller 上下文和一组其余的 poller 上下文，它们都是基于 goroutines 来实现事件处理循环。
-
+![[Pasted image 20240920121642.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 main server poller 监听 server fd 用于接受新的连接。main server poller 事件循环将新连接的 fd 以负载均衡的方式分配到其他 poller。Netpoll的默认设置是为每 20 个 cpu 创建一个 poller。在满负载的服务器中，所有连接都均衡地分布到这些poller中，每个 poller 负责处理连接上的各种事件。
@@ -45,7 +45,7 @@ main server poller 监听 server fd 用于接受新的连接。main server polle
 **收方向**
 
 正如上文解释的，每个连接都被分配到其中一个 poller 中，Kernel 通过触发 EPOLLIN 事件的方式通知 poller 连接有数据可被读取。
-
+![[Pasted image 20240920121648.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 事件循环分配好输入缓冲区，执行recv系统调用，然后从池中分配一个 goroutine 来执行用户注册的 task handler 程序（应用程序逻辑）。从这里开始，task 上下文与 poller 上下文并行执行。用户处理程序负责释放输入缓冲区。poller在处理完所有事件后进入事件等待状态。
@@ -55,7 +55,7 @@ main server poller 监听 server fd 用于接受新的连接。main server polle
 **发方向**
 
 Netpoll 的 connection 类为用户提供了接口，用来分配 output buffer，并通过网络发送数据。应用通过调用 connection.Flush API  来发起网络传输。
-
+![[Pasted image 20240920121654.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 sendmsg 系统调用在用户 task 上下文中被执行。如果内核目前无法完成数据传输，poller 配置会从 read 模式变为 read-write 模式，这意味着 poller 同时开始监听 EPOLLIN 和 EPOLLOUT事件。当 socket 准备好发送更多数据时，将触发 EPOLLOUT 事件，并从轮询器上下文触发进一步的 sendmsg 系统调用。
@@ -65,7 +65,7 @@ sendmsg 系统调用在用户 task 上下文中被执行。如果内核目前无
 **io_uring 模型**
 
 本章节总结了 io_uring 接口的 IO 模型，本文只关注网络 IO 所需的特性。单个io_uring由提交队列（SQ）、完成队列（CQ）和缓冲区队列（PBQ）组成。
-
+![[Pasted image 20240920121707.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 io_uring 提供了一种对文件描述符执行异步 IO 操作的方法：https://github.com/axboe/liburing/blob/master/src/include/liburing/io_uring.h#L188。
@@ -79,7 +79,7 @@ io_uring 提供了一种对文件描述符执行异步 IO 操作的方法：http
   
 
 数据从用户空间流入（recv）和流出（send）有两种方法。第一种方法是，用户显式地陷入内核态来消费 SQ entry 或生成 CQ entry。另一种是通过将 io_uring 设置IORING_SETUP_SQPOLL标志的方式，这个标志设置后，会在内核中创建一个 SQ 轮询线程，该线程消费 SQ entry 并为 recv 生成 CQ entry。两种方法之间的基本区别在于：一种是对 SQ 和 CQ 的操作发生在用户程序上下文中，另一种是发生在单独的内核线程中。SQ 轮询线程有一个空闲时间段，在空闲时间超过设置的值后，它通过设置一个位来通知用户自己将进入睡眠状态。一旦线程进入睡眠状态，用户需要负责在合适的时间唤醒线程。
-
+![[Pasted image 20240920121716.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 让我们绘制一个IORING_OP_SEND和IORING_OP_RECV的端到端工作流程，以进一步增强我们对 io_uring 的理解。
@@ -87,7 +87,7 @@ io_uring 提供了一种对文件描述符执行异步 IO 操作的方法：http
   
 
 **IORING_OP_SEND**
-
+![[Pasted image 20240920121725.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发送工作流程很简单，但 io_uring 的两种不同配置模式之间存在一些差异。在左边，用户向 SQ 中插入多个 entry，并决定何时准备好进入内核处理请求。对于批处理的责任在于用户，能减少多少系统调用的程度取决于批处理的数量。将数据从用户空间复制到内核的sock_send_msg在用户空间线程上下文中调用，CQ entry 在返回用户空间之前生成。在右边，内核线程负责执行sock_send_msg，用户不需要进入内核。用户可以在这段时间做一些其他工作，例如处理 CQ entry 或进入内核等待 操作完成。如果用户可以在内核处理操作和生成 CQ entry 时执行其他活动，可以实现零系统调用。
@@ -97,11 +97,11 @@ io_uring 提供了一种对文件描述符执行异步 IO 操作的方法：http
 **IORING_OP_RECV**
 
 接收过程比较复杂，因为它依赖于外部读取的触发。用户在提交一个 multishot entry 后，内核通过 VFS 层在 fd 上创建一个轮询事件。这个过程只需要发生一次，这就是 multishot 的意思。
-
+![[Pasted image 20240920121732.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 io_uring 设计利用 Linux 中的task_work机制将数据读取到用户空间缓冲区。顾名思义，task_work代表每个任务（线程）并以链表形式组织，在每次上下文返回用户空间时，例如，在系统调用结束返回用户空间之前，内核都会遍历该链表。因此，当数据到达轮询 fd 时，会为处理 multishot 的 SQ 条目的线程创建一个 task_work 条目。每当用户进行系统调用或有意进入内核等待完成时，任务就会被执行，或者在 SQ_POLL线程的情况下，它会在列表上循环以执行 task_work。
-
+![[Pasted image 20240920121737.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -109,13 +109,13 @@ io_uring 设计利用 Linux 中的task_work机制将数据读取到用户空间�
 **Batching in io_uring**
 
 从理论上讲，epoll和io_uring都依赖于 Linux 的vfs_poll 系统调用，但是将数据流式传输给用户态的方式有本质的不同。io_uring 在内核内部以task_work链表的形式进行批量处理。为了理解区别，让我们以单线程echo服务器为例，基于epoll的单线程 echo 服务器将等待内核中的事件，然后通过recv和 send系统调用来处理请求。而如果使用 io_uring，read 操作则会由内核执行。
-
+![[Pasted image 20240920121742.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 batching 操作可以显著提高吞吐，但如果处理不当，会导致更多的时延，在 echo ping pong 测试中，下面的数据可以证明。
-
+![[Pasted image 20240920121751.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920121755.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在 1KB 的 echo server 基准测试中，io_uring 提供了一致的良好吞吐量，但延迟也增加了 10% 以上。
@@ -131,7 +131,7 @@ batching 操作可以显著提高吞吐，但如果处理不当，会导致更�
 Netpoll 的主要设计特征是有固定数量的 goroutine 运行事件处理循环并映射到它们负责的连接。用户处理程序则从池中选择 goroutin 进行执行，执行结束后，goroutin 会放回池中等待下次冲用。这使得 go 运行时更加轻量级，并为 IO 操作提供良好的尾部延迟。我认为这是 Netpoll 设计的关键原则，基于 io_uring 的方案也应该遵循这一原则。
 
   
-
+![[Pasted image 20240920121805.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **方案架构**
@@ -221,11 +221,11 @@ Netpoll 的主要设计特征是有固定数量的 goroutine 运行事件处理�
   
 
 **（1）吞吐量**
-
+![[Pasted image 20240920121925.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920121930.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920121935.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最后的图表显示了使用 1% 的 CPU 利用率可以实现的吞吐量。对于连接数较低的场景（100），系统没有满载运行，并且由于其轮询模式导致较高的 CPU 利用率，使得每 1% 的 CPU 利用率的吞吐量低于 epoll。在 RPC 模式下，较高的连接意味着会有更多的网络数据进入网络协议栈导致整个系统更加强繁忙，从而有效地利用了轮询模式。**对于 200 以上的连接，uring-2 配置的吞吐量增加了 10% ~ 15%，uring-4 与 epoll 的吞吐量差距不大**。
@@ -233,9 +233,9 @@ Netpoll 的主要设计特征是有固定数量的 goroutine 运行事件处理�
   
 
 **（2）时延**
-
+![[Pasted image 20240920121941.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920121946.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 用户空间和内核中的轮询模式有两个主要优点。首先，它解决了内核内部读取的 io_uring 批处理问题，因为读取的数据对用户空间可见的速度要快得多，从而优化了延迟增加的问题。其次，系统调用的计数变为零。这两个因素都有助于在两种 uring 配置中降低延迟。表中的负数表示相比于 epoll 延迟百分比的减少。**uring-2 配置显示 10% ~ 20%，uring-4 显示 30% ~ 40% 的延迟减少。uring-4 对于延迟的优化更加明显是由于执行发送的并行线程更多。**
@@ -271,7 +271,7 @@ Netpoll 的主要设计特征是有固定数量的 goroutine 运行事件处理�
   
 
 运行如下图所示：
-
+![[Pasted image 20240920121959.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于基于 io_uring 的 server app，需要保留额外的 CPU 用于 sqpoll 线程。例如，如果配置 server app 使用 3 个 sqpoll 线程，19 个用于 server app 的CPU 将会预留 3 个 CPU 用于 sqpoll。在这个 case 中，server app 会用"numactl -C 14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29 -m 0"命令启动，CPU 11,12,13 被 pin 住用于 sqpoll。
@@ -307,11 +307,11 @@ io_uring 配置：
   
 
 **（1）吞吐量**
-
+![[Pasted image 20240920122006.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920122010.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920122015.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 基于 io_uring 的 Netpoll server，在相同 CPU资源的情况下， **提升了 10%～15%的吞吐量**。
@@ -319,9 +319,9 @@ io_uring 配置：
   
 
 **（2）时延**
-
+![[Pasted image 20240920122020.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920122027.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 基于 io_uring 的 Netpoll server，**在 P99 时延测试中，所有场景下都有 20%～40% 的提升。对于 P9999 延迟测试，对于一些场景有 10%～20% 的提升**，剩下场景基本和原生方案持平。
@@ -329,7 +329,7 @@ io_uring 配置：
   
 
 **（3）系统调用次数**
-
+![[Pasted image 20240920122245.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 基于 io_uring 的 Netpoll server，在 polling 模式下，可以将系统调用次数降至 0，在非 poling 模式下，系统调用次数也最多降了 15 倍。

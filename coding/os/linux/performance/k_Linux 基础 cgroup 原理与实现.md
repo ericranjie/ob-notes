@@ -20,7 +20,7 @@ CPP开发者
 
 前面介绍过，`cgroup` 是用来控制进程组对各种资源的使用，而在内核中，`cgroup` 是通过 `cgroup` 结构体来描述的，我们来看看其定义：
 
-```
+```c
 struct cgroup {    unsigned long flags;        /* "unsigned long" so bitops work */    atomic_t count;    struct list_head sibling;   /* my parent's children */    struct list_head children;  /* my children */    struct cgroup *parent;      /* my parent */    struct dentry *dentry;      /* cgroup fs entry */    struct cgroup_subsys_state *subsys[CGROUP_SUBSYS_COUNT];    struct cgroupfs_root *root;    struct cgroup *top_cgroup;    struct list_head css_sets;    struct list_head release_list;};
 ```
 
@@ -42,7 +42,7 @@ struct cgroup {    unsigned long flags;        /* "unsigned lo
     
 
 我们通过下面图片来描述 `层级` 中各个 `cgroup` 组成的树状关系：
-
+![[Pasted image 20240920124925.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cgroup-links
@@ -51,7 +51,7 @@ cgroup-links
 
 每个 `子系统` 都有属于自己的资源控制统计信息结构，而且每个 `cgroup` 都绑定一个这样的结构，这种资源控制统计信息结构就是通过 `cgroup_subsys_state` 结构体实现的，其定义如下：
 
-```
+```c
 struct cgroup_subsys_state {    struct cgroup *cgroup;    atomic_t refcnt;    unsigned long flags;};
 ```
 
@@ -66,12 +66,12 @@ struct cgroup_subsys_state {    struct cgroup *cgroup;    atomic_t 
 
 从 `cgroup_subsys_state` 结构的定义看不到各个 `子系统` 相关的资源控制统计信息，这是因为 `cgroup_subsys_state` 结构并不是真实的资源控制统计信息结构，比如 `内存子系统` 真正的资源控制统计信息结构是 `mem_cgroup`，那么怎样通过这个 `cgroup_subsys_state` 结构去找到对应的 `mem_cgroup` 结构呢？我们来看看 `mem_cgroup` 结构的定义：
 
-```
+```c
 struct mem_cgroup {    struct cgroup_subsys_state css; // 注意这里    struct res_counter res;    struct mem_cgroup_lru_info info;    int prev_priority;    struct mem_cgroup_stat stat;};
 ```
 
 从 `mem_cgroup` 结构的定义可以发现，`mem_cgroup` 结构的第一个字段就是一个 `cgroup_subsys_state` 结构。下面的图片展示了他们之间的关系：
-
+![[Pasted image 20240920124937.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cgroup-state-memory
@@ -81,16 +81,15 @@ cgroup-state-memory
 由于 `cgroup_subsys_state` 部分在 `mem_cgroup` 结构的首部，所以要将 `cgroup_subsys_state` 结构转换成 `mem_cgroup` 结构，只需要通过指针类型转换即可。
 
 `cgroup` 结构与 `cgroup_subsys_state` 结构之间的关系如下图：
-
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240920124951.png]]
 cgroup-subsys-state
 
 ## `css_set` 结构体
 
 由于一个进程可以同时添加到不同的 `cgroup` 中（前提是这些 `cgroup` 属于不同的 `层级`）进行资源控制，而这些 `cgroup` 附加了不同的资源控制 `子系统`。所以需要使用一个结构把这些 `子系统` 的资源控制统计信息收集起来，方便进程通过 `子系统ID` 快速查找到对应的 `子系统` 资源控制统计信息，而 `css_set` 结构体就是用来做这件事情。`css_set` 结构体定义如下：
 
-```
+```c
 struct css_set {    struct kref ref;    struct list_head list;    struct list_head tasks;    struct list_head cg_links;    struct cgroup_subsys_state *subsys[CGROUP_SUBSYS_COUNT];};
 ```
 
@@ -107,13 +106,15 @@ struct css_set {    struct kref ref;    struct list_head list;  
 
 进程描述符 `task_struct` 有两个字段与此相关，如下：
 
-```
+```c
 struct task_struct {    ...    struct css_set *cgroups;    struct list_head cg_list;    ...}
 ```
 
 可以看出，`task_struct` 结构的 `cgroups` 字段就是指向 `css_set` 结构的指针，而 `cg_list` 字段用于连接所有使用此 `css_set` 结构的进程列表。
 
 `task_struct` 结构与 `css_set` 结构的关系如下图：
+![[Pasted image 20240920125058.png]]
+
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -123,7 +124,7 @@ cgroup-task-cssset
 
 `CGroup` 通过 `cgroup_subsys` 结构操作各个 `子系统`，每个 `子系统` 都要实现一个这样的结构，其定义如下：
 
-```
+```c
 struct cgroup_subsys {    struct cgroup_subsys_state *(*create)(struct cgroup_subsys *ss,                          struct cgroup *cgrp);    void (*pre_destroy)(struct cgroup_subsys *ss, struct cgroup *cgrp);    void (*destroy)(struct cgroup_subsys *ss, struct cgroup *cgrp);    int (*can_attach)(struct cgroup_subsys *ss,              struct cgroup *cgrp, struct task_struct *tsk);    void (*attach)(struct cgroup_subsys *ss, struct cgroup *cgrp,            struct cgroup *old_cgrp, struct task_struct *tsk);    void (*fork)(struct cgroup_subsys *ss, struct task_struct *task);    void (*exit)(struct cgroup_subsys *ss, struct task_struct *task);    int (*populate)(struct cgroup_subsys *ss,            struct cgroup *cgrp);    void (*post_clone)(struct cgroup_subsys *ss, struct cgroup *cgrp);    void (*bind)(struct cgroup_subsys *ss, struct cgroup *root);    int subsys_id;    int active;    int disabled;    int early_init;    const char *name;    struct cgroupfs_root *root;    struct list_head sibling;    void *private;};
 ```
 
@@ -154,7 +155,7 @@ struct cgroup_subsys mem_cgroup_subsys = {    .name = "memory",   �
 
 另外 Linux 内核还定义了一个 `cgroup_subsys` 结构的数组 `subsys`，用于保存所有 `子系统` 的 `cgroup_subsys` 结构，如下：
 
-```
+```c
 static struct cgroup_subsys *subsys[] = {    cpuset_subsys,    debug_subsys,    ns_subsys,    cpu_cgroup_subsys,    cpuacct_subsys,    mem_cgroup_subsys};
 ```
 
@@ -164,7 +165,7 @@ static struct cgroup_subsys *subsys[] = {    cpuset_subsys,    debu
 
 要使用 `CGroup` 功能首先必须先进行挂载操作，比如使用下面命令挂载一个 `CGroup`：
 
-```
+```c
 $ mount -t cgroup -o memory memory /sys/fs/cgroup/memory
 ```
 
