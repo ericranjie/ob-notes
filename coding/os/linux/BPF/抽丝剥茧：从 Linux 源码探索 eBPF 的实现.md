@@ -99,7 +99,7 @@ libbpf 类型 `sock_ops` => BPF 程序类型 `BPF_PROG_TYPE_SOCK_OPS` => 挂
 ## 套接字操作 sock_ops
 
 套接字的操作很多，这里以连接建立过程中服务端 `accept` 操作为例。
-
+![[Pasted image 20240920144340.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 依然是从系统调用 `accept` 开始。

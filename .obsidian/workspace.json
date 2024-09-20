@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
+                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
+                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
+                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md"
+                "file": "coding/os/linux/BPF/一文看懂eBPF eBPF的简单使用.md"
               }
             }
           }
@@ -148,27 +148,31 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
+    "0x99-image/Pasted image 20240920144340.png",
+    "coding/os/linux/BPF/抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
+    "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
+    "0x99-image/Pasted image 20240920141231.png",
+    "0x99-image/Pasted image 20240920141349.png",
+    "0x99-image/Pasted image 20240920141342.png",
+    "0x99-image/Pasted image 20240920141336.png",
+    "0x99-image/Pasted image 20240920141329.png",
+    "0x99-image/Pasted image 20240920141317.png",
+    "0x99-image/Pasted image 20240920141310.png",
+    "0x99-image/Pasted image 20240920141303.png",
+    "0x99-image/Pasted image 20240920141250.png",
+    "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
+    "coding/os/linux/BPF/i_bpf在android逆向中的辅助效果.md",
     "coding/os/linux/BPF/a_BPF内核实现详解.md",
     "Untitled.md",
-    "0x99-image/Pasted image 20240920124501.png",
-    "0x99-image/Pasted image 20240920132031.png",
-    "0x99-image/Pasted image 20240920131635.png",
-    "coding/os/linux/BPF/bpf在android逆向中的辅助效果.md",
     "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
-    "0x99-image/Pasted image 20240920131424.png",
     "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "coding/os/linux/performance/一文说清linux system load.md",
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
-    "0x99-image/Pasted image 20240920125058.png",
-    "0x99-image/Pasted image 20240920124951.png",
-    "0x99-image/Pasted image 20240920124937.png",
-    "0x99-image/Pasted image 20240920124925.png",
     "coding/os/linux/performance/i_性能提升 8450%，Linux 内核函数获大幅改进.md",
-    "0x99-image/Pasted image 20240920124507.png",
     "coding/os/linux/performance/t_性能优化的路有多远？.md",
     "coding/os/linux/network/服务器性能优化之网络性能优化.md",
     "coding/os/linux/network/k_如果让你来设计网络，你会把它弄成啥样？.md",
-    "0x99-image/Pasted image 20240920123404.png",
     "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
     "coding/os/linux/network/Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
@@ -179,11 +183,6 @@
     "coding/os/linux/network/d_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
     "coding/os/linux/network/i_向左向右 网络IO卸载.md",
     "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
-    "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
-    "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
-    "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
-    "coding/os/linux/network/最后一天，继续卷！.md",
-    "coding/os/linux/network/QUIC/b_跟我一起学QUIC（十五）：QUIC的传输机制详解.md",
     "coding/os/linux/network/debug",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
