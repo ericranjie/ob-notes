@@ -70,7 +70,7 @@ dentry 用来记录文件的名字、inode 指针以及与其他 dentry 的关�
 不同于 inode，dentry 是由内核维护的一个内存数据结构，所以通常也被叫做 dentry cache。
 
 ##### 文件是如何存储在磁盘上的
-
+![[Pasted image 20240922121431.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里有张图解释了文件是如何存储在磁盘上的，首先，磁盘再进行文件系统格式化的时候，会分出来 3 个区：
@@ -124,7 +124,7 @@ superblock 对于文件系统来说非常重要，如果 superblock 损坏了，
 ### ZFS
 
 这里简单介绍一个广泛应用的文件系统 ZFS，一些数据库应用也会用到 ZFS，先看一张 zfs 的层级结构图：
-
+![[Pasted image 20240922121439.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这是一张从底向上的图：
@@ -148,7 +148,7 @@ superblock 对于文件系统来说非常重要，如果 superblock 损坏了，
     
 
 除了 raidz 还支持其他方案：
-
+![[Pasted image 20240922121448.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **创建 zfs**
@@ -173,7 +173,7 @@ superblock 对于文件系统来说非常重要，如果 superblock 损坏了，
 ##### 事务文件系统
 
 zfs 的写操作是事务的，意味着要么就没写，要么就写成功了，不会像其他文件系统那样，应用打开了文件，写入还没保存的时候断电，导致文件为空。zfs 保证写操作事务采用的是 copy on write 的方式：
-
+![[Pasted image 20240922121457.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - 当 block B 有修改变成 B1 的时候，普通的文件系统会直接在 block B 原地进行修改变成 B1
@@ -270,7 +270,7 @@ ARC 工作流程大致如下：
     
 
 ### Generic Block Layer
-
+![[Pasted image 20240922121512.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 和 VFS 类似，为了对上层屏蔽不同块设备的差异，内核在文件系统和块设备之前抽象了一个 Generic Block Layer（通用块层），有时候一些人也会把下面的 I/O 调度层并到通用块层里表述。
@@ -283,7 +283,7 @@ ARC 工作流程大致如下：
     
 
 下图是一个完整的 I/O 栈全景图：
-
+![[Pasted image 20240922121519.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到中间的 Block Layer 其实就是 Generic Block Layer，在图中可以看到 Block Layer 的 I/O 调度分为两类，分别表示单队列和多队列的调度：

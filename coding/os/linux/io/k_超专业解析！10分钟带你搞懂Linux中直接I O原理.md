@@ -72,8 +72,18 @@ The following article is from 云加社区 Author 王睿
 
   
 
-```
+```c
 用 ls -l 命令看最前面的字符可以看到这个文件是什么类型
+ 
+ 
+brw-r--r-- 1 root    root    1, 2 4月  25 11:03 bnod // 块设备文件
+crw-r--r-- 1 root    root    1, 2 4月  25 11:04 cnod // 符号设备文件
+drwxr-xr-x 2 wrn3552 wrn3552    6 4月  25 11:01 dir // 目录
+-rw-r--r-- 1 wrn3552 wrn3552    0 4月  25 11:01 file // 普通文件
+prw-r--r-- 1 root    root       0 4月  25 11:04 pipeline // 有名管道
+srwxr-xr-x 1 root    root       0 4月  25 11:06 socket.sock // socket文件
+lrwxrwxrwx 1 root    root       4 4月  25 11:04 softlink -> file // 软连接
+-rw-r--r-- 2 wrn3552 wrn3552 0 4月  25 11:07 hardlink // 硬链接（本质也是普通文件）
 ```
 
   
@@ -101,8 +111,17 @@ inode是用来记录文件的metadata，所谓metadata在Wikipedia上的描述�
 
   
 
-```
+```c
 wrn3552@novadev:~/playground$ stat file
+  文件：file
+  大小：0               块：0          IO 块：4096   普通空文件
+设备：fe21h/65057d      Inode：32828       硬链接：2
+权限：(0644/-rw-r--r--)  Uid：( 3041/ wrn3552)   Gid：( 3041/ wrn3552)
+最近访问：2021-04-25 11:07:59.603745534 +0800
+最近更改：2021-04-25 11:07:59.603745534 +0800
+最近改动：2021-04-25 11:08:04.739848692 +0800
+创建时间：-
+
 ```
 
   
@@ -120,8 +139,14 @@ dentry用来记录文件的名字、inode指针以及与其他dentry的关联关
 
   
 
-```
+```c
 wrn3552@novadev:~/playground$ tree
+.
+├── dir
+│   └── file_in_dir
+├── file
+└── hardlink
+
 ```
 
   
@@ -150,7 +175,7 @@ wrn3552@novadev:~/playground$ tree
 #### **（三）文****件是如何存储在磁盘上的**
 
   
-
+![[Pasted image 20240922102209.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -255,7 +280,7 @@ Superblock对于文件系统来说非常重要，如果Superblock损坏了，文
 先看一张ZFS的层级结构图：
 
   
-
+![[Pasted image 20240922102259.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -288,8 +313,29 @@ Superblock对于文件系统来说非常重要，如果Superblock损坏了，文
 
   
 
-```
+```c
 root@:~ # zpool create tank raidz /dev/ada1 /dev/ada2 /dev/ada3 raidz /dev/ada4 /dev/ada5 /dev/ada6
+root@:~ # zpool list tank
+NAME    SIZE  ALLOC   FREE  CKPOINT  EXPANDSZ   FRAG    CAP  DEDUP  HEALTH  ALTROOT
+tank     11G   824K  11.0G        -         -     0%     0%  1.00x  ONLINE  -
+root@:~ # zpool status tank
+  pool: tank
+ state: ONLINE
+  scan: none requested
+config:
+ 
+ 
+        NAME        STATE     READ WRITE CKSUM
+        tank        ONLINE       0     0     0
+          raidz1-0  ONLINE       0     0     0
+            ada1    ONLINE       0     0     0
+            ada2    ONLINE       0     0     0
+            ada3    ONLINE       0     0     0
+          raidz1-1  ONLINE       0     0     0
+            ada4    ONLINE       0     0     0
+            ada5    ONLINE       0     0     0
+            ada6    ONLINE       0     0     0
+
 ```
 
   
@@ -307,7 +353,7 @@ root@:~ # zpool create tank raidz /dev/ada1 /dev/ada2 /dev/ada3 raidz /dev/ada4 
 除了raidz还支持其他方案：
 
   
-
+![[Pasted image 20240922102327.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -317,8 +363,12 @@ root@:~ # zpool create tank raidz /dev/ada1 /dev/ada2 /dev/ada3 raidz /dev/ada4 
 
   
 
-```
+```c
 root@:~ # zfs create -o mountpoint=/mnt/srev tank/srev
+root@:~ # df -h tank/srev
+Filesystem    Size    Used   Avail Capacity  Mounted on
+tank/srev     7.1G    117K    7.1G     0%    /mnt/srev
+
 ```
 
   
@@ -338,8 +388,12 @@ root@:~ # zfs create -o mountpoint=/mnt/srev tank/srev
 
   
 
-```
+```c
 root@:~ # zfs set quota=1G tank/srev
+root@:~ # df -h tank/srev
+Filesystem    Size    Used   Avail Capacity  Mounted on
+tank/srev     1.0G    118K    1.0G     0%    /mnt/srev
+
 ```
 
   
@@ -371,7 +425,7 @@ root@:~ # zfs set quota=1G tank/srev
 #### ZFS保证写操作事务采用的是copy on write的方式：
 
   
-
+![[Pasted image 20240922102353.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -538,8 +592,18 @@ ARC定义了**4**个链表：
 
   
 
-```
+```c
 g18-"299" on ~# ls -l /dev/sda*
+brw-rw---- 1 root disk 8,  0 Apr 25 15:53 /dev/sda
+brw-rw---- 1 root disk 8,  1 Apr 25 15:53 /dev/sda1
+brw-rw---- 1 root disk 8, 10 Apr 25 15:53 /dev/sda10
+brw-rw---- 1 root disk 8,  2 Apr 25 15:53 /dev/sda2
+brw-rw---- 1 root disk 8,  5 Apr 25 15:53 /dev/sda5
+brw-rw---- 1 root disk 8,  6 Apr 25 15:53 /dev/sda6
+brw-rw---- 1 root disk 8,  7 Apr 25 15:53 /dev/sda7
+brw-rw---- 1 root disk 8,  8 Apr 25 15:53 /dev/sda8
+brw-rw---- 1 root disk 8,  9 Apr 25 15:53 /dev/sda9
+
 ```
 
   
@@ -559,7 +623,7 @@ g18-"299" on ~# ls -l /dev/sda*
 **四、Generic Block Layer**
 
   
-
+![[Pasted image 20240922102410.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   

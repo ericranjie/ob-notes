@@ -95,7 +95,7 @@ aio 主要提供了三个系统调用：
     
 - io_getevents 用于io 请求处理完成之后的io 收割
     
-
+![[Pasted image 20240922122310.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 大体的IO调度过程如下：
@@ -414,7 +414,7 @@ static inline void io_uring_prep_rw(int op, struct io_uring_sqe *sqe, int fd,
 }
 
 那我们需要先回到最开始的io_uring_setup以及 后续的mmap setup返回的结果 之后 用户态和内核态共享的数据结构内容。
-
+![[Pasted image 20240922122405.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 数据结构 在内存中的分布 如上图：
@@ -489,7 +489,7 @@ struct io_uring_sqe *io_uring_get_sqe(struct io_uring *ring)
 > io_uring 中的ring就是 上图中的io 链路，从sq队尾进入，最后请求从cq 队头出来，整个链路就是一个环形(ring)。而sq和cq在数据结构上被存放在了 io_uring 中。加了uring 中的u 猜测是指用户态(userspace)可访问的，目的是好的，不过读起来的单词谐音就让一些人略微尴尬(urine。。。)
 
 非poll 模式下的内核火焰图调用栈如下：
-
+![[Pasted image 20240922122419.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 
@@ -520,11 +520,11 @@ IORING_SETUP_IOPOLL，这种方式是由nvme 驱动支持的 io_poll。即用户
 IORING_SETUP_SQPOLL，这种模式的poll则是我们fio测试下的 sqthread_poll开启的配置。开启之后io_uring会启动一个内核线程，用来轮询submit queue，从而达到不需要系统调用的参与就可以提交请求。用户请求在用户空间提交到SQ 之后，这个内核线程处于唤醒状态时会不断得轮询SQ，也就可以立即捕获到这次请求。（我们前面的案例中会先在用户空间构造指定数量的SQ放到ring-buffer中，再由io_uring_enter一起提交到内核），这个时候有了sq_thread 的轮询，只要用户空间提交到SQ，内核就能够捕获到并进行处理。如果sq_thread 长时间捕获不到请求，则会进入休眠状态，需要通过调用io_uring_enter系统调用，并设置IORING_SQ_NEED_WAKEUP来唤醒sq_thread。
 
 大体的调度方式如下图：
-
+![[Pasted image 20240922122429.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这种sq_thread 内核对SQ的轮询模式能够极大得减少请求在submit queue中的排队时间，同时减少了io_uring_enter系统调用的开销。
-
+![[Pasted image 20240922122434.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 开启sq_thread之后的轮询模式可以看到 用户提交请求 对CPU消耗仅仅只占用了一小部分的cpu。
@@ -554,7 +554,7 @@ inline struct io_uring* CreateIOUring() {
 在io_poll模式下，对MultiGet的接口测试性能数据大概如下：
 
 > 我的环境不支持io_poll，大体收益应该和fio的poll模式下的性能收益差不了太多
-
+![[Pasted image 20240922122445.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 db_bench的配置可以使用，直接用rocksdb的master, CMakeList.txt 默认会开启io_uring：  
