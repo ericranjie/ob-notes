@@ -134,10 +134,8 @@ VF Stride字段表示相邻两个VF的Routing ID的偏移量。
   
 
 Linux系统下，基于SR-IOV有三种应用场景：HostOS使用PF、HOstOS使用VF、将VF直通到VM（虚拟机），见图2.2.1：
-
+![[Pasted image 20240922201845.png]]
   
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6bytWv1g4hytJkvFaqHpDP3C5MuThA5Rh5pIH1ulYrzrmWF9yqkmWFTdeicoicGnc55ial3wFYNaFkPOMw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 图2.2.1
 
@@ -162,7 +160,7 @@ l VFIO
 l Hypervisor（QEMU/KVM）  
 
 l VF Driver(运行在GuestOS中)
-
+![[Pasted image 20240922201905.png]]
   
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
@@ -188,6 +186,9 @@ IOMMU(I/O Memory Management Unit)是一个内存管理单元，主要针对外�
 1）地址空间隔离
 
 在没有iommu的时候，用户态驱动可以通过设备dma可以访问到机器的全部的地址空间，如何保护机器物理内存区对于用户态驱动框架设计带来挑战。引入iommu以后，iommu通过控制每个设备dma地址到实际物理地址的映射转换，可以实现地址空间上的隔离，使设备只能访问规定的内存区域，见图3.1.1.1.1。
+![[Pasted image 20240922201920.png]]
+
+
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -212,13 +213,13 @@ IOMMU(I/O Memory Management Unit)是一个内存管理单元，主要针对外�
 兼容模式和重映射模式，Bit4位为0来表征为不可重映射中断，Bit4位为
 
 1来表征为可重映射中断，见图3.1.1.2.1和图3.1.1.2.2。
-
+![[Pasted image 20240922201949.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3.1.1.2.1
 
   
-
+![[Pasted image 20240922201959.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3.1.1.2.2
@@ -230,7 +231,7 @@ IOMMU(I/O Memory Management Unit)是一个内存管理单元，主要针对外�
 Interrupt Remapping Table Entry是一个二级表，需要先通过Interrupt Remapping Table Address Register来找到Interrupt Remapping Table Entry所在的地址，Interrupt Remapping Table Entry的格式如图3.1.1.2.3：
 
   
-
+![[Pasted image 20240922202009.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3.1.1.2.3
@@ -244,7 +245,7 @@ IOMMU中断重映射的实质是将来自PCIe设备的中断（包括来自IOAPI
 VFIO(Virtual Function I/O)是基于IOMMU为HostOS的用户空间暴露PCIe设备的配置空间和DMA。VFIO的组成主要有以下及部分，见图3.1.2.1：
 
   
-
+![[Pasted image 20240922202019.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3.1.2.1
@@ -292,7 +293,7 @@ QEMU/KVM 的PCI设备直通QEMU的核心工作主要有两部分：
 QEMU中PCI设备直通时vfio-pci注册流程见图3.1.3.1：
 
   
-
+![[Pasted image 20240922201656.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3.1.3.1
@@ -302,7 +303,7 @@ QEMU中PCI设备直通时vfio-pci注册流程见图3.1.3.1：
 QEMU中PCI设备直通时vfio-pci初始化流程见图3.1.3.2：
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240922202044.png]]
 图3.1.3.2
 
   
@@ -330,7 +331,7 @@ PCI设备直通时，GuestOS中的设备驱动操作虚拟PCI设备的DMA时，Q
 让IOMMU建立GPA到HPA的映射关系。
 
 当GuestOS中直通设备的驱动分配内存并配置DMA时，QEMU通过VFIO接口将GPA下发到PCI Device的DMA，DMA读取数据时经由IOMMU映射，找到相应的HPA。
-
+![[Pasted image 20240922202059.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3.2.1.1

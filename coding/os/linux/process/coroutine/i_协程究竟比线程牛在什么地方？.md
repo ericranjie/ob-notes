@@ -35,7 +35,7 @@ show me the code!
 
 测试代码参见[test05](https://kfngxl.cn/index.php/archives/611/tests/test05/src/main/main.go)，测试过程是不断在协程之间让出CPU。核心代码如下：
 
-```
+```go
 func cal()  {
     for i :=0 ; i<1000000 ;i++{
         runtime.Gosched()
@@ -60,7 +60,7 @@ func main() {
 
 好了，让我们编译运行一下：
 
-```
+```c
 # cd tests/test05/src/main/;  
 # go build  
 # ./main  
@@ -74,7 +74,7 @@ func main() {
 
 在空间上，协程初始化创建的时候为其分配的栈有2KB。而线程栈要比这个数字大的多，可以通过ulimit 命令查看，一般都在几兆，作者的机器上是10M。如果对每个用户创建一个协程去处理，100万并发用户请求只需要2G内存就够了，而如果用线程模型则需要10T。
 
-```
+```c
 # ulimit -a  
 stack size              (kbytes, -s) 10240  
 ```

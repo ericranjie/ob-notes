@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/process/d_Linux系统如何标识进程？.md",
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/process/d_Linux系统如何标识进程？.md",
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/process/d_Linux系统如何标识进程？.md",
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/process/d_Linux系统如何标识进程？.md"
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md"
               }
             }
           }
@@ -148,43 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "0x99-image/-20240922/Pasted image 20240922201656.png",
+    "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+    "0x99-image/-20240922/Pasted image 20240922202059.png",
+    "0x99-image/-20240922/Pasted image 20240922202044.png",
+    "0x99-image/-20240922/Pasted image 20240922202019.png",
+    "0x99-image/-20240922/Pasted image 20240922202009.png",
+    "0x99-image/-20240922/Pasted image 20240922201959.png",
+    "0x99-image/-20240922/Pasted image 20240922201949.png",
+    "0x99-image/-20240922/Pasted image 20240922201920.png",
+    "0x99-image/-20240922/Pasted image 20240922201905.png",
+    "0x99-image/-20240922/Pasted image 20240922201845.png",
+    "coding/os/linux/process/Shopee 送命题：进程切换为什么比线程切换慢.md",
+    "coding/os/linux/process/d_Process Creation（二）.md",
+    "coding/os/linux/process/i_Linux进程冻结技术.md",
+    "coding/os/linux/process/coroutine/i_协程究竟比线程牛在什么地方？.md",
+    "coding/os/linux/process/k_进程管理和终端驱动：基本概念.md",
+    "test/self_notes.md",
+    "README.md",
+    "Untitled.md",
+    "coding/os/linux/process/d_Linux系统如何标识进程？.md",
     "coding/os/linux/process/d_Process Creation（一）.md",
     "coding/os/linux/io/关于linux io_uring性能测试及其 实现原理的一些探索.md",
-    "0x99-image/-20240922/80c0f5a70583f670c050228034d0070a.jpg",
     "0x99-image/-20240922",
-    "0x99-image/-20240922/Pasted image 20240922121431.png",
-    "0x99-image/-20240922/Pasted image 20240922122445.png",
-    "0x99-image/-20240922/Pasted image 20240922122434.png",
-    "0x99-image/-20240922/Pasted image 20240922122429.png",
-    "0x99-image/-20240922/Pasted image 20240922122419.png",
-    "0x99-image/-20240922/Pasted image 20240922122405.png",
-    "0x99-image/-20240922/Pasted image 20240922122310.png",
     "coding/os/linux/io/k_Linux IO 那些事儿.md",
-    "0x99-image/-20240922/Pasted image 20240922121519.png",
-    "0x99-image/-20240922/Pasted image 20240922121512.png",
     "coding/os/linux/io/i_看一遍就理解：IO模型详解.md",
     "coding/os/linux/io/k_超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
     "coding/frontend/n_基于 iframe 的全新微前端方案.md",
     "coding/frontend/c_这本计算机神书，出 JavaScript 版了！.md",
     "society/编程到底难不难？.md",
     "coding/frontend/n_详解16个CSS新特性（2021最新版-下）.md",
-    "README.md",
     "coding/frontend/n_代码质量第4层——健壮的代码！.md",
     "coding/frontend/k_Node.js 的 perf_hooks.md",
     "coding/frontend/i_Node.js 抓取堆快照过程解析.md",
     "coding/frontend/a(pt)_hyengine - 面向移动端的高性能通用编译 解释引擎.md",
     "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
     "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
-    "coding/os/linux/BPF/i_深入理解DPDK架构 经典PDF分享.md",
-    "coding/os/linux/BPF/i_抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
-    "coding/os/linux/BPF/c_Linux eBPF学习路径.md",
-    "coding/os/linux/BPF/i_揭秘 vmlinux.h 对eBPF 程序的重要意义.md",
-    "coding/os/linux/BPF/a_浅谈一下，Linux中基于eBPF的恶意利用与检测机制.md",
-    "coding/os/linux/BPF/i_一文看懂eBPF eBPF的简单使用.md",
-    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
-    "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
-    "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
-    "coding/os/linux/BPF/i_bpf在android逆向中的辅助效果.md",
     "coding/os/linux/network/debug",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
