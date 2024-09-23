@@ -200,7 +200,7 @@ void __rcu **idr_get_free(struct radix_tree_root *root, ...)
 
 Gargi Sharma 在 10000 个进程的情况下分别统计了 ps、pstree 的耗时情况。
 
-```
+```c
 ps:
     With IDR API    With bitmap
 real    0m1.479s    0m2.319s
@@ -208,7 +208,7 @@ user    0m0.070s    0m0.060s
 sys    0m0.289s    0m0.516s
 ```
 
-```
+```c
 pstree:
     With IDR API    With bitmap
 real    0m1.024s    0m1.794s

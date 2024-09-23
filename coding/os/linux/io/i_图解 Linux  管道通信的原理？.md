@@ -57,13 +57,13 @@ CPP开发者
 
 编译代码：
 
-```
+```c
 [root@localhost pipe]# gcc -g pipe.c -o pipe
 ```
 
 运行代码，输出结果如下：
 
-```
+```c
 [root@localhost pipe]# ./pipeparent read 11 bytes data: hello world
 ```
 
@@ -91,7 +91,7 @@ CPP开发者
 
 在 Linux 内核中，管道使用 `pipe_inode_info` 对象来进行管理。我们先来看看 `pipe_inode_info` 对象的定义，如下所示：
 
-```
+```c
 struct pipe_inode_info {    wait_queue_head_t wait;    unsigned int nrbufs,    unsigned int curbuf;    ...    unsigned int readers;    unsigned int writers;    unsigned int waiting_writers;    ...    struct inode *inode;    struct pipe_buffer bufs[16];};
 ```
 
@@ -116,7 +116,7 @@ struct pipe_inode_info {    wait_queue_head_t wait;    unsigned int�
 
 由于环形缓冲区是由 16 个 `pipe_buffer` 对象组成，所以下面我们来看看 `pipe_buffer` 对象的定义：
 
-```
+```c
 struct pipe_buffer {    struct page *page;    unsigned int offset;    unsigned int len;    ...};
 ```
 

@@ -208,14 +208,16 @@ CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他�
 
 时钟中断处理函数会调用 scheduler_tick()，它通过调度类(scheduling class) 的 task_tick 方法 检查进程的时间片是否耗尽，如果耗尽则标记需要抢占：
 
-```
-// kernel/sched/core.cvoid scheduler_tick(void){    [...]    curr->sched_class->task_tick(rq, curr, 0);    [...]}
+```c
+// kernel/sched/core.c
+void scheduler_tick(void){    [...]    curr->sched_class->task_tick(rq, curr, 0);    [...]}
 ```
 
 Linux 的调度策略被封装成调度类，例如 CFS、Real-Time。CFS 调度类的 task_tick() 如下：
 
-```
-// kernel/sched/fair.ctask_tick_fair()    -> entity_tick()        -> resched_curr(rq_of(cfs_rq));
+```c
+// kernel/sched/fair.c
+task_tick_fair()    -> entity_tick()        -> resched_curr(rq_of(cfs_rq));
 ```
 
 **  
@@ -223,8 +225,9 @@ Linux 的调度策略被封装成调度类，例如 CFS、Real-Time。CFS 调度
 
 当进程被唤醒的时候，如果优先级高于 CPU 上的当前进程，就会触发抢占。相应的内核代码中，try_to_wake_up() 最终通过 check_preempt_curr() 检查是否标记需要抢占：
 
-```
-// kernel/sched/core.cvoid check_preempt_curr(struct rq *rq, struct task_struct *p, int flags){ const struct sched_class *class; if (p->sched_class == rq->curr->sched_class) {      rq->curr->sched_class->check_preempt_curr(rq, p, flags); } else {      for_each_class(class) {           if (class == rq->curr->sched_class)                break;           if (class == p->sched_class) {                resched_curr(rq);                break;           }      }   }   [...]}
+```c
+// kernel/sched/core.c
+void check_preempt_curr(struct rq *rq, struct task_struct *p, int flags){ const struct sched_class *class; if (p->sched_class == rq->curr->sched_class) {      rq->curr->sched_class->check_preempt_curr(rq, p, flags); } else {      for_each_class(class) {           if (class == rq->curr->sched_class)                break;           if (class == p->sched_class) {                resched_curr(rq);                break;           }      }   }   [...]}
 ```
 
 参数 "p" 指向被唤醒进程，"rq" 代表抢占的 CPU。如果 p 的调度类和 rq 当前的调度类相同，则调用 rq 当前的调度类的 check_preempt_curr() (例如 cfs 的 check_preempt_wakeup()) 来判断是否要标记需要抢占。
@@ -236,8 +239,11 @@ Linux 的调度策略被封装成调度类，例如 CFS、Real-Time。CFS 调度
 
 如果新进程的优先级高于 CPU 上的当前进程，会需要触发抢占。相应的代码是 sched_fork()，它再通过调度类的 task_fork() 标记需要抢占：
 
-```
-// kernel/sched/core.cint sched_fork(unsigned long clone_flags, struct task_struct *p){    [...]    if (p->sched_class->task_fork)          p->sched_class->task_fork(p);    [...]}// kernel/sched/fair.cstatic void task_fork_fair(struct task_struct *p){ 　[...] 　if (sysctl_sched_child_runs_first && curr && entity_before(curr, se)) {  　　resched_curr(rq);     }     [...]}
+```c
+// kernel/sched/core.c
+int sched_fork(unsigned long clone_flags, struct task_struct *p){    [...]    if (p->sched_class->task_fork)          p->sched_class->task_fork(p);    [...]}
+// kernel/sched/fair.c
+static void task_fork_fair(struct task_struct *p){ 　[...] 　if (sysctl_sched_child_runs_first && curr && entity_before(curr, se)) {  　　resched_curr(rq);     }     [...]}
 ```
 
 **  
@@ -245,8 +251,10 @@ Linux 的调度策略被封装成调度类，例如 CFS、Real-Time。CFS 调度
 
 如果修改进程 nice 值导致优先级高于 CPU 上的当前进程，也要标记需要抢占，代码见 set_user_nice()。
 
-```
-// kernel/sched/core.cvoid set_user_nice(struct task_struct *p, long nice){    [...]    // If the task increased its priority or is running and lowered its priority, then reschedule its CPU    if (delta < 0 || (delta > 0 && task_running(rq, p)))         resched_curr(rq);}
+```c
+// kernel/sched/core.c
+void set_user_nice(struct task_struct *p, long nice){    [...]    // If the task increased its priority or is running and lowered its priority, then reschedule its CPU    
+													 if (delta < 0 || (delta > 0 && task_running(rq, p)))         resched_curr(rq);}
 ```
 
 还有很多场景，这里就不一一列举了。
@@ -260,7 +268,7 @@ Linux 的调度策略被封装成调度类，例如 CFS、Real-Time。CFS 调度
 
 看下面这个例子：
 
-```
+```c
 struct this_needs_locking tux[NR_CPUS];tux[smp_processor_id()] = some_value;/* task is preempted here... */something = tux[smp_processor_id()];
 ```
 
@@ -271,8 +279,9 @@ struct this_needs_locking tux[NR_CPUS];tux[smp_processor_id()] = some_value;
 
 这个很好理解，你正在操作 CPU 相关的寄存器以进行 context switch 时，肯定是不能再允许抢占。
 
-```
-asmlinkage __visible void __sched schedule(void){ struct task_struct *tsk = current; sched_submit_work(tsk); do {        // 调度前禁止内核抢占      preempt_disable();      __schedule(false);      sched_preempt_enable_no_resched(); } while (need_resched()); sched_update_worker(tsk);}
+```c
+asmlinkage __visible void __sched schedule(void){ struct task_struct *tsk = current; sched_submit_work(tsk); do {        // 调度前禁止内核抢占      
+preempt_disable();      __schedule(false);      sched_preempt_enable_no_resched(); } while (need_resched()); sched_update_worker(tsk);}
 ```
 
 **  
@@ -280,7 +289,7 @@ asmlinkage __visible void __sched schedule(void){ struct task_struct *tsk
 
 支持内核抢占，这意味着进程有可能与被抢占的进程在相同的 critical section 中运行。为防止这种情况，当持有自旋锁时，要禁止内核抢占。
 
-```
+```c
 static inline void __raw_spin_lock(raw_spinlock_t *lock){     preempt_disable();     spin_acquire(&lock->dep_map, 0, 0, _RET_IP_);     LOCK_CONTENDED(lock, do_raw_spin_trylock, do_raw_spin_lock);}
 ```
 
@@ -297,8 +306,12 @@ static inline void __raw_spin_lock(raw_spinlock_t *lock){     preempt_d
 
 它们都是在 ret_to_user() 里判断是否执行用户抢占。
 
-```
-// arch/arm64/kernel/entry.Sret_to_user() // 返回到用户空间    work_pending()        do_notify_resume()            schedule() // arch/arm64/kernel/signal.casmlinkage void do_notify_resume(struct pt_regs *regs,    unsigned long thread_flags){ do {      [...]        // 检查是否要需要调度      if (thread_flags & _TIF_NEED_RESCHED) {           local_daif_restore(DAIF_PROCCTX_NOIRQ);           schedule();      } else {           [...] } while (thread_flags & _TIF_WORK_MASK);}
+```c
+// arch/arm64/kernel/entry.S
+ret_to_user() // 返回到用户空间    
+work_pending()        do_notify_resume()            schedule() // arch/arm64/kernel/signal.c
+asmlinkage void do_notify_resume(struct pt_regs *regs,    unsigned long thread_flags){ do {      [...]        // 检查是否要需要调度      
+																						   if (thread_flags & _TIF_NEED_RESCHED) {           local_daif_restore(DAIF_PROCCTX_NOIRQ);           schedule();      } else {           [...] } while (thread_flags & _TIF_WORK_MASK);}
 ```
 
 ###   
@@ -306,8 +319,9 @@ static inline void __raw_spin_lock(raw_spinlock_t *lock){     preempt_d
 
 **中断返回内核空间的时候：**
 
-```
-// arch/arm64/kernel/entry.Sel1_irq    irq_handler    arm64_preempt_schedule_irq        preempt_schedule_irq            __schedule(true) // kernel/sched/core.c/* This is the entry point to schedule() from kernel preemption */asmlinkage __visible void __sched preempt_schedule_irq(void){ [...] do {      preempt_disable();      local_irq_enable();      __schedule(true);      local_irq_disable();      sched_preempt_enable_no_resched(); } while (need_resched()); exception_exit(prev_state);}
+```c
+// arch/arm64/kernel/entry.S
+el1_irq    irq_handler    arm64_preempt_schedule_irq        preempt_schedule_irq            __schedule(true) // kernel/sched/core.c/* This is the entry point to schedule() from kernel preemption */asmlinkage __visible void __sched preempt_schedule_irq(void){ [...] do {      preempt_disable();      local_irq_enable();      __schedule(true);      local_irq_disable();      sched_preempt_enable_no_resched(); } while (need_resched()); exception_exit(prev_state);}
 ```
 
 **内核恢复为可抢占的时候：**
@@ -316,8 +330,10 @@ static inline void __raw_spin_lock(raw_spinlock_t *lock){     preempt_d
 
 例如 spinlock unlock 时：
 
-```
-static inline void __raw_spin_unlock(raw_spinlock_t *lock){     spin_release(&lock->dep_map, 1, _RET_IP_);     do_raw_spin_unlock(lock);     preempt_enable();  // 使能抢占时，如果需要，就会执行抢占}// include/linux/preempt.h#define preempt_enable() \do { \     barrier(); \     if (unlikely(preempt_count_dec_and_test())) \          __preempt_schedule(); \} while (0)
+```c
+static inline void __raw_spin_unlock(raw_spinlock_t *lock){     spin_release(&lock->dep_map, 1, _RET_IP_);     do_raw_spin_unlock(lock);     preempt_enable();  // 使能抢占时，如果需要，就会执行抢占}// include/linux/preempt.h
+														   #define preempt_enable() \
+														   do { \     barrier(); \     if (unlikely(preempt_count_dec_and_test())) \          __preempt_schedule(); \} while (0)
 ```
 
 **内核显式地要求调度的时候：**
@@ -328,8 +344,9 @@ static inline void __raw_spin_unlock(raw_spinlock_t *lock){     spin_re
 
 例如 mutex，sem，waitqueue 获取不到资源，或者是等待 IO。这种情况下进程会将自己的状态从　TASK_RUNNING 修改为 TASK_INTERRUPTIBLE，然后调用 schedule() 主动让出 CPU 并等待唤醒。
 
-```
-// block/blk-core.cstatic struct request *get_request(struct request_queue *q, int op,       int op_flags, struct bio *bio,       gfp_t gfp_mask){    [...]    prepare_to_wait_exclusive(&rl->wait[is_sync], &wait,      TASK_UNINTERRUPTIBLE);    io_schedule();  // 会调用 schedule();    [...]}
+```c
+// block/blk-core.c
+static struct request *get_request(struct request_queue *q, int op,       int op_flags, struct bio *bio,       gfp_t gfp_mask){    [...]    prepare_to_wait_exclusive(&rl->wait[is_sync], &wait,      TASK_UNINTERRUPTIBLE);    io_schedule();  // 会调用 schedule();    [...]}
 ```
 
 ##   

@@ -58,7 +58,7 @@ Dan Kegel这篇文章阅读难度并不大，大白建议从事服务端开发�
 在APUE第三版都没有提到epoll，所以**我们解决C10K问题的时间并不长**，其中IO复用epoll/kqueue/iocp等技术对于C10k问题的解决起到了非常重要的作用。
 
 开源大神们基于epoll/kqueue等开发了诸如libevent/libuv等网络库，从而大幅提高了高并发网络的开发效率，对于C/C++程序员来说并不陌生。
-
+![[Pasted image 20240923220928.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里简单提一下针对下一个10年的展望和挑战：**C10M问题**。
@@ -74,19 +74,19 @@ Errata Security的CEO Robert Graham在Shmoocon 2013大会上的演讲，大佬�
 确实也是如此，**难道你不觉得Linux内核做了太多不该自己做的事情了吗**？
 
 近几年出现的DPDK、PFRING、NETMAP等技术也是类似的思想，现在流行的协处理器+CPU的架构也是这样的：
-
+![[Pasted image 20240923220943.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 3. 服务器最大并发数分析
 
 前面提到的C10K和C10M问题都是围绕着提升服务器并发能力展开的，但是难免要问：**服务器最大的并发上限是多少**？
-
+![[Pasted image 20240923220949.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 3.1 五元组
 
 做过通信的盆友们一定听过**五元组**这个概念，一个五元组可以唯一标记一个网络连接，所以要理解和分析最大并发数，就必须理解五元组：
-
+![[Pasted image 20240923221049.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这样的话，就可以基本认为：**理论最大并发数 = 服务端唯一五元组数**。
@@ -100,7 +100,7 @@ Errata Security的CEO Robert Graham在Shmoocon 2013大会上的演讲，大佬�
 对于服务端本身来说，DestPort数量确实有限，假定有多张网卡，每个网卡绑定多个IP，**服务端的Port端口数和IP数的组合类型也是有限的**。
 
 对于客户端来说，本身的端口和IP也是一样有限的，虽然这是个**组合问题**，但是数量还是有限的：
-
+![[Pasted image 20240923221055.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 3.3 并发数理论极限
@@ -112,7 +112,7 @@ Errata Security的CEO Robert Graham在Shmoocon 2013大会上的演讲，大佬�
 分析一下，前面的计算都是针对单个服务器或者客户端的，但是**实际上每个服务器会应对全网的所有客户端**，那么从服务端看，源IP和源Port的数量是非常大的。
 
 **理论上服务端可以接受的客户端IP是2^32(按照IPv4计算）,端口数是2^16，目前端口号仍然是16bit的，所有这个理论最大值是2^48**，果然很大！
-
+![[Pasted image 20240923221107.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 3.4 实际情况
@@ -126,11 +126,11 @@ Errata Security的CEO Robert Graham在Shmoocon 2013大会上的演讲，大佬�
 ## 4. 客户端最大连接数  
 
 理解了服务器的最大并发数是2^48，那么**客户端最多可以连接多少服务器呢**？
-
+![[Pasted image 20240923221112.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于客户端来说，当然可以借助于多网卡多IP来增加连接能力，我们仍然假定客户端只有1张网卡1个IP，由于端口数的限制到2^16，再去掉系统占用的端口，剩下可用的差不多64000。
-
+![[Pasted image 20240923221119.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 也就是说，客户端虽然可以连接任意的目的IP和目的端口，但是客户端自身端口是有限的，所以**客户端的理论最大连接数是2^16**，含系统占用端口。
@@ -144,7 +144,7 @@ Errata Security的CEO Robert Graham在Shmoocon 2013大会上的演讲，大佬�
 毕竟公网IP都是有限并且要花钱的，我们大部分机器都是在局域网中结合NAT来进行外网访问的，所以这个场景还是很熟悉的。
 
 来看下**内网机器访问外网时的IP&端口替换和映射还原的过程**，就明白了：
-
+![[Pasted image 20240923221126.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   

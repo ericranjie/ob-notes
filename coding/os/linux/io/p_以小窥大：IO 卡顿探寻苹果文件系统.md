@@ -74,7 +74,7 @@ DTrace 即动态追踪技术（Dynamic Tracing），是内核提供的高级动�
 
 由于 iOS 平台不支持自定义 dtrace （虽然Instruments 就是基于 dtrace 的，但 iOS 即便越狱了也没办法触发自定义 dtrace 行为）， 我们只有基于 macOS 打开 dtrace 分析下这个时候到底发生了什么。运行 demo ，多次跑如下 dtrace 命令分析 demo 运行状态。
 
-```
+```c
 sudo dtrace -n 'lockstat:::adaptive-block { @[stack()] = sum(arg1); }' -p 95637sudo dtrace -n 'profile-999 /arg0/ { @[stack()] = count(); }'  -p 95806sudo lockstat sleep 10
 ```
 
@@ -166,7 +166,7 @@ System Trace 数据表明：当并发 I/O 遍历的文件目录是同一个时�
 苹果从 iOS10.3 开始引入了 APFS，而在此之前 HFS+ 一直是作为 iOS 和 macOS 的文件系统。
 
 应用程序是如何从 ssd 等存储介质上读写文件的呢？如下图：
-
+![[Pasted image 20240923192751.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### VFS

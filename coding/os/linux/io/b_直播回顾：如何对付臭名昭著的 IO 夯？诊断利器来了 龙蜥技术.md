@@ -90,13 +90,13 @@
 IO 夯，可简单理解为 IO 路径在一定程度上堵住了，轻则经过特定路径的 IO 不可访问，重则整条 IO 路径堵住不可用，任你多少 IO 丢下来，我就是没反应。为什么 IO 路径会堵住呢，无外乎是在等待资源。
 
 等待资源一般涉及的是 IO 路径上不可重入的临界区，要求进程持有资源进入、释放资源退出，又或者是事物处理型，允许接受有限个进程的事物，但要等待这些进程的事物全部被处理完之后，才能接收新的进程事物，开始处理新一轮的流程。而当处于临界区内的进程，由于内核 bug 或存储介质原因，导致无法顺利完成 IO 后正常退出，最终造成临界区外的进程因为拿不到资源而处于阻塞状态，导致无 IO 可用。由此可见，只要临界区内的进程不退出这种尴尬的状态，整条 IO 路径就不可用。
-
+![[Pasted image 20240923191615.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-1
 
 内核下有条 io complete 的关键路径，这条路径属于可重入路径，其主要职责为对 IO 结束后的收尾工作，一般地，会先执行一个 IO 回调流程，而后更新一些 IO 的stat信息，最后结束生命周期。内核中也有一些特殊类的 IO，在 IO 子系统中的处理方式与一般的 IO 有所差异，如 flush/fua io，而作者曾经碰到过一起 flush/fua io 夯的问题。flush/fua io 在使用日志型的文件系统场景下可能会比较常见，如 ext4 文件系统，为了保证文件系统元数据能够真正的持久化存储到磁盘的日志区域，jbd 线程在提交 commit record 的时候会发起这种 IO，而flush/fua io的处理流程也是比较繁琐的：
-
+![[Pasted image 20240923191620.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-2
@@ -112,7 +112,7 @@ IO 夯，可简单理解为 IO 路径在一定程度上堵住了，轻则经过�
 **3.3 IO夯问题分析方法现状**
 
 当遇到 IO 夯问题时，我们通常会分析 dmesg 中 hungtask 调用栈、或者是 iosta 信息、sysfs/debugfs 中的统计信息，再结合以往经验去推测问题可能出在哪。当我们碰到如下图 3-3 所示的 iostat 信息时，根据经验，会怀疑是磁盘侧有 IO 没回，因此怀疑io夯在磁盘上，让存储的同学去排查磁盘侧。但这种经验却不一定靠谱，如果是在磁盘返回到 io complete 之间有内核 bug，iostat 也会出现下图中的信息。
-
+![[Pasted image 20240923191626.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-3
@@ -122,13 +122,13 @@ IO 夯，可简单理解为 IO 路径在一定程度上堵住了，轻则经过�
 **3.4 利器简介——sysak iosdiag**
 
 sysAK iosdiag，是 sysAK 工具平台中的 IO 诊断工具，已具备 IO 时延探测、IO 夯诊断两大功能，其中 IO 夯诊断可用于检测当前系统中 IO 夯事件并确定问题边界。工具的大体架构图 3-4 所示：
-
+![[Pasted image 20240923191634.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-4
 
 首先通过 sysAK 的 iosdiag 功能去使能 IO 夯诊断，这里诊断到 IO 夯之后，会对 IO 进行数据分析，然后形成诊断结论，诊断结论是以 json 的数据格式保存在一个日志文件里面，同时也支持将数据上传到指定的地方，**目前支持 oss 的上传方式**，不上传的话，数据也会存在机器本地，供调用者去查看。
-
+![[Pasted image 20240923191641.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-5

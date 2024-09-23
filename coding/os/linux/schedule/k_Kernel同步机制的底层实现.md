@@ -96,7 +96,7 @@
     
 
 我在举个例子，如下：
-
+![[Pasted image 20240923215552.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > T1 : 进程1调用spin_lock，此时next=0, owner=0获得该锁，在arch_spin_lock()底层实现中，会next++
@@ -108,7 +108,7 @@
 > T4&T5 : 进程1调用spin_unlock，此时owner++，即owner=1，接着调用sev指令，让进程2和进程3退出standby状态，走while(1)流程，重新检查owner==next条件。此时进程2条件成立，进程3继续等待。进程2获得该锁，进程3继续等待。
 
 ### Linux Kernel中的SpinLock的实现
-
+![[Pasted image 20240923215558.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ```c

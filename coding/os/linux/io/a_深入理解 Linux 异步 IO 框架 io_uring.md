@@ -14,7 +14,7 @@ Linux爱好者
 167篇原创内容
 
 公众号
-
+![[Pasted image 20240923185622.png]]
 、![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -106,7 +106,7 @@ eBPF 作为动态跟踪工具，能够更方便地排查和观测 `io_uring` �
 ### 1.2 非阻塞式 I/O：`select()/poll()/epoll()`
 
 阻塞式之后，出现了一些新的、非阻塞的系统调用，例如 `select()`、`poll()` 以及更新的 `epoll()`。应用程序在调用这些函数读写时不会阻塞，而是 **==立即返回==**，返回的是一个**==已经 ready 的文件描述符列表==**。
-
+![[Pasted image 20240923185643.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 但这种方式存在一个致命缺点：**==只支持 network sockets 和 pipes==** ——`epoll()` 甚至连 storage files 都不支持。
@@ -114,7 +114,7 @@ eBPF 作为动态跟踪工具，能够更方便地排查和观测 `io_uring` �
 ### 1.3 线程池方式
 
 对于 storage I/O，经典的解决思路是 thread pool[5]：主线程将 I/O 分发给 worker 线程，后者代替主线程进行阻塞式读写，主线程不会阻塞。
-
+![[Pasted image 20240923185651.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这种方式的问题是 **==线程上下文切换开销可能非常大==**，后面性能压测会看到。
@@ -210,7 +210,7 @@ io_uring 来自资深内核开发者 Jens Axboe 的想法，他在 Linux I/O sta
     
 - **==完成队列==**：completion queue (CQ)
     
-
+![[Pasted image 20240923185707.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这两个队列：
@@ -584,7 +584,7 @@ io_uring 支持创建 I/O chain。一个 chain 内的 I/O 是顺序执行的，�
 |linux-aio|1,322,000|10,114,149|**-6.7%**|
 |io_uring (basic)|1,417,000|11,309,574|**—**|
 |io_uring (enhanced)|1,486,000|11,483,468|**4.9%**|
-
+![[Pasted image 20240923185730.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 几点分析：
@@ -625,7 +625,7 @@ io_uring 支持创建 I/O chain。一个 chain 内的 I/O 是顺序执行的，�
 |posix-aio (thread pool)|1,070,000|114,791,187|**-78.7%**|
 |linux-aio|4,127,000|105,052|**-17.9%**|
 |io_uring|5,024,000|106,683|**—**|
-
+![[Pasted image 20240923185740.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 结果分析：
@@ -667,10 +667,10 @@ Scylla 重度依赖 direct I/O，从一开始就使用 `linux-aio`。在我们�
 
 启用 `io_uring` 高级特性之后，我们看到性能确实有提升：Intel Optane 设备，单个 CPU  读取 512 字节，观察到 5% 的性能提升。与 表 1 & 2 对得上。虽然 5% 的提升 看上去不是太大，但对于希望压榨出硬件所有性能的数据库来说，还是非常宝贵的。
 
-|   |   |
-|---|---|
-|==linux-aio:==<br><br>Throughput         :      330 MB/s  <br>    Lat average        :     1549 usec  <br>    Lat quantile=  0.5 :     1547 usec  <br>    Lat quantile= 0.95 :     1694 usec  <br>    Lat quantile= 0.99 :     1703 usec  <br>    Lat quantile=0.999 :     1950 usec  <br>    Lat max            :     2177 usec|==io_uring, with buffer and file registration and poll:==<br><br>Throughput         :      346 MB/s  <br>Lat average        :     1470 usec  <br>Lat quantile= 0.5  :     1468 usec  <br>Lat quantile= 0.95 :     1558 usec  <br>Lat quantile= 0.99 :     1613 usec  <br>Lat quantile=0.999 :     1674 usec  <br>Lat max            :     1829 usec|
-|使用 1 个 CPU 从 Intel Optane 设备读取 512 字节。1000 并发请求。linux-aio 和 io_uring basic interface 性能差异很小。  但启用 io_uring 高级特性后，有 5% 的性能差距。|   |
+|                                                                                                                                                                                                                                                                                                                                  |                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ==linux-aio:==<br><br>Throughput         :      330 MB/s  <br>    Lat average        :     1549 usec  <br>    Lat quantile=  0.5 :     1547 usec  <br>    Lat quantile= 0.95 :     1694 usec  <br>    Lat quantile= 0.99 :     1703 usec  <br>    Lat quantile=0.999 :     1950 usec  <br>    Lat max            :     2177 usec | ==io_uring, with buffer and file registration and poll:==<br><br>Throughput         :      346 MB/s  <br>Lat average        :     1470 usec  <br>Lat quantile= 0.5  :     1468 usec  <br>Lat quantile= 0.95 :     1558 usec  <br>Lat quantile= 0.99 :     1613 usec  <br>Lat quantile=0.999 :     1674 usec  <br>Lat max            :     1829 usec |
+| 使用 1 个 CPU 从 Intel Optane 设备读取 512 字节。1000 并发请求。linux-aio 和 io_uring basic interface 性能差异很小。  但启用 io_uring 高级特性后，有 5% 的性能差距。                                                                                                                                                                                                     |                                                                                                                                                                                                                                                                                                                                                     |
 
 ## 5 eBPF
 
