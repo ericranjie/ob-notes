@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+                "file": "coding/os/linux/io/图解 Linux  管道通信的原理？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+                "file": "coding/os/linux/io/图解 Linux  管道通信的原理？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+                "file": "coding/os/linux/io/图解 Linux  管道通信的原理？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md"
+                "file": "coding/os/linux/io/图解 Linux  管道通信的原理？.md"
               }
             }
           }
@@ -148,17 +148,20 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x99-image/-20240922/Pasted image 20240922201656.png",
+    "Pasted image 20240922230021.png",
+    "Pasted image 20240922230012.png",
+    "Pasted image 20240922230000.png",
+    "Pasted image 20240922225952.png",
+    "Pasted image 20240922225944.png",
+    "Pasted image 20240922225931.png",
+    "Pasted image 20240922225820.png",
+    "coding/os/linux/io/k_彻底搞懂IO多路复用.md",
+    "coding/os/linux/io/b_block io生命历程.md",
     "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+    "0x99-image/-20240922/Pasted image 20240922201656.png",
     "0x99-image/-20240922/Pasted image 20240922202059.png",
     "0x99-image/-20240922/Pasted image 20240922202044.png",
     "0x99-image/-20240922/Pasted image 20240922202019.png",
-    "0x99-image/-20240922/Pasted image 20240922202009.png",
-    "0x99-image/-20240922/Pasted image 20240922201959.png",
-    "0x99-image/-20240922/Pasted image 20240922201949.png",
-    "0x99-image/-20240922/Pasted image 20240922201920.png",
-    "0x99-image/-20240922/Pasted image 20240922201905.png",
-    "0x99-image/-20240922/Pasted image 20240922201845.png",
     "coding/os/linux/process/Shopee 送命题：进程切换为什么比线程切换慢.md",
     "coding/os/linux/process/d_Process Creation（二）.md",
     "coding/os/linux/process/i_Linux进程冻结技术.md",
@@ -182,8 +185,6 @@
     "coding/frontend/k_Node.js 的 perf_hooks.md",
     "coding/frontend/i_Node.js 抓取堆快照过程解析.md",
     "coding/frontend/a(pt)_hyengine - 面向移动端的高性能通用编译 解释引擎.md",
-    "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
-    "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
     "coding/os/linux/network/debug",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",

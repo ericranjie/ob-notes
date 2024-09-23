@@ -44,14 +44,14 @@ CPP开发者
     
 
 其原理如下图所示：
-
+![[Pasted image 20240922225820.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于管道分为读端和写端，所以需要两个文件描述符来管理管道：`fd[0]` 为读端，`fd[1]` 为写端。
 
 下面代码介绍了怎么使用 `pipe` 系统调用来创建一个管道：
 
-```
+```c
 #include <stdio.h>#include <unistd.h>#include <sys/types.h>#include <stdlib.h>#include <string.h>int main(){    int ret = -1;    int fd[2];  // 用于管理管道的文件描述符    pid_t pid;    char buf[512] = {0};    char *msg = "hello world";    // 创建一个管理    ret = pipe(fd);    if (-1 == ret) {        printf("failed to create pipe\n");        return -1;    }      pid = fork();     // 创建子进程    if (0 == pid) {   // 子进程        close(fd[0]); // 关闭管道的读端        ret = write(fd[1], msg, strlen(msg)); // 向管道写端写入数据        exit(0);    } else {          // 父进程        close(fd[1]); // 关闭管道的写端        ret = read(fd[0], buf, sizeof(buf)); // 从管道的读端读取数据        printf("parent read %d bytes data: %s\n", ret, buf);    }    return 0;}
 ```
 
@@ -76,7 +76,7 @@ CPP开发者
 ### 1. 环形缓冲区（Ring Buffer）
 
 在内核中，`管道` 使用了环形缓冲区来存储数据。环形缓冲区的原理是：把一个缓冲区当成是首尾相连的环，其中通过读指针和写指针来记录读操作和写操作位置。如下图所示：
-
+![[Pasted image 20240922225931.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -130,7 +130,7 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
     
 
 下图展示了 `pipe_inode_info` 对象与 `pipe_buffer` 对象的关系：
-
+![[Pasted image 20240922225944.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 管道的环形缓冲区实现方式与经典的环形缓冲区实现方式有点区别，经典的环形缓冲区一般先申请一块地址连续的内存块，然后通过读指针与写指针来对读操作与写操作进行定位。
@@ -142,7 +142,7 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
 ### 3. 读操作
 
 从 `经典的环形缓冲区` 中读取数据时，首先通过读指针来定位到读取数据的起始地址，然后判断环形缓冲区中是否有数据可读，如果有就从环形缓冲区中读取数据到用户空间的缓冲区中。如下图所示：
-
+![[Pasted image 20240922225952.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -155,7 +155,7 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
     
 
 读取数据的过程如下图所示：
-
+![[Pasted image 20240922230000.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -166,7 +166,7 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
 
 我们来看看管道读操作的代码实现，读操作由 `pipe_read` 函数完成。为了突出重点，我们只列出关键代码，如下所示：
 
-```
+```c
 static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, unsigned long nr_segs,          loff_t pos){    ...    struct pipe_inode_info *pipe;    // 1. 获取管道对象    pipe = inode->i_pipe;    for (;;) {        // 2. 获取管道未读数据占有多少个内存页        int bufs = pipe->nrbufs;        if (bufs) {            // 3. 获取读操作应该从环形缓冲区的哪个内存页处读取数据            int curbuf = pipe->curbuf;              struct pipe_buffer *buf = pipe->bufs + curbuf;            ...            /* 4. 通过 pipe_buffer 的 offset 字段获取真正的读指针,             *    并且从管道中读取数据到用户缓冲区.             */            error = pipe_iov_copy_to_user(iov, addr + buf->offset, chars, atomic);            ...            ret += chars;            buf->offset += chars; // 增加 pipe_buffer 对象的 offset 字段的值            buf->len -= chars;    // 减少 pipe_buffer 对象的 len 字段的值            /* 5. 如果当前内存页的数据已经被读取完毕 */            if (!buf->len) {                ...                curbuf = (curbuf + 1) & (PIPE_BUFFERS - 1);                pipe->curbuf = curbuf; // 移动 pipe_inode_info 对象的 curbuf 指针                pipe->nrbufs = --bufs; // 减少 pipe_inode_info 对象的 nrbufs 字段                do_wakeup = 1;            }            total_len -= chars;            // 6. 如果读取到用户期望的数据长度, 退出循环            if (!total_len)                break;        }        ...    }    ...    return ret;}
 ```
 
@@ -190,7 +190,7 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 分析完管道读操作的实现后，接下来，我们分析一下管道写操作的实现。
 
 `经典的环形缓冲区` 写入数据时，首先通过写指针进行定位要写入的内存地址，然后判断环形缓冲区的空间是否足够，足够就把数据写入到环形缓冲区中。如下图所示：
-
+![[Pasted image 20240922230012.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -204,7 +204,7 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 下面我们来看看，向管道写入 200 字节数据的过程示意图，如下所示：
 
 如上图所示，向管道写入数据时：
-
+![[Pasted image 20240922230021.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - 首先通过 `pipe_inode_info` 的 `curbuf` 字段和 `nrbufs` 字段来定位到，应该向哪个 `pipe_buffer` 写入数据。
@@ -214,7 +214,7 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 
 下面我们通过源码来分析，写操作是怎么实现的，代码如下（为了特出重点，代码有所删减）：
 
-```
+```c
 static ssize_tpipe_write(struct kiocb *iocb, const struct iovec *_iov, unsigned long nr_segs,           loff_t ppos){    ...    struct pipe_inode_info *pipe;    ...    pipe = inode->i_pipe;    ...    chars = total_len & (PAGE_SIZE - 1); /* size of the last buffer */    // 1. 如果最后写入的 pipe_buffer 还有空闲的空间    if (pipe->nrbufs && chars != 0) {        // 获取写入数据的位置        int lastbuf = (pipe->curbuf + pipe->nrbufs - 1) & (PIPE_BUFFERS-1);        struct pipe_buffer *buf = pipe->bufs + lastbuf;        const struct pipe_buf_operations *ops = buf->ops;        int offset = buf->offset + buf->len;        if (ops->can_merge && offset + chars <= PAGE_SIZE) {            ...            error = pipe_iov_copy_from_user(offset + addr, iov, chars, atomic);            ...            buf->len += chars;            total_len -= chars;            ret = chars;            // 如果要写入的数据已经全部写入成功, 退出循环            if (!total_len)                goto out;        }    }    // 2. 如果最后写入的 pipe_buffer 空闲空间不足, 那么申请一个新的内存页来存储数据    for (;;) {        int bufs;        ...        bufs = pipe->nrbufs;        if (bufs < PIPE_BUFFERS) {            int newbuf = (pipe->curbuf + bufs) & (PIPE_BUFFERS-1);            struct pipe_buffer *buf = pipe->bufs + newbuf;            ...            // 申请一个新的内存页            if (!page) {                page = alloc_page(GFP_HIGHUSER);                ...            }            ...            error = pipe_iov_copy_from_user(src, iov, chars, atomic);            ...            ret += chars;            buf->page = page;            buf->ops = &anon_pipe_buf_ops;            buf->offset = 0;            buf->len = chars;            pipe->nrbufs = ++bufs;            pipe->tmp_page = NULL;            // 如果要写入的数据已经全部写入成功, 退出循环            total_len -= chars;            if (!total_len)                break;        }        ...    }out:    ...    return ret;}
 ```
 

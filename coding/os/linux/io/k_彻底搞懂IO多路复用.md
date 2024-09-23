@@ -28,7 +28,7 @@
   
 服务端为了处理客户端的连接和请求的数据，写了如下代码。
 
-```
+```c
 listenfd = socket();   // 打开一个网络通信端口bind(listenfd);        // 绑定listen(listenfd);      // 监听while(1) {  connfd = accept(listenfd);  // 阻塞建立连接  int n = read(connfd, buf);  // 阻塞读数据  doSomeThing(buf);  // 利用读到的数据做些什么  close(connfd);     // 关闭连接，循环等待下一个连接}
 ```
 
@@ -58,7 +58,7 @@ listenfd = socket();   // 打开一个网络通信端口bind(listenfd); �
 
 有一种聪明的办法是，每次都创建一个新的进程或线程，去调用 read 函数，并做业务处理。
 
-```
+```c
 while(1) {  connfd = accept(listenfd);  // 阻塞建立连接  pthread_create（doWork);  // 创建一个新的线程}void doWork() {  int n = read(connfd, buf);  // 阻塞读数据  doSomeThing(buf);  // 利用读到的数据做些什么  close(connfd);     // 关闭连接，循环等待下一个连接}
 ```
 
@@ -74,7 +74,7 @@ while(1) {  connfd = accept(listenfd);  // 阻塞建立连接  pthread
 
 操作系统提供了这样的功能，只需要在调用 read 前，将文件描述符设置为非阻塞即可。
 
-```
+```c
 fcntl(connfd, F_SETFL, O_NONBLOCK);int n = read(connfd, buffer) != SUCCESS);
 ```
 
@@ -100,13 +100,13 @@ fcntl(connfd, F_SETFL, O_NONBLOCK);int n = read(connfd, buffer) != SUCCE
 
 当然还有个聪明的办法，我们可以每 accept 一个客户端连接后，将这个文件描述符（connfd）放到一个数组里。
 
-```
+```c
 fdlist.add(connfd);
 ```
 
 然后弄一个新的线程去不断遍历这个数组，调用每一个元素的非阻塞 read 方法。
 
-```
+```c
 while(1) {  for(fd <-- fdlist) {    if(read(fd) != -1) {      doSomeThing();    }  }}
 ```
 
@@ -130,7 +130,7 @@ select 是操作系统提供的系统调用函数，通过它，我们可以把�
 
 select系统调用的函数定义如下。
 
-```
+```c
 int select(    int nfds,    fd_set *readfds,    fd_set *writefds,    fd_set *exceptfds,    struct timeval *timeout);// nfds:监控的文件描述符集里最大文件描述符加1// readfds：监控有读数据到达文件描述符集合，传入传出参数// writefds：监控写数据到达文件描述符集合，传入传出参数// exceptfds：监控异常发生达文件描述符集合, 传入传出参数// timeout：定时阻塞监控时间，3种情况//  1.NULL，永远等下去//  2.设置timeval，等待固定时间//  3.设置timeval里时间均为0，检查描述字后立即返回，轮询
 ```
 
@@ -138,21 +138,22 @@ int select(    int nfds,    fd_set *readfds,    fd_set *writefds
 
 首先一个线程不断接受客户端连接，并把 socket 文件描述符放到一个 list 里。
 
-```
+```c
 while(1) {  connfd = accept(listenfd);  fcntl(connfd, F_SETFL, O_NONBLOCK);  fdlist.add(connfd);}
 ```
 
 然后，另一个线程不再自己遍历，而是调用 select，将这批文件描述符 list 交给操作系统去遍历。
 
-```
-while(1) {  // 把一堆文件描述符 list 传给 select 函数  // 有已就绪的文件描述符就返回，nready 表示有多少个就绪的  nready = select(list);  ...}
+```c
+while(1) {  // 把一堆文件描述符 list 传给 select 函数  // 有已就绪的文件描述符就返回，nready 表示有多少个就绪的  nready = select(list);  ...
+}
 ```
 
 不过，当 select 函数返回后，用户依然需要遍历刚刚提交给操作系统的 list。
 
 只不过，操作系统会将准备就绪的文件描述符做上标识，用户层将不会再有无意义的系统调用开销。
 
-```
+```c
 while(1) {  nready = select(list);  // 用户层依然要遍历，只不过少了很多无效的系统调用  for(fd <-- fdlist) {    if(fd != -1) {      // 只读已就绪的文件描述符      read(fd, buf);      // 总共只有 nready 个已就绪描述符，不用过多遍历      if(--nready == 0) break;    }  }}
 ```
 
@@ -178,7 +179,7 @@ while(1) {  nready = select(list);  // 用户层依然要遍历，只不
 
 poll 也是操作系统提供的系统调用函数。
 
-```
+```c
 int poll(struct pollfd *fds, nfds_tnfds, int timeout);struct pollfd {  intfd; /*文件描述符*/  shortevents; /*监控的事件*/  shortrevents; /*监控事件中满足条件返回的事件*/};
 ```
 
@@ -208,19 +209,19 @@ epoll 是最终的大 boss，它解决了 select 和 poll 的一些问题。
 
 第一步，创建一个 epoll 句柄
 
-```
+```c
 int epoll_create(int size);
 ```
 
 第二步，向内核添加、修改或删除要监控的文件描述符。
 
-```
+```c
 int epoll_ctl(  int epfd, int op, int fd, struct epoll_event *event);
 ```
 
 第三步，类似发起了 select() 调用
 
-```
+```c
 int epoll_wait(  int epfd, struct epoll_event *events, int max events, int timeout);
 ```
 
