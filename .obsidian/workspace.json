@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/Linux中常见同步机制设计原理.md",
+                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/Linux中常见同步机制设计原理.md",
+                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/Linux中常见同步机制设计原理.md",
+                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/Linux中常见同步机制设计原理.md"
+                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md"
               }
             }
           }
@@ -146,8 +146,32 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "0x01-leetcode/1-dimensional/linked-list/sort",
+    "0x01-leetcode/1-dimensional/linked-list/remove/m_82. Remove Duplicates from Sorted List II.md",
+    "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/e_206. Reverse Linked List.md",
+    "0x01-leetcode/1-dimensional/linked-list/remove",
+    "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/m_92. Reverse Linked List II.md",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/e_21. Merge Two Sorted Lists.md",
+    "0x01-leetcode/1-dimensional/linked-list/reverse",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/h_25. Reverse Nodes in k-Group.md",
+    "0x01-leetcode/1-dimensional/linked-list/merge",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/m_24. Swap Nodes in Pairs.md",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/h_23. Merge k Sorted Lists.md",
+    "0x01-leetcode/1-dimensional/linked-list/m_86. Partition List.md",
+    "0x01-leetcode/1-dimensional/linked-list/sort/m_148. Sort List.md",
+    "0x01-leetcode/1-dimensional/linked-list/m_143. Reorder List.md",
+    "0x01-leetcode/1-dimensional/linked-list",
+    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（一）：workqueue的基本概念.md",
+    "coding/os/linux/schedule/d_多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
+    "coding/os/linux/schedule/d_load_balance函数代码详解.md",
+    "coding/os/linux/schedule/Linux实时化与硬实时RTOS综述.md",
+    "coding/os/linux/schedule/i_Linux内核同步机制之（二）：Per-CPU变量.md",
+    "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
+    "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
     "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
     "0x99-image/Pasted image 20240923215552.png",
     "0x99-image/Pasted image 20240923221126.png",
@@ -163,36 +187,14 @@
     "coding/os/linux/schedule/i_Linux内核同步机制之（一）：原子操作.md",
     "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
     "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
-    "coding/os/linux/schedule/load_balance函数代码详解.md",
     "coding/os/linux/process/b_为什么新版内核将进程pid管理从bitmap替换成了radix-tree？.md",
     "coding/os/linux/process/i_Shopee 送命题：进程切换为什么比线程切换慢.md",
-    "coding/os/linux/process/k_一文看懂 fork 系统调用.md",
-    "coding/os/linux/process/i_计算机科学基础知识之（六）理解栈帧.md",
-    "coding/os/linux/io/epoll/m_深入理解 Linux 的 epoll 机制.md",
-    "coding/os/linux/io/b_直播回顾：如何对付臭名昭著的 IO 夯？诊断利器来了 龙蜥技术.md",
-    "coding/os/linux/io/i_浅析Linux sockfs文件系统.md",
-    "coding/os/linux/io/p_以小窥大：IO 卡顿探寻苹果文件系统.md",
-    "coding/os/linux/shell/i_使用 Linux 的 diff 和 patch 对文件进行协作.md",
-    "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
-    "coding/os/linux/io/k_关于linux io_uring性能测试及其 实现原理的一些探索.md",
-    "coding/os/linux/io/i_图解 Linux  管道通信的原理？.md",
-    "coding/os/linux/io/k_彻底搞懂IO多路复用.md",
-    "coding/os/linux/io/b_block io生命历程.md",
-    "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
-    "coding/os/linux/process/d_Process Creation（二）.md",
-    "coding/os/linux/process/i_Linux进程冻结技术.md",
-    "coding/os/linux/process/coroutine/i_协程究竟比线程牛在什么地方？.md",
-    "coding/os/linux/process/k_进程管理和终端驱动：基本概念.md",
     "0x99-image/-20240922",
     "coding/os/linux/network/debug",
     "coding/os/ARM/init",
     "coding/os/linux/device/device_tree",
     "coding/os/linux/device/device_model",
     "coding/os/linux/device/GPIO",
-    "coding/os/linux/io/epoll",
-    "coding/java/Spring",
-    "coding/cpp/opensource/qt",
-    "coding/cpp/opensource/protobuf",
     "Untitled.canvas"
   ]
 }
