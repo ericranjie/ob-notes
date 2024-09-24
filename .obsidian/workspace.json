@@ -11,9 +11,11 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "0x99-image/Pasted image 20240924111635.png"
+                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -46,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "图解 Linux  管道通信的原理？",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240924111635.png",
+                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240924111635.png",
+                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240924111635.png"
+                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md"
               }
             }
           }
@@ -144,8 +146,41 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/lock/Linux内核同步机制之（六）：Seqlock.md",
+    "coding/os/linux/schedule/lock/Linux内核同步机制之（八）：mutex.md",
+    "coding/os/linux/schedule/lock/spinlock/Linux内核的自旋锁.md",
+    "coding/os/linux/schedule/lock/Linux读写锁逻辑解析.md",
+    "coding/os/linux/schedule/lock/spinlock/k_Linux内核同步机制之（四）：spin lock.md",
+    "coding/os/linux/schedule/lock/spinlock/i_Linux内核同步机制之（五）：Read Write spin lock.md",
+    "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md",
+    "coding/os/linux/schedule/lock/RCU/i_Linux内核同步机制之（七）：RCU基础.md",
+    "coding/os/linux/schedule/lock/RCU/k_Linux2.6.23 ：sleepable RCU的实现.md",
+    "coding/os/linux/schedule/lock/spinlock/i_Linux 网络：性能杀手 spinlock.md",
+    "coding/os/linux/schedule/lock/spinlock",
+    "coding/os/linux/schedule/lock/RCU/i_RCU synchronize原理分析.md",
+    "coding/os/linux/schedule/lock/d_futex基础问答.md",
+    "coding/os/linux/schedule/PELT/i_per-entity load tracking.md",
+    "coding/os/linux/schedule/PELT/d_PELT算法浅析.md",
+    "coding/os/linux/schedule/signal/a_Linux内核-信号的传递过程.md",
+    "Pasted image 20240924152411.png",
+    "Pasted image 20240924152400.png",
+    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（四）：workqueue如何处理work.md",
+    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（二）：CMWQ概述.md",
+    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（三）：创建workqueue代码分析.md",
+    "coding/os/linux/schedule/b_深入理解 Linux 调度（GPU）虚拟化.md",
+    "0x99-image/Pasted image 20240924114438.png",
+    "0x99-image/Pasted image 20240924114828.png",
+    "0x99-image/Pasted image 20240924114820.png",
+    "0x99-image/Pasted image 20240924114803.png",
+    "0x99-image/Pasted image 20240924114743.png",
+    "0x99-image/Pasted image 20240924114726.png",
+    "0x99-image/Pasted image 20240924114655.png",
+    "0x99-image/Pasted image 20240924114648.png",
+    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
+    "coding/os/linux/schedule/i_甄建勇：五分钟搞定计算机体系结构（上）.md",
+    "coding/os/linux/shell/i_使用 logrotate 命令轮转和归档日志 Linux 中国.md",
     "0x01-leetcode/math-logic/hard-logic/validate/m_393. UTF-8 Validation.md",
     "0x01-leetcode/math-logic/hard-logic/m_71. Simplify Path.md",
     "0x01-leetcode/math-logic/hard-logic/validate",
@@ -155,44 +190,11 @@
     "0x01-leetcode/math-logic",
     "0x01-leetcode/1-dimensional/stack/monotonous-stack/h_768. Max Chunks To Make Sorted II.md",
     "0x01-leetcode/1-dimensional/queue",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element/m_556. Next Greater Element III.md",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element/m_503. Next Greater Element II.md",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element/e_496. Next Greater Element I.md",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/h_321. Create Maximum Number.md",
     "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/m_316. Remove Duplicate Letters.md",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/m_402. Remove K Digits.md",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/h_85. Maximal Rectangle.md",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/h_84. Largest Rectangle in Histogram.md",
-    "0x99-image/Pasted image 20240924111645.png",
-    "0x99-image/Pasted image 20240924111635.png",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/descending-stack/m_739. Daily Temperatures.md",
     "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack",
-    "0x01-leetcode/1-dimensional/array/rotate/e_189. Rotate Array.md",
     "0x01-leetcode/1-dimensional/stack/monotonous-stack/descending-stack",
     "0x01-leetcode/1-dimensional/stack/monotonous-stack",
-    "0x01-leetcode/1-dimensional/array/h_135. Candy.md",
-    "0x01-leetcode/1-dimensional/array/rotate",
-    "0x01-leetcode/1-dimensional/array/missing-num/e_448. Find All Numbers Disappeared in an Array.md",
-    "0x01-leetcode/1-dimensional/array/missing-num/m_442. Find All Duplicates in an Array.md",
-    "0x01-leetcode/1-dimensional/array/missing-num/h_41. First Missing Positive.md",
-    "0x01-leetcode/1-dimensional/array/buy-sell-stock/m_122. Best Time to Buy and Sell Stock II.md",
-    "0x01-leetcode/1-dimensional/array/buy-sell-stock/e_121. Best Time to Buy and Sell Stock.md",
-    "0x01-leetcode/1-dimensional/string/rearrange/m_767. Reorganize String.md",
-    "0x01-leetcode/1-dimensional/string/rearrange/m_621. Task Scheduler.md",
-    "0x01-leetcode/1-dimensional/string/rearrange/h_358. Rearrange String k Distance Apart.md",
-    "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
-    "0x01-leetcode/1-dimensional/stack/e_716. Max Stack.md",
-    "0x01-leetcode/1-dimensional/stack/parenthesis/e_657. Robot Return to Origin.md",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
-    "0x99-image/Pasted image 20240923215552.png",
-    "0x99-image/Pasted image 20240923221126.png",
-    "0x99-image/Pasted image 20240923221119.png",
-    "0x99-image/Pasted image 20240923221112.png",
-    "0x99-image/Pasted image 20240923221107.png",
-    "0x99-image/Pasted image 20240923221055.png",
-    "0x99-image/Pasted image 20240923221049.png",
-    "0x99-image/Pasted image 20240923220949.png",
     "Untitled.canvas"
   ]
 }

@@ -103,7 +103,7 @@ Linux内核之旅
 `信号处理程序`是由用户进程定义的函数，包含在用户代码段中。`handle_signal()`函数在内核态运行，而信号处理程序在用户态运行；这意味着当前进程必须首先在用户态执行信号处理程序，然后才能被允许恢复其“正常”执行。此外，当内核试图恢复进程的正常执行时，内核堆栈不再包含被中断程序的硬件上下文，因为内核堆栈在每次从用户态转换到内核态时都会被清空。
 
 下图`11-2`说明了捕获信号的函数执行流程。假设非阻塞信号被发送给进程。中断或异常发生时，进程切换到内核态。在即将返回到用户态之前，内核调用`do_signal()`函数，依次处理信号（`handle_signal()`）并配置用户态栈（`setup_frame()`或`setup_rt_frame()`）。进程切换到用户态后，开始执行信号处理程序，因为该处理程序的地址被强制加载到了`PC`程序计数器中。当信号程序终止后，调用`setup_frame()`或`setup_rt_frame()`将返回代码加载到用户态栈中。这段返回代码会调用`sigreturn()`和`rt_sigreturn()`系统调用；相应的服务例程会将正常程序的硬件上下文内容拷贝到内核态栈并将用户态栈恢复到其原始状态（`restore_sigcontext()`）。当系统调用终止时，正常程序继续其执行。
-
+![[Pasted image 20240924152400.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图`11-2` 捕获一个信号
@@ -163,7 +163,7 @@ Linux内核之旅
     
     发起`sigreturn()`系统调用的8字节代码。在`Linux`早期版本中，这段代码用来从信号处理程序返回；但`Linux 2.6`版本以后，仅用作符号签名，以便调试器可以识别信号的栈帧。
     
-
+![[Pasted image 20240924152411.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图`11-3` 用户态栈上的`frame`

@@ -81,7 +81,7 @@ The following article is from 腾讯技术工程 Author jikesong
 #### 2.1 GPU 能做什么
 
 GPU 天然适合向量计算。常用场景及 API：
-
+![[Pasted image 20240924114438.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)此外还有加解密、哈希等场景，例如近些年来的挖矿。渲染是 GPU 诞生之初的应用: GPU 的 G 就是 Graphics —— 图形。
 
 桌面、服务器级别的 GPU，长期以来仅有三家厂商:
@@ -294,17 +294,17 @@ API 层的 GPU 虚拟化是目前业界应用最广泛的 GPU 虚拟化方案。
 所以事实上，到目前为止，GPU 的 SR-IOV 仅仅是封装了 PCIe TLP 层的 VF 路由标识、从而规避了 runtime 时的软件 DMA 翻译，除此之外，和基于 MDEV 的 MPT 方案并无本质的不同。
 
 ##### 2.3.7 谱系表
-
+![[Pasted image 20240924114515.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在介绍完了上述的这些方案后，我们重新看下 CUDA 计算、OpenGL 渲染两种场景的软件栈，看看能发现什么:
 
 CUDA 计算 stack：
-
+![[Pasted image 20240924114542.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 OpenGL 渲染 Stack：
-
+![[Pasted image 20240924114554.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看出，**从 API 库开始，直到 GPU 硬件，Stack 中的每一个阶段，都有被截获、转发的可能性**。甚至，一概称之为「API 转发」是不合适的 —— 以 GRID vGPU、GVT-g 为例的 DEV 转发，事实上就是 MPT，和任何 API 都没有关系。
@@ -316,7 +316,7 @@ OpenGL 渲染 Stack：
 首先，我们这里谈到的，都是 nVidia 生产的 GPU、都只考虑 CUDA 计算场景。其次，这里的虚拟化指的是 OS 虚拟化的容器技术，不适用于 KATA 这样的、基于系统虚拟化的安全容器。
 
 #### 3.1 CUDA 的生态
-
+![[Pasted image 20240924114602.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 CUDA 开发者使用的，通常是 CUDA Runtime API，它是 high-level 的；而 CUDA Driver API 则是 low-level 的，它对程序和 GPU 硬件有更精细的控制。Runtime API 是对 Driver API 的封装。
@@ -333,7 +333,7 @@ CUDA Driver 即是 UMD，它直接和 KMD 打交道。两者都属于 NVIDIA Dri
     
 
 以 nvidia.ko 为例，为了兼容不同版本的 Linux 内核 API，它提供了相当丰富的兼容层，于是也就开源了部分代码:
-
+![[Pasted image 20240924114639.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中这个 26M 大小的、被剥离了符号表的 nv-kernel.o_binary，就是 GPU 驱动的核心代码，所有的 GPU 硬件细节都藏在其中。
@@ -343,11 +343,11 @@ CUDA Driver 即是 UMD，它直接和 KMD 打交道。两者都属于 NVIDIA Dri
 为了让多个容器可以共享同一个 GPU，为了限定每个容器能使用的 GPU 份额，业界出现了不同的方案，典型的如 vCUDA 和 cGPU：
 
 vCUDA 架构：
-
+![[Pasted image 20240924114648.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cGPU 架构：
-
+![[Pasted image 20240924114655.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 两者的实现策略不同，cGPU 比 vCUDA 更底层，从而实现了不侵入用户环境。
@@ -355,7 +355,7 @@ cGPU 架构：
 #### 3.3 GPU 池化简介
 
 从截获的位置，看 GPU 池化的谱系：
-
+![[Pasted image 20240924114726.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 以 CUDA API 转发的池化方案、业界某产品为例，它到了 GPU 所在的后端机器上，由于一个 GPU 卡可能运行多个 GPU 任务，这些任务之间，依然需要有算力隔离。它为了实现这一点，在后端默认启用了 nVidia MPS —— 也就是故障隔离最差的方案。这会导致什么？**一个 VM 里的 CUDA 程序越界访问了显存，一堆风马牛不相及的 VM 里的 CUDA 应用就会被杀死**。
@@ -385,13 +385,13 @@ nVidia GPU 支持基于 Engine 的 Context Switch。不管是哪一代的 GPU，
 ##### 3.4.1 GPU microarchitecture 和 chip
 
 真正决定 GPU 硬件以何种方式工作的，是 chip 型号。不管是 GRID Driver 还是 Tesla Driver，要指挥 GPU 硬件工作，就要首先判断 GPU 属于哪种 chip，从而决定用什么样的软硬件接口来驱动它。
-
+![[Pasted image 20240924114743.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 3.4.2 PFIFO: GPU Scheduling Internals
 
 PFIFO 架构：
-
+![[Pasted image 20240924114803.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 概念解释：
@@ -504,11 +504,11 @@ qGPU == QoS GPU。它是目前业界唯一真正实现了故障隔离、显存�
 ##### 3.5.1 qGPU 基本架构
 
 qGPU 基本架构：
-
+![[Pasted image 20240924114820.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 3.5.2 qGPU QoS 效果
-
+![[Pasted image 20240924114828.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **注释**
