@@ -11,11 +11,9 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
-                "mode": "source",
-                "source": false
+                "file": "0x99-image/Pasted image 20240924111635.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
+                "file": "0x99-image/Pasted image 20240924111635.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
+                "file": "0x99-image/Pasted image 20240924111635.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md"
+                "file": "0x99-image/Pasted image 20240924111635.png"
               }
             }
           }
@@ -148,31 +146,45 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "0x01-leetcode/1-dimensional/linked-list/sort",
-    "0x01-leetcode/1-dimensional/linked-list/remove/m_82. Remove Duplicates from Sorted List II.md",
-    "0x01-leetcode/1-dimensional/linked-list/remove/e_83. Remove Duplicates from Sorted List.md",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/e_206. Reverse Linked List.md",
-    "0x01-leetcode/1-dimensional/linked-list/remove",
+    "0x01-leetcode/math-logic/hard-logic/validate/m_393. UTF-8 Validation.md",
+    "0x01-leetcode/math-logic/hard-logic/m_71. Simplify Path.md",
+    "0x01-leetcode/math-logic/hard-logic/validate",
+    "0x01-leetcode/1-dimensional/queue/m_950. Reveal Cards In Increasing Order.md",
+    "0x01-leetcode/math-logic/hard-logic",
+    "0x01-leetcode/math/Untitled",
+    "0x01-leetcode/math-logic",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/h_768. Max Chunks To Make Sorted II.md",
+    "0x01-leetcode/1-dimensional/queue",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element/m_556. Next Greater Element III.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element/m_503. Next Greater Element II.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element/e_496. Next Greater Element I.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/h_321. Create Maximum Number.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/m_316. Remove Duplicate Letters.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/m_402. Remove K Digits.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/h_85. Maximal Rectangle.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack/h_84. Largest Rectangle in Histogram.md",
+    "0x99-image/Pasted image 20240924111645.png",
+    "0x99-image/Pasted image 20240924111635.png",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/descending-stack/m_739. Daily Temperatures.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack",
+    "0x01-leetcode/1-dimensional/array/rotate/e_189. Rotate Array.md",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack/descending-stack",
+    "0x01-leetcode/1-dimensional/stack/monotonous-stack",
+    "0x01-leetcode/1-dimensional/array/h_135. Candy.md",
+    "0x01-leetcode/1-dimensional/array/rotate",
+    "0x01-leetcode/1-dimensional/array/missing-num/e_448. Find All Numbers Disappeared in an Array.md",
+    "0x01-leetcode/1-dimensional/array/missing-num/m_442. Find All Duplicates in an Array.md",
+    "0x01-leetcode/1-dimensional/array/missing-num/h_41. First Missing Positive.md",
+    "0x01-leetcode/1-dimensional/array/buy-sell-stock/m_122. Best Time to Buy and Sell Stock II.md",
+    "0x01-leetcode/1-dimensional/array/buy-sell-stock/e_121. Best Time to Buy and Sell Stock.md",
+    "0x01-leetcode/1-dimensional/string/rearrange/m_767. Reorganize String.md",
+    "0x01-leetcode/1-dimensional/string/rearrange/m_621. Task Scheduler.md",
+    "0x01-leetcode/1-dimensional/string/rearrange/h_358. Rearrange String k Distance Apart.md",
+    "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
+    "0x01-leetcode/1-dimensional/stack/e_716. Max Stack.md",
+    "0x01-leetcode/1-dimensional/stack/parenthesis/e_657. Robot Return to Origin.md",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/m_92. Reverse Linked List II.md",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/e_21. Merge Two Sorted Lists.md",
-    "0x01-leetcode/1-dimensional/linked-list/reverse",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/h_25. Reverse Nodes in k-Group.md",
-    "0x01-leetcode/1-dimensional/linked-list/merge",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/m_24. Swap Nodes in Pairs.md",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/h_23. Merge k Sorted Lists.md",
-    "0x01-leetcode/1-dimensional/linked-list/m_86. Partition List.md",
-    "0x01-leetcode/1-dimensional/linked-list/sort/m_148. Sort List.md",
-    "0x01-leetcode/1-dimensional/linked-list/m_143. Reorder List.md",
-    "0x01-leetcode/1-dimensional/linked-list",
-    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（一）：workqueue的基本概念.md",
-    "coding/os/linux/schedule/d_多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "coding/os/linux/schedule/d_load_balance函数代码详解.md",
-    "coding/os/linux/schedule/Linux实时化与硬实时RTOS综述.md",
-    "coding/os/linux/schedule/i_Linux内核同步机制之（二）：Per-CPU变量.md",
-    "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
-    "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
-    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
     "0x99-image/Pasted image 20240923215552.png",
     "0x99-image/Pasted image 20240923221126.png",
     "0x99-image/Pasted image 20240923221119.png",
@@ -181,20 +193,6 @@
     "0x99-image/Pasted image 20240923221055.png",
     "0x99-image/Pasted image 20240923221049.png",
     "0x99-image/Pasted image 20240923220949.png",
-    "0x99-image/Pasted image 20240923220943.png",
-    "0x99-image/Pasted image 20240923220928.png",
-    "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
-    "coding/os/linux/schedule/i_Linux内核同步机制之（一）：原子操作.md",
-    "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
-    "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
-    "coding/os/linux/process/b_为什么新版内核将进程pid管理从bitmap替换成了radix-tree？.md",
-    "coding/os/linux/process/i_Shopee 送命题：进程切换为什么比线程切换慢.md",
-    "0x99-image/-20240922",
-    "coding/os/linux/network/debug",
-    "coding/os/ARM/init",
-    "coding/os/linux/device/device_tree",
-    "coding/os/linux/device/device_model",
-    "coding/os/linux/device/GPIO",
     "Untitled.canvas"
   ]
 }
