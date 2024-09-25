@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
+                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
+                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
+                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md"
+                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md"
               }
             }
           }
@@ -148,52 +148,52 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "self-improvement/VIP私教，自强老师亲自一对一指导.md",
+    "test/关于实施就业优先战略促进高质量充分就业的意见.md",
+    "test/x.md",
+    "self-improvement/hair/如果我停止使用Finasteride会发生什么？.md",
+    "self-improvement/hair/头皮按摩能改善雄激素性脱发的脱发吗？（我们的2019年研究）.md",
+    "self-improvement/hair/雄激素性脱发（AGA）：它是什么，是什么原因导致它，以及我们不知道什么？.md",
+    "coding/os/linux/schedule/deadline/k_deadline调度器之（一）：原理.md",
+    "self-improvement/hair/Untitled",
+    "self-improvement/hair",
+    "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md",
+    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（四）：High level irq event handler.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（六）：ARM中断处理过程.md",
+    "coding/os/linux/schedule/interrupt/i_linux kernel的中断子系统之（九）：tasklet.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（二）：IRQ Domain介绍.md",
+    "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
+    "coding/os/linux/schedule/interrupt/k_Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
+    "coding/os/linux/schedule/interrupt/p_中断上下文中调度会怎样？.md",
+    "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel中断子系统之（五）：驱动申请中断API.md",
+    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（七）：GIC代码分析.md",
+    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（八）：softirq.md",
+    "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
+    "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
+    "0x99-image/Pasted image 20240925102246.png",
+    "0x99-image/Pasted image 20240925102357.png",
+    "0x99-image/Pasted image 20240925102347.png",
+    "0x99-image/Pasted image 20240925102336.png",
+    "0x99-image/Pasted image 20240925102327.png",
+    "0x99-image/Pasted image 20240925102321.png",
+    "0x99-image/Pasted image 20240925102314.png",
+    "0x99-image/Pasted image 20240925102304.png",
+    "0x99-image/Pasted image 20240925102253.png",
+    "coding/os/linux/schedule/lock/i_mlock锁原理剖析.md",
+    "coding/os/linux/schedule/lock/lock-free/b_如何利用CAS技术实现无锁队列.md",
+    "0x99-image/Pasted image 20240924152400.png",
+    "coding/os/linux/schedule/lock/lock-free",
+    "coding/os/linux/schedule/lock/i_什么时候需要cpu_relax()锁.md",
+    "coding/os/linux/schedule/lock/mutex/d_futex基础问答.md",
     "coding/os/linux/schedule/lock/Linux内核同步机制之（六）：Seqlock.md",
-    "coding/os/linux/schedule/lock/Linux内核同步机制之（八）：mutex.md",
-    "coding/os/linux/schedule/lock/spinlock/Linux内核的自旋锁.md",
-    "coding/os/linux/schedule/lock/Linux读写锁逻辑解析.md",
-    "coding/os/linux/schedule/lock/spinlock/k_Linux内核同步机制之（四）：spin lock.md",
-    "coding/os/linux/schedule/lock/spinlock/i_Linux内核同步机制之（五）：Read Write spin lock.md",
-    "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md",
-    "coding/os/linux/schedule/lock/RCU/i_Linux内核同步机制之（七）：RCU基础.md",
-    "coding/os/linux/schedule/lock/RCU/k_Linux2.6.23 ：sleepable RCU的实现.md",
-    "coding/os/linux/schedule/lock/spinlock/i_Linux 网络：性能杀手 spinlock.md",
+    "coding/os/linux/schedule/lock/rwlock",
+    "coding/os/linux/schedule/lock/mutex",
     "coding/os/linux/schedule/lock/spinlock",
-    "coding/os/linux/schedule/lock/RCU/i_RCU synchronize原理分析.md",
-    "coding/os/linux/schedule/lock/d_futex基础问答.md",
-    "coding/os/linux/schedule/PELT/i_per-entity load tracking.md",
-    "coding/os/linux/schedule/PELT/d_PELT算法浅析.md",
-    "coding/os/linux/schedule/signal/a_Linux内核-信号的传递过程.md",
-    "Pasted image 20240924152411.png",
-    "Pasted image 20240924152400.png",
-    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（四）：workqueue如何处理work.md",
-    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（二）：CMWQ概述.md",
-    "coding/os/linux/schedule/workqueue/k_Concurrency Managed Workqueue之（三）：创建workqueue代码分析.md",
-    "coding/os/linux/schedule/b_深入理解 Linux 调度（GPU）虚拟化.md",
-    "0x99-image/Pasted image 20240924114438.png",
-    "0x99-image/Pasted image 20240924114828.png",
-    "0x99-image/Pasted image 20240924114820.png",
-    "0x99-image/Pasted image 20240924114803.png",
-    "0x99-image/Pasted image 20240924114743.png",
-    "0x99-image/Pasted image 20240924114726.png",
-    "0x99-image/Pasted image 20240924114655.png",
-    "0x99-image/Pasted image 20240924114648.png",
-    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
-    "coding/os/linux/schedule/i_甄建勇：五分钟搞定计算机体系结构（上）.md",
-    "coding/os/linux/shell/i_使用 logrotate 命令轮转和归档日志 Linux 中国.md",
-    "0x01-leetcode/math-logic/hard-logic/validate/m_393. UTF-8 Validation.md",
-    "0x01-leetcode/math-logic/hard-logic/m_71. Simplify Path.md",
     "0x01-leetcode/math-logic/hard-logic/validate",
-    "0x01-leetcode/1-dimensional/queue/m_950. Reveal Cards In Increasing Order.md",
     "0x01-leetcode/math-logic/hard-logic",
     "0x01-leetcode/math/Untitled",
     "0x01-leetcode/math-logic",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/h_768. Max Chunks To Make Sorted II.md",
-    "0x01-leetcode/1-dimensional/queue",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/next-greater-element",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/ascending-stack",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack/descending-stack",
-    "0x01-leetcode/1-dimensional/stack/monotonous-stack",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
     "Untitled.canvas"
   ]

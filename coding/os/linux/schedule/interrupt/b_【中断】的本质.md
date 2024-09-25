@@ -106,7 +106,7 @@ Linux云计算网络
 ## 中断的分类
 
 在 `x86` 系统中，中断的分类如下：
-
+![[Pasted image 20240925102246.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 内部中断
@@ -123,7 +123,7 @@ Linux云计算网络
 软中断也属于内部中断，是非常有用的，它是由 `int` 指令触发的。比如 `int3` 这条指令，`gdb` 就是利用它来实现对应用程序的调试。
 
 很久之前写过这样的一篇文章[原来gdb的底层调试原理这么简单](https://mp.weixin.qq.com/s?__biz=MzA3MzAwODYyNQ==&mid=2247483895&idx=1&sn=ba35d1823c259a959b72a310e0a92068&scene=21#wechat_redirect)，其中就描述了 `gdb` 是如何通过插入一个 `int` 指令，来替换被调试程序的指令码，从而实现断点调试功能的。
-
+![[Pasted image 20240925102253.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 外部中断
@@ -143,7 +143,7 @@ Linux云计算网络
 虽然现代计算机都已经是 `APIC`(高级可编程中断控制器) 了，但是由于 `8259a` 芯片是那么的经典，大部分描述外部中断的文章都会用它来举例。
 
 每一片 `8259a` 可以提供 `8` 个中断输入引脚，两片芯片级联在一起，就可以提供 `15` 个中断信号：
-
+![[Pasted image 20240925102304.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 1. 主片的输出引脚 INT 连接到 CPU 的 INTR 引脚上;
@@ -181,17 +181,17 @@ Linux云计算网络
 > 2. Linux 的系统调用，分配的就是 128 号中断;
 
 我们来分别看一下内部中断和外部中断相关的中断号：
-
+![[Pasted image 20240925102314.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于通过 `8259a` 可编程中断控制器接入的中断信号分配如下图所示：
-
+![[Pasted image 20240925102321.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 刚才已经说过，`8259a` 是可编程的，假如我们通过配置寄存器，把 `IRQ0` 的中断号设置为 `32`, 那么主片上 `IRQ1 ~ IRQ7` 所对应的中断号依次加 `1`，从片上 `IRQ8~IRQ15` 对应的中断号也是依次递增。
 
 所以，有时候我们可以在代码中断看到下面的宏定义：
-
+![[Pasted image 20240925102327.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 中断向量和中断处理程序
@@ -199,7 +199,7 @@ Linux云计算网络
 当一个中断发生的时候，`CPU` 获取到该中断对应的中断号，下一步就是要确定调用哪一个函数来处理这个中断，这个函数就称作中断服务程序(Interrupt Service Routine，ISR)，有时候也称作中断处理程序、中断处理函数，本质都一样。
 
 中断向，就是通过中断号去查找处理程序的重要的桥梁！
-
+![[Pasted image 20240925102336.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 中断向量的本质
@@ -213,7 +213,7 @@ Linux云计算网络
 每一个中断向量占用 `4` 个字节(`2` 个字节的段地址，`2` 个字节的偏移地址)，`256` 个中断一共占用了 `1024` 个字节的空间。
 
 之前的文章中，已经介绍过相关的内存模型，如下图所示：
-
+![[Pasted image 20240925102347.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果把一个中断向量看作函数指针，那么这个中断向量表就相当于是函数指针数组。

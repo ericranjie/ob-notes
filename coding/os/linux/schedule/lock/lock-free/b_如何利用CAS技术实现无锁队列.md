@@ -191,7 +191,7 @@ DeQueue(Q) //出队列
 我们可以看到，DeQueue的代码操作的是 head->next，而不是 head 本身。这样考虑是因为一个边界条件，我们需要一个dummy的头指针来解决链表中如果只有一个元素，head 和 tail 都指向同一个结点的问题，这样 EnQueue 和 DeQueue 要互相排斥了。
 
 但是，如果 head 和 tail 都指向同一个结点，这意味着队列为空，应该返回 ERR_EMPTY_QUEUE，但是，在判断 p->next == NULL 时，另外一个EnQueue操作做了一半，此时的 p->next 不为 NULL了，但是 tail 指针还差最后一步，没有更新到新加的结点，这个时候就会出现，在 EnQueue 并没有完成的时候， DeQueue 已经把新增加的结点给取走了，此时，队列为空，但是，head 与 tail 并没有指向同一个结点。如下所示：
-
+![[Pasted image 20240925101646.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 虽然，EnQueue的函数会把 tail 指针置对，但是，这种情况可能还是会导致一些并发问题，所以，严谨来说，我们需要避免这种情况。于是，我们需要加入更多的判断条件，还确保这个问题。下面是相关的改进代码：  
@@ -311,7 +311,7 @@ SafeRead(q)
     
 
 如下图所示：
-
+![[Pasted image 20240925101654.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
