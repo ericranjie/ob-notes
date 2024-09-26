@@ -28,7 +28,21 @@
 通过之前的文章，我们已经介绍了CFS调度器主要管理的是调度实体。每一个进程通过`task_struct`描述，`task_struct`包含调度实体`sched_entity`参与调度。暂且针对这种调度实体，我们称作**task se**。现在引入组调度的概念，我们使用`task_group`描述一个组。在这个组中管理组内的所有进程。因为CFS就绪队列管理的单位是调度实体，因此，`task_group`也脱离不了`sched_entity`，所以在`task_group`结构体也包含调度实体`sched_entity`，我们称这种调度实体为**group se**。`task_group`定义在`kernel/sched/sched.h`文件。
 
 ```c
- 
+ 1. `struct task_group {`
+2. `struct cgroup_subsys_state css;`
+3. `#ifdef CONFIG_FAIR_GROUP_SCHED`
+4. `/* schedulable entities of this group on each CPU */`
+5. `struct sched_entity **se; /* 1 */`
+6. `/* runqueue "owned" by this group on each CPU */`
+7. `struct cfs_rq **cfs_rq; /* 2 */`
+8. `unsigned long shares; /* 3 */`
+9. `#ifdef CONFIG_SMP`
+10. `atomic_long_t load_avg ____cacheline_aligned; /* 4 */`
+11. `#endif`
+12. `#endif`
+13. `struct cfs_bandwidth cfs_bandwidth;`
+14. `/* ... */`
+15. `};`
 ```
 
 > 1. 指针数组，数组大小等于CPU数量。现在假设只有一个CPU的系统。我们将一个用户组也用一个调度实体代替，插入对应的红黑树。例如，上面用户组A和用户组B就是两个调度实体se，挂在顶层的就绪队列cfs_rq中。用户组A管理9个可运行的进程，这9个调度实体se作为用户组A调度实体的child。通过se->parent成员建立关系。用户组A也维护一个就绪队列cfs_rq，暂且称之为group cfs_rq，管理的9个进程的调度实体挂在group cfs_rq上。当我们选择进程运行的时候，首先从根就绪队列cfs_rq上选择用户组A，再从用户组A的group cfs_rq上选择其中一个进程运行。现在考虑多核CPU的情况，用户组中的进程可以在多个CPU上运行。因此，我们需要CPU个数的调度实体se，分别挂在每个CPU的根cfs_rq上。
@@ -161,43 +175,37 @@ static long calc_group_shares(struct cfs_rq *cfs_rq){	long tg_weight, tg_shares,
 
 但是上面的计算公式的依据是什么呢？如何得到的？首先我觉得我们能介绍的计算方法是上一节《用户组的权重》说的方法，计算group cfs_rq的权重占的比例。公式如下。
 
-```txt
- 
+```c
                     tg->shares * grq->load.weightge->load.weight = -------------------------------               (1)		      \Sum grq->load.weight
 ```
 
 由于计算**\Sum grq->load.weight**这个总和开销太大（原因可能是CPU数量比较大的系统，访问其他CPU group cfs_rq造成数据访问竞争激烈）。因此我们使用平均负载来近似处理，平均负载值变化缓慢，因此近似后的值更容易计算且更稳定。近似处理条件如下，将权重和平均负载近似处理。
 
-```txt
- 
+```c
 grq->load.weight -> grq->avg.load_avg                           (2)
 ```
 
 经过近似处理后的公式(1)变换如下：
 
-```txt
- 
+```c
                   tg->shares * grq->avg.load_avgge->load.weight = ------------------------------                (3)			tg->load_avg Where: tg->load_avg ~= \Sum grq->avg.load_avg
 ```
 
 公式(3)问题在于，因为平均负载值变化很慢 (它的设计正是如此) ，这会导致在边界条件的时候的瞬变。 具体而言，当空闲group开始运行一个进程的时候。 我们的CPU的grq->avg.load_avg需要花费时间来慢慢变化，产生不良的延迟。在这种特殊情况下（单核CPU也是这种情况），公式(1)计算如下：
 
-```txt
- 
+```c
                    tg->shares * grq->load.weightge->load.weight = ------------------------------- = tg->shares (4)			grq->load.weight
 ```
 
 我们的目标就是将近似公式(3)在UP情景时修改成公式(4)的情况。
 
-```tx
- 
+```c
 ge->load.weight =              tg->shares * grq->load.weight   ---------------------------------------------------         (5)   tg->load_avg - grq->avg.load_avg + grq->load.weight
 ```
 
 但是因为grq->load.weight可以降到0，导致除数是0。因此我们需要使用grq->avg.load_avg作为其下限，然后给出：
 
-```txt
- 
+```c
                   tg->shares * grq->load.weightge->load.weight = -----------------------------		           (6)            		tg_load_avg'  Where: tg_load_avg' = tg->load_avg - grq->avg.load_avg +                       max(grq->load.weight, grq->avg.load_avg)
 ```
 

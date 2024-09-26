@@ -71,7 +71,7 @@ static const u32 runnable_avg_yN_inv[] = {	0xffffffff, 0xfa83b2da, 0xf5257d14, 0
 
 针对以上事例，我们可以得到一个更通用情况下的计算公式。假设上一时刻负载贡献是u，经历d时间后的负载贡献如何计算呢？根据上面的例子，我们可以把时间d分成3和部分：d1是离当前时间最远（不完整的）period 的剩余部分，d2 是完整period时间，而d3是（不完整的）当前 period 的剩余部分。假设时间d是经过p个周期（d=d1+d2+d3, p=1+d2/1024）。d1，d2，d3 的示意图如下：
 
-```txt
+```c
  
       d1          d2           d3      ^           ^            ^      |           |            |    |<->|<----------------->|<--->||---x---|------| ... |------|-----x (now)                                     p-1 u' = (u + d1) y^p + 1024 \Sum y^n + d3 y^0                           n=1                             p-1    = u y^p + d1 y^p + 1024 \Sum y^n + d3 y^0                             n=1
 ```
@@ -96,14 +96,12 @@ struct sched_avg {	u64						last_update_time;	u64						load_sum;	u64						runnab
 一个调度实体se可能属于task，也有可能属于group（Linux支持组调度，需要配置CONFIG_FAIR_GROUP_SCHED）。调度实体se的初始化针对task se和group se也就有所区别。调度实体使用`struct sched_entity`描述如下。
 
 ```c
- 
 struct sched_entity {	struct load_weight		load;	unsigned long			runnable_weight;#ifdef CONFIG_SMP	struct sched_avg		avg;#endif};
 ```
 
 调度实体se初始化函数是init_entity_runnable_average()，代码如下。
 
 ```c
- 
 void init_entity_runnable_average(struct sched_entity *se){	struct sched_avg *sa = &se->avg; 	memset(sa, 0, sizeof(*sa)); 	/*	 * Tasks are intialized with full load to be seen as heavy tasks until	 * they get a chance to stabilize to their real load level.	 * Group entities are intialized with zero load to reflect the fact that	 * nothing has been attached to the task group yet.	 */	if (entity_is_task(se))		sa->runnable_load_avg = sa->load_avg = scale_load_down(se->load.weight); 	se->runnable_weight = se->load.weight; 	/* when this task enqueue'ed, it will contribute to its cfs_rq's load_avg */}
 ```
 
@@ -130,7 +128,6 @@ void init_entity_runnable_average(struct sched_entity *se){	struct sched_avg *sa
 以上公式在代码中由两部实现，accumulate_sum()函数计算step1部分，然后调用__accumulate_pelt_segments()函数计算step2部分。
 
 ```c
- 
 static __always_inline u32accumulate_sum(u64 delta, int cpu, struct sched_avg *sa,	       unsigned long load, unsigned long runnable, int running){	unsigned long scale_freq, scale_cpu;	u32 contrib = (u32)delta; /* p == 0 -> delta < 1024 */	u64 periods; 	scale_freq = arch_scale_freq_capacity(cpu);	scale_cpu = arch_scale_cpu_capacity(NULL, cpu); 	delta += sa->period_contrib;                                 /* 1 */	periods = delta / 1024; /* A period is 1024us (~1ms) */      /* 2 */ 	/*	 * Step 1: decay old *_sum if we crossed period boundaries.	 */	if (periods) {		sa->load_sum = decay_load(sa->load_sum, periods);        /* 3 */		sa->runnable_load_sum = decay_load(sa->runnable_load_sum, periods);		sa->util_sum = decay_load((u64)(sa->util_sum), periods); 		/*		 * Step 2		 */		delta %= 1024;		contrib = __accumulate_pelt_segments(periods,            /* 4 */				1024 - sa->period_contrib, delta);	}	sa->period_contrib = delta;                                  /* 5 */ 	contrib = cap_scale(contrib, scale_freq);	if (load)		sa->load_sum += load * contrib;	if (runnable)		sa->runnable_load_sum += runnable * contrib;	if (running)		sa->util_sum += contrib * scale_cpu; 	return periods;}
 ```
 
@@ -195,7 +192,6 @@ void calc_converged_max(void){    int n = -1;    long max = 1024;	long last = 0,
 - scheduler tick，周期性调用更新负载信息。
 
 ```c
- 
 static inline void update_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags){	u64 now = cfs_rq_clock_task(cfs_rq);	struct rq *rq = rq_of(cfs_rq);	int cpu = cpu_of(rq);	int decayed; 	/*	 * Track task load average for carrying it to new CPU after migrated, and	 * track group sched_entity load average for task_h_load calc in migration	 */	if (se->avg.last_update_time && !(flags & SKIP_AGE_LOAD))		__update_load_avg_se(now, cpu, cfs_rq, se);                  /* 1 */ 	decayed  = update_cfs_rq_load_avg(now, cfs_rq);                  /* 2 */	/* ...... */}
 ```
 

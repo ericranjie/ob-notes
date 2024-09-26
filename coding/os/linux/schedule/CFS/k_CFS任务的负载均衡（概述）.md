@@ -57,27 +57,27 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 内核中struct sched_domain来描述调度域，其主要的成员如下：
 
-|   |   |
-|---|---|
-|成员|描述|
-|Parent和child|Sched domain会形成层级结构，parent和child建立了不同层级结构的父子关系。对于base domain而言，其child等于NULL，对于top domain而言，其parent等于NULL。|
-|groups|一个调度域中有若干个调度组，这些调度组形成一个环形链表，groups成员就是链表头。|
-|min_interval<br><br>max_interval|做均衡也是需要开销的，我们不可能时刻去检查调度域的均衡状态，这两个参数定义了检查该sched domain均衡状态的时间间隔范围|
-|busy_factor|正常情况下，balance_interval定义了均衡的时间间隔，如果cpu繁忙，那么均衡要时间间隔长一些，即时间间隔定义为busy_factor x balance_interval|
-|imbalance_pct|调度域内的不均衡状态达到了一定的程度之后就开始进行负载均衡的操作。imbalance_pct这个成员定义了判定不均衡的门限|
-|cache_nice_tries|这个成员应该是和nr_balance_failed配合控制负载均衡过程的迁移力度。当nr_balance_failed大于cache_nice_tries的时候，负载均衡会变得更加激进。|
-|nohz_idle|每个cpu都有其对应的LLC sched domain，而LLC SD记录对应cpu的idle状态（是否tick被停掉），进一步得到该domain中busy cpu的个数，体现在（sd->shared->nr_busy_cpus）|
-|flags|调度域标志，下面有表格详细描述|
-|level|该sched domain在整个调度域层级结构中的level。Base sched domain的level等于0，向上依次加一。|
-|last_balance|上次进行balance的时间点。通过基础均衡时间间隔（）和当前sd的状态可以计算最终的均衡间隔时间（get_sd_balance_interval），last_balance加上这个计算得到的均衡时间间隔就是下一次均衡的时间点。|
-|balance_interval|定义了该sched domain均衡的基础时间间隔|
-|nr_balance_failed|本sched domain中进行负载均衡失败的次数。当失败次数大于cache_nice_tries的时候，我们考虑迁移cache hot的任务，进行更激进的均衡操作。|
-|max_newidle_lb_cost|在该domain上进行newidle balance的最大时间长度（即newidle balance的开销）。<br><br>最小值是sysctl_sched_migration_cost|
-|next_decay_max_lb_cost|max_newidle_lb_cost会记录最近在该sched domain上进行newidle balance的最大时间长度，这个max cost不是一成不变的，它有一个衰减过程，每秒衰减1%，这个成员就是用来控制衰减的。|
-|avg_scan_cost|平均扫描成本|
-|负载均衡统计成员|负载均衡的统计信息|
-|struct sched_domain_shared *shared|为了降低锁竞争，Sched domain是per-CPU的，然而有一些信息是需要在per-CPU 的sched domain之间共享的，不能在每个sched domain上构建。这些共享信息是：<br><br>1、该sched domain中的busy cpu的个数<br><br>2、该sched domain中是否有idle的cpu|
-|span_weight<br><br>span|该调度域的跨度，在手机场景下，span等于该sched domain中所有CPU core形成的cpu mask。span_weight说明该sched domain中CPU的个数。|
+|                                    |                                                                                                                                                                          |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 成员                                 | 描述                                                                                                                                                                       |
+| Parent和child                       | Sched domain会形成层级结构，parent和child建立了不同层级结构的父子关系。对于base domain而言，其child等于NULL，对于top domain而言，其parent等于NULL。                                                                |
+| groups                             | 一个调度域中有若干个调度组，这些调度组形成一个环形链表，groups成员就是链表头。                                                                                                                               |
+| min_interval<br><br>max_interval   | 做均衡也是需要开销的，我们不可能时刻去检查调度域的均衡状态，这两个参数定义了检查该sched domain均衡状态的时间间隔范围                                                                                                         |
+| busy_factor                        | 正常情况下，balance_interval定义了均衡的时间间隔，如果cpu繁忙，那么均衡要时间间隔长一些，即时间间隔定义为busy_factor x balance_interval                                                                             |
+| imbalance_pct                      | 调度域内的不均衡状态达到了一定的程度之后就开始进行负载均衡的操作。imbalance_pct这个成员定义了判定不均衡的门限                                                                                                            |
+| cache_nice_tries                   | 这个成员应该是和nr_balance_failed配合控制负载均衡过程的迁移力度。当nr_balance_failed大于cache_nice_tries的时候，负载均衡会变得更加激进。                                                                            |
+| nohz_idle                          | 每个cpu都有其对应的LLC sched domain，而LLC SD记录对应cpu的idle状态（是否tick被停掉），进一步得到该domain中busy cpu的个数，体现在（sd->shared->nr_busy_cpus）                                                      |
+| flags                              | 调度域标志，下面有表格详细描述                                                                                                                                                          |
+| level                              | 该sched domain在整个调度域层级结构中的level。Base sched domain的level等于0，向上依次加一。                                                                                                        |
+| last_balance                       | 上次进行balance的时间点。通过基础均衡时间间隔（）和当前sd的状态可以计算最终的均衡间隔时间（get_sd_balance_interval），last_balance加上这个计算得到的均衡时间间隔就是下一次均衡的时间点。                                                       |
+| balance_interval                   | 定义了该sched domain均衡的基础时间间隔                                                                                                                                                |
+| nr_balance_failed                  | 本sched domain中进行负载均衡失败的次数。当失败次数大于cache_nice_tries的时候，我们考虑迁移cache hot的任务，进行更激进的均衡操作。                                                                                      |
+| max_newidle_lb_cost                | 在该domain上进行newidle balance的最大时间长度（即newidle balance的开销）。<br><br>最小值是sysctl_sched_migration_cost                                                                           |
+| next_decay_max_lb_cost             | max_newidle_lb_cost会记录最近在该sched domain上进行newidle balance的最大时间长度，这个max cost不是一成不变的，它有一个衰减过程，每秒衰减1%，这个成员就是用来控制衰减的。                                                         |
+| avg_scan_cost                      | 平均扫描成本                                                                                                                                                                   |
+| 负载均衡统计成员                           | 负载均衡的统计信息                                                                                                                                                                |
+| struct sched_domain_shared *shared | 为了降低锁竞争，Sched domain是per-CPU的，然而有一些信息是需要在per-CPU 的sched domain之间共享的，不能在每个sched domain上构建。这些共享信息是：<br><br>1、该sched domain中的busy cpu的个数<br><br>2、该sched domain中是否有idle的cpu |
+| span_weight<br><br>span            | 该调度域的跨度，在手机场景下，span等于该sched domain中所有CPU core形成的cpu mask。span_weight说明该sched domain中CPU的个数。                                                                              |
 
 关于调度域标记解释如下：
 

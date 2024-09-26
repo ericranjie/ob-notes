@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
+                "file": "coding/os/linux/schedule/CFS/a_CFS组调度.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
+                "file": "coding/os/linux/schedule/CFS/a_CFS组调度.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
+                "file": "coding/os/linux/schedule/CFS/a_CFS组调度.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md"
+                "file": "coding/os/linux/schedule/CFS/a_CFS组调度.md"
               }
             }
           }
@@ -148,13 +148,36 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "0x99-image/Pasted image 20240926174104.png",
+    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
+    "0x99-image/Pasted image 20240926174634.png",
+    "0x99-image/Pasted image 20240926174628.png",
+    "0x99-image/Pasted image 20240926174559.png",
+    "0x99-image/Pasted image 20240926174551.png",
+    "0x99-image/Pasted image 20240926174542.png",
+    "0x99-image/Pasted image 20240926174535.png",
+    "0x99-image/Pasted image 20240926174529.png",
+    "0x99-image/Pasted image 20240926174524.png",
+    "0x99-image/Pasted image 20240926174518.png",
+    "0x99-image/Pasted image 20240926174513.png",
+    "coding/os/linux/schedule/CFS/k_CFS调度器（3）-组调度.md",
+    "coding/os/linux/schedule/PELT/d_CFS调度器（4）-PELT(per entity load tracking).md",
+    "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
+    "coding/os/linux/schedule/CFS/k_CFS调度器（6）-总结.md",
+    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（任务放置）.md",
+    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（概述）.md",
+    "coding/os/linux/schedule/CFS/d_CFS任务放置代码详解.md",
+    "coding/os/linux/schedule/deadline/d_Deadline调度器之（二）：细节和使用方法.md",
+    "coding/os/linux/schedule/deadline/k_deadline调度器之（一）：原理.md",
+    "test/hair.md",
+    "test/x.md",
+    "coding/os/linux/schedule/进程切换分析（3）：同步处理.md",
+    "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
     "self-improvement/VIP私教，自强老师亲自一对一指导.md",
     "test/关于实施就业优先战略促进高质量充分就业的意见.md",
-    "test/x.md",
     "self-improvement/hair/如果我停止使用Finasteride会发生什么？.md",
     "self-improvement/hair/头皮按摩能改善雄激素性脱发的脱发吗？（我们的2019年研究）.md",
     "self-improvement/hair/雄激素性脱发（AGA）：它是什么，是什么原因导致它，以及我们不知道什么？.md",
-    "coding/os/linux/schedule/deadline/k_deadline调度器之（一）：原理.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md",
@@ -163,30 +186,7 @@
     "coding/os/linux/schedule/interrupt/i_linux kernel的中断子系统之（九）：tasklet.md",
     "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（二）：IRQ Domain介绍.md",
     "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
-    "coding/os/linux/schedule/interrupt/k_Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
-    "coding/os/linux/schedule/interrupt/p_中断上下文中调度会怎样？.md",
-    "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
-    "coding/os/linux/schedule/interrupt/d_Linux kernel中断子系统之（五）：驱动申请中断API.md",
-    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（七）：GIC代码分析.md",
-    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（八）：softirq.md",
-    "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
-    "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
-    "0x99-image/Pasted image 20240925102246.png",
-    "0x99-image/Pasted image 20240925102357.png",
-    "0x99-image/Pasted image 20240925102347.png",
-    "0x99-image/Pasted image 20240925102336.png",
-    "0x99-image/Pasted image 20240925102327.png",
-    "0x99-image/Pasted image 20240925102321.png",
-    "0x99-image/Pasted image 20240925102314.png",
-    "0x99-image/Pasted image 20240925102304.png",
-    "0x99-image/Pasted image 20240925102253.png",
-    "coding/os/linux/schedule/lock/i_mlock锁原理剖析.md",
-    "coding/os/linux/schedule/lock/lock-free/b_如何利用CAS技术实现无锁队列.md",
-    "0x99-image/Pasted image 20240924152400.png",
     "coding/os/linux/schedule/lock/lock-free",
-    "coding/os/linux/schedule/lock/i_什么时候需要cpu_relax()锁.md",
-    "coding/os/linux/schedule/lock/mutex/d_futex基础问答.md",
-    "coding/os/linux/schedule/lock/Linux内核同步机制之（六）：Seqlock.md",
     "coding/os/linux/schedule/lock/rwlock",
     "coding/os/linux/schedule/lock/mutex",
     "coding/os/linux/schedule/lock/spinlock",
