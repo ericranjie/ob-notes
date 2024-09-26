@@ -143,16 +143,16 @@ CPU 1执行的代码是：
 
 当cpu 1执行到--取变量a的值--这条指令的时候，b已经是被cpu0修改为1了，这也就是说a＝1这个代码已经执行了，因此，从汇编代码的逻辑来看，这时候a值应该是确定的1。然而并非如此，cpu 0和cpu 1执行的指令和动作描述如下：
 
-|   |   |   |   |
-|---|---|---|---|
-|cpu 0执行的指令|cpu 0动作描述|cpu 1执行的指令|cpu 1动作描述|
-|str     r3, [r2]  <br>（a=1）|1、发生cache miss  <br>2、将1保存在store buffer中  <br>3、发送read invalidate命令，试图从cpu 1的cacheline中获取数据，并invalidate其cache line  <br>  <br>注：这里无需等待response，立刻执行下一条指令|ldr     r3, [r3]   <br>（获取b的值）|1、发生cache miss  <br>2、发送read命令，试图加载b对应的cacheline  <br>  <br>注：这里cpu必须等待read response，下面的指令依赖于这个读取的结果|
-|str     r3, [r4]   <br>（b=1）|1、cache hit  <br>2、cacheline中的值被修改为1，状态变成modified|||
-||响应cpu 1的read命令，发送read response（b＝1）给CPU 0。write back，将状态设定为shared|||
-|||cmp     r3, #0|1、cpu 1收到来自cpu 0的read response，加载b对应的cacheline，状态为shared  <br>2、b等于1，因此不必跳转到start执行|
-|||ldr     r2, [r2]  <br>（获取a的值）|1、cache hit  <br>2、获取了a的旧值，也就是0|
-||||响应CPU 0的read invalid命令，将a对应的cacheline设为invalid状态，发送read response和invalidate ack。但是已经酿成大错了。|
-||收到来自cpu 1的响应，将store buffer中的1写入cache line。|||
+|                              |                                                                                                                                                          |                                |                                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| cpu 0执行的指令                   | cpu 0动作描述                                                                                                                                                | cpu 1执行的指令                     | cpu 1动作描述                                                                                            |
+| str     r3, [r2]  <br>（a=1）  | 1、发生cache miss  <br>2、将1保存在store buffer中  <br>3、发送read invalidate命令，试图从cpu 1的cacheline中获取数据，并invalidate其cache line  <br>  <br>注：这里无需等待response，立刻执行下一条指令 | ldr     r3, [r3]   <br>（获取b的值） | 1、发生cache miss  <br>2、发送read命令，试图加载b对应的cacheline  <br>  <br>注：这里cpu必须等待read response，下面的指令依赖于这个读取的结果 |
+| str     r3, [r4]   <br>（b=1） | 1、cache hit  <br>2、cacheline中的值被修改为1，状态变成modified                                                                                                        |                                |                                                                                                      |
+|                              | 响应cpu 1的read命令，发送read response（b＝1）给CPU 0。write back，将状态设定为shared                                                                                        |                                |                                                                                                      |
+|                              |                                                                                                                                                          | cmp     r3, #0                 | 1、cpu 1收到来自cpu 0的read response，加载b对应的cacheline，状态为shared  <br>2、b等于1，因此不必跳转到start执行                  |
+|                              |                                                                                                                                                          | ldr     r2, [r2]  <br>（获取a的值）  | 1、cache hit  <br>2、获取了a的旧值，也就是0                                                                      |
+|                              |                                                                                                                                                          |                                | 响应CPU 0的read invalid命令，将a对应的cacheline设为invalid状态，发送read response和invalidate ack。但是已经酿成大错了。           |
+|                              | 收到来自cpu 1的响应，将store buffer中的1写入cache line。                                                                                                               |                                |                                                                                                      |
 
   对于硬件，CPU不清楚具体的代码逻辑，它不可能直接帮助软件工程师，只是提供一些memory barrier的指令，让软件工程师告诉CPU他想要的内存访问逻辑顺序。这时候，cpu 0的代码修改如下：
 
@@ -166,16 +166,16 @@ CPU 1执行的代码是：
 
 这种情况下，cpu 0和cpu 1执行的指令和动作描述如下：
 
-|   |   |   |   |
-|---|---|---|---|
-|cpu 0执行的指令|cpu 0动作描述|cpu 1执行的指令|cpu 1动作描述|
-|str     r3, [r2]  <br>（a=1）|1、发生cache miss  <br>2、将1保存在store buffer中  <br>3、发送read invalidate命令，试图从cpu 1的cacheline中获取数据，并invalidate其cache line  <br>  <br>注：这里无需等待response，立刻执行下一条指令|ldr     r3, [r3]   <br>（获取b的值）|1、发生cache miss  <br>2、发送read命令，试图加载b对应的cacheline  <br>  <br>注：这里cpu必须等待read response，下面的指令依赖于这个读取的结果|
-|memory barrier instruction|CPU收到memory barrier指令，知道软件要控制访问顺序，因此不会执行下一条str指令，要等到收到read response和invalidate ack后，将store buffer中所有数据写到cacheline之后才会执行后续的store指令|||
-|||cmp     r3, #0  <br>beq     start|1、cpu 1收到来自cpu 0的read response，加载b对应的cacheline，状态为shared  <br>2、b等于0，跳转到start执行|
-||||响应CPU 0的read invalid命令，将a对应的cacheline设为invalid状态，发送read response和invalidate ack。|
-||收到来自cpu 1的响应，将store buffer中的1写入cache line。|||
-|str     r3, [r4]   <br>（b=1）|1、cache hit，但是cacheline状态是shared，需要发送invalidate到cpu 1  <br>2、将1保存在store buffer中  <br>  <br>注：这里无需等待invalidate ack，立刻执行下一条指令|||
-|…|…|…|…|
+|                              |                                                                                                                                                          |                                   |                                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| cpu 0执行的指令                   | cpu 0动作描述                                                                                                                                                | cpu 1执行的指令                        | cpu 1动作描述                                                                                            |
+| str     r3, [r2]  <br>（a=1）  | 1、发生cache miss  <br>2、将1保存在store buffer中  <br>3、发送read invalidate命令，试图从cpu 1的cacheline中获取数据，并invalidate其cache line  <br>  <br>注：这里无需等待response，立刻执行下一条指令 | ldr     r3, [r3]   <br>（获取b的值）    | 1、发生cache miss  <br>2、发送read命令，试图加载b对应的cacheline  <br>  <br>注：这里cpu必须等待read response，下面的指令依赖于这个读取的结果 |
+| memory barrier instruction   | CPU收到memory barrier指令，知道软件要控制访问顺序，因此不会执行下一条str指令，要等到收到read response和invalidate ack后，将store buffer中所有数据写到cacheline之后才会执行后续的store指令                        |                                   |                                                                                                      |
+|                              |                                                                                                                                                          | cmp     r3, #0  <br>beq     start | 1、cpu 1收到来自cpu 0的read response，加载b对应的cacheline，状态为shared  <br>2、b等于0，跳转到start执行                      |
+|                              |                                                                                                                                                          |                                   | 响应CPU 0的read invalid命令，将a对应的cacheline设为invalid状态，发送read response和invalidate ack。                     |
+|                              | 收到来自cpu 1的响应，将store buffer中的1写入cache line。                                                                                                               |                                   |                                                                                                      |
+| str     r3, [r4]   <br>（b=1） | 1、cache hit，但是cacheline状态是shared，需要发送invalidate到cpu 1  <br>2、将1保存在store buffer中  <br>  <br>注：这里无需等待invalidate ack，立刻执行下一条指令                              |                                   |                                                                                                      |
+| …                            | …                                                                                                                                                        | …                                 | …                                                                                                    |
 
 由于增加了memory barrier，保证了a、b这两个变量的访问顺序，从而保证了程序逻辑。
 

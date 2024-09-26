@@ -22,7 +22,7 @@ FreeRTOS的内存分配一般为静态分配方式以及动态分配方式。在
 动态分配内存：以动态分配方式给任务、软件定时器，信号量、互斥锁等系统资源分配资源，调用系统提供的pvPortMalloc内存分配接口，在系统的ucHeap中（使用heap_3.c的内存管理方式除外，使用heap_3.c内存方式，会直接调用c库的malloc申请空间）申请任务、信号量、队列、互斥锁等所需的内存空间。内存分布如下图所示（heap_3.c的内存管理方式除外）：
 
   
-
+![[Pasted image 20240926181152.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -86,7 +86,7 @@ heap_1的内存管理策略是5个内存管理策略中只允许申请不允许�
 由下面官方提供的pvPortMalloc代码可知，申请的内存数量调整到对齐字节数的整数倍前提下，在系统的ucHeap的大数组分配对应的内存。
 
   
-
+![[Pasted image 20240926181206.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -94,7 +94,7 @@ heap_1的内存管理策略是5个内存管理策略中只允许申请不允许�
 从官方的提供的vPortFree代码可知，heap_1不支持释放内存。
 
   
-
+![[Pasted image 20240926181213.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -106,7 +106,7 @@ heap_1的内存管理策略是5个内存管理策略中只允许申请不允许�
   heap_2使用链表对系统ucHeap中剩余的空闲内存块进行管理，申请内存时，会采用最佳匹配算法给调用pvPortMalloc的申请内存者分配对应的内存，如下官方提供的pvPortMalloc函数实现所示：
 
   
-
+![[Pasted image 20240926181218.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -122,7 +122,7 @@ heap_2的vPortFree函数将释放的内存块直接回收到剩余内存块的�
 heap_3申请内存时，挂起所有的FreeRTOS系统任务，调用c库的malloc函数进行动态申请内存，申请完成，继续调用xTaskResumeAll运行系统任务，如下图官方代码所示：
 
   
-
+![[Pasted image 20240926181226.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -138,7 +138,7 @@ heap_3申请内存时，挂起所有的FreeRTOS系统任务，调用c库的mallo
 Heap_4和heap_2一样采用链表的方式对剩余的内存进行管理，分配内存的时候同样采用最佳匹配算法搜索内存给到用户。Heap_4与heap_2不同之处在于，调用prvInsertBlockIntoFreeList函数将剩余空闲内存块压入剩余内存链表的时候，会将链表相邻的内存碎片进行合并。如官方给出的prvInsertBlockIntoFreeList函数源码所示：
 
   
-
+![[Pasted image 20240926181231.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -152,7 +152,7 @@ Heap_4和heap_2一样采用链表的方式对剩余的内存进行管理，分�
 heap_5内存管理方式与heap_4基本类似，在heap_4基础上加入了允许跨越不同的不连续的内存域进行内存的分配以及释放，跨越的不同的与在HeapRegion_t结构体进行定义。参考下面官方注释提供的范例所示进行定义即可：
 
   
-
+![[Pasted image 20240926181238.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   

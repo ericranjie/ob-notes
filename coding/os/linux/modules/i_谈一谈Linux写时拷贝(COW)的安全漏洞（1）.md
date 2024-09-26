@@ -33,7 +33,32 @@ Parent process 3497, data 10
 如果都是上面的经典模型，那么岁月静好，与君白头偕老。但是，总会有人在花田里犯了错，破晓前仍然没有忘掉。这个COW技术，就爆出了巨大的漏洞，让父子进程间可以向对方泄露写过的新数据，成为了Linux内核的惊天大瓜。
 
 我们先来看看是怎样的一个程序，让COW的人设崩塌了呢？
+```c
+    static void *data;
+ 
+    posix_memalign(&data, 0x1000, 0x1000);
+    strcpy(data, "BORING DATA");
+ 
+    if (fork() == 0) {
+	// child
+	int pipe_fds[2];
+	struct iovec iov = {.iov_base = data, .iov_len = 0x1000 };
+	char buf[0x1000];
+ 
+	pipe(pipe_fds);
+	vmsplice(pipe_fds[1], &iov, 1, 0);
+	munmap(data, 0x1000);
+ 
+	sleep(2);
+	read(pipe_fds[0], buf, 0x1000);
+	printf("read string from child: %s\n", buf);
+   } else {
+	// parent
+	sleep(1);
+	strcpy(data, "THIS IS SECRET");
+   }
 
+```
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上面的程序，父子进程最初共享了data指向的0x1000这么大1个page的内容。然后父进程在data里面写“BORING DATA”,之后，父进程fork子进程。子进程接下来创建了一个pipe，并用vmsplice，把data指向的buffer拼接到了pipe的写端，而后子进程通过munmap()去掉data的映射，再睡眠2秒制造机会让父进程在data里面写"THIS IS SECRET"。2秒后，子进程read pipe的读端，这个时候，神奇的事情发生了，子进程读到了父进程写的秘密数据。
@@ -51,11 +76,11 @@ An issue was discovered in the Linux kernel before 5.7.3, related to mm/gup.c an
 这个瓜大地直接惊动了祖师爷Linus Torvalds发patch来进行“修复”，Linus的“修复”patch编号是17839856fd58 ("gup: document and work around 'COW can break either way' issue")。祖师爷的修复方法比较简单直接，对于任何要COW的page，如果你做GUP，哪怕你后面对这个page的行为是只读的，也要得到一份新的copy。对应前面的参考代码，其实就是子进程调用vmsplice的行为，打破了COW的常规逻辑，之后子进程read(pipe[0])的时候，读到的是新的page。
 
 所以没有Linus的patch的时候，data的内存在父子进程分布如下：
-
+![[Pasted image 20240926180527.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 有了Linus的patch后，data的内存在父子进程分布如下：
-
+![[Pasted image 20240926180533.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 显然，这样之后，父进程写data后，写的是蓝色区域，子进程读的是黄色的区域，这样子进程是肯定读不到SECRET数据了。
@@ -63,7 +88,7 @@ An issue was discovered in the Linux kernel before 5.7.3, related to mm/gup.c an
 **Linus是永远正确的？必须是！**当Linus把这个patch合入5.8内核的时候，人们以为故事就此结束了，却没想到瓜才刚刚开始。作为Linus内核的吃瓜群众，我们的激情从不曾磨灭，因为“吃在嘴里，甜在心里”，吃瓜的甜蜜诱惑引诱我们一步步走入Linux内核的深渊，误了一生。
 
 redhat的Peter Xu童鞋，在2020年8月报了一个bug，直指祖师爷的patch造成了问题，因为它破坏了类似userfaultfd-wp和umapsort这样的应用程序。注意，子曾经曰过，“If a change results in user programs breaking, it's a bug in the kernel. We never EVER blame the user programs”，有图有真相：
-
+![[Pasted image 20240926180541.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一个典型的umap代码仓库在：
@@ -91,11 +116,30 @@ _https://blog.csdn.net/21cnbao/article/details/115153742_
 前面我们提到，通过Linus的17839856fd58 ("gup: document and work around 'COW can break either way' issue") patch，子进程vmsplice的GUP行为会强迫子进程进行COW，得到新的拷贝。但是，现在Linus不这个干了，vmsplice的pipe写端还是指向老的页面，他重新选择了在父进程进行实际的写的时候，不再只是傻傻地判断page的mapcount，他还会判断是不是有人间接通过GUP等形式，增加了page的引用计数，如果是，则在父进程写的时候，进行copy-on-write，这个时候，父进程写过"THIS IS SECRET"后，data在父子进程的内存分布变成：
 
   
-
+![[Pasted image 20240926180550.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于父进程是在新的黄色page进行写，而子进程用的是老的蓝色page，所以"THIS IS SECRET"不会泄露给子进程。Linus的最主要修改是直接变更了do_wp_page()函数，逻辑变成：
+```c
+        struct page *page = vmf->page;
+ 
+        if (page_count(page) != 1)
+                goto copy;
+        if (!trylock_page(page))
+                goto copy;
+        if (page_mapcount(page) != 1 && page_count(page) != 1) {
+                unlock_page(page);
+                goto copy;
+        }
+        /* Ok, we've got the only map reference, and the only
+         *  page count reference, and the page is locked,
+         * it's dark out, and we're wearing sunglasses. Hit it.
+         */
+        wp_page_reuse(vmf);
+        unlock_page(page);
+        return VM_FAULT_WRITE
 
+```
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 因为GUP的行为会增加page的refcount，从而触发父进程在写data的wp的page fault里面，进行COW。所以Linus是守信用的，自己提交的patch犯的错，含泪也要revert掉。
