@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md",
+                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md",
+                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md",
+                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md"
+                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md"
               }
             }
           }
@@ -148,18 +148,24 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x99-image/Pasted image 20240927095558.png",
+    "Pasted image 20240927120038.png",
+    "Pasted image 20240927120031.png",
+    "Pasted image 20240927120023.png",
+    "Pasted image 20240927120018.png",
+    "Pasted image 20240927120008.png",
+    "Pasted image 20240927120000.png",
+    "Pasted image 20240927115953.png",
+    "Pasted image 20240927115947.png",
+    "Pasted image 20240927115941.png",
+    "Pasted image 20240927115936.png",
+    "Pasted image 20240927115927.png",
+    "coding/os/linux/memory/memory-manage/i_图文详解 Linux 分页机制！.md",
+    "coding/os/linux/memory/memory-manage/k_Linux下访问匿名页发生的神奇“化学反应”.md",
+    "coding/os/linux/memory/memory-manage/i_理解内存的Rank、位宽以及内存颗粒内部结构.md",
+    "coding/os/linux/memory/memory-manage/i_页面回收的基本概念.md",
+    "coding/os/linux/memory/memory-manage/图解 Linux内存背后的那些神秘往事.md",
+    "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
     "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md",
-    "0x99-image/Pasted image 20240927100808.png",
-    "0x99-image/Pasted image 20240927100751.png",
-    "0x99-image/Pasted image 20240927100738.png",
-    "0x99-image/Pasted image 20240927100725.png",
-    "0x99-image/Pasted image 20240927100708.png",
-    "0x99-image/Pasted image 20240927100657.png",
-    "0x99-image/Pasted image 20240927100642.png",
-    "0x99-image/Pasted image 20240927100628.png",
-    "0x99-image/Pasted image 20240927100606.png",
-    "0x99-image/Pasted image 20240927100555.png",
     "coding/os/linux/memory/memory-manage/b_由Google、OPPO、ARM、华为等大厂程序员贡献的Linux Large Folios大页在社区和产品的现状和未来.md",
     "coding/os/linux/memory/memory-debug/p_解决 Linux 内核 Section GC 失败问题 - Part 1.md",
     "coding/os/linux/memory/memory-debug/i_明明还有大量内存，为啥报错“无法分配内存”？.md",
@@ -178,12 +184,6 @@
     "coding/os/linux/filesystem/k_F2FS技术拆解.md",
     "coding/os/linux/filesystem/k_Linux文件系统十问.md",
     "coding/os/FreeRTOS/k_FreeRTOS内存机制.md",
-    "coding/os/linux/modules/i_谈一谈Linux写时拷贝(COW)的安全漏洞（1）.md",
-    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
-    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
-    "coding/os/linux/schedule/CFS/k_CFS调度器（3）-组调度.md",
-    "coding/os/linux/schedule/PELT/d_CFS调度器（4）-PELT(per entity load tracking).md",
-    "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
