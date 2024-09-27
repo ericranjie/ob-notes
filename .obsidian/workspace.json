@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md"
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md"
               }
             }
           }
@@ -148,17 +148,22 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "Pasted image 20240927120038.png",
-    "Pasted image 20240927120031.png",
-    "Pasted image 20240927120023.png",
-    "Pasted image 20240927120018.png",
-    "Pasted image 20240927120008.png",
-    "Pasted image 20240927120000.png",
-    "Pasted image 20240927115953.png",
-    "Pasted image 20240927115947.png",
-    "Pasted image 20240927115941.png",
-    "Pasted image 20240927115936.png",
-    "Pasted image 20240927115927.png",
+    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
+    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
+    "coding/os/linux/memory/memory-init/b_Linux 物理内存初始化.md",
+    "Pasted image 20240927142152.png",
+    "Pasted image 20240927142145.png",
+    "Pasted image 20240927142134.png",
+    "Pasted image 20240927142127.png",
+    "Pasted image 20240927142118.png",
+    "Pasted image 20240927142111.png",
+    "Pasted image 20240927142059.png",
+    "Pasted image 20240927142053.png",
+    "Pasted image 20240927142044.png",
+    "Pasted image 20240927142032.png",
+    "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
+    "coding/os/linux/memory/memory-manage/slub/b_SLUB DEBUG原理.md",
+    "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
     "coding/os/linux/memory/memory-manage/i_图文详解 Linux 分页机制！.md",
     "coding/os/linux/memory/memory-manage/k_Linux下访问匿名页发生的神奇“化学反应”.md",
     "coding/os/linux/memory/memory-manage/i_理解内存的Rank、位宽以及内存颗粒内部结构.md",
@@ -179,11 +184,6 @@
     "coding/os/linux/init/i_linux 启动es init heap not equal.md",
     "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
     "coding/os/linux/filesystem/i_文件缓存回写简述.md",
-    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
-    "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
-    "coding/os/linux/filesystem/k_F2FS技术拆解.md",
-    "coding/os/linux/filesystem/k_Linux文件系统十问.md",
-    "coding/os/FreeRTOS/k_FreeRTOS内存机制.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
