@@ -94,7 +94,7 @@
 假如说当前创建的进程是一个容器中的进程，那么它至少得申请两个 PID 号才行。一个 PID 是在容器命名空间中的进程号，一个是根命名空间（宿主机）中的进程号。
 
 这也符合我们平时的经验。在容器中的每一个进程其实我们在宿主机中也都能看到。但是在容器中看到的进程号一般是和在宿主机上看到的是不一样的。比如一个进程在容器中的 pid 是 5，在宿主机命名空间下是 1256。那么该进程在内核中的对象大概是如下这个样子。
-
+![[Pasted image 20240927095558.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 二、新版本是否有所改观

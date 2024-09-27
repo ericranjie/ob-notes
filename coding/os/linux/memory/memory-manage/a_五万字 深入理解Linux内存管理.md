@@ -168,8 +168,12 @@ Linux内存管理的整体模式是虚拟内存管理(分页内存管理)，并�
 ## 2.1 物理内存节点
 
 我国的省为什么要按照现在的这个形状来划分呢，主要是依据山川地形还有民俗风情等历史原因。那么物理内存划分为节点的原因是什么呢？这就要从UMA、NUMA说起了。我们用三个图来看一下。
+![[Pasted image 20240927100321.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240927100345.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)图中的CPU都是物理CPU。当一个系统中的CPU越来越多、内存越来越多的时候，内存总线就会成为一个系统的瓶颈。如果大家都还挤在同一个总线上，速度必然很慢。于是我们可以采取一种方法，把一部分CPU和一部分内存直连在一起，构成一个节点，不同节点之间CPU访问内存采用间接方式。节点内的内存访问速度就会很快，节点之间的内存访问速度虽然很慢，但是我们可以尽量减少节点之间的内存访问，这样系统总的内存访问速度就会很快。
+![[Pasted image 20240927100400.png]]![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)图中的CPU都是物理CPU。当一个系统中的CPU越来越多、内存越来越多的时候，内存总线就会成为一个系统的瓶颈。如果大家都还挤在同一个总线上，速度必然很慢。于是我们可以采取一种方法，把一部分CPU和一部分内存直连在一起，构成一个节点，不同节点之间CPU访问内存采用间接方式。节点内的内存访问速度就会很快，节点之间的内存访问速度虽然很慢，但是我们可以尽量减少节点之间的内存访问，这样系统总的内存访问速度就会很快。
 
 Linux中的代码对UMA和NUMA是统一处理的，因为UMA可以看成是只有一个节点的NUMA。如果编译内核时配置了CONFIG_NUMA，内核支持NUMA架构的计算机，内核中会定义节点指针数组来表示各个node。如果编译内核时没有配置CONFIG_NUMA，则内核只支持UMA架构的计算机，内核中会定义一个内存节点。这样所有其它的代码都可以统一处理了。
 
@@ -269,11 +273,15 @@ linux-src/include/asm-generic/memory_model.h
 
 我们对物理内存的三级区划有了简单的了解，下面我们再对它们之间的关系进行更进一步地分析。虽然在节点描述符中包含了所有的区域类型，但是除了第一个节点能包含所有的区域类型之外，其它的节点并不能包含所有的区域类型，因为有些区域类型(DMA、DMA32)必须从物理内存的起点开始。Normal、HighMem和Movable是可以出现在所有的节点上的。页面编号(pfn)是从物理内存的起点开始编号，不是每个节点或者区域重新编号的。所有区域的范围都必须是整数倍个页面，不能出现半个页面。节点描述符不仅记录自己所包含的区域，还会记录自己的起始页帧号和跨越页帧数量，区域描述符也会记录自己的起始页帧号和跨越页帧数量。
 
-下面我们来画个图看一下节点与页面之间的关系以及x86上具体的区分划分情况。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+下面我们来画个图看一下节点与页面之间的关系以及x86上具体的区分划分情况。
+![[Pasted image 20240927100451.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
 # 三、物理内存分配
 
-当我们把物理内存区划弄明白之后，再来学习物理内存分配就比较容易了。物理内存分配最底层的是页帧分配。页帧分配的分配单元是区域，分配粒度是页面。如何进行页帧分配呢？Linux采取的算法叫做伙伴系统(buddy system)。只有伙伴系统还不行，因为伙伴系统进行的是大粒度的分配，我们还需要批发与零售，于是便有了slab allocator和kmalloc。这几种内存分配方法分配的都是线性映射的内存，当系统连续内存不足的时候，Linux还提供了vmalloc用来分配非线性映射的内存。下面我们画图来看一下它们之间的关系。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)Buddy System既是直接的内存分配接口，也是所有其它内存分配器的底层分配器。Slab建立在Buddy的基础之上，Kmalloc又建立在Slab的基础之上。Vmalloc和CMA也是建立在Buddy的基础之上。Linux采取的这种内存分配体系提供了丰富灵活的内存接口，还能同时减少外部碎片和内部碎片。  
+当我们把物理内存区划弄明白之后，再来学习物理内存分配就比较容易了。物理内存分配最底层的是页帧分配。页帧分配的分配单元是区域，分配粒度是页面。如何进行页帧分配呢？Linux采取的算法叫做伙伴系统(buddy system)。只有伙伴系统还不行，因为伙伴系统进行的是大粒度的分配，我们还需要批发与零售，于是便有了slab allocator和kmalloc。这几种内存分配方法分配的都是线性映射的内存，当系统连续内存不足的时候，Linux还提供了vmalloc用来分配非线性映射的内存。下面我们画图来看一下它们之间的关系。
+![[Pasted image 20240927100500.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)Buddy System既是直接的内存分配接口，也是所有其它内存分配器的底层分配器。Slab建立在Buddy的基础之上，Kmalloc又建立在Slab的基础之上。Vmalloc和CMA也是建立在Buddy的基础之上。Linux采取的这种内存分配体系提供了丰富灵活的内存接口，还能同时减少外部碎片和内部碎片。  
 
 ## 3.1 Buddy System
 
@@ -295,7 +303,9 @@ linux-src/include/asm-generic/memory_model.h
 
 一种迁移类型的页块被盗页之后，它的迁移类型就改变了，所以一个页块的迁移类型是会改变的，有可能变来变去。当物理内存比较少时，这种变来变去就会特别频繁，这样迁移类型带来的好处就得不偿失了。因此内核定义了一个变量page_group_by_mobility_disabled，当物理内存比较少时就禁用迁移类型。
 
-伙伴系统管理页块的方式可以用下图来表示：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+伙伴系统管理页块的方式可以用下图来表示：
+![[Pasted image 20240927100515.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
 ### 3.1.3 伙伴系统的算法逻辑
 
@@ -367,7 +377,9 @@ __GFP_ZERO：把要分配的页清零。
 
 伙伴系统的最小分配粒度是页面，但是内核中有很多大量的同一类型结构体的分配请求，比如说进程的结构体task_struct，如果使用伙伴系统来分配显然不合适，如果自己分配一个页面，然后可以分割成多个task_struct，显然也很麻烦，于是内核中给我们提供了slab分配机制来满足这种需求。Slab的基本思想很简单，就是自己先从伙伴系统中分配一些页面，然后把这些页面切割成一个个同样大小的基本块，用户就可以从slab中申请分配一个同样大小的内存块了。如果slab中的内存不够用了，它会再向伙伴系统进行申请。不同的slab其基本块的大小并不相同，内核的每个模块都要为自己的特定需求分配特定的slab，然后再从这个slab中分配内存。
 
-刚开始的时候内核中就只有一个slab，其接口和实现都叫slab。但是后来内核中又出现了两个slab实现，slob和slub。slob是针对嵌入式系统进行优化的，slub是针对内存比较多的系统进行优化的，它们的接口还是slab。由于现在的计算机内存普遍都比较大，连手机的的内存都6G、8G起步了，所以现在除了嵌入式系统之外，内核默认使用的都是slub。下面我们画个图看一下它们的关系。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)可以看到Slab在不同的语境下有不同的含义，有时候指的是整个Slab机制，有时候指的是Slab接口，有时候指的是Slab实现。如果我们在讨论问题的时候遇到了歧义，可以加上汉语后缀以明确语义。  
+刚开始的时候内核中就只有一个slab，其接口和实现都叫slab。但是后来内核中又出现了两个slab实现，slob和slub。slob是针对嵌入式系统进行优化的，slub是针对内存比较多的系统进行优化的，它们的接口还是slab。由于现在的计算机内存普遍都比较大，连手机的的内存都6G、8G起步了，所以现在除了嵌入式系统之外，内核默认使用的都是slub。下面我们画个图看一下它们的关系。
+![[Pasted image 20240927100534.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)可以看到Slab在不同的语境下有不同的含义，有时候指的是整个Slab机制，有时候指的是Slab接口，有时候指的是Slab实现。如果我们在讨论问题的时候遇到了歧义，可以加上汉语后缀以明确语义。  
 
 ### 3.2.1 Slab接口
 
@@ -411,11 +423,15 @@ __GFP_ZERO：把要分配的页清零。
 
 # 四、物理内存回收
 
-内存作为系统最宝贵的资源，总是不够用的。当内存不足的时候就要对内存进行回收了。内存回收按照回收时机可以分为同步回收和异步回收，同步回收是指在分配内存的时候发现无法分配到内存就进行回收，异步回收是指有专门的线程定期进行检测，如果发现内存不足就进行回收。内存回收的类型有两种，一是内存规整，也就是内存碎片整理，它不会增加可用内存的总量，但是会增加连续可用内存的量，二是页帧回收，它会把物理页帧的内容写入到外存中去，然后解除其与虚拟内存的映射，这样可用物理内存的量就增加了。内存回收的时机和类型是正交关系，同步回收中会使用内存规整和页帧回收，异步回收中也会使用内存规整和页帧回收。在异步回收中，内存规整有单独的线程kcompactd，此类线程一个node一个，线程名是[kcompactd/nodeid]，页帧回收也有单独的线程kswapd，此类线程也是一个node一个，线程名是[kswapd/nodeid]。在同步回收中，还有一个大杀器，那就是OOM Killer，OOM是内存耗尽的意思，当内存耗尽，其它所有的内存回收方法也回收不到内存的时候，就会使用这个大杀器。下面我们画个图来看一下：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+内存作为系统最宝贵的资源，总是不够用的。当内存不足的时候就要对内存进行回收了。内存回收按照回收时机可以分为同步回收和异步回收，同步回收是指在分配内存的时候发现无法分配到内存就进行回收，异步回收是指有专门的线程定期进行检测，如果发现内存不足就进行回收。内存回收的类型有两种，一是内存规整，也就是内存碎片整理，它不会增加可用内存的总量，但是会增加连续可用内存的量，二是页帧回收，它会把物理页帧的内容写入到外存中去，然后解除其与虚拟内存的映射，这样可用物理内存的量就增加了。内存回收的时机和类型是正交关系，同步回收中会使用内存规整和页帧回收，异步回收中也会使用内存规整和页帧回收。在异步回收中，内存规整有单独的线程kcompactd，此类线程一个node一个，线程名是[kcompactd/nodeid]，页帧回收也有单独的线程kswapd，此类线程也是一个node一个，线程名是[kswapd/nodeid]。在同步回收中，还有一个大杀器，那就是OOM Killer，OOM是内存耗尽的意思，当内存耗尽，其它所有的内存回收方法也回收不到内存的时候，就会使用这个大杀器。下面我们画个图来看一下：
+![[Pasted image 20240927100555.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
 ## 4.1 内存规整
 
-系统运行的时间长了，内存一会儿分配一会儿释放，慢慢地可用内存就会变得很碎片化不连续。虽然总的可用内存还不少，但是却无法分配大块连续内存，此时就需要进行内存规整了。内存规整是以区域为基本单位，找到可用移动的页帧，把它们都移到同一端，然后连续可用内存的量就增大了。其逻辑如下图所示：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+系统运行的时间长了，内存一会儿分配一会儿释放，慢慢地可用内存就会变得很碎片化不连续。虽然总的可用内存还不少，但是却无法分配大块连续内存，此时就需要进行内存规整了。内存规整是以区域为基本单位，找到可用移动的页帧，把它们都移到同一端，然后连续可用内存的量就增大了。其逻辑如下图所示：
+![[Pasted image 20240927100606.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
 ## 4.2 页帧回收
 
@@ -479,7 +495,9 @@ oom_badness首先把unkiller的进程也就是init进程内核线程直接返回
 
 # 六、虚拟内存映射
 
-开启分页内存机制之后，CPU访问一切内存都要通过虚拟内存地址访问，CPU把虚拟内存地址发送给MMU，MMU把虚拟内存地址转换为物理内存地址，然后再用物理内存地址通过MC(内存控制器)访问内存。MMU里面有两个部件，TLB和PTW。TLB可以意译地址转换缓存器，它是缓存虚拟地址解析结果的地方。PTW可以意译为虚拟地址解析器，它负责解析页表，把虚拟地址转换为物理地址，然后再送去MC进行访问。同时其转换结果也会被送去TLB进行缓存，下次再访问相同虚拟地址的时候就不用再去解析了，可以直接用缓存的结果。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+开启分页内存机制之后，CPU访问一切内存都要通过虚拟内存地址访问，CPU把虚拟内存地址发送给MMU，MMU把虚拟内存地址转换为物理内存地址，然后再用物理内存地址通过MC(内存控制器)访问内存。MMU里面有两个部件，TLB和PTW。TLB可以意译地址转换缓存器，它是缓存虚拟地址解析结果的地方。PTW可以意译为虚拟地址解析器，它负责解析页表，把虚拟地址转换为物理地址，然后再送去MC进行访问。同时其转换结果也会被送去TLB进行缓存，下次再访问相同虚拟地址的时候就不用再去解析了，可以直接用缓存的结果。
+![[Pasted image 20240927100628.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
 ## 6.1 页表
 
@@ -489,7 +507,10 @@ oom_badness首先把unkiller的进程也就是init进程内核线程直接返回
 
 Linux内核最多支持五级页表，在五级页表体系中，每一级页表分别叫做PGD、P4D、PUD、PMD、PTE。如果页表不够五级的，从第二级开始依次去掉一级。
 
-页表项是下一级页表或者最终页帧的物理地址，页表也是一个页帧，页帧的地址都是4K对齐的，所以页表项中的物理地址的最后12位一定都是0，既然都是0，那么就没必要表示出来了，我们就可以把这12位拿来做其它用途了。下面我们来看一下x86的页表项格式。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这是32位的页表项格式，其中12-31位是物理地址。
+页表项是下一级页表或者最终页帧的物理地址，页表也是一个页帧，页帧的地址都是4K对齐的，所以页表项中的物理地址的最后12位一定都是0，既然都是0，那么就没必要表示出来了，我们就可以把这12位拿来做其它用途了。下面我们来看一下x86的页表项格式。
+![[Pasted image 20240927100642.png]]
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这是32位的页表项格式，其中12-31位是物理地址。
 
 P，此页表项是否有效，1代表有效，0代表无效，为0时其它字段无意义。
 
@@ -513,9 +534,14 @@ G，Global; determines whether the translation is global
 
 ## 6.2 MMU
 
-MMU是通过遍历页表把虚拟地址转换为物理地址的。其过程如下所示：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)CR3是CPU的寄存器，存放的是PGD的物理地址。MMU首先通过CR3获取PGD的物理地址，然后以虚拟地址的31-22位为index，在PGD中找到相应的页表项，先检测页表项的P是否存在，R/W是否有读写权限，U/S是否有访问权限，如果检测都通过了，则进入下一步，如果没通过则触发缺页异常。关于中断与异常的基本原理请参看《深入理解Linux中断机制》。如果检测通过了，页表项的31-12位代表PTE的物理地址，取虚拟地址中的21-12位作为index，在PTE中找到对应的页表项，也是先各种检测，如果没通过则触发缺页异常。如果通过了，则31-12位代表最终页帧的物理地址，然后把虚拟地址的11-0位作为页内偏移加上去，就找到了虚拟地址对应的物理地址了，然后送到MC进行访问。64位系统的逻辑和32位是相似的，只不过是多了几级页表而已，就不再赘述了。
+MMU是通过遍历页表把虚拟地址转换为物理地址的。其过程如下所示：
+![[Pasted image 20240927100657.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)CR3是CPU的寄存器，存放的是PGD的物理地址。MMU首先通过CR3获取PGD的物理地址，然后以虚拟地址的31-22位为index，在PGD中找到相应的页表项，先检测页表项的P是否存在，R/W是否有读写权限，U/S是否有访问权限，如果检测都通过了，则进入下一步，如果没通过则触发缺页异常。关于中断与异常的基本原理请参看《深入理解Linux中断机制》。如果检测通过了，页表项的31-12位代表PTE的物理地址，取虚拟地址中的21-12位作为index，在PTE中找到对应的页表项，也是先各种检测，如果没通过则触发缺页异常。如果通过了，则31-12位代表最终页帧的物理地址，然后把虚拟地址的11-0位作为页内偏移加上去，就找到了虚拟地址对应的物理地址了，然后送到MC进行访问。64位系统的逻辑和32位是相似的，只不过是多了几级页表而已，就不再赘述了。
 
-一个进程的所有页表通过页表项的指向构成了一个页表树，页表树的根节点是PGD，根指针是CR3。页表树中所有的地址都是物理地址，MMU在遍历页表树时使用物理地址可以直接访问内存。一个页表只有加入了某个页表树才有意义，孤立的页表是没有意义的。每个进程都有一个页表树，切换进程就会切换页表树，切换页表树的方法是给CR3赋值，让其指向当前进程的页表树的根节点也就是PGD。进程的虚拟内存空间分为两部分，内核空间和用户空间，所有进程的内核空间都是共享的，所以所有进程的页表树根节点的内核子树都相同。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+一个进程的所有页表通过页表项的指向构成了一个页表树，页表树的根节点是PGD，根指针是CR3。页表树中所有的地址都是物理地址，MMU在遍历页表树时使用物理地址可以直接访问内存。一个页表只有加入了某个页表树才有意义，孤立的页表是没有意义的。每个进程都有一个页表树，切换进程就会切换页表树，切换页表树的方法是给CR3赋值，让其指向当前进程的页表树的根节点也就是PGD。进程的虚拟内存空间分为两部分，内核空间和用户空间，所有进程的内核空间都是共享的，所以所有进程的页表树根节点的内核子树都相同。
+![[Pasted image 20240927100708.png]]
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
 
 ## 6.3 缺页异常
 
@@ -531,7 +557,12 @@ MMU在解析虚拟内存时如果发现了读写错误或者权限错误或者�
 
 # 七、虚拟内存空间
 
-CPU开启了分页内存机制之后，就只能通过虚拟内存来访问内存了。内核通过构建页表树来创建虚拟内存空间，一个页表树对应一个虚拟内存空间。虚拟内存空间又分为两部分，内核空间和用户空间。所有的页表树都共享内核空间，它们内核页表子树是相同的。内核空间和用户空间不仅在数量上不同，在权限上不同，在构建方式上也不同。内核空间在系统全局都只有一个，不仅在UP上是如此，在SMP上也是只有一个，多个CPU共享同一个内核空间。内核空间是特权空间，可以执行所有的操作，也可以访问用户空间。用户空间是非特权空间，很多操作不能做，也不能随意访问内核，唯一能访问内核的方式就是通过系统调用。内核空间和用户空间最大的不同是构建方式。内核空间是在系统启动时就构建好的，是完整构建的，物理内存和虚拟内存是直接一次就映射好的，而且是不会销毁的，因为系统运行着内核就要一直存在。用户空间是在创建进程时构建的，但是并没有完整构建，虚拟内存到物理内存的映射是随着进程的运行通过触发缺页异常一步一步构建的，而且在内存回收时还有可能被解除映射，最后随着进程的死亡，用户空间还会被销毁。下面我们看个图：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这个图是在讲进程调度时画的图，但是也能表明内核空间和用户空间的关系。下面我们再来看一下单个进程角度下内核空间与用户空间的关系图。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)在32位系统上默认是内核占据上面1G虚拟空间，进程占据下面3G虚拟空间，有config选项可以选择其它比列，所有CPU架构都是如此。在64位系统上，由于64位的地址空间实在是太大了，Linux并没有使用全部的虚拟内存空间，而是只使用其中一部分位数。使用的方法是把用户空间的高位补0，内核空间的高位补1，这样从64位地址空间的角度来看就是只使用了两段，中间留空，方便以后往中间扩展。中间留空的是非法内存空间，不能使用。具体使用多少位，高位如何补0，不同架构的选择是不同的。ARM64在4K页面大小的情况下有39位和48位两种虚拟地址空间的选择。X86 64有48位和57位两种虚拟地址空间的选择。ARM64是内核空间和用户空间都有这么多的地址空间，x86 64是内核空间和用户空间平分这么多的地址空间，上图中的大小也可以反应出这一点。  
+CPU开启了分页内存机制之后，就只能通过虚拟内存来访问内存了。内核通过构建页表树来创建虚拟内存空间，一个页表树对应一个虚拟内存空间。虚拟内存空间又分为两部分，内核空间和用户空间。所有的页表树都共享内核空间，它们内核页表子树是相同的。内核空间和用户空间不仅在数量上不同，在权限上不同，在构建方式上也不同。内核空间在系统全局都只有一个，不仅在UP上是如此，在SMP上也是只有一个，多个CPU共享同一个内核空间。内核空间是特权空间，可以执行所有的操作，也可以访问用户空间。用户空间是非特权空间，很多操作不能做，也不能随意访问内核，唯一能访问内核的方式就是通过系统调用。内核空间和用户空间最大的不同是构建方式。内核空间是在系统启动时就构建好的，是完整构建的，物理内存和虚拟内存是直接一次就映射好的，而且是不会销毁的，因为系统运行着内核就要一直存在。用户空间是在创建进程时构建的，但是并没有完整构建，虚拟内存到物理内存的映射是随着进程的运行通过触发缺页异常一步一步构建的，而且在内存回收时还有可能被解除映射，最后随着进程的死亡，用户空间还会被销毁。下面我们看个图：
+![[Pasted image 20240927100725.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这个图是在讲进程调度时画的图，但是也能表明内核空间和用户空间的关系。下面我们再来看一下单个进程角度下内核空间与用户空间的关系图。
+![[Pasted image 20240927100738.png]]
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)在32位系统上默认是内核占据上面1G虚拟空间，进程占据下面3G虚拟空间，有config选项可以选择其它比列，所有CPU架构都是如此。在64位系统上，由于64位的地址空间实在是太大了，Linux并没有使用全部的虚拟内存空间，而是只使用其中一部分位数。使用的方法是把用户空间的高位补0，内核空间的高位补1，这样从64位地址空间的角度来看就是只使用了两段，中间留空，方便以后往中间扩展。中间留空的是非法内存空间，不能使用。具体使用多少位，高位如何补0，不同架构的选择是不同的。ARM64在4K页面大小的情况下有39位和48位两种虚拟地址空间的选择。X86 64有48位和57位两种虚拟地址空间的选择。ARM64是内核空间和用户空间都有这么多的地址空间，x86 64是内核空间和用户空间平分这么多的地址空间，上图中的大小也可以反应出这一点。  
 
 ## 7.1 内核空间
 
@@ -541,7 +572,10 @@ CPU开启了分页内存机制之后，就只能通过虚拟内存来访问内�
 
 大家在这里可能有两个误解：一是认为物理内存映射就代表使用，不使用就不会映射，这是不对的，使用时肯定要映射，但是映射了不代表在使用，映射了可以先放在那，只有被内存分配器分配出去的才算是被使用；二是物理内存只会被内核空间或者用户空间两者之一映射，谁使用了就映射到谁的空间中去，这也是不对的，对于用户空间，只有其使用了物理内存才会去映射，但是对于内核空间，内核空间是管理者，它把所有物理内存都映射到自己的空间比较方便管理，而且映射了不代表使用。
 
-64位和32位还有一个很大的不同。32位上是把小于896M的物理内存都线性映射到从3G开始的内核空间中去，32位上只有一个线性映射区间。64位上有两个线性映射区间，一是把内核代码和数据所在的物理内存映射到一个固定的地址区间中去，二是把所有物理内存都映射到某一段内存区间中去，显然内核本身所占用的物理内存被映射了两次。下面我们画图来看一看内核空间的布局。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)32位的内核空间布局比较简单，前896M是直接映射区，后面是8M的的隔离区，然后是大约100多M的vmalloc区，再后面是持久映射区和固定映射区，其位置和大小是由宏决定的。
+64位和32位还有一个很大的不同。32位上是把小于896M的物理内存都线性映射到从3G开始的内核空间中去，32位上只有一个线性映射区间。64位上有两个线性映射区间，一是把内核代码和数据所在的物理内存映射到一个固定的地址区间中去，二是把所有物理内存都映射到某一段内存区间中去，显然内核本身所占用的物理内存被映射了两次。下面我们画图来看一看内核空间的布局。
+![[Pasted image 20240927100751.png]]
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)32位的内核空间布局比较简单，前896M是直接映射区，后面是8M的的隔离区，然后是大约100多M的vmalloc区，再后面是持久映射区和固定映射区，其位置和大小是由宏决定的。
 
 64位的内核空间布局比较复杂，而且不同的架构之间差异非常大，我们以x86 64 48位虚拟地址为例说一下。图中一列画不下，分成了两列，我们从48位-1看起，首先是由一个8T的空洞，然后是LDT remap，然后是直接映射区有64T，用来映射所有的物理内存，目前来说对于绝大部分计算机都够用了，然后是0.5T的空洞，然后是vmalloc和ioremap区有32T，然后是1T的空洞，然后是vmemmap区有1T，vmemmap就是我们前面所讲的所有页面描述符的数组，然后是1T的空洞，然后是KASAN的影子内存有16T，紧接着再看48位-2，首先是2T的空洞，然后是cpu_entry_area，然后是0.5T的空洞，然后是%esp fixup stack，然后是444G的空洞，然后是EFI的映射区域，然后是2T的空洞，然后是内核的映射区有512M，然后是ko的映射区有1520M，然后是fixmap和vsyscall，最后是2M的空洞。如果开启了kaslr，内核和映射区会增加512M，相应的ko的映射区会减少512M。
 
@@ -577,7 +611,10 @@ CPU开启了分页内存机制之后，就只能通过虚拟内存来访问内�
 
 # 九、总结回顾
 
-前面我们讲了这么多的东西，现在再来总结回顾一下。首先我们再重新看一下Linux的内存管理体系图，我们边看这个图边进行总结。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)首先要强调的一点是，这么多的东西，都是在内核里进行管理的，内核是可以操作这一切的。但是对进程来说这些基本都是透明的，进程只能看到自己的虚拟内存空间，只能在自己空间里分配虚拟内存，其它的，进程什么也看不见、管不着。
+前面我们讲了这么多的东西，现在再来总结回顾一下。首先我们再重新看一下Linux的内存管理体系图，我们边看这个图边进行总结。
+![[Pasted image 20240927100808.png]]
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)首先要强调的一点是，这么多的东西，都是在内核里进行管理的，内核是可以操作这一切的。但是对进程来说这些基本都是透明的，进程只能看到自己的虚拟内存空间，只能在自己空间里分配虚拟内存，其它的，进程什么也看不见、管不着。
 
 目前绝大部分的操作系统采用的内存管理模式都是以分页内存为基础的虚拟内存机制。虚拟内存机制的中心是MMU和页表，MMU是需要硬件提供的，页表是需要软件来操作的。虚拟内存左边连着物理内存管理，右边连着虚拟内存空间，左边和右边有着复杂的关系。物理内存管理中，首先是对物理内存的三级区划，然后是对物理内存的三级分配体系，最后是物理内存的回收。虚拟内存空间中，首先可以分为内核空间和用户空间，两者在很多方面都有着显著的不同。内核空间是内核运行的地方，只有一份，永久存在，有特权，而且其内存映射是提前映射、线性映射，不会换页。用户空间是进程运行的地方，有N份，随着进程的诞生而创建、进程的死亡而销毁。用户空间中虚拟内存的分配和物理内存的分配是分开的，进程只能分配虚拟内存，物理内存的分配是在进程运行过程中动态且透明地分配的。用户空间的物理内存可以分为文件页和匿名页，页帧回收的主要逻辑就是围绕文件页和匿名页展开的。
 
