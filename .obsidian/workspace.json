@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
+                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
+                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
+                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md"
+                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md"
               }
             }
           }
@@ -146,10 +146,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
     "0x99-image/Pasted image 20240928180353.png",
-    "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
+    "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
     "0x99-image/Pasted image 20240928180501.png",
     "0x99-image/Pasted image 20240928180452.png",
     "0x99-image/Pasted image 20240928180428.png",
