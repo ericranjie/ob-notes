@@ -36,7 +36,7 @@ C/C++语言中，内存的分配与回收都是由开发人员在编写代码时
 内存泄漏（Memory Leak）是指程序中己动态分配的堆内存由于某种原因程序未释放或无法释放，造成系统内存的浪费，导致程序运行速度减慢甚至系统崩溃等严重后果。
 
 当我们在程序中对原始指针(raw pointer)使用`new`操作符或者`free`函数的时候，实际上是在堆上为其分配内存，这个内存指的是RAM，而不是硬盘等永久存储。持续申请而不释放(或者少量释放)内存的应用程序，最终因内存耗尽导致`OOM(out of memory)`。
-
+![[Pasted image 20240928180353.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 方便大家理解内存泄漏的危害，举个简单的例子。有一个宾馆，共有100间房间，顾客每次都是在前台进行登记，然后拿到房间钥匙。如果有些顾客不需要该房间了，既不去前台处登记退房，也不归还钥匙，久而久之，前台处可用房间越来越少，收入也越来越少，濒临倒闭。当程序申请了内存，而不进行归还，久而久之，可用内存越来越少，OS就会进行自我保护，杀掉该进程，这就是我们常说的`OOM(out of memory)`。
@@ -63,7 +63,7 @@ C/C++语言中，内存的分配与回收都是由开发人员在编写代码时
 这就得从进程的内存布局说起。
 
 ### 进程内存布局
-
+![[Pasted image 20240928180402.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图为32位进程的内存布局，从上图中主要包含以下几个块：
@@ -101,14 +101,14 @@ C/C++语言中，内存的分配与回收都是由开发人员在编写代码时
     
 
 由于本文主要讲内存分配相关，所以下面的内容仅涉及到栈(stack)和堆(heap)。
-
+![[Pasted image 20240928180411.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 栈
 
 栈一块连续的内存块，栈上的内存分配就是在这一块连续内存块上进行操作的。编译器在编译的时候，就已经知道要分配的内存大小，当调用函数时候，其内部的遍历都会在栈上分配内存；当结束函数调用时候，内部变量就会被释放，进而将内存归还给栈。
 
-```
+```c
 class Object {
  public:
   Object() = default;
@@ -251,7 +251,7 @@ void fun() {
 `#include <stdio.h>   #include <stdlib.h>      int main() {     int a;     int *p;     p = (int *)malloc(sizeof(int));     free(p);        return 0;   }   `
 
 上述代码很简单，有两个变量a和p，类型分别为int和int *，其中，a和p存储在栈上，p的值为在堆上的某块地址(在上述代码中，p的值为0x1c66010)，上述代码布局如下图所示：
-
+![[Pasted image 20240928180428.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 产生方式
@@ -454,7 +454,7 @@ void fun() {
 通过上面输出可以发现，因为引用计数都是2，所以在main函数结束的时候，不会调用controller和sub_controller的析构函数，所以就出现了`内存泄漏`。
 
 上面产生内存泄漏的原因，就是我们常说的`循环引用`。
-
+![[Pasted image 20240928180452.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 为了解决std::shared_ptr循环引用导致的内存泄漏，我们可以使用std::weak_ptr来单面去除上图中的循环。
@@ -466,7 +466,7 @@ void fun() {
 `controller use_count: 1   sub_controller use_count: 2   in ~Controller   in ~SubController   `
 
 从上面结果可以看出，controller和sub_controller均以释放，所以`循环引用`引起的内存泄漏问题，也得以解决。
-
+![[Pasted image 20240928180501.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可能有人会问，使用std::shared_ptr可以直接访问对应的成员函数，如果是std::weak_ptr的话，怎么访问呢？我们可以使用下面的方式:

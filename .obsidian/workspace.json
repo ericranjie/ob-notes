@@ -11,9 +11,11 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "0x99-image/Pasted image 20240928174711.png"
+                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -46,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "一文看懂 GDB底层实现原理",
+                "query": "内存泄漏-原因、避免以及定位",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240928174711.png",
+                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240928174711.png",
+                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240928174711.png"
+                "file": "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md"
               }
             }
           }
@@ -144,27 +146,29 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
+    "0x99-image/Pasted image 20240928180353.png",
+    "coding/os/linux/debug/a_内存泄漏-原因、避免以及定位.md",
+    "0x99-image/Pasted image 20240928180501.png",
+    "0x99-image/Pasted image 20240928180452.png",
+    "0x99-image/Pasted image 20240928180428.png",
+    "0x99-image/Pasted image 20240928180411.png",
+    "0x99-image/Pasted image 20240928180402.png",
+    "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
+    "0x99-image/Pasted image 20240928174711.png",
     "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
     "0x99-image/Pasted image 20240928175040.png",
     "0x99-image/Pasted image 20240928175032.png",
     "0x99-image/Pasted image 20240928175023.png",
-    "0x99-image/Pasted image 20240928175013.png",
     "coding/os/linux/debug/如何对一个【可执行程序】进行拦截和包装？.md",
     "coding/os/linux/debug/Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
-    "0x99-image/Pasted image 20240928174727.png",
-    "0x99-image/Pasted image 20240928174711.png",
     "coding/os/linux/debug/c_18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
     "coding/os/linux/debug/at_大厂干掉 OOM 的套路，不过如此.md",
     "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
     "coding/os/linux/debug/i_Linux下“用户空间修改设备寄存器或者物理内存”的实现.md",
     "coding/frontend/c_这本计算机神书，出 JavaScript 版了！.md",
-    "0x99-image/Pasted image 20240928131711.png",
     "coding/os/linux/debug/GDB/使用 GDB + Qemu 调试 Linux 内核.md",
-    "0x99-image/Pasted image 20240928132702.png",
-    "0x99-image/Pasted image 20240928132655.png",
-    "0x99-image/Pasted image 20240928132646.png",
     "coding/os/linux/debug/深入理解Linux Netlink机制：进程间通信的关键.md",
     "coding/os/linux/debug/p_一例hardened_usercopy的bug解析.md",
     "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
@@ -182,9 +186,6 @@
     "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
     "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
     "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
