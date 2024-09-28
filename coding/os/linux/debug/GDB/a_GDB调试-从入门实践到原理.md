@@ -315,39 +315,41 @@ tui为`terminal user interface`的缩写，在启动时候指定`-tui`参数，�
 
 首先，我们先看一段代码：
 
-```
-#include<stdio.h>void print(int xx, int *xxptr) {  printf("In print():\n");  printf("   xx is %d and is stored at %p.\n", xx, &xx);  printf("   ptr points to %p which holds %d.\n", xxptr, *xxptr);}int main(void) {  int x = 10;  int *ptr = &x;  printf("In main():\n");  printf("   x is %d and is stored at %p.\n", x, &x);  printf("   ptr points to %p which holds %d.\n", ptr, *ptr);  print(x, ptr);  return 0;}
+```c
+#include<stdio.h>
+void print(int xx, int *xxptr) {  printf("In print():\n");  printf("   xx is %d and is stored at %p.\n", xx, &xx);  printf("   ptr points to %p which holds %d.\n", xxptr, *xxptr);}int main(void) {  int x = 10;  int *ptr = &x;  printf("In main():\n");  printf("   x is %d and is stored at %p.\n", x, &x);  printf("   ptr points to %p which holds %d.\n", ptr, *ptr);  print(x, ptr);  return 0;}
 ```
 
 这个代码比较简单，下面我们开始进入调试：
 
-```
-gdb ./test_mainGNU gdb (GDB) Red Hat Enterprise Linux 7.6.1-114.el7Copyright (C) 2013 Free Software Foundation, Inc.License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>This is free software: you are free to change and redistribute it.There is NO WARRANTY, to the extent permitted by law.  Type "show copying"and "show warranty" for details.This GDB was configured as "x86_64-redhat-linux-gnu".For bug reporting instructions, please see:<http://www.gnu.org/software/gdb/bugs/>...Reading symbols from /root/test_main...done.(gdb) rStarting program: /root/./test_mainIn main():   x is 10 and is stored at 0x7fffffffe424.   ptr points to 0x7fffffffe424 which holds 10.In print():   xx is 10 and is stored at 0x7fffffffe40c.   xxptr points to 0x7fffffffe424 which holds 10.[Inferior 1 (process 31518) exited normally]Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
+```c
+gdb ./test_mainGNU gdb (GDB) Red Hat Enterprise Linux 7.6.1-114.el7Copyright (C) 2013 Free Software Foundation, Inc.License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>This is free software: you are free to change and redistribute it.There is NO WARRANTY, to the extent permitted by law.  Type "show copying"and "show warranty" for details.This GDB was configured as "x86_64-redhat-linux-gnu".For bug reporting instructions, please see:<http://www.gnu.org/software/gdb/bugs/>...Reading symbols from /root/test_main...done.(gdb) r
+Starting program: /root/./test_mainIn main():   x is 10 and is stored at 0x7fffffffe424.   ptr points to 0x7fffffffe424 which holds 10.In print():   xx is 10 and is stored at 0x7fffffffe40c.   xxptr points to 0x7fffffffe424 which holds 10.[Inferior 1 (process 31518) exited normally]Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64
 ```
 
 在上述命令中，我们通过gdb test命令启动调试，然后通过执行r(run命令的缩写)执行程序，直至退出，换句话说，上述命令是一个完整的使用gdb运行可执行程序的完整过程(只使用了r命令)，接下来，我们将以此为例子，介绍几种比较常见的命令。
 
 ##### 断点
 
-```
+```c
 (gdb) b 15Breakpoint 1 at 0x400601: file test_main.cc, line 15.(gdb) info bNum     Type           Disp Enb Address            What1       breakpoint     keep y   0x0000000000400601 in main() at test_main.cc:15(gdb) rStarting program: /root/./test_mainIn main():   x is 10 and is stored at 0x7fffffffe424.   ptr points to 0x7fffffffe424 which holds 10.Breakpoint 1, main () at test_main.cc:1515   print(xx, xxptr);Missing separate debuginfos, use: debuginfo-install glibc-2.17-260.el7.x86_64(gdb)
 ```
 
 ##### backtrace
 
-```
+```c
 (gdb) backtrace#0  main () at test_main.cc:15(gdb)
 ```
 
 backtrace命令是列出当前堆栈中的所有帧。在上面的例子中，栈上只有一帧，编号为0，属于main函数。
 
-```
+```c
 (gdb) stepprint (xx=10, xxptr=0x7fffffffe424) at test_main.cc:44   printf("In print():\n");(gdb)
 ```
 
 接着，我们执行了step命令，即进入函数内。下面我们继续通过backtrace命令来查看栈帧信息。
 
-```
+```c
 (gdb) backtrace#0  print (xx=10, xxptr=0x7fffffffe424) at test_main.cc:4#1  0x0000000000400612 in main () at test_main.cc:15(gdb)
 ```
 
@@ -363,25 +365,25 @@ backtrace命令是列出当前堆栈中的所有帧。在上面的例子中，�
 
 在前面的例子中，由于当前正在print()函数中执行，GDB位于第0帧的上下文中。可以通过frame命令来获取当前正在执行的上下文所在的帧。
 
-```
+```c
 (gdb) frame#0  print (xx=10, xxptr=0x7fffffffe424) at test_main.cc:44   printf("In print():\n");(gdb)
 ```
 
 下面，我们尝试使用print命令打印下当前栈帧的值，如下：
 
-```
+```c
 (gdb) print xx$1 = 10(gdb) print xxptr$2 = (int *) 0x7fffffffe424(gdb)
 ```
 
 如果我们想看其他栈帧的内容呢？比如main函数中x和ptr的信息呢？假如直接打印这俩值的话，那么就会得到如下：
 
-```
+```c
 (gdb) print xNo symbol "x" in current context.(gdb) print xxptrNo symbol "ptr" in current context.(gdb)
 ```
 
 在此，我们可以通过_frame num_来切换栈帧，如下：
 
-```
+```c
 (gdb) frame 1#1  0x0000000000400612 in main () at test_main.cc:1515   print(x, ptr);(gdb) print x$3 = 10(gdb) print ptr$4 = (int *) 0x7fffffffe424(gdb)
 ```
 
@@ -389,8 +391,13 @@ backtrace命令是列出当前堆栈中的所有帧。在上面的例子中，�
 
 为了方便进行演示，我们创建一个简单的例子，代码如下：
 
-```
-#include <chrono>#include <iostream>#include <string>#include <thread>#include <vector>int fun_int(int n) {  std::this_thread::sleep_for(std::chrono::seconds(10));  std::cout << "in fun_int n = " << n << std::endl;    return 0;}int fun_string(const std::string &s) {  std::this_thread::sleep_for(std::chrono::seconds(10));  std::cout << "in fun_string s = " << s << std::endl;    return 0;}int main() {  std::vector<int> v;  v.emplace_back(1);  v.emplace_back(2);  v.emplace_back(3);  std::cout << v.size() << std::endl;  std::thread t1(fun_int, 1);  std::thread t2(fun_string, "test");  std::cout << "after thread create" << std::endl;  t1.join();  t2.join();  return 0;}
+```c
+#include <chrono>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <vector>
+int fun_int(int n) {  std::this_thread::sleep_for(std::chrono::seconds(10));  std::cout << "in fun_int n = " << n << std::endl;    return 0;}int fun_string(const std::string &s) {  std::this_thread::sleep_for(std::chrono::seconds(10));  std::cout << "in fun_string s = " << s << std::endl;    return 0;}int main() {  std::vector<int> v;  v.emplace_back(1);  v.emplace_back(2);  v.emplace_back(3);  std::cout << v.size() << std::endl;  std::thread t1(fun_int, 1);  std::thread t2(fun_string, "test");  std::cout << "after thread create" << std::endl;  t1.join();  t2.join();  return 0;}
 ```
 
 上述代码比较简单：
@@ -404,8 +411,9 @@ backtrace命令是列出当前堆栈中的所有帧。在上面的例子中，�
 
 下面是一个完整的调试过程：
 
-```
-(gdb) b 27Breakpoint 1 at 0x4013d5: file test.cc, line 27.(gdb) b test.cc:32Breakpoint 2 at 0x40142d: file test.cc, line 32.(gdb) info bNum     Type           Disp Enb Address            What1       breakpoint     keep y   0x00000000004013d5 in main() at test.cc:272       breakpoint     keep y   0x000000000040142d in main() at test.cc:32(gdb) rStarting program: /root/test[Thread debugging using libthread_db enabled]Using host libthread_db library "/lib64/libthread_db.so.1".Breakpoint 1, main () at test.cc:27(gdb) cContinuing.3[New Thread 0x7ffff6fd2700 (LWP 44996)]in fun_int n = 1[New Thread 0x7ffff67d1700 (LWP 44997)]Breakpoint 2, main () at test.cc:3232   std::cout << "after thread create" << std::endl;(gdb) info threads  Id   Target Id         Frame  3    Thread 0x7ffff67d1700 (LWP 44997) "test" 0x00007ffff7051fc3 in new_heap () from /lib64/libc.so.6  2    Thread 0x7ffff6fd2700 (LWP 44996) "test" 0x00007ffff7097e2d in nanosleep () from /lib64/libc.so.6* 1    Thread 0x7ffff7fe7740 (LWP 44987) "test" main () at test.cc:32(gdb) thread 2[Switching to thread 2 (Thread 0x7ffff6fd2700 (LWP 44996))]#0  0x00007ffff7097e2d in nanosleep () from /lib64/libc.so.6(gdb) bt#0  0x00007ffff7097e2d in nanosleep () from /lib64/libc.so.6#1  0x00007ffff7097cc4 in sleep () from /lib64/libc.so.6#2  0x00007ffff796ceb9 in std::this_thread::__sleep_for(std::chrono::duration<long, std::ratio<1l, 1l> >, std::chrono::duration<long, std::ratio<1l, 1000000000l> >) () from /lib64/libstdc++.so.6#3  0x00000000004018cc in std::this_thread::sleep_for<long, std::ratio<1l, 1l> > (__rtime=...) at /usr/include/c++/4.8.2/thread:281#4  0x0000000000401307 in fun_int (n=1) at test.cc:9#5  0x0000000000404696 in std::_Bind_simple<int (*(int))(int)>::_M_invoke<0ul>(std::_Index_tuple<0ul>) (this=0x609080)    at /usr/include/c++/4.8.2/functional:1732#6  0x000000000040443d in std::_Bind_simple<int (*(int))(int)>::operator()() (this=0x609080) at /usr/include/c++/4.8.2/functional:1720#7  0x000000000040436e in std::thread::_Impl<std::_Bind_simple<int (*(int))(int)> >::_M_run() (this=0x609068) at /usr/include/c++/4.8.2/thread:115#8  0x00007ffff796d070 in ?? () from /lib64/libstdc++.so.6#9  0x00007ffff7bc6dd5 in start_thread () from /lib64/libpthread.so.0#10 0x00007ffff70d0ead in clone () from /lib64/libc.so.6(gdb) cContinuing.after thread createin fun_int n = 1[Thread 0x7ffff6fd2700 (LWP 45234) exited]in fun_string s = test[Thread 0x7ffff67d1700 (LWP 45235) exited][Inferior 1 (process 45230) exited normally](gdb) q
+```c
+(gdb) b 27
+Breakpoint 1 at 0x4013d5: file test.cc, line 27.(gdb) b test.cc:32Breakpoint 2 at 0x40142d: file test.cc, line 32.(gdb) info bNum     Type           Disp Enb Address            What1       breakpoint     keep y   0x00000000004013d5 in main() at test.cc:272       breakpoint     keep y   0x000000000040142d in main() at test.cc:32(gdb) rStarting program: /root/test[Thread debugging using libthread_db enabled]Using host libthread_db library "/lib64/libthread_db.so.1".Breakpoint 1, main () at test.cc:27(gdb) cContinuing.3[New Thread 0x7ffff6fd2700 (LWP 44996)]in fun_int n = 1[New Thread 0x7ffff67d1700 (LWP 44997)]Breakpoint 2, main () at test.cc:3232   std::cout << "after thread create" << std::endl;(gdb) info threads  Id   Target Id         Frame  3    Thread 0x7ffff67d1700 (LWP 44997) "test" 0x00007ffff7051fc3 in new_heap () from /lib64/libc.so.6  2    Thread 0x7ffff6fd2700 (LWP 44996) "test" 0x00007ffff7097e2d in nanosleep () from /lib64/libc.so.6* 1    Thread 0x7ffff7fe7740 (LWP 44987) "test" main () at test.cc:32(gdb) thread 2[Switching to thread 2 (Thread 0x7ffff6fd2700 (LWP 44996))]#0  0x00007ffff7097e2d in nanosleep () from /lib64/libc.so.6(gdb) bt#0  0x00007ffff7097e2d in nanosleep () from /lib64/libc.so.6#1  0x00007ffff7097cc4 in sleep () from /lib64/libc.so.6#2  0x00007ffff796ceb9 in std::this_thread::__sleep_for(std::chrono::duration<long, std::ratio<1l, 1l> >, std::chrono::duration<long, std::ratio<1l, 1000000000l> >) () from /lib64/libstdc++.so.6#3  0x00000000004018cc in std::this_thread::sleep_for<long, std::ratio<1l, 1l> > (__rtime=...) at /usr/include/c++/4.8.2/thread:281#4  0x0000000000401307 in fun_int (n=1) at test.cc:9#5  0x0000000000404696 in std::_Bind_simple<int (*(int))(int)>::_M_invoke<0ul>(std::_Index_tuple<0ul>) (this=0x609080)    at /usr/include/c++/4.8.2/functional:1732#6  0x000000000040443d in std::_Bind_simple<int (*(int))(int)>::operator()() (this=0x609080) at /usr/include/c++/4.8.2/functional:1720#7  0x000000000040436e in std::thread::_Impl<std::_Bind_simple<int (*(int))(int)> >::_M_run() (this=0x609068) at /usr/include/c++/4.8.2/thread:115#8  0x00007ffff796d070 in ?? () from /lib64/libstdc++.so.6#9  0x00007ffff7bc6dd5 in start_thread () from /lib64/libpthread.so.0#10 0x00007ffff70d0ead in clone () from /lib64/libc.so.6(gdb) cContinuing.after thread createin fun_int n = 1[Thread 0x7ffff6fd2700 (LWP 45234) exited]in fun_string s = test[Thread 0x7ffff67d1700 (LWP 45235) exited][Inferior 1 (process 45230) exited normally](gdb) q
 ```
 
 在上述调试过程中：

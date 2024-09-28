@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md"
+                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md"
               }
             }
           }
@@ -146,14 +146,30 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/debug/trace/b_Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇.md",
+    "coding/os/linux/debug/ASAN",
+    "Pasted image 20240928120724.png",
+    "Pasted image 20240928120718.png",
+    "Pasted image 20240928120704.png",
+    "Pasted image 20240928120654.png",
+    "Pasted image 20240928120629.png",
+    "Pasted image 20240928120610.png",
+    "Pasted image 20240928120542.png",
+    "Pasted image 20240928120533.png",
+    "Pasted image 20240928120526.png",
+    "Pasted image 20240928120519.png",
+    "coding/os/linux/debug/trace/k_Systrace 线程 CPU 运行状态分析技巧 - Runnable.md",
+    "coding/os/linux/debug/GDB/a_GDB调试-从入门实践到原理.md",
+    "coding/os/linux/debug/trace",
+    "coding/os/linux/debug/GDB/p_GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md",
+    "coding/os/linux/debug/GDB",
+    "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
     "coding/os/linux/memory/C&DMA/应读者要求讲讲 DMA.md",
     "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
     "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
     "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
-    "0x99-image/Pasted image 20240927115732.png",
-    "0x99-image/Pasted image 20240927115704.png",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
@@ -161,14 +177,6 @@
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "coding/os/linux/memory/memory-init/b_Linux 物理内存初始化.md",
-    "0x99-image/Pasted image 20240927142152.png",
-    "0x99-image/Pasted image 20240927142145.png",
-    "0x99-image/Pasted image 20240927142134.png",
-    "0x99-image/Pasted image 20240927142127.png",
-    "0x99-image/Pasted image 20240927142118.png",
-    "0x99-image/Pasted image 20240927142111.png",
-    "0x99-image/Pasted image 20240927142059.png",
-    "0x99-image/Pasted image 20240927142053.png",
     "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
     "coding/os/linux/memory/memory-manage/slub/b_SLUB DEBUG原理.md",
     "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
@@ -178,12 +186,6 @@
     "coding/os/linux/memory/memory-manage/i_页面回收的基本概念.md",
     "coding/os/linux/memory/memory-manage/图解 Linux内存背后的那些神秘往事.md",
     "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
-    "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md",
-    "coding/os/linux/memory/memory-manage/b_由Google、OPPO、ARM、华为等大厂程序员贡献的Linux Large Folios大页在社区和产品的现状和未来.md",
-    "coding/os/linux/memory/memory-debug/p_解决 Linux 内核 Section GC 失败问题 - Part 1.md",
-    "coding/os/linux/memory/memory-debug/i_明明还有大量内存，为啥报错“无法分配内存”？.md",
-    "coding/os/linux/memory/memory-debug/i_proc meminfo分析（一）.md",
-    "coding/os/linux/memory/memory-debug/i_KASLR.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
@@ -191,9 +193,6 @@
     "coding/os/linux/schedule/lock/mutex",
     "coding/os/linux/schedule/lock/spinlock",
     "0x01-leetcode/math-logic/hard-logic/validate",
-    "0x01-leetcode/math-logic/hard-logic",
-    "0x01-leetcode/math/Untitled",
-    "0x01-leetcode/math-logic",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
     "Untitled.canvas"
   ]

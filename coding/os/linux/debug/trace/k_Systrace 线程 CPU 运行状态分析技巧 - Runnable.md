@@ -23,7 +23,7 @@ Perfetto/Systrace: 不同 CPU 运行状态异常原因 101 - Running 长[1] 中
 Systrace 中 Runnable 的可视化效果展示如下，点击就可以查看 wakeup 信息（不一定有）![](https://mmbiz.qpic.cn/mmbiz_png/HjA9ygCONWnaxNKNUjibvUznYOvNsWBCnQQGJEY7aHh4Na64lbmBicrtjpJmdFjq5MzleL04faxfKwk8tFmySQvw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240928120148.png]]
 图 2: 性能之巅 2 CPU 优化
 
 从图 2 可知，一个 CPU 核在某个时刻只能执行一个线程，因此所有待执行的任务都在一个「可执行队列」里排队，一个 CPU 核就有一个队列。能插入到这个队列里排队的，代表着这个线程除了 CPU 资源，其他资源均已获取，如 IO、锁、信号量等。处于「可执行队列」的时候，线程的状态就会被置为 RUNNABLE，也就是 Systrace 里看到的 Runnable 状态。
@@ -36,7 +36,7 @@ Linux 内核是通过赋予不同线程执行时间片并通过轮转的方式�
     
 2. SCHED_NORMAL: 普通调度类，目前常用的是 CFS（Complete Fair Scheduler）调度器。实时类的优先级高于普通调度类，高优先级的能抢占低优先级，并且要等待高优先级的执行完才能执行低优先级的。一般情况下 Runnable 的时间都很短，但出异常的的时候它会影响关键线程的关键任务在指定时间内完成。
     
-
+![[Pasted image 20240928120158.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3: AOSP 渲染架构
