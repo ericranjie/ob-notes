@@ -75,7 +75,7 @@ nlmsg_flags：消息标记，它们用以表示消息的类型，如下:
 
 (3)struct msghdr 结构体
 
-```
+```c
 struct iovec {                    /* Scatter/gather array items */     void  *iov_base;              /* Starting address */     size_t iov_len;               /* Number of bytes to transfer */ };  /* iov_base: iov_base指向数据包缓冲区，即参数buff，iov_len是buff的长度。msghdr中允许一次传递多个buff，以数组的形式组织在 msg_iov中，msg_iovlen就记录数组的长度 （即有多少个buff）  */ struct msghdr {     void         *msg_name;       /* optional address */     socklen_t     msg_namelen;    /* size of address */     struct iovec *msg_iov;        /* scatter/gather array */     size_t        msg_iovlen;     /* # elements in msg_iov */     void         *msg_control;    /* ancillary data, see below */     size_t        msg_controllen; /* ancillary data buffer len */     int           msg_flags;      /* flags on received message */ };
 ```
 

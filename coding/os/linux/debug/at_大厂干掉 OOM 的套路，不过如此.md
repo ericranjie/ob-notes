@@ -73,7 +73,7 @@
 
 #### **| 报错信息**
 
-```
+```c
 pthread_create (1040KB stack) failed: Out of memory
 ```
 
@@ -87,14 +87,16 @@ pthread_create (1040KB stack) failed: Out of memory
 
 pthread_create 触发的 OOM 异常，源码（Android 9）位置如下： 
 
-```
+```c
 http://androidxref.com/9.0.0_r3/xref/art/runtime/thread.cc
 ```
 
   
 
-```
-void Thread::CreateNativeThread(JNIEnv* env, jobject java_peer, size_t stack_size, bool is_daemon) {  ...  pthread_create_result = pthread_create(...)  //创建线程成功  if (pthread_create_result == 0) {      return;  }  //创建线程失败  ...  {    std::string msg(child_jni_env_ext.get() == nullptr ?        StringPrintf("Could not allocate JNI Env: %s", error_msg.c_str()) :        StringPrintf("pthread_create (%s stack) failed: %s",                                 PrettySize(stack_size).c_str(), strerror(pthread_create_result)));    ScopedObjectAccess soa(env);    soa.Self()->ThrowOutOfMemoryError(msg.c_str());  }}
+```c
+void Thread::CreateNativeThread(JNIEnv* env, jobject java_peer, size_t stack_size, bool is_daemon) {  ...  pthread_create_result = pthread_create(...)  //创建线程成功
+if (pthread_create_result == 0) {      return;  }  //创建线程失败
+																									...  {    std::string msg(child_jni_env_ext.get() == nullptr ?        StringPrintf("Could not allocate JNI Env: %s", error_msg.c_str()) :        StringPrintf("pthread_create (%s stack) failed: %s",                                 PrettySize(stack_size).c_str(), strerror(pthread_create_result)));    ScopedObjectAccess soa(env);    soa.Self()->ThrowOutOfMemoryError(msg.c_str());  }}
 ```
 
   
@@ -105,7 +107,7 @@ pthread_create 里面会调用 Linux 内核创建线程，那什么情况下会�
 
 #### 查看系统对每个进程的线程数限制：
 
-```
+```c
 cat /proc/sys/kernel/threads-max
 ```
 
@@ -119,12 +121,12 @@ cat /proc/sys/kernel/threads-max
 
 #### 查看当前进程运行的线程数：
 
-```
+```c
 cat proc/{pid}/status
 ```
 
   
-
+![[Pasted image 20240928131711.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当线程数超过 /proc/sys/kernel/threads-max 中规定的上限时就会触发 OOM。  
@@ -172,7 +174,7 @@ Java 层的 Thread 只是一个普通的对象，只有调用了 start 方法，
 
 创建一个 Thread 的子类叫 ShadowThread 吧，重写 start 方法，调用自定义的线程池 CustomThreadPool 来执行任务。
 
-```
+```c
 public class ShadowThread extends Thread {    @Override    public synchronized void start() {        Log.i("ShadowThread", "start,name="+ getName());        CustomThreadPool.THREAD_POOL_EXECUTOR.execute(new MyRunnable(getName()));    }    class MyRunnable implements Runnable {        String name;        public MyRunnable(String name){            this.name = name;        }        @Override        public void run() {            try {                ShadowThread.this.run();                Log.d("ShadowThread","run name="+name);            } catch (Exception e) {                Log.w("ShadowThread","name="+name+",exception:"+ e.getMessage());                RuntimeException exception = new RuntimeException("threadName="+name+",exception:"+ e.getMessage());                exception.setStackTrace(e.getStackTrace());                throw exception;            }        }    }}
 ```
 
@@ -183,11 +185,11 @@ public class ShadowThread extends Thread {    @Override    public 
   
 
 可以安装一个 ASM Bytecode Viewer 插件，如下所示：
-
+![[Pasted image 20240928131742.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过字节码修改，你可以简单理解为做如下替换：  
-
+![[Pasted image 20240928131750.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于将任务放到线程池去执行，假如线程奔溃了，我们不知道是哪个线程出问题，所以自定义 ShadowThread 中的内部类 MyRunnable 的作用是：在线程出现异常的时候，将异常捕获，还原它的名字，重新抛出一个信息更全的异常。  
@@ -196,14 +198,14 @@ public class ShadowThread extends Thread {    @Override    public 
 
 测试代码：
 
-```
+```c
     private fun testThreadCrash() {        Thread {            val i = 9 / 0        }.apply {            name = "testThreadCrash"        }.start()    }
 ```
 
   
 
 开启一个线程，然后触发奔溃，堆栈信息如下：  
-
+![[Pasted image 20240928131759.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到原本的 new Thread 已经被优化成了 CustomThreadPool 线程池调用，并且奔溃的时候不用担心找不到线程是哪里创建的，会还原线程名。
@@ -215,7 +217,7 @@ public class ShadowThread extends Thread {    @Override    public 
   
 
 ##### 数据对比：同个场景简单测试了一下 new Thread 优化前后线程数峰值对比如下图。
-
+![[Pasted image 20240928131804.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于不同 App，优化效果会有一些不同，不过可以看到这个优化确实是有效的。
@@ -228,7 +230,7 @@ public class ShadowThread extends Thread {    @Override    public 
 
 随着项目引入的 SDK 越来越多，绝大部分 SDK 内部都会使用自己的线程池做异步操作，线程池的参数如果设置不对，核心线程空闲的时候没有释放，会使整体的线程数量处于较高位置。
 
-```
+```c
     public ThreadPoolExecutor(int corePoolSize,                              int maximumPoolSize,                              long keepAliveTime,                              TimeUnit unit,                              BlockingQueue<Runnable> workQueue,                              ThreadFactory threadFactory) {        this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,             threadFactory, defaultHandler);    }
 ```
 
@@ -258,7 +260,7 @@ public class ShadowThread extends Thread {    @Override    public 
 - 允许核心线程在空闲时自动销毁
     
 
-```
+```c
 executor.allowCoreThreadTimeOut(true)
 ```
 
@@ -277,11 +279,11 @@ executor.allowCoreThreadTimeOut(true)
 - 可以在 Application 类的 <clinit>() 中调用我们自定义的静态方法 ShadowAsyncTask.optimizeAsyncTaskExecutor() 来修改 AsyncTask 的线程池参数，调用 executor.allowCoreThreadTimeOut(true)；
     
 
-  
 
 你可以简单理解为做如下替换： 
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240928131829.png]]
+
 
 详细代码可以参考 booster。
 
@@ -348,7 +350,7 @@ https://github.com/KwaiAppTeam/KOOM/blob/master/koom-thread-leak/src/main/cpp/sr
 
 收集线程信息代码如下：
 
-```
+```c
     private fun dumpThreadIfNeed() {        val threadNames = runCatching { File("/proc/self/task").listFiles() }            .getOrElse {                return@getOrElse emptyArray()            }            ?.map {                runCatching { File(it, "comm").readText() }.getOrElse { "failed to read $it/comm" }            }            ?.map {                if (it.endsWith("\n")) it.substring(0, it.length - 1) else it            }            ?: emptyList()        Log.d("TAG", "dumpThread = " + threadNames.joinToString(separator = ","))    }
 ```
 
@@ -377,6 +379,7 @@ E/art: ashmem_create_region failed for 'indirect ref table': Too many o
 #### **| 系统限制**
 
 Android 是基于 Linux 内核，/proc/pid/limits 描述着 linux 系统对每个进程的一些资源限制，如下图是一台 Android 6.0 的设备，Max open files 的限制是 1024。
+![[Pasted image 20240928131954.png]]
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
