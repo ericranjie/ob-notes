@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md"
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md"
               }
             }
           }
@@ -146,20 +146,22 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+    "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
+    "0x99-image/Pasted image 20240928114158.png",
     "coding/os/linux/debug/trace/b_Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇.md",
     "coding/os/linux/debug/ASAN",
-    "Pasted image 20240928120724.png",
-    "Pasted image 20240928120718.png",
-    "Pasted image 20240928120704.png",
-    "Pasted image 20240928120654.png",
-    "Pasted image 20240928120629.png",
-    "Pasted image 20240928120610.png",
-    "Pasted image 20240928120542.png",
-    "Pasted image 20240928120533.png",
-    "Pasted image 20240928120526.png",
-    "Pasted image 20240928120519.png",
+    "0x99-image/Pasted image 20240928120724.png",
+    "0x99-image/Pasted image 20240928120718.png",
+    "0x99-image/Pasted image 20240928120704.png",
+    "0x99-image/Pasted image 20240928120654.png",
+    "0x99-image/Pasted image 20240928120629.png",
+    "0x99-image/Pasted image 20240928120610.png",
+    "0x99-image/Pasted image 20240928120542.png",
+    "0x99-image/Pasted image 20240928120533.png",
+    "0x99-image/Pasted image 20240928120526.png",
     "coding/os/linux/debug/trace/k_Systrace 线程 CPU 运行状态分析技巧 - Runnable.md",
     "coding/os/linux/debug/GDB/a_GDB调试-从入门实践到原理.md",
     "coding/os/linux/debug/trace",
@@ -185,7 +187,6 @@
     "coding/os/linux/memory/memory-manage/i_理解内存的Rank、位宽以及内存颗粒内部结构.md",
     "coding/os/linux/memory/memory-manage/i_页面回收的基本概念.md",
     "coding/os/linux/memory/memory-manage/图解 Linux内存背后的那些神秘往事.md",
-    "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
