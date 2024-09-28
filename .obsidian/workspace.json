@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
+                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
+                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
+                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md"
+                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md"
               }
             }
           }
@@ -146,23 +146,30 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x99-image/Pasted image 20240928180353.png",
+    "coding/os/linux/debug/k_如何对一个【可执行程序】进行拦截和包装？.md",
+    "coding/os/linux/debug/b_自己动手写一个GDB 设置断点（原理篇）.md",
+    "0x99-image/Pasted image 20240928191447.png",
+    "0x99-image/Pasted image 20240928191510.png",
+    "0x99-image/Pasted image 20240928191504.png",
+    "0x99-image/Pasted image 20240928191455.png",
+    "coding/os/linux/debug/手把手教你 拦截系统调用.md",
+    "coding/os/linux/debug/kt_带你快速对比SPI、UART、I2C通信的区别与应用！.md",
+    "coding/os/linux/debug/k_内核内存泄漏探测器kmemleak(一).md",
+    "coding/os/linux/debug/b_Linux内核调试的方式以及工具集锦.md",
+    "0x99-image/Pasted image 20240928190647.png",
+    "0x99-image/Pasted image 20240928190832.png",
+    "0x99-image/Pasted image 20240928190754.png",
+    "0x99-image/Pasted image 20240928190738.png",
+    "coding/os/linux/debug/b_Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
+    "coding/os/linux/debug/k_x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
+    "coding/os/linux/debug/c_Linux后台开发调试经验分享.md",
     "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
+    "0x99-image/Pasted image 20240928180353.png",
     "0x99-image/Pasted image 20240928180501.png",
-    "0x99-image/Pasted image 20240928180452.png",
-    "0x99-image/Pasted image 20240928180428.png",
-    "0x99-image/Pasted image 20240928180411.png",
-    "0x99-image/Pasted image 20240928180402.png",
     "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
-    "0x99-image/Pasted image 20240928174711.png",
     "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
-    "0x99-image/Pasted image 20240928175040.png",
-    "0x99-image/Pasted image 20240928175032.png",
-    "0x99-image/Pasted image 20240928175023.png",
-    "coding/os/linux/debug/如何对一个【可执行程序】进行拦截和包装？.md",
-    "coding/os/linux/debug/Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
     "coding/os/linux/debug/c_18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
     "coding/os/linux/debug/at_大厂干掉 OOM 的套路，不过如此.md",
     "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
@@ -177,15 +184,8 @@
     "coding/os/linux/debug/trace/b_Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇.md",
     "coding/os/linux/debug/ASAN",
     "coding/os/linux/debug/trace/k_Systrace 线程 CPU 运行状态分析技巧 - Runnable.md",
-    "coding/os/linux/debug/GDB/a_GDB调试-从入门实践到原理.md",
     "coding/os/linux/debug/trace",
-    "coding/os/linux/debug/GDB/p_GDB高级技巧：边Debug边修复BUG，无需修改代码，无需重新编译.md",
     "coding/os/linux/debug/GDB",
-    "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/memory/C&DMA/应读者要求讲讲 DMA.md",
-    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
-    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
-    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",

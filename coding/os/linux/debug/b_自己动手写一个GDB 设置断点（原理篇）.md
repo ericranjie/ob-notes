@@ -24,7 +24,7 @@ Original songsong001 Linux内核那些事
 > **从物理学的角度看**，中断是一种电信号，由硬件设备产生，并直接送入中断控制器（如 8259A）的输入引脚上，然后再由中断控制器向处理器发送相应的信号。处理器一经检测到该信号，便中断自己当前正在处理的工作，转而去处理中断。此后，处理器会通知 OS 已经产生中断。这样，OS 就可以对这个中断进行适当的处理。不同的设备对应的中断不同，而每个中断都通过一个唯一的数字标识，这些值通常被称为中断请求线。
 
 如果进程在运行的过程中，发生了中断，CPU 将会停止运行当前进程，转而执行内核设置好的 `中断服务例程`。如下图所示：
-
+![[Pasted image 20240928191447.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 软中断  
@@ -42,7 +42,7 @@ Original songsong001 Linux内核那些事
 接下来，我们将会介绍如何设置一个断点。
 
 我们知道，当 CPU 执行到 `int3` 指令（`0xcc`）时会停止运行当前进程。所以，我们只需要在要进行设置断点的位置改为 `int3` 指令即可。如下图所示：
-
+![[Pasted image 20240928191455.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从上图可以看出，设置断点时，只需要在要设置断点的位置修改为 `int3` 指令即可。但我们还需要保存原来被替换的指令，因为调试完毕后，我们还需要把 `int3` 指令修改为原来的指令，这样程序才能正常运行。  
@@ -70,7 +70,7 @@ Original songsong001 Linux内核那些事
 
 我们定义一个结构体 `breakpoint_context` 用于保存断点被设置前的信息：
 
-```
+```c
 struct breakpoint_context{    void *addr; // 设置断点的地址    long data;  // 断点原来的数据};
 ```
 
@@ -91,7 +91,7 @@ struct breakpoint_context{    void *addr; // 设置断点的地址   
 
 首先，我们来实现用于创建一个断点的辅助函数 `create_breakpoint()`：
 
-```
+```c
 breakpoint_context *create_breakpoint(void *addr){    breakpoint_context *ctx = malloc(sizeof(*ctx));    if (ctx) {        ctx->addr = addr;        ctx->data = NULL;    }    return ctx;}
 ```
 
@@ -105,7 +105,7 @@ breakpoint_context *create_breakpoint(void *addr){    breakpoint_context 
 
 获取某个内存地址处的数据可以使用 `ptrace(PTRACE_PEEKTEXT,...)` 函数来实现，如下所示：
 
-```
+```c
 long data = ptrace(PTRACE_PEEKTEXT, pid, address, 0);
 ```
 
@@ -113,7 +113,7 @@ long data = ptrace(PTRACE_PEEKTEXT, pid, address, 0);
 
 而要将某内存地址处设置为制定的值，可以使用 `ptrace(PTRACE_POKETEXT,...)` 函数来实现，如下所示：
 
-```
+```c
 ptrace(PTRACE_POKETEXT, pid, address, data);
 ```
 
@@ -121,25 +121,25 @@ ptrace(PTRACE_POKETEXT, pid, address, data);
 
 有了上面的基础，现在我们可以来编写 `enable_breakpoint()` 函数的代码了：
 
-```
+```c
 void enable_breakpoint(pid_t pid, breakpoint_context *ctx){    // 1. 获取断点处的数据, 并且保存到 breakpoint_context 结构的 data 字段中    ctx->data = ptrace(PTRACE_PEEKTEXT, pid, ctx->addr, 0);    // 2. 把断点处的值设置为 int3 指令(0xCC)    ptrace(PTRACE_POKETEXT, pid, ctx->addr, (ctx->data & 0xFFFFFF00) | 0xCC);}
 ```
 
 `enable_breakpoint()` 函数的原理，上面已经详细介绍过了。
 
 不过有一点我们需要注意的，就是使用 `ptrace()` 函数一次只能获取和设置一个 4 字节大小的长整型数据。但是 `int3` 指令是一个单子节指令，所以设置断点时，需要对设置的数据进行处理。如下图所示：
-
+![[Pasted image 20240928191504.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 3. 禁用断点  
 
 禁用断点的原理与启用断点刚好相反，就是把断点处的 `int3` 指令替换成原来的指令，原理如下图所示：
-
+![[Pasted image 20240928191510.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于 `breakpoint_context` 结构的 `data` 字段保存了断点处原来的指令，所以我们只需要把断点处的指令替换成 `data` 字段的数据即可，代码如下：  
 
-```
+```c
 void disable_breakpoint(pid_t pid, breakpoint_context *ctx){    long data = ptrace(PTRACE_PEEKTEXT, pid, ctx->addr, 0);    ptrace(PTRACE_POKETEXT, pid, ctx->addr, (data & 0xFFFFFF00) | (ctx->data & 0xFF));}
 ```
 
@@ -147,7 +147,7 @@ void disable_breakpoint(pid_t pid, breakpoint_context *ctx){    long da
 
 释放断点的实现就非常简单了，只需要调用 `free()` 函数把 `breakpoint_context` 结构占用的内存释放掉即可，代码如下：
 
-```
+```c
 void free_breakpoint(breakpoint_context *ctx){    free(ctx);}
 ```
 

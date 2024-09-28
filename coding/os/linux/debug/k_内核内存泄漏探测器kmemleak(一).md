@@ -9,7 +9,7 @@
 
 event_object_trigger_callback()
 
-```
+```c
 {           obj_data = kzalloc(sizeof(*obj_data),GFP_KERNEL);           obj_data->field= field;           obj_data->offset = offset;           obj_data->obj_type_size= obj_type_size;           …}
 ```
 
@@ -17,7 +17,7 @@ event_object_trigger_callback()
 
 如果仅仅是以上代码，kmemleak工具在扫描过程中，obj_data会被判定为内存泄漏，因为没有其它的内存引用obj_data.如果是以下这种代码，就不会被判定为内存泄漏
 
-```
+```c
 event_object_trigger_callback(){    obj_data = kzalloc(sizeof(*obj_data), GFP_KERNEL);    obj_data->field = field;    obj_data->offset = offset;    obj_data->obj_type_size = obj_type_size;    trigger_data = kzalloc(sizeof(*trigger_data), GFP_KERNEL);    trigger_data->private_data = obj_data;…}
 ```
 
@@ -27,7 +27,7 @@ event_object_trigger_callback(){    obj_data = kzalloc(sizeof(*obj_data),�
 
 Kmemleak 把object(其实就是pointer<指针> 分为三种颜色:
 
-```
+```c
 mm/kmemleak.c 301  * Object colors, encoded with count andmin_count: 302  * - white - orphan object, not enoughreferences to it (count < min_count) 303  * - gray - not orphan, not marked as false positive (min_count == 0) or 304  *             sufficient references to it (count >= min_count) 305  * - black - ignore, it doesn't containreferences (e.g. text section) 306  *             (min_count == -1). No function defined for this color.
 ```
 
@@ -43,7 +43,7 @@ Note:
 
 一个对象，叫做一个object,就是一个pointer(指针)，在内核中使用一个数据结构(kmemleak_object)维护这个object的引用，状态，被内存分配时候分配的时间，归属的进程等信息。
 
-```
+```c
 struct kmemleak_object {     /* 仅仅展示重要的成员*/{unsigned int flags;        /* object status flags */struct list_head object_list;struct list_head gray_list;unsigned long pointer;/* minimumnumber of a pointers found before it is considered leak */int min_count;  /* the totalnumber of pointers found pointing to this object */int count;u32 checksum;pid_t pid;char comm[TASK_COMM_LEN];} 
 ```
 
@@ -51,13 +51,13 @@ struct kmemleak_object {     /* 仅仅展示重要的成员*/{unsigned 
 
 1.  把所有对象变成white
 
-```
+```c
 list_for_each_entry_rcu(object,&object_list, object_list) {/* reset the reference count (whitenthe object) */       object->count= 0;if (color_gray(object) &&get_object(object))    list_add_tail(&object->gray_list,&gray_list);…}// color_gray(object->count >= object->min_count)
 ```
 
 哪些对象初始化的时候就是gray(color_gray)?
 
-```
+```c
 mm/kmemleak.ckmemleak_init()    /*register the data/bss sections */ create_object((unsigned long)_sdata, _edata -_sdata,               KMEMLEAK_GREY, GFP_ATOMIC); create_object((unsigned long)__bss_start,__bss_stop - __bss_start,               KMEMLEAK_GREY, GFP_ATOMIC);#define KMEMLEAK_GREY  0#defineKMEMLEAK_BLACK  -1static struct kmemleak_object *create_object(unsigned long ptr, 
 ```
 

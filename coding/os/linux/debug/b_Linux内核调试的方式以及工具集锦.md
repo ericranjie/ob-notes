@@ -40,7 +40,7 @@ CHENG Jian Linux内核之旅
 ---
 
 内核中有三个常用的伪文件系统: procfs, debugfs和sysfs.
-
+![[Pasted image 20240928190647.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 它们都用于Linux内核和用户空间的数据交换, 但是适用的场景有所差异：
@@ -82,8 +82,9 @@ Linux 文件系统：procfs, sysfs, debugfs 用法简介：http://www.tinylab.or
 
 `Sysfs` 是一个基于内存的文件系统, 实际上它基于`ramfs`, `sysfs` 提供了一种把内核数据结构, 它们的属性以及属性与数据结构的联系开放给用户态的方式, 它与 `kobject` 子系统紧密地结合在一起, 因此内核开发者不需要直接使用它, 而是内核的各个子系统使用它. 用户要想使用 `sysfs` 读取和设置内核参数, 仅需装载 `sysfs` 就可以通过文件操作应用来读取和设置内核通过 `sysfs` 开放给用户的各个参数：
 
-```
+```c
 mkdir -p /sysfs
+mount -t sysfs sysfs /sysfs
 ```
 
 注意, 不要把 `sysfs` 和 `sysctl` 混淆, `sysctl` 是内核的一些控制参数, 其目的是方便用户对内核的行为进行控制, 而 `sysfs` 仅仅是把内核的 `kobject` 对象的层次关系与属性开放给用户查看, 因此 `sysfs`的绝大部分是只读的, 模块作为一个 `kobject` 也被出口到 `sysfs`, 模块参数则是作为模块属性出口的, 内核实现者为模块的使用提供了更灵活的方式, 允许用户设置模块参数在 `sysfs` 的可见性并允许用户在编写模块时设置这些参数在 `sysfs` 下的访问权限, 然后用户就可以通过 `sysfs` 来查看和设置模块参数, 从而使得用户能在模块运行时控制模块行为.
@@ -146,7 +147,7 @@ Linux 运用debugfs调试方法：http://www.xuebuyuan.com/1023006.html
 `relayfs` 的用户空间`API` :
 
 `relayfs` 实现了四个标准的文件 `I/O` 函数, `open、mmap、poll和close`
-
+![[Pasted image 20240928190738.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 注意 : 用户态应用在使用上述 API 时必须保证已经挂载了 relayfs 文件系统, 但内核在创建和使用 channel时不需要relayfs 已经挂载. 下面命令将把 relayfs 文件系统挂载到 /mnt/relay.
@@ -216,7 +217,7 @@ linux设备驱动学习笔记–内核调试方法之printk：http://blog.csdn.n
 `framework`, 采用 `plugin` 的方式支持开发人员添加更多种类的 `trace` 功能.
 
 `Ftrace` 由 `RedHat` 的 `Steve Rostedt` 负责维护. 到 `2.6.30` 为止, 已经支持的 `tracer` 包括 :
-
+![[Pasted image 20240928190754.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里还没有列出所有的 `tracer`, `ftrace` 是目前非常活跃的开发领域, 新的 `tracer` 将不断被加入内核。
@@ -251,8 +252,8 @@ Linux trace使用入门：http://blog.csdn.net/jscese/article/details/46415531
 - 使用
     
 
-```
-#  收集信息
+```c
+#  收集信息 sudo trace-cmd reord subsystem:tracing   #  解析结果 #sudo trace-cmd report
 ```
 
 trace-cmd: A front-end for Ftrace：https://lwn.net/Articles/410200/
@@ -435,7 +436,7 @@ perf 移植：http://www.cnblogs.com/helloworldtoyou/p/5585152.html
 ---
 
 `LTTng` 是一个 `Linux` 平台开源的跟踪工具, 是一套软件组件, 可允许跟踪 `Linux` 内核和用户程序, 并控制跟踪会话(开始/停止跟踪、启动/停止事件 等等). 这些组件被绑定如下三个包 :
-
+![[Pasted image 20240928190832.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **相关资料链接：**
