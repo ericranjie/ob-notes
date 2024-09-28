@@ -103,7 +103,7 @@
 由于`app.c`文件中，已经`include "rd3.h"`了，并且调用了其中的`rd3_func(int, int)`函数。
 
 所以我们需要新建一个假的 "rd3.h" 提供给`app.c`，并且要把函数`rd3_func(int, int)`"重导向"到一个包装函数，然后在包装函数中去调用真正的目标函数，如下图所示：
-
+![[Pasted image 20240928174711.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 "重导向"函数：可以使用宏来实现。
@@ -151,6 +151,7 @@
 > 2. 把 rd3_wrap.c 中的 __real_rd3_func 符号，解析成 rd3_func，从而调用真正的函数。
 >     
 
+![[Pasted image 20240928174727.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这几个符号的转换，是由链接器自动完成的！

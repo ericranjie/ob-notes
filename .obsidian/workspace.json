@@ -11,9 +11,11 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "0x99-image/Pasted image 20240928131711.png"
+                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -46,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "一文看懂 GDB底层实现原理",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x99-image/Pasted image 20240928131711.png",
+                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x99-image/Pasted image 20240928131711.png",
+                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x99-image/Pasted image 20240928131711.png"
+                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md"
               }
             }
           }
@@ -144,21 +146,28 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
+    "Pasted image 20240928175040.png",
+    "Pasted image 20240928175032.png",
+    "Pasted image 20240928175023.png",
+    "Pasted image 20240928175013.png",
+    "coding/os/linux/debug/如何对一个【可执行程序】进行拦截和包装？.md",
+    "coding/os/linux/debug/Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
+    "Pasted image 20240928174727.png",
+    "Pasted image 20240928174711.png",
+    "coding/os/linux/debug/c_18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
+    "coding/os/linux/debug/at_大厂干掉 OOM 的套路，不过如此.md",
+    "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
+    "coding/os/linux/debug/i_Linux下“用户空间修改设备寄存器或者物理内存”的实现.md",
+    "coding/frontend/c_这本计算机神书，出 JavaScript 版了！.md",
+    "0x99-image/Pasted image 20240928131711.png",
     "coding/os/linux/debug/GDB/使用 GDB + Qemu 调试 Linux 内核.md",
     "0x99-image/Pasted image 20240928132702.png",
     "0x99-image/Pasted image 20240928132655.png",
     "0x99-image/Pasted image 20240928132646.png",
     "0x99-image/Pasted image 20240928132635.png",
-    "0x99-image/Pasted image 20240928132618.png",
-    "0x99-image/Pasted image 20240928132246.png",
     "coding/os/linux/debug/深入理解Linux Netlink机制：进程间通信的关键.md",
-    "coding/os/linux/debug/at_大厂干掉 OOM 的套路，不过如此.md",
-    "0x99-image/Pasted image 20240928131954.png",
-    "0x99-image/Pasted image 20240928131829.png",
-    "Pasted image 20240928131820.png",
-    "0x99-image/Pasted image 20240928131804.png",
     "coding/os/linux/debug/p_一例hardened_usercopy的bug解析.md",
     "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
     "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
@@ -178,13 +187,6 @@
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
-    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
-    "coding/os/linux/memory/memory-init/b_Linux 物理内存初始化.md",
-    "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
-    "coding/os/linux/memory/memory-manage/slub/b_SLUB DEBUG原理.md",
-    "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
