@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md",
+                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md",
+                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md",
+                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/掌握Linux内存故障追踪：技术指南.md"
+                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md"
               }
             }
           }
@@ -148,26 +148,35 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/memory/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "coding/os/linux/memory/a_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
+    "coding/os/linux/debug/KFENCE/Linux Kfence 详解.md",
+    "coding/os/linux/debug/内核内存错误检测工具KFENCE.md",
+    "coding/os/linux/debug/KFENCE",
+    "coding/os/linux/debug/b_手把手教你拦截Linux系统调用.md",
+    "0x99-image/Pasted image 20240928195526.png",
+    "0x99-image/Pasted image 20240928195543.png",
+    "0x99-image/Pasted image 20240928195532.png",
+    "coding/os/linux/debug/手把手教你 拦截系统调用.md",
+    "coding/os/linux/debug/bn_案例分析 - 内存泄露的排查方法.md",
+    "coding/os/linux/debug/i_钓鱼累了，写下断言怎么用.md",
+    "coding/os/linux/debug/bt_掌握Linux内存故障追踪：技术指南.md",
     "coding/os/linux/debug/k_如何对一个【可执行程序】进行拦截和包装？.md",
     "coding/os/linux/debug/b_自己动手写一个GDB 设置断点（原理篇）.md",
     "0x99-image/Pasted image 20240928191447.png",
     "0x99-image/Pasted image 20240928191510.png",
     "0x99-image/Pasted image 20240928191504.png",
     "0x99-image/Pasted image 20240928191455.png",
-    "coding/os/linux/debug/手把手教你 拦截系统调用.md",
     "coding/os/linux/debug/kt_带你快速对比SPI、UART、I2C通信的区别与应用！.md",
     "coding/os/linux/debug/k_内核内存泄漏探测器kmemleak(一).md",
     "coding/os/linux/debug/b_Linux内核调试的方式以及工具集锦.md",
     "0x99-image/Pasted image 20240928190647.png",
     "0x99-image/Pasted image 20240928190832.png",
     "0x99-image/Pasted image 20240928190754.png",
-    "0x99-image/Pasted image 20240928190738.png",
     "coding/os/linux/debug/b_Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
     "coding/os/linux/debug/k_x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
     "coding/os/linux/debug/c_Linux后台开发调试经验分享.md",
     "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
-    "0x99-image/Pasted image 20240928180353.png",
-    "0x99-image/Pasted image 20240928180501.png",
     "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
     "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
     "coding/os/linux/debug/c_18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
@@ -176,14 +185,7 @@
     "coding/os/linux/debug/i_Linux下“用户空间修改设备寄存器或者物理内存”的实现.md",
     "coding/frontend/c_这本计算机神书，出 JavaScript 版了！.md",
     "coding/os/linux/debug/GDB/使用 GDB + Qemu 调试 Linux 内核.md",
-    "coding/os/linux/debug/深入理解Linux Netlink机制：进程间通信的关键.md",
-    "coding/os/linux/debug/p_一例hardened_usercopy的bug解析.md",
-    "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
-    "coding/os/linux/debug/ASAN/深入分析HWASAN检测内存错误原理.md",
-    "coding/os/linux/debug/trace/b_Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇.md",
     "coding/os/linux/debug/ASAN",
-    "coding/os/linux/debug/trace/k_Systrace 线程 CPU 运行状态分析技巧 - Runnable.md",
     "coding/os/linux/debug/trace",
     "coding/os/linux/debug/GDB",
     "self-improvement/hair/Untitled",
@@ -192,7 +194,6 @@
     "coding/os/linux/schedule/lock/rwlock",
     "coding/os/linux/schedule/lock/mutex",
     "coding/os/linux/schedule/lock/spinlock",
-    "0x01-leetcode/math-logic/hard-logic/validate",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
     "Untitled.canvas"
   ]

@@ -164,33 +164,34 @@ struct nlmsghdr{  __u32 nlmsg_len;   /* Length of message */  __u16 nlmsg_type; 
 
 结构 struct iovec 用于把多个消息通过一次系统调用来发送，下面是该结构使用示例：
 
-```
+```c
 struct iovec iov;iov.iov_base = (void *)nlhdr;iov.iov_len = nlh->nlmsg_len;msg.msg_iov = &iov;msg.msg_iovlen = 1;
 ```
 
 在完成以上步骤后，消息就可以通过下面语句直接发送：
 
-```
+```c
 sendmsg(fd, &msg, 0);
 ```
 
 应用接收消息时需要首先分配一个足够大的缓存来保存消息头以及消息的数据部分，然后填充消息头，添完后就可以直接调用函数 recvmsg() 来接收。
 
-```
-#define MAX_NL_MSG_LEN 1024struct sockaddr_nl nladdr;struct msghdr msg;struct iovec iov;struct nlmsghdr * nlhdr;nlhdr = (struct nlmsghdr *)malloc(MAX_NL_MSG_LEN);iov.iov_base = (void *)nlhdr;iov.iov_len = MAX_NL_MSG_LEN;msg.msg_name = (void *)&(nladdr);msg.msg_namelen = sizeof(nladdr);msg.msg_iov = &iov;msg.msg_iovlen = 1;recvmsg(fd, &msg, 0);
+```c
+#define MAX_NL_MSG_LEN 1024
+struct sockaddr_nl nladdr;struct msghdr msg;struct iovec iov;struct nlmsghdr * nlhdr;nlhdr = (struct nlmsghdr *)malloc(MAX_NL_MSG_LEN);iov.iov_base = (void *)nlhdr;iov.iov_len = MAX_NL_MSG_LEN;msg.msg_name = (void *)&(nladdr);msg.msg_namelen = sizeof(nladdr);msg.msg_iov = &iov;msg.msg_iovlen = 1;recvmsg(fd, &msg, 0);
 ```
 
 注意：fd为socket调用打开的netlink socket描述符，在消息接收后，nlhdr指向接收到的消息的消息头，nladdr保存了接收到的消息的目标地址，宏NLMSG_DATA(nlhdr)返回指向消息的数据部分的指针。
 
 在linux/netlink.h中定义了一些方便对消息进行处理的宏，这些宏包括：
 
-```
+```c
 #define NLMSG_ALIGNTO   4#define NLMSG_ALIGN(len) ( ((len)+NLMSG_ALIGNTO-1) & ~(NLMSG_ALIGNTO-1) )
 ```
 
 宏NLMSG_ALIGN(len)用于得到不小于len且字节对齐的最小数值。
 
-```
+```c
 #define NLMSG_LENGTH(len) ((len)+NLMSG_ALIGN(sizeof(struct nlmsghdr)))
 ```
 

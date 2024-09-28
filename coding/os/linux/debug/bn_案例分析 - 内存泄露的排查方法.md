@@ -28,25 +28,25 @@ Linux阅码场
 
 查看系统内存情况：
 
-```
+```c
 free -h
 ```
 
 查看meminfo，：
 
-```
+```c
 /proc/meminfo ：
 ```
 
 对于内存泄露的问题，需要关注的主要有：
 
-```
+```c
 MemTotal:       32571632 kBMemFree:         3910664 kBMemAvailable:    7495000 kBBuffers:          124784 kBCached:          6162332 kBSwapCached:            0 kB...Slab:             591388 kBSReclaimable:     518688 kBSUnreclaim:        72700 kB...VmallocTotal:   34359738367 kBVmallocUsed:      620516 kBVmallocChunk:   34358945788 kB...HugePages_Total:      16HugePages_Free:        2HugePages_Rsvd:        0HugePages_Surp:        0Hugepagesize:    1048576 kB
 ```
 
 vmalloc的指标含义为：
 
-```
+```c
 VMallocTotal — The total amount of memory, in kilobytes, of total allocated virtual address space. VMallocUsed — The total amount of memory, in kilobytes, of used virtual address space.VMallocChunk — The largest contiguous block of memory, in kilobytes, of available virtual address space.
 ```
 
@@ -58,7 +58,7 @@ VMallocTotal — The total amount of memory, in kilobytes, of total allocated vi
 
 比如，我遇到的一个案例，对比正常机和故障机器内存：
 
-```
+```c
 free：差距有3708Mcache+buff:消耗量差不多VmallocUsed：差距有2678MSUnreclaim：差距有887M
 ```
 
@@ -66,13 +66,13 @@ free：差距有3708Mcache+buff:消耗量差不多VmallocUsed：差距有2678MSU
 
 ## 查看slabinfo
 
-```
+```c
 cat /proc/slabinfo
 ```
 
 通过查看slabinfo能够看出系统中所有的slab使用情况，在我的机器上截取的部分输出如下所示：
 
-```
+```c
 slabinfo - version: 2.1# name            <active_objs> <num_objs> <objsize> <objperslab> <pagesperslab> : tunables <limit> <batchcount> <sharedfactor> : slabdata <active_slabs> <num_slabs> <sharedavail>isofs_inode_cache     92     92    704   23    4 : tunables    0    0    0 : slabdata      4      4      0ext4_groupinfo_4k    420    420    144   28    1 : tunables    0    0    0 : slabdata     15     15      0ext4_inode_cache   76561  79569   1176   27    8 : tunables    0    0    0 : slabdata   2947   2947      0ext4_allocation_context    128    128    128   32    1 : tunables    0    0    0 : slabdata      4      4      0ext4_io_end         1344   1344     64   64    1 : tunables    0    0    0 : slabdata     21     21      0ext4_extent_status  91678  91902     40  102    1 : tunables    0    0    0 : slabdata    901    901      0jbd2_journal_handle    365    365     56   73    1 : tunables    0    0    0 : slabdata      5      5      0jbd2_journal_head   1632   1666    120   34    1 : tunables    0    0    0 : slabdata     49     49      0jbd2_revoke_table_s    256    256     16  256    1 : tunables    0    0    0 : slabdata      1      1      0jbd2_revoke_record_s    512    512     32  128    1 : tunables    0    0    0 : slabdata      4      4      0scsi_sense_cache      64     64    128   32    1 : tunables    0    0    0 : slabdata      2      2      0MPTCPv6                0      0   2112   15    8 : tunables    0    0    0 : slabdata      0      0      0ip6-frags              0      0    224   18    1 : tunables    0    0    0 : slabdata      0      0      0PINGv6                 0      0   1344   24    8 : tunables    0    0    0 : slabdata      0      0      0RAWv6                 48     48   1344   24    8 : tunables    0    0    0 : slabdata      2      2      0UDPv6                396    396   1472   22    8 : tunables    0    0    0 : slabdata     18     18      0tw_sock_TCPv6          0      0    272   30    2 : tunables    0    0    0 : slabdata      0      0      0request_sock_TCPv6      0      0    336   24    2 : tunables    0    0    0 : slabdata      0      0      0TCPv6                144    144   2624   12    8 : tunables    0    0    0 : slabdata     12     12      0
 ```
 
@@ -82,7 +82,7 @@ slabinfo - version: 2.1# name            <active_objs> <num_objs> <objsize> <obj
 
 slabtop也可以查看系统中的slab对象，并且可以按照不同的指标进行排序输出，比如可以按照slab活动对象个数排序查看slab，快速查找申请量最多的slab：
 
-```
+```c
 slabtop -s -a
 ```
 
@@ -90,13 +90,13 @@ slabtop -s -a
 
 内核中申请内存，除了使用slab，还可能使用vmallocinfo申请，对于vmalloc的查看，需要借助于另外一个接口：
 
-```
+```c
 cat /proc/vmallocinfo
 ```
 
 它的输出示例：
 
-```
+```c
 virtual address range of the area, size in bytes, caller information of the creator, and optional information0xffffc90006404000-0xffffc90006406000    8192 ebt_register_table+0xa2/0x380 [ebtables] pages=1 vmalloc N0=10xffffc90006406000-0xffffc90006408000    8192 ebt_register_table+0xb7/0x380 [ebtables] pages=1 vmalloc N0=10xffffc90006408000-0xffffc9000640a000    8192 ebt_register_table+0xb7/0x380 [ebtables] pages=1 vmalloc N0=10xffffc9000640c000-0xffffc9000640e000    8192 ebt_register_table+0xa2/0x380 [ebtables] pages=1 vmalloc N0=10xffffc9000640e000-0xffffc90006410000    8192 ebt_register_table+0xb7/0x380 [ebtables] pages=1 vmalloc N0=1
 ```
 
@@ -132,7 +132,7 @@ echo 'stacktrace:5 if (bytes_req >= 256 && bytes_req <= 512)' >  /sys/kernel/deb
 
 stacktrace:5 这里是指只跟踪前5次事件，也就最多打印5次相关的调用栈。这个触发器的含义是只打印kmalloc申请大小为256到512大小之间的事件。如果要跟踪slab对象的申请，比如我们知道了某个slab可能存在泄漏，那么查看代码找到这个slab对象的size，可以这样：
 
-```
+```c
 echo 'stacktrace:5 if (bytes_req == 256)'  > /sys/kernel/debug/tracing/events/kmem/kmem_cache_alloc/trigger
 ```
 
@@ -142,7 +142,7 @@ echo 'stacktrace:5 if (bytes_req == 256)'  > /sys/kernel/debug/tracing/events/km
 
 使用perf也可以实现一样的功能，比如：
 
-```
+```c
 perf record -e 'kmem:kmem_cache_alloc' -a -g --filter 'bytes_req == 256'
 ```
 
@@ -150,19 +150,19 @@ perf record -e 'kmem:kmem_cache_alloc' -a -g --filter 'bytes_req == 256'
 
 上面提到使用ftrace或者perf可以跟踪内存分配的调用栈，它们底层都是依赖于kmem tracepoint来实现的，获取的信息只能是以size大小来过滤，而无法指定某一个slab来作为trace对象，那么现在就来介绍另外一种能够trace特定slab对象的方法。这种方法借助的是slub debug特性，因此主要针对的是slub分配器，至于其他类型的分配器并不具有通用性。对于slub分配器，它在sysfs中提供了一些debug的文件节点：
 
-```
+```c
 /sys/kernel/slab/<slab-name>/<debug-option>
 ```
 
 其中有一个trace选项，可以用来跟踪slab对象的申请和分配，比如我们想要跟踪mm_struct这个对象：
 
-```
+```c
 echo 1 > /sys/kernel/slab/mm_struct/trace
 ```
 
 这个选项打开之后会在dmesg系统日志中打印内存的申请和释放过程，以及对应的调用堆栈，比如：
 
-```
+```c
 [3904231.500556] TRACE mm_struct free 0xffff88085be9d140 inuse=18 fp=0xffff88085be99900[3904231.500570] Object ffff88085be9d1b0: 21 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  !...............[3904231.500733] Call Trace:[3904231.500736]  [<ffffffff816b4d9a>] dump_stack+0x19/0x1b[3904231.500740]  [<ffffffff816b2018>] free_debug_processing+0x1ca/0x259[3904231.500743]  [<ffffffff81088997>] ? __mmdrop+0x77/0xb0[3904231.500746]  [<ffffffff811eaeb0>] __slab_free+0x250/0x2f0[3904231.500749]  [<ffffffff811eb132>] kmem_cache_free+0x1e2/0x200[3904231.500752]  [<ffffffff81088997>] __mmdrop+0x77/0xb0[3904231.500754]  [<ffffffff81088ec8>] mmput+0xc8/0xf0[3904231.500758]  [<ffffffff81214f74>] flush_old_exec+0x434/0x820[3904231.500760]  [<ffffffff8126c44c>] load_elf_binary+0x33c/0xe00[3904231.500770]  [<ffffffffc0097064>] ? load_misc_binary+0x64/0x460 [binfmt_misc][3904231.500772]  [<ffffffff812e27c3>] ? ima_get_action+0x23/0x30[3904231.500776]  [<ffffffff812e1e2e>] ? process_measurement+0x8e/0x250[3904231.500779]  [<ffffffff812e22e9>] ? ima_bprm_check+0x49/0x50[3904231.500781]  [<ffffffff8126c110>] ? load_elf_library+0x220/0x220[3904231.500784]  [<ffffffff8121468f>] search_binary_handler+0xef/0x310[3904231.500786]  [<ffffffff81215bd6>] do_execve_common.isra.25+0x5b6/0x6c0[3904231.500789]  [<ffffffff81215f79>] SyS_execve+0x29/0x30[3904231.500792]  [<ffffffff816c6719>] stub_execve+0x69/0xa0
 ```
 

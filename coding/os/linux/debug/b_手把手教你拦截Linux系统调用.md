@@ -27,7 +27,7 @@
 
 在 Linux 内核中，使用 `sys_call_table` 数组来保存所有系统调用，`sys_call_table` 数组每一个元素代表着一个系统调用的入口，其定义如下：
 
-```
+```c
 typedef void (*sys_call_ptr_t)(void);const sys_call_ptr_t sys_call_table[__NR_syscall_max+1] = {    ...};
 ```
 
@@ -35,12 +35,12 @@ typedef void (*sys_call_ptr_t)(void);const sys_call_ptr_t sys_call_table[__N
 
 `0x80` 号软中断服务，会通过以下代码来调用系统调用，如下所示：
 
-```
+```c
 ...call *sys_call_table(,%eax,8)...
 ```
 
 上面的代码会根据 `eax` 寄存器中的值来调用正确的系统调用，其过程如下图所示：
-
+![[Pasted image 20240928195526.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -48,7 +48,7 @@ typedef void (*sys_call_ptr_t)(void);const sys_call_ptr_t sys_call_table[__N
 整体流程  
 
   
-
+![[Pasted image 20240928195532.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 三、系统调用拦截
@@ -71,13 +71,13 @@ typedef void (*sys_call_ptr_t)(void);const sys_call_ptr_t sys_call_table[__N
 
 `System.map` 是一份内核符号表，包含了内核中的变量名和函数名地址，在每次编译内核时，自动生成。获取 `sys_call_table` 数组的虚拟地址使用如下命令：
 
-```
+```c
 sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 ```
 
 结果如下图所示：  
   
-
+![[Pasted image 20240928195543.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -89,8 +89,9 @@ sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 
 `kallsyms_lookup_name()` 函数的使用很简单，只需要传入要获取虚拟内存地址的变量名即可，如下代码所示：
 
-```
-#include <linux/kallsyms.h>void func() {    ...    unsigned long *sys_call_table;    // 获取 sys_call_table 的虚拟内存地址    sys_call_table = (unsigned long *)kallsyms_lookup_name("sys_call_table");    ...}
+```c
+#include <linux/kallsyms.h>void func() {    ...    unsigned long *sys_call_table;    // 获取 sys_call_table 的虚拟内存地址    
+sys_call_table = (unsigned long *)kallsyms_lookup_name("sys_call_table");    ...}
 ```
 
 ### 2. 设置 sys_call_table 数组为可写状态
@@ -105,7 +106,7 @@ sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 
 代码如下：
 
-```
+```c
 /* * 设置cr0寄存器的第16位为0 */unsigned int clear_and_return_cr0(void){    unsigned int cr0 = 0;    unsigned int ret;    /* 将cr0寄存器的值移动到rax寄存器中，同时输出到cr0变量中 */    asm volatile ("movq %%cr0, %%rax" : "=a"(cr0));    ret = cr0;    cr0 &= 0xfffeffff;  /* 将cr0变量值中的第16位清0，将修改后的值写入cr0寄存器 */    /* 读取cr0的值到rax寄存器，再将rax寄存器的值放入cr0中 */    asm volatile ("movq %%rax, %%cr0" :: "a"(cr0));    return ret;}/* * 还原cr0寄存器的值为val */void setback_cr0(unsigned int val){    asm volatile ("movq %%rax, %%cr0" :: "a"(val));}
 ```
 
@@ -113,7 +114,7 @@ sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 
 由于 `x86 CPU` 的内存保护机制是通过虚拟内存页表来实现的（可以参考这篇文章：[漫谈内存映射](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648464745&idx=1&sn=374b770823d0a9e9677386160e57f71c&scene=21#wechat_redirect)），所以我们只需要把 `sys_call_table` 数组的虚拟内存页表项中的保护标志位清空即可，代码如下：
 
-```
+```c
 /* * 把虚拟内存地址设置为可写 */int make_rw(unsigned long address){    unsigned int level;    //查找虚拟地址所在的页表地址    pte_t *pte = lookup_address(address, &level);    if (pte->pte & ~_PAGE_RW)  //设置页表读写属性        pte->pte |=  _PAGE_RW;    return 0;}/* * 把虚拟内存地址设置为只读 */int make_ro(unsigned long address){    unsigned int level;    pte_t *pte = lookup_address(address, &level);    pte->pte &= ~_PAGE_RW;  //设置只读属性    return 0;}
 ```
 
@@ -123,8 +124,9 @@ sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 
 我们可以在内核模块初始化函数修改 `sys_call_table` 数组的值，然后在内核模块退出函数改回成原来的值即可，完整代码如下：
 
-```
-/* * File: syscall.c */#include <linux/module.h>#include <linux/kernel.h>#include <linux/init.h>#include <linux/unistd.h>#include <linux/time.h>#include <asm/uaccess.h>#include <linux/sched.h>#include <linux/kallsyms.h>unsigned long *sys_call_table;unsigned int clear_and_return_cr0(void);void setback_cr0(unsigned int val);static int sys_hackcall(void);unsigned long *sys_call_table = 0;/* 定义一个函数指针，用来保存原来的系统调用*/static int (*orig_syscall_saved)(void);/* * 设置cr0寄存器的第16位为0 */unsigned int clear_and_return_cr0(void){    unsigned int cr0 = 0;    unsigned int ret;    /* 将cr0寄存器的值移动到rax寄存器中，同时输出到cr0变量中 */    asm volatile ("movq %%cr0, %%rax" : "=a"(cr0));    ret = cr0;    cr0 &= 0xfffeffff;  /* 将cr0变量值中的第16位清0，将修改后的值写入cr0寄存器 */    /* 读取cr0的值到rax寄存器，再将rax寄存器的值放入cr0中 */    asm volatile ("movq %%rax, %%cr0" :: "a"(cr0));    return ret;}/* * 还原cr0寄存器的值为val */void setback_cr0(unsigned int val){    asm volatile ("movq %%rax, %%cr0" :: "a"(val));}/* * 自己编写的系统调用函数 */static int sys_hackcall(void){    printk("Hack syscall is successful!!!\n");    return 0;}/* * 模块的初始化函数，模块的入口函数，加载模块时调用 */static int __init init_hack_module(void){    int orig_cr0;    printk("Hack syscall is starting...\n");    /* 获取 sys_call_table 虚拟内存地址 */    sys_call_table = (unsigned long *)kallsyms_lookup_name("sys_call_table");    /* 保存原始系统调用 */    orig_syscall_saved = (int(*)(void))(sys_call_table[__NR_perf_event_open]);    orig_cr0 = clear_and_return_cr0(); /* 设置cr0寄存器的第16位为0 */    sys_call_table[__NR_perf_event_open] = (unsigned long)&sys_hackcall; /* 替换成我们编写的函数 */    setback_cr0(orig_cr0); /* 还原cr0寄存器的值 */    return 0;}/* * 模块退出函数，卸载模块时调用 */static void __exit exit_hack_module(void){    int orig_cr0;    orig_cr0 = clear_and_return_cr0();    sys_call_table[__NR_perf_event_open] = (unsigned long)orig_syscall_saved; /* 设置为原来的系统调用 */    setback_cr0(orig_cr0);    printk("Hack syscall is exited....\n");}module_init(init_hack_module);module_exit(exit_hack_module);MODULE_LICENSE("GPL");
+```c
+/* * File: syscall.c */#include <linux/module.h>#include <linux/kernel.h>#include <linux/init.h>#include <linux/unistd.h>#include <linux/time.h>#include <asm/uaccess.h>#include <linux/sched.h>#include <linux/kallsyms.h>
+unsigned long *sys_call_table;unsigned int clear_and_return_cr0(void);void setback_cr0(unsigned int val);static int sys_hackcall(void);unsigned long *sys_call_table = 0;/* 定义一个函数指针，用来保存原来的系统调用*/static int (*orig_syscall_saved)(void);/* * 设置cr0寄存器的第16位为0 */unsigned int clear_and_return_cr0(void){    unsigned int cr0 = 0;    unsigned int ret;    /* 将cr0寄存器的值移动到rax寄存器中，同时输出到cr0变量中 */    asm volatile ("movq %%cr0, %%rax" : "=a"(cr0));    ret = cr0;    cr0 &= 0xfffeffff;  /* 将cr0变量值中的第16位清0，将修改后的值写入cr0寄存器 */    /* 读取cr0的值到rax寄存器，再将rax寄存器的值放入cr0中 */    asm volatile ("movq %%rax, %%cr0" :: "a"(cr0));    return ret;}/* * 还原cr0寄存器的值为val */void setback_cr0(unsigned int val){    asm volatile ("movq %%rax, %%cr0" :: "a"(val));}/* * 自己编写的系统调用函数 */static int sys_hackcall(void){    printk("Hack syscall is successful!!!\n");    return 0;}/* * 模块的初始化函数，模块的入口函数，加载模块时调用 */static int __init init_hack_module(void){    int orig_cr0;    printk("Hack syscall is starting...\n");    /* 获取 sys_call_table 虚拟内存地址 */    sys_call_table = (unsigned long *)kallsyms_lookup_name("sys_call_table");    /* 保存原始系统调用 */    orig_syscall_saved = (int(*)(void))(sys_call_table[__NR_perf_event_open]);    orig_cr0 = clear_and_return_cr0(); /* 设置cr0寄存器的第16位为0 */    sys_call_table[__NR_perf_event_open] = (unsigned long)&sys_hackcall; /* 替换成我们编写的函数 */    setback_cr0(orig_cr0); /* 还原cr0寄存器的值 */    return 0;}/* * 模块退出函数，卸载模块时调用 */static void __exit exit_hack_module(void){    int orig_cr0;    orig_cr0 = clear_and_return_cr0();    sys_call_table[__NR_perf_event_open] = (unsigned long)orig_syscall_saved; /* 设置为原来的系统调用 */    setback_cr0(orig_cr0);    printk("Hack syscall is exited....\n");}module_init(init_hack_module);module_exit(exit_hack_module);MODULE_LICENSE("GPL");
 ```
 
 在上面代码中，我们将 `perf_event_open()` 系统调用替换成了我们自己实现的函数。
@@ -135,7 +137,7 @@ sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 
 为了编译方便，我们编写一个 Makefile 文件来进行编译，如下所示：
 
-```
+```c
 obj-m:=syscall.oPWD:= $(shell pwd)KERNELDIR:= /lib/modules/$(shell uname -r)/buildEXTRA_CFLAGS= -O0all:    make -C $(KERNELDIR)  M=$(PWD) modulesclean:    make -C $(KERNELDIR) M=$(PWD) clean
 ```
 
@@ -145,8 +147,9 @@ obj-m:=syscall.oPWD:= $(shell pwd)KERNELDIR:= /lib/modules/$(shell uname -r
 
 现在，我们编写一个测试程序来测试一下系统调用拦截是否成功，代码如下：
 
-```
-#include <syscall.h>#include <stdio.h>#include <unistd.h>int main(void){    unsigned long ret = syscall(__NR_perf_event_open, NULL, 0, 0, 0, 0);    printf("%d\n", (int)ret);    return 0;}
+```c
+#include <syscall.h>#include <stdio.h>#include <unistd.h>
+int main(void){    unsigned long ret = syscall(__NR_perf_event_open, NULL, 0, 0, 0, 0);    printf("%d\n", (int)ret);    return 0;}
 ```
 
 ### 6. 运行结果
@@ -155,13 +158,13 @@ obj-m:=syscall.oPWD:= $(shell pwd)KERNELDIR:= /lib/modules/$(shell uname -r
 
 使用以下命令安装内核模块：
 
-```
+```c
 root# insmod syscall.ko
 ```
 
 然后通过 `dmesg` 命令来观察系统日志，可以看到以下输出：
 
-```
+```c
 ...[  133.564652] Hack syscall is starting...
 ```
 
@@ -171,7 +174,7 @@ root# insmod syscall.ko
 
 接着，我们运行刚才编写的测试程序，然后观察系统日志，输出如下：
 
-```
+```c
 ...[  532.243714] Hack syscall is successful!!!
 ```
 
