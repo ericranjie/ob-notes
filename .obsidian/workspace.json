@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md"
+                "file": "coding/os/linux/memory/memory-performance/内存管理：程序是如何被优雅的装载到内存中.md"
               }
             }
           }
@@ -148,9 +148,12 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/memory/C&DMA/应读者要求讲讲 DMA.md",
+    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
+    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
     "0x99-image/Pasted image 20240927115732.png",
     "0x99-image/Pasted image 20240927115704.png",
-    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
@@ -166,7 +169,6 @@
     "0x99-image/Pasted image 20240927142111.png",
     "0x99-image/Pasted image 20240927142059.png",
     "0x99-image/Pasted image 20240927142053.png",
-    "0x99-image/Pasted image 20240927142044.png",
     "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
     "coding/os/linux/memory/memory-manage/slub/b_SLUB DEBUG原理.md",
     "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
@@ -182,8 +184,6 @@
     "coding/os/linux/memory/memory-debug/i_明明还有大量内存，为啥报错“无法分配内存”？.md",
     "coding/os/linux/memory/memory-debug/i_proc meminfo分析（一）.md",
     "coding/os/linux/memory/memory-debug/i_KASLR.md",
-    "coding/os/linux/learning/Linux内核源码如何学习？.md",
-    "coding/os/linux/learning/kfngxl.cn - 开发内功修炼网站上线啦！.md",
     "self-improvement/hair/Untitled",
     "self-improvement/hair",
     "coding/os/linux/schedule/lock/lock-free",
