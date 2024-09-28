@@ -11,11 +11,9 @@
             "id": "550c24418126d846",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
-                "mode": "source",
-                "source": false
+                "file": "0x99-image/Pasted image 20240928174711.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
+                "file": "0x99-image/Pasted image 20240928174711.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
+                "file": "0x99-image/Pasted image 20240928174711.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md"
+                "file": "0x99-image/Pasted image 20240928174711.png"
               }
             }
           }
@@ -146,16 +144,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "Pasted image 20240928175040.png",
-    "Pasted image 20240928175032.png",
-    "Pasted image 20240928175023.png",
-    "Pasted image 20240928175013.png",
+    "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
+    "0x99-image/Pasted image 20240928175040.png",
+    "0x99-image/Pasted image 20240928175032.png",
+    "0x99-image/Pasted image 20240928175023.png",
+    "0x99-image/Pasted image 20240928175013.png",
     "coding/os/linux/debug/如何对一个【可执行程序】进行拦截和包装？.md",
     "coding/os/linux/debug/Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
-    "Pasted image 20240928174727.png",
-    "Pasted image 20240928174711.png",
+    "0x99-image/Pasted image 20240928174727.png",
+    "0x99-image/Pasted image 20240928174711.png",
     "coding/os/linux/debug/c_18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
     "coding/os/linux/debug/at_大厂干掉 OOM 的套路，不过如此.md",
     "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
@@ -166,7 +165,6 @@
     "0x99-image/Pasted image 20240928132702.png",
     "0x99-image/Pasted image 20240928132655.png",
     "0x99-image/Pasted image 20240928132646.png",
-    "0x99-image/Pasted image 20240928132635.png",
     "coding/os/linux/debug/深入理解Linux Netlink机制：进程间通信的关键.md",
     "coding/os/linux/debug/p_一例hardened_usercopy的bug解析.md",
     "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
