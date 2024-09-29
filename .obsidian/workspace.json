@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md",
+                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md",
+                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md",
+                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/k_深入理解Linux Netlink机制：进程间通信的关键.md"
+                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md"
               }
             }
           }
@@ -148,6 +148,22 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "0x99-image/Pasted image 20240929113159.png",
+    "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
+    "coding/os/linux/memory/cache/深入理解CPU缓存：性能优化的关键.md",
+    "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md",
+    "coding/cpp/从新手到专业人士：探索 C++ STL 以获得终极性能.md",
+    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
+    "coding/cpp/sizeof(void)之谜.md",
+    "coding/cpp/C++ STL之合并、反转和其他算法.md",
+    "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
+    "interview/interview-resources.md",
+    "coding/compiler/利用Makfile给多文件、多目录C源码建立工程.md",
+    "0x99-image/Pasted image 20240929114001.png",
+    "0x99-image/Pasted image 20240929113949.png",
+    "coding/compiler/k_从编译器的角度来看循环优化.md",
+    "0x99-image/Pasted image 20240929113208.png",
+    "coding/os/linux/debug/b_深入理解Linux Netlink机制：进程间通信的关键.md",
     "coding/os/linux/memory/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
     "coding/os/linux/memory/a_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/debug/KFENCE/Linux Kfence 详解.md",
@@ -166,25 +182,8 @@
     "0x99-image/Pasted image 20240928191447.png",
     "0x99-image/Pasted image 20240928191510.png",
     "0x99-image/Pasted image 20240928191504.png",
-    "0x99-image/Pasted image 20240928191455.png",
     "coding/os/linux/debug/kt_带你快速对比SPI、UART、I2C通信的区别与应用！.md",
     "coding/os/linux/debug/k_内核内存泄漏探测器kmemleak(一).md",
-    "coding/os/linux/debug/b_Linux内核调试的方式以及工具集锦.md",
-    "0x99-image/Pasted image 20240928190647.png",
-    "0x99-image/Pasted image 20240928190832.png",
-    "0x99-image/Pasted image 20240928190754.png",
-    "coding/os/linux/debug/b_Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
-    "coding/os/linux/debug/k_x86_64架构的函数调用链中为什么有些函数名称前面带有问号.md",
-    "coding/os/linux/debug/c_Linux后台开发调试经验分享.md",
-    "coding/os/linux/debug/memory-debug/a_内存泄漏-原因、避免以及定位.md",
-    "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
-    "coding/os/linux/debug/GDB/b_一文看懂 GDB底层实现原理.md",
-    "coding/os/linux/debug/c_18 个终端命令行工具，绝对让你感觉自己像个10倍程序员.md",
-    "coding/os/linux/debug/at_大厂干掉 OOM 的套路，不过如此.md",
-    "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
-    "coding/os/linux/debug/i_Linux下“用户空间修改设备寄存器或者物理内存”的实现.md",
-    "coding/frontend/c_这本计算机神书，出 JavaScript 版了！.md",
-    "coding/os/linux/debug/GDB/使用 GDB + Qemu 调试 Linux 内核.md",
     "coding/os/linux/debug/ASAN",
     "coding/os/linux/debug/trace",
     "coding/os/linux/debug/GDB",

@@ -44,7 +44,9 @@
 
 `peng@ubuntu:/mnt/hgfs/code/phone$ make   make[1]: Entering directory '/mnt/hgfs/code/phone/allfree'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/allfree'   make[1]: Entering directory '/mnt/hgfs/code/phone/create'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/create'   make[1]: Entering directory '/mnt/hgfs/code/phone/delete'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/delete'   make[1]: Entering directory '/mnt/hgfs/code/phone/display'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/display'   make[1]: Entering directory '/mnt/hgfs/code/phone/init'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/init'   make[1]: Entering directory '/mnt/hgfs/code/phone/login'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/login'   make[1]: Entering directory '/mnt/hgfs/code/phone/menu'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/menu'   make[1]: Entering directory '/mnt/hgfs/code/phone/search'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/search'   make[1]: Entering directory '/mnt/hgfs/code/phone/main'   make[1]: Nothing to be done for 'all'.   make[1]: Leaving directory '/mnt/hgfs/code/phone/main'   gcc -Wall -O3 -o phone allfree/*.o create/*.o delete/*.o display/*.o init/*.o login/*.o menu/*.o search/*.o main/*.o -lpthread   phone make done!` 
 
-运行结果如下：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+运行结果如下：
+![[Pasted image 20240929113949.png]]
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 二、Makefile常用基础知识点
 
@@ -180,7 +182,7 @@ foreach函数和别的函数非常的不一样。因为这个函数是用来做�
 即a替代了替代了(2)
 
 ## 三、编译详细说明
-
+![[Pasted image 20240929114001.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们在根目录下执行make命令后，详细步骤如下：

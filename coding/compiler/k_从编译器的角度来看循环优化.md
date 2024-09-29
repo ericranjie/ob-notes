@@ -243,7 +243,7 @@ C和C++都有严格的别名机制，这意味着当循环中同时存在标量�
 `for (int i = 0; i < n; i+=4) {        double<4> b_val = load<4>(B + i);       double<4> c_val = load<4>(C + i);       double<4> a_val = add<4>(b_val, c_val);       store<4>(a_val, A + i);   }   `
 
 如下图所示：
-
+![[Pasted image 20240929113159.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 向量化计算 https://johnysswlab.com/loop-optimizations-how-does-the-compiler-do-it/
@@ -276,7 +276,7 @@ C和C++都有严格的别名机制，这意味着当循环中同时存在标量�
 `double<4> vec_sum = { 0.0, 0.0, 0.0, 0.0 };   for (int i = 0; i < n; i+=4) {        double<4> a_val = load<4>(a + i);       vec_sum = add<4>(a, vec_sum);   }   sum = 0.0;   for (int i = 0; i < 4; i++) {       sum += vec_sum[i];   }   `
 
 如下图所示：
-
+![[Pasted image 20240929113208.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 reductions https://johnysswlab.com/loop-optimizations-how-does-the-compiler-do-it/
