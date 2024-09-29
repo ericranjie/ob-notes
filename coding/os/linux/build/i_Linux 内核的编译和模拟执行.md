@@ -7,7 +7,7 @@
 
 源代码需要用编译工具编译生成最终的可被执行的二进制文件，在笔者的 Ubuntu 系统上，直接使用 gcc 编译出来的内核是可以在 Intel x86 架构的 CPU 上执行。为了能编译出能在 arm 架构的 CPU 上运行的内核，就需要使用交叉编译工具链，它是用于在一种计算机体系结构上生成针对另一种不同计算机体系结构的目标代码的工具集合，在笔者的目录下则是上一篇中提到的 arm-linux-gnueabihf ，笔者并没有对其进行编译而是直接解压使用其编译工具，小伙伴可以 ls arm-linux-gnueabihf 目录下的 bin 目录（顺带说一下，笔者的目录结构就是上一篇中 _**tree**_ 命令列出来的结构）：
 
-```
+```c
 pzx@pzx-vm:~/linux/arm-linux-gnueabihf$ ls -l bin | grep gcc
 ```
 
@@ -17,7 +17,7 @@ pzx@pzx-vm:~/linux/arm-linux-gnueabihf$ ls -l bin | grep gcc
 
 内核的编译十分简单，只需要切换到内核的目录下执行以下几条指令即可：  
 
-```
+```c
 make ARCH=arm CROSS_COMPILE=../arm-linux-gnueabihf/bin/arm-linux-gnueabihf- vexpress_defconfig
 ```
 
@@ -25,7 +25,7 @@ _**make**_ 是一个构建工具，用来编译代码，这也是上一篇笔者
 
 ARCH=arm 表示要构建的 CPU 架构是 arm，CROSS_COMPILE=../arm-linux-gnueabihf/bin/arm-linux-gnueabihf- 则表示使用的编译工具的前缀是 CROSS_COMPILE=../arm-linux-gnueabihf/bin/arm-linux-gnueabihf-，为什么要强调是前缀呢？笔者简单的 _**grep**_ 一把 Makefile：  
 
-```
+```c
 pzx@pzx-vm:~/linux/linux-5.4.246$ cat Makefile | grep CROSS_COMPILE
 ```
 
@@ -33,13 +33,13 @@ pzx@pzx-vm:~/linux/linux-5.4.246$ cat Makefile | grep CROSS_COMPILE
 
 内核编译完成后，生成的内核镜像文件是内核源码目录中 arch/arm/boot/ 目录的 zImage，设备树文件则是 arch/arm/boot/dts/ 目录的 vexpress-v2p-ca9.dtb。如果和笔者的编译方式不同，可以使用 _**find**_ 命令查找：
 
-```
+```c
 pzx@pzx-vm:~/linux/linux-5.4.246$ find ./ -name zImage
 ```
 
 有关 find 命令笔者在此篇就不过多描述，有了内核镜像文件和设备树文件后，我们就可以使用 qemu 模拟启动内核了：  
 
-```
+```c
 qemu-system-arm -M vexpress-a9 -m 256M -kernel ./arch/arm/boot/zImage -dtb ./arch/arm/boot/dts/vexpress-v2p-ca9.dtb
 ```
 

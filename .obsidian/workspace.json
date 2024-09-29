@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
+                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
+                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
+                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md"
+                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md"
               }
             }
           }
@@ -148,8 +148,24 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x99-image/Pasted image 20240929113159.png",
+    "coding/os/linux/build/Linux如何从Boot到OS，再到应用程序？.md",
+    "coding/os/linux/build/b_计算机科学基础知识（四） 动态库和位置无关代码.md",
+    "coding/os/linux/build/d_Linux设备树语法规范.md",
+    "coding/os/linux/build/i_u-boot FIT image介绍.md",
+    "coding/os/linux/build/i_Linux kernel内核配置解析(1)_概述(基于ARM64架构).md",
+    "coding/os/linux/build/k_计算机科学基础知识（五）动态链接.md",
+    "coding/os/linux/build/b_计算机科学基础知识（三）静态库和静态链接.md",
+    "coding/os/linux/build/Docker镜像瘦身：从1.43G到22.4MB.md",
+    "coding/os/linux/build/an_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
+    "0x99-image/Pasted image 20240929153126.png",
+    "0x99-image/Pasted image 20240929153222.png",
+    "0x99-image/Pasted image 20240929153213.png",
+    "0x99-image/Pasted image 20240929153205.png",
+    "0x99-image/Pasted image 20240929153151.png",
+    "0x99-image/Pasted image 20240929153138.png",
+    "coding/os/linux/build/i_Linux 内核的编译和模拟执行.md",
     "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
+    "0x99-image/Pasted image 20240929113159.png",
     "coding/os/linux/memory/cache/深入理解CPU缓存：性能优化的关键.md",
     "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md",
     "coding/cpp/从新手到专业人士：探索 C++ STL 以获得终极性能.md",
@@ -169,21 +185,6 @@
     "coding/os/linux/debug/KFENCE/Linux Kfence 详解.md",
     "coding/os/linux/debug/内核内存错误检测工具KFENCE.md",
     "coding/os/linux/debug/KFENCE",
-    "coding/os/linux/debug/b_手把手教你拦截Linux系统调用.md",
-    "0x99-image/Pasted image 20240928195526.png",
-    "0x99-image/Pasted image 20240928195543.png",
-    "0x99-image/Pasted image 20240928195532.png",
-    "coding/os/linux/debug/手把手教你 拦截系统调用.md",
-    "coding/os/linux/debug/bn_案例分析 - 内存泄露的排查方法.md",
-    "coding/os/linux/debug/i_钓鱼累了，写下断言怎么用.md",
-    "coding/os/linux/debug/bt_掌握Linux内存故障追踪：技术指南.md",
-    "coding/os/linux/debug/k_如何对一个【可执行程序】进行拦截和包装？.md",
-    "coding/os/linux/debug/b_自己动手写一个GDB 设置断点（原理篇）.md",
-    "0x99-image/Pasted image 20240928191447.png",
-    "0x99-image/Pasted image 20240928191510.png",
-    "0x99-image/Pasted image 20240928191504.png",
-    "coding/os/linux/debug/kt_带你快速对比SPI、UART、I2C通信的区别与应用！.md",
-    "coding/os/linux/debug/k_内核内存泄漏探测器kmemleak(一).md",
     "coding/os/linux/debug/ASAN",
     "coding/os/linux/debug/trace",
     "coding/os/linux/debug/GDB",
