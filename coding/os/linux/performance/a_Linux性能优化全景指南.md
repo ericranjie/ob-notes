@@ -1,11 +1,14 @@
 # 
-互联网后端架构 架构之家
 
- _2022年03月01日 20:11_
+极客重生 极客重生
 
-![](https://mmbiz.qpic.cn/mmbiz_png/UHKG18j8iasYnWrQpRtuZOMrykbTZcVkNemY1yxvPBMVYUgkFRSTLicicZM5t9zy73dQIeDUohnQyTwRKmOSYnqfQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+ _2022年02月17日 19:36_
 
-# Part1Linux性能优化  
+![图片](https://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6l1cwiaktXM5TFic5hDiaWtENxBKvogeLKstuUyoESMe4Aw139geLibV0hOQaLoiaCjLchoggqvJLmZcwg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+
+原文：http://33h.co/kyq4z
+
+# Part1Linux性能优化
 
 ## 1性能优化
 
@@ -37,7 +40,7 @@
 
 对于不同的性能问题要选取不同的性能分析工具。下面是常用的Linux Performance Tools以及对应分析的性能问题类型。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/lPwvgkMwLNiacfpvYibLHkL44j7YsLVfPESWoqX6kMonmqLBLh5g53icYpiafiaKdv6csdTkpia5qln3gEmrMgwrlxCg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图片来自: www.ctq6.cn
 
@@ -111,11 +114,13 @@ Linux进程按照等级权限将进程的运行空间分为内核空间和用户
 
 **中断处理优先级比进程高，所以中断上下文切换和进程上下文切换不会同时发生**
 
+**[Docker+K8s+Jenkins 主流技术全解视频资料](http://mp.weixin.qq.com/s?__biz=MzAwNTM5Njk3Mw==&mid=2247506337&idx=2&sn=3899a7373d1f2dde5d8c71cb17a3e51a&chksm=9b1fd923ac685035150c5efa021bdba0e278fe484f26ee56946a6310329199cddfff054defe0&scene=21#wechat_redirect)**
+
 ### CPU上下文切换(下)
 
 通过vmstat可以查看系统总体的上下文切换情况
 
-```
+```c
 vmstat 5         #每隔5s输出一组数据procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu----- r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st 1  0      0 103388 145412 511056    0    0    18    60    1    1  2  1 96  0  0 0  0      0 103388 145412 511076    0    0     0     2  450 1176  1  1 99  0  0 0  0      0 103388 145412 511076    0    0     0     8  429 1135  1  1 98  0  0 0  0      0 103388 145412 511076    0    0     0     0  431 1132  1  1 98  0  0 0  0      0 103388 145412 511076    0    0     0    10  467 1195  1  1 98  0  0 1  0      0 103388 145412 511076    0    0     0     2  426 1139  1  0 99  0  0 4  0      0  95184 145412 511108    0    0     0    74  500 1228  4  1 94  0  0 0  0      0 103512 145416 511076    0    0     0   455  723 1573 12  3 83  2  0
 ```
 
@@ -130,7 +135,7 @@ vmstat 5         #每隔5s输出一组数据procs -----------memory--
 
 要查看每个进程的详细情况，需要使用pidstat来查看每个进程上下文切换情况
 
-```
+```c
 pidstat -w 514时51分16秒   UID       PID   cswch/s nvcswch/s  Command14时51分21秒     0         1      0.80      0.00  systemd14时51分21秒     0         6      1.40      0.00  ksoftirqd/014时51分21秒     0         9     32.67      0.00  rcu_sched14时51分21秒     0        11      0.40      0.00  watchdog/014时51分21秒     0        32      0.20      0.00  khugepaged14时51分21秒     0       271      0.20      0.00  jbd2/vda1-814时51分21秒     0      1332      0.20      0.00  argusagent14时51分21秒     0      5265     10.02      0.00  AliSecGuard14时51分21秒     0      7439      7.82      0.00  kworker/0:214时51分21秒     0      7906      0.20      0.00  pidstat14时51分21秒     0      8346      0.20      0.00  sshd14时51分21秒     0     20654      9.82      0.00  AliYunDun14时51分21秒     0     25766      0.20      0.00  kworker/u2:114时51分21秒     0     28603      1.00      0.00  python3
 ```
 
@@ -139,13 +144,13 @@ pidstat -w 514时51分16秒   UID       PID   cswch/s nvcswch/s�
 - nvcswch 每秒非自愿上下文切换次数 （时间片轮流等系统强制调度）
     
 
-```
+```c
 vmstat 1 1    #首先获取空闲系统的上下文切换次数sysbench --threads=10 --max-time=300 threads run #模拟多线程切换问题vmstat 1 1    #新终端观察上下文切换情况此时发现cs数据明显升高，同时观察其他指标：r列： 远超系统CPU个数，说明存在大量CPU竞争us和sy列：sy列占比80%，说明CPU主要被内核占用in列： 中断次数明显上升，说明中断处理也是潜在问题
 ```
 
 说明运行/等待CPU的进程过多，导致大量的上下文切换，上下文切换导致系统的CPU占用率高
 
-```
+```c
 pidstat -w -u 1  #查看到底哪个进程导致的问题
 ```
 
@@ -153,13 +158,13 @@ pidstat -w -u 1  #查看到底哪个进程导致的问题
 
 另外对于中断次数过多，我们可以通过/proc/interrupts文件读取
 
-```
+```c
 watch -d cat /proc/interrupts
 ```
 
 发现次数变化速度最快的是重调度中断（RES），该中断用来唤醒空闲状态的CPU来调度新的任务运行。分析还是因为过多任务的调度问题，和上下文切换分析一致。
 
-### [某个应用的CPU使用率达到100%，怎么办？](http://mp.weixin.qq.com/s?__biz=MzI4OTU3ODk3NQ==&mid=2247494140&idx=1&sn=cde62a1adf48d40313b9eef3a30986b1&chksm=ec2fa34cdb582a5a032bdbbfc03fb29912c1bdc791f89f52a770ea46f2e33d2d1af4f7d59f37&scene=21#wechat_redirect)
+### 某个应用的CPU使用率达到100%，怎么办？
 
 Linux作为多任务操作系统，将CPU时间划分为很短的时间片，通过调度器轮流分配给各个任务使用。为了维护CPU时间，Linux通过事先定义的节拍率，触发时间中断，并使用全局变了jiffies记录开机以来的节拍数。时间中断发生一次该值+1.
 
@@ -169,7 +174,7 @@ CPU使用率可以通过top 或 ps来查看。分析进程的CPU问题可以通�
 
 perf top / perf record / perf report （-g 开启调用关系的采样）
 
-```
+```c
 sudo docker run --name nginx -p 10000:80 -itd feisky/nginxsudo docker run --name phpfpm -itd --network container:nginx feisky/php-fpmab -c 10 -n 100 http://XXX.XXX.XXX.XXX:10000/ #测试Nginx服务性能
 ```
 
@@ -177,15 +182,15 @@ sudo docker run --name nginx -p 10000:80 -itd feisky/nginxsudo docker 
 
 接着用perf来分析具体是php-fpm中哪个函数导致该问题。
 
-```
+```c
 perf top -g -p XXXX #对某一个php-fpm进程进行分析
 ```
 
 发现其中sqrt和add_function占用CPU过多， 此时查看源码找到原来是sqrt中在发布前没有删除测试代码段，存在一个百万次的循环导致。将该无用代码删除后发现nginx负载能力明显提升
 
-### [系统的CPU使用率很高，为什么找不到高CPU的应用？](http://mp.weixin.qq.com/s?__biz=MzI4OTU3ODk3NQ==&mid=2247494140&idx=1&sn=cde62a1adf48d40313b9eef3a30986b1&chksm=ec2fa34cdb582a5a032bdbbfc03fb29912c1bdc791f89f52a770ea46f2e33d2d1af4f7d59f37&scene=21#wechat_redirect)
+### 系统的CPU使用率很高，为什么找不到高CPU的应用？
 
-```
+```c
 sudo docker run --name nginx -p 10000:80 -itd feisky/nginx:spsudo docker run --name phpfpm -itd --network container:nginx feisky/php-fpm:spab -c 100 -n 1000 http://XXX.XXX.XXX.XXX:10000/ #并发100个请求测试
 ```
 
@@ -204,7 +209,7 @@ sudo docker run --name nginx -p 10000:80 -itd feisky/nginx:spsudo docke
 
 可以通过pstree来查找 stress的父进程，找出调用关系。
 
-```
+```c
 pstree | grep stress
 ```
 
@@ -237,7 +242,7 @@ pstree | grep stress
 
 #### 磁盘O_DIRECT问题
 
-```
+```c
 sudo docker run --privileged --name=app -itd feisky/app:iowaitps aux | grep '/app'
 ```
 
@@ -251,7 +256,7 @@ sudo docker run --privileged --name=app -itd feisky/app:iowaitps aux | 
 
 用dstat来分析，因为它可以同时查看CPU和I/O两种资源的使用情况，便于对比分析。
 
-```
+```c
 dstat 1 10    #间隔1秒输出10组数据
 ```
 
@@ -259,7 +264,7 @@ dstat 1 10    #间隔1秒输出10组数据
 
 之前top查看的处于D状态的进程号，用pidstat -d -p XXX 展示进程的I/O统计数据。发现处于D状态的进程都没有任何读写操作。在用pidstat -d 查看所有进程的I/O统计数据，看到app进程在进行磁盘读操作，每秒读取32MB的数据。进程访问磁盘必须使用系统调用处于内核态，接下来重点就是找到app进程的系统调用。
 
-```
+```c
 sudo strace -p XXX #对app进程调用进行跟踪
 ```
 
@@ -310,7 +315,7 @@ sudo strace -p XXX #对app进程调用进行跟踪
     CPU缓存的复用情况,命中率越高性能越好. 其中L1/L2常用在单核,L3则用在多核中
     
 
-### [性能工具](http://mp.weixin.qq.com/s?__biz=MzI4OTU3ODk3NQ==&mid=2247484279&idx=1&sn=dbfadbbe3279b07b1d55fb298ef88203&chksm=ec2c49c7db5bc0d11ede88da28c053f01339fb125bf75cc6bc19d37985595b6ee220432e41e7&scene=21#wechat_redirect)
+### 性能工具
 
 - 平均负载案例
     
@@ -852,30 +857,240 @@ pidstat -d 1 1003:02:02 PM   UID       PID   kB_rd/s   kB_wr
 pidstat -T ALL -r -p 20955 1 1003:12:16 PM   UID       PID  minflt/s  majflt/s     VSZ    RSS   %MEM  Command03:12:17 PM   995     20955      0.00      0.00 6312520 1408040   4.37  java03:12:16 PM   UID       PID minflt-nr majflt-nr  Command03:12:17 PM   995     20955         0         0  java
 ```
 
+版权归原作者所有，如有侵权，请联系删除。  
+
   
 
-操作系统1
+- END -
 
-面试14
+---
 
-阅读 1404
+  
+
+**看完一键三连********在看********，**转发****，********点赞****
+
+**是对文章最大的赞赏，极客重生感谢你****![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
+
+  
+
+推荐阅读
+
+  
+
+[
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+定个目标｜建立自己的技术知识体系
+
+
+
+
+
+
+
+](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247570933&idx=1&sn=04bf666a7a402ed65b83020dc28dd543&chksm=c18522a4f6f2abb27ca1d09eaf646cc7eca2feea9c7f39618d3048b87634695955a8831992a9&scene=21#wechat_redirect)
+
+  
+
+[
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+从C10K到C10M高性能网络的探索与实践
+
+
+
+
+
+
+
+](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247570691&idx=1&sn=b449e2832a49c7201fda8ee340090160&chksm=c1852252f6f2ab44d77f1dddecdb49c297254eb1c4c4957f4c5986bd880f3ba91820fc4deb08&scene=21#wechat_redirect)
+
+  
+
+[
+
+![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+性能优化实战｜使用eBPF代替iptables优化服务网格数据面性能
+
+
+
+
+
+
+
+](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247571000&idx=1&sn=6514fc2b281426783e36a5069875e3d6&chksm=c1852169f6f2a87f9264b2304428f33d9b9b0f03424e48d6e229eeef0f3f5d2adf4afa0676fb&scene=21#wechat_redirect)
+
+  
+
+  
+
+你好，这里是极客重生，我是阿荣，大家都叫我荣哥，从华为->外企->到互联网大厂，目前是大厂资深工程师，多次获得五星员工，多年职场经验，技术扎实，专业后端开发和后台架构设计，热爱底层技术，丰富的实战经验，分享技术的本质原理，希望帮助更多人蜕变重生，拿BAT大厂offer，培养高级工程师能力，成为技术专家，实现高薪梦想，期待你的关注！[**点击蓝字查看我的成长之路**。](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247564006&idx=1&sn=8c88b0d7222ce0e310a012e90bff961f&chksm=c1850db7f6f284a133be27ad27ecd965c3c942583f69bd1a26c34ebf179b4cd6ceb3d7e787b4&scene=21#wechat_redirect)
+
+  
+
+校招/社招/简历/面试技巧/大厂技术栈分析/后端开发进阶/优秀开源项目/直播分享/技术视野/实战高手等, [极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247568828&idx=1&sn=ec346110ca42539f5d797f94eee57e9a&chksm=c1853aedf6f2b3fbf80600f4f71059ce2eddcb7c3e900953014764a3d16d2fd77f8190303898&scene=21#wechat_redirect)希望成为最有技术价值星球，尽最大努力为星球的同学提供技术和成长帮助！详情查看->[极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247568828&idx=1&sn=ec346110ca42539f5d797f94eee57e9a&chksm=c1853aedf6f2b3fbf80600f4f71059ce2eddcb7c3e900953014764a3d16d2fd77f8190303898&scene=21#wechat_redirect)  
+
+  
+
+![](http://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6m7W7KicZrc94icQe4d8ItHFyONKlBkGVqEAiavUicEzmEszR5aPvicKDeCMy8aAw6lPFe8AGhHQic1UKaA/300?wx_fmt=png&wxfrom=19)
+
+**极客重生**
+
+技术学习分享，一起进步
+
+180篇原创内容
+
+公众号
+
+                                                                求点赞，在看，分享三连![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+深入理解Linux系统51
+
+精通后端开发67
+
+深入理解Linux系统 · 目录
+
+上一篇内推|底层翻身的机会来了，快来看一看！下一篇eBPF在大厂的应用
+
+阅读 4061
 
 ​
 
 写留言
 
+**留言 7**
+
+- 周俊诚
+    
+    2022年2月18日
+    
+    赞1
+    
+    荣哥 666
+    
+- 乐观主义现代人
+    
+    2022年4月9日
+    
+    赞
+    
+    荣哥，能不能再细点，比如我知道很多看CPU数据的方法，到底多少我才觉得我这个CPU有压力，io多少的时候我知道磁盘读写跟不上导致的。我得到数据容易，关键是我看到这些数据，哪个是异常的呢。这种标准或者说你的经验值能不能说下。再比如我不管你内存多少，可用内存剩不到10%我就认为你的内存不够了，谢谢大佬
+    
+- arsenaler
+    
+    2022年2月18日
+    
+    赞
+    
+    很干，收藏![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+    
+- 许玉康
+    
+    2022年2月18日
+    
+    赞
+    
+    6666
+    
+- abelian(王立强)
+    
+    2022年2月18日
+    
+    赞
+    
+    如果程序一直运行在用户态，比如计算一个很复杂的逻辑或者死循环，一段很长时间不会进入内核态，操作系统如何做到调度
+    
+- bin
+    
+    2022年2月17日
+    
+    赞
+    
+    荣哥太硬核了，基本涵盖全了，赶快收藏起来
+    
+- 凉凉
+    
+    2022年2月17日
+    
+    赞
+    
+    支持荣哥![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+    
+
+已无更多数据
+
 [](javacript:;)
 
-![](http://mmbiz.qpic.cn/mmbiz_png/UHKG18j8iasZL522OziaOEtP4PG1n2UibBr7DeJ9aaicemeTMmoX55yicTvXSWVUOFHvBgoFgH0mlemJymIRgXz9PIw/300?wx_fmt=png&wxfrom=18)
+![](http://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6m7W7KicZrc94icQe4d8ItHFyONKlBkGVqEAiavUicEzmEszR5aPvicKDeCMy8aAw6lPFe8AGhHQic1UKaA/300?wx_fmt=png&wxfrom=18)
 
-架构之家
+极客重生
 
-314
+31821
+
+7
 
 写留言
 
-写留言
+**留言 7**
 
-**留言**
+- 周俊诚
+    
+    2022年2月18日
+    
+    赞1
+    
+    荣哥 666
+    
+- 乐观主义现代人
+    
+    2022年4月9日
+    
+    赞
+    
+    荣哥，能不能再细点，比如我知道很多看CPU数据的方法，到底多少我才觉得我这个CPU有压力，io多少的时候我知道磁盘读写跟不上导致的。我得到数据容易，关键是我看到这些数据，哪个是异常的呢。这种标准或者说你的经验值能不能说下。再比如我不管你内存多少，可用内存剩不到10%我就认为你的内存不够了，谢谢大佬
+    
+- arsenaler
+    
+    2022年2月18日
+    
+    赞
+    
+    很干，收藏![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+    
+- 许玉康
+    
+    2022年2月18日
+    
+    赞
+    
+    6666
+    
+- abelian(王立强)
+    
+    2022年2月18日
+    
+    赞
+    
+    如果程序一直运行在用户态，比如计算一个很复杂的逻辑或者死循环，一段很长时间不会进入内核态，操作系统如何做到调度
+    
+- bin
+    
+    2022年2月17日
+    
+    赞
+    
+    荣哥太硬核了，基本涵盖全了，赶快收藏起来
+    
+- 凉凉
+    
+    2022年2月17日
+    
+    赞
+    
+    支持荣哥![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+    
 
-暂无留言
+已无更多数据

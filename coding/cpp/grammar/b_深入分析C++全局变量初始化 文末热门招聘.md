@@ -68,7 +68,7 @@ info files
 
 这里的 Entry point， 就是程序运行起来的入口地址， 我们可以进一步调试它：
 
-```
+```c
 b *0x555555555040
 r
 ```
@@ -86,7 +86,8 @@ r
 给一段简单的示例 test.cpp：
 
 ```cpp
-#include int main() { printf("Hello ByteDance!\n"); return 0; }
+#include
+int main() { printf("Hello ByteDance!\n"); return 0; }
 ```
 
 当我们将这段代码编译成可以执行文件时， 站在开发者的角度上来说， 只有 test.cpp 一个文件参与了这个过程。但实际上并非如此， 追加 -v 选项后可以看到详细的编译连接过程， 实际上还有一些 .o 文件参与了链接的过程， 这些 .o 文件除了标准库相关的文件， 还包含了程序启动相关的文件， 我们接下来要做的就是找到这些与程序启动相关的文件， 这有助于我们理解 main 之前发生的一些事情。

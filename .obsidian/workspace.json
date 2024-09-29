@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
+                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
+                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
+                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md"
+                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
+    "coding/cpp/grammar/k_C++协程在阿里的推广和大规模应用.md",
+    "coding/cpp/grammar/d_C++反射：全方位解读Lura库的前世今生！.md",
+    "coding/cpp/grammar/k_C++为什么要弄出虚表这个东西？.md",
+    "coding/cpp/grammar/a_C++26 中的新功能.md",
+    "coding/cpp/grammar/C++ 反射：深入探究 function 实现机制！.md",
+    "coding/cpp/grammar/C++ 按值返回对象那些事.md",
+    "coding/architecture/【性能优化】lock-free在召回引擎中的实现.md",
+    "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
+    "coding/os/linux/performance/手把手教你调优.md",
+    "coding/os/linux/process/i_「linux」孤儿进程与僵尸进程产生及其处理.md",
+    "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
+    "coding/os/linux/performance/d_闻茂泉：系统性能监控与分析的工程化实践之路.md",
+    "coding/os/linux/performance/a_Linux性能优化全景指南.md",
+    "coding/os/linux/performance/架构必知：Linux性能优化全景指南（建议收藏）.md",
+    "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md",
+    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
+    "coding/os/linux/performance/从纳秒级优化谈CPU眼里的好代码.md",
+    "coding/os/linux/performance/Linux 性能基准测试工具及测试方法.md",
+    "coding/os/linux/memory/memory-init/b_Linux 物理内存初始化.md",
+    "coding/os/linux/learning/a_CSAPP，拆弹到一点！！！.md",
     "coding/os/linux/build/Linux如何从Boot到OS，再到应用程序？.md",
     "coding/os/linux/build/b_计算机科学基础知识（四） 动态库和位置无关代码.md",
     "coding/os/linux/build/d_Linux设备树语法规范.md",
     "coding/os/linux/build/i_u-boot FIT image介绍.md",
     "coding/os/linux/build/i_Linux kernel内核配置解析(1)_概述(基于ARM64架构).md",
-    "coding/os/linux/build/k_计算机科学基础知识（五）动态链接.md",
-    "coding/os/linux/build/b_计算机科学基础知识（三）静态库和静态链接.md",
-    "coding/os/linux/build/Docker镜像瘦身：从1.43G到22.4MB.md",
-    "coding/os/linux/build/an_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
     "0x99-image/Pasted image 20240929153213.png",
     "0x99-image/Pasted image 20240929153205.png",
     "0x99-image/Pasted image 20240929153151.png",
     "0x99-image/Pasted image 20240929153138.png",
-    "coding/os/linux/build/i_Linux 内核的编译和模拟执行.md",
-    "coding/os/linux/debug/memory-debug/k_内核返回错误debug神器 -- retsnoop.md",
     "0x99-image/Pasted image 20240929113159.png",
-    "coding/os/linux/memory/cache/深入理解CPU缓存：性能优化的关键.md",
-    "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md",
-    "coding/cpp/从新手到专业人士：探索 C++ STL 以获得终极性能.md",
-    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
-    "coding/cpp/sizeof(void)之谜.md",
-    "coding/cpp/C++ STL之合并、反转和其他算法.md",
-    "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
-    "interview/interview-resources.md",
-    "coding/compiler/利用Makfile给多文件、多目录C源码建立工程.md",
     "0x99-image/Pasted image 20240929114001.png",
     "0x99-image/Pasted image 20240929113949.png",
-    "coding/compiler/k_从编译器的角度来看循环优化.md",
     "0x99-image/Pasted image 20240929113208.png",
-    "coding/os/linux/debug/b_深入理解Linux Netlink机制：进程间通信的关键.md",
-    "coding/os/linux/memory/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
-    "coding/os/linux/memory/a_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
-    "coding/os/linux/debug/KFENCE/Linux Kfence 详解.md",
-    "coding/os/linux/debug/内核内存错误检测工具KFENCE.md",
     "coding/os/linux/debug/KFENCE",
     "coding/os/linux/debug/ASAN",
     "coding/os/linux/debug/trace",

@@ -27,7 +27,7 @@ show me the code!
 
 为了更好地展示火焰图的原理，我专门写了一小段代码，
 
-```
+```c
 int main() {
     for (i = 0; i < 100; i++) {
         if (i < 10) {
@@ -45,20 +45,20 @@ int main() {
 
 接下来我们用这个代码实际体验一下火焰图是如何生成的。在本节中，我们只讲如何使用，原理后面的小节再展开。
 
-```
+```c
 # gcc -o main main.c
 # perf record -g ./main
 ```
 
 这个时候，在你执行命令的当前目录下生成了一个perf.data文件。接下来咱们需要把Brendan Gregg的生成火焰图的项目下载下来。我们需要这个项目里的两个perl脚本。
 
-```
+```c
 # git clone https://github.com/brendangregg/FlameGraph.git
 ```
 
 接下来我们使用 perf script 解析这个输出文件，并把输出结果传入到 FlameGraph/stackcollapse-perf.pl 脚本中来进一步解析，最后交由 FlameGraph/flamegraph.pl 来生成svg 格式的火焰图。具体命令可以一行来完成。
 
-```
+```c
 # perf script | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > out.svg
 ```
 
@@ -79,7 +79,7 @@ int main() {
 
 在生成火焰图的第一步中，就是需要对你要观察的进程或服务器进行采样。采样可用的工具有好几个，我们这里用的是 perf record。
 
-```
+```c
 # perf record -g ./main
 ```
 
@@ -87,33 +87,33 @@ int main() {
 
 它可以指定采集事件。当前系统支持的事件列表可以用过 perf list 来查看。默认情况下采集的是 Hardware event 下的 cycles 这一事件。假如我们想采样 cache-misses 事件，我们可以通过 -e 参数指定。
 
-```
+```c
 # perf record -e cache-misses  sleep 5 // 指定要采集的事件
 ```
 
 还可以指定采样的方式。该命令支持两种采样方式，时间频率采样，事件次数发生采样。-F 参数指定的是每秒钟采样多少次。-c参数指定的是每发生多少次采样一次。
 
-```
+```c
 # perf record -F 100 sleep 5           // 每一秒钟采样100次
 # perf record -c 100 sleep 5           // 每发生100次采样一次
 ```
 
 还可以指定要记录的CPU核
 
-```
+```c
 # perf record -C 0,1 sleep 5           // 指定要记录的CPU号
 # perf record -C 0-2 sleep 5           // 指定要记录的CPU范围
 ```
 
 还可以采集内核的调用栈
 
-```
+```c
 # perf record -a -g ./main
 ```
 
 在使用 perf record 执行后，会将采样到的数据都生成到 perf.data 文件中。在上面的实验中，虽然我们只采集了几秒，但是生成的文件还挺大的，有 800 多 KB。我们通过 perf script 命令可以解析查看一下该文件的内容。大概有 5 万多行。其中的内容就是采样 cycles 事件时的调用栈信息。
 
-```
+```c
 ......
 59848 main 412201 389052.225443:     676233 cycles:u:
 59849             55651b8b5132 caculate+0xd (/data00/home/zhangyanfei.allen/work_test/test07/main)
@@ -126,7 +126,7 @@ int main() {
 
 除了 perf script 外，还可以使用 perf report 来查看和渲染结果。
 
-```
+```c
 # perf report -n --stdio
 ```
 
@@ -169,14 +169,14 @@ perf_event_alloc(struct perf_event_attr *attr, ...)
 
 当 perf_event_open 创建事件对象，并打开后，硬件上发生的事件就可以出发执行了。内核注册相应的硬件中断处理函数是 perf_event_nmi_handler。
 
-```
+```c
 //file:arch/x86/events/core.c
 register_nmi_handler(NMI_LOCAL, perf_event_nmi_handler, 0, "PMI");
 ```
 
 这样 CPU 硬件会根据 perf_event_open 调用时指定的周期发起中断，调用 perf_event_nmi_handler 通知内核进行采样处理
 
-```
+```c
 //file:arch/x86/events/core.c
 static int perf_event_nmi_handler(unsigned int cmd, struct pt_regs *regs)
 {    
@@ -187,7 +187,7 @@ static int perf_event_nmi_handler(unsigned int cmd, struct pt_regs *regs)
 
 该终端处理函数的函数调用链经过 x86_pmu_handle_irq 到达 perf_event_overflow。其中 perf_event_overflow 是一个关键的采样函数。无论是硬件事件采样，还是软件事件采样都会调用到它。它会调用 perf_event_open 时注册的 overflow_handler。我们假设 overflow_handler 为 perf_event_output_forward
 
-```
+```c
 void
 perf_event_output_forward(struct perf_event *event, ...)
 {
@@ -197,7 +197,7 @@ perf_event_output_forward(struct perf_event *event, ...)
 
 在 \_\_perf_event_output 中真正进行了采样处理
 
-```
+```c
 //file:kernel/events/core.c
 static __always_inline int
 __perf_event_output(struct perf_event *event, ...)
@@ -212,7 +212,7 @@ __perf_event_output(struct perf_event *event, ...)
 
 如果开启了 PERF_SAMPLE_CALLCHAIN，则不仅仅会把当前在执行的函数名采集下来，还会把整个调用链都记录起来。
 
-```
+```c
 //file:kernel/events/core.c
 void perf_prepare_sample(...)
 {
@@ -242,7 +242,7 @@ void perf_prepare_sample(...)
 
 前面我们用 perf script 解析是看到的函数调用栈信息比较的长。
 
-```
+```c
 ......
 59848 main 412201 389052.225443:     676233 cycles:u:
 59849             55651b8b5132 caculate+0xd (/data00/home/zhangyanfei.allen/work_test/test07/main)
@@ -255,7 +255,7 @@ void perf_prepare_sample(...)
 
 在画火焰图的前一步得需要对这个数据进行一下预处理。stackcollapse-perf.pl 脚本会统计每个调用栈回溯出现的次数，并将调用栈处理为一行。行前面表示的是调用栈，后面输出的是采样到该函数在运行的次数。
 
-```
+```c
 # perf script | ../FlameGraph/stackcollapse-perf.pl
 main;[unknown];__libc_start_main;main;funcA;funcD;funcE;caculate 554118432
 main;[unknown];__libc_start_main;main;funcB;caculate 338716787
