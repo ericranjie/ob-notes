@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_153. Find Minimum in Rotated Sorted Array.md",
+                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_153. Find Minimum in Rotated Sorted Array.md",
+                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_153. Find Minimum in Rotated Sorted Array.md",
+                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_153. Find Minimum in Rotated Sorted Array.md"
+                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md"
               }
             }
           }
@@ -148,8 +148,30 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_81. Search in Rotated Sorted Array II.md",
+    "0x01-leetcode/1-dimensional/binary-search/m_34. Find First and Last Position of Element in Sorted Array.md",
+    "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
+    "0x01-leetcode/1-dimensional/binary-search/e_852. Peak Index in a Mountain Array.md",
+    "0x01-leetcode/1-dimensional/binary-search/m_162. Find Peak Element.md",
+    "0x01-leetcode/1-dimensional/binary-search/matrix-search/m_240. Search a 2D Matrix II.md",
+    "0x01-leetcode/1-dimensional/binary-search/matrix-search/m_74. Search a 2D Matrix.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/h_668. Kth Smallest Number in Multiplication Table.md",
+    "0x01-leetcode/1-dimensional/binary-search/matrix-search",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/h_786. K-th Smallest Prime Fraction.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/m_658. Find K Closest Elements.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/m_378. Kth Smallest Element in a Sorted Matrix.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/m_373. Find K Pairs with Smallest Sums.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/h_719. Find K-th Smallest Pair Distance.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/h_774. Minimize Max Distance to Gas Station.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/m_875. Koko Eating Bananas.md",
+    "0x01-leetcode/1-dimensional/binary-search/LDS/h_1044. Longest Duplicate Substring.md",
+    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee",
+    "0x01-leetcode/1-dimensional/binary-search/missing-number/m_287. Find the Duplicate Number.md",
+    "0x01-leetcode/1-dimensional/binary-search/LDS",
+    "0x01-leetcode/1-dimensional/binary-search/missing-number/m_268. Missing Number.md",
     "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_153. Find Minimum in Rotated Sorted Array.md",
+    "0x01-leetcode/1-dimensional/binary-search/missing-number",
+    "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_81. Search in Rotated Sorted Array II.md",
     "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_33. Search in Rotated Sorted Array.md",
     "0x01-leetcode/1-dimensional/binary-search/h_4. Median of Two Sorted Arrays.md",
     "0x01-leetcode/1-dimensional/binary-search/rotated-array",
@@ -160,30 +182,8 @@
     "0x01-leetcode/1-dimensional/linked-list/m_2. Add Two Numbers.md",
     "0x01-leetcode/1-dimensional/linked-list/partition/e_328. Odd Even Linked List.md",
     "0x01-leetcode/1-dimensional/linked-list/reorder",
-    "0x01-leetcode/1-dimensional/linked-list/partition/m_86. Partition List.md",
-    "0x01-leetcode/1-dimensional/sorting/bucket-sort/h_164. Maximum Gap.md",
     "0x01-leetcode/1-dimensional/linked-list/partition",
-    "0x01-leetcode/1-dimensional/sorting/quick-sort/m_215. Kth Largest Element in an Array.md",
     "0x01-leetcode/1-dimensional/sorting/bucket-sort",
-    "0x01-leetcode/1-dimensional/sorting/design-comparator/m_179. Largest Number.md",
-    "0x01-leetcode/1-dimensional/sorting/quick-sort",
-    "README.md",
-    "0x01-leetcode/1-dimensional/sorting/design-comparator",
-    "Welcome.md",
-    "0x01-leetcode/1-dimensional/sorting/wiggle-sort/m_376. Wiggle Subsequence.md",
-    "0x01-leetcode/1-dimensional/sorting/wiggle-sort/m_324. Wiggle Sort II.md",
-    "0x01-leetcode/1-dimensional/sorting/wiggle-sort/m_280. Wiggle Sort.md",
-    "0x01-leetcode/1-dimensional/sorting/counting-sort/m_75. Sort Colors.md",
-    "0x01-leetcode/1-dimensional/sorting/wiggle-sort",
-    "coding/cpp/grammar/a_终极 C++避坑指南.md",
-    "0x01-leetcode/1-dimensional/sorting/counting-sort",
-    "0x01-leetcode/1-dimensional/sorting",
-    "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
-    "coding/cpp/grammar/k_C++协程在阿里的推广和大规模应用.md",
-    "coding/cpp/grammar/d_C++反射：全方位解读Lura库的前世今生！.md",
-    "coding/cpp/grammar/k_C++为什么要弄出虚表这个东西？.md",
-    "coding/cpp/grammar/a_C++26 中的新功能.md",
-    "coding/cpp/grammar/C++ 反射：深入探究 function 实现机制！.md",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
     "0x99-image/Pasted image 20240929153213.png",
