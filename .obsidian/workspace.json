@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/performance/bn_一文说清linux system load.md",
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/performance/bn_一文说清linux system load.md",
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/performance/bn_一文说清linux system load.md",
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/performance/bn_一文说清linux system load.md"
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md"
               }
             }
           }
@@ -148,6 +148,13 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/os/linux/network/n_深入理解CNI（容器网络接口）.md",
+    "coding/cpp/comment/2021年还有人在使用C语言吗？.md",
+    "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
+    "coding/os/linux/performance/bn_Linux系统性能优化：七个实战经验.md",
+    "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
+    "coding/os/linux/performance/pn_Linux问题分析与性能优化.md",
+    "coding/os/linux/performance/bn_一文说清linux system load.md",
     "coding/os/linux/performance/kn_从纳秒级优化谈CPU眼里的好代码.md",
     "coding/os/linux/performance/an _微信工程师：常见性能优化方案与实用工具.md",
     "coding/database/手把手教你调优.md",
@@ -172,13 +179,6 @@
     "0x01-leetcode/math-logic/moore-voting/e_169. Majority Element.md",
     "0x01-leetcode/math-logic/moore-voting",
     "0x01-leetcode/math-logic/m_319. Bulb Switcher.md",
-    "0x01-leetcode/math-logic/m_279. Perfect Squares.md",
-    "0x01-leetcode/math-logic/m_233. Number of Digit One.md",
-    "0x01-leetcode/math-logic/hard-logic/validate/m_468. Validate IP Address.md",
-    "0x01-leetcode/math-logic/hard-logic/m_93. Restore IP Addresses.md",
-    "0x01-leetcode/math-logic/hard-logic/h_68. Text Justification.md",
-    "0x01-leetcode/math-logic/hard-logic/h_420. Strong Password Checker.md",
-    "0x01-leetcode/math-logic/hard-logic/e_8. String to Integer (atoi).md",
     "0x01-leetcode/math-logic/find-regular-pattern",
     "0x01-leetcode/math-logic/coordinate",
     "0x01-leetcode/math-logic/convert/roman-interger",
