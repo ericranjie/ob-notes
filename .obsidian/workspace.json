@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
+                "file": "0x01-leetcode/math-logic/bit-manipulation/e_389. Find the Difference.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
+                "file": "0x01-leetcode/math-logic/bit-manipulation/e_389. Find the Difference.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
+                "file": "0x01-leetcode/math-logic/bit-manipulation/e_389. Find the Difference.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md"
+                "file": "0x01-leetcode/math-logic/bit-manipulation/e_389. Find the Difference.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/1-dimensional/binary-search/m_34. Find First and Last Position of Element in Sorted Array.md",
-    "0x01-leetcode/1-dimensional/binary-search/e_278. First Bad Version.md",
-    "0x01-leetcode/1-dimensional/binary-search/e_852. Peak Index in a Mountain Array.md",
-    "0x01-leetcode/1-dimensional/binary-search/m_162. Find Peak Element.md",
-    "0x01-leetcode/1-dimensional/binary-search/matrix-search/m_240. Search a 2D Matrix II.md",
-    "0x01-leetcode/1-dimensional/binary-search/matrix-search/m_74. Search a 2D Matrix.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/h_668. Kth Smallest Number in Multiplication Table.md",
-    "0x01-leetcode/1-dimensional/binary-search/matrix-search",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/h_786. K-th Smallest Prime Fraction.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/m_658. Find K Closest Elements.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/m_378. Kth Smallest Element in a Sorted Matrix.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/m_373. Find K Pairs with Smallest Sums.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth/h_719. Find K-th Smallest Pair Distance.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/h_774. Minimize Max Distance to Gas Station.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/Kth",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee/m_875. Koko Eating Bananas.md",
-    "0x01-leetcode/1-dimensional/binary-search/LDS/h_1044. Longest Duplicate Substring.md",
-    "0x01-leetcode/1-dimensional/binary-search/by-subfunction-returnee",
-    "0x01-leetcode/1-dimensional/binary-search/missing-number/m_287. Find the Duplicate Number.md",
-    "0x01-leetcode/1-dimensional/binary-search/LDS",
-    "0x01-leetcode/1-dimensional/binary-search/missing-number/m_268. Missing Number.md",
-    "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_153. Find Minimum in Rotated Sorted Array.md",
-    "0x01-leetcode/1-dimensional/binary-search/missing-number",
-    "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_81. Search in Rotated Sorted Array II.md",
-    "0x01-leetcode/1-dimensional/binary-search/rotated-array/m_33. Search in Rotated Sorted Array.md",
-    "0x01-leetcode/1-dimensional/binary-search/h_4. Median of Two Sorted Arrays.md",
-    "0x01-leetcode/1-dimensional/binary-search/rotated-array",
-    "0x01-leetcode/1-dimensional/binary-search/e_704. Binary Search.md",
-    "0x01-leetcode/1-dimensional/sorting/e_937. Reorder Data in Log Files.md",
-    "0x01-leetcode/1-dimensional/binary-search",
-    "0x01-leetcode/1-dimensional/linked-list/m_43. Multiply Strings.md",
-    "0x01-leetcode/1-dimensional/linked-list/m_2. Add Two Numbers.md",
-    "0x01-leetcode/1-dimensional/linked-list/partition/e_328. Odd Even Linked List.md",
-    "0x01-leetcode/1-dimensional/linked-list/reorder",
-    "0x01-leetcode/1-dimensional/linked-list/partition",
-    "0x01-leetcode/1-dimensional/sorting/bucket-sort",
+    "0x01-leetcode/math-logic/bit-manipulation/hamming-distance/m_477. Total Hamming Distance.md",
+    "0x01-leetcode/math-logic/bit-manipulation/e_389. Find the Difference.md",
+    "0x01-leetcode/math-logic/bit-manipulation/hamming-distance/e_461. Hamming Distance.md",
+    "0x01-leetcode/math-logic/bit-manipulation/m_201. Bitwise AND of Numbers Range.md",
+    "0x01-leetcode/math-logic/bit-manipulation/hamming-distance",
+    "0x01-leetcode/math-logic/bit-manipulation/h_927. Three Equal Parts.md",
+    "0x01-leetcode/math-logic/bit-manipulation/m_421. Maximum XOR of Two Numbers in an Array.md",
+    "0x01-leetcode/math-logic/bit-manipulation/m_136. Single Number.md",
+    "0x01-leetcode/math-logic/bit-manipulation/m_89. Gray Code.md",
+    "0x01-leetcode/math-logic/bit-manipulation/m_29. Divide Two Integers.md",
+    "0x01-leetcode/math-logic/m_233. Number of Digit One.md",
+    "0x01-leetcode/math-logic/bit-manipulation",
+    "0x01-leetcode/math-logic/m_319. Bulb Switcher.md",
+    "0x01-leetcode/math-logic/m_279. Perfect Squares.md",
+    "0x01-leetcode/math-logic/h_679. 24 Game.md",
+    "0x01-leetcode/math-logic/e_9. Palindrome Number.md",
+    "0x01-leetcode/math-logic/e_7. Reverse Integer.md",
+    "0x01-leetcode/math-logic/e_400. Nth Digit.md",
+    "0x01-leetcode/math-logic/e_665. Non-decreasing Array.md",
+    "0x01-leetcode/math-logic/rand/h_843. Guess the Word.md",
+    "0x01-leetcode/math-logic/rand/h_710. Random Pick with Blacklist.md",
+    "0x01-leetcode/math-logic/rand/rejection-sampling/m_478. Generate Random Point in a Circle.md",
+    "0x01-leetcode/math-logic/rand/rejection-sampling/m_470. Implement Rand10() Using Rand7().md",
+    "0x01-leetcode/math-logic/rand/m_384. Shuffle an Array.md",
+    "0x01-leetcode/math-logic/rand/rejection-sampling",
+    "0x01-leetcode/math-logic/rand/m_382. Linked List Random Node.md",
+    "0x01-leetcode/math-logic/coordinate/m_59. Spiral Matrix II.md",
+    "0x01-leetcode/math-logic/rand",
+    "0x01-leetcode/math-logic/coordinate/m_48. Rotate Image.md",
+    "0x01-leetcode/math-logic/coordinate/m_54. Spiral Matrix.md",
+    "0x01-leetcode/math-logic/coordinate",
+    "0x01-leetcode/1-dimensional/double-pointer/sliding-window",
+    "0x01-leetcode/1-dimensional/double-pointer/fast-slow-pointer",
+    "0x01-leetcode/1-dimensional/double-pointer/interval",
+    "0x01-leetcode/1-dimensional/double-pointer/N-sum",
+    "0x01-leetcode/1-dimensional/double-pointer",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
     "0x99-image/Pasted image 20240929153213.png",
