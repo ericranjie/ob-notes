@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/math-logic/e_482. License Key Formatting.md",
+                "file": "coding/os/linux/performance/bn_一文说清linux system load.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/math-logic/e_482. License Key Formatting.md",
+                "file": "coding/os/linux/performance/bn_一文说清linux system load.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/math-logic/e_482. License Key Formatting.md",
+                "file": "coding/os/linux/performance/bn_一文说清linux system load.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/math-logic/e_482. License Key Formatting.md"
+                "file": "coding/os/linux/performance/bn_一文说清linux system load.md"
               }
             }
           }
@@ -148,43 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/math-logic/e_397. Integer Replacement.md",
-    "0x01-leetcode/math-logic/e_482. License Key Formatting.md",
-    "0x01-leetcode/math-logic/h_1240. Tiling a Rectangle with the Fewest Squares.md",
-    "0x01-leetcode/math-logic/e_728. Self Dividing Numbers.md",
-    "0x01-leetcode/math-logic/rectangle-area/h_850. Rectangle Area II.md",
-    "0x01-leetcode/math-logic/rectangle-area/e_223. Rectangle Area.md",
-    "0x01-leetcode/math-logic/brain-teaser/e_458. Poor Pigs.md",
-    "0x01-leetcode/math-logic/rectangle-area",
-    "0x01-leetcode/math-logic/h_296. Best Meeting Point.md",
-    "0x01-leetcode/math-logic/brain-teaser",
-    "0x01-leetcode/math-logic/h_65. Valid Number.md",
-    "0x01-leetcode/math-logic/h_736. Parse Lisp Expression.md",
-    "0x01-leetcode/math-logic/find-regular-pattern/e_453. Minimum Moves to Equal Array Elements.md",
-    "0x01-leetcode/math-logic/find-regular-pattern/e_258. Add Digits.md",
-    "0x01-leetcode/math-logic/find-regular-pattern/m_781. Rabbits in Forest.md",
-    "0x01-leetcode/math-logic/find-regular-pattern/e_696. Count Binary Substrings.md",
-    "0x01-leetcode/math-logic/bezout-lemma/m_365. Water and Jug Problem.md",
-    "0x01-leetcode/math-logic/find-regular-pattern",
-    "0x01-leetcode/math-logic/Untitled.canvas",
-    "0x01-leetcode/math-logic/e_165. Compare Version Numbers.md",
-    "0x01-leetcode/math-logic/bezout-lemma",
-    "0x01-leetcode/math-logic/moore-voting/m_229. Majority Element II.md",
-    "0x01-leetcode/math-logic/moore-voting/e_169. Majority Element.md",
-    "0x01-leetcode/math-logic/e_14. Longest Common Prefix.md",
-    "0x01-leetcode/math-logic/moore-voting",
+    "coding/os/linux/performance/kn_从纳秒级优化谈CPU眼里的好代码.md",
+    "coding/os/linux/performance/an _微信工程师：常见性能优化方案与实用工具.md",
+    "coding/database/手把手教你调优.md",
+    "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
+    "coding/cpp/grammar/a_终极 C++避坑指南.md",
+    "0x01-leetcode/math-logic/sqrt/m_50. Pow(x, n).md",
     "0x01-leetcode/math-logic/sqrt/m_367. Valid Perfect Square.md",
     "0x01-leetcode/math-logic/sqrt/e_69. Sqrt(x).md",
-    "0x01-leetcode/math-logic/sqrt/m_50. Pow(x, n).md",
-    "0x01-leetcode/math-logic/convert/roman-interger/e_13. Roman to Integer.md",
     "0x01-leetcode/math-logic/sqrt",
-    "0x01-leetcode/math-logic/convert/roman-interger/m_12. Integer to Roman.md",
-    "0x01-leetcode/math-logic/convert/excel-26/e_171. Excel Sheet Column Number.md",
+    "0x01-leetcode/math-logic/rectangle-area/h_850. Rectangle Area II.md",
+    "0x01-leetcode/math-logic/rectangle-area/e_223. Rectangle Area.md",
+    "0x01-leetcode/math-logic/rectangle-area",
+    "0x01-leetcode/math-logic/rand/rejection-sampling/m_478. Generate Random Point in a Circle.md",
+    "0x01-leetcode/math-logic/rand/rejection-sampling/m_470. Implement Rand10() Using Rand7().md",
+    "0x01-leetcode/math-logic/rand/rejection-sampling",
+    "0x01-leetcode/math-logic/rand/m_384. Shuffle an Array.md",
+    "0x01-leetcode/math-logic/rand/m_382. Linked List Random Node.md",
+    "0x01-leetcode/math-logic/rand/h_843. Guess the Word.md",
+    "0x01-leetcode/math-logic/rand/h_710. Random Pick with Blacklist.md",
+    "0x01-leetcode/math-logic/rand",
+    "0x01-leetcode/math-logic/moore-voting/m_229. Majority Element II.md",
+    "0x01-leetcode/math-logic/moore-voting/e_169. Majority Element.md",
+    "0x01-leetcode/math-logic/moore-voting",
+    "0x01-leetcode/math-logic/m_319. Bulb Switcher.md",
+    "0x01-leetcode/math-logic/m_279. Perfect Squares.md",
+    "0x01-leetcode/math-logic/m_233. Number of Digit One.md",
+    "0x01-leetcode/math-logic/hard-logic/validate/m_468. Validate IP Address.md",
+    "0x01-leetcode/math-logic/hard-logic/m_93. Restore IP Addresses.md",
+    "0x01-leetcode/math-logic/hard-logic/h_68. Text Justification.md",
+    "0x01-leetcode/math-logic/hard-logic/h_420. Strong Password Checker.md",
+    "0x01-leetcode/math-logic/hard-logic/e_8. String to Integer (atoi).md",
+    "0x01-leetcode/math-logic/find-regular-pattern",
+    "0x01-leetcode/math-logic/coordinate",
     "0x01-leetcode/math-logic/convert/roman-interger",
-    "0x01-leetcode/math-logic/convert/excel-26/e_168. Excel Sheet Column Title.md",
     "0x01-leetcode/math-logic/convert/excel-26",
     "0x01-leetcode/math-logic/convert",
-    "0x01-leetcode/math-logic/bit-manipulation/hamming-distance",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
     "0x99-image/Pasted image 20240929153213.png",

@@ -38,7 +38,7 @@ epoll_wait(6, {{EPOLLIN, {u32=96841984, u64=140312383435008}}}, 512, 60000) = 1
 
 首先我对线上正在服务的nginx进行strace统计，可以看出系统调用的耗时大约分布在1-15us左右。因此我们可以大致得出结论，系统调用的耗时大约是1us级别的，当然由于不同系统调用执行的操作不一样，执行当时的环境不一样，因此不同的时刻，不同的调用之间会存在耗时上的上下波动。
 
-```
+```c
 # strace -cp 8527  
 strace: Process 8527 attached  
 % time     seconds  usecs/call     calls    errors syscall  
@@ -61,13 +61,13 @@ strace: Process 8527 attached
 
 首先创建一个固定大小为1M的文件
 
-```
+```c
 dd if=/dev/zero of=in.txt bs=1M count=1
 ```
 
 然后再编译代码进行测试
 
-```
+```c
 #cd tests/test02/  
 #gcc main.c -o main  
 #time ./main  
@@ -92,7 +92,7 @@ x86-64 CPU有一个特权级别的概念。内核运行在最高级别，称为R
 
 除了上述堆栈和寄存器等环境的切换外，系统调用由于特权级别比较高，也还需要进行一系列的权限校验、有效性等检查相关操作。所以系统调用的开销相对函数调用来说要大的多。我们在[test02](https://kfngxl.cn/index.php/archives/608/tests/test02/main.c)的基础上计算一下每个系统调用需要执行的CPU指令数。
 
-```
+```c
 # perf stat ./main
 
  Performance counter stats for './main':
@@ -112,7 +112,7 @@ x86-64 CPU有一个特权级别的概念。内核运行在最高级别，称为R
 
 对实验代码进行稍许改动，把for循环中的read调用注释掉，再重新编译运行
 
-```
+```c
 # gcc main.c -o main  
 # perf stat ./main  
 
@@ -139,7 +139,7 @@ x86-64 CPU有一个特权级别的概念。内核运行在最高级别，称为R
 
 如果非要扒到内核的实现上，我建议大家参考一下《深入理解LINUX内核-第十章系统调用》。最初系统调用是通过汇编指令int（中断）来实现的，当用户态进程发出int $0x80指令时，CPU切换到内核态并开始执行system_call函数。 只不过后来大家觉得系统调用实在是太慢了，因为int指令要执行一致性和安全性检查。后来Intel又提供了“快速系统调用”的sysenter指令，我们验证一下。
 
-```
+```c
 # perf stat -e syscalls:sys_enter_read ./main  
 
  Performance counter stats for './main':  
