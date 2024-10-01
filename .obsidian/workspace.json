@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md"
+                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md"
               }
             }
           }
@@ -148,8 +148,17 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
+    "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_322. Coin Change.md",
+    "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
+    "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle/e_119. Pascal's Triangle II.md",
+    "0x01-leetcode/algorithm/dynamic-programming/coin-change",
+    "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle/e_118. Pascal's Triangle.md",
+    "0x01-leetcode/algorithm/dynamic-programming/minimax/m_375. Guess Number Higher or Lower II.md",
+    "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle",
+    "0x01-leetcode/algorithm/dynamic-programming/minimax/m_486. Predict the Winner.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
+    "0x01-leetcode/algorithm/dynamic-programming/minimax",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_647. Palindromic Substrings.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_516. Longest Palindromic Subsequence.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_132. Palindrome Partitioning II.md",
@@ -173,17 +182,8 @@
     "0x01-leetcode/algorithm/dynamic-programming/climb-stair",
     "0x01-leetcode/algorithm/dynamic-programming/jump-game/h_403. Frog Jump.md",
     "0x01-leetcode/algorithm/dynamic-programming/jump-game/h_656. Coin Path.md",
-    "0x01-leetcode/algorithm/dynamic-programming/jump-game/m_55. Jump Game.md",
-    "0x01-leetcode/algorithm/dynamic-programming/word-break/h_472. Concatenated Words.md",
     "0x01-leetcode/algorithm/dynamic-programming/jump-game",
-    "0x01-leetcode/algorithm/dynamic-programming/word-break/h_140. Word Break II.md",
-    "0x01-leetcode/algorithm/dynamic-programming/word-break/m_139. Word Break.md",
-    "0x01-leetcode/algorithm/dynamic-programming/house-robber/m_337. House Robber III.md",
     "0x01-leetcode/algorithm/dynamic-programming/word-break",
-    "0x01-leetcode/algorithm/dynamic-programming/house-robber/m_256. Paint House.md",
-    "0x01-leetcode/algorithm/dynamic-programming/house-robber",
-    "0x01-leetcode/algorithm/dynamic-programming/distance",
-    "0x01-leetcode/algorithm/dynamic-programming/subarray-subsequence/longest-common-subsequence-subarray",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
