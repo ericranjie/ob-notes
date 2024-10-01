@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
+                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
+                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
+                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md"
+                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md"
               }
             }
           }
@@ -148,42 +148,43 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "coding/os/linux/network/n_深入理解CNI（容器网络接口）.md",
-    "coding/cpp/comment/2021年还有人在使用C语言吗？.md",
+    "0x01-leetcode/algorithm/divide-and-conquer/m_932. Beautiful Array.md",
+    "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
+    "0x01-leetcode/algorithm/greedy",
+    "0x01-leetcode/algorithm/divide-and-conquer/m_53. Maximum Subarray.md",
+    "0x01-leetcode/algorithm/divide-and-conquer/parentheses/m_241. Different Ways to Add Parentheses.md",
+    "0x01-leetcode/other-series/e_228. Summary Ranges.md",
+    "0x01-leetcode/algorithm/divide-and-conquer/parentheses",
+    "0x01-leetcode/algorithm/divide-and-conquer",
+    "0x01-leetcode/algorithm",
+    "0x01-leetcode/other-series/m_163. Missing Ranges.md",
+    "0x01-leetcode/other-series/SQL/m_180. Consecutive Numbers.md",
+    "0x01-leetcode/other-series/SQL/e_176. Second Highest Salary.md",
+    "0x01-leetcode/other-series/reverse-words-in-a-string/m_151. Reverse Words in a String.md",
+    "0x01-leetcode/other-series/SQL",
+    "0x01-leetcode/other-series/accumulate-array/e_598. Range Addition II.md",
+    "0x01-leetcode/other-series/reverse-words-in-a-string",
+    "0x01-leetcode/other-series/accumulate-array/m_361. Bomb Enemy.md",
+    "0x01-leetcode/other-series/accumulate-array/m_370. Range Addition.md",
+    "0x01-leetcode/other-series/accumulate-array/h_1074. Number of Submatrices That Sum to Target.md",
+    "0x01-leetcode/other-series/accumulate-array/h_644. Maximum Average Subarray II.md",
+    "0x01-leetcode/other-series/accumulate-array/e_643. Maximum Average Subarray I.md",
+    "0x01-leetcode/other-series/accumulate-array/m_560. Subarray Sum Equals K.md",
+    "0x01-leetcode/other-series/accumulate-array/m_523. Continuous Subarray Sum.md",
+    "0x01-leetcode/other-series/accumulate-array/m_1031. Maximum Sum of Two Non-Overlapping Subarrays.md",
+    "0x01-leetcode/other-series/accumulate-array/m_1109. Corporate Flight Bookings.md",
+    "0x01-leetcode/math-logic/e_482. License Key Formatting.md",
+    "0x01-leetcode/other-series/accumulate-array",
+    "0x01-leetcode/other-series",
     "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
-    "coding/os/linux/performance/bn_Linux系统性能优化：七个实战经验.md",
-    "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
     "coding/os/linux/performance/pn_Linux问题分析与性能优化.md",
-    "coding/os/linux/performance/bn_一文说清linux system load.md",
     "coding/os/linux/performance/kn_从纳秒级优化谈CPU眼里的好代码.md",
-    "coding/os/linux/performance/an _微信工程师：常见性能优化方案与实用工具.md",
-    "coding/database/手把手教你调优.md",
     "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
-    "coding/cpp/grammar/a_终极 C++避坑指南.md",
-    "0x01-leetcode/math-logic/sqrt/m_50. Pow(x, n).md",
-    "0x01-leetcode/math-logic/sqrt/m_367. Valid Perfect Square.md",
-    "0x01-leetcode/math-logic/sqrt/e_69. Sqrt(x).md",
-    "0x01-leetcode/math-logic/sqrt",
-    "0x01-leetcode/math-logic/rectangle-area/h_850. Rectangle Area II.md",
-    "0x01-leetcode/math-logic/rectangle-area/e_223. Rectangle Area.md",
+    "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
+    "coding/os/linux/performance/bn_一文说清linux system load.md",
     "0x01-leetcode/math-logic/rectangle-area",
-    "0x01-leetcode/math-logic/rand/rejection-sampling/m_478. Generate Random Point in a Circle.md",
-    "0x01-leetcode/math-logic/rand/rejection-sampling/m_470. Implement Rand10() Using Rand7().md",
-    "0x01-leetcode/math-logic/rand/rejection-sampling",
-    "0x01-leetcode/math-logic/rand/m_384. Shuffle an Array.md",
-    "0x01-leetcode/math-logic/rand/m_382. Linked List Random Node.md",
-    "0x01-leetcode/math-logic/rand/h_843. Guess the Word.md",
-    "0x01-leetcode/math-logic/rand/h_710. Random Pick with Blacklist.md",
-    "0x01-leetcode/math-logic/rand",
-    "0x01-leetcode/math-logic/moore-voting/m_229. Majority Element II.md",
-    "0x01-leetcode/math-logic/moore-voting/e_169. Majority Element.md",
-    "0x01-leetcode/math-logic/moore-voting",
-    "0x01-leetcode/math-logic/m_319. Bulb Switcher.md",
-    "0x01-leetcode/math-logic/find-regular-pattern",
-    "0x01-leetcode/math-logic/coordinate",
-    "0x01-leetcode/math-logic/convert/roman-interger",
-    "0x01-leetcode/math-logic/convert/excel-26",
-    "0x01-leetcode/math-logic/convert",
+    "0x01-leetcode/math-logic/brain-teaser",
+    "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
     "0x99-image/Pasted image 20240929153213.png",
