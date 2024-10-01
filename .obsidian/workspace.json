@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
                 "mode": "source",
                 "source": false
               }
@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 359.50390243530273
   },
   "right": {
     "id": "0ed372e18b255e27",
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md"
+                "file": "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md"
               }
             }
           }
@@ -146,44 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "550c24418126d846",
   "lastOpenFiles": [
-    "auxiliary",
-    "science",
-    "0x01-leetcode/algorithm/divide-and-conquer/m_932. Beautiful Array.md",
-    "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
-    "0x01-leetcode/algorithm/greedy",
-    "0x01-leetcode/algorithm/divide-and-conquer/m_53. Maximum Subarray.md",
-    "0x01-leetcode/algorithm/divide-and-conquer/parentheses/m_241. Different Ways to Add Parentheses.md",
-    "0x01-leetcode/other-series/e_228. Summary Ranges.md",
-    "0x01-leetcode/algorithm/divide-and-conquer/parentheses",
-    "0x01-leetcode/algorithm/divide-and-conquer",
-    "0x01-leetcode/algorithm",
-    "0x01-leetcode/other-series/m_163. Missing Ranges.md",
-    "0x01-leetcode/other-series/SQL/m_180. Consecutive Numbers.md",
-    "0x01-leetcode/other-series/SQL/e_176. Second Highest Salary.md",
-    "0x01-leetcode/other-series/reverse-words-in-a-string/m_151. Reverse Words in a String.md",
-    "0x01-leetcode/other-series/SQL",
-    "0x01-leetcode/other-series/accumulate-array/e_598. Range Addition II.md",
-    "0x01-leetcode/other-series/reverse-words-in-a-string",
-    "0x01-leetcode/other-series/accumulate-array/m_361. Bomb Enemy.md",
-    "0x01-leetcode/other-series/accumulate-array/m_370. Range Addition.md",
-    "0x01-leetcode/other-series/accumulate-array/h_1074. Number of Submatrices That Sum to Target.md",
-    "0x01-leetcode/other-series/accumulate-array/h_644. Maximum Average Subarray II.md",
-    "0x01-leetcode/other-series/accumulate-array/e_643. Maximum Average Subarray I.md",
-    "0x01-leetcode/other-series/accumulate-array/m_560. Subarray Sum Equals K.md",
-    "0x01-leetcode/other-series/accumulate-array/m_523. Continuous Subarray Sum.md",
-    "0x01-leetcode/other-series/accumulate-array/m_1031. Maximum Sum of Two Non-Overlapping Subarrays.md",
-    "0x01-leetcode/other-series/accumulate-array/m_1109. Corporate Flight Bookings.md",
-    "0x01-leetcode/math-logic/e_482. License Key Formatting.md",
-    "0x01-leetcode/other-series/accumulate-array",
-    "0x01-leetcode/other-series",
-    "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
-    "coding/os/linux/performance/pn_Linux问题分析与性能优化.md",
-    "coding/os/linux/performance/kn_从纳秒级优化谈CPU眼里的好代码.md",
-    "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
-    "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
-    "0x01-leetcode/math-logic/rectangle-area",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_647. Palindromic Substrings.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_516. Longest Palindromic Subsequence.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_132. Palindrome Partitioning II.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_131. Palindrome Partitioning.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_5. Longest Palindromic Substring.md",
+    "0x01-leetcode/algorithm/dynamic-programming/parenthesis/h_32. Longest Valid Parentheses.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome",
+    "0x01-leetcode/algorithm/dynamic-programming/string",
+    "0x01-leetcode/algorithm/dynamic-programming/regular-expression/h_44. Wildcard Matching.md",
+    "0x01-leetcode/algorithm/dynamic-programming/parenthesis",
+    "0x01-leetcode/algorithm/dynamic-programming/regular-expression/h_10. Regular Expression Matching.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_91. Decode Ways.md",
+    "0x01-leetcode/algorithm/dynamic-programming/regular-expression",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_842. Split Array into Fibonacci Sequence.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_377. Combination Sum IV.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_306. Additive Number.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/e_509. Fibonacci Number.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/e_746. Min Cost Climbing Stairs.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/e_70. Climbing Stairs.md",
+    "0x01-leetcode/algorithm/dynamic-programming/jump-game/m_134. Gas Station.md",
+    "0x01-leetcode/algorithm/dynamic-programming/climb-stair",
+    "0x01-leetcode/algorithm/dynamic-programming/jump-game/h_403. Frog Jump.md",
+    "0x01-leetcode/algorithm/dynamic-programming/jump-game/h_656. Coin Path.md",
+    "0x01-leetcode/algorithm/dynamic-programming/jump-game/m_55. Jump Game.md",
+    "0x01-leetcode/algorithm/dynamic-programming/word-break/h_472. Concatenated Words.md",
+    "0x01-leetcode/algorithm/dynamic-programming/jump-game",
+    "0x01-leetcode/algorithm/dynamic-programming/word-break/h_140. Word Break II.md",
+    "0x01-leetcode/algorithm/dynamic-programming/word-break/m_139. Word Break.md",
+    "0x01-leetcode/algorithm/dynamic-programming/house-robber/m_337. House Robber III.md",
+    "0x01-leetcode/algorithm/dynamic-programming/word-break",
+    "0x01-leetcode/algorithm/dynamic-programming/house-robber/m_256. Paint House.md",
+    "0x01-leetcode/algorithm/dynamic-programming/house-robber",
+    "0x01-leetcode/algorithm/dynamic-programming/distance",
+    "0x01-leetcode/algorithm/dynamic-programming/subarray-subsequence/longest-common-subsequence-subarray",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
