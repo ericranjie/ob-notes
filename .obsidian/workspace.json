@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md"
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md"
               }
             }
           }
@@ -148,8 +148,26 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_322. Coin Change.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_562. Longest Line of Consecutive One in Matrix.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_514. Freedom Trail.md",
+    "0x01-leetcode/algorithm/dynamic-programming/Untitled",
+    "0x01-leetcode/algorithm/dynamic-programming/h_629. K Inverse Pairs Array.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_879. Profitable Schemes.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_828. Unique Letter String.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_265. Paint House II.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_1000. Minimum Cost to Merge Stones.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_546. Remove Boxes.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_488. Zuma Game.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_312. Burst Balloons.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_688. Knight Probability in Chessboard.md",
+    "0x01-leetcode/algorithm/dynamic-programming/h_691. Stickers to Spell Word.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_576. Out of Boundary Paths.md",
+    "0x01-leetcode/algorithm/dynamic-programming/range-query/m_304. Range Sum Query 2D - Immutable.md",
+    "0x01-leetcode/algorithm/dynamic-programming/range-query/e_303. Range Sum Query - Immutable.md",
     "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
+    "0x01-leetcode/algorithm/dynamic-programming/range-query",
+    "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_322. Coin Change.md",
     "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle/e_119. Pascal's Triangle II.md",
     "0x01-leetcode/algorithm/dynamic-programming/coin-change",
     "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle/e_118. Pascal's Triangle.md",
@@ -161,29 +179,11 @@
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_647. Palindromic Substrings.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_516. Longest Palindromic Subsequence.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_132. Palindrome Partitioning II.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_131. Palindrome Partitioning.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_5. Longest Palindromic Substring.md",
-    "0x01-leetcode/algorithm/dynamic-programming/parenthesis/h_32. Longest Valid Parentheses.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome",
     "0x01-leetcode/algorithm/dynamic-programming/string",
-    "0x01-leetcode/algorithm/dynamic-programming/regular-expression/h_44. Wildcard Matching.md",
     "0x01-leetcode/algorithm/dynamic-programming/parenthesis",
-    "0x01-leetcode/algorithm/dynamic-programming/regular-expression/h_10. Regular Expression Matching.md",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_91. Decode Ways.md",
     "0x01-leetcode/algorithm/dynamic-programming/regular-expression",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_842. Split Array into Fibonacci Sequence.md",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_377. Combination Sum IV.md",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/m_306. Additive Number.md",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/e_509. Fibonacci Number.md",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/e_746. Min Cost Climbing Stairs.md",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair/e_70. Climbing Stairs.md",
-    "0x01-leetcode/algorithm/dynamic-programming/jump-game/m_134. Gas Station.md",
     "0x01-leetcode/algorithm/dynamic-programming/climb-stair",
-    "0x01-leetcode/algorithm/dynamic-programming/jump-game/h_403. Frog Jump.md",
-    "0x01-leetcode/algorithm/dynamic-programming/jump-game/h_656. Coin Path.md",
-    "0x01-leetcode/algorithm/dynamic-programming/jump-game",
-    "0x01-leetcode/algorithm/dynamic-programming/word-break",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
