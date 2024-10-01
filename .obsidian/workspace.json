@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md"
+                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md"
               }
             }
           }
@@ -148,8 +148,9 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/algorithm/dynamic-programming/m_562. Longest Line of Consecutive One in Matrix.md",
     "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
+    "0x01-leetcode/algorithm/dynamic-programming/m_562. Longest Line of Consecutive One in Matrix.md",
     "0x01-leetcode/algorithm/dynamic-programming/h_514. Freedom Trail.md",
     "0x01-leetcode/algorithm/dynamic-programming/Untitled",
     "0x01-leetcode/algorithm/dynamic-programming/h_629. K Inverse Pairs Array.md",
@@ -178,7 +179,6 @@
     "0x01-leetcode/algorithm/dynamic-programming/minimax",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_647. Palindromic Substrings.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_516. Longest Palindromic Subsequence.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome",
     "0x01-leetcode/algorithm/dynamic-programming/string",
     "0x01-leetcode/algorithm/dynamic-programming/parenthesis",
