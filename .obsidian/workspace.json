@@ -146,8 +146,9 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "550c24418126d846",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "science",
     "0x01-leetcode/algorithm/divide-and-conquer/m_932. Beautiful Array.md",
     "0x01-leetcode/algorithm/greedy/m_452. Minimum Number of Arrows to Burst Balloons.md",
     "0x01-leetcode/algorithm/greedy",
@@ -181,7 +182,6 @@
     "coding/os/linux/performance/kn_从纳秒级优化谈CPU眼里的好代码.md",
     "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
     "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
-    "coding/os/linux/performance/bn_一文说清linux system load.md",
     "0x01-leetcode/math-logic/rectangle-area",
     "0x01-leetcode/math-logic/brain-teaser",
     "0x01-leetcode/math-logic/Untitled.canvas",
