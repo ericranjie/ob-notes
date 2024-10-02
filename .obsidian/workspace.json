@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md"
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md"
               }
             }
           }
@@ -148,8 +148,20 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_226. Invert Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/inorder/h_99. Recover Binary Search Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/postorder",
+    "0x01-leetcode/2-dimensional/tree/traversal/inorder/m_94. Binary Tree Inorder Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/preorder/h_834. Sum of Distances in Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/inorder",
+    "0x01-leetcode/2-dimensional/tree/traversal/preorder/m_255. Verify Preorder Sequence in Binary Search Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/preorder/m_114. Flatten Binary Tree to Linked List.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer/h_117. Populating Next Right Pointers in Each Node II.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/preorder",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer/m_116. Populating Next Right Pointers in Each Node.md",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_226. Invert Binary Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_958. Check Completeness of a Binary Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_662. Maximum Width of Binary Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_515. Find Largest Value in Each Tree Row.md",
@@ -171,19 +183,7 @@
     "0x01-leetcode/2-dimensional/tree/n-ary-tree/h_431. Encode N-ary Tree to Binary Tree.md",
     "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree",
     "0x01-leetcode/2-dimensional/tree/n-ary-tree/h_428. Serialize and Deserialize N-ary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree/m_429. N-ary Tree Level Order Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/validate/e_572. Subtree of Another Tree.md",
     "0x01-leetcode/2-dimensional/tree/n-ary-tree",
-    "0x01-leetcode/2-dimensional/tree/validate/e_100. Same Tree.md",
-    "0x01-leetcode/2-dimensional/tree/flatten/m_114. Flatten Binary Tree to Linked List.md",
-    "0x01-leetcode/2-dimensional/tree/validate",
-    "0x01-leetcode/2-dimensional/tree/flatten/m_430. Flatten a Multilevel Doubly Linked List.md",
-    "0x01-leetcode/2-dimensional/tree/flatten/m_297. Serialize and Deserialize Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/fenwick-tree/h_493. Reverse Pairs.md",
-    "0x01-leetcode/2-dimensional/tree/flatten",
-    "README.md",
-    "0x01-leetcode/2-dimensional/tree/fenwick-tree",
-    "0x01-leetcode/2-dimensional/tree",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
