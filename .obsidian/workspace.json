@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md"
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset/m_90. Subsets II.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset/m_78. Subsets.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_377. Combination Sum IV.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/m_419. Battleships in a Board.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/h_803. Bricks Falling When Hit.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/h_765. Couples Holding Hands.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/e_695. Max Area of Island.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/m_694. Number of Distinct Islands.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/h_305. Number of Islands II.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/h_815. Bus Routes.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/union-find",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_417. Pacific Atlantic Water Flow.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_200. Number of Islands.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_130. Surrounded Regions.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_286. Walls and Gates.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_994. Rotting Oranges.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-search/m_79. Word Search.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_329. Longest Increasing Path in a Matrix.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-search/Untitled 1.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-search",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_752. Open the Lock.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder/h_854. K-Similar Strings.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder/h_126. Word Ladder II.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder/m_127. Word Ladder.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/h_847. Shortest Path Visiting All Nodes.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder",
+    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/m_1202. Smallest String With Swaps.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/dyeing/m_886. Possible Bipartition.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/dyeing/m_785. Is Graph Bipartite?.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/h_839. Similar String Groups.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/dyeing",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/m_323. Number of Connected Components in an Undirected Graph.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/directed-graph/course-schedule",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph/directed-graph",
+    "0x01-leetcode/2-dimensional/BFS-DFS/graph",
     "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_216. Combination Sum III.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_40. Combination Sum II.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_39. Combination Sum.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_77. Combinations.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_22. Generate Parentheses.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/e_784. Letter Case Permutation.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/m_60. Permutation Sequence.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/m_31. Next Permutation.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/h_47. Permutations II.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/m_46. Permutations.md",
-    "0x01-leetcode/data-structure/treeset-treemap/m_729. My Calendar I.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation",
-    "0x01-leetcode/2-dimensional/BFS-DFS",
-    "0x01-leetcode/2-dimensional",
-    "0x01-leetcode/data-structure/treeset-treemap/h_631. Design Excel Sum Formula.md",
-    "0x01-leetcode/data-structure/heap/h_871. Minimum Number of Refueling Stops.md",
-    "0x01-leetcode/data-structure/treeset-treemap",
-    "0x01-leetcode/data-structure/heap/h_502. IPO.md",
-    "0x01-leetcode/data-structure/heap/m_451. Sort Characters By Frequency.md",
-    "0x01-leetcode/data-structure/heap/m_692. Top K Frequent Words.md",
-    "0x01-leetcode/data-structure/heap/m_347. Top K Frequent Elements.md",
-    "0x01-leetcode/data-structure/special-data-structure-design/h_1172. Dinner Plate Stacks.md",
-    "0x01-leetcode/data-structure/heap",
-    "0x01-leetcode/data-structure/special-data-structure-design/m_1146. Snapshot Array.md",
-    "0x01-leetcode/data-structure/special-data-structure-design/m_919. Complete Binary Tree Inserter.md",
-    "0x01-leetcode/data-structure/special-data-structure-design/LRU-LFU/m_609. Find Duplicate File in System.md",
-    "0x01-leetcode/data-structure/special-data-structure-design/LRU-LFU/e_604. Design Compressed String Iterator.md",
-    "0x01-leetcode/data-structure/special-data-structure-design/LRU-LFU",
-    "0x01-leetcode/data-structure/special-data-structure-design",
-    "0x01-leetcode/data-structure/hashset-hashmap",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
