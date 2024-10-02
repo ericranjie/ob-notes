@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
+                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
+                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
+                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md"
+                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/2-dimensional/tree/traversal/inorder/h_99. Recover Binary Search Tree.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete/m_776. Split BST.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete/m_450. Delete Node in a BST.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_426. Convert Binary Search Tree to Sorted Doubly Linked List.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_230. Kth Smallest Element in a BST.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST/m_96. Unique Binary Search Trees.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST/m_95. Unique Binary Search Trees II.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_701. Insert into a Binary Search Tree.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_98. Validate Binary Search Tree.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/m_865. Smallest Subtree with all the Deepest Nodes.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree",
+    "0x01-leetcode/2-dimensional/tree/path-sum/e_110. Balanced Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/e_104. Maximum Depth of Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/e_543. Diameter of Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/m_687. Longest Univalue Path.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/m_250. Count Univalue Subtrees.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/m_129. Sum Root to Leaf Numbers.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/h_124. Binary Tree Maximum Path Sum.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/m_666. Path Sum IV.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/e_437. Path Sum III.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/m_113. Path Sum II.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum/e_112. Path Sum.md",
     "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/path-sum",
+    "0x01-leetcode/2-dimensional/tree/traversal/inorder/h_99. Recover Binary Search Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/postorder",
     "0x01-leetcode/2-dimensional/tree/traversal/inorder/m_94. Binary Tree Inorder Traversal.md",
     "0x01-leetcode/2-dimensional/tree/traversal/preorder/h_834. Sum of Distances in Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/inorder",
     "0x01-leetcode/2-dimensional/tree/traversal/preorder/m_255. Verify Preorder Sequence in Binary Search Tree.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/preorder/m_114. Flatten Binary Tree to Linked List.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer/h_117. Populating Next Right Pointers in Each Node II.md",
     "0x01-leetcode/2-dimensional/tree/traversal/preorder",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer/m_116. Populating Next Right Pointers in Each Node.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_226. Invert Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_958. Check Completeness of a Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_662. Maximum Width of Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_515. Find Largest Value in Each Tree Row.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_314. Binary Tree Vertical Order Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_111. Minimum Depth of Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_107. Binary Tree Level Order Traversal II.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_103. Binary Tree Zigzag Level Order Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_102. Binary Tree Level Order Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/construct/merge/e_617. Merge Two Binary Trees.md",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order",
     "0x01-leetcode/2-dimensional/tree/traversal",
-    "0x01-leetcode/2-dimensional/tree/construct/m_889. Construct Binary Tree from Preorder and Postorder Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/construct/merge",
-    "0x01-leetcode/2-dimensional/tree/construct/m_106. Construct Binary Tree from Inorder and Postorder Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/construct/m_105. Construct Binary Tree from Preorder and Inorder Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree/h_440. K-th Smallest in Lexicographical Order.md",
-    "0x01-leetcode/2-dimensional/tree/construct",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree/m_386. Lexicographical Numbers.md",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree/h_431. Encode N-ary Tree to Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree/h_428. Serialize and Deserialize N-ary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/n-ary-tree",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
