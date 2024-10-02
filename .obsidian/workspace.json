@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
+                "file": "coding/cpp/performance/k_C++服务性能优化的道与术-道篇：阿姆达尔定律.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
+                "file": "coding/cpp/performance/k_C++服务性能优化的道与术-道篇：阿姆达尔定律.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
+                "file": "coding/cpp/performance/k_C++服务性能优化的道与术-道篇：阿姆达尔定律.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md"
+                "file": "coding/cpp/performance/k_C++服务性能优化的道与术-道篇：阿姆达尔定律.md"
               }
             }
           }
@@ -148,11 +148,16 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/cpp/冷门知识点：进程间通信如何加锁？.md",
+    "coding/cpp/i_sizeof(void)之谜.md",
+    "coding/cpp/a_从新手到专业人士：探索 C++ STL 以获得终极性能.md",
+    "coding/cpp/i_new和delete一定要配对使用吗？.md",
     "coding/cpp/k_C++常见的三种内存破的场景和分析.md",
+    "coding/cpp/n_C++ STL之合并、反转和其他算法.md",
+    "coding/cpp/Chrome 浏览器开源背后的一盘大棋.md",
     "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
     "coding/cpp/k_内存池设计与实现.md",
     "coding/cpp/comment/82页《现代C++教程》：高速上手C++ 11 14 17 20.md",
-    "coding/cpp/i_new和delete一定要配对使用吗？.md",
     "coding/cpp/low-level/a_C++ 内存管理（一）.md",
     "coding/cpp/comment/k_C++编程习惯与编程要点.md",
     "interview/a_C语言与C++面试知识总结.md",
@@ -170,11 +175,6 @@
     "coding/cpp/performance/b_提升 C++ 开发效率的几个小技巧.md",
     "coding/cpp/grammar/pointer/k_shared_ptr是线程安全的吗？.md",
     "coding/cpp/grammar/pointer/i_C++ 智能指针用法详解.md",
-    "coding/cpp/opensource/i_真香！Facebook官方的开源 C++11 组件库.md",
-    "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
-    "coding/cpp/grammar/i_C++20 新特性的小细节.md",
-    "coding/cpp/grammar/k_漫谈 C++ 的各种检查.md",
-    "coding/cpp/comment/c_C C++ Linux服务器开发 高级架构师进阶之路.md",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree",
