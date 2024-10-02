@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
+                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
+                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
+                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md"
+                "file": "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete/m_776. Split BST.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete/m_450. Delete Node in a BST.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_426. Convert Binary Search Tree to Sorted Doubly Linked List.md",
+    "coding/cpp/k_C++常见的三种内存破的场景和分析.md",
+    "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
+    "coding/cpp/k_内存池设计与实现.md",
+    "coding/cpp/comment/82页《现代C++教程》：高速上手C++ 11 14 17 20.md",
+    "coding/cpp/i_new和delete一定要配对使用吗？.md",
+    "coding/cpp/low-level/a_C++ 内存管理（一）.md",
+    "coding/cpp/comment/k_C++编程习惯与编程要点.md",
+    "interview/a_C语言与C++面试知识总结.md",
+    "coding/cpp/performance/k_太实用了！减少C++代码编译时间的方法，看完的都加薪了.md",
+    "coding/cpp/low-level/a_做引擎开发，更需要深入 C++ 内存管理.md",
+    "coding/cpp/grammar/b_谈谈C++新标准带来的属性（Attribute）.md",
+    "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
+    "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
+    "coding/cpp/grammar/k_那些值得使用的标准Attributes.md",
+    "coding/cpp/grammar/Untitled",
+    "coding/cpp/low-level/k_原创 C++中临时对象的学习笔记-编程技术-看雪.md",
+    "coding/cpp/opensource/qt/i_Qt学习之路第24篇 Qt绘制系统简介.md",
+    "coding/cpp/comment/c_C++ Web（HTTP）开发 10 大利器.md",
+    "coding/cpp/b_C++ 线程的使用.md",
+    "coding/cpp/performance/b_提升 C++ 开发效率的几个小技巧.md",
+    "coding/cpp/grammar/pointer/k_shared_ptr是线程安全的吗？.md",
+    "coding/cpp/grammar/pointer/i_C++ 智能指针用法详解.md",
+    "coding/cpp/opensource/i_真香！Facebook官方的开源 C++11 组件库.md",
+    "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
+    "coding/cpp/grammar/i_C++20 新特性的小细节.md",
+    "coding/cpp/grammar/k_漫谈 C++ 的各种检查.md",
+    "coding/cpp/comment/c_C C++ Linux服务器开发 高级架构师进阶之路.md",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_230. Kth Smallest Element in a BST.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST/m_96. Unique Binary Search Trees.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST/m_95. Unique Binary Search Trees II.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_701. Insert into a Binary Search Tree.md",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/m_98. Validate Binary Search Tree.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/m_865. Smallest Subtree with all the Deepest Nodes.md",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree",
-    "0x01-leetcode/2-dimensional/tree/path-sum/e_110. Balanced Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/e_104. Maximum Depth of Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/e_543. Diameter of Binary Tree.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/m_687. Longest Univalue Path.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/m_250. Count Univalue Subtrees.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/m_129. Sum Root to Leaf Numbers.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/h_124. Binary Tree Maximum Path Sum.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/m_666. Path Sum IV.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/e_437. Path Sum III.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/m_113. Path Sum II.md",
-    "0x01-leetcode/2-dimensional/tree/path-sum/e_112. Path Sum.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/postorder/m_145. Binary Tree Postorder Traversal.md",
     "0x01-leetcode/2-dimensional/tree/path-sum",
-    "0x01-leetcode/2-dimensional/tree/traversal/inorder/h_99. Recover Binary Search Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/postorder",
-    "0x01-leetcode/2-dimensional/tree/traversal/inorder/m_94. Binary Tree Inorder Traversal.md",
-    "0x01-leetcode/2-dimensional/tree/traversal/preorder/h_834. Sum of Distances in Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/inorder",
-    "0x01-leetcode/2-dimensional/tree/traversal/preorder/m_255. Verify Preorder Sequence in Binary Search Tree.md",
     "0x01-leetcode/2-dimensional/tree/traversal/preorder",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order",
-    "0x01-leetcode/2-dimensional/tree/traversal",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
