@@ -33,4 +33,5 @@ DIKW模型:
 wowotech: P13
 
 # Leetcode
-题解来自grandyang大神，感谢！
+leetcode题解主要来自grandyang大神，感谢！
+>https://github.com/grandyang/leetcode

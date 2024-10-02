@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md"
+                "file": "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/2-dimensional/BFS-DFS/m_419. Battleships in a Board.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/e_999. Available Captures for Rook.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/h_803. Bricks Falling When Hit.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/h_765. Couples Holding Hands.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/e_695. Max Area of Island.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/m_694. Number of Distinct Islands.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/union-find/h_305. Number of Islands II.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/h_815. Bus Routes.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/union-find",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_417. Pacific Atlantic Water Flow.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_200. Number of Islands.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_130. Surrounded Regions.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_286. Walls and Gates.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_994. Rotting Oranges.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-search/m_79. Word Search.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_329. Longest Increasing Path in a Matrix.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-search/Untitled 1.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-search",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/m_752. Open the Lock.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder/h_854. K-Similar Strings.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder/h_126. Word Ladder II.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder/m_127. Word Ladder.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/h_847. Shortest Path Visiting All Nodes.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze/word-ladder",
-    "0x01-leetcode/2-dimensional/BFS-DFS/matrix-maze",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/m_1202. Smallest String With Swaps.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/dyeing/m_886. Possible Bipartition.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/dyeing/m_785. Is Graph Bipartite?.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/h_839. Similar String Groups.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/dyeing",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph/m_323. Number of Connected Components in an Undirected Graph.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/undirected-graph",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/directed-graph/course-schedule",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph/directed-graph",
-    "0x01-leetcode/2-dimensional/BFS-DFS/graph",
-    "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_226. Invert Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_199. Binary Tree Right Side View.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_958. Check Completeness of a Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_662. Maximum Width of Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_515. Find Largest Value in Each Tree Row.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_314. Binary Tree Vertical Order Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_111. Minimum Depth of Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_107. Binary Tree Level Order Traversal II.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/m_103. Binary Tree Zigzag Level Order Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order/e_102. Binary Tree Level Order Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/construct/merge/e_617. Merge Two Binary Trees.md",
+    "0x01-leetcode/2-dimensional/tree/traversal/level-order",
+    "0x01-leetcode/2-dimensional/tree/traversal",
+    "0x01-leetcode/2-dimensional/tree/construct/m_889. Construct Binary Tree from Preorder and Postorder Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/construct/merge",
+    "0x01-leetcode/2-dimensional/tree/construct/m_106. Construct Binary Tree from Inorder and Postorder Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/construct/m_105. Construct Binary Tree from Preorder and Inorder Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree/h_440. K-th Smallest in Lexicographical Order.md",
+    "0x01-leetcode/2-dimensional/tree/construct",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree/m_386. Lexicographical Numbers.md",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree/h_431. Encode N-ary Tree to Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree/den-ary-tree",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree/h_428. Serialize and Deserialize N-ary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree/m_429. N-ary Tree Level Order Traversal.md",
+    "0x01-leetcode/2-dimensional/tree/validate/e_572. Subtree of Another Tree.md",
+    "0x01-leetcode/2-dimensional/tree/n-ary-tree",
+    "0x01-leetcode/2-dimensional/tree/validate/e_100. Same Tree.md",
+    "0x01-leetcode/2-dimensional/tree/flatten/m_114. Flatten Binary Tree to Linked List.md",
+    "0x01-leetcode/2-dimensional/tree/validate",
+    "0x01-leetcode/2-dimensional/tree/flatten/m_430. Flatten a Multilevel Doubly Linked List.md",
+    "0x01-leetcode/2-dimensional/tree/flatten/m_297. Serialize and Deserialize Binary Tree.md",
+    "0x01-leetcode/2-dimensional/tree/fenwick-tree/h_493. Reverse Pairs.md",
+    "0x01-leetcode/2-dimensional/tree/flatten",
+    "README.md",
+    "0x01-leetcode/2-dimensional/tree/fenwick-tree",
+    "0x01-leetcode/2-dimensional/tree",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
