@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "内存泄漏-原因、避免以及定位",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md"
+                "file": "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
-    "0x01-leetcode/algorithm/dynamic-programming/m_569. Median Employee Salary.md",
-    "0x01-leetcode/algorithm/dynamic-programming/m_120. Triangle.md",
-    "0x01-leetcode/algorithm/dynamic-programming/m_562. Longest Line of Consecutive One in Matrix.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_514. Freedom Trail.md",
-    "0x01-leetcode/algorithm/dynamic-programming/Untitled",
-    "0x01-leetcode/algorithm/dynamic-programming/h_629. K Inverse Pairs Array.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_879. Profitable Schemes.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_828. Unique Letter String.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_265. Paint House II.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_1000. Minimum Cost to Merge Stones.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_546. Remove Boxes.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_488. Zuma Game.md",
-    "0x01-leetcode/algorithm/dynamic-programming/m_312. Burst Balloons.md",
-    "0x01-leetcode/algorithm/dynamic-programming/m_688. Knight Probability in Chessboard.md",
-    "0x01-leetcode/algorithm/dynamic-programming/h_691. Stickers to Spell Word.md",
-    "0x01-leetcode/algorithm/dynamic-programming/m_576. Out of Boundary Paths.md",
-    "0x01-leetcode/algorithm/dynamic-programming/range-query/m_304. Range Sum Query 2D - Immutable.md",
-    "0x01-leetcode/algorithm/dynamic-programming/range-query/e_303. Range Sum Query - Immutable.md",
-    "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_518. Coin Change 2.md",
-    "0x01-leetcode/algorithm/dynamic-programming/range-query",
-    "0x01-leetcode/algorithm/dynamic-programming/coin-change/m_322. Coin Change.md",
-    "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle/e_119. Pascal's Triangle II.md",
-    "0x01-leetcode/algorithm/dynamic-programming/coin-change",
-    "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle/e_118. Pascal's Triangle.md",
-    "0x01-leetcode/algorithm/dynamic-programming/minimax/m_375. Guess Number Higher or Lower II.md",
-    "0x01-leetcode/algorithm/dynamic-programming/pascal-triangle",
-    "0x01-leetcode/algorithm/dynamic-programming/minimax/m_486. Predict the Winner.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
-    "0x01-leetcode/algorithm/dynamic-programming/minimax",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_647. Palindromic Substrings.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome",
-    "0x01-leetcode/algorithm/dynamic-programming/string",
-    "0x01-leetcode/algorithm/dynamic-programming/parenthesis",
-    "0x01-leetcode/algorithm/dynamic-programming/regular-expression",
-    "0x01-leetcode/algorithm/dynamic-programming/climb-stair",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset/m_90. Subsets II.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/h_902. Numbers At Most N Given Digit Set.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset/m_78. Subsets.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_377. Combination Sum IV.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/subset",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_216. Combination Sum III.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_40. Combination Sum II.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_39. Combination Sum.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_77. Combinations.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination/m_22. Generate Parentheses.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/e_784. Letter Case Permutation.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/combination",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/m_60. Permutation Sequence.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/m_31. Next Permutation.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/h_47. Permutations II.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/m_46. Permutations.md",
+    "0x01-leetcode/data-structure/treeset-treemap/m_729. My Calendar I.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation",
+    "0x01-leetcode/2-dimensional/BFS-DFS",
+    "0x01-leetcode/2-dimensional",
+    "0x01-leetcode/data-structure/treeset-treemap/h_631. Design Excel Sum Formula.md",
+    "0x01-leetcode/data-structure/heap/h_871. Minimum Number of Refueling Stops.md",
+    "0x01-leetcode/data-structure/treeset-treemap",
+    "0x01-leetcode/data-structure/heap/h_502. IPO.md",
+    "0x01-leetcode/data-structure/heap/m_451. Sort Characters By Frequency.md",
+    "0x01-leetcode/data-structure/heap/m_692. Top K Frequent Words.md",
+    "0x01-leetcode/data-structure/heap/m_347. Top K Frequent Elements.md",
+    "0x01-leetcode/data-structure/special-data-structure-design/h_1172. Dinner Plate Stacks.md",
+    "0x01-leetcode/data-structure/heap",
+    "0x01-leetcode/data-structure/special-data-structure-design/m_1146. Snapshot Array.md",
+    "0x01-leetcode/data-structure/special-data-structure-design/m_919. Complete Binary Tree Inserter.md",
+    "0x01-leetcode/data-structure/special-data-structure-design/LRU-LFU/m_609. Find Duplicate File in System.md",
+    "0x01-leetcode/data-structure/special-data-structure-design/LRU-LFU/e_604. Design Compressed String Iterator.md",
+    "0x01-leetcode/data-structure/special-data-structure-design/LRU-LFU",
+    "0x01-leetcode/data-structure/special-data-structure-design",
+    "0x01-leetcode/data-structure/hashset-hashmap",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x99-image/Pasted image 20240929153126.png",
     "0x99-image/Pasted image 20240929153222.png",
