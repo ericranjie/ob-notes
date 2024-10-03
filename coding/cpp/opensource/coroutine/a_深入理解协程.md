@@ -17,35 +17,14 @@ CPP开发者
 
 C++ 在互联网服务端开发方向依然占据着相当大的份额；百度，腾讯，甚至以java为主流开发语言的阿里都在大规模使用C++做互联网服务端开发，今天以C++为例子，分析一下要支持协程，需要考虑哪些问题，如何权衡利弊，反过来也可以了解到协程适合哪些场景。  
 
-  
-
-  
-
 **第1章 C++协程近况简介**
-
-  
-
 #   
-
 协程分两种，无栈协程(stackless)和有栈协程(stackful)，前者无法解决异步回调模式中上下文保存与恢复的问题，在此不做论述，文中后续提到的协程均指有栈协程。
 
-  
-
-  
-
 **第1节.旧时代**
-
-  
-
-  
-
 在2014年以前，C++服务端开发是以异步回调模型为主流，业务流程中每一个需要等待IO处理的节点都需要切断业务处理流程、保存当前处理的上下文、设置回调函数，等IO处理完成后再恢复上下文、接续业务处理流程。
 
-  
-
 在一个典型的互联网业务处理流程中，这样的行为节点多达十几个甚至数十个(微服务间的rpc请求、与redis之类的高速缓存的交互、与mysql\mongodb之类的DB交互、调用第三方HttpServer的接口等等)；被切割的支离破碎的业务处理流程带来了几个常见的难题：
-
-  
 
 - 每个流程都要定义一个上下文struct，并手动保存与恢复；
     
@@ -56,25 +35,13 @@ C++ 在互联网服务端开发方向依然占据着相当大的份额；百度�
 - 回调式的逻辑是“不知何时会被触发”的，用户状态管理也会有更多挑战；
     
 
-  
-
 这些具体的难题综合起来，在工程化角度呈现出的效果就是：代码编写复杂，开发周期长，维护困难，BUG多且防不胜防。
 
-  
-
-  
-
 **第2节.新时代**
-
-  
-
-  
 
 ##   
 
 2014年腾讯的微信团队开源了一个C风格的协程框架libco，并在次年的架构师峰会上做了宣讲，使业内都认识到异步回调模式升级为协程模式的必要性，从此开启了C++互联网服务端开发的协程时代。BAT三家旗下的各个小部门、业内很多与时俱进的互联网公司都纷纷自研协程框架，一时呈百花齐放之态。
-
-  
 
 笔者所在的公司当时也试用了一段时间libco，修修补补很多次，终究是因为问题太多而放弃，改用了自研的libgo作为协程开发框架。
 
@@ -318,7 +285,7 @@ gcc提供的“黄金链接器”支持一种允许栈内存不连续的编译�
     
 
   
-
+![[Pasted image 20241003103414.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -476,7 +443,7 @@ HOOK是一个精细活，需要繁琐的边界条件测试，不但要保证返�
 比如我们在试用libco的时候就遇到这样一个问题：
 
   
-
+![[Pasted image 20241003103454.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -609,7 +576,7 @@ libgo针对这个问题HOOK了getXXbyYY_r系列函数，在函数入口使用了
 linux上的signal是有着不可重入属性的，在signal处理函数中处理复杂的操作极易出现死锁，libgo提供了解决这个问题的编译参数：
 
   
-
+![[Pasted image 20241003103443.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ####   
@@ -653,7 +620,7 @@ libgo还HOOK了三个sleep函数：sleep、usleep、nanosleep
 libgo仿照golang制作了Channel功能，通过如下代码：
 
   
-
+![[Pasted image 20241003103506.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -661,7 +628,7 @@ libgo仿照golang制作了Channel功能，通过如下代码：
 即创建了一个不带额外缓冲区的、传递int的channel，重载了操作符<<和>>，使用
 
   
-
+![[Pasted image 20241003103514.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -669,7 +636,7 @@ libgo仿照golang制作了Channel功能，通过如下代码：
 向其写入一个整数1，正如golang中channel的行为一样，此时如果没有另一个协程使用
 
   
-
+![[Pasted image 20241003103518.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -681,7 +648,7 @@ libgo仿照golang制作了Channel功能，通过如下代码：
 如果使用
 
   
-
+![[Pasted image 20241003103523.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -693,7 +660,7 @@ libgo仿照golang制作了Channel功能，通过如下代码：
 也可以使用
 
   
-
+![[Pasted image 20241003103530.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -713,7 +680,7 @@ libgo仿照golang制作了Channel功能，通过如下代码：
 在任何C++协程库的使用中，都应该慎重使用或禁用线程锁，比如下面的代码
 
   
-
+![[Pasted image 20241003103536.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -733,7 +700,7 @@ libgo仿照golang制作了Channel功能，通过如下代码：
 其实我们可以提供一个协程锁来解决这一问题，比如下面的代码
 
   
-
+![[Pasted image 20241003103541.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -757,7 +724,7 @@ libgo还提供了协程读写锁：co_rwmutex
 另外，即便开发者有意识的规避第一个例子那样的场景，也很容易踩到另外一个线程锁导致的坑，比如在使用zookeeper-client这样会启动后台线程来call回调函数的第三方库时：
 
   
-
+![[Pasted image 20241003103548.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -769,7 +736,7 @@ libgo还提供了协程读写锁：co_rwmutex
 针对这种情况最优雅的处理方式就是使用Channel，因为libgo提供的Channel不仅可以用于协程间交换数据，也可以用于协程与线程间交换数据，可以说是专门针对zk这类起后台线程的第三方库设计的。
 
   
-
+![[Pasted image 20241003103553.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ####   
@@ -853,7 +820,7 @@ CLS的使用方式参见tutorail文件夹下的sample13_cls.cpp教程代码。
 libgo提供了一个宏：co_await，来辅助用户完成线程池与协程的交互。
 
   
-
+![[Pasted image 20241003103603.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -861,7 +828,7 @@ libgo提供了一个宏：co_await，来辅助用户完成线程池与协程的�
 在协程中使用
 
   
-
+![[Pasted image 20241003103608.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -869,7 +836,7 @@ libgo提供了一个宏：co_await，来辅助用户完成线程池与协程的�
 可以把func投递到线程池中，并且挂起当前协程，直到func完成后协程会被唤醒，继续执行下去。也可以使用
 
   
-
+![[Pasted image 20241003103625.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   

@@ -6,8 +6,6 @@
 
 今天，想聊聊workflow这个开源项目。
 
-  
-
 关于workflow，我之前特意写过一篇文章【[推荐学习这个C++开源项目](http://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247487891&idx=1&sn=46c64de685c49e3c33790cc8e37e308f&chksm=c21d232ff56aaa39452b82b8367eeb2afe815d69b3200465b238aff39f3427b964a6ca69940b&scene=21#wechat_redirect)】。
 
 今天还是想再啰嗦啰嗦，因为自己这一年也在带团队从0到1做项目，需要负责整个项目的架构设计、接口设计、模块划分等工作。
