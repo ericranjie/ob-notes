@@ -133,7 +133,7 @@ $ sysctl net.ipv4.tcp_timestamps
 
 第五个选项（3）表示 TCP 窗口缩放（RFC1323）。TCP 协议头的窗口大小由 2 字节表示（最大 65535 字节），但实际上内核默认的 TCP 缓存区大小比这个值大很多：
 
-```
+```c
 $ sysctl net.ipv4.tcp_rmem net.ipv4.tcp_wmem
 ```
 
@@ -141,7 +141,7 @@ $ sysctl net.ipv4.tcp_rmem net.ipv4.tcp_wmem
 
 **net.ipv4.tcp_window_scaling** 控制开关。注意携带这个 option 之后的包才会放大，所以当前这个包 wireshark 输出的 **Calculated window size** 并没有乘以系数，后续的包才乘（这个 option 只在握手的时候交换信息，如果抓的包不包含握手包的话，是无法精确知道实际的 window size 的）。
 
-```
+```c
 $ sysctl net.ipv4.tcp_window_scaling
 ```
 
