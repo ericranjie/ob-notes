@@ -4,13 +4,9 @@ Original 里缪 CppMore
 
  _2022年02月18日 19:20_
 
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/9XBBCfGaPEl4ab4IPWfvaEflLA3TwU8eCCct5PlsKpUV1ChPDXCoHRibKPfdwRCJAXAuJwlJlCVnc5Bx5GGZwFg/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 晚上好。
 
 本篇开始介绍C++反射，这是第一篇。
-
-  
 
 ## C++中的产生式元编程
 
@@ -29,13 +25,13 @@ C++提供了许多生成代码的特性，如图所示。
 Fold Expressions是C++17提供的展开参数包的简便方式，这同样是一种产生代码的特性。见[C++17: Simplify Code with Fold Expressions](http://mp.weixin.qq.com/s?__biz=MzUxOTQ4NjIzNw==&mid=2247484950&idx=1&sn=3d833a2cc642d1826f6699b86b722b12&chksm=f9f9a864ce8e217285659c1ad7fa5a02a98cd2b030971ad8bab859637b7b5f17f45514cf1acd&scene=21#wechat_redirect)。  
 
 Expansion Statements是P1306提出的一种新语句，可以减少遍历时的重复，主要是方便反射遍历用的。这也是一种产生代码的特性，举个遍历tuple的例子，
-
+```cpp
 auto tup = std::make_tuple(0, 'a', 3.14);  
 template for (auto& elem : tup)  
     std::cout << elem << std::endl;  
-
+```
 语法起初是for...，后来改为了template for，这代码相当于如下代码：
-
+```cpp
 auto tup = std::make_tuple(0, 'a', 3.14);  
 {  
     auto elem  = std::get<0>(tup);  
@@ -49,7 +45,7 @@ auto tup = std::make_tuple(0, 'a', 3.14);
     auto elem  = std::get<2>(tup);  
     std::cout << elem << std::endl;  
 }
-
+```
 该提案由于时间原因没能进入C++20，之后三年没动静，最近CWG进行了review，但是作者一直没有更新论文，也没能进入C++23。似乎放弃了？（https://github.com/cplusplus/papers/issues/156）
 
 虽然已经拥有这么多生成代码的特性，但是我们依旧无法轻易完成像序列化、ORM、远程调用、schema generation等等需求。因为C++缺少获取类型元信息的机制，所以无法获取像类型的参数列表、成员类型、成员名称等等这些信息。
@@ -95,7 +91,7 @@ C++缺少的是类型遍历的能力，有了这种能力，就能够遍历出�
 反射分为动态反射和静态反射，动态反射就是运行期的反射，静态反射就是编译期的反射。
 
 C++的反射是静态反射，第一个Reflection TS基于N4766。当时还是基于类型来表示反射信息，举个例子：
-
+```cpp
 template <typename T>  
 std::string get_type_name() {  
     namespace reflect = std::experimental::reflect;  
@@ -106,13 +102,13 @@ std::string get_type_name() {
     return reflect::get_name_v<aliased_T_t>;  
 }  
 std::cout << get_type_name<std::string>(); // outputs basic_string
-
+```
 看不懂也没关系，因为早就废弃这种方式了。
 
 这种方式是为了简化和模板元的结合，然而出于多方面考虑，SG7转而支持value-based reflection，也就是现在的反射。为此，C++20提供了许多扩展特性来支持反射的设计，例如consteval function，std::is_constant_evaluated()，constexpr dynamic allocation。
 
 新式的反射语法，举个例子：
-
+```cpp
 #include <meta>  
 template<Enum T>  
 std::string to_string(T value) {  
@@ -123,7 +119,7 @@ std::string to_string(T value) {
     }  
     return "<unnamed>";  
 }
-
+```
 这段代码是要以string形式输出枚举类型的值。
 
 获取类型元信息的操作符是"^ operator"，读作**_lifting operator_**，意思就是向上获取类型的元信息。这对应上一节介绍的_**reflection**_这个词。（_reflection_操作的原本语法是reflexpr()，太重更换了）
@@ -178,11 +174,6 @@ C++反射进入标准的速度如此慢，导致在过去这么多年，已经�
 
 原本只打算写一篇的，包含一些细节，但是内容比想象的要多，所以拆解成为更有层次的一个小系列，不会太多，四五篇足矣。
 
-  
-
-  
-
-![](https://mmbiz.qlogo.cn/mmbiz_jpg/mUBQ21ETsDA7DH60GIcuqUvvWgCWsibCibLv0Zos5hpvrZTqZ4lPh0CttCd9DxkpwOcOHM8UqPviaC0P7THN3KF4g/0?wx_fmt=jpeg)
 
 里缪
 

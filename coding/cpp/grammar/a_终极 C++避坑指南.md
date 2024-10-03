@@ -1,12 +1,7 @@
 
-
 原创 腾讯程序员 腾讯技术工程
 
- _2022年09月06日 18:00_ _广东_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
+ _2022年09月06日 18:00_ _广东_  
 
 作者：boreholehu，腾讯 WXG 后台开发工程师
 
@@ -36,30 +31,40 @@ C++在演变过程中一直在吸收其他语言的优势，不断提供新的�
 #### 数组的复制
 
 我们知道，结构体类型是可以很轻松的复制的，比如说：
-
-`struct St {     int m1;     double m2;   };      void demo() {     St st1;     St st2 = st1; // OK     St st3;     st1 = st3; // OK   }   `
+```cpp
+struct St {
+  int m1;
+  double m2;
+};
+void demo() {
+  St st1;
+  St st2 = st1; // OK
+  St st3;
+  st1 = st3; // OK
+}   
+```
 
 但数组却并不可以，比如：
-
+```cpp
 `int arr1[5];   int arr2[5] = arr1; // ERR   `
-
+```
 明明这里 arr2 和 arr1 同为`int[5]`类型，但是并不支持复制。照理说，数组应当比结构体更加适合复制场景，因为需求是很明确的，就是元素按位复制。
 
 #### 数组类型传参
 
 由于数组不可以复制，导致了数组同样不支持传参，因此我们只能采用“首地址+长度”的方式来传递数组：
-
-`void f1(int *arr, size_t size) {}      void demo() {     int arr[5];     f1(arr, 5);   }   `
-
+```cpp
+void f1(int *arr, size_t size) {}      void demo() {     int arr[5];     f1(arr, 5);   }   
+```
 而为了方便程序员进行这种方式的传参，C 又做了额外的 2 件事：
 
 1. 提供一种隐式类型转换，支持将数组类型转换为首元素指针类型（比如说这里 arr 是`int[5]`类型，传参时自动转换为`int *`类型）
     
 2. 函数参数的语法糖，如果在函数参数写数组类型，那么会自动转换成元素指针类型，比如说下面这几种写法都完全等价：
     
-
-`void f(int *arr);   void f(int arr[]);   void f(int arr[5]);   void f(int arr[100]);   `
-
+```cpp
+void f(int *arr);   void f(int arr[]);   void f(int arr[5]);   void f(int arr[100]);
+```
 所以这里非常容易误导人的就在这个语法糖中，**无论中括号里写多少，或者不写，这个值都是会被忽略的**，要想知道数组的边界，你就必须要通过额外的参数来传递。
 
 但通过参数传递这是一种软约束，你无法保证调用者传的就是数组元素个数，这里的危害详见后面“指针偏移”的章节。
@@ -71,13 +76,16 @@ C++在演变过程中一直在吸收其他语言的优势，不断提供新的�
 所以综合考虑，干脆这里就不支持复制，强迫程序员使用指针+长度这种方式来操作数组，反而更加符合数组的实际使用场景。
 
 当然了，在 C++中有了引用语法，我们还是可以把数组类型进行传递的，比如：
-
-`void f1(int (&arr)[5]); // 必须传int[5]类型   void demo() {     int arr1[5];     int arr2[8];        f1(arr1); // OK     f1(arr2); // ERR   }   `
-
+```cpp
+void f1(int (&arr)[5]); // 必须传int[5]类型
+void demo() {     int arr1[5];     int arr2[8];        f1(arr1); // OK   
+f1(arr2); // ERR
+}   
+```
 但绝大多数的场景似乎都不会这样去用。一些新兴语言（比如说 Go）就注意到了这一点，因此将其进行了区分。在 Go 语言中，区分了“数组”和“切片”的概念，数组就是长度固定的，整体来传递；而切片则类似于首地址+长度的方式传递（只不过没有单独用参数，而是用 len 函数来获取）
-
-`func f1(arr [5]int) {   }   func f2(arr []int) {   }   `
-
+```cpp
+func f1(arr [5]int) {   }   func f2(arr []int) {   }
+```
 上面例子里，f1 就必须传递长度是 5 的数组类型，而 f2 则可以传递任意长度的切片类型。
 
 而 C++其实也注意到了这一点，但由于兼容问题，它只能通过 STL 提供容器的方式来解决，`std::array`就是定长数组，而`std::vector`就是变长数组，跟上述 Go 语言中的数组和切片的概念是基本类似的。这也是 C++中更加推荐使用 vector 而不是 C 风格数组的原因。
@@ -113,23 +121,30 @@ a2 是`int (*)[5]`类型，是一个指针，指针指向了一个`int[5]`类型
 上面这个例子中，int 和()共同表示了“定义函数”这个意义。也就是说，看到 int 这个关键字，并不一定是表示定义变量，还有可能是定义函数，定义函数时 int 表示了函数的返回值的类型。
 
 正是由于 C/C++中，类型说明符具有多重含义，才造成一些复杂语法简直让人崩溃，比如说定义高阶函数：
-
-`// 输入一个函数，输出这个函数的导函数   double (*DC(double (*)(double)))(double);   `
-
+```cpp
+// 输入一个函数，输出这个函数的导函数
+double (*DC(double (*)(double)))(double);
+```
 DC 是一个函数，它有一个参数，是`double (*)(double)`类型的函数指针，它的返回值是一个`double (*)(double)`类型的函数指针。但从直观性上来说，上面的写法完全毫无可读性，如果没有那一行注释，相信大家很难看得出这个语法到底是在做什么。
 
 C++引入了返回值右置的语法，从一定程度上可以解决这个问题：
-
-`auto f1() -> int;   auto DC(auto (*)(double) -> double) -> auto (*)(double) -> double;   `
-
+```cpp
+auto f1() -> int;
+auto DC(auto (*)(double) -> double) -> auto (*)(double) -> double;
+```
 但用 auto 作为占位符仍然还是有些突兀和晦涩的。
 
 #### 将类型符和动作语义分离的语言
 
 我们来看一看其他语言是如何弥补这个缺陷的，最简单的做法就是把“类型”和“动作”这两件事分开，用不同的关键字来表示。 Go 语言：
-
-`// 定义变量   var a1 int   var a2 []int   var a3 *int   var a4 []*int // 元素为指针的数组   var a5 *[]int // 数组的指针   // 定义函数   func f1() {   }   func f2() int {     return 0   }   // 高阶函数   func DC(f func(float64)float64) func(float64)float64 {   }   `
-
+```cpp
+// 定义变量
+var a1 int   var a2 []int   var a3 *int   var a4 []*int // 元素为指针的数组
+var a5 *[]int // 数组的指针   
+// 定义函数
+func f1() {   }   func f2() int {     return 0   }   // 高阶函数   
+func DC(f func(float64)float64) func(float64)float64 {   }
+```
 Swift 语言：
 
 `// 定义变量   var a1: Int   var a2: [Int]      // 定义函数   func f1() {   }      func f2() -> Int {     return 0   }   // 高阶函数   func DC(f: (Double, Double)->Double) -> (Double, Double)->Double {   }   `
@@ -327,9 +342,9 @@ C++保留的`++`和`--`的语义，也是因为它和`+=1`或`-=1`语义并不�
 但 C++中的格式化字符串可以说完全就是 C 的那一套，根本没有任何扩展。换句话说，除了基本数据类型和 0 结尾的字符串以外，其他任何类型都没有用于匹配的格式符。
 
 例如，对于结构体类型、数组、元组类型等等，都没法匹配到格式符：
-
+```cpp
 `struct Point {     double x, y;   };      void Demo() {     // 打印Point     Point p {1, 2.5};     printf("(%lf,%lf)", p.x, p.y); // 无法直接打印p     // 打印数组     int arr[] = {1, 2, 3};     for (int i = 0; i < 3; i++) {       printf("%d, ", arr[i]); // 无法直接打印整个数组     }     // 打印元组     std::tuple tu(1, 2.5, "abc");     printf("(%d,%lf,%s)", std::get<0>(tu), std::get<1>(tu), std::get<2>(tu)); // 无法直接打印整个元组   }   `
-
+```
 对于这些组合类型，我们就不得不手动去访问内部成员，或者用循环访问，非常不方便。
 
 针对于字符串，还会有一个严重的潜在问题，比如：
@@ -1644,29 +1659,39 @@ C 中的解决的办法就是定义宏，又有宏是预编译期进行替换的
 既然，我们已经有`{1, 2}`的构造参数了，能否想办法跳过这一次临时对象，而是直接在`vector`末尾的空间上进行构造呢？这就涉及了就地构造的问题。我们在前面“new 和 delete”的章节介绍过，“分配空间”和“构造对象”的步骤可以拆解开来做。首先对`vector`的`buffer`进行扩容（如果需要的话），确定了要放置新对象的空间以后，直接使用`placement new`进行就地构造。
 
 比如针对`Test`的`vector`我们可以这样写：
-
-`template <>   void vector<Test>::emplace_back(int a, int b) {     // 需要时扩容     // new_ptr表示末尾为新对象分配的空间     new(new_ptr) Test{a, b};   }   `
-
+```cpp
+template <>   void vector<Test>::emplace_back(int a, int b) {
+  // 需要时扩容
+  // new_ptr表示末尾为新对象分配的空间
+  new(new_ptr) Test{a, b};
+}
+```
 STL 中把容器的就地构造方法叫做`emplace`，原理就是通过传递构造参数，直接在对应位置就地构造。所以更加通用的方法应该是：
-
-`template <typename T, typename... Args>   void vector<T>::emplace_back(Args &&...args) {     // new_ptr表示末尾为新对象分配的空间     new(new_ptr) T{std::forward<Args>(args)...};   }   `
-
+```cpp
+template <typename T, typename... Args>   void vector<T>::emplace_back(Args &&...args) {
+  // new_ptr表示末尾为新对象分配的空间
+  new(new_ptr) T{std::forward<Args>(args)...};
+}
+```
 #### 嵌套就地构造
 
 就地构造确实能在一定程度上解决多余的对象复制问题，但如果是嵌套形式就实则没办法了，举例来说：
-
-`struct Test {     int a, b;   };      void Demo() {     std::vector<std::tuple<int, Test>> ve;     ve.emplace_back(1, Test{1, 2}); // tuple嵌套的Test没法就地构造   }   `
-
+```cpp
+struct Test {     int a, b;   }; 
+void Demo() {     std::vector<std::tuple<int, Test>> ve;     ve.emplace_back(1, Test{1, 2}); // tuple嵌套的Test没法就地构造
+}
+```
 也就是说，我们没法在就地构造对象时对参数再就地构造。
 
 这件事情放在`map`或者`unordered_map`上更加有趣，因为这两个容器的成员都是`std::pair`，所以对它进行`emplace`的时候，就地构造的是`pair`而不是内部的对象：
-
-`struct Test {     int a, b;   };      void Demo() {     std::map<int, Test> ma;     ma.emplace(1, Test{1, 2}); // 这里emplace的对象是pair<int, Test>   }   `
-
+```cpp
+struct Test {     int a, b;   };      void Demo() {     std::map<int, Test> ma;     ma.emplace(1, Test{1, 2}); // 这里emplace的对象是pair<int, Test>   
+}
+```
 不过好在，`map`和`unordered_map`提供了`try_emplace`方法，可以在一定程度上解决这个问题，函数原型是：
-
-`template <typename K, typename V, typename... Args>   std::pair<iterator, bool> map<K, V>::try_emplace(const K &key, Args &&...args);   `
-
+```cpp
+template <typename K, typename V, typename... Args>   std::pair<iterator, bool> map<K, V>::try_emplace(const K &key, Args &&...args);
+```
 这里把`key`和`value`拆开了，前者还是只能通过复制的方式传递，但后者可以就地构造。（实际使用时，`value`更需要就地构造，一般来说`key`都是整数、字符串这些。）那么我们可用它代替`emplace`:
 
 `void Demo() {     std::map<int, Test> ma;     ma.try_emplace(1, 1, 2); // 1, 2用于构造Test   }   `
@@ -1680,9 +1705,9 @@ STL 中把容器的就地构造方法叫做`emplace`，原理就是通过传递�
 `void Demo() {     std::map<int, std::map<int, std::string>> ma;     // 例如想给key为(1, 2)新增value为"abc"的     // 由于无法确定外层key为1是否已经有了，所以要单独判断     if (ma.count(1) == 0) {       ma.emplace(1, std::map<int, std::string>{});     }     ma.at(1).emplace(1, "abc");   }   `
 
 但是利用`try_emplace`就可以更取巧一些：
-
-`void Demo() {     std::map<int, std::map<int, std::string>> ma;     ma.try_emplace(1).first->second.try_emplace(1, "abc");   }   `
-
+```cpp
+void Demo() {     std::map<int, std::map<int, std::string>> ma;     ma.try_emplace(1).first->second.try_emplace(1, "abc");   }
+```
 解释一下，如果`ma`含有`key`为`1`的项，就返回对应迭代器，如果没有的话则会新增（由于没指定后面的参数，所以会构造一个空`map`），并返回迭代器。迭代器在返回值的第一项，所以取`first`得到迭代器，迭代器指向的是`map`内部的`pair`，取`second`得到内部的`map`，再对其进行一次`try_emplace`插入内部的元素。
 
 当然了，这么做确实可读性会下降很多，具体使用时还需要自行取舍。
@@ -1699,30 +1724,9 @@ STL 中把容器的就地构造方法叫做`emplace`，原理就是通过传递�
 
 如果你能读到这里的话，那非常感激你的支持，听我说谢谢你，因为有你……咳咳~。这篇文章作为我学习 C++多年的一个沉淀，也希望借此把我的想法分享给读者，如果你有任何疑问或者建议，欢迎评论区留言！针对更多 C++的特性的用法、编程技巧等内容，请期待我其他系列的文章。
 
-  
 
 腾讯程序员
 
 ，赞690
 
 阅读 1.2万
-
-​
-
-写留言
-
-[](javacript:;)
-
-![](http://mmbiz.qpic.cn/sz_mmbiz_png/j3gficicyOvauPPfL7J2AVERiaoMJy9NBIwbJE2ZRJX7FZ2Dx7IibtTwdlqYSqTZTCsXkDS2jvNF8wWJKcibxXtOHng/300?wx_fmt=png&wxfrom=18)
-
-腾讯技术工程
-
-1273644
-
-写留言
-
-写留言
-
-**留言**
-
-暂无留言
