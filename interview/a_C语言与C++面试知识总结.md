@@ -583,9 +583,7 @@ return 0;
 
 ```cpp
 enum color { red, yellow, green };
-
 enum { floatPrec = 6, doublePrec = 10 };
-
 ```
 
 ## **decltype**

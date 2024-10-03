@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md",
+                "file": "interview/a_C语言与C++面试知识总结.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md",
+                "file": "interview/a_C语言与C++面试知识总结.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md",
+                "file": "interview/a_C语言与C++面试知识总结.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/grammar/a_终极 C++避坑指南.md"
+                "file": "interview/a_C语言与C++面试知识总结.md"
               }
             }
           }
@@ -148,10 +148,10 @@
   },
   "active": "68f8997a14328494",
   "lastOpenFiles": [
+    "auxiliary/test/alloctor.md",
+    "coding/cpp/grammar/a_终极 C++避坑指南.md",
     "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
     "coding/cpp/grammar/b_（文末赠书）学了许多年 C++ 终于想通了.......md",
-    "coding/cpp/grammar/a_终极 C++避坑指南.md",
-    "coding/cpp/grammar/alloctor.md",
     "coding/cpp/grammar/an_万字长文带你掌握C++11中auto和decltype的用法和区别.md",
     "coding/cpp/grammar/C++20新特性—“宇宙飞船”运算符.md",
     "coding/cpp/grammar/i_C++20那些事之宇宙飞船运算符.md",
