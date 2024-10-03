@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+                "file": "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+                "file": "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+                "file": "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md"
+                "file": "coding/os/linux/network/Linux 虚拟网络设备之 bridge.md"
               }
             }
           }
@@ -148,6 +148,8 @@
   },
   "active": "68f8997a14328494",
   "lastOpenFiles": [
+    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
+    "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
     "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
     "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
     "0x99-image/Pasted image 20241003134601.png",
@@ -182,8 +184,6 @@
     "coding/cpp/opensource/coroutine/a_深入理解协程.md",
     "coding/cpp/opensource/coroutine/an_协程简史，一文讲清楚协程的起源、发展和实现.md",
     "coding/cpp/opensource/coroutine/k_使用C++20协程和io_uring优雅地实现异步IO.md",
-    "coding/cpp/opensource/coroutine/b_微信著名libco协程库原理剖析.md",
-    "coding/cpp/opensource/coroutine/深入探索C++20的重要特性：从模块化到协程.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",

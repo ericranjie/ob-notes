@@ -7,7 +7,7 @@ Original 浅奕 阿里云开发者
 
 TCP/IP 这个主题很多文章比较陈旧，且以讹传讹的东西太多，所以本文作者结合了理论和实践去写，旨在通过一系列实验帮助读者深入理解 TCP 连接的建立过程。
 
-写在前面
+# 写在前面
 
 通信媒介可能会**丢失**或者**改变**被传递的消息，在这类**有损通信信道上提供可靠通信协议**的问题已经被研究了很多年。处理差错的两种主要方法是**纠错码**和**数据重传**。后者又称之为**自动重复请求**（Automatic Repeat Request， ARQ），TCP 协议基于此方法设计。
 
@@ -15,49 +15,59 @@ TCP/IP 这个主题很多文章比较陈旧，且以讹传讹的东西太多，�
 
 本文在阐述一些具体的行为和特性时也会提示相关的 RFC 文档。但是需要注意，具体系统的协议实现**并非完全照搬** RFC 的每一句话，实践中在一些特定的场景下也会选择更有利于解决具体问题的方案。
 
-实验环境
-
+# 实验环境
 
 **机器信息**
 
 两台虚拟机，IP 地址分别是 10.0.0.3（vm-1）和 10.0.0.4（vm-2）：
 
-```
+```c
 $ uname -a
+Linux workspace-1 5.10.134-16.3.an8.aarch64 #1 SMP Tue Mar 26 18:49:57 CST 2024 aarch64 aarch64 aarch64 GNU/Linux 
+$ ip -4 addr 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000     inet 127.0.0.1/8 scope host lo        valid_lft forever preferred_lft forever 
+2: enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000     inet 10.0.0.3/24 brd 10.0.0.255 scope global dynamic noprefixroute enp0s5        valid_lft 1746sec preferred_lft 1746sec
 ```
 
+```c
+$ uname -a 
+Linux workspace-2 5.10.134-16.3.an8.aarch64 #1 SMP Tue Mar 26 18:49:57 CST 2024 aarch64 aarch64 aarch64 GNU/Linux 
+$ ip -4 addr 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000     inet 127.0.0.1/8 scope host lo        valid_lft forever preferred_lft forever 
+2: enp0s5: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000     inet 10.0.0.4/24 brd 10.0.0.255 scope global dynamic noprefixroute enp0s5        valid_lft 1784sec preferred_lft 1784sec
 ```
-$ uname -a
-```
 
-  
-
-TCP 连接的建立
-
-  
+# TCP 连接的建立
 
 **开启抓包**
 
 在 vm-1 上开启 **tcpdump** 抓包：
 
-```
-# vm-1
+```c
+# vm-1 
+# 如果只输出到控制台而不需要保存包到文件的话，将 -w tcp.pcap --print 参数删除即可 $ sudo tcpdump -s0 -X -nn "tcp port 9527" -w tcp.pcap --print  
+
+# 上面命令的 --print 参数在 tcpdump v4.99.0 版本才引入，用于 -w 写文件的同时在控制台也输出详情。如果实验环境的 tcpdump 版本过低，可以从源码编译安装，或者使用下面低版本 tcpdump 等效命令： 
+$ sudo tcpdump -s0 "tcp port 9527" -w - -U | tee tcp.pcap | tcpdump -r 
 ```
 
-  
 
 **创建连接**
 
 在 vm-1 上使用 nc 监听 TCP 9527 端口：
 
-```
-# vm-1
+```c
+# vm-1 
+$ nc -k -l 10.0.0.3 9527
 ```
 
 这时候可以在另一个终端使用 **netstat** 命令查看这个监听套接字的情况：  
 
-```
-# vm-1
+```c
+# vm-1 
+$ sudo netstat -anpo | grep Recv-Q; sudo netstat -anpo | grep 9527 
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name     Timer 
+tcp        0      0 10.0.0.3:9527           0.0.0.0:*               LISTEN      1704/nc              off (0.00/0/0)
 ```
 
 在 vm-2 上打开一个终端，使用 nc 连接服务端：  

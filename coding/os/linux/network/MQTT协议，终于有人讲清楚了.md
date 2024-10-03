@@ -1,14 +1,9 @@
-# 
 
 一口Linux
 
  _2024年09月11日 20:29_ _河北_
 
 The following article is from 小麦大叔 Author 菜刀和小麦
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6Q363R0far9dUvNVpUPfT4rce2bp9S07H7hg4g8F6w9Q/0)
 
 **小麦大叔**.
 
