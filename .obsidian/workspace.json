@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md"
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md"
               }
             }
           }
@@ -148,27 +148,29 @@
   },
   "active": "24e3f17feddf85ca",
   "lastOpenFiles": [
+    "zx99-image/Pasted image 20241003192825.png",
     "README.md",
+    "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+    "zx99-image/Pasted image 20241003191858.png",
+    "coding/os/linux/modules/k_图解 Linux进程通信 - 管道实现.md",
+    "zx99-image/Pasted image 20241003192150.png",
+    "zx99-image/Pasted image 20241003192144.png",
+    "zx99-image/Pasted image 20241003192124.png",
+    "zx99-image/Pasted image 20241003192116.png",
+    "zx99-image/Pasted image 20241003192110.png",
+    "zx99-image/Pasted image 20241003192052.png",
+    "zx99-image/Pasted image 20241003192019.png",
+    "zx99-image/Pasted image 20241003191920.png",
+    "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
     "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
     "Untitled.canvas",
     "coding/coding-quote.md",
-    "zx99-image/Pasted image 20241003161545.png",
     "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的?.md",
-    "zx99-image/Pasted image 20241003161644.png",
-    "zx99-image/Pasted image 20241003161638.png",
-    "zx99-image/Pasted image 20241003161633.png",
-    "zx99-image/Pasted image 20241003161623.png",
-    "zx99-image/Pasted image 20241003161616.png",
-    "zx99-image/Pasted image 20241003161609.png",
-    "zx99-image/Pasted image 20241003161602.png",
-    "zx99-image/Pasted image 20241003161556.png",
     "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
     "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
-    "zx99-image/Pasted image 20241003150402.png",
     "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
     "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
-    "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
     "coding/os/linux/network/t_linux loop device 机制介绍.md",
     "coding/os/linux/network/最后一天，继续卷！.md",
     "coding/os/linux/network/d_以太网驱动的流程浅析(二)-Ifconfig的详细代码流程.md",
@@ -182,9 +184,6 @@
     "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
     "coding/cpp/grammar/b_（文末赠书）学了许多年 C++ 终于想通了.......md",
     "coding/cpp/grammar/an_万字长文带你掌握C++11中auto和decltype的用法和区别.md",
-    "coding/cpp/grammar/C++20新特性—“宇宙飞船”运算符.md",
-    "coding/cpp/grammar/i_C++20那些事之宇宙飞船运算符.md",
-    "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
