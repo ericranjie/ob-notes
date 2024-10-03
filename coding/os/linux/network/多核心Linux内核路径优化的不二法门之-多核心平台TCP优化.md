@@ -1,42 +1,26 @@
 
 dog250 Linux阅码场
-
  _2021年12月14日 07:00_
-
-_**原文作者：dog250**_
-
-_**原文链接：https://blog.csdn.net/dog250/article/details/48690407**_
-  
 
 本文可以作为《 Linux转发性能评估与优化(转发瓶颈分析与解决方案)》的姊妹篇，这两篇文章结合在一起，恰好就是整个Linux内核协议栈的一个优化方案。事实上Linux协议栈本来就是面向两个方向的，一个是转发，更多的是本地接收。目前大量的服务器采用Linux作为其载体，更加体现了协议栈本地处理相对于转发的重要性，因此本文就这个问题扯两句，欢迎拍砖！
 
-  
-
-**0.声明：**
+# **0.声明：**
 
 **0).关于来源**
 
 昨天就答应皮鞋厂老板了，只是昨晚心情太复杂，本文没有赶出来，今天在飞机上写下了剩余的...
 
-  
-
 **1).关于Linux原生代码**
 
 本文假设读者已经对Linux的TCP实现源码有了足够清晰的理解，因此不会大量篇幅分析Linux内核关于TCP的源代码，比如tcp_v4_rcv的流程之类的。
-
-  
 
 **2).关于我的优化代码**
 
 由于涉及到很多复杂的因素，本文不提供完整的可编译的优化源码(整个源码并非我一人完成，在未经同伙同意之前，我不敢擅作主张，但是想法是我的，所以我能展示的只是原理以及我负责的那部分代码)。
 
-  
-
 **3).关于TCP协议**
 
 本文不谈TCP协议本身以及其细节(细节请参考RFC以及各类论文，比如各种流控，拥控算法之类的)，仅包含的内容是TCP协议之外的框架实现的优化。
-
-  
 
 **1.Linux的TCP实现**
 
@@ -52,8 +36,6 @@ TCP首先会通过三次握手建立一个连接，然后就可以传输数据�
 
 这个比较简单，略。
 
-  
-
 **1.2.Linux的TCP在系统架构方面分为两个部分**
 
 1).软中断协议栈处理
@@ -63,13 +45,10 @@ Linux内核在软中断环境中进行协议栈的处理，在这个处理流程
 2).用户进程处理
 
 Linux的socket API的处理是在用户进程上下文中进行的。通过1.1节，我们知道由于代码层面上这些都是合并在一起的，因此一个socket会被各种执行流操作，直观的考虑，这需要大量锁的开销。
-
-  
-
 **1.3.连接处理的总体框图**
 
 我给出一个连接处理总体框图，其中红线表示发生竞争的地方，而正是这些地方阻止了TCP连接的并行处理，图示如下：
-
+![[Pasted image 20241003141846.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我来一一解释这些红线的意义：
@@ -80,70 +59,33 @@ _1号红线：_
 
 协议栈锁定socket：由于软中断处理协议栈，它可能运行在硬中断之后的任意上下文，因此不能睡眠，故而必须是一把自旋锁slock，由socket本身保有，该锁不仅仅保护和用户进程之间的竞态，也保护不同CPU上对同一个socket协议栈操作之间的竞态(很常见，一个侦听socket上可以同时到达很多连接请求[可悲的是，这些请求不能同时被处理！！])。
 
-  
-
 用户进程锁定socket：用户进程是可以随时睡眠的，因此可以采用非自旋锁xlock来保护多个进程之间的竞态，然而同时又为了和内核协议栈操作同一个socket的软中断互斥，因此在获取xlock之前，首先要获取该socket的slock，当获取xlock之后或者暂时没有获得xlock要睡眠的时候，将slock释放掉。相关的逻辑如下：
-
-  
-
-stack_process
-
-{
-
+```cpp
+stack_process {
     ...
-
     spin_lock(socket->slock); //1
-
     process(skb);
-
     spin_unlock(socket->slock);
-
     ...
-
 }
 
-  
-
-  
-
-user_process
-
-{
-
+user_process {
     ...
-
     spin_lock(socket->slock); //2
-
-    while(true) 
-
-    {
-
+    while(true) {
         ...
-
         spin_unlock(socket->slock);
-
         睡眠;
-
         spin_lock(socket->slock); //2
-
-        if (占据xlock成功)
-
-        {
-
+        if (占据xlock成功) {
             break;
-
         }
-
     }
-
     spin_unlock(socket->slock);
-
     ...
-
 }
-
+```
   
-
 可见，Linux采用了以上的方式很完美的解决了两类问题，第一类问题是操作socket的执行流之间的同步与互斥，第二类问题时软中断上下文和进程上下文之间的锁的不同。
 
 在理解了socket锁定之后，我们来看下backlog这个队列是干什么的。其实很简单，就是将skb推到当前正占据socket的那个进程的一个队列里面，等到进程完成任务，准备释放socket占有权的时候，如果发现该队列里面有skb，那么在其上下文中处理它们。这实际上是一种职责转移，这个转移也可以带来一些优化效果，那就是直接在socket所属的用户进程上下文处理skb，这样就避免了一部分cache刷新。
@@ -166,47 +108,31 @@ _4号红线：_
 
 说完了用户态多个进程/线程同时在同一个socket上accept时的排队，现在看看内核协议栈的处理，也好不到哪里去。如果多个CPU同时被连接请求中断，大量的请求针对同一个侦听socket，那么大家就要在4号红线处排队！而这个情况在单CPU时几乎并不存在，根本不可能同时有多个CPU执行到同一个地点...
 
-  
-
 **2.多核CPU架构下Linux TCP连接处理性能瓶颈**
 
 通过以上针对几条红线的描述，到此为止，我已经展示了几个瓶颈，这些点都是要排队的点。以上的那个框图事实上非常好，这些排队点也无可厚非，因为设计一个系统，就是要自包容解决所有问题，竞争只要存在，就一定要通过排队来解决它，因此上述的框架根本不用更改，锁还是留在原处。问题的根本不是锁的存在，问题的根本在于锁的不易获取！
 
 TCP的处理运行在各个CPU上，CPU被当作了一种资源，这是操作系统的核心概念，但是反过来呢？如果把CPU当成服务者本身，而socket当成资源，问题就迎刃而解了。这个思路很重要，我在nf-HiPAC中第一次接触到了它，原来可以把match和rule颠倒过来玩，然后以这个思想做指导我设计了DxR Pro++，现在还是这个思想，TCP的优化依然可以这么做。
 
-  
-
 **3.Linux TCP连接处理优化**
 
 整体考虑一种连接处理被优化后的TCP实现，我只关心从accept API中会返回什么。只要我能快速获取一个客户socket，并且不破坏listen，bind这些API本身，修改其实现是必须的。
 
-  
-
 **3.1.纵向拆分socket**
 
 我将一个listen socket拆分成了两个部分，上半部和下半部，上半部对应用户进程，下半部对应内核协议栈。原始的socket是下图的样子：
-
+![[Pasted image 20241003142120.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 我的socket被改成了下面的样子：
-
-  
-
+![[Pasted image 20241003142128.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
 
 消解1号红线和2号红线
 
 一个socket的上半部和下半部只通过一个accept队列关联，事实上即使在上半部正在占有socket的时候，下半部依然可以继续处理。
 
 然而，事实证明，在执行accept的进程绑定CPU的情况下，1号红线的消解并没有预期的性能提升，而2号红线的消解带来的性能提升影响也不大。如果是不绑定CPU，性能提升反而比绑定更好，看来横向和纵向并不是独立的两块，它们会相互影响。
-
-  
 
 **3.2.横向拆分socket**
 
