@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "Linux转发性能评估与优化(转发瓶颈分析与解决方案)",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md"
+                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md"
               }
             }
           }
@@ -148,23 +148,27 @@
   },
   "active": "68f8997a14328494",
   "lastOpenFiles": [
-    "0x99-image/Pasted image 20241003145358.png",
-    "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+    "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "README.md",
-    "interview/kn_这些年背过的面试题——网络和操作系统基础篇.md",
-    "0x99-image/Pasted image 20241003144941.png",
-    "0x99-image/Pasted image 20241003145043.png",
-    "0x99-image/Pasted image 20241003145035.png",
-    "0x99-image/Pasted image 20241003145030.png",
-    "0x99-image/Pasted image 20241003145025.png",
-    "0x99-image/Pasted image 20241003145017.png",
-    "0x99-image/Pasted image 20241003145010.png",
-    "0x99-image/Pasted image 20241003145005.png",
-    "0x99-image/Pasted image 20241003144949.png",
+    "zx99-image/Pasted image 20241003150402.png",
+    "zx99-image/Pasted image 20241003150502.png",
+    "zx99-image/Pasted image 20241003150446.png",
+    "zx99-image/Pasted image 20241003150425.png",
+    "zx99-image/Pasted image 20241003150415.png",
     "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
-    "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
     "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
+    "coding/os/linux/network/t_linux loop device 机制介绍.md",
+    "coding/os/linux/network/最后一天，继续卷！.md",
+    "zx99-image/Pasted image 20241003145826.png",
+    "coding/os/linux/network/d_以太网驱动的流程浅析(二)-Ifconfig的详细代码流程.md",
+    "zx99-image/Pasted image 20241003145842.png",
+    "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+    "zx99-image/Pasted image 20241003145358.png",
+    "interview/kn_这些年背过的面试题——网络和操作系统基础篇.md",
+    "zx99-image/Pasted image 20241003144941.png",
+    "zx99-image/Pasted image 20241003145043.png",
+    "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
     "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
     "interview/a_C语言与C++面试知识总结.md",
@@ -179,10 +183,6 @@
     "coding/cpp/grammar/k_C++反射 第一章：通识.md",
     "coding/coding-quote.md",
     "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
-    "coding/cpp/i_sizeof(void)之谜.md",
-    "coding/cpp/k_C++常见的三种内存破的场景和分析.md",
-    "coding/cpp/opensource/memory/b_【性能优化】高效内存池的设计与实现.md",
-    "coding/cpp/opensource/Glibc.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",

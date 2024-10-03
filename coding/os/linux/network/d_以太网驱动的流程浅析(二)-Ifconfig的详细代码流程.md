@@ -1,42 +1,18 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[heaven](http://www.wowotech.net/author/532) 发布于：2019-12-27 16:53 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 我们继续上一节的内容往下分析代码
 
-  
-
-  
 
 【硬件环境】         Imx6ul
-
 【Linux kernel版本】   Linux4.1.15
-
 【以太网phy】        Realtek8201f
 
 ## 1.1 Ifconfig的详细代码流程
-
 ret_fast_syscall ===》这是返回系统调用的syscall，大家可以看注释，saving r0，back into the SVC stack
-
 arch/arm/kernel/entry-common.S
 
-  
-
+```cpp
 1. /*
 2.  * This is the fast syscall return path.  We do as little as
 3.  * possible here, and this includes saving r0 back into the SVC
@@ -59,11 +35,10 @@ arch/arm/kernel/entry-common.S
 
 21. 	restore_user_regs fast = 1, offset = S_OFF
 22.  UNWIND(.fnend		)
-
+```
   
-
 fs/ioctl.c
-
+```cpp
 1. SYSCALL_DEFINE3(ioctl, unsigned int, fd, unsigned int, cmd, unsigned long, arg)
 2. {
 3. 	int error;
@@ -77,7 +52,9 @@ fs/ioctl.c
 11. 	fdput(f);
 12. 	return error;
 13. }
+```
 
+```cpp
 1. /*
 2.  * When you add any new common ioctls to the switches above and below
 3.  * please update compat_sys_ioctl() too.
@@ -142,15 +119,12 @@ fs/ioctl.c
 62. 	}
 63. 	return error;
 64. }
-
-  
+```
 
 通过dump信息，我们知道是调用了vfs_ioctl，
 
-  
-
 继续看vfs_ioctl：
-
+```cpp
 1. /**
 2.  * vfs_ioctl - call filesystem specific ioctl methods
 3.  * @filp:	open file to invoke ioctl method on
@@ -166,11 +140,8 @@ fs/ioctl.c
 13. 		      unsigned long arg)
 14. {
 15. 	int error = -ENOTTY;
-
 1.     printk("zbh %s:%s(%d) file system name:%s \r\n", 
-
 1.         __FILE__, __func__, __LINE__, filp->f_path.dentry->d_sb->s_type->name);
-
 1. 	if (!filp->f_op->unlocked_ioctl)
 2. 		goto out;
 
@@ -180,26 +151,19 @@ fs/ioctl.c
 7.  out:
 8. 	return error;
 9. }
-
+```
   
-
 打印的目的是告诉大家一个查看文件系统类型的方法。
-
 这个是属于vfs下的sockfs文件系统
-
 到了这里我们要找到unlocked_ioctl的回调函数是哪个
 
 方法一：
-
-[![图像 97.jpg](http://www.wowotech.net/content/uploadfile/201912/9bdb1577437344.jpg "点击查看原图")](http://www.wowotech.net/content/uploadfile/201912/9bdb1577437344.jpg)  
-  
-
+![[Pasted image 20241003145826.png]] 
 方法二：
 
 因为我们在kernel的dump信息里面知道是调用了sock_ioctl，所以我们直接去找这个函数就好了，net/socket.c
 
-  
-
+```cpp
 1. /*
 2.  *	Socket files have a set of 'special' operations as well as the generic file ones. These don't appear
 3.  *	in the operation structures but are done directly via the socketcall() multiplexor.
@@ -222,19 +186,12 @@ fs/ioctl.c
 20. 	.splice_write = generic_splice_sendpage,
 21. 	.splice_read =	sock_splice_read,
 22. };
-
-  
+```
 
 注册是在如下地方注册的：
-
 使用函数
-
 1. sock_alloc_file
-
-  
-
-  
-
+```cpp
 1. /*
 2.  *	Obtains the first available file descriptor and sets it up for use.
 3.  *
@@ -287,15 +244,10 @@ fs/ioctl.c
 50. 	return file;
 51. }
 52. EXPORT_SYMBOL(sock_alloc_file);
-
+```
 从socket到下的流程是这样
-
-  
-
 系统调用socket
-
-  
-
+```cpp
 1. SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)
 2. {
 3. 	int retval;
@@ -336,42 +288,24 @@ fs/ioctl.c
 1. 在sock_map_fd中调用了sock_alloc_file
 
 4. 1. static int sock_map_fd(struct socket *sock, int flags)
-    
 5. {
-    
 6. 	struct file *newfile;
-    
 7. 	int fd = get_unused_fd_flags(flags);
-    
 8. 	if (unlikely(fd < 0))
-    
 9. 		return fd;
-    
-
 11. 	newfile = sock_alloc_file(sock, flags, NULL);
-    
 12. 	if (likely(!IS_ERR(newfile))) {
-    
 13. 		fd_install(fd, newfile);
-    
 14. 		return fd;
-    
 15. 	}
-    
 
 17. 	put_unused_fd(fd);
-    
 18. 	return PTR_ERR(newfile);
-    
 19. }
-    
-
-  
+```    
 
 看下sock_ioctl代码：
-
-  
-
+```cpp
 1. /*
 2.  *	With an ioctl, arg may well be a user mode pointer, but we don't know
 3.  *	what to do with it - that's up to the protocol still.
@@ -451,13 +385,10 @@ fs/ioctl.c
 77. 		}
 78. 	return err;
 79. }
-
-  
+```
 
 最后执行sock_do_ioctl
-
-  
-
+```cpp
 1. static long sock_do_ioctl(struct net *net, struct socket *sock,
 2. 				 unsigned int cmd, unsigned long arg)
 3. {
@@ -475,19 +406,11 @@ fs/ioctl.c
 
 16. 	return err;
 17. }
-
+```
   
-
-  
-
-  
-
 我们可以得出err是-19，
-
 这里的sock->ops->ioctl回调的是inet_ioctl, 路径：net/ipv4/af_inet.c
-
-  
-
+```cpp
 1. /*
 2.  *	ioctl() calls you can issue on an INET socket. Most of these are
 3.  *	device configuration and stuff and very rarely used. Some ioctls
@@ -544,23 +467,17 @@ fs/ioctl.c
 54. 	return err;
 55. }
 56. EXPORT_SYMBOL(inet_ioctl);
-
+```
 我们看到这个代码，和ifconfig出问题的那个宏SIOCSIFFLAGS一样
-
-  
-
+```cpp
 case SIOCSIFFLAGS:  
 err = devinet_ioctl(net, cmd, (void __user *)arg);  
 break;
-
-  
+```
 
 调到了devinet_ioctl，路径：net/ipv4/devinet.c
-
 这个函数太长，我就黏贴部分代码
-
-  
-
+```cpp
 1. int devinet_ioctl(struct net *net, unsigned int cmd, void __user *arg)
 2. {
 3. 	struct ifreq ifr;
@@ -592,17 +509,11 @@ break;
 29. 		}
 30. 		ret = dev_change_flags(dev, ifr.ifr_flags);
 31. 		break;
-
+```
   
-
-  
-
-  
-
 继续跟踪dev_change_flags，路径：net/core/dev.c
 
-  
-
+```cpp
 1. /**
 2.  *	dev_change_flags - change device settings
 3.  *	@dev: device
@@ -686,13 +597,10 @@ break;
 
 59. 	return ret;
 60. }
-
-  
+```
 
 我们看这里
-
-  
-
+```cpp
 1. 	/*
 2. 	 *	Have we downed the interface. We handle IFF_UP ourselves
 3. 	 *	according to user attempts to set it, rather than blindly
@@ -702,11 +610,8 @@ break;
 7. 	ret = 0;
 8. 	if ((old_flags ^ flags) & IFF_UP)
 9. 		ret = ((old_flags & IFF_UP) ? __dev_close : __dev_open)(dev);
-
+```
   
-
-  
-
 到这里大家有印象了吧？__dev_open最终回调的是控制器驱动fec_main.c中的那个
 
 fec_enet_open，大家还记得我们要分析什么吧？那个-19的错误就是这个open里面返回的

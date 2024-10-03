@@ -1,298 +1,144 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2021-7-6 10:38 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
-# 一例智能网卡(mellanox)的网卡故障分析
+背景：这个是在centos 7.6.1810的环境上复现的，智能网卡是目前很多云服务器上的网卡标配，在oppo主要用于vpc等场景，智能网卡的代码随着功能的增强导致复杂度一直在上升，驱动的bug一直是内核bug中的大头，在遇到类似问题时，内核开发者由于对驱动代码不熟悉，排查会比较费劲,本身涉及的背景知识有：dma_pool,dma_page,net_device,mlx5_core_dev设备，设备卸载，uaf问题等,另外，这个bug目测在最新的linux基线也没有解决,本文单独拿出来列举是因为uaf问题相对比较独特。
+下面列一下我们是怎么排查并解决这个问题的。
 
-## 背景：这个是在centos 7.6.1810的环境上复现的，智能网卡是目前很多
-
-## 云服务器上的网卡标配，在oppo主要用于vpc等场景，智能网卡的代码随着
-
-## 功能的增强导致复杂度一直在上升，驱动的bug一直是内核bug
-
-## 中的大头，在遇到类似问题时，内核开发者由于对驱动代码不熟悉，排查
-
-## 会比较费劲,本身涉及的背景知识有：dma_pool,dma_page,net_device,
-
-## mlx5_core_dev设备，设备卸载，uaf问题等,另外，这个bug目测在最新的
-
-## linux基线也没有解决,本文单独拿出来列举是因为uaf问题相对比较独特。
-
-### 下面列一下我们是怎么排查并解决这个问题的。
-
-  
-
-#### 一、故障现象
-
+# 一、故障现象
 oppo云内核团队接到连通性告警报障，发现机器复位：
 
 ```c
-
 UPTIME: 00:04:16-------------运行的时间很短
-
 LOAD AVERAGE: 0.25, 0.23, 0.11
-
 TASKS: 2027
-
 RELEASE: 3.10.0-1062.18.1.el7.x86_64
-
 MEMORY: 127.6 GB
-
 PANIC: "BUG: unable to handle kernel NULL pointer dereference at           (null)"
-
 PID: 23283
-
 COMMAND: "spider-agent"
-
 TASK: ffff9d1fbb090000  [THREAD_INFO: ffff9d1f9a0d8000]
-
 CPU: 0
-
 STATE: TASK_RUNNING (PANIC)
 
-  
-
 crash> bt
-
 PID: 23283  TASK: ffff9d1fbb090000  CPU: 0   COMMAND: "spider-agent"
-
  #0 [ffff9d1f9a0db650] machine_kexec at ffffffffb6665b34
-
  #1 [ffff9d1f9a0db6b0] __crash_kexec at ffffffffb6722592
-
  #2 [ffff9d1f9a0db780] crash_kexec at ffffffffb6722680
-
  #3 [ffff9d1f9a0db798] oops_end at ffffffffb6d85798
-
  #4 [ffff9d1f9a0db7c0] no_context at ffffffffb6675bb4
-
  #5 [ffff9d1f9a0db810] __bad_area_nosemaphore at ffffffffb6675e82
-
  #6 [ffff9d1f9a0db860] bad_area_nosemaphore at ffffffffb6675fa4
-
  #7 [ffff9d1f9a0db870] __do_page_fault at ffffffffb6d88750
-
  #8 [ffff9d1f9a0db8e0] do_page_fault at ffffffffb6d88975
-
  #9 [ffff9d1f9a0db910] page_fault at ffffffffb6d84778
-
     [exception RIP: dma_pool_alloc+427]//caq:异常地址
-
     RIP: ffffffffb680efab  RSP: ffff9d1f9a0db9c8  RFLAGS: 00010046
-
     RAX: 0000000000000246  RBX: ffff9d0fa45f4c80  RCX: 0000000000001000
-
     RDX: 0000000000000000  RSI: 0000000000000246  RDI: ffff9d0fa45f4c10
-
     RBP: ffff9d1f9a0dba20   R8: 000000000001f080   R9: ffff9d00ffc07c00
-
     R10: ffffffffc03e10c4  R11: ffffffffb67dd6fd  R12: 00000000000080d0
-
     R13: ffff9d0fa45f4c10  R14: ffff9d0fa45f4c00  R15: 0000000000000000
-
     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-
 #10 [ffff9d1f9a0dba28] mlx5_alloc_cmd_msg at ffffffffc03e10e3 [mlx5_core]//涉及的模块
-
 #11 [ffff9d1f9a0dba78] cmd_exec at ffffffffc03e3c92 [mlx5_core]
-
 #12 [ffff9d1f9a0dbb18] mlx5_cmd_exec at ffffffffc03e442b [mlx5_core]
-
 #13 [ffff9d1f9a0dbb48] mlx5_core_access_reg at ffffffffc03ee354 [mlx5_core]
-
 #14 [ffff9d1f9a0dbba0] mlx5_query_port_ptys at ffffffffc03ee411 [mlx5_core]
-
 #15 [ffff9d1f9a0dbc10] mlx5e_get_link_ksettings at ffffffffc0413035 [mlx5_core]
-
 #16 [ffff9d1f9a0dbce8] __ethtool_get_link_ksettings at ffffffffb6c56d06
-
 #17 [ffff9d1f9a0dbd48] speed_show at ffffffffb6c705b8
-
 #18 [ffff9d1f9a0dbdd8] dev_attr_show at ffffffffb6ab1643
-
 #19 [ffff9d1f9a0dbdf8] sysfs_kf_seq_show at ffffffffb68d709f
-
 #20 [ffff9d1f9a0dbe18] kernfs_seq_show at ffffffffb68d57d6
-
 #21 [ffff9d1f9a0dbe28] seq_read at ffffffffb6872a30
-
 #22 [ffff9d1f9a0dbe98] kernfs_fop_read at ffffffffb68d6125
-
 #23 [ffff9d1f9a0dbed8] vfs_read at ffffffffb684a8ff
-
 #24 [ffff9d1f9a0dbf08] sys_read at ffffffffb684b7bf
-
 #25 [ffff9d1f9a0dbf50] system_call_fastpath at ffffffffb6d8dede
-
     RIP: 00000000004a5030  RSP: 000000c001099378  RFLAGS: 00000212
-
     RAX: 0000000000000000  RBX: 000000c000040000  RCX: ffffffffffffffff
-
     RDX: 000000000000000a  RSI: 000000c00109976e  RDI: 000000000000000d---read的文件fd编号
-
     RBP: 000000c001099640   R8: 0000000000000000   R9: 0000000000000000
-
     R10: 0000000000000000  R11: 0000000000000206  R12: 000000000000000c
-
     R13: 0000000000000032  R14: 0000000000f710c4  R15: 0000000000000000
-
     ORIG_RAX: 0000000000000000  CS: 0033  SS: 002b                
-
 ```
 
 从堆栈看，是某进程读取文件触发了一个内核态的空指针引用。
-
-#### 二、故障现象分析
-
-  
+# 二、故障现象分析
 
 从堆栈信息看：
 
-  
-
 1、当时进程打开fd编号为13的文件，这个从rdi的值可以看出。
-
-  
-
 2、speed_show 和 __ethtool_get_link_ksettings 表示在读取网卡的速率值
-
 下面看下打开的文件是哪个，
 
 ```c
-
 crash> files 23283
-
 PID: 23283  TASK: ffff9d1fbb090000  CPU: 0   COMMAND: "spider-agent"
-
 ROOT: /rootfs    CWD: /rootfs/home/service/app/spider
-
  FD       FILE            DENTRY           INODE       TYPE PATH
-
 ....
-
   9 ffff9d0f5709b200 ffff9d1facc80a80 ffff9d1069a194d0 REG  /rootfs/sys/devices/pci0000:3a/0000:3a:00.0/0000:3b:00.0/net/p1p1/speed---这个还在
-
  10 ffff9d0f4a45a400 ffff9d0f9982e240 ffff9d0fb7b873a0 REG  /rootfs/sys/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.0/net/p3p1/speed---注意对应关系  0000:5e:00.0 对应p3p1
-
  11 ffff9d0f57098f00 ffff9d1facc80240 ffff9d1069a1b530 REG  /rootfs/sys/devices/pci0000:3a/0000:3a:00.0/0000:3b:00.1/net/p1p2/speed---这个还在
-
  13 ffff9d0f4a458a00 ffff9d0f9982e0c0 ffff9d0fb7b875f0 REG  /rootfs/sys/devices/pci0000:5d/0000:5d:00.0/0000:5e:00.1/net/p3p2/speed---注意对应关系 0000:5e:00.1 对应p3p2
-
 ....
-
 ```
 
 注意上面 pci编号与 网卡名称的对应关系，后面会用到。
-
 打开文件读取speed本身应该是一个很常见的流程，
-
 下面从 exception RIP: dma_pool_alloc+427 进一步分析为什么触发了NULL pointer dereference
-
 展开具体的堆栈如下：
 
 ```c
-
 #9 [ffff9d1f9a0db910] page_fault at ffffffffb6d84778
-
     [exception RIP: dma_pool_alloc+427]
-
     RIP: ffffffffb680efab  RSP: ffff9d1f9a0db9c8  RFLAGS: 00010046
-
     RAX: 0000000000000246  RBX: ffff9d0fa45f4c80  RCX: 0000000000001000
-
     RDX: 0000000000000000  RSI: 0000000000000246  RDI: ffff9d0fa45f4c10
-
     RBP: ffff9d1f9a0dba20   R8: 000000000001f080   R9: ffff9d00ffc07c00
-
     R10: ffffffffc03e10c4  R11: ffffffffb67dd6fd  R12: 00000000000080d0
-
     R13: ffff9d0fa45f4c10  R14: ffff9d0fa45f4c00  R15: 0000000000000000
-
     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-
     ffff9d1f9a0db918: 0000000000000000 ffff9d0fa45f4c00 
-
     ffff9d1f9a0db928: ffff9d0fa45f4c10 00000000000080d0 
-
     ffff9d1f9a0db938: ffff9d1f9a0dba20 ffff9d0fa45f4c80 
-
     ffff9d1f9a0db948: ffffffffb67dd6fd ffffffffc03e10c4 
-
     ffff9d1f9a0db958: ffff9d00ffc07c00 000000000001f080 
-
     ffff9d1f9a0db968: 0000000000000246 0000000000001000 
-
     ffff9d1f9a0db978: 0000000000000000 0000000000000246 
-
     ffff9d1f9a0db988: ffff9d0fa45f4c10 ffffffffffffffff 
-
     ffff9d1f9a0db998: ffffffffb680efab 0000000000000010 
-
     ffff9d1f9a0db9a8: 0000000000010046 ffff9d1f9a0db9c8 
-
     ffff9d1f9a0db9b8: 0000000000000018 ffffffffb680ee45 
-
     ffff9d1f9a0db9c8: ffff9d0faf9fec40 0000000000000000 
-
     ffff9d1f9a0db9d8: ffff9d0faf9fec48 ffffffffb682669c 
-
     ffff9d1f9a0db9e8: ffff9d00ffc07c00 00000000618746c1 
-
     ffff9d1f9a0db9f8: 0000000000000000 0000000000000000 
-
     ffff9d1f9a0dba08: ffff9d0faf9fec40 0000000000000000 
-
     ffff9d1f9a0dba18: ffff9d0fa3c800c0 ffff9d1f9a0dba70 
-
     ffff9d1f9a0dba28: ffffffffc03e10e3 
 
 #10 [ffff9d1f9a0dba28] mlx5_alloc_cmd_msg at ffffffffc03e10e3 [mlx5_core]
-
     ffff9d1f9a0dba30: ffff9d0f4eebee00 0000000000000001 
-
     ffff9d1f9a0dba40: 000000d0000080d0 0000000000000050 
-
     ffff9d1f9a0dba50: ffff9d0fa3c800c0 0000000000000005 --r12是rdi ,ffff9d0fa3c800c0
-
     ffff9d1f9a0dba60: ffff9d0fa3c803e0 ffff9d1f9d87ccc0 
-
     ffff9d1f9a0dba70: ffff9d1f9a0dbb10 ffffffffc03e3c92 
-
 #11 [ffff9d1f9a0dba78] cmd_exec at ffffffffc03e3c92 [mlx5_core]
-
 ```
 
 从堆栈中取出对应的 mlx5_core_dev 为 ffff9d0fa3c800c0
 
-  
-
 ```c
-
 crash> mlx5_core_dev.cmd ffff9d0fa3c800c0 -xo
-
 struct mlx5_core_dev {
-
   [ffff9d0fa3c80138] struct mlx5_cmd cmd;
-
 }
 
 crash> mlx5_cmd.pool ffff9d0fa3c80138
-
   pool = 0xffff9d0fa45f4c00------这个就是dma_pool，写驱动代码的同学会经常遇到
 
 ```
@@ -300,315 +146,163 @@ crash> mlx5_cmd.pool ffff9d0fa3c80138
 出问题的代码行号为：
 
 ```c
-
 crash> dis -l dma_pool_alloc+427 -B 5
-
 /usr/src/debug/kernel-3.10.0-1062.18.1.el7/linux-3.10.0-1062.18.1.el7.x86_64/mm/dmapool.c: 334
-
 0xffffffffb680efab <dma_pool_alloc+427>:        mov    (%r15),%ecx
-
 而对应的r15，从上面的堆栈看，确实是null。
-
     305 void *dma_pool_alloc(struct dma_pool *pool, gfp_t mem_flags,
-
     306                      dma_addr_t *handle)
-
     307 {
-
 ...
-
     315         spin_lock_irqsave(&pool->lock, flags);
-
     316         list_for_each_entry(page, &pool->page_list, page_list) {
-
     317                 if (page->offset < pool->allocation)---//caq:当前满足条件
-
     318                         goto ready;//caq:跳转到ready
-
     319         }
-
     320 
-
     321         /* pool_alloc_page() might sleep, so temporarily drop &pool->lock */
-
     322         spin_unlock_irqrestore(&pool->lock, flags);
-
     323 
-
     324         page = pool_alloc_page(pool, mem_flags & (~__GFP_ZERO));
-
     325         if (!page)
-
     326                 return NULL;
-
     327 
-
     328         spin_lock_irqsave(&pool->lock, flags);
-
     329 
-
     330         list_add(&page->page_list, &pool->page_list);
-
     331  ready:
-
     332         page->in_use++;//caq:表示正在引用
-
     333         offset = page->offset;//从上次用完的地方开始使用
-
     334         page->offset = *(int *)(page->vaddr + offset);//caq:出问题的行号
-
 ...
-
     }
-
 ```
 
 从上面的代码看，page->vaddr为NULL,offset也为0，才会引用NULL，page有两个来源，
-
-  
-
 第一种是从pool中的page_list中取，
-
-  
-
 第二种是从pool_alloc_page临时申请，当然申请之后会挂入到pool中的page_list,
-
-  
-
 下面查看一下这个page_list.
-
-  
-
 ```c
-
 crash> dma_pool ffff9d0fa45f4c00 -x
-
 struct dma_pool {
-
   page_list = {
-
     next = 0xffff9d0fa45f4c80, 
-
     prev = 0xffff9d0fa45f4c00
-
   }, 
 
   lock = {
-
     {
-
       rlock = {
-
         raw_lock = {
-
           val = {
-
             counter = 0x1
-
           }
-
         }
-
       }
-
     }
-
   }, 
 
   size = 0x400, 
-
   dev = 0xffff9d1fbddec098, 
-
   allocation = 0x1000, 
-
   boundary = 0x1000, 
-
   name = "mlx5_cmd\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000", 
-
   pools = {
-
     next = 0xdead000000000100, 
-
     prev = 0xdead000000000200
-
   }
-
 }
 
-  
-
 crash> list dma_pool.page_list -H 0xffff9d0fa45f4c00 -s dma_page.offset,vaddr
-
 ffff9d0fa45f4c80
-
   offset = 0
-
   vaddr = 0x0
-
 ffff9d0fa45f4d00
-
   offset = 0
-
   vaddr = 0x0
-
 ```
 
 从 dma_pool_alloc 函数的代码逻辑看，pool->page_list确实不为空，而且满足
-
 if (page->offset < pool->allocation) 的条件，所以第一个page应该是 ffff9d0fa45f4c80
-
 也就是从第一种情况取出的：
 
-  
-
 ```c
-
 crash> dma_page ffff9d0fa45f4c80
-
 struct dma_page {
-
   page_list = {
-
     next = 0xffff9d0fa45f4d00, 
-
     prev = 0xffff9d0fa45f4c80
-
   }, 
-
   vaddr = 0x0, //caq:这个异常，引用这个将导致crash
-
   dma = 0, 
-
   in_use = 1, //caq:这个标记为在使用，符合page->in_use++;
-
   offset = 0
-
 }
-
-  
-
 ```
 
 问题分析到这里，因为dma_pool中的page，申请之后，vaddr都会初始化，
-
 一般在pool_alloc_page 中进行初始化，怎么可能会NULL呢？
-
 然后查看一下这个地址：
 
 ```c
-
 crash> kmem ffff9d0fa45f4c80-------这个是dma_pool中的page
-
 CACHE            NAME                 OBJSIZE  ALLOCATED     TOTAL  SLABS  SSIZE
-
 ffff9d00ffc07900 kmalloc-128//caq:注意这个长度  128       8963     14976    234     8k
-
   SLAB              MEMORY            NODE  TOTAL  ALLOCATED  FREE
-
   ffffe299c0917d00  ffff9d0fa45f4000     0     64         29    35
-
   FREE / [ALLOCATED]
-
    ffff9d0fa45f4c80  
 
-  
-
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
-
 ffffe299c0917d00 10245f4000                0 ffff9d0fa45f4c00  1 2fffff00004080 slab,head
-
 ```
 
 由于以前用过类似的dma函数，印象中dma_page没有这么大，再看看第二个dma_page如下：
 
-  
-
 ```c
-
 crash> kmem ffff9d0fa45f4d00
-
 CACHE            NAME                 OBJSIZE  ALLOCATED     TOTAL  SLABS  SSIZE
-
 ffff9d00ffc07900 kmalloc-128              128       8963     14976    234     8k
-
   SLAB              MEMORY            NODE  TOTAL  ALLOCATED  FREE
-
   ffffe299c0917d00  ffff9d0fa45f4000     0     64         29    35
-
   FREE / [ALLOCATED]
-
    ffff9d0fa45f4d00  
 
-  
-
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
-
 ffffe299c0917d00 10245f4000                0 ffff9d0fa45f4c00  1 2fffff00004080 slab,head
 
-  
-
 crash> dma_page ffff9d0fa45f4d00
-
 struct dma_page {
-
   page_list = {
-
     next = 0xffff9d0fa45f5000, 
-
     prev = 0xffff9d0fa45f4d00
-
   }, 
-
   vaddr = 0x0, -----------caq：也是null
-
   dma = 0, 
-
   in_use = 0, 
-
   offset = 0
-
 }
 
-  
-
 crash> list dma_pool.page_list -H 0xffff9d0fa45f4c00 -s dma_page.offset,vaddr
-
 ffff9d0fa45f4c80
-
   offset = 0
-
   vaddr = 0x0
-
 ffff9d0fa45f4d00
-
   offset = 0
-
   vaddr = 0x0
-
 ffff9d0fa45f5000
-
   offset = 0
-
   vaddr = 0x0
-
 .........
-
-  
-
 ```
 
 看来不仅是第一个dma_page有问题，所有在pool中的dma_page单元都一样，
 
 那直接查看一下dma_page的正常大小：
 
-  
-
 ```c
-
 crash> p sizeof(struct dma_page)
-
 $3 = 40
-
 ```
 
 按道理长度才40字节，就算申请slab的话，也应该扩展为64字节才对，怎么可能像上面那个dma_page
@@ -616,52 +310,30 @@ $3 = 40
 一样是128字节呢？为了解开这个疑惑，找一个正常的其他节点对比一下：
 
 ```c
-
 crash> net
-
    NET_DEVICE     NAME   IP ADDRESS(ES)
-
 ffff8f9e800be000  lo     127.0.0.1
-
 ffff8f9e62640000  p1p1   
-
 ffff8f9e626c0000  p1p2   
-
 ffff8f9e627c0000  p3p1   -----//caq:以这个为例
-
 ffff8f9e62100000  p3p2   
-
-  
+```
 
 然后根据代码：通过net_device查看mlx5e_priv：
 
-  
-
+```c
 static int mlx5e_get_link_ksettings(struct net_device *netdev,
-
-                    struct ethtool_link_ksettings *link_ksettings)
-
-{
-
+                    struct ethtool_link_ksettings *link_ksettings) {
 ...
-
     struct mlx5e_priv *priv    = netdev_priv(netdev);
-
 ...
-
 }
 
-  
 
 static inline void *netdev_priv(const struct net_device *dev)
-
 {
-
   return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
-
 }
-
-  
 
 crash> px sizeof(struct net_device)
 
