@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "708d45d25c4fe774",
+        "id": "b38761dc58c40cfb",
         "type": "tabs",
         "children": [
           {
-            "id": "68f8997a14328494",
+            "id": "24e3f17feddf85ca",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
+                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "Linux转发性能评估与优化(转发瓶颈分析与解决方案)",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
+                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
+                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md"
+                "file": "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md"
               }
             }
           }
@@ -146,29 +146,34 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "68f8997a14328494",
+  "active": "24e3f17feddf85ca",
   "lastOpenFiles": [
-    "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "README.md",
+    "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
+    "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "Untitled.canvas",
+    "coding/coding-quote.md",
+    "zx99-image/Pasted image 20241003161545.png",
+    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的?.md",
+    "zx99-image/Pasted image 20241003161644.png",
+    "zx99-image/Pasted image 20241003161638.png",
+    "zx99-image/Pasted image 20241003161633.png",
+    "zx99-image/Pasted image 20241003161623.png",
+    "zx99-image/Pasted image 20241003161616.png",
+    "zx99-image/Pasted image 20241003161609.png",
+    "zx99-image/Pasted image 20241003161602.png",
+    "zx99-image/Pasted image 20241003161556.png",
+    "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
+    "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "zx99-image/Pasted image 20241003150402.png",
-    "zx99-image/Pasted image 20241003150502.png",
-    "zx99-image/Pasted image 20241003150446.png",
-    "zx99-image/Pasted image 20241003150425.png",
-    "zx99-image/Pasted image 20241003150415.png",
     "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
     "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
     "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
     "coding/os/linux/network/t_linux loop device 机制介绍.md",
     "coding/os/linux/network/最后一天，继续卷！.md",
-    "zx99-image/Pasted image 20241003145826.png",
     "coding/os/linux/network/d_以太网驱动的流程浅析(二)-Ifconfig的详细代码流程.md",
-    "zx99-image/Pasted image 20241003145842.png",
     "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
-    "zx99-image/Pasted image 20241003145358.png",
     "interview/kn_这些年背过的面试题——网络和操作系统基础篇.md",
-    "zx99-image/Pasted image 20241003144941.png",
-    "zx99-image/Pasted image 20241003145043.png",
-    "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
     "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
     "interview/a_C语言与C++面试知识总结.md",
@@ -180,9 +185,6 @@
     "coding/cpp/grammar/C++20新特性—“宇宙飞船”运算符.md",
     "coding/cpp/grammar/i_C++20那些事之宇宙飞船运算符.md",
     "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
-    "coding/cpp/grammar/k_C++反射 第一章：通识.md",
-    "coding/coding-quote.md",
-    "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
@@ -194,7 +196,6 @@
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order",
     "0x01-leetcode/math-logic/Untitled.canvas",
-    "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas",
-    "Untitled.canvas"
+    "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
   ]
 }

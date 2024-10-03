@@ -1,32 +1,8 @@
-# 
 
 CPP开发者
-
  _2021年10月13日 11:57_
-
 The following article is from 开发内功修炼 Author 张彦飞allen
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5PSTGibsjHYiaRMmoGJxNMm8VFPdHQgvCVyBuEibNnqLMwA/0)
-
-**开发内功修炼**.
-
 飞哥有鹅厂、搜狗 10 年多的开发工作经验。通过本号，我把多年中对于性能的一些深度思考分享给大家。
-
-](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651164890&idx=1&sn=305fdbc1dd029e0bd455de99fc3ca4c5&chksm=80644185b713c893729d53a09f09719907e4f55d83504acac9b3ec17566ce77e6a5e79ca386e&mpshare=1&scene=24&srcid=1013wV69u3DdaS4bPqHzMbbA&sharer_sharetime=1634105261866&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0624c1cdbd84e46437413f4832a201693d4e85833d35b9081b38011fde127aa688ee404cf74f81175c07465a2ada95748d87d90cac2f287a73359bd78660c22015a20795ca6761b8f63fa51e03541adcaf687df8b1d0a7dc4def72abaa878cf91a0323f9eead6e2614ecd802a9b3c12cef1f642d0e3a52c20&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_e829fd9228a9&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQegpUzP6Nw31ZpztPtQNhxRKUAgIE97dBBAEAAAAAABJmFZvUh0wAAAAOpnltbLcz9gKNyK89dVj0SGbgFvEJhFF6ATHMlbeOJ2sjv05b7qGcmRbMu7bePZL729Od%2FbmgC%2BwfrTgXmY65aGyY7laf42iySGnZT7tdbT8rfXqM7%2BdINASWxrLLhesHyDU3aPpUfPTNznnUWb9%2FErE54v7Vj8A8ykSW3HSAkd8yraySAuDo4eSNnq3dIMcez4uPn5DCLrzwpsLYy8DNkW%2ByVjSk%2BdiPMQ5j4APY%2BfCnzAZ4h3YuAkWmKdRXflq42CstOkc0PrccnxZczLiDtd5JbnBBSVuFdBISUlLseckCQkF7tiGo28Eh0bTGmsoHHkWsbCk1%2BxExtYrgjw%3D%3D&acctmode=0&pass_ticket=%2F63kOOZKuhKMKv2qhdRNn%2BYs96HonZvVNlQI0sR91ckbacQPoekf70FeYWArCGP0&wx_header=0#)
-
-↓推荐关注↓
-
-![](http://mmbiz.qpic.cn/mmbiz_png/DSU8cv1j3ibStMRcibJLd4TkNlt53KNZj0A2IicORH4REC4ics87icsx703M5giby2wuofz3dicMsHVcXDMXTM6t6VBQw/300?wx_fmt=png&wxfrom=19)
-
-**开源前哨**
-
-点击获取10万+ star的开发资源库。 日常分享热门、有趣和实用的开源项目～
-
-167篇原创内容
-
-公众号
 
 今天聊聊大家工作中经常用到的 tcpdump。  
 
@@ -35,18 +11,15 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 按照飞哥的风格，不搞到最底层的原理咱是不会罢休的。所以我对相关的源码进行了深入分析。通过本文，你将彻底搞清楚了以下这几个问题。
 
 - tcpdump 是如何工作的？
-    
 - netfilter 过滤的包 tcpdump 是否可以抓的到？
-    
 - 让你自己写一个抓包程序的话该如何下手？
-    
 
 借助这几个问题，我们来展开今天的探索之旅！
 
 ## 一、网络包接收过程
 
 在[图解Linux网络包接收过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666548640&idx=1&sn=7e6dcbbcd569ad4f3c20e915b78b3bac&chksm=80dc890bb7ab001d4cd880c773b3e7b3b9ee4d7d9d4fac0ebbeaa6d247c70084d8cde829bcf2&scene=21#wechat_redirect)一文中我们详细介绍了网络包是如何从网卡到达用户进程中的。这个过程我们可以简单用如下这个图来表示。
-
+![[Pasted image 20241003161545.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 找到 tcpdump 抓包点  
@@ -74,7 +47,7 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 如果你用 NF_HOOK 作为关键词来搜索，还能搜到不少 netfilter 的过滤点。不过所有的过滤点都是位于 IP 协议层的。
 
 在接收包的过程中，数据包是先经过网络设备层然后才到协议层的。
-
+![[Pasted image 20241003161556.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么我们开篇中的一个问题就有了答案了。假如我们设置了 netfilter 规则，在接收包的过程中，工作在网络设备层的 tcpdump 先开始工作。还没等 netfilter 过滤，tcpdump 就抓到包了！  
@@ -84,7 +57,7 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 ## 二、网络包发送过程
 
 我们接着再来看网络包发送过程。在[25 张图，一万字，拆解 Linux 网络包发送过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666554809&idx=1&sn=31381caf815f6b0dc266b6dc432959da&chksm=80dca112b7ab2804efc8a99772fc17a1217f791a988c5087a703b10c4bf3d27fee55abfbcd85&scene=21#wechat_redirect)一文中，我们详细描述过网络包的发送过程。发送过程可以汇总成简单的一张图。
-
+![[Pasted image 20241003161602.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 找到 netfilter 过滤点  
@@ -104,7 +77,7 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 在上述代码中我们看到，在 dev_queue_xmit_nit 中遍历 ptype_all 中的协议，并依次调用 deliver_skb。这就会执行到 tcpdump 挂在上面的虚拟协议。
 
 在网络包的发送过程中，和接收过程恰好相反，是协议层先处理、网络设备层后处理。
-
+![[Pasted image 20241003161609.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **如果 netfilter 设置了过滤规则，那么在协议层就直接过滤掉了。在下层网络设备层工作的 tcpdump 将无法再捕获到该网络包**。  
@@ -132,7 +105,7 @@ socket 系统调用的第一个参数表示创建的 socket 所属的地址簇�
 在 __sock_create 中，从 net_families 中获取了指定协议。并调用了它的 create 方法来完成创建。
 
 net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，还支持很多种协议族。比如 PF_UNIX、PF_INET6（ipv6）、PF_PACKET等等。每一种协议族在 net_families 数组的特定位置都可以找到其 family 类型。在这个 family 类型里，成员函数 create 指向该协议族的对应创建函数。
-
+![[Pasted image 20241003161616.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 根据上图，我们看到对于 packet 类型的 socket，pf->create 实际调用到的是 packet_create 函数。我们进入到这个函数中来一探究竟，这是理解 tcpdump 工作原理的关键！  
@@ -140,7 +113,7 @@ net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，�
 `//file: packet/af_packet.c   static int packet_create(struct net *net, struct socket *sock, int protocol,       int kern)   {    ...    po = pkt_sk(sk);    po->prot_hook.func = packet_rcv;       //注册钩子    if (proto) {     po->prot_hook.type = proto;     register_prot_hook(sk);    }   }      static void register_prot_hook(struct sock *sk)   {    struct packet_sock *po = pkt_sk(sk);    dev_add_pack(&po->prot_hook);   }   `
 
 在 packet_create 中设置回调函数为 packet_rcv，再通过 register_prot_hook => dev_add_pack 完成注册。注册完后，是在全局协议 ptype_all 链表中添加了一个虚拟的协议进来。
-
+![[Pasted image 20241003161623.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们再来看下 dev_add_pack 是如何注册协议到 ptype_all 中的。回顾我们开头看到的 socket 函数调用，第三个参数 proto 传入的是 ETH_P_ALL。那 dev_add_pack 其实最后是把 hook 函数添加到了 ptype_all 里了，代码如下。  
@@ -161,11 +134,11 @@ net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，�
 
 **2. netfilter 过滤的包 tcpdump是否可以抓的到**  
 关于这个问题，得分接收和发送过程分别来看。在网络包接收的过程中，由于 tcpdump 近水楼台先得月，所以完全可以捕获到命中 netfilter 过滤规则的包。
-
+![[Pasted image 20241003161633.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 但是在发送的过程中，恰恰相反。网络包先经过协议层，这时候被 netfilter 过滤掉的话，底层工作的 tcpdump 还没等看见就啥也没了。  
-
+![[Pasted image 20241003161638.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **3. 让你自己写一个抓包程序的话该如何下手**  
@@ -175,12 +148,13 @@ net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，�
 
 编译一下，注意运行需要 root 权限。
 
-```
-# gcc -o main main.c# ./main 
+```c
+# gcc -o main main.c
+# ./main 
 ```
 
 运行结果预览如下。
-
+![[Pasted image 20241003161644.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -197,15 +171,6 @@ net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，�
 
 3、[上午写了一段代码，下午就被开除了，奇怪的知识又增加了](http://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651164883&idx=1&sn=f29d8c8a08732d7dec12e998c7bb6a71&chksm=8064418cb713c89a62ab13f4479ad0e1e8542b2d3570e87e7d3981c331c1055c7bbc655fb304&scene=21#wechat_redirect)
 
-  
-
-**关注『CPP开发者』**  
-
-看精选C++技术文章 . 加C++开发者专属圈子
-
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
-
-**CPP开发者**
 
 我们在 Github 维护着 9000+ star 的C语言/C++开发资源。日常分享 C语言 和 C++ 开发相关技术文章，每篇文章都经过精心筛选，一篇文章讲透一个知识点，让读者读有所获～
 
