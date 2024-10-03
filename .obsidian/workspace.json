@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "file": "coding/os/linux/device/bn_学习下 eMMC.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "file": "coding/os/linux/device/bn_学习下 eMMC.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "file": "coding/os/linux/device/bn_学习下 eMMC.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md"
+                "file": "coding/os/linux/device/bn_学习下 eMMC.md"
               }
             }
           }
@@ -148,19 +148,23 @@
   },
   "active": "24e3f17feddf85ca",
   "lastOpenFiles": [
-    "zx99-image/Pasted image 20241003192825.png",
+    "coding/os/linux/device/a_中断唤醒系统流程.md",
     "README.md",
+    "zx99-image/Pasted image 20241003223815.png",
+    "coding/os/linux/network/TCP/b_Google的TCP BBR拥塞控制算法深度解析.md",
+    "zx99-image/Pasted image 20241003224039.png",
+    "zx99-image/Pasted image 20241003224023.png",
+    "zx99-image/Pasted image 20241003224016.png",
+    "zx99-image/Pasted image 20241003224009.png",
+    "zx99-image/Pasted image 20241003224001.png",
+    "zx99-image/Pasted image 20241003223947.png",
+    "Pasted image 20241003223919.png",
+    "Pasted image 20241003223857.png",
+    "coding/os/linux/network/TCP/an_告别 TCP！.md",
+    "coding/os/linux/network/i_最后一天，继续卷！.md",
     "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
-    "zx99-image/Pasted image 20241003191858.png",
+    "zx99-image/Pasted image 20241003192825.png",
     "coding/os/linux/modules/k_图解 Linux进程通信 - 管道实现.md",
-    "zx99-image/Pasted image 20241003192150.png",
-    "zx99-image/Pasted image 20241003192144.png",
-    "zx99-image/Pasted image 20241003192124.png",
-    "zx99-image/Pasted image 20241003192116.png",
-    "zx99-image/Pasted image 20241003192110.png",
-    "zx99-image/Pasted image 20241003192052.png",
-    "zx99-image/Pasted image 20241003192019.png",
-    "zx99-image/Pasted image 20241003191920.png",
     "coding/os/linux/network/pn_通过实验深入了解 TCP 连接的建立和关闭.md",
     "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
@@ -172,7 +176,6 @@
     "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
     "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
     "coding/os/linux/network/t_linux loop device 机制介绍.md",
-    "coding/os/linux/network/最后一天，继续卷！.md",
     "coding/os/linux/network/d_以太网驱动的流程浅析(二)-Ifconfig的详细代码流程.md",
     "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
     "interview/kn_这些年背过的面试题——网络和操作系统基础篇.md",
@@ -182,8 +185,6 @@
     "auxiliary/test/alloctor.md",
     "coding/cpp/grammar/a_终极 C++避坑指南.md",
     "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
-    "coding/cpp/grammar/b_（文末赠书）学了许多年 C++ 终于想通了.......md",
-    "coding/cpp/grammar/an_万字长文带你掌握C++11中auto和decltype的用法和区别.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",

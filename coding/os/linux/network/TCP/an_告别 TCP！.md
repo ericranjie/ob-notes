@@ -1,16 +1,12 @@
 
 原创 小林coding 小林coding
-
  _2022年03月08日 17:46_
 
 大家好，我是小林。
 
 我第一次写 TCP 文章是这篇：[硬不硬你说了算！近 40 张图解被问千百遍的 TCP 三次握手和四次挥手面试题](https://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247484005&idx=1&sn=cb07ee1c891a7bdd0af3859543190202&scene=21#wechat_redirect)
-
 这篇文章虽然距离现在有差不多 2 年了，但是依旧很经典，时常收到很多读者的支持和鼓励。
-
 不过，由于文章篇幅比较长，所以难免出现了一些错别字，或者没解释清楚的地方。
-
 所以，我上周末抽空重新修正了这篇文章，并且又增加了一些面试题，所以现在新的 TCP 文章已经接近 2 万字啦。
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZcdcBQHLbqPN67xicTR5pyovh5Yic1jmRjWsYBvjvdr9oiaWVVkdw1z2ib7IFian6UibHoVLbAtjVYPXsEA/640?wx_fmt=png&wxfrom=13&tp=wxpic)

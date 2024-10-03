@@ -1,23 +1,6 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
+ 
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-1-1 17:03 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
-
-1. 前言
+# 1. 前言
 
 曾几何时，不知道你是否想过外部中断是如何产生的呢？又是如何唤醒系统的呢？在项目中，一般具有中断唤醒的设备会有一个interrupt pin硬件连接到SoC的gpio pin。一般来说，当设备需要唤醒系统的时候，会通过改变interrupt pin电平状态，而SoC会检测到这个变化，将SoC从睡眠中唤醒，该设备通过相关的子系统通知上层应用做出相应的处理。这就是中断唤醒的过程。说起来很简洁，可以说是涵盖了软硬件两大块。是不是？
 
@@ -33,7 +16,7 @@
 2. 中断唤醒流程
 
 现在还是假设你有一个上述的设备，现在你开始编写driver代码了。假设部分代码如下：
-
+```cpp
 1. static irqreturn_t smcdef_event_handler(int irq, void *private)
 2. {
 3.     /* do something you want, like report input events through input subsystem */
@@ -92,17 +75,13 @@
 56. MODULE_AUTHOR("smcdef");
 57. MODULE_DESCRIPTION("IRQ test");
 58. MODULE_LICENSE("GPL");
-
+```
 在probe函数中通过request_thread_irq接口注册驱动的中断服务函数smcdef_event_handler，注意这里smcdef_event_handler的执行环境是中断上下文，thread_fn的方式下面也会介绍。
-
-  
 
 2.1. enable_irq_wake  
 
 当系统睡眠（echo "mem" > /sys/power/state）的时候，回想一下suspend的流程就会知道，最终会调用smcdef_suspend使能中断唤醒功能。enable_irq_wake主要工作是在irq_set_irq_wake中完成，代码如下：
-
-  
-
+```cpp
 1. int irq_set_irq_wake(unsigned int irq, unsigned int on) 
 2. {
 3.     unsigned long flags;
@@ -134,24 +113,16 @@
 29.     irq_put_desc_busunlock(desc, flags);
 30.     return ret;
 31. }
-
+```
   
-
 > 1) 首先在set_irq_wake_real函数中通过irq_chip的irq_set_wake回调函数设置SoC相关wakeup寄存器使能中断唤醒功能，如果不使能的话，即使设备在那疯狂的产生中断signal，SoC可不会理睬你哦！  
 > 2) 设置irq的state为IRQD_WAKEUP_STATE，这步很重要，suspend流程会用到的。
 
-  
-
 2.2. Suspend to RAM流程
-
-  
 
 先画个图示意一下系统Suspend to RAM流程。我们可以看到图片画的很漂亮。从enter_state开始到suspend_ops->enter()结束。对于suspend_ops->enter()调用，我的理解是CPU停在这里了，待到醒来的时候，就从这里开始继续前行的脚步。
 
 [![STR流程.png](http://www.wowotech.net/content/uploadfile/201801/7dc41514798124.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201801/7dc41514798124.png)
-
-  
-
 > 1) enable_irq_wake()可以有两种途径，一是在driver的suspend函数中由驱动开发者主动调用；二是在driver的probe函数中调用dev_pm_set_wake_irq()和device_init_wakeup()。因为suspend的过程中会通过dev_pm_arm_wake_irq()打开所有wakeup source的irq wake功能。我更推荐途径1，因为系统已经帮我们做了，何必重复造轮子呢！  
 > 2) 对于已经enable 并且使能wakeup的irq，置位IRQD_WAKEUP_ARMED，然后等待IRQ handler和threaded handler执行完成。后续详细分析这一块。  
 > 3) 针对仅仅enable的irq，设置IRQS_SUSPENDED标志位，并disable irq。  
@@ -159,8 +130,6 @@
 > 5) 在cpu sleep之前进行最后一步操作就是syscore suspend。既然是最后suspend，那一定是其他device都依赖的系统核心驱动。后面说说什么的设备会注册syscore suspend。
 
 2.3. resume流程
-
-  
 
 假设我们使用的是gic-v3代码，边沿触发中断设备。现在设备需要唤醒系统了，产生一个边沿电平触发中断。此时会唤醒boot cpu（因为noboot cpu在suspend的时候已经被disable）。你以为此时就开始跳转中断服务函数了吗？no！还记得上一节说的吗？suspend之后已经diasble boot cpu的irq，因此中断不会立即执行。什么时候会执行呢？当然是等到local_irq_enable()之后。resume流程如下图。
 
@@ -176,9 +145,7 @@
   
 先想一想为什么要等到syscore_resume之后才arch_suspend_enable_irqs()呢？试想一下，系统刚被唤醒，最重要的事情是不是先打开相关的时钟以及最基本driver（例如：gpio、irq_chip等）呢？因此syscore_resume主要是clock以及gpio的驱动resume，因为这是其他设备依赖的最基本设备。回想一下上一节中Susoend to RAM流程中，syscore_suspend也同样是最后suspend的，毕竟人家是大部分设备的基础，当然最后才能suspend。可以通过register_syscore_ops()接口注册syscore operation。
 
-  
 2.5. gic interrupt controller中断执行流程
-
   
 接下来arch_suspend_enable_irqs()之后就是中断流程了，其函数执行流程如下。
 
@@ -189,7 +156,7 @@
   
 
 图片中是一个中断从汇编开始到结束的流程。假设我们的设备是边沿触发中断，那么一定会执行到handle_edge_irq()，如果你不想追踪代码，或者对中断流程不熟悉，我教你个方法，在注册的中断handle中加上一句WARN_ON(1);语句，请查看log信息即可。handle_edge_irq()代码如下：
-
+```cpp
 1. void handle_edge_irq(struct irq_desc *desc)
 2. {
 3.     raw_spin_lock(&desc->lock);
@@ -242,13 +209,12 @@
 50. out_unlock:
 51.     raw_spin_unlock(&desc->lock);
 52. }
-
+```
 > 1) irq_may_run()判断irq是否有IRQD_WAKEUP_ARMED标志位，当然这里是有的。随后调用irq_pm_check_wakeup()清除IRQD_WAKEUP_ARMED flag顺便置位IRQS_SUSPENDED和IRQS_PENDING flag，又irq_disable关闭了中断。  
 > 2) irq_may_run()返回false，因此这里直接返回了，所以你注册的中断handle并没有执行。你绝望，也没办法。当然这里也可以知道，唤醒系统的这次中断注册的handle的执行环境不是硬件中断上下文。
 
 2.6. dpm_resume_noirq()  
 
-  
 我们来继续分析2.3节resume的后续流程，把图继续搬过来。
 
 [![resume流程.png](http://www.wowotech.net/content/uploadfile/201801/a16a1514798123.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201801/a16a1514798123.png)
@@ -260,9 +226,7 @@
 > 5) check_irq_resend才是真正触发你注册的中断handle执行的真凶。
 
 check_irq_resend代码如下:
-
-  
-
+```cpp
 1. void check_irq_resend(struct irq_desc *desc)
 2. {
 3.     /*
@@ -292,13 +256,11 @@ check_irq_resend代码如下:
 27.         }
 28.     }
 29. }
-
+```
   
-
 由于在之前分析已经设置了IRQS_PENDING flag，因此这里会tasklet_schedule(&resend_tasklet)并且置位irqs_resend变量中相应的bit位，代表软中断触发。然后就开始tasklet_schedule最终会唤醒ksoftirqd线程，在ksoftirqd线程中会调用你注册的中断handle。具体调用过程可以参考wowo的softirq和tasklet文章。这里我们也可以得出中断handle执行的上下文环境是软中断上下文的结论。当然我们还是有必要分析一下tasklet最后一步resend_irqs()函数的作用，代码如下：
 
-  
-
+```cpp
 1. /* Bitmap to handle software resend of interrupts: */
 2. static DECLARE_BITMAP(irqs_resend, IRQ_BITMAP_BITS);
 
@@ -321,9 +283,8 @@ check_irq_resend代码如下:
 20. }
 21. /* Tasklet to handle resend: */
 22. static DECLARE_TASKLET(resend_tasklet, resend_irqs, 0);
-
+```
   
-
 > 1)  irqs_resend是一个unsigned int类型的数组，每一个bit都代表一个irq是否resend。  
 > 2)  resend_irqs是注册的resend_tasklet的callback函数，当tasklet_schedule(&resend_tasklet)之后就会被调度执行。  
 > 3)  在resend_irqs函数中，通过判断irqs_resend变量中的每一个bit位是否为1（即是否需要resend，也就是调用irq注册的中断handle）。  
@@ -333,11 +294,9 @@ check_irq_resend代码如下:
 
 2.7. IRQ handler会睡眠吗？
 
-  
 你想过request_thread_irq函数注册的hardirq handler或者是threaded handler会执行一半时，系统会再一次的休眠下去吗？再看看2.2节的图，实际上对于所有已经打开的irq在suspend_device_irqs()会调用synchronize_irq()等待正在处理的hardirq handler或者threaded handler。synchronize_irq()代码如下：
 
-  
-
+```cpp
 1. void synchronize_irq(unsigned int irq)
 2. {
 3.     struct irq_desc *desc = irq_to_desc(irq);
@@ -353,16 +312,13 @@ check_irq_resend代码如下:
 13.                !atomic_read(&desc->threads_active));
 14.     }
 15. }
-
+```
   
-
 > 1) __synchronize_hardirq()是等待hardirq handler执行完毕。  
 > 2) 只要threads_active计数不为0就等待threaded handler执行完毕。
 
 __synchronize_hardirq()代码如下：
-
-  
-
+```cpp
 1. static void __synchronize_hardirq(struct irq_desc *desc)
 2. {
 3.     bool inprogress;
@@ -385,13 +341,11 @@ __synchronize_hardirq()代码如下：
 20.         /* Oops, that failed? */
 21.     } while (inprogress);
 22. }
-
+```
   
-
 irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。标识hardirq thread正在执行，IRQD_IRQ_INPROGRESS在handle_irq_event()执行开始设置，等到handle_irq_event_percpu()执行完毕之后，同样在handle_irq_event()之后清除。因此hardirq handler执行结束之前系统不会睡眠。那么threaded handler情况也是这样吗？在__handle_irq_event_percpu()函数中通过__irq_wake_thread()函数唤醒irq_thread线程。__irq_wake_thread()函数如下：
 
-  
-
+```cpp
 1. void __irq_wake_thread(struct irq_desc *desc, struct irqaction *action)
 2. {
 3.     /*
@@ -415,16 +369,14 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 
 23.     wake_up_process(action->thread);
 24. }
-
+```
   
-
 > 1) 如果irq的中断线程已经设置IRQTF_RUNTHREAD标志位，代表irq线程已经正在运行，因此无需重新唤醒，直接返回即可。  
 > 2) 使用atomic_inc()增加threads_active计数，在synchronize_irq()函数中会判断threads_active计数是否为0来决定是否需要等待irq_thread执行完毕。
 
 说了这些，不知道你是否知道什么是irq_thread呢？我们通过request_thread_irq()函数指定thread_fn，这个thread_fn就是irq_thread线程最终调用的函数。而每个irq都会创建一个irq线程，创建的过程在setup_irq_thread()函数进行，setup_irq_thread()函数代码如下：
 
-  
-
+```cpp
 1. static int setup_irq_thread(struct irqaction *new, unsigned int irq, bool secondary)
 2. {
 3.     struct task_struct *t;
@@ -450,20 +402,16 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 23.     set_bit(IRQTF_AFFINITY, &new->thread_flags);
 24.     return 0;
 25. }
-
+```
   
-
 通过kthread_create()创建irq/irq-new->name的线程，该线程的入口函数值irq_thread。在irq_thread()中每执行完成一个thread_fn就会threads_active计数减1。  
 现在可以考虑第三个问题了，假如register_thread_irq方式注册的threaded irq中调用msleep(1000)，睡眠1秒，请问系统此时会继续睡下去而没调度回来吗？因此导致msleep后续的操作没有执行。答案就是不会，因为suspend时候会等待threaded handler执行完毕，所以系统不会睡眠，放心好了。
 
-  
 2.8. 工作队列会睡眠吗？
 
-  
 现在来思考一个按键消抖问题。如果你还不知道什么是按键消抖的话，我……。按键消抖在内核中通常是这样处理，通过变压触发中断，在中断handler中通过queue delayed work一段时间，计时结束执行按键上报处理。从内核的gpio_keys抠出部分代码如下：
 
-  
-
+```cpp
 1. static void gpio_keys_gpio_work_func(struct work_struct *work)
 2. {
 3.     struct gpio_button_data *bdata =
@@ -482,15 +430,13 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 
 17.     return IRQ_HANDLED;
 18. }
-
+```
   
-
 当按键按下，中断handler gpio_keys_gpio_isr执行，设定delayed work的定时器，等到定时器计时结束执行gpio_keys_gpio_work_func()，在gpio_keys_gpio_work_func()上报键值。你有考虑过一个问题吗？假如系统已经睡眠，此时第一次按下按键，是否有可能出现gpio_keys_gpio_work_func()函数没有执行，系统又继续睡眠，在第二次按键的时候执行第一次按键应该调用的gpio_keys_gpio_work_func()的情况吗？其实是有可能出现。只要bdata->software_debounce大于一定的时间就有可能出现。如果这个时间巧合，还有可能出现有时候正确上报，有时候没有上报。其实原因就是，内核的suspend只保证了IRQ handler的执行完成，并没有保证工作队列的执行完毕。
 
 这里说的问题是work_queue没有机会调度，系统就休眠了。如果使用的不是delayed work，就是普通的work，只是在work中使用类似msleep的操作，系统是否也会继续睡眠呢？修改代码如下：
 
-  
-
+```cpp
 1. static void gpio_keys_gpio_work_func(struct work_struct *work)
 2. {
 3.     struct gpio_button_data *bdata =
@@ -508,20 +454,17 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 
 16.     return IRQ_HANDLED;
 17. }
-
+```
   
-
 这里的gpio_keys_gpio_work_func()中添加一句msleep(1000)会怎么样呢？由于此时使用的不是delayed work，因此一般不会出现没有调度work就睡眠的情况，与上面的情况还是有点区别的。但是这里其实也是有可能睡眠的，一旦msleep(1000)语句执行完毕，系统满足sleep条件，此时系统还是有可能睡眠导致后面的操作没有执行。在下次唤醒系统的时候才可能执行。所以这种情况下也是危险的。
 
 结论就是：内核的suspend只保证了IRQ handler（hardirq handler or threaded handler）的执行完成，并没有保证工作队列的执行完毕。因此我们使用工作队列的话，必须要考虑这种情况的发生，并解决。
 
 2.9. 如何解决工作队列睡眠问题？
 
-  
 系统suspend的过程中，主要是通过pm_wakeup_pending()判断suspend是否需要abort。如果你对我说的这一块不清楚，可以看看wowo其他几篇关于电源管理的文章。pm_wakeup_pending()主要是判断combined_event_count变量在suspend的过程中是否改变，如果改变suspend就应该abort。既然知道了原理，那么就好办了。在中断handler开始处增加combined_event_count计数，工作队列函数结尾位置减小combined_event_count计数即可。当然是不用你自己写代码，系统提供了接口函数pm_stay_awake()和pm_relax()。2.8节修改后的代码如下：
 
-  
-
+```cpp
 1. static void gpio_keys_gpio_work_func(struct work_struct *work)
 2. {
 3.     struct gpio_button_data *bdata =
@@ -548,28 +491,21 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 
 25.     return IRQ_HANDLED;
 26. }
-
+```
   
-
 好了，现在你放心好了，即使你是在gpio_keys_gpio_work_func()中msleep(2000)，系统也会等到pm_relax()执行之后系统才可能suspend。
 
-  
 3. 驱动工程师建议
 
-  
 看了这么多代码总是想说点东西。不管是建议还是什么。我由衷地希望驱动工程师可以写出完美没有bug并且简洁的代码。因此，这里有点小建议给驱动工程师（某些特性可能需要比较新的内核版本）。  
 1) 如果设备具有唤醒系统的功能，请在probe函数中调用device_init_wakeup()和dev_pm_set_wake_irq()（注意调用顺序，先device_init_wakeup()再dev_pm_set_wake_irq()）。毕竟这样系统suspend的时候会自动帮助我们enable_irq_wake()和disable_irq_wake()，何乐而不为呢！简单就是美。如果你是i2c设备，那么可以更完美。连probe函数里面也可以不用调用了。只需要在设备的dts中添加wakeup-source属性即可。i2c core会自动帮我们完成这些操作。  
 2) 如果你习惯在driver的suspend()中关闭中断，在resum()中打开中断，我觉你没必要这么做，何必要这些冗余代码呢！  
 3) 既然dts现在这么流行了，你又何必不用呢！设备dts中的interrupts属性都会指明中断触发type，那你就用嘛！怎么获取这个flag呢？irqd_get_trigger_type()可以通过dts获取irq的触发type。所以request_threaded_irq()的第四个参数irqflags可以使用irqd_get_trigger_type()获得。如果你的内核版本更新的话，还可以更简单，irqflags传入0即可，在request_threaded_irq()中会自动帮我们调用irqd_get_trigger_type()获取。当然了，我也看聪明的IC厂家提供的driver，在dts中自定义一个属性表明irqflags，在driver中获取。我只能猜测driver的编写者不知道irqd_get_trigger_type()接口吧！  
 4) 如果中断下半部使用工作队列，请成对使用pm_stay_awake()和pm_relax()。否则，谁也无法保证系统不会再一次的睡眠。
 
-  
-
 _原创文章，转发请注明出处。蜗窝科技，www.wowotech.net。_
-
   
-
-  
+--- 
 
 标签: [电源管理](http://www.wowotech.net/tag/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86) [中断处理](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86) [中断子系统](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%AD%90%E7%B3%BB%E7%BB%9F) [中断唤醒](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%94%A4%E9%86%92)
 

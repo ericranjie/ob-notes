@@ -1,47 +1,17 @@
-# 
 
 人人极客社区
-
  _2022年04月06日 08:30_
 
-![](http://mmbiz.qpic.cn/mmbiz_png/9sNwsXcN68pL55XIyzTrCHZTbIUdTibQcuzuCaYeGTXNMyn6ACmicUrpoDC0xZSap46XJ59sKysPg9Rg379f32cA/300?wx_fmt=png&wxfrom=19)
-
-**人人极客社区**
-
-工程师们自己的Linux底层技术社区，分享体系架构、内核、网络、安全和驱动。
-
-316篇原创内容
-
-公众号
-
 - eMMC 简介
-    
-
 - Host Interface
-    
 - Flash Controller
-    
 - Flash Memory
-    
-
 - eMMC 分区管理
-    
-
 - Boot Area Partitions
-    
-
 - eMMC 分区应用实例
-    
 - eMMC 总线协议
-    
-
 - eMMC 总线接口
-    
 - eMMC 总线模型
-    
-
-  
-
 ## eMMC 简介
 
 eMMC 是 embedded MultiMediaCard 的简称。MultiMediaCard，即MMC， 是一种闪存卡（Flash Memory Card）标准，它定义了 MMC 的架构以及访问　Flash Memory 的接口和协议。而eMMC 则是对 MMC 的一个拓展，以满足更高标准的性能、成本、体积、稳定、易用等的需求。
