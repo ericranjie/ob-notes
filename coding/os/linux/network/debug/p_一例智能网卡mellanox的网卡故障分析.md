@@ -329,60 +329,36 @@ static int mlx5e_get_link_ksettings(struct net_device *netdev,
 ...
 }
 
-
 static inline void *netdev_priv(const struct net_device *dev)
 {
   return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
 }
 
 crash> px sizeof(struct net_device)
-
 $2 = 0x8c0
 
-  
-
 crash> mlx5e_priv.mdev ffff8f9e627c08c0---根据偏移计算
-
   mdev = 0xffff8f9e67c400c0
 
-  
-
 crash> mlx5_core_dev.cmd 0xffff8f9e67c400c0 -xo
-
 struct mlx5_core_dev {
-
   [ffff8f9e67c40138] struct mlx5_cmd cmd;
-
 }
 
-  
-
 crash> mlx5_cmd.pool ffff8f9e67c40138
-
   pool = 0xffff8f9e7bf48f80
 
-  
-
 crash> dma_pool 0xffff8f9e7bf48f80
-
 struct dma_pool {
-
   page_list = {
-
     next = 0xffff8f9e79c60880, //caq:其中的一个dma_page
-
     prev = 0xffff8fae6e4db800
-
   }, 
 
 .......
-
   size = 1024, 
-
   dev = 0xffff8f9e800b3098, 
-
   allocation = 4096, 
-
   boundary = 4096, 
 
   name = "mlx5_cmd\000\217\364{\236\217\377\377\300\217\364{\236\217\377\377\200\234>\250\217\217\377\377", 
