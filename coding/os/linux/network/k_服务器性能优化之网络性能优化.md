@@ -1,14 +1,9 @@
-# 
 
 Linux内核之旅
 
  _2021年12月24日 18:09_
 
 以下文章来源于极客重生 ，作者极客重生
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5dshlIEKpEhkUKbZoLeGqWdTZ4ia7z4wcOTuLo2U3gSSg/0)
 
 **极客重生**.
 
@@ -44,14 +39,14 @@ hi ，大家好，今天分享一篇**后台服务器性能优化**之**网络�
 
 **R**eceive **S**ide **S**caling（RSS）是所述机构具有多个RX / TX队列过程的数据包。当带有RSS 的网卡接收到数据包时，它会对数据包应用过滤器并将数据包分发到RX 队列。过滤器通常是一个哈希函数，可以通过“ethtool -X”进行配置。如果你想在前 3 个队列中均匀分布流量：
 
-```
+```c
 # ethtool -X eth0 equal 3
 ```
 
 或者，如果你发现一个特别有用的魔法哈希键：  
 
-```
-  # ethtool -X eth0 hkey <magic hash key>
+```c
+# ethtool -X eth0 hkey <magic hash key>
 ```
 
 对于**低延迟网络**，除了过滤器之外，CPU 亲和性也很重要。最佳设置是分配一个 CPU 专用于一个队列。首先通过检查/proc/interrupt找出IRQ号，然后将CPU位掩码设置为/proc/irq/<IRQ_NUMBER>/smp_affinity来分配专用CPU。为避免设置被覆盖，必须禁用守护进程_irqbalance_。请注意，根据内核文档，超线程对中断处理没有任何好处，因此最好将队列数与物理 CPU 内核数相匹配。  

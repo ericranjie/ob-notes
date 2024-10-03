@@ -3,8 +3,6 @@ Original 浅奕 阿里云开发者
 
  _2024年08月26日 08:31_ _浙江_
 
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/Z6bicxIx5naJqNQO3WNPDickicksAVMek4UYRYNDQY1emhibia5rA2tur1EhYOD4swQOZaYsohPsCyh5g5HS28SP1Dg/640?wx_fmt=jpeg&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 阿里妹导读
 
 TCP/IP 这个主题很多文章比较陈旧，且以讹传讹的东西太多，所以本文作者结合了理论和实践去写，旨在通过一系列实验帮助读者深入理解 TCP 连接的建立过程。
@@ -19,7 +17,6 @@ TCP/IP 这个主题很多文章比较陈旧，且以讹传讹的东西太多，�
 
 实验环境
 
-  
 
 **机器信息**
 
