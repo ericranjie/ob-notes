@@ -1,29 +1,19 @@
 
-
 阿里巴巴技术质量 阿里云开发者
-
  _2024年04月18日 08:31_ _浙江_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/Z6bicxIx5naIgx4meDqKQrQics0xRoaOmcHXQuicV1EkuOV5nT4AXeRUKfQPJye81Q9b0smfMXYt7BB9UzDS9NF6Q/640?wx_fmt=jpeg&from=appmsg&wxfrom=13&tp=wxpic)
 
 阿里妹导读
 
-  
-
 本文是技术人面试系列网络和操作系统基础篇，面试中关于网络和操作系统基础都需要了解哪些内容？一文带你详细了解，欢迎收藏！
 
-网络基础
-
-  
+# 网络基础
 
 **TCP三次握手**
 
 **三次握手过程：**
 
 客户端——发送带有SYN标志的数据包——服务端一次握手Client进入syn_sent状态；
-
 服务端——发送带有SYN/ACK标志的数据包——客户端二次握手服务端进入syn_rcvd；
-
 客户端——发送带有ACK标志的数据包——服务端三次握手连接就进入Established状态；
 
 **为什么三次：**
@@ -89,7 +79,7 @@ TCP/IP五层：物理层、数据链路层、网络层、传输层、应用层
 物理层：中继器、集线器
 
 #### 3、TCP与UDP区别及场景
-
+![[Pasted image 20241003144941.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **基于UDP的协议：**RIP、DNS、SNMP
@@ -132,7 +122,7 @@ TCP将接收到的数据包保存在接收缓存里，如果TCP接收数据包�
 #### 6、TCP、UDP报文格式
 
 **TCP报文格式：**
-
+![[Pasted image 20241003144949.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **源端口号和目的端口号：**
@@ -179,7 +169,7 @@ TCP的流量控制由连接的每一端通过声明的窗口大小来提供。�
 最常见的可选字段是最长报文大小，又称为MSS(Maximum Segment Size)。每个连接方通常都在通信的第一个报文段（为建立连接而设置SYN标志的那个段）中指明这个选项。它指明本端所能接收的最大长度的报文段。
 
 **UDP报文格式：**
-
+![[Pasted image 20241003145005.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **端口号：**
@@ -195,7 +185,7 @@ UDP长度字段指的是UDP首部和UDP数据的字节长度。该字段的最�
 UDP检验和是一个端到端的检验和。它由发送端计算，然后由接收端验证。其目的是为了发现UDP首部和数据在发送端到接收端之间发生的任何改动。
 
 **IP报文格式：**普通的IP首部长为20个字节，除非含有可选项字段。
-
+![[Pasted image 20241003145010.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **4位版本：**
@@ -227,7 +217,7 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 首部检验和字段是根据IP首部计算的检验和码。它不对首部后面的数据进行计算。ICMP、IGMP、UDP和TCP在它们各自的首部中均含有同时覆盖首部和数据检验和码。
 
 **以太网报文格式：**
-
+![[Pasted image 20241003145017.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **目的地址和源地址：**
@@ -268,7 +258,7 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 #### 2、HTTP与HTTPS之间的区别
 
 **HTTP与HTTPS之间的区别：**
-
+![[Pasted image 20241003145025.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **HTTPS链接建立的过程：**
@@ -294,11 +284,11 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 #### 3、Get和Post请求区别
 
 **HTTP请求：**
-
+![[Pasted image 20241003145030.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **get和Post区别：**
-
+![[Pasted image 20241003145035.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 4、HTTP常见响应状态码
@@ -354,7 +344,7 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 **浏览器输入URL过程**
 
 **过程：**DNS解析、TCP连接、发送HTTP请求、服务器处理请求并返回HTTP报文、浏览器渲染、结束。
-
+![[Pasted image 20241003145043.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 操作系统基础
@@ -468,8 +458,26 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 
 缺点：没有合适的算法，只有适合的算法，lFU、random都可以。
 
-```
+```java
 /**
+ * @program: Java
+ * @description: LRU最近最久未使用置换算法，通过LinkedHashMap实现
+ * @author: Mr.Li
+ * @create: 2020-07-17 10:29
+ **/
+public class LRUCache {
+    private LinkedHashMap<Integer,Integer> cache;
+    private int capacity;   //容量大小
+    /**
+     *初始化构造函数
+     * @param capacity
+     */
+    public LRUCache(int capacity) {
+        cache = new LinkedHashMap<>(capacity);
+        this.capacity = capacity;
+    }
+
+
 ```
 
 ```
