@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/opensource/详解C++高性能无锁队列的原理与实现.md",
+                "file": "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/opensource/详解C++高性能无锁队列的原理与实现.md",
+                "file": "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/opensource/详解C++高性能无锁队列的原理与实现.md",
+                "file": "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/opensource/详解C++高性能无锁队列的原理与实现.md"
+                "file": "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md"
               }
             }
           }
@@ -148,18 +148,24 @@
   },
   "active": "550c24418126d846",
   "lastOpenFiles": [
+    "coding/cpp/i_sizeof(void)之谜.md",
+    "coding/cpp/k_C++常见的三种内存破的场景和分析.md",
+    "README.md",
+    "0x99-image/Pasted image 20241003122354.png",
+    "coding/cpp/opensource/memory/b_【性能优化】高效内存池的设计与实现.md",
+    "coding/cpp/opensource/Glibc.md",
+    "0x99-image/Pasted image 20241003120639.png",
+    "coding/cpp/opensource/p_详解C++高性能无锁队列的原理与实现.md",
+    "0x99-image/Pasted image 20241003121039.png",
+    "0x99-image/Pasted image 20241003121025.png",
+    "0x99-image/Pasted image 20241003120929.png",
+    "0x99-image/Pasted image 20241003120920.png",
+    "0x99-image/Pasted image 20241003120713.png",
+    "0x99-image/Pasted image 20241003120705.png",
+    "0x99-image/Pasted image 20241003120700.png",
+    "0x99-image/Pasted image 20241003120652.png",
     "coding/cpp/opensource/in_推荐学习这个开源项目 (workflow).md",
-    "0x99-image/Pasted image 20241003103414.png",
     "coding/cpp/opensource/coroutine/a_深入理解协程.md",
-    "0x99-image/Pasted image 20241003103625.png",
-    "0x99-image/Pasted image 20241003103608.png",
-    "0x99-image/Pasted image 20241003103603.png",
-    "0x99-image/Pasted image 20241003103553.png",
-    "0x99-image/Pasted image 20241003103548.png",
-    "0x99-image/Pasted image 20241003103541.png",
-    "0x99-image/Pasted image 20241003103536.png",
-    "0x99-image/Pasted image 20241003103530.png",
-    "0x99-image/Pasted image 20241003103523.png",
     "coding/cpp/opensource/coroutine/an_协程简史，一文讲清楚协程的起源、发展和实现.md",
     "coding/cpp/opensource/coroutine/k_使用C++20协程和io_uring优雅地实现异步IO.md",
     "coding/cpp/opensource/coroutine/b_微信著名libco协程库原理剖析.md",
@@ -168,10 +174,8 @@
     "coding/cpp/performance/k_太实用了！减少C++代码编译时间的方法，看完的都加薪了.md",
     "coding/cpp/performance/k_C++服务性能优化的道与术-道篇：阿姆达尔定律.md",
     "coding/cpp/冷门知识点：进程间通信如何加锁？.md",
-    "coding/cpp/i_sizeof(void)之谜.md",
     "coding/cpp/a_从新手到专业人士：探索 C++ STL 以获得终极性能.md",
     "coding/cpp/i_new和delete一定要配对使用吗？.md",
-    "coding/cpp/k_C++常见的三种内存破的场景和分析.md",
     "coding/cpp/n_C++ STL之合并、反转和其他算法.md",
     "coding/cpp/Chrome 浏览器开源背后的一盘大棋.md",
     "coding/cpp/low-level/a_10张图22段代码，万字长文带你搞懂虚拟内存模型和malloc内部原理.md",
@@ -180,10 +184,6 @@
     "coding/cpp/low-level/a_C++ 内存管理（一）.md",
     "coding/cpp/comment/k_C++编程习惯与编程要点.md",
     "interview/a_C语言与C++面试知识总结.md",
-    "coding/cpp/low-level/a_做引擎开发，更需要深入 C++ 内存管理.md",
-    "coding/cpp/grammar/b_谈谈C++新标准带来的属性（Attribute）.md",
-    "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
-    "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",

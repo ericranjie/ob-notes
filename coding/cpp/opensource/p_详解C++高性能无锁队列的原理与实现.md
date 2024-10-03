@@ -13,37 +13,36 @@ Linux开发架构之路
 队列是一种非常重要的数据结构，其特性是先进先出（FIFO），符合流水线业务流程。在进程间通信、网络通信间经常采用队列做缓存，缓解数据处理压力。根据操作队列的场景分为：单生产者——单消费者、多生产者——单消费者、单生产者——多消费者、多生产者——多消费者四大模型。根据队列中数据分为：队列中的数据是定长的、队列中的数据是变长的。
 
 （1）单生产者——单消费者
-
+![[Pasted image 20241003120639.png]]
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxwvdt4Ge69XvK3cXTTHGxrqAReBqP56aEJ86y6I4ZUZunhrnHbZ3sVA/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
   
 
 （2）多生产者——单消费者
-
+![[Pasted image 20241003120646.png]]
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxu2Cgibu2ibzVHzibib3ecDBHUyGULmQ8pHILt6d7WTFCtSk0icGJl1fbu7A/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
   
 
 （3）单生产者——多消费者
-
+![[Pasted image 20241003120652.png]]
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxcDrf53VtOFHdsIKX6YoEhZaQfDkp6OvyUBDT674CSopUcrlP0sIruw/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
   
 
 （4）多生产者——多消费者
-
+![[Pasted image 20241003120700.png]]
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxe55aL9qvurqkASDia52dSias89ehbxcHdOwHZh3dPF7ia360csX9S87yA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
 
 （5）数据定长队列
-
+![[Pasted image 20241003120705.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
 
 （6）数据变长队列
-
+![[Pasted image 20241003120713.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 
@@ -59,7 +58,7 @@ Linux开发架构之路
 CAS即Compare and Swap，是所有CPU指令都支持CAS的原子操作（X86中CMPXCHG汇编指令），用于实现实现各种无锁（lock free）数据结构。
 
 CAS操作的C语言实现如下：
-
+```c
 bool compare_and_swap ( int *memory_location, int expected_value, int new_value)  
 {  
     if (*memory_location == expected_value)  
@@ -69,37 +68,37 @@ bool compare_and_swap ( int *memory_location, int expected_value, int new_value)
     }  
     return false;  
 }
-
+```
 CAS用于检查一个内存位置是否包含预期值，如果包含，则把新值复赋值到内存位置。成功返回true，失败返回false。
 
 （1）GGC对CAS支持
 
 GCC4.1+版本中支持CAS原子操作。
-
+```c
 bool __sync_bool_compare_and_swap (type *ptr, type oldval type newval, ...);  
    
 type __sync_val_compare_and_swap (type *ptr, type oldval type newval, ...);
-
+```
 （2）Windows对CAS支持
 
 Windows中使用Windows API支持CAS。
-
+```c
 LONG InterlockedCompareExchange(  
   LONG volatile *Destination,  
   LONG          ExChange,  
   LONG          Comperand  
 );
-
+```
 （3）C++11对CAS支持
 
 C++11 STL中atomic函数支持CAS并可以跨平台。
-
+```c
 template< class T >  
 bool atomic_compare_exchange_weak( std::atomic* obj,T* expected, T desired );  
    
 template< class T >  
 bool atomic_compare_exchange_weak( volatile std::atomic* obj,T* expected, T desired );
-
+```
 其它原子操作如下：
 
 Fetch-And-Add：一般用来对变量做+1的原子操作
@@ -161,11 +160,11 @@ GitHub：https://github.com/LMAX-Exchange/disruptor
 RingBuffer是生产者和消费者模型中常用的数据结构，生产者将数据追加到数组尾端，当达到数组的尾部时，生产者绕回到数组的头部；消费者从数组头端取走数据，当到达数组的尾部时，消费者绕回到数组头部。
 
 如果只有一个生产者和一个消费者，环形缓冲区可以无锁访问，环形缓冲区的写入index只允许生产者访问并修改，只要生产者在更新index前将新的值保存到缓冲区中，则消费者将始终看到一致的数据结构；读取index也只允许消费者访问并修改，消费者只要在取走数据后更新读index，则生产者将始终看到一致的数据结构。
-
+![[Pasted image 20241003120920.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 空队列时，front与rear相等；当有元素进队，则rear后移；有元素出队，则front后移。
-
+![[Pasted image 20241003120929.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -173,17 +172,17 @@ RingBuffer是生产者和消费者模型中常用的数据结构，生产者将�
 空队列时，rear等于front；满队列时，队列尾部空一个位置，因此判断循环队列满时使用(rear-front+maxn)%maxn。
 
 入队操作：
-
+```c
 data[rear] = x;  
    
 rear = (rear+1)%maxn;
-
+```
 出队操作：
-
+```c
 x = data[front];  
    
 front = (front+1)%maxn;
-
+```
 ### 
 
 3.2.单生产者单消费者
@@ -207,7 +206,7 @@ front = (front+1)%maxn;
 3.4.RingBuffer实现
 
 RingBuffer.hpp文件：
-
+```c
 #pragma once  
    
 template <class T>  
@@ -288,9 +287,9 @@ private:
     int m_rear;// 队列尾部索引  
     T* m_data;// 数据缓冲区  
 };
-
+```
 RingBufferTest.cpp测试代码：
-
+```c
 #include <stdio.h>  
 #include <thread>  
 #include <unistd.h>  
@@ -374,11 +373,11 @@ int main(int argc, char const *argv[])
     consumer.join();  
     return 0;  
 }
-
+```
 编译：
 
 g++ --std=c++11  RingBufferTest.cpp -o test -pthread
-
+![[Pasted image 20241003121039.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -390,7 +389,7 @@ g++ --std=c++11  RingBufferTest.cpp -o test -pthread
 3.5.LockFreeQueue实现
 
 LockFreeQueue.hpp:
-
+```c
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <string.h>  
@@ -607,7 +606,7 @@ protected:
 #endif  
     T* m_buffer;  
 };
-
+```
 #define USE_LOCK
 
 开启spinlock锁，多生产者多消费者场景
@@ -621,7 +620,7 @@ protected:
 开启队列大小的2的幂对齐
 
 LockFreeQueueTest.cpp测试文件：
-
+```c
 #include "LockFreeQueue.hpp"  
 #include <thread>  
    
@@ -702,13 +701,13 @@ int main(int argc, char const *argv[])
    
     return 0;  
 }
-
+```
 多线程场景下，需要定义USE_LOCK宏，开启锁保护。
 
 编译：
 
 > g++ --std=c++11 -O3 LockFreeQueueTest.cpp -o test -lrt -pthread
-
+![[Pasted image 20241003121025.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -728,7 +727,7 @@ kfifo是Linux内核的一个FIFO数据结构，采用环形循环队列的数据
 4.2.kfifo内核队列实现
 
 kfifo数据结构定义如下：
-
+```c
 struct kfifo  
 {  
     unsigned char *buffer;  
@@ -872,7 +871,7 @@ static inline unsigned int kfifo_len(struct kfifo *fifo)
     spin_unlock_irqrestore(fifo->lock, flags);  
     return ret;  
 }
-
+```
 ### 
 
 4.3.kfifo设计要点
@@ -886,7 +885,7 @@ kfifo->size值在调用者传递参数size的基础上向2的幂扩展，目的�
 （2）使用spin_lock_irqsave与spin_unlock_irqrestore 实现同步。
 
 Linux内核中有spin_lock、spin_lock_irq和spin_lock_irqsave保证同步。
-
+```c
 static inline void __raw_spin_lock(raw_spinlock_t *lock)  
 {  
     preempt_disable();  
@@ -901,7 +900,7 @@ static inline void __raw_spin_lock_irq(raw_spinlock_t *lock)
     spin_acquire(&lock->dep_map, 0, 0, _RET_IP_);  
     LOCK_CONTENDED(lock, do_raw_spin_trylock, do_raw_spin_lock);  
 }
-
+```
 spin_lock比spin_lock_irq速度快，但并不是线程安全的。spin_lock_irq增加调用local_irq_disable函数，即禁止本地中断，是线程安全的，既禁止本地中断，又禁止内核抢占。
 
 spin_lock_irqsave是基于spin_lock_irq实现的一个辅助接口，在进入和离开临界区后，不会改变中断的开启、关闭状态。
