@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/a_C语言与C++面试知识总结.md",
+                "file": "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/a_C语言与C++面试知识总结.md",
+                "file": "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/a_C语言与C++面试知识总结.md",
+                "file": "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/a_C语言与C++面试知识总结.md"
+                "file": "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md"
               }
             }
           }
@@ -148,6 +148,20 @@
   },
   "active": "68f8997a14328494",
   "lastOpenFiles": [
+    "0x99-image/Pasted image 20241003134601.png",
+    "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
+    "README.md",
+    "0x99-image/Pasted image 20241003134847.png",
+    "0x99-image/Pasted image 20241003134829.png",
+    "0x99-image/Pasted image 20241003134824.png",
+    "0x99-image/Pasted image 20241003134816.png",
+    "0x99-image/Pasted image 20241003134808.png",
+    "0x99-image/Pasted image 20241003134800.png",
+    "0x99-image/Pasted image 20241003134754.png",
+    "0x99-image/Pasted image 20241003134745.png",
+    "0x99-image/Pasted image 20241003134739.png",
+    "0x99-image/Pasted image 20241003134727.png",
+    "interview/a_C语言与C++面试知识总结.md",
     "auxiliary/test/alloctor.md",
     "coding/cpp/grammar/a_终极 C++避坑指南.md",
     "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
@@ -161,29 +175,15 @@
     "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
     "coding/cpp/i_sizeof(void)之谜.md",
     "coding/cpp/k_C++常见的三种内存破的场景和分析.md",
-    "README.md",
-    "0x99-image/Pasted image 20241003122354.png",
     "coding/cpp/opensource/memory/b_【性能优化】高效内存池的设计与实现.md",
     "coding/cpp/opensource/Glibc.md",
-    "0x99-image/Pasted image 20241003120639.png",
     "coding/cpp/opensource/p_详解C++高性能无锁队列的原理与实现.md",
-    "0x99-image/Pasted image 20241003121039.png",
-    "0x99-image/Pasted image 20241003121025.png",
-    "0x99-image/Pasted image 20241003120929.png",
-    "0x99-image/Pasted image 20241003120920.png",
-    "0x99-image/Pasted image 20241003120713.png",
-    "0x99-image/Pasted image 20241003120705.png",
-    "0x99-image/Pasted image 20241003120700.png",
-    "0x99-image/Pasted image 20241003120652.png",
     "coding/cpp/opensource/in_推荐学习这个开源项目 (workflow).md",
     "coding/cpp/opensource/coroutine/a_深入理解协程.md",
     "coding/cpp/opensource/coroutine/an_协程简史，一文讲清楚协程的起源、发展和实现.md",
     "coding/cpp/opensource/coroutine/k_使用C++20协程和io_uring优雅地实现异步IO.md",
     "coding/cpp/opensource/coroutine/b_微信著名libco协程库原理剖析.md",
     "coding/cpp/opensource/coroutine/深入探索C++20的重要特性：从模块化到协程.md",
-    "coding/cpp/opensource/coroutine/k_C++ 20 协程 Coroutine（3，剖析）.md",
-    "coding/cpp/performance/k_太实用了！减少C++代码编译时间的方法，看完的都加薪了.md",
-    "coding/cpp/performance/k_C++服务性能优化的道与术-道篇：阿姆达尔定律.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",

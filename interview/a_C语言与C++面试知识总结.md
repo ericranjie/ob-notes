@@ -609,7 +609,6 @@ auto fcn2(It beg, It end) -> typename remove_reference<decltype(*beg)>::type
     // 处理序列
     return *beg;    // 返回序列中一个元素的拷贝
 }
-
 ```
 
 ## **引用**
@@ -747,7 +746,6 @@ public:
     void do(int a);
     void do(int a, int b);
 };
-
 ```
 
 ### **动态多态（运行期期/晚绑定）**
@@ -797,7 +795,6 @@ int main()
     shape2 = nullptr;
     return 0;
 }
-
 ```
 
 ## **虚析构函数**
@@ -828,7 +825,6 @@ int main()
     shape1 = NULL;
     return 0；
 }
-
 ```
 
 ## **纯虚函数**
