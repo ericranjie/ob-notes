@@ -1,37 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2016-6-8 16:41 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
-
-## 
-
-相关文章：
-
-[DRAM 原理 2 ：DRAM Memory Organization](http://www.wowotech.net/basic_tech/309.html)[](http://www.wowotech.net/basic_tech/307.html)
-
-[DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)
-
-[DRAM 原理 4 ：DRAM Timing](http://www.wowotech.net/basic_tech/330.html)  
-
-[DRAM 原理 5 ：DRAM Devices Organization](http://www.wowotech.net/basic_tech/343.html)
 
 ## 1. Storage Capacitor
 
-  
 
 DRAM Storage Cell 使用 Storage Capacitor 来存储 Bit 信息。
 
@@ -143,7 +113,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [SDRAM](http://www.wowotech.net/tag/SDRAM) [dram](http://www.wowotech.net/tag/dram)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [通过点亮LED的方法调试嵌入式代码](http://www.wowotech.net/soft/debug_using_led.html) | [u-boot启动流程分析(2)_板级(board)部分](http://www.wowotech.net/u-boot/boot_flow_2.html)»
 

@@ -1,10 +1,7 @@
-
 Original 字节跳动STE团队 字节跳动SYS Tech
-
  _2023年07月21日 19:33_ _北京_
 
 导语：ASAN(AddressSanitizer) 是 C/C++开发者常用的内存错误检测工具，主要用于检测缓冲区溢出、访问已释放的内存等内存错误。AArch64 上提供了 Top-Byte-Ingore 硬件特性，HWASan(HardWare-assisted AddressSanitizer) 就是利用 Top-Byte-Ignore 特性实现的增强版 ASan，与 ASAN 相比 HWASan 的内存开销更低，检测到的内存错误范围更大。因此在 AArch64 平台，建议使用 HWASAN。本篇文章将深入分析 HWASAN 检测内存错误的原理，帮助大家更好地理解和使用 HWASan 来排查程序中存在的疑难内存错误。
-
 
 **前言**
 

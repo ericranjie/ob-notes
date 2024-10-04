@@ -1,4 +1,3 @@
-
 原创 布道师Peter 人人极客社区
 
  _2021年11月25日 08:26_
@@ -10,41 +9,41 @@ __initcall_start 到 __initcall_end 之间的 section，通过 vmlinux.lds 可�
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 宏 INIT_CALLS 中定义的这些 section 中放了一系列的函数，这些函数是用 pure_initcall，core_initcall 等宏定义的。如下所示：
-
+```cpp
 `#define INIT_CALLS_LEVEL(level)      \     VMLINUX_SYMBOL(__initcall##level##_start) = .;  \     KEEP(*(.initcall##level##.init))   \     KEEP(*(.initcall##level##s.init))   \      #define INIT_CALLS       \     VMLINUX_SYMBOL(__initcall_start) = .;   \     KEEP(*(.initcallearly.init))    \     INIT_CALLS_LEVEL(0)     \     INIT_CALLS_LEVEL(1)     \     INIT_CALLS_LEVEL(2)     \     INIT_CALLS_LEVEL(3)     \     INIT_CALLS_LEVEL(4)     \     INIT_CALLS_LEVEL(5)     \     INIT_CALLS_LEVEL(rootfs)    \     INIT_CALLS_LEVEL(6)     \     INIT_CALLS_LEVEL(7)     \     VMLINUX_SYMBOL(__initcall_end) = .;   `
 
 `#define __define_initcall(fn, id) \    static initcall_t __initcall_name(fn, id) __used \    __attribute__((__section__(".initcall" #id ".init"))) = fn;        #define pure_initcall(fn)  __define_initcall(fn, 0)   #define core_initcall(fn)  __define_initcall(fn, 1)   #define core_initcall_sync(fn)  __define_initcall(fn, 1s)   #define postcore_initcall(fn)  __define_initcall(fn, 2)   #define postcore_initcall_sync(fn) __define_initcall(fn, 2s)   #define arch_initcall(fn)  __define_initcall(fn, 3)   #define arch_initcall_sync(fn)  __define_initcall(fn, 3s)   #define subsys_initcall(fn)  __define_initcall(fn, 4)   #define subsys_initcall_sync(fn) __define_initcall(fn, 4s)   #define fs_initcall(fn)   __define_initcall(fn, 5)   #define fs_initcall_sync(fn)  __define_initcall(fn, 5s)   #define rootfs_initcall(fn)  __define_initcall(fn, rootfs)   #define device_initcall(fn)  __define_initcall(fn, 6)   #define device_initcall_sync(fn) __define_initcall(fn, 6s)   #define late_initcall(fn)  __define_initcall(fn, 7)   #define late_initcall_sync(fn)  __define_initcall(fn, 7s)   `
-
+```
 所以，pure_initcall 定义的 initcall 函数放在 .initcall.0.init，core_initcall 定义的 initcall 函数放在 .initcall.1.init，以此类推。
 
 ## do_initcalls
 
 现在我们看下内核启动过程中，实现驱动加载的函数。
+```cpp
+static void __init do_initcalls(void)   {    int level;       for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++)     //依次调用不同等级的初始化函数     do_initcall_level(level);   }   
 
-`static void __init do_initcalls(void)   {    int level;       for (level = 0; level < ARRAY_SIZE(initcall_levels) - 1; level++)     //依次调用不同等级的初始化函数     do_initcall_level(level);   }   `
-
-`static void __init do_initcall_level(int level)   {    initcall_t *fn;       strcpy(initcall_command_line, saved_command_line);    //initcall_level_names 是个数组，里面存放了各个级别的初始化函数级数名    parse_args(initcall_level_names[level],        initcall_command_line, __start___param,        __stop___param - __start___param,        level, level,        NULL, &repair_env_string);       //执行各个初始化级别的函数    for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)     //初始化同一级别中的函数     do_one_initcall(*fn);   }   `
-
+static void __init do_initcall_level(int level)   {    initcall_t *fn;       strcpy(initcall_command_line, saved_command_line);    //initcall_level_names 是个数组，里面存放了各个级别的初始化函数级数名    parse_args(initcall_level_names[level],        initcall_command_line, __start___param,        __stop___param - __start___param,        level, level,        NULL, &repair_env_string);       //执行各个初始化级别的函数    for (fn = initcall_levels[level]; fn < initcall_levels[level+1]; fn++)     //初始化同一级别中的函数     do_one_initcall(*fn);   }   
+```
 initcall_level_names 是个数组，里面存放了各个级别的初始化函数级数名。如下所示：
-
-`static char *initcall_level_names[] __initdata = {    "early",    "core",    "postcore",    "arch",    "subsys",    "fs",    "device",    "late",   };   `
-
+```cpp
+static char *initcall_level_names[] __initdata = {    "early",    "core",    "postcore",    "arch",    "subsys",    "fs",    "device",    "late",   };   
+```
 即轮询执行各个级别的函数，然后通过 do_one_initcall 初始化同一级别中的函数。
 
 ## module_init
 
 以 module_init 为例子，因为：
-
-`#define module_init(x) __initcall(x);   #define __initcall(fn) device_initcall(fn);   #define device_initcall(fn)  __define_initcall(fn, 6);   `
-
+```cpp
+#define module_init(x) __initcall(x);   #define __initcall(fn) device_initcall(fn);   #define device_initcall(fn)  __define_initcall(fn, 6);   
+```
 所以：
 
 `module_init(gpu_init);   `
 
 变为：
-
-`#define __define_initcall(gpu_init, 6) \   static initcall_t __initcall_gpu_init6 __used \   __attribute__((__section__(".initcall.6.init"))) = gpu_init;   `
-
+```cpp
+#define __define_initcall(gpu_init, 6) \   static initcall_t __initcall_gpu_init6 __used \   __attribute__((__section__(".initcall.6.init"))) = gpu_init;   
+```
 通过查找内核映射表 System.map，可以看到 __initcall_gpu_init6 函数指针:
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)

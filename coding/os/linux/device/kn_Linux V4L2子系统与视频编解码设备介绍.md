@@ -1,22 +1,13 @@
-# 
-
 Original qinhua OPPO内核工匠
-
  _2024年04月26日 17:30_
 
 # **1.V4L2简介**   
-
-  
 
 ### **1.1 什么是V4L2**  
 
 V4L，其全称是Video4Linux（即Video for Linux），是Linux内核中关于视频设备的驱动框架，涉及开关视频设备，以及从该类设备采集并处理相关的音、视频信息。V4L从Linux2.1版本的内核中开始出现。现在Linux内核中用的是V4L2，即Video4Linux2（即Video for Linux Two），其是修改V4L相关Bug后的一个升级版，始于Linux 2.5内核。
 
-  
-
 由于硬件的复杂性，V4L2 驱动程序往往非常复杂：大多数设备都有多个 IC，在 /dev 中导出多个设备节点，并创建非 V4L2 设备，例如 DVB、ALSA、FB、I2C 和输入（IR ） 设备。尤其是 V4L2 驱动程序必须设置支持 IC 来进行音频/视频复用/编码/解码，这一事实使其比大多数驱动程序更加复杂。通常这些IC通过一条或多条I2C总线连接到主桥驱动器，但也可以使用其他总线。此类设备称为“子设备”。长期以来，该框架仅限于用于创建 V4L 设备节点的 video_device 结构和用于处理视频缓冲区的 video_buf。这意味着所有驱动程序都必须自行设置设备实例并连接到子设备。其中一些操作要正确执行起来相当复杂，许多驱动程序从未正确执行过。还有很多通用代码由于缺乏框架而永远无法重构。
-
-  
 
 因此，这个V4L2框架设置了所有驱动程序所需的基本构建块，并且这个相同的框架应该使将公共代码重构为所有驱动程序共享的实用程序函数变得更加容易。
 
@@ -28,7 +19,6 @@ V4L，其全称是Video4Linux（即Video for Linux），是Linux内核中关于�
 
              图1-1 V4L2框架
 
-  
 
 Linux系统中视频设备主要包括以下四个部分：    
 
@@ -45,23 +35,16 @@ Linux系统中视频设备主要包括以下四个部分：    
 V4L2支持的设备十分广泛，但是其中只有很少一部分在本质上是真正的视频设备：
 
 - video capture interface：视频采集接口，从camera上获取视频数据，视频捕获是V4L2的基本应用；
-    
 - video output interface：视频输出接口，允许应用程序驱动外设提供视频图像
-    
 - video overlay interface：视频覆盖接口，是捕获接口的一个变体，其工作是便于捕获设备直接显示到显示器，无需经过CPU；Android拍照应用在进行预览时，可能就是这种模式。
-    
 - VBI interfaces：基于电视场消隐实现远程传送文字的技术与设备；    
-    
 - radio interface：无线电接口，从AM和FM调谐器设备访问音频流。
-    
 - Codec Interface：编解码接口，对视频数据流执行转换。
-    
 
 通常情况下V4L2的主设备号是81，次设备号为0～255；这些次设备号里又分为多类设备：视频设备、Radio（收音机）设备、Teletext on VBI等。因此V4L2设备对应的文件节点有：/dev/videoX、/dev/vbiX、/dev/radioX。对于Radio设备，即用于收发声音。但要提醒注意的是，对于声音的采集与处理，在我们的Android手持设备中常会有个Mic设备，它则是属于ALSA子系统的。我们主要讨论的是Video设备。
 
 ## **2.编解码设备**  
 
-  
 
 传统的Capture设备从Camera硬件读取数据到DDR，Output设备从DDR读取数据输出到Display；Codec Interface 不同于传统的V4L2 Capture / Output 设备；通常是基于M2M(memory to memory)，即从DDR读取数据，进行一些处理后再写入DDR;
 

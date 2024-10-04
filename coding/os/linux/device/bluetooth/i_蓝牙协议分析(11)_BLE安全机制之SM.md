@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-9-7 19:49 分类：[蓝牙](http://www.wowotech.net/sort/bluetooth)
 
@@ -205,7 +189,7 @@ SMP使用固定的L2CAP channel（CID为0x0006）传输Security相关的命令�
 
 标签: [蓝牙](http://www.wowotech.net/tag/%E8%93%9D%E7%89%99) [Bluetooth](http://www.wowotech.net/tag/Bluetooth) [BLE](http://www.wowotech.net/tag/BLE) [SMP](http://www.wowotech.net/tag/SMP) [配对](http://www.wowotech.net/tag/%E9%85%8D%E5%AF%B9) [pairing](http://www.wowotech.net/tag/pairing) [鉴权](http://www.wowotech.net/tag/%E9%89%B4%E6%9D%83) [authentication](http://www.wowotech.net/tag/authentication) [security](http://www.wowotech.net/tag/security)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [X-025-KERNEL-Linux gpio driver的移植之基本功能](http://www.wowotech.net/x_project/kernel_gpio_driver_porting_1.html) | [Linux reset framework](http://www.wowotech.net/pm_subsystem/reset_framework.html)»
 

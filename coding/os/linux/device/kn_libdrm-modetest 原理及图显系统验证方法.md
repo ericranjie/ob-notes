@@ -1,7 +1,4 @@
-# 
-
 spy_os Linux爱好者
-
  _2021年08月27日 11:52_
 
 linux平台普遍采用的DRM软件架构中，不仅包含了内核空间驱动层的代码，而且提供应用层的支撑库libdrm。libdrm基于DRI协议通过ioctl与2D图显驱动进行交互，配置图显处理器以及HDMI、MIPI、LVDS等编解码单元。
@@ -23,18 +20,16 @@ from rockchip
 支持的命令行参数主要包括三类：
 
 1. 查询类
-    
 2. 测试类
-    
 3. 通用选项
     
-
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 与解析命令函参数有关的三个API：
-
-`1static int parse_connector(struct pipe_arg *pipe, const char *arg)   2static int parse_plane(struct plane_arg *plane, const char *p)   3static int parse_property(struct property_arg *p, const char *arg)   4static void parse_fill_patterns(char *arg)   `
-
+```cpp
+1 static int parse_connector(struct pipe_arg *pipe, const char *arg)   2 static int parse_plane(struct plane_arg *plane, const char *p)   
+3 static int parse_property(struct property_arg *p, const char *arg)   4 static void parse_fill_patterns(char *arg)   
+```
 #### 打开DRM设备
 
 打开DRM设备的流程如下：
@@ -42,9 +37,33 @@ from rockchip
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 modetest只能打开static const char * const modules[]内定义的DRM驱动，默认支持的DRM驱动包括：
-
- `1static const char * const modules[] = {    2    "i915",    3    "amdgpu",    4    "radeon",    5    "nouveau",    6    "vmwgfx",    7    "omapdrm",    8    "exynos",    9    "tilcdc",   10    "msm",   11    "sti",   12    "tegra",   13    "imx-drm",   14    "rockchip",   15    "atmel-hlcdc",   16    "fsl-dcu-drm",   17    "vc4",   18    "virtio_gpu",   19    "mediatek",   20    "meson",   21    "pl111",   22    "stm",   23    "sun4i-drm",   24    "armada-drm",   25};`
-
+```cpp
+ 1static const char * const modules[] = {    
+ 2    "i915",    
+ 3    "amdgpu",    
+ 4    "radeon",    
+ 5    "nouveau",    
+ 6    "vmwgfx",    
+ 7    "omapdrm",    
+ 8    "exynos",    
+ 9    "tilcdc",   
+ 10    "msm",   
+ 11    "sti",   
+ 12    "tegra",   
+ 13    "imx-drm",   
+ 14    "rockchip",   
+ 15    "atmel-hlcdc",   
+ 16    "fsl-dcu-drm",   
+ 17    "vc4",   
+ 18    "virtio_gpu",   
+ 19    "mediatek",   
+ 20    "meson",   
+ 21    "pl111",   
+ 22    "stm",   
+ 23    "sun4i-drm",   
+ 24    "armada-drm",   
+ 25};
+```
 当我们自己的图显驱动需要使用modetest进行验证的时候，需要在这里增加驱动名字。DRM驱动的名字定义在kernel driver的drm_driver数据结构中。
 
  `1struct drm_driver {    2...    3    /** @major: driver major number */    4    int major;    5    /** @minor: driver minor number */    6    int minor;    7    /** @patchlevel: driver patch level */    8    int patchlevel;    9    /** @name: driver name */   10    char *name;   11    /** @desc: driver description */   12    char *desc;   13    /** @date: driver date */   14    char *date;   15...   16};`

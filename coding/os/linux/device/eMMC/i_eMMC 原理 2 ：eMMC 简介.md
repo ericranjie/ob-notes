@@ -1,113 +1,124 @@
-# [蜗窝科技](http://www.wowotech.net/)
+作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2017-1-12 20:28 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
 
-### 慢下来，享受技术。
+eMMC 是 embedded MultiMediaCard 的简称。MultiMediaCard，即 MMC， 是一种闪存卡（Flash Memory Card）标准，它定义了 MMC 的架构以及访问　Flash Memory 的接口和协议。而 eMMC 则是对 MMC 的一个拓展，以满足更高标准的性能、成本、体积、稳定、易用等的需求。
 
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
+eMMC 的整体架构如下图片所示：
 
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
+![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_architecture.png)
 
-﻿
+图片： eMMC 整体架构
 
-## 
 
-作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-9-1 10:46 分类：[电源管理子系统](http://www.wowotech.net/sort/pm_subsystem)
+eMMC 内部主要可以分为 Flash Memory、Flash Controller 以及 Host Interface 三大部分。
 
-## 1. 前言
+## 1. Flash Memory
 
-大家都知道，复杂IC内部有很多具有独立功能的硬件模块，例如CPU cores、GPU cores、USB控制器、MMC控制器、等等，出于功耗、稳定性等方面的考虑，有些IC在内部为这些硬件模块设计了复位信号（reset signals），软件可通过寄存器（一般1个bit控制1个硬件）控制这些硬件模块的复位状态。
+Flash Memory 是一种非易失性的存储器，通常在嵌入式系统中用于存放系统、应用和数据等，类似与 PC 系统中的硬盘。
 
-Linux kernel为了方便设备驱动的编写，抽象出一个简单的软件框架----reset framework，为reset的provider提供统一的reset资源管理手段，并为reset的consumer（各个硬件模块）提供便捷、统一的复位控制API。
+目前，绝大部分手机和平板等移动设备中所使用的 eMMC 内部的 Flash Memory 都属于 NAND Flash，关于 NAND Flash 的更多细节可以参考 [Flash Memory](https://linux.codingbelief.com/zh/storage/flash_memory/index.html) 章节。
 
-reset framework的思路、实现和使用都非常简单、易懂（参考kernel有关的API--include/linux/reset-controller.h、include/linux/reset.h可知），不过麻雀虽小，五脏俱全，通过它可以加深对Linux kernel的设备模型、驱动框架、分层设计、provider/consumer等设计思想的理解，因此本文将对其进行一个简单的罗列和总结。
+eMMC 在内部对 Flash Memory 划分了几个主要区域，如下图所示：
 
-## 2. 从consumer的角度看
+![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_partitions.png)
 
-从某一个硬件模块的驱动设计者来看，他的要求很简单：我只是想复位我的硬件，而不想知道到底用什么手段才能复位（例如控制哪个寄存器的哪个bit位，等等）。
+图片：eMMC 内部分区
 
-> 这个要求其实体现了软件设计（甚至是任何设计）中的一个最最质朴的设计理念：封装和抽象。对设备驱动来说，它期望看到是“reset”这个通用概念，用这个通用概念去发号施令的话，这个驱动就具备了通用性和可移植性（无论在周围的环境如何变化，“reset”本身不会变化）。而至于怎么reset，是通过寄存器A的bit m，还是寄存器B的bit n，则是平台维护者需要关心的事情（就是本文的reset provider）。
+  
 
-看到这样的要求，Linux kernel说：OK，于是reset framework出场，提供了如下的机制（基于device tree）：
+1. BOOT Area Partition 1 & 2  
+    此分区主要是为了支持从 eMMC 启动系统而设计的。  
+    该分区的数据，在 eMMC 上电后，可以通过很简单的协议就可以读取出来。同时，大部分的 SOC 都可以通过 GPIO 或者 FUSE 的配置，让 ROM 代码在上电后，将 eMMC BOOT 分区的内容加载到 SOC 内部的 SRAM 中执行。
+    
+2. RPMB Partition  
+    RPMB 是 Replay Protected Memory Block 的简称，它通过 HMAC SHA-256 和 Write Counter 来保证保存在 RPMB 内部的数据不被非法篡改。  
+    在实际应用中，RPMB 分区通常用来保存安全相关的数据，例如指纹数据、安全支付相关的密钥等。
+    
+3. General Purpose Partition 1～4  
+    此区域则主要用于存储系统或者用户数据。 General Purpose Partition 在芯片出厂时，通常是不存在的，需要主动进行配置后，才会存在。
+    
+4. User Data Area  
+    此区域则主要用于存储系统和用户数据。  
+    User Data Area 通常会进行再分区，例如 Android 系统中，通常在此区域分出 boot、system、userdata 等分区。
+    
 
-1）首先，提供描述系统中reset资源的方法（参考下面第3章的介绍），这样consumer可以基于这种描述在自己的dts node中引用所需的reset信号。
+更多 eMMC 分区相关的细节，请参考 [eMMC 分区管理](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_partitions.html) 章节。
 
-2）然后，consumer设备在自己的dts node中使用“resets”、“reset-names”等关键字声明所需的reset的资源，例如[1]（“resets”字段的具体格式由reset provider决定”）：
+## 2. Flash Controller
 
-> device {                                                                 
->         resets = <&rst 20>;                                              
->         reset-names = "reset";                                           
-> };
+NAND Flash 直接接入 Host 时，Host 端通常需要有 NAND Flash Translation Layer，即 NFTL 或者 NAND Flash 文件系统来做坏块管理、ECC等的功能。
 
-3）最后，consumer driver在需要的时候，可以调用下面的API复位自己（具体可参考“include/linux/reset.h“）：
+eMMC 则在其内部集成了 Flash Controller，用于完成擦写均衡、坏块管理、ECC校验等功能。相比于直接将 NAND Flash 接入到 Host 端，eMMC 屏蔽了 NAND Flash 的物理特性，可以减少 Host 端软件的复杂度，让 Host 端专注于上层业务，省去对 NAND Flash 进行特殊的处理。同时，eMMC 通过使用 Cache、Memory Array 等技术，在读写性能上也比 NAND Flash 要好很多。
 
-3-a）只有一个reset信号的话，可以使用最简单的device_reset API
+![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_vs_nand_flash.png)
 
-> int device_reset(struct device *dev);
+图片：NAND Flash 与 eMMC
 
-3-b）如果需要更为复杂的控制（例如有多个reset信号、需要控制处于reset状态的长度的等），可以使用稍微复杂的API
+## 3. Host Interface
 
-> /* 通过reset_control_get或者devm_reset_control_get获得reset句柄 */  
-> struct reset_control *reset_control_get(struct device *dev, const char *id);     
-> void reset_control_put(struct reset_control *rstc);                              
-> struct reset_control *devm_reset_control_get(struct device *dev, const char *id);
-> 
-> /* 通过reset_control_reset进行复位，或者通过reset_control_assert使设备处于复位生效状态，通过reset_control_deassert使复位失效 */  
-> int reset_control_reset(struct reset_control *rstc);                             
-> int reset_control_assert(struct reset_control *rstc);                            
-> int reset_control_deassert(struct reset_control *rstc);
+eMMC 与 Host 之间的连接如下图所示：
 
-## 3. 从provider的角度看
+![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_host_interfaces.png)
 
-kernel为reset provider提供的API位于“include/linux/reset-controller.h”中，很简单，无非就是：创建并填充reset controller设备（struct reset_controller_dev），并调用相应的接口（reset_controller_register/reset_controller_unregister）注册或者注销之。
+图片：eMMC Interface
 
-reset controller的抽象也很简单：
+  
 
-|   |
-|---|
-|struct reset_controller_dev {                                                    <br>        struct reset_control_ops *ops;                                           <br>        struct module *owner;                                                    <br>        struct list_head list;                                                   <br>        struct device_node *of_node;                                             <br>        int of_reset_n_cells;                                                    <br>        int (*of_xlate)(struct reset_controller_dev *rcdev,                      <br>                        const struct of_phandle_args *reset_spec);               <br>        unsigned int nr_resets;  <br>};|
+各个信号的用途如下所示：
 
-> ops提供reset操作的实现，基本上是reset provider的所有工作量。
-> 
-> of_xlate和of_reset_n_cells用于解析consumer device dts node中的“resets = ; ”节点，如果reset controller比较简单（仅仅是线性的索引），可以不实现，使用reset framework提供的简单版本----of_reset_simple_xlate即可。
-> 
-> nr_resets，该reset controller所控制的reset信号的个数。
-> 
-> 其它字段内部使用，provider不需要关心。
+CLK  
+用于同步的时钟信号
 
-struct reset_control_ops也比较单纯，如下：
+Data Strobe  
+此信号是从 Device 端输出的时钟信号，频率和 CLK 信号相同，用于同步从 Device 端输出的数据。该信号在 eMMC 5.0 中引入。
 
-|   |
-|---|
-|struct reset_control_ops {                                                       <br>        int (*reset)(struct reset_controller_dev *rcdev, unsigned long id);      <br>        int (*assert)(struct reset_controller_dev *rcdev, unsigned long id);     <br>        int (*deassert)(struct reset_controller_dev *rcdev, unsigned long id);  <br>};|
+CMD  
+此信号用于发送 Host 的 command 和 Device 的 response。
 
-> reset可控制设备完成一次完整的复位过程。
-> 
-> assert和deassert分别控制设备reset状态的生效和失效。
+DAT0-7  
+用于传输数据的 8 bit 总线。
 
-## 4. 参考文档
+Host 与 eMMC 之间的通信都是 Host 以一个 Command 开始发起的。针对不同的 Command，Device 会做出不同的响应。详细的通信协议相关内容，请参考 [eMMC 总线协议](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_bus_protocol.html) 章节。
 
-[1] Documentation/devicetree/bindings/reset/reset.txt
+## 4. 参考资料
 
-_原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http://www.wowotech.net/pm_subsystem/reset_framework.html)。
+1. [Embedded Multi-Media Card (e•MMC) Electrical Standard (5.1)](http://www.jedec.org/sites/default/files/docs/JESD84-B51.pdf) [PDF]
 
-标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [framework](http://www.wowotech.net/tag/framework) [reset](http://www.wowotech.net/tag/reset)
+_原创文章，转发请注明出处。蜗窝科技_  
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+标签: [emmc](http://www.wowotech.net/tag/emmc)
 
-« [蓝牙协议分析(11)_BLE安全机制之SM](http://www.wowotech.net/bluetooth/le_security_manager.html) | [页面回收的基本概念](http://www.wowotech.net/memory_management/page_reclaim_basic.html)»
+---
+
+« [为什么会有文件系统(一)](http://www.wowotech.net/filesystem/370.html) | [Linux MMC framework(1)_软件架构](http://www.wowotech.net/comm/mmc_framework_arch.html)»
 
 **评论：**
 
-**shousi**  
-2024-06-09 20:18
+**[lethe](http://android%20develope/)**  
+2020-05-07 17:40
 
-挺巧妙的
+所以对于emmc和ufs这种内部集成了flash controller的话，ecc 、wear leveing 和 bad block management这些软件层面的逻辑只有flash vendor可以对吗？ 感觉这些很关键呐。。
 
-[回复](http://www.wowotech.net/pm_subsystem/reset_framework.html#comment-8906)
+[回复](http://www.wowotech.net/basic_tech/emmc_intro.html#comment-7983)
+
+**[lethe](http://android%20develope/)**  
+2020-05-07 17:41
+
+@lethe：仅vendor可见对吗？漏字了
+
+[回复](http://www.wowotech.net/basic_tech/emmc_intro.html#comment-7984)
+
+**小豌豆**  
+2017-01-19 14:48
+
+eMMC也有几种模式：  
+   1线，4线，8线  
+   不同的速度，DDR52，SDR50等，  
+  
+和NandFlash最大的不同就在于，eMMC的速度更快，所以需要调试delayChain，  
+   比起NandFlash，eMMC在kernel的代码少的太太多了，而且无 physicBlock和LogicalBlock的概念~  
+等~
+
+[回复](http://www.wowotech.net/basic_tech/emmc_intro.html#comment-5167)
 
 **发表评论：**
 
@@ -173,11 +184,11 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
         - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
 - ### 随机文章
     
-    - [CMA模块学习笔记](http://www.wowotech.net/memory_management/cma.html)
-    - [快讯：蓝牙5.0发布（新特性速览）](http://www.wowotech.net/bluetooth/bluetooth_5_0_overview.html)
-    - [从“码农”说起](http://www.wowotech.net/tech_discuss/111.html)
-    - [内存初始化代码分析（三）：创建系统内存地址映射](http://www.wowotech.net/memory_management/mem_init_3.html)
-    - [防冲突机制介绍](http://www.wowotech.net/basic_tech/103.html)
+    - [Linux reset framework](http://www.wowotech.net/pm_subsystem/reset_framework.html)
+    - [Linux电源管理(8)_Wakeup count功能](http://www.wowotech.net/pm_subsystem/wakeup_count.html)
+    - [Linux内核的整体架构](http://www.wowotech.net/linux_kenrel/11.html)
+    - [Linux时间子系统之（一）：时间的基本概念](http://www.wowotech.net/timer_subsystem/time_concept.html)
+    - [X-000-PRE-开发环境搭建](http://www.wowotech.net/x_project/develop_env.html)
 - ### 文章存档
     
     - [2024年2月(1)](http://www.wowotech.net/record/202402)

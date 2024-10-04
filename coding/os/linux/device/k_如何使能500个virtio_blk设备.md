@@ -1,44 +1,19 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2022-8-12 16:12 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 # 一例virtio_blk设备中断占用分析
-
 ## 背景：这个是在客户的centos8.4的环境上复现的，dpu是目前很多
-
 ## 云服务器上的网卡标配了，在云豹的dpu产品测试中，dpu实现的virtio_blk
 
-## 设备在申请中断时报错，在排查这个错误的过程中，觉得某些部分还比较有
-
-## 趣，故记录之。本身涉及的背景知识有：irq,msi,irq_domain,
+设备在申请中断时报错，在排查这个错误的过程中，觉得某些部分还比较有趣，故记录之。本身涉及的背景知识有：irq,msi,irq_domain,
 
 ## affinity，virtio_blk，irqbalance
-
 ### 下面列一下我们是怎么排查并解决这个问题的。
-
-  
 
 #### 一、故障现象
 
 内核团队接到测试组测试客户前端内核抛栈：
 
-```
-
+```c
 [25338.485128] virtio-pci 0000:b3:00.0: virtio_pci: leaving for legacy driver  
 [25338.496174] **genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)**  
 [25338.503822] CPU: 20 PID: 5431 Comm: kworker/20:0 Kdump: loaded Tainted: G           OE    --------- -  - 4.18.0-305.30.1.jmnd2.el8.x86_64 #1  
@@ -72,66 +47,43 @@
 [25338.625283]  ? kthread_flush_work_fn+0x10/0x10  
 [25338.629731]  ret_from_fork+0x1f/0x40  
 [25338.633395] virtio_blk: probe of virtio418 failed with error -16  
-
 ```
 
 从堆栈看，是某个virtio_blk设备在probe的时候报错，错误码为-16。
-
 #### 二、故障现象分析
-
-  
 
 从堆栈信息看：
 
-  
 
 1、virtio418是一个virtio_blk设备，在probe过程中调用 __setup_irq 返回了-16。
-
-  
 
 2、[25338.496174] genirq: Flags mismatch irq 0. 00000080 (virtio418) vs. 00015a00 (timer)，说明我们的virtio_blk
 
 设备去申请了0号中断，由于0号中断被timer占用，irq子系统在比较flags时发现不符合，则打印这行。
-
 具体代码为：
 
-```
-
+```c
 static int
-
 __setup_irq(unsigned int irq, struct irq_desc *desc, struct irqaction *new)  
 {
-
 ......
-
 mismatch:  
         if (!(new->flags & IRQF_PROBE_SHARED)) {  
                 pr_err("Flags mismatch irq %d. %08x (%s) vs. %08x (%s)\n",  
                        irq, new->flags, new->name, old->flags, old->name);
-
 ......
-
        ret = -EBUSY;
-
 ......
-
       return ret;
-
 }
-
 ```
 
 至于为什么virtio_blk会去申请0号中断，因为我们实现virtio_blk后端设备的时候，并没有支持intx，即virtio_pci类虚拟的pci_dev设备的irq值为0，本文先不管这个。
-
 从堆栈看，virtio 申请中断是走了vp_find_vqs_intx流程，
 
-```
-
+```c
 crash> dis -l vp_find_vqs+0xc7  
 /usr/src/debug/linux/drivers/virtio/virtio_pci_common.c: **369---行号为369**
-
-  
-
     356 static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned nvqs,  
     357                 struct virtqueue *vqs[], vq_callback_t *callbacks[],  
     358                 const char * const names[], const bool *ctx)  
@@ -140,17 +92,14 @@ crash> dis -l vp_find_vqs+0xc7
     366  
     367         err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,  
     368                         dev_name(&vdev->dev), vp_dev);
-
     **369         if (err)----压栈的返回地址**
-
 ......
 
 ```
 
 我们dpu卡实现的virtio设备，都是使能msix的，按照代码流程,应该是先尝试msix，既然能走到 vp_find_vqs_intx 流程，说明 vp_find_vqs_msix失败了，而且按照如下代码：
 
-```
-
+```c
     395 int vp_find_vqs(struct virtio_device *vdev, unsigned nvqs,  
     396                 struct virtqueue *vqs[], vq_callback_t *callbacks[],  
     397                 const char * const names[], const bool *ctx,  
@@ -169,17 +118,14 @@ crash> dis -l vp_find_vqs+0xc7
     410         /* Finally fall back to regular interrupts. */  
     411         return vp_find_vqs_intx(vdev, nvqs, vqs, callbacks, names, ctx);//caq:最后退化成intx模式  
     412 }
-
 ```
 
 说明vp_find_vqs_msix **失败了两次**。第一次是 单vqueue单中断号的非共享方式，第二次是多个vq共用一个中断的方式。
 
 通过打点发现，失败两次的原因是 __irq_domain_activate_irq  返回了-28
 
-```
-
+```c
 __irq_domain_activate_irq return=-28
-
 0xffffffff8fb52f70 : __irq_domain_activate_irq+0x0/0x80 [kernel]  
  0xffffffff8fb54bc5 : irq_domain_activate_irq+0x25/0x40 [kernel]  
  0xffffffff8fb56bfe : msi_domain_alloc_irqs+0x15e/0x2f0 [kernel]  
@@ -188,18 +134,14 @@ __irq_domain_activate_irq return=-28
  0xffffffff8feef96b : pci_alloc_irq_vectors_affinity+0xbb/0x130 [kernel]  
  0xffffffff8ff7472b : vp_find_vqs_msix+0x1fb/0x510 [kernel]  
  0xffffffff8ff74aad : vp_find_vqs+0x6d/0x190 [kernel]  
-  
-
 ```
 
 查看具体的代码：
 
-```
-
+```c
 static int __irq_domain_activate_irq(struct irq_data *irqd, bool reserve)  
 {  
 int ret = 0;  
-  
 if (irqd && irqd->domain) {//caq:均不为NULL  
 struct irq_domain *domain = irqd->domain;  
   
@@ -215,7 +157,6 @@ __irq_domain_deactivate_irq(irqd->parent_data);
 }  
 return ret;  
 }
-
 ```
 
 由于客户 host kernel开启了 CONFIG_IRQ_DOMAIN_HIERARCHY，根据irq_domain 级别 ，该系统的irq_domain 级联如下：
@@ -224,8 +165,7 @@ return ret;
 
 不过上图是arm常见的，盗用arm图，本x86系统类似，irq_domain级别具体跟踪如下：
 
-```
-
+```c
 crash> irq_domain.name,parent 0xffff9bff87d4dec0  
   name = 0xffff9bff87c1fd60 "INTEL-IR-MSI-1-2"  
   parent = 0xffff9bff87400000  
@@ -235,13 +175,11 @@ crash> irq_domain.name,parent 0xffff9bff87400000
 crash> irq_domain.name,parent 0xffff9bff87c6c900  
   name = 0xffff9bff87c3ecd0 "VECTOR"-----------最高级的  
   parent = 0x0---所以parent为空
-
 ```
 
 根据返回-28，根据最高级的irq_domain定位到 调用链为：
 
-```
-
+```c
 //caq:类比于 dma_domain_ops，在x86内是最高级的irq_domain了，因为他的domain parent为NULL  
 static const struct irq_domain_ops x86_vector_domain_ops = {//caq:x86针对acpi实现的irq_domain_ops  
 .alloc = x86_vector_alloc_irqs,//caq:分配中断  
@@ -255,19 +193,17 @@ static const struct irq_domain_ops x86_vector_domain_ops = {//caq:x86针对acpi�
 调用链：
 
 x86_vector_activate-->activate_managed-->assign_managed_vector-->irq_matrix_alloc_managed
-
 ```
 
 查看 代码如下：
 
-```
-
+```c
 int irq_matrix_alloc_managed(struct irq_matrix *m, const struct cpumask *msk,  
      unsigned int *mapped_cpu)  
 {//caq:managed irq 分配  
 unsigned int bit, cpu, end = m->alloc_end;  
 struct cpumap *cm;  
-  
+
 if (cpumask_empty(msk))  
 return -EINVAL;  
   
@@ -276,15 +212,13 @@ if (cpu == UINT_MAX)
 return -ENOSPC;//caq:说明没找到  
 ......  
 }
-
 ```
 
 由于没有开启 CONFIG_GENERIC_IRQ_DEBUGFS，所以没办法直接看到 vector_matrix 具体的值，
 
 借助crash工具查看：
 
-```
-
+```c
 crash> p *vector_matrix  
 $82 = {  
   matrix_bits = 256,  
@@ -300,7 +234,6 @@ $82 = {
   scratch_map = {18446744069952503807, 18446744073709551615, 18446744073709551615, 18446735277616529407, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  
   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}  
 }
-
 ```
 
 一个疑问涌上心头，为什么总共才分配了1922 个中断，全局的global_available就为0了呢？
@@ -309,14 +242,12 @@ $82 = {
 
 而走managed流程，也就是申请中断时，带有了RQD_AFFINITY_MANAGED：
 
-```
-
+```c
 static int  
 assign_irq_vector_policy(struct irq_data *irqd, struct irq_alloc_info *info)  
 {  
 if (irqd_affinity_is_managed(irqd))//caq:如果是 managed 的irq,也就是irq_data中有 IRQD_AFFINITY_MANAGED 标记  
 return reserve_managed_vector(irqd);
-
 ```
 
 我们回过来查看vector alloc时的调用链：
@@ -325,8 +256,7 @@ x86_vector_alloc_irqs-->assign_irq_vector_policy-->reserve_managed_vector-->irq_
 
 对一个两个队列的virtio_blk申请中断时，打点发现如下：
 
-```
-
+```c
 m->global_available=15296 
 
 0xffffffff87158300 : irq_matrix_reserve_managed+0x0/0x130 [kernel]---从15296减少到15256  
@@ -337,8 +267,7 @@ call vdev=0xffff8b781ce17000,index=0,callback=0xffffffffc0448000,ctx=0,msix_vec=
 
 由于已经缩小到是因为virtio_blk设备的中断申请流程，使用热插拔确认一下：
 
-```
-
+```c
 118:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0         53          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0  IR-PCI-MSI 94371841-edge      virtio3-req.0  
  119:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0         49          0          0          0  IR-PCI-MSI 94371842-edge      virtio3-req.1  
   
@@ -375,35 +304,27 @@ $3 = {
   scratch_map = {481036337152, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},  
   system_map = {1125904739729407, 0, 1, 18446726481523507200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}  
 }
-
 ```
 
 说明 对于mask内的cpu号，都需要一个中断容量，两个40就是因为80核的服务器，两个vq，平分中断，感兴趣的同学可以去查看irq_build_affinity_masks这个函数的实现。这样一个vector，因为开启了 IRQD_AFFINITY_MANAGED 属性，导致需要占用80个中断容量。而我们系统由于有512个virtio_blk设备，所以申请到部分设备的时候，就把总的
 
 vector容量耗光了，但其实分配的**irq总数才不到2000**.
 
-  
-
 那么，virtio_blk设备什么时候开启的 IRQD_AFFINITY_MANAGED  属性的呢？查看git记录：
 
-```
-
+```c
 6abd6e5a44040 (Amit Shah                 2011-12-22 16:58:29 +0530  507) static int init_vq(struct virtio_blk *vblk)  
 6abd6e5a44040 (Amit Shah                 2011-12-22 16:58:29 +0530  508) {  
 ......  
 6a27b656fc021 (Ming Lei                  2014-06-26 17:41:48 +0800  515)        struct virtio_device *vdev = vblk->vdev;  
 ad71473d9c437 (Christoph Hellwig         2017-02-05 18:15:25 +0100  516)        struct irq_affinity desc = { 0, };----会导致blk申请中断时，使用内核managed方式来申请，一个dev会占用cpu核数这么多的容量。
-
 ```
 
 看起来是 ad71473d9c437  这个 commit引入了这个问题。
 
-  
-
 但是根据virtio_blk驱动，第一遍中断申请的时候才有affinity_managed 设置，第二遍应该并没有设置，具体 vp_find_vqs_msix 如下：
 
-```
-
+```c
 //caq:vq申请中断，msix 模式,per_vq_vectors 决定是个vq共享中断还是独占中断  
 static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,  
 struct virtqueue *vqs[], vq_callback_t *callbacks[],  
@@ -447,7 +368,6 @@ flags |= PCI_IRQ_AFFINITY;//caq:带上亲核属性
 desc->pre_vectors++; /* virtio config vector */**//caq:细节，相当于指定了config中断不要设置亲核，走系统默认**  
 }  
 ......
-
 ```
 
 原因，因为前面很多virtio_blk设备因为一个vector占用了80个中断容量，导致整体中断数不够了，
@@ -456,8 +376,7 @@ desc->pre_vectors++; /* virtio config vector */**//caq:细节，相当于指定�
 
 在另外一个virtio_blk单vq的环境上，具体查看如下：
 
-```
-
+```c
 [root@localhost config_json]#  cat /proc/interrupts |grep req |tail -1  
  986:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0        114          0          0  IR-PCI-MSI 93687809-edge      virtio180-req.0  
 [root@localhost config_json]# cat /proc/irq/986/smp_affinity  
@@ -465,8 +384,6 @@ ffff,ffffffff,ffffffff
 
 [root@localhost config_json]#  cat /proc/interrupts |grep queues |tail -1  
 1650:          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0        120          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0          0  IR-PCI-MSI 94369793-edge      virtio512-virtqueues
-
-  
 
 [root@localhost config_json]# cat /proc/irq/1650/smp_affinity  
 ffff,ffffffff,ffffffff  
@@ -480,14 +397,11 @@ vdafj
 
 以上可以看出，virtio180，也就是 vdsh 的block设备，走了 vp_find_vqs_msix 第一遍流程，分配了带 managed_affinity 的vector，所以他的中断名字是req结尾的，
 
-  
-
 而另外一个 virtio512 ，也就是 vdafj 的block设备，走了 vp_find_vqs_msix 第二遍流程，没有分配 带 managed_affinity 的vector，所以它的中断名字是 virtqueues 结尾的，
 
 而后面的设备，只能走第三个流程，报错了，所以打点发现，除了 activate的时候会报容量不足，在alloc阶段，也会在 irq_matrix_alloc 报容量不足。
 
-```
-
+```c
 int irq_matrix_alloc(struct irq_matrix *m, const struct cpumask *msk,  
      bool reserved, unsigned int *mapped_cpu)  
 {
@@ -518,7 +432,6 @@ Returning to  :  0xffffffffb705adb7 : x86_vector_alloc_irqs+0x2d7/0x3c0 [kerne
  0x1b7574a40  
  0x1b7574a40 (inexact)  
 **irq_matrix_reserve_managed return -28**  
-
 ```
 
 #### 三、故障复现
@@ -531,16 +444,11 @@ Returning to  :  0xffffffffb705adb7 : x86_vector_alloc_irqs+0x2d7/0x3c0 [kerne
 
 则会使得后面大量的virtio_blk走第二个分支，此时不带managed_affinity，**反而能分配成功。**
 
-  
-
 #### 四、故障规避或解决
-
-  
 
 可能的解决方案之一：
 
-```
-
+```c
 static int init_vq(struct virtio_blk *vblk)//caq:初始化关于vq相关的内容  
 {  
 int err;  
@@ -551,32 +459,23 @@ struct virtqueue **vqs;
 unsigned short num_vqs;  
 struct virtio_device *vdev = vblk->vdev;  
 **struct irq_affinity desc = { 0, }**;//caq:去掉这行代码
-
 ```
 
 解决方案之二：
 
-开启irqbalance,并让服务器进入 Power-save mode 时，irqbalance 会将中断集中分配给numa节点的第一个 CPU，这样慢慢地，各个核
-
-的available的irq 容量就相差比较大了，当然这种不太靠谱。
+开启irqbalance,并让服务器进入 Power-save mode 时，irqbalance 会将中断集中分配给numa节点的第一个 CPU，这样慢慢地，各个核的available的irq 容量就相差比较大了，当然这种不太靠谱。
 
 解决方案之三：
 
 手工调整中断亲核，使得某些核的容量接近于0，然后再加载virtio_blk设备。
 
-  
-
 #### 五、作者简介
-
-  
 
 陈安庆，目前在dpu厂商 云豹智能 负责linux内核及虚拟化方面的工作，
 
-  
-
 联系方式：微信与手机同号：18752035557。
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [futex基础问答](http://www.wowotech.net/kernel_synchronization/futex.html) | [Linux内核同步机制之（九）：Queued spinlock](http://www.wowotech.net/kernel_synchronization/queued_spinlock.html)»
 

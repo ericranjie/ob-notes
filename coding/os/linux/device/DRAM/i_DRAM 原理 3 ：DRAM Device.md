@@ -1,35 +1,6 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2016-7-27 22:12 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
 
 在前面的文章中，介绍了 DRAM Cell 和 Memory Array。 本文则以 SDR SDRAM 为例，描述 DRAM Device 与 Host 端的接口，以及其内部的其他模块，包括 Control Logic、IO、Row & Column Decoder 等。
-
-相关文章：
-
-[DRAM 原理 1 ：DRAM Storage Cell](http://www.wowotech.net/basic_tech/307.html)
-
-[DRAM 原理 2 ：DRAM Memory Organization](http://www.wowotech.net/basic_tech/309.html)
-
-[DRAM 原理 4 ：DRAM Timing](http://www.wowotech.net/basic_tech/330.html)  
-
-[DRAM 原理 5 ：DRAM Devices Organization](http://www.wowotech.net/basic_tech/343.html)
-
-  
 
 ## 1. SDRAM Interface
 
@@ -196,7 +167,7 @@ GDDR，即 Graphic DDR，主要用在显卡设备上。相对于 DDR，GDDR 具�
 
 标签: [SDRAM](http://www.wowotech.net/tag/SDRAM) [dram](http://www.wowotech.net/tag/dram)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux kernel内核配置解析(1)_概述(基于ARM64架构)](http://www.wowotech.net/linux_kenrel/kernel_config_overview.html) | [X-008-UBOOT-支持命令行(Bubblegum-96平台)](http://www.wowotech.net/x_project/bubblegum_uboot_cmdline.html)»
 

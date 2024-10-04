@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2016-11-25 16:28 分类：[蓝牙](http://www.wowotech.net/sort/bluetooth)
 
@@ -137,7 +121,7 @@ Scanner发送scan请求时，需要指定ScanA和AdvA两个地址。其实ScanA�
 
 标签: [蓝牙](http://www.wowotech.net/tag/%E8%93%9D%E7%89%99) [BLE](http://www.wowotech.net/tag/BLE) [resolvable](http://www.wowotech.net/tag/resolvable) [privacy](http://www.wowotech.net/tag/privacy) [安全](http://www.wowotech.net/tag/%E5%AE%89%E5%85%A8)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [X-019-KERNEL-串口驱动开发之数据收发](http://www.wowotech.net/x_project/serial_driver_porting_4.html) | [内存初始化代码分析（三）：创建系统内存地址映射](http://www.wowotech.net/memory_management/mem_init_3.html)»
 

@@ -1,39 +1,6 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2016-8-29 22:42 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
 
 在 [DRAM Device](http://www.wowotech.net/basic_tech/321.html) 章节中，我们简单介绍了 SDRAM 的 Active、Read、Write 等的操作，在本中，我们将详细的介绍各个操作的时序。
-
-  
-
-相关文章：
-
-[DRAM 原理 1 ：DRAM Storage Cell](http://www.wowotech.net/basic_tech/307.html)
-
-[DRAM 原理 2 ：DRAM Memory Organization](http://www.wowotech.net/basic_tech/309.html)
-
-[DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)  
-
-[DRAM 原理 5 ：DRAM Devices Organization](http://www.wowotech.net/basic_tech/343.html)
-
-  
-
-+
 
 ## 1. Overview
 
@@ -220,7 +187,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [SDRAM](http://www.wowotech.net/tag/SDRAM) [dram](http://www.wowotech.net/tag/dram)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux内存模型](http://www.wowotech.net/memory_management/memory_model.html) | [eMMC框架及其初始化](http://www.wowotech.net/filesystem/329.html)»
 

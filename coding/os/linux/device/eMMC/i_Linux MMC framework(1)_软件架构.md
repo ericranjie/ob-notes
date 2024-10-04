@@ -1,141 +1,135 @@
-# [蜗窝科技](http://www.wowotech.net/)
+作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-1-10 22:24 分类：[通信类协议](http://www.wowotech.net/sort/comm)
 
-### 慢下来，享受技术。
+## 1. 前言
 
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
+由[1]中MMC、SD、SDIO的介绍可知，这三种技术都是起源于MMC技术，有很多共性，因此Linux kernel统一使用MMC framework管理所有和这三种技术有关的设备。
 
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
+本文将基于[1]对MMC技术的介绍，学习Linux kernel MMC framework的软件架构。
 
-﻿
+## 2. 软件架构
 
-## 
-作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2017-1-12 20:28 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
+Linux kernel的驱动框架有两个要点（尽管本站前面的文章已经多次强调，本文还是要再说明一下，因为这样的设计思想，说一千遍都不会烦）：
 
-eMMC 是 embedded MultiMediaCard 的简称。MultiMediaCard，即 MMC， 是一种闪存卡（Flash Memory Card）标准，它定义了 MMC 的架构以及访问　Flash Memory 的接口和协议。而 eMMC 则是对 MMC 的一个拓展，以满足更高标准的性能、成本、体积、稳定、易用等的需求。
+> 1）抽象硬件（硬件架构是什么样子，驱动框架就应该是什么样子）。
+> 
+> 2）向“客户”提供使用该硬件的API（之前我们提到最多的客户是“用户空间的Application”，不过也有其它“客户”，例如内核空间的其它driver、其它framework）。
 
-eMMC 的整体架构如下图片所示：
+以本文的描述对象为例，MMC framework的软件架构如下面“图片1”所示：
 
-![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_architecture.png)
+[![mmc_architecture](http://www.wowotech.net/content/uploadfile/201701/50b2a0c2bbf76a81a7a5fd9549b7daae20170110142443.gif "mmc_architecture")](http://www.wowotech.net/content/uploadfile/201701/d07215f202ec5295dd60b88a86e2660020170110142442.gif)
 
-图片： eMMC 整体架构
+图片1 Linux MMC framework软件架构
 
-  
+MMC framework分别有“从左到右”和“从下到上”两种层次结构。
 
-eMMC 内部主要可以分为 Flash Memory、Flash Controller 以及 Host Interface 三大部分。
+1） 从左到右
 
-## 1. Flash Memory
+MMC协议是一个总线协议，因此包括Host controller、Bus、Card三类实体（从左到右）。相应的，MMC framework抽象出了host、bus、card三个软件实体，以便和硬件一一对应：
 
-Flash Memory 是一种非易失性的存储器，通常在嵌入式系统中用于存放系统、应用和数据等，类似与 PC 系统中的硬盘。
+> host，负责驱动Host controller，提供诸如访问card的寄存器、检测card的插拔、读写card等操作方法。从设备模型的角度看，host会检测卡的插入，并向bus注册MMC card设备；
+> 
+> bus，是MMC bus的虚拟抽象，以标准设备模型的方式，收纳MMC card（device）以及对应的MMC driver（driver）；
+> 
+> card，抽象具体的MMC卡，由对应的MMC driver驱动（从这个角度看，可以忽略MMC的技术细节，只需关心一个个具有特定功能的卡设备，如存储卡、WIFI卡、GPS卡等等）。
 
-目前，绝大部分手机和平板等移动设备中所使用的 eMMC 内部的 Flash Memory 都属于 NAND Flash，关于 NAND Flash 的更多细节可以参考 [Flash Memory](https://linux.codingbelief.com/zh/storage/flash_memory/index.html) 章节。
+2）从下到上
 
-eMMC 在内部对 Flash Memory 划分了几个主要区域，如下图所示：
+MMC framework从下到上也有3个层次（老生常谈了）：
 
-![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_partitions.png)
+> MMC core位于中间，是MMC framework的核心实现，负责抽象host、bus、card等软件实体，负责向底层提供统一、便利的编写Host controller driver的API；
+> 
+> MMC host controller driver位于底层，基于MMC core提供的框架，驱动具体的硬件（MMC controller）；
+> 
+> MMC card driver位于最上面，负责驱动MMC core抽象出来的虚拟的card设备，并对接内核其它的framework（例如块设备、TTY、wireless等），实现具体的功能。
 
-图片：eMMC 内部分区
+## 3. 工作流程
 
-  
+基于图片1中的软件架构，Linux MMC framework的工作流程如下：
 
-1. BOOT Area Partition 1 & 2  
-    此分区主要是为了支持从 eMMC 启动系统而设计的。  
-    该分区的数据，在 eMMC 上电后，可以通过很简单的协议就可以读取出来。同时，大部分的 SOC 都可以通过 GPIO 或者 FUSE 的配置，让 ROM 代码在上电后，将 eMMC BOOT 分区的内容加载到 SOC 内部的 SRAM 中执行。
-    
-2. RPMB Partition  
-    RPMB 是 Replay Protected Memory Block 的简称，它通过 HMAC SHA-256 和 Write Counter 来保证保存在 RPMB 内部的数据不被非法篡改。  
-    在实际应用中，RPMB 分区通常用来保存安全相关的数据，例如指纹数据、安全支付相关的密钥等。
-    
-3. General Purpose Partition 1～4  
-    此区域则主要用于存储系统或者用户数据。 General Purpose Partition 在芯片出厂时，通常是不存在的，需要主动进行配置后，才会存在。
-    
-4. User Data Area  
-    此区域则主要用于存储系统和用户数据。  
-    User Data Area 通常会进行再分区，例如 Android 系统中，通常在此区域分出 boot、system、userdata 等分区。
-    
+[![mmc_opt_flow](http://www.wowotech.net/content/uploadfile/201701/610a9ad18af8205f2c8d6e9c2d24c82d20170110142445.gif "mmc_opt_flow")](http://www.wowotech.net/content/uploadfile/201701/133ff2349cf343a5d07bccb6c266b5ca20170110142444.gif)
 
-更多 eMMC 分区相关的细节，请参考 [eMMC 分区管理](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_partitions.html) 章节。
+图片2 MMC操作流程
 
-## 2. Flash Controller
+暂时不进行详细介绍，感兴趣的同学可以照着代码先看看。后续其它文章会逐一展开。
 
-NAND Flash 直接接入 Host 时，Host 端通常需要有 NAND Flash Translation Layer，即 NFTL 或者 NAND Flash 文件系统来做坏块管理、ECC等的功能。
+_原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http://www.wowotech.net/comm/mmc_framework_arch.html)。
 
-eMMC 则在其内部集成了 Flash Controller，用于完成擦写均衡、坏块管理、ECC校验等功能。相比于直接将 NAND Flash 接入到 Host 端，eMMC 屏蔽了 NAND Flash 的物理特性，可以减少 Host 端软件的复杂度，让 Host 端专注于上层业务，省去对 NAND Flash 进行特殊的处理。同时，eMMC 通过使用 Cache、Memory Array 等技术，在读写性能上也比 NAND Flash 要好很多。
+标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [架构](http://www.wowotech.net/tag/%E6%9E%B6%E6%9E%84) [Architecture](http://www.wowotech.net/tag/Architecture) [framework](http://www.wowotech.net/tag/framework) [mmc](http://www.wowotech.net/tag/mmc)
 
-![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_vs_nand_flash.png)
+---
 
-图片：NAND Flash 与 eMMC
-
-## 3. Host Interface
-
-eMMC 与 Host 之间的连接如下图所示：
-
-![](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_host_interfaces.png)
-
-图片：eMMC Interface
-
-  
-
-各个信号的用途如下所示：
-
-CLK  
-用于同步的时钟信号
-
-Data Strobe  
-此信号是从 Device 端输出的时钟信号，频率和 CLK 信号相同，用于同步从 Device 端输出的数据。该信号在 eMMC 5.0 中引入。
-
-CMD  
-此信号用于发送 Host 的 command 和 Device 的 response。
-
-DAT0-7  
-用于传输数据的 8 bit 总线。
-
-Host 与 eMMC 之间的通信都是 Host 以一个 Command 开始发起的。针对不同的 Command，Device 会做出不同的响应。详细的通信协议相关内容，请参考 [eMMC 总线协议](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/emmc_bus_protocol.html) 章节。
-
-## 4. 参考资料
-
-1. [Embedded Multi-Media Card (e•MMC) Electrical Standard (5.1)](http://www.jedec.org/sites/default/files/docs/JESD84-B51.pdf) [PDF]
-
-_原创文章，转发请注明出处。蜗窝科技_  
-
-标签: [emmc](http://www.wowotech.net/tag/emmc)
-
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
-
-« [为什么会有文件系统(一)](http://www.wowotech.net/filesystem/370.html) | [Linux MMC framework(1)_软件架构](http://www.wowotech.net/comm/mmc_framework_arch.html)»
+« [eMMC 原理 2 ：eMMC 简介](http://www.wowotech.net/basic_tech/emmc_intro.html) | [eMMC 原理 1 ：Flash Memory 简介](http://www.wowotech.net/basic_tech/flash_memory_intro.html)»
 
 **评论：**
 
-**[lethe](http://android%20develope/)**  
-2020-05-07 17:40
+**[董先生](http://dongni.work/)**  
+2021-10-11 16:47
 
-所以对于emmc和ufs这种内部集成了flash controller的话，ecc 、wear leveing 和 bad block management这些软件层面的逻辑只有flash vendor可以对吗？ 感觉这些很关键呐。。
-
-[回复](http://www.wowotech.net/basic_tech/emmc_intro.html#comment-7983)
-
-**[lethe](http://android%20develope/)**  
-2020-05-07 17:41
-
-@lethe：仅vendor可见对吗？漏字了
-
-[回复](http://www.wowotech.net/basic_tech/emmc_intro.html#comment-7984)
-
-**小豌豆**  
-2017-01-19 14:48
-
-eMMC也有几种模式：  
-   1线，4线，8线  
-   不同的速度，DDR52，SDR50等，  
+你好，不太理解这个“从下到上也有3个层次”  
   
-和NandFlash最大的不同就在于，eMMC的速度更快，所以需要调试delayChain，  
-   比起NandFlash，eMMC在kernel的代码少的太太多了，而且无 physicBlock和LogicalBlock的概念~  
-等~
+不太明白card_driver 与 host controller driver 这两个有什么区别？  
+  
+请问大家，有没有一些相关文档，以供仔细阅读呢？  
+  
+刚学习，有点迷糊，谢谢大家指教！
 
-[回复](http://www.wowotech.net/basic_tech/emmc_intro.html#comment-5167)
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-8330)
+
+**北海风云**  
+2019-08-20 14:29
+
+图挂了 。能补一下吗 ?
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-7599)
+
+**zoro**  
+2017-03-25 23:55
+
+请问框图是用什么软件画的啊
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5379)
+
+**[wowo](http://www.wowotech.net/)**  
+2017-03-27 08:49
+
+@zoro：ppt
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5380)
+
+**[江南书生](http://no/)**  
+2017-05-04 17:30
+
+@wowo：PPT 画的这么工整，牛逼
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5516)
+
+**[wowo](http://www.wowotech.net/)**  
+2017-05-05 08:23
+
+@江南书生：哪里，过奖了。其实office2007之后，用ppt画图还是挺漂亮的，那些模板的配色，做到不错:-)
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5520)
+
+**[江南书生](http://no/)**  
+2017-03-01 14:38
+
+赞
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5276)
+
+**青春年少**  
+2017-02-13 16:57
+
+写的真好
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5218)
+
+**[狂奔的蜗牛](http://www.wowotech.net/)**  
+2017-01-25 10:37
+
+清晰明了，赞
+
+[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5191)
 
 **发表评论：**
 
@@ -201,11 +195,11 @@ eMMC也有几种模式：
         - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
 - ### 随机文章
     
-    - [Linux reset framework](http://www.wowotech.net/pm_subsystem/reset_framework.html)
-    - [Linux电源管理(8)_Wakeup count功能](http://www.wowotech.net/pm_subsystem/wakeup_count.html)
-    - [Linux内核的整体架构](http://www.wowotech.net/linux_kenrel/11.html)
-    - [Linux时间子系统之（一）：时间的基本概念](http://www.wowotech.net/timer_subsystem/time_concept.html)
-    - [X-000-PRE-开发环境搭建](http://www.wowotech.net/x_project/develop_env.html)
+    - [内存初始化代码分析（一）：identity mapping和kernel image mapping](http://www.wowotech.net/memory_management/__create_page_tables_code_analysis.html)
+    - [Common Clock Framework系统结构](http://www.wowotech.net/pm_subsystem/ccf-arch.html)
+    - [process credentials相关的用户空间文件](http://www.wowotech.net/linux_application/24.html)
+    - [Linux时间子系统之（十六）：clockevent](http://www.wowotech.net/timer_subsystem/clock-event.html)
+    - [蓝牙协议分析(11)_BLE安全机制之SM](http://www.wowotech.net/bluetooth/le_security_manager.html)
 - ### 文章存档
     
     - [2024年2月(1)](http://www.wowotech.net/record/202402)

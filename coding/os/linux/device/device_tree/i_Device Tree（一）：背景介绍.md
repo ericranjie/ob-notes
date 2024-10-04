@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-5-22 16:46 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
@@ -24,9 +8,7 @@
 我想从下面三个方面来了解Device Tree：
 
 1、为何要引入Device Tree，这个机制是用来解决什么问题的？（这是本文的主题）
-
 2、Device Tree的基础概念（请参考[DT基础概念](http://www.wowotech.net/linux_kenrel/dt_basic_concept.html)）
-
 3、ARM linux中和Device Tree相关的代码分析（请参考[DT代码分析](http://www.wowotech.net/linux_kenrel/dt-code-analysis.html)）
 
 阅读linux内核代码就像欣赏冰山，有看得到的美景（各种内核机制及其代码），也有埋在水面之下看不到的基础（机制背后的源由和目的）。沉醉于各种内核机制的代码固然有无限乐趣，但更重要的是注入更多的思考，思考其背后的机理，真正理解软件抽象。这样才能举一反三，并应用在具体的工作和生活中。
@@ -34,9 +16,7 @@
 本文主要从下面几个方面阐述为何ARM linux会引入Device Tree：
 
 1、没有Device Tree的ARM linux是如何运转的？
-
 2、混乱的ARM architecture代码和存在的问题
-
 3、新内核的解决之道
 
 二、没有Device Tree的ARM linux是如何运转的？
@@ -46,17 +26,17 @@
 1、自己撰写一个bootloader并传递适当的参数给kernel。除了传统的command line以及tag list之类的，最重要的是申请一个machine type，当拿到属于自己项目的machine type ID的时候，当时心情雀跃，似乎自己已经是开源社区的一份子了（其实当时是有意愿，或者说有目标是想将大家的代码并入到linux kernel main line的）。
 
 2、在内核的arch/arm目录下建立mach-xxx目录，这个目录下，放入该SOC的相关代码，例如中断controller的代码，时间相关的代码，内存映射，睡眠相关的代码等等。此外，最重要的是建立一个board specific文件，定义一个machine的宏：
-
-> MACHINE_START(project name, "xxx公司的xxx硬件平台")  
->     .phys_io    = 0x40000000,  
->     .boot_params    = 0xa0000100,    
->     .io_pg_offst    = (io_p2v(0x40000000) >> 18) & 0xfffc,  
->     .map_io        = xxx_map_io,  
->     .init_irq    = xxx_init_irq,  
->     .timer        = &xxx_timer,  
->     .init_machine    = xxx_init,  
-> MACHINE_END
-
+```cpp
+MACHINE_START(project name, "xxx公司的xxx硬件平台")  
+.phys_io    = 0x40000000,  
+.boot_params    = 0xa0000100,    
+.io_pg_offst    = (io_p2v(0x40000000) >> 18) & 0xfffc,  
+.map_io        = xxx_map_io,  
+.init_irq    = xxx_init_irq,  
+.timer        = &xxx_timer,  
+.init_machine    = xxx_init,  
+MACHINE_END
+```
 在xxx_init函数中，一般会加入很多的platform device。因此，伴随这个board specific文件中是大量的静态table，描述了各种硬件设备信息。
 
 3、调通了system level的driver（timer，中断处理，clock等）以及串口terminal之后，linux kernel基本是可以起来了，后续各种driver不断的添加，直到系统软件支持所有的硬件。
@@ -68,7 +48,6 @@
 每次正式的linux kernel release之后都会有两周的merge window，在这个窗口期间，kernel各个部分的维护者都会提交各自的patch，将自己测试稳定的代码请求并入kernel main line。每到这个时候，Linus就会比较繁忙，他需要从各个内核维护者的分支上取得最新代码并merge到自己的kernel source tree中。Tony Lindgren，内核OMAP development tree的维护者，发送了一个邮件给Linus，请求提交OMAP平台代码修改，并给出了一些细节描述：
 
 1、简单介绍本次改动
-
 2、关于如何解决merge conficts。有些git mergetool就可以处理，不能处理的，给出了详细介绍和解决方案
 
 一切都很平常，也给出了足够的信息，然而，正是这个pull request引发了一场针对ARM linux的内核代码的争论。我相信Linus一定是对ARM相关的代码早就不爽了，ARM的merge工作量较大倒在其次，主要是他认为ARM很多的代码都是垃圾，代码里面有若干愚蠢的table，而多个人在维护这个table，从而导致了冲突。因此，在处理完OMAP的pull request之后（Linus并非针对OMAP平台，只是Tony Lindgren撞在枪口上了），他发出了怒吼：
@@ -80,9 +59,7 @@
 对于一件事情，不同层次的人有不同层次的思考。这次争论涉及的人包括：
 
 1、内核维护者（CPU体系结构无关的代码）
-
 2、维护ARM系统结构代码的人
-
 3、维护ARM sub architecture的人（来自各个ARM SOC vendor）
 
 维护ARM sub architecture的人并没有强烈的使命感，作为公司的一员，他们最大的目标是以最快的速度支持自己公司的SOC，尽快的占领市场。这些人的软件功力未必强，对linux kernel的理解未必深入（有些人可能很强，但是人在江湖身不由己）。在这样的情况下，很多SOC specific的代码都是通过copy and paste，然后稍加修改代码就提交了。此外，各个ARM vendor的SOC family是一长串的CPU list，每个CPU多多少少有些不同，这时候＃ifdef就充斥了各个源代码中，让ARM mach-和plat-目录下的代码有些不忍直视。
@@ -94,9 +71,7 @@
 经过争论，确定的问题如下：
 
 1、ARM linux缺少platform（各个ARM sub architecture，或者说各个SOC）之间的协调，导致arm linux的代码有重复。值得一提的是在本次争论之前，ARM维护者已经进行了不少相关的工作（例如PM和clock tree）来抽象相同的功能模块。
-
 2、ARM linux中大量的board specific的源代码应该踢出kernel，否则这些垃圾代码和table会影响linux kernel的长期目标。
-
 3、各个sub architecture的维护者直接提交给Linux并入主线的机制缺乏层次。
 
 四、新内核的解决之道
@@ -106,13 +81,9 @@
 针对重复的代码问题，如果不同的SOC使用了相同的IP block（例如I2C controller），那么这个driver的code要从各个arch/arm/mach-xxx中独立出来，变成一个通用的模块供各个SOC specific的模块使用。移动到哪个目录呢？对于I2C或者USB OTG而言，这些HW block的驱动当然应该移动到kernel/drivers目录。因为，对于这些外设，可能是in-chip，也可能是off-chip的，但是对于软件而言，它们是没有差别的（或者说好的软件抽象应该掩盖底层硬件的不同）。对于那些system level的code呢？例如clock control、interrupt control。其实这些也不是ARM-specific，应该属于linux kernel的核心代码，应该放到linux/kernel目录下，属于core-Linux-kernel frameworks。当然对于ARM平台，也需要保存一些和framework交互的code，这些code叫做ARM SoC core architecture code。OK，总结一下：
 
 1、ARM的核心代码仍然保存在arch/arm目录下
-
 2、ARM SoC core architecture code保存在arch/arm目录下
-
 3、ARM SOC的周边外设模块的驱动保存在drivers目录下
-
 4、ARM SOC的特定代码在arch/arm/mach-xxx目录下
-
 5、ARM SOC board specific的代码被移除，由Device Tree机制来负责传递硬件拓扑和硬件资源信息。
 
 OK，终于来到了Device Tree了。本质上，Device Tree改变了原来用hardcode方式将HW 配置信息嵌入到内核代码的方法，改用bootloader传递一个DB的形式。对于基于ARM CPU的嵌入式系统，我们习惯于针对每一个platform进行内核的编译。但是随着ARM在消费类电子上的广泛应用（甚至桌面系统、服务器系统），我们期望ARM能够象X86那样用一个kernel image来支持多个platform。在这种情况下，如果我们认为kernel是一个black box，那么其输入参数应该包括：
@@ -131,7 +102,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [Device](http://www.wowotech.net/tag/Device) [tree](http://www.wowotech.net/tag/tree)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [蓝牙协议分析(1)_基本概念](http://www.wowotech.net/bluetooth/bt_overview.html) | [Linux电源管理(3)_Generic PM之Reboot过程](http://www.wowotech.net/pm_subsystem/reboot.html)»
 

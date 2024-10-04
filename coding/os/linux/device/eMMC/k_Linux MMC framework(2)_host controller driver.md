@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-3-8 21:33 分类：[通信类协议](http://www.wowotech.net/sort/comm)
 
 ## 1. 前言
@@ -83,51 +66,51 @@ MMC core使用struct mmc_host结构抽象具体的MMC host controller，该结�
 struct mmc_host_ops抽象并集合了MMC host controller所有的操作函数集，包括：
 
 1）数据传输有关的函数
-
-> /*  
-> * It is optional for the host to implement pre_req and post_req in  
-> * order to support double buffering of requests (prepare one  
-> * request while another request is active).  
-> * pre_req() must always be followed by a post_req().  
-> * To undo a call made to pre_req(), call post_req() with  
-> * a nonzero err condition.  
-> */  
-> void    (*post_req)(struct mmc_host *host, struct mmc_request *req,  
->                     int err);  
-> void    (*pre_req)(struct mmc_host *host, struct mmc_request *req,  
->                    bool is_first_req);  
-> void    (*request)(struct mmc_host *host, struct mmc_request *req);
-
+```cpp
+/*  
+* It is optional for the host to implement pre_req and post_req in  
+* order to support double buffering of requests (prepare one  
+* request while another request is active).  
+* pre_req() must always be followed by a post_req().  
+* To undo a call made to pre_req(), call post_req() with  
+* a nonzero err condition.  
+*/  
+void    (*post_req)(struct mmc_host *host, struct mmc_request *req,  
+int err);  
+void    (*pre_req)(struct mmc_host *host, struct mmc_request *req,  
+bool is_first_req);  
+void    (*request)(struct mmc_host *host, struct mmc_request *req);
+```
 pre_req和post_req是非必需的，host driver可以利用它们实现诸如双buffer之类的高级功能。
 
 数据传输的主题是struct mmc_request类型的指针，具体可参考3.7小节的介绍。
 
 2）总线参数的配置以及卡状态的获取函数
-
-> /*  
-> * Avoid calling these three functions too often or in a "fast path",  
-> * since underlaying controller might implement them in an expensive  
-> * and/or slow way.  
-> *  
-> * Also note that these functions might sleep, so don't call them  
-> * in the atomic contexts!  
-> *  
-> * Return values for the get_ro callback should be:  
-> *   0 for a read/write card  
-> *   1 for a read-only card  
-> *   -ENOSYS when not supported (equal to NULL callback)  
-> *   or a negative errno value when something bad happened  
-> *  
-> * Return values for the get_cd callback should be:  
-> *   0 for a absent card  
-> *   1 for a present card  
-> *   -ENOSYS when not supported (equal to NULL callback)  
-> *   or a negative errno value when something bad happened  
-> */  
-> void    (*set_ios)(struct mmc_host *host, struct mmc_ios *ios);  
-> int     (*get_ro)(struct mmc_host *host);  
-> int     (*get_cd)(struct mmc_host *host);
-
+```cpp
+/*  
+* Avoid calling these three functions too often or in a "fast path",  
+* since underlaying controller might implement them in an expensive  
+* and/or slow way.  
+*  
+* Also note that these functions might sleep, so don't call them  
+* in the atomic contexts!  
+*  
+* Return values for the get_ro callback should be:  
+*   0 for a read/write card  
+*   1 for a read-only card  
+*   -ENOSYS when not supported (equal to NULL callback)  
+*   or a negative errno value when something bad happened  
+*  
+* Return values for the get_cd callback should be:  
+*   0 for a absent card  
+*   1 for a present card  
+*   -ENOSYS when not supported (equal to NULL callback)  
+*   or a negative errno value when something bad happened  
+*/  
+void    (*set_ios)(struct mmc_host *host, struct mmc_ios *ios);  
+int     (*get_ro)(struct mmc_host *host);  
+int     (*get_cd)(struct mmc_host *host);
+```
 set_ios用于设置bus的参数（ios，可参考3.5小节的介绍）；get_ro可获取card的读写状态（具体可参考上面的注释）；get_cd用于检测卡的存在状态。
 
 注4：注释中特别说明了，这几个函数可以sleep，耗时较长，没事别乱用。
@@ -137,35 +120,35 @@ set_ios用于设置bus的参数（ios，可参考3.5小节的介绍）；get_ro�
 #### 3.3 struct mmc_pwrseq
 
 MMC framework的power sequence是一个比较有意思的功能，它提供一个名称为struct mmc_pwrseq_ops的操作函数集，集合了power on、power off等操作函数，用于控制MMC系统的供电，如下：
+```cpp
+struct mmc_pwrseq_ops {  
+void (pre_power_on)(struct mmc_host *host);  
+void (*post_power_on)(struct mmc_host *host);  
+void (*power_off)(struct mmc_host *host);  
+void (*free)(struct mmc_host *host);  
+};
 
-> struct mmc_pwrseq_ops {  
->         void (*pre_power_on)(struct mmc_host *host);  
->         void (*post_power_on)(struct mmc_host *host);  
->         void (*power_off)(struct mmc_host *host);  
->         void (*free)(struct mmc_host *host);  
-> };
-> 
-> struct mmc_pwrseq {  
->         const struct mmc_pwrseq_ops *ops;  
-> };
-
+struct mmc_pwrseq {  
+const struct mmc_pwrseq_ops *ops;  
+};
+```
 与此同时，MMC core提供了一个通用的pwrseq的管理模块（drivers/mmc/core/pwrseq.c），以及一些简单的pwrseq策略（如drivers/mmc/core/pwrseq_simple.c、drivers/mmc/core/pwrseq_emmc.c），最终的目的是，通过一些简单的dts配置，即可正确配置MMC的供电，例如：
+```cpp
+/* arch/arm/boot/dts/omap3-igep0020.dts */  
+mmc2_pwrseq: mmc2_pwrseq {  
+compatible = "mmc-pwrseq-simple";  
+reset-gpios = <&gpio5 11 GPIO_ACTIVE_LOW>,      / gpio_139 - RESET_N_W /  
+<&gpio5 10 GPIO_ACTIVE_LOW>;      / gpio_138 - WIFI_PDN /  
+};
 
-> /* arch/arm/boot/dts/omap3-igep0020.dts */  
-> mmc2_pwrseq: mmc2_pwrseq {  
->         compatible = "mmc-pwrseq-simple";  
->         reset-gpios = <&gpio5 11 GPIO_ACTIVE_LOW>,      /* gpio_139 - RESET_N_W */  
->                       <&gpio5 10 GPIO_ACTIVE_LOW>;      /* gpio_138 - WIFI_PDN */  
-> };
-> 
-> /* arch/arm/boot/dts/rk3288-veyron.dtsi  */  
-> emmc_pwrseq: emmc-pwrseq {  
->         compatible = "mmc-pwrseq-emmc";  
->         pinctrl-0 = <&emmc_reset>;  
->         pinctrl-names = "default";  
->         reset-gpios = <&gpio2 9 GPIO_ACTIVE_HIGH>;  
-> };
-
+/ arch/arm/boot/dts/rk3288-veyron.dtsi  /  
+emmc_pwrseq: emmc-pwrseq {  
+compatible = "mmc-pwrseq-emmc";  
+pinctrl-0 = <&emmc_reset>;  
+pinctrl-names = "default";  
+reset-gpios = <&gpio2 9 GPIO_ACTIVE_HIGH>;  
+};
+```
 具体的细节，在需要的时候，阅读代码即可，这里不再赘述。
 
 #### 3.4 Host capabilities
@@ -214,17 +197,11 @@ MMC framework的power sequence是一个比较有意思的功能，它提供一�
 struct mmc_ios中保存了MMC总线当前的配置情况，包括如下信息：
 
 1）clock，时钟频率。
-
 2）vdd，卡的供电电压，通过“1 << vdd”可以得到MMC_VDD_x_x（具体可参考include/linux/mmc/host.h中MMC_VDD_开头的定义），进而得到电压信息。
-
 3）bus_mode，两种信号模式，open-drain（MMC_BUSMODE_OPENDRAIN）和push-pull（MMC_BUSMODE_PUSHPULL），对应不同的高低电平（可参考相应的spec，例如[2]）。
-
 4）chip_select，只针对SPI模式，指定片选信号的有效模式，包括没有片选信号（MMC_CS_DONTCARE）、高电平有效（MMC_CS_HIGH）、低电平有效（MMC_CS_LOW）。
-
 5）power_mode，当前的电源状态，包括MMC_POWER_OFF、MMC_POWER_UP、MMC_POWER_ON和MMC_POWER_UNDEFINED。
-
 6）bus_width，总线的宽度，包括1-bit（MMC_BUS_WIDTH_1）、4-bit（MMC_BUS_WIDTH_4）和8-bit（MMC_BUS_WIDTH_8）。
-
 7）timing，符合哪一种总线时序（大多对应某一类MMC规范），包括：
 
 > MMC_TIMING_LEGACY，旧的、不再使用的规范；  
@@ -251,12 +228,12 @@ struct mmc_ios中保存了MMC总线当前的配置情况，包括如下信息：
 #### 3.6 struct mmc_supply
 
 struct mmc_supply中保存了两个struct regulator指针（如下），用于控制MMC子系统有关的供电（vmmc和vqmmc）。
-
-> struct mmc_supply {  
->         struct regulator *vmmc;         /* Card power supply */  
->         struct regulator *vqmmc;        /* Optional Vccq supply */  
-> };
-
+```cpp
+struct mmc_supply {  
+struct regulator vmmc;         / Card power supply /  
+struct regulator *vqmmc;        / Optional Vccq supply /  
+};
+```
 关于vmmc和vqmmc，说明如下：
 
 > vmmc是卡的供电电压，一般连接到卡的VDD管脚上。而vqmmc则用于上拉信号线（CMD、CLK和DATA[6]）。
@@ -268,20 +245,20 @@ struct mmc_supply中保存了两个struct regulator指针（如下），用于�
 #### 3.7 struct mmc_request
 
 struct mmc_request封装了一次传输请求，定义如下：
+```cpp
+/* include/linux/mmc/core.h */
 
-> /* include/linux/mmc/core.h */
-> 
-> struct mmc_request {  
->         struct mmc_command      *sbc;           /* SET_BLOCK_COUNT for multiblock */  
->         struct mmc_command      *cmd;  
->         struct mmc_data         *data;  
->         struct mmc_command      *stop;
-> 
->         struct completion       completion;  
->         void                    (*done)(struct mmc_request *);/* completion function */  
->         struct mmc_host         *host;  
-> };
+struct mmc_request {  
+struct mmc_command      *sbc;           / SET_BLOCK_COUNT for multiblock /  
+struct mmc_command      *cmd;  
+struct mmc_data         *data;  
+struct mmc_command      *stop;
 
+struct completion       completion;  
+void                    (*done)(struct mmc_request *);/ completion function /  
+struct mmc_host         *host;  
+};
+```
 要理解这个数据结构，需要先了解MMC的总线协议（bus protocol），这里以eMMC[2]为例进行简单的介绍（更为详细的解释，可参考相应的spec以及本站的文章--“[eMMC 原理 4 ：总线协议](http://www.wowotech.net/basic_tech/emmc_bus_protocol.html)[7]”）。
 
 **3.7.1 MMC bus protocol**
@@ -452,28 +429,28 @@ struct mmc_data结构包含了数据传输有关的内容：
 编写MMC host驱动的所有工作，都是围绕struct mmc_host结构展开的。在对应的platform driver的probe函数中，通过mmc_alloc_host分配一个mmc host后，我们需要根据controller的实际情况，填充对应的字段。
 
 mmc host中大部分和controller能力/特性有关的字段，可以通过dts配置（然后在代码中调用mmc_of_parse自动解析并填充），举例如下（注意其中红色的部分，都是MMC framework的标准字段）：
+```cpp
+/* arch/arm/boot/dts/exynos5420-peach-pit.dts */
 
-> /* arch/arm/boot/dts/exynos5420-peach-pit.dts */
-> 
-> &mmc_1 {  
->         status = "okay";  
->         num-slots = <1>;  
->         non-removable;  
->         cap-sdio-irq;  
->         keep-power-in-suspend;  
->         clock-frequency = <400000000>;  
->         samsung,dw-mshc-ciu-div = <1>;  
->         samsung,dw-mshc-sdr-timing = <0 1>;  
->         samsung,dw-mshc-ddr-timing = <0 2>;  
->         pinctrl-names = "default";  
->         pinctrl-0 = <&sd1_clk>, <&sd1_cmd>, <&sd1_int>, <&sd1_bus1>,  
->                     <&sd1_bus4>, <&sd1_bus8>, <&wifi_en>;  
->         bus-width = <4>;  
->         cap-sd-highspeed;  
->         mmc-pwrseq = <&mmc1_pwrseq>;  
->         vqmmc-supply = <&buck10_reg>;  
-> };
-
+&mmc_1 {  
+status = "okay";  
+num-slots = <1>;  
+non-removable;  
+cap-sdio-irq;  
+keep-power-in-suspend;  
+clock-frequency = <400000000>;  
+samsung,dw-mshc-ciu-div = <1>;  
+samsung,dw-mshc-sdr-timing = <0 1>;  
+samsung,dw-mshc-ddr-timing = <0 2>;  
+pinctrl-names = "default";  
+pinctrl-0 = <&sd1_clk>, <&sd1_cmd>, <&sd1_int>, <&sd1_bus1>,  
+<&sd1_bus4>, <&sd1_bus8>, <&wifi_en>;  
+bus-width = <4>;  
+cap-sd-highspeed;  
+mmc-pwrseq = <&mmc1_pwrseq>;  
+vqmmc-supply = <&buck10_reg>;  
+};
+```
 #### 5.2 数据传输的实现
 
 填充struct mmc_host变量的过程中，工作量最大的，就是对struct mmc_host_ops的实现（毫无疑问！所有MMC host的操作逻辑都封在这里呢！！）。这里简单介绍一下相关的概念，具体的驱动编写步骤，后面文章会结合“[X Project](http://www.wowotech.net/sort/x_project)”详细描述。
@@ -556,7 +533,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [driver](http://www.wowotech.net/tag/driver) [mmc](http://www.wowotech.net/tag/mmc) [host](http://www.wowotech.net/tag/host)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux调度器：用户空间接口](http://www.wowotech.net/process_management/scheduler-API.html) | [eMMC 原理 4 ：总线协议](http://www.wowotech.net/basic_tech/emmc_bus_protocol.html)»
 

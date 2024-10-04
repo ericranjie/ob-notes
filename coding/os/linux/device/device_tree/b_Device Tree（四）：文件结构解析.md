@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2017-9-24 11:08 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
 **前言**
@@ -30,30 +13,30 @@ Device Tree文件的格式为dts，包含的头文件格式为dtsi，dts文件�
 
 **3. Device Tree头信息**  
 fdtdump工具使用，Linux终端执行ftddump –h，输出以下信息：
-
-> fdtdump -h  
-> Usage: fdtdump [options] <file>  
-> Options: -[dshV]  
->   -d, --debug   Dump debug information while decoding the file  
->   -s, --scan    Scan for an embedded fdt in file  
->   -h, --help    Print this help and exit  
->   -V, --version Print version and exit
-
+```cpp
+fdtdump -h  
+Usage: fdtdump options <file>  
+ Options: -[dshV]  
+   -d, --debug   Dump debug information while decoding the file  
+   -s, --scan    Scan for an embedded fdt in file  
+   -h, --help    Print this help and exit  
+   -V, --version Print version and exit
+```
 本文采用s5pv21_smc.dtb文件为例说明fdtdump工具的使用。Linux终端执行fdtdump –sd s5pv21_smc.dtb > s5pv21_smc.txt，打开s5pv21_smc.txt文件，部分输出信息如下所示：
-
-> // magic:  0xd00dfeed  
-> // totalsize:  0xce4 (3300)  
-> // off_dt_struct: 0x38  
-> // off_dt_strings: 0xc34  
-> // off_mem_rsvmap: 0x28  
-> // version: 17  
-> // last_comp_version: 16  
-> // boot_cpuid_phys: 0x0  
-> // size_dt_strings: 0xb0  
-> // size_dt_struct: 0xbfc
-
+```cpp
+// magic:  0xd00dfeed  
+// totalsize:  0xce4 (3300)  
+// off_dt_struct: 0x38  
+// off_dt_strings: 0xc34  
+// off_mem_rsvmap: 0x28  
+// version: 17  
+// last_comp_version: 16  
+// boot_cpuid_phys: 0x0  
+// size_dt_strings: 0xb0  
+// size_dt_struct: 0xbfc
+```
 以上信息便是Device Tree文件头信息，存储在dtb文件的开头部分。在Linux内核中使用struct fdt_header结构体描述。struct fdt_header结构体定义在scripts\dtc\libfdt\fdt.h文件中。
-
+```cpp
 1. struct fdt_header {
 2. 	fdt32_t magic;			     /* magic word FDT_MAGIC */
 3. 	fdt32_t totalsize;		     /* total size of DT block */
@@ -71,7 +54,7 @@ fdtdump工具使用，Linux终端执行ftddump –h，输出以下信息：
 15. 	/* version 17 fields below */
 16. 	fdt32_t size_dt_struct;		 /* size of the structure block */
 17. };
-
+```
 fdtdump工具的输出信息即是以上结构中每一个成员的值，struct fdt_header结构体包含了Device Tree的私有信息。例如: fdt_header.magic是fdt的魔数,固定值为0xd00dfeed，fdt_header.totalsize是fdt文件的大小。使用二进制工具打开s5pv21_smc.dtb验证。s5pv21_smc.dtb二进制文件头信息如下图所示。从下图中可以得到Device Tree的文件是以大端模式储存。并且，头部信息和fdtdump的输出信息一致。
 
 [![](http://www.wowotech.net/content/uploadfile/201709/97111506232039.png)](http://www.wowotech.net/content/uploadfile/201709/97111506232039.png)
@@ -102,7 +85,7 @@ Device Tree中的节点信息举例如下图所示。
 [![](http://www.wowotech.net/content/uploadfile/201709/518c1506232119.png)](http://www.wowotech.net/content/uploadfile/201709/518c1506232119.png)
 
 Device Tree源文件的结构分为header、fill_area、dt_struct及dt_string四个区域。fill_area区域填充数值0。节点（node）信息使用struct fdt_node_header结构体描述。属性信息使用struct fdt_property结构体描述。各个结构体信息如下:
-
+```cpp
 1. struct fdt_node_header {
 2. 	fdt32_t tag;
 3. 	char name[0];
@@ -114,15 +97,15 @@ Device Tree源文件的结构分为header、fill_area、dt_struct及dt_string四
 9. 	fdt32_t nameoff;
 10. 	char data[0];
 11. };
-
+```
 struct fdt_node_header描述节点信息，tag是标识node的起始结束等信息的标志位，name指向node名称的首地址。tag的取值如下： 
-
+```cpp
 1. #define FDT_BEGIN_NODE	0x1		/* Start node: full name */
 2. #define FDT_END_NODE	0x2		/* End node */
 3. #define FDT_PROP	      0x3		/* Property: name off, size, content */
 4. #define FDT_NOP		0x4		/* nop */
 5. #define FDT_END		0x9
-
+```
 FDT_BEGIN_NODE和FDT_END_NODE标识node节点的起始和结束，FDT_PROP标识node节点下面的属性起始符，FDT_END标识Device Tree的结束标识符。因此，对于每个node节点的tag标识符一般为FDT_BEGIN_NODE，对于每个node节点下面的属性的tag标识符一般是FDT_PROP。  
 
 描述属性采用struct fdt_property描述，tag标识是属性，取值为FDT_PROP；len为属性值的长度（包括‘\0’，单位：字节）；nameoff为属性名称存储位置相对于off_dt_strings的偏移地址。
@@ -133,7 +116,7 @@ FDT_BEGIN_NODE和FDT_END_NODE标识node节点的起始和结束，FDT_PROP标识
 
 **5. kernel解析Device Tree**  
 Device Tree文件结构描述就以上struct fdt_header、struct fdt_node_header及struct fdt_property三个结构体描述。kernel会根据Device Tree的结构解析出kernel能够使用的struct property结构体。kernel根据Device Tree中所有的属性解析出数据填充struct property结构体。struct property结构体描述如下： 
-
+```cpp
 1. struct property {
 2. 	char *name;                          /* property full name */
 3. 	int length;                          /* property value length */
@@ -143,7 +126,7 @@ Device Tree文件结构描述就以上struct fdt_header、struct fdt_node_header
 7. 	unsigned int unique_id;
 8. 	struct bin_attribute attr;        /* 属性文件，与sysfs文件系统挂接 */
 9. };
-
+```
 总的来说，kernel根据Device Tree的文件结构信息转换成struct property结构体，并将同一个node节点下面的所有属性通过property.next指针进行链接，形成一个单链表。  
 kernel中究竟是如何解析Device Tree的呢？下面分析函数解析过程。函数调用过程如下图所示。kernel的C语言阶段的入口函数是init/main.c/stsrt_kernel()函数，在early_init_dt_scan_nodes()中会做以下三件事：
 
@@ -156,7 +139,7 @@ kernel中究竟是如何解析Device Tree的呢？下面分析函数解析过程
 [![](http://www.wowotech.net/content/uploadfile/201709/a40d1506232259.png)](http://www.wowotech.net/content/uploadfile/201709/a40d1506232259.png)
 
 Device Tree中的每一个node节点经过kernel处理都会生成一个struct device_node的结构体，struct device_node最终一般会被挂接到具体的struct device结构体。struct device_node结构体描述如下：
-
+```cpp
 1. struct device_node {
 2. 	const char *name;              /* node的名称，取最后一次“/”和“@”之间子串 */
 3. 	const char *type;              /* device_type的属性名称，没有为<NULL> */
@@ -179,11 +162,10 @@ Device Tree中的每一个node节点经过kernel处理都会生成一个struct d
 20. #define OF_DETACHED       2 /* node has been detached from the device tree*/
 21. #define OF_POPULATED      3 /* device already created for the node */
 22. #define OF_POPULATED_BUS 4 /* of_platform_populate recursed to children of this node */
-
+```
   
-
 struct device_node结构体中的每个成员作用已经备注了注释信息，下面分析以上信息是如何得来的。Device Tree的解析首先从unflatten_device_tree()开始，代码列出如下：
-
+```cpp
 1. /**
 2.  * unflatten_device_tree - create tree of device_nodes from flat blob
 3.  *
@@ -235,11 +217,10 @@ struct device_node结构体中的每个成员作用已经备注了注释信息�
 49. 	start = 0;
 50. 	unflatten_dt_node(blob, mem, &start, NULL, mynodes, 0, false);
 51. }
-
-  
+```
 
 分析以上代码，在unflatten_device_tree()中，调用函数__unflatten_device_tree()，参数initial_boot_params指向Device Tree在内存中的首地址，of_root在经过该函数处理之后，会指向根节点，early_init_dt_alloc_memory_arch是一个函数指针，为struct device_node和struct property结构体分配内存的回调函数（callback）。在__unflatten_device_tree()函数中，两次调用unflatten_dt_node()函数，第一次是为了得到Device Tree转换成struct device_node和struct property结构体需要分配的内存大小，第二次调用才是具体填充每一个struct device_node和struct property结构体。unflatten_dt_node()代码列出如下：
-
+```cpp
 1. /**
 2.  * unflatten_dt_node - Alloc and populate a device_node from the flat tree
 3.  * @blob: The parent device tree blob
@@ -450,8 +431,7 @@ struct device_node结构体中的每个成员作用已经备注了注释信息�
 
 209. 	return mem;
 210. }
-
-  
+```
 
 通过以上函数处理就得到了所有的struct device_node结构体，为每一个node都会自动添加一个名称为“name”的property，property.length的值为当前node的名称取最后一个“/”和“@”之间的子串（包括‘\0’）。例如：/serial@e2900800，则length = 7，property.value = device_node.name = “serial”。  
 **6. platform_device和device_node绑定**  
@@ -460,7 +440,7 @@ struct device_node结构体中的每个成员作用已经备注了注释信息�
 [![](http://www.wowotech.net/content/uploadfile/201709/395b1506232186.png)](http://www.wowotech.net/content/uploadfile/201709/395b1506232186.png)
 
 代码分析如下：
-
+```cpp
 1. const struct of_device_id of_default_bus_match_table[] = {
 2. 	{ .compatible = "simple-bus", },
 3. 	{ .compatible = "simple-mfd", },
@@ -537,8 +517,7 @@ struct device_node结构体中的每个成员作用已经备注了注释信息�
 74. 	of_node_set_flag(bus, OF_POPULATED_BUS);
 75. 	return rc;
 76. }
-
-  
+```
 
 总的来说，当of_platform_populate()函数执行完毕，kernel就为DTB中所有包含compatible属性名的第一级node创建platform_device结构体，并向平台设备总线注册设备信息。如果第一级node的compatible属性值等于“simple-bus”、“simple-mfd”或者"arm,amba-bus"的话，kernel会继续为当前node的第二级包含compatible属性的node创建platform_device结构体，并注册设备。Linux系统下的设备大多都是挂载在平台总线下的，因此在平台总线被注册后，会根据of_root节点的树结构，去寻找该总线的子节点，所有的子节点将被作为设备注册到该总线上。  
 **7. i2c_client和device_node绑定**  
@@ -550,13 +529,12 @@ struct device_node结构体中的每个成员作用已经备注了注释信息�
 **8. Device_Tree与sysfs**  
 kernel启动流程为start_kernel()→rest_init()→kernel_thread():kernel_init()→do_basic_setup()→driver_init()→of_core_init()，在of_core_init()函数中在sys/firmware/devicetree/base目录下面为设备树展开成sysfs的目录和二进制属性文件，所有的node节点就是一个目录，所有的property属性就是一个二进制属性文件。
 
-  
 
 _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http://www.wowotech.net/armv8a_arch/arm_concept.html)。_  
 
 标签: [设备树](http://www.wowotech.net/tag/%E8%AE%BE%E5%A4%87%E6%A0%91)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [X-026-KERNEL-Linux gpio driver的移植之gpio range](http://www.wowotech.net/x_project/kernel_gpio_driver_porting_2.html) | [X-025-KERNEL-Linux gpio driver的移植之基本功能](http://www.wowotech.net/x_project/kernel_gpio_driver_porting_1.html)»
 

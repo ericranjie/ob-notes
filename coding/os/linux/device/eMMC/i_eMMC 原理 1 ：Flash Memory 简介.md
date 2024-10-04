@@ -1,152 +1,161 @@
-# [蜗窝科技](http://www.wowotech.net/)
+作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2017-1-9 19:28 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
 
-### 慢下来，享受技术。
+eMMC 是 Flash Memory 的一类，在详细介绍 eMMC 之前，先简单介绍一下 Flash Memory。
 
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
+Flash Memory 是一种非易失性的存储器。在嵌入式系统中通常用于存放系统、应用和数据等。在 PC 系统中，则主要用在固态硬盘以及主板 BIOS 中。另外，绝大部分的 U 盘、SDCard 等移动存储设备也都是使用 Flash Memory 作为存储介质。
 
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
+## 1. Flash Memory 的主要特性
 
-﻿
+与传统的硬盘存储器相比，Flash Memory 具有质量轻、能耗低、体积小、抗震能力强等的优点，但也有不少局限性，主要如下：
 
-##
+1. 需要先擦除再写入  
+    Flash Memory 写入数据时有一定的限制。它只能将当前为 1 的比特改写为 0，而无法将已经为 0 的比特改写为 1，只有在擦除的操作中，才能把整块的比特改写为 1。
+    
+2. 块擦除次数有限  
+    Flash Memory 的每个数据块都有擦除次数的限制（十万到百万次不等），擦写超过一定次数后，该数据块将无法可靠存储数据，成为坏块。  
+    为了最大化的延长 Flash Memory 的寿命，在软件上需要做擦写均衡（Wear Leveling），通过分散写入、动态映射等手段均衡使用各个数据块。同时，软件还需要进行坏块管理（Bad Block Management，BBM），标识坏块，不让坏块参与数据存储。（注：除了擦写导致的坏块外，Flash Memory 在生产过程也会产生坏块，即固有坏块。）
+    
+3. 读写干扰  
+    由于硬件实现上的物理特性，Flash Memory 在进行读写操作时，有可能会导致邻近的其他比特发生位翻转，导致数据异常。这种异常可以通过重新擦除来恢复。Flash Memory 应用中通常会使用 ECC 等算法进行错误检测和数据修正。
+    
+4. 电荷泄漏  
+    存储在 Flash Memory 存储单元的电荷，如果长期没有使用，会发生电荷泄漏，导致数据错误。不过这个时间比较长，一般十年左右。此种异常是非永久性的，重新擦除可以恢复。
+    
+## 2. NOR Flash 和 NAND Flash
 
-作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-1-10 22:24 分类：[通信类协议](http://www.wowotech.net/sort/comm)
+根据硬件上存储原理的不同，Flash Memory 主要可以分为 NOR Flash 和 NAND Flash 两类。 主要的差异如下所示：
 
-## 1. 前言
+- NAND Flash 读取速度与 NOR Flash 相近，根据接口的不同有所差异；
+- NAND Flash 的写入速度比 NOR Flash 快很多；
+- NAND Flash 的擦除速度比 NOR Flash 快很多；
+- NAND Flash 最大擦次数比 NOR Flash 多；
+- NOR Flash 支持片上执行，可以在上面直接运行代码；
+- NOR Flash 软件驱动比 NAND Flash 简单；
+- NOR Flash 可以随机按字节读取数据，NAND Flash 需要按块进行读取。
+- 大容量下 NAND Flash 比 NOR Flash 成本要低很多，体积也更小；
 
-由[1]中MMC、SD、SDIO的介绍可知，这三种技术都是起源于MMC技术，有很多共性，因此Linux kernel统一使用MMC framework管理所有和这三种技术有关的设备。
+（注：NOR Flash 和 NAND Flash 的擦除都是按块块进行的，执行一个擦除或者写入操作时，NOR Flash 大约需要 5s，而 NAND Flash 通常不超过 4ms。）
 
-本文将基于[1]对MMC技术的介绍，学习Linux kernel MMC framework的软件架构。
+### 2.1 NOR Flash
 
-## 2. 软件架构
+NOR Flash 根据与 CPU 端接口的不同，可以分为 Parallel NOR Flash 和 Serial NOR Flash 两类。  
+Parallel NOR Flash 可以接入到 Host 的 SRAM/DRAM Controller 上，所存储的内容可以直接映射到 CPU 地址空间，不需要拷贝到 RAM 中即可被 CPU 访问，因而支持片上执行。Serial NOR Flash 的成本比 Parallel NOR Flash 低，主要通过 SPI 接口与 Host 连接。
+  
 
-Linux kernel的驱动框架有两个要点（尽管本站前面的文章已经多次强调，本文还是要再说明一下，因为这样的设计思想，说一千遍都不会烦）：
+![](https://linux.codingbelief.com/zh/storage/flash_memory/nor_flash_interface.png)
 
-> 1）抽象硬件（硬件架构是什么样子，驱动框架就应该是什么样子）。
-> 
-> 2）向“客户”提供使用该硬件的API（之前我们提到最多的客户是“用户空间的Application”，不过也有其它“客户”，例如内核空间的其它driver、其它framework）。
+图片： Parallel NOR Flash 与 Serial NOR Flash
 
-以本文的描述对象为例，MMC framework的软件架构如下面“图片1”所示：
+  
 
-[![mmc_architecture](http://www.wowotech.net/content/uploadfile/201701/50b2a0c2bbf76a81a7a5fd9549b7daae20170110142443.gif "mmc_architecture")](http://www.wowotech.net/content/uploadfile/201701/d07215f202ec5295dd60b88a86e2660020170110142442.gif)
+鉴于 NOR Flash 擦写速度慢，成本高等特性，NOR Flash 主要应用于小容量、内容更新少的场景，例如 PC 主板 BIOS、路由器系统存储等。
 
-图片1 Linux MMC framework软件架构
+更多 NOR Flash 的相关细节，请参考 [NOR Flash](https://linux.codingbelief.com/zh/storage/flash_memory/nor_flash/index.html) 章节。
 
-MMC framework分别有“从左到右”和“从下到上”两种层次结构。
+### 2.2 NAND Flash
 
-1） 从左到右
+NAND Flash 需要通过专门的 NFI（NAND Flash Interface）与 Host 端进行通信，如下图所示：
 
-MMC协议是一个总线协议，因此包括Host controller、Bus、Card三类实体（从左到右）。相应的，MMC framework抽象出了host、bus、card三个软件实体，以便和硬件一一对应：
+  
 
-> host，负责驱动Host controller，提供诸如访问card的寄存器、检测card的插拔、读写card等操作方法。从设备模型的角度看，host会检测卡的插入，并向bus注册MMC card设备；
-> 
-> bus，是MMC bus的虚拟抽象，以标准设备模型的方式，收纳MMC card（device）以及对应的MMC driver（driver）；
-> 
-> card，抽象具体的MMC卡，由对应的MMC driver驱动（从这个角度看，可以忽略MMC的技术细节，只需关心一个个具有特定功能的卡设备，如存储卡、WIFI卡、GPS卡等等）。
+![](https://linux.codingbelief.com/zh/storage/flash_memory/nand_flash_interface.png)
 
-2）从下到上
+图片：NAND Flash Interface
 
-MMC framework从下到上也有3个层次（老生常谈了）：
+  
 
-> MMC core位于中间，是MMC framework的核心实现，负责抽象host、bus、card等软件实体，负责向底层提供统一、便利的编写Host controller driver的API；
-> 
-> MMC host controller driver位于底层，基于MMC core提供的框架，驱动具体的硬件（MMC controller）；
-> 
-> MMC card driver位于最上面，负责驱动MMC core抽象出来的虚拟的card设备，并对接内核其它的framework（例如块设备、TTY、wireless等），实现具体的功能。
+NAND Flash 根据每个存储单元内存储比特个数的不同，可以分为 SLC（Single-Level Cell）、MLC（Multi-Level Cell） 和 TLC（Triple-Level Cell） 三类。其中，在一个存储单元中，SLC 可以存储 1 个比特，MLC 可以存储 2 个比特，TLC 则可以存储 3 个比特。
 
-## 3. 工作流程
+NAND Flash 的一个存储单元内部，是通过不同的电压等级，来表示其所存储的信息的。在 SLC 中，存储单元的电压被分为两个等级，分别表示 0 和 1 两个状态，即 1 个比特。在 MLC 中，存储单元的电压则被分为 4 个等级，分别表示 00 01 10 11 四个状态，即 2 个比特位。同理，在 TLC 中，存储单元的电压被分为 8 个等级，存储 3 个比特信息。
 
-基于图片1中的软件架构，Linux MMC framework的工作流程如下：
+  
 
-[![mmc_opt_flow](http://www.wowotech.net/content/uploadfile/201701/610a9ad18af8205f2c8d6e9c2d24c82d20170110142445.gif "mmc_opt_flow")](http://www.wowotech.net/content/uploadfile/201701/133ff2349cf343a5d07bccb6c266b5ca20170110142444.gif)
+![](https://linux.codingbelief.com/zh/storage/flash_memory/slc_mlc_tlc.png)
 
-图片2 MMC操作流程
+图片： SLC、MLC 与 TLC
 
-暂时不进行详细介绍，感兴趣的同学可以照着代码先看看。后续其它文章会逐一展开。
+  
 
-_原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http://www.wowotech.net/comm/mmc_framework_arch.html)。
+NAND Flash 的单个存储单元存储的比特位越多，读写性能会越差，寿命也越短，但是成本会更低。Table 1 中，给出了特定工艺和技术水平下的成本和寿命数据。
 
-标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [架构](http://www.wowotech.net/tag/%E6%9E%B6%E6%9E%84) [Architecture](http://www.wowotech.net/tag/Architecture) [framework](http://www.wowotech.net/tag/framework) [mmc](http://www.wowotech.net/tag/mmc)
+  
+
+Table 1
+
+||SLC|MLC|TLC|
+|---|---|---|---|
+|制造成本|30-35 美元 / 32GB|17 美元 / 32GB|9-12 美元 / 32GB|
+|擦写次数|10万次或更高|1万次或更高|5000次甚至更高|
+|存储单元|1 bit / cell|2 bits / cell|3 bits / cell|
+
+（注：以上数据来源于互联网，仅供参考）
+
+  
+
+相比于 NOR Flash，NAND Flash 写入性能好，大容量下成本低。目前，绝大部分手机和平板等移动设备中所使用的 eMMC 内部的 Flash Memory 都属于 NAND Flash。PC 中的固态硬盘中也是使用 NAND Flash。
+
+更多 NAND Flash 的相关细节，请参考 [NAND Flash](https://linux.codingbelief.com/zh/storage/flash_memory/nand_flash/index.html) 章节。
+
+## 3. Raw Flash 和 Managed Flash
+
+由于 Flash Memory 存在按块擦写、擦写次数的限制、读写干扰、电荷泄露等的局限，为了最大程度的发挥 Flash Memory 的价值，通常需要有一个特殊的软件层次，实现坏块管理、擦写均衡、ECC、垃圾回收等的功能，这一个软件层次称为 FTL（Flash Translation Layer）。
+
+在具体实现中，根据 FTL 所在的位置的不同，可以把 Flash Memory 分为 Raw Flash 和 Managed Flash 两类。
+
+  
+
+![](https://linux.codingbelief.com/zh/storage/flash_memory/raw_vs_managed_flash.png)
+
+图片： Raw Flash 和 Managed Flash
+
+  
+
+Raw Flash  
+在此类应用中，在 Host 端通常有专门的 FTL 或者 Flash 文件系统来实现坏块管理、擦写均衡等的功能。Host 端的软件复杂度较高，但是整体方案的成本较低，常用于价格敏感的嵌入式产品中。  
+通常我们所说的 NOR Flash 和 NAND Flash 都属于这类型。
+
+Managed Flash  
+Managed Flash 在其内部集成了 Flash Controller，用于完成擦写均衡、坏块管理、ECC校验等功能。相比于直接将 Flash 接入到 Host 端，Managed Flash 屏蔽了 Flash 的物理特性，对 Host 提供标准化的接口，可以减少 Host 端软件的复杂度，让 Host 端专注于上层业务，省去对 Flash 进行特殊的处理。  
+[eMMC](https://linux.codingbelief.com/zh/storage/flash_memory/emmc/index.html)、[SD Card](https://linux.codingbelief.com/zh/storage/flash_memory/sd_card/index.html)、[UFS](https://linux.codingbelief.com/zh/storage/flash_memory/ufs/index.html)、U 盘等产品是属于 Managed Flash 这一类。
+
+## 4. 参考资料
+
+1. [NOR NAND Flash Guide: Selecting a Flash Storage Solution](https://www.micron.com/~/media/documents/products/product-flyer/flyer_nor_nand_flash_guide.pdf) [PDF]
+2. [Wiki: Common Flash Memory Interface](https://en.wikipedia.org/wiki/Common_Flash_Memory_Interface) [Web]
+3. [Quick Guide to Common Flash Interface](https://www.spansion.com/Support/Application%20Notes/Quick_Guide_to_CFI_AN.pdf) [PDF]
+4. [MICRON NOR Flash Technology](https://www.micron.com/products/nor-flash) [Web]
+5. [MICRON NAND Flash Technology](https://www.micron.com/products/nand-flash) [Web]
+6. [Wiki：闪存](https://zh.wikipedia.org/wiki/%E9%97%AA%E5%AD%98) [Web]
+7. [Wiki：Flash File System](https://en.wikipedia.org/wiki/Flash_file_system) [Web]
+8. [Wear Leveling in Micron® NAND Flash Memory](https://www.micron.com/~/media/documents/products/technical-note/nand-flash/tn2961_wear_leveling_in_nand.pdf) [PDF]
+9. [Understanding Flash: The Flash Translation Layer](https://flashdba.com/2014/09/17/understanding-flash-the-flash-translation-layer/) [Web]
+10. [谈NAND Flash的底层结构和解析](http://blog.sina.com.cn/s/blog_4b4b54da01016rx3.html) [Web]
+11. [闪存基础](http://www.ssdfans.com/?p=45) [Web]
+12. [Open NAND Flash Interface (ONFI)](http://www.onfi.org/) [Web]
+
+_原创文章，转发请注明出处。蜗窝科技_  
+
+标签: [emmc](http://www.wowotech.net/tag/emmc)
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [eMMC 原理 2 ：eMMC 简介](http://www.wowotech.net/basic_tech/emmc_intro.html) | [eMMC 原理 1 ：Flash Memory 简介](http://www.wowotech.net/basic_tech/flash_memory_intro.html)»
+« [Linux MMC framework(1)_软件架构](http://www.wowotech.net/comm/mmc_framework_arch.html) | [X-022-OTHERS-git操作记录之合并远端分支的更新](http://www.wowotech.net/x_project/u_boot_merge_denx.html)»
 
 **评论：**
 
-**[董先生](http://dongni.work/)**  
-2021-10-11 16:47
+**六个九十度**  
+2021-01-05 10:53
 
-你好，不太理解这个“从下到上也有3个层次”  
-  
-不太明白card_driver 与 host controller driver 这两个有什么区别？  
-  
-请问大家，有没有一些相关文档，以供仔细阅读呢？  
-  
-刚学习，有点迷糊，谢谢大家指教！
+cell的含义和managed flash的解释很有收获，多谢分享！
 
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-8330)
+[回复](http://www.wowotech.net/basic_tech/flash_memory_intro.html#comment-8178)
 
-**北海风云**  
-2019-08-20 14:29
+**[mimolock](http://www.wowotech.net/)**  
+2017-03-11 21:21
 
-图挂了 。能补一下吗 ?
+不错，之前对eMMC使用的flash有疑惑，现在豁然开朗
 
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-7599)
-
-**zoro**  
-2017-03-25 23:55
-
-请问框图是用什么软件画的啊
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5379)
-
-**[wowo](http://www.wowotech.net/)**  
-2017-03-27 08:49
-
-@zoro：ppt
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5380)
-
-**[江南书生](http://no/)**  
-2017-05-04 17:30
-
-@wowo：PPT 画的这么工整，牛逼
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5516)
-
-**[wowo](http://www.wowotech.net/)**  
-2017-05-05 08:23
-
-@江南书生：哪里，过奖了。其实office2007之后，用ppt画图还是挺漂亮的，那些模板的配色，做到不错:-)
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5520)
-
-**[江南书生](http://no/)**  
-2017-03-01 14:38
-
-赞
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5276)
-
-**青春年少**  
-2017-02-13 16:57
-
-写的真好
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5218)
-
-**[狂奔的蜗牛](http://www.wowotech.net/)**  
-2017-01-25 10:37
-
-清晰明了，赞
-
-[回复](http://www.wowotech.net/comm/mmc_framework_arch.html#comment-5191)
+[回复](http://www.wowotech.net/basic_tech/flash_memory_intro.html#comment-5307)
 
 **发表评论：**
 
@@ -212,11 +221,11 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
         - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
 - ### 随机文章
     
-    - [内存初始化代码分析（一）：identity mapping和kernel image mapping](http://www.wowotech.net/memory_management/__create_page_tables_code_analysis.html)
-    - [Common Clock Framework系统结构](http://www.wowotech.net/pm_subsystem/ccf-arch.html)
-    - [process credentials相关的用户空间文件](http://www.wowotech.net/linux_application/24.html)
-    - [Linux时间子系统之（十六）：clockevent](http://www.wowotech.net/timer_subsystem/clock-event.html)
-    - [蓝牙协议分析(11)_BLE安全机制之SM](http://www.wowotech.net/bluetooth/le_security_manager.html)
+    - [基于Hikey的"Boot from USB"调试](http://www.wowotech.net/x_project/hikey_usb_boot.html)
+    - [调试手段之sys节点](http://www.wowotech.net/linux_application/15.html)
+    - [Linux PM QoS framework(1)_概述和软件架构](http://www.wowotech.net/pm_subsystem/pm_qos_overview.html)
+    - [systemd：为何要创建一个新的init系统软件](http://www.wowotech.net/linux_application/why-systemd.html)
+    - [Linux CPU core的电源管理(1)_概述](http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html)
 - ### 文章存档
     
     - [2024年2月(1)](http://www.wowotech.net/record/202402)

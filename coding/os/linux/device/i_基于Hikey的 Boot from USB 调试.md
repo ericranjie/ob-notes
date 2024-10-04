@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2016-12-20 22:36 分类：[X Project](http://www.wowotech.net/sort/x_project)
 
 ## 1. 前言
@@ -70,47 +53,47 @@
 mainline的u-boot已经支持了Hikey，但没有使能SPL功能，这刚好给我们大显身手的机会，步骤如下：
 
 1）修改“arch/arm/Kconfig”，找到config TARGET_HIKEY配置项，增加select SUPPORT_SPL和select SPL，以支持SPL功能
-
-> config TARGET_HIKEY  
-> bool "Support HiKey 96boards Consumer Edition Platform"  
-> select ARM64  
-> + select SUPPORT_SPL  
-> + select SPL  
-> select DM  
-> select DM_GPIO  
-> select DM_SERIAL
-
+```cpp
+config TARGET_HIKEY  
+bool "Support HiKey 96boards Consumer Edition Platform"  
+select ARM64  
++ select SUPPORT_SPL  
++ select SPL  
+select DM  
+select DM_GPIO  
+select DM_SERIAL
+```
 2）修改完成后，在build目录执行make uboot-config，打开配置界面后，直接保存退出，从新生成config文件，具体可参考：
 
 > [https://github.com/wowotechX/u-boot/blob/1775dca1f14df5b3ba0884c54b665f91fff24933/configs/hikey_defconfig](https://github.com/wowotechX/u-boot/blob/1775dca1f14df5b3ba0884c54b665f91fff24933/configs/hikey_defconfig "https://github.com/wowotechX/u-boot/blob/1775dca1f14df5b3ba0884c54b665f91fff24933/configs/hikey_defconfig")
 
 3）修改include/configs/hikey.h文件，增加SPL有关的TEXT配置，如下（黄色部分比较重要）：
-
-> #define CONFIG_SPL_TEXT_BASE 0xf9801000  
-> #define CONFIG_SPL_MAX_SIZE (1024 * 20)  
-> #define CONFIG_SPL_BSS_START_ADDR (CONFIG_SPL_TEXT_BASE + \  
->                                                                  CONFIG_SPL_MAX_SIZE)  
-> #define CONFIG_SPL_BSS_MAX_SIZE (1024 * 12)  
-> #define CONFIG_SPL_STACK (CONFIG_SPL_BSS_START_ADDR + \  
->                                               CONFIG_SPL_BSS_MAX_SIZE + \  
->                                               1024 * 12)
-
+```cpp
+define CONFIG_SPL_TEXT_BASE 0xf9801000  
+define CONFIG_SPL_MAX_SIZE (1024 * 20)  
+define CONFIG_SPL_BSS_START_ADDR (CONFIG_SPL_TEXT_BASE + \  
+CONFIG_SPL_MAX_SIZE)  
+define CONFIG_SPL_BSS_MAX_SIZE (1024 * 12)  
+define CONFIG_SPL_STACK (CONFIG_SPL_BSS_START_ADDR + \  
+CONFIG_SPL_BSS_MAX_SIZE + \  
+1024 * 12)
+```
 4）修改board/hisilicon/hikey/hikey.c，加入两个和SPL有关的函数实现，board_init_f和panic，并在board_init_f中点亮一盏LED灯，代码如下：
-
-> +#ifdef CONFIG_SPL_BUILD  
-> +void board_init_f(ulong bootflag)  
-> +{  
-> +     /* GPIO4_2(User LED3), 0xF7020000, GPIODIR(0x400), GPIODAT2(0x10) */  
-> +     writel(readl(0xF7020400) | (1 << 2), 0xF7020400);  
-> +     writel(readl(0xF7020010) | 0xFF, 0xF7020010);  
-> +     while (1);  
-> +}  
-> +  
-> +void panic(const char *fmt, ...)  
-> +{  
-> +}  
-> +#endif
-
+```cpp
++#ifdef CONFIG_SPL_BUILD  
++void board_init_f(ulong bootflag)  
++{  
++     /* GPIO4_2(User LED3), 0xF7020000, GPIODIR(0x400), GPIODAT2(0x10) */  
++     writel(readl(0xF7020400) | (1 << 2), 0xF7020400);  
++     writel(readl(0xF7020010) | 0xFF, 0xF7020010);  
++     while (1);  
++}  
++  
++void panic(const char *fmt, ...)  
++{  
++}  
++#endif
+```
 其中LED有关的配置可参考Hikey（乐美客版）的原理图[7]以及[Hi6220V100](https://github.com/96boards/documentation/blob/master/ConsumerEdition/HiKey/HardwareDocs/Hi6220V100_Multi-Mode_Application_Processor_Function_Description.pdf)的spec[2]。
 
 修改完毕后，编译生成u-boot-spl.bin，留作后用。
@@ -128,23 +111,23 @@ mainline的u-boot已经支持了Hikey，但没有使能SPL功能，这刚好给�
 如下：
 
 > [https://github.com/wowotechX/tools/blob/hikey/hisilicon/gen_loader.py](https://github.com/wowotechX/tools/blob/hikey/hisilicon/gen_loader.py "https://github.com/wowotechX/tools/blob/hikey/hisilicon/gen_loader.py")
-> 
+>
 > [https://github.com/wowotechX/tools/blob/hikey/hisilicon/hisi-idt.py](https://github.com/wowotechX/tools/blob/hikey/hisilicon/hisi-idt.py "https://github.com/wowotechX/tools/blob/hikey/hisilicon/hisi-idt.py")
 
 #### 3.5 修改“[X Project](http://www.wowotech.net/sort/x_project)”的编译脚本，增加Hikey u-boot-spl的运行命令
 
 如下：
-
-> img-loader=$(TOOLS_DIR)/$(BOARD_VENDOR)/img_loader.bin  
-> uboot-spl-bin=$(UBOOT_OUT_DIR)/spl/u-boot-spl.bin  
-> gen-loader=$(TOOLS_DIR)/$(BOARD_VENDOR)/gen_loader.py  
-> hisi-idt=$(TOOLS_DIR)/$(BOARD_VENDOR)/hisi-idt.py  
->   
-> spl-run:  
->     # generate SPL image  
->     sudo python $(gen-loader) -o spl.img --img_loader=$(img-loader) --img_bl1=$(uboot-spl-bin)  
->     sudo python $(hisi-idt) --img1=spl.img -d /dev/ttyUSB0  
->     rm -f spl.img
+```cpp
+img-loader=(TOOLS_DIR)/(BOARD_VENDOR)/img_loader.bin  
+uboot-spl-bin=$(UBOOT_OUT_DIR)/spl/u-boot-spl.bin  
+gen-loader=(TOOLS_DIR)/(BOARD_VENDOR)/gen_loader.py  
+hisi-idt=(TOOLS_DIR)/(BOARD_VENDOR)/hisi-idt.py  
+```
+spl-run:  
+# generate SPL image  
+sudo python (gen-loader) -o spl.img --img_loader=(img-loader) --img_bl1=$(uboot-spl-bin)  
+sudo python $(hisi-idt) --img1=spl.img -d /dev/ttyUSB0  
+rm -f spl.img
 
 主要思路为：
 

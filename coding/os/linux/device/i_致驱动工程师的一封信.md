@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-4-14 21:00 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
 **引言**  
@@ -26,15 +9,15 @@
 **如何利用dts**  
 
 首先我们关注的主要是两点，gpio和irq。其他的选择忽略。先展示一下我期望的gpio和irq的使用方法。dts如下。
-
+```cpp
 1. device {
 2.     rst-gpio = <&gpioc_ctl 10 OF_GPIO_ACTIVE_LOW>;
 3.     irq-gpio = <&gpioc_ctl 11 0>;
 4.     interrupts-extended = <&vic 11 IRQF_TRIGGER_RISING>;
 5. };
-
+```
 对于以上的dts你应该再熟悉不过，当然这里不是教你如何使用dts，而是关注gpio和irq最后一个数字可以如何利用。例如rst-gpio的OF_GPIO_ACTIVE_LOW代表什么意思呢？可以理解为低有效。什么意思呢？举个例子，正常情况下，我们需要一个gpio口控制灯，我们认为灯打开就是active状态。对于一个程序员来说，我们可以封装一个函数，写1就是打开灯，写0就是关灯。但是对于硬件来说，变化的是gpio口的电平状态。如果gpio输出高电平灯亮，那么这就是高有效。如果硬件设计是gpio输出低电平灯亮，那么就是低有效。对于一个软件工程师来说，我们的期望是写1就是亮灯，写0就是关灯。我可不管硬件工程师是怎么设计的。我们可以认为dts是描述具体的硬件。因此对于驱动来说，硬件的这种变化，只需要修改dts即可。软件不用任何修改。软件可以如下实现。
-
+```cpp
 1. int device_probe(struct platform_device *pdev)
 2. {
 3.     rst_gpio = of_get_named_gpio_flags(np, "rst-gpio", 0, &flags);
@@ -49,17 +32,17 @@
 12.     trigger_type = irq_get_trigger_type(irq);
 13.     request_threaded_irq(irq, NULL, irq_handler, trigger_type, "irq", NULL);
 14. }
-
+```
 驱动按照以上代码实现的话，如果修改中断触发类型或者电平有效状态只需要修改dts即可。例如不同的IC复位电平是不一样的，有的IC是高电平复位，有的IC却是低电平复位。其实这就是一个电平有效状态的例子。
 
 **如何调试gpio**   
 
 移植驱动阶段或者调试阶段的工程中，难免想知道当前gpio的电平状态。当然很easy。万用表戳上去不就行了。是啊！硬件工程师的思维。作为软件工程师自然是要软件的方法。下面介绍两个api接口。自己摸索使用吧。点到为止。
-
+```cpp
 1. static inline int gpio_export(unsigned gpio, bool direction_may_change);
 2. static inline int gpio_export_link(struct device *dev, const char *name,
 3.            unsigned gpio);
-
+```
 在你的driver中调用以上api后，编译下载。去/sys/class/gpio目录看看有什么发现。
 
 **如何调试irq**  
@@ -71,10 +54,8 @@
 输出信息不想多余的介绍。看代码去。根据输出的irq num，假设是irq_num。请进入以下目录。看看下面都有什么文件。摸索这些文件可以为你调试带来哪些方便。
 
   
-
 1. cd /proc/irq/irq_num
 
-  
 
 **dts和sysfs有什么关联** 
 

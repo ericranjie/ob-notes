@@ -105,11 +105,10 @@
 > vim@ubuntu:~$ go get github.com/wowotech/gatt
 
 下载后代码的位置为：
-
-> vim@ubuntu:~$ ls $GOPATH/src/github.com/wowotech/
-> 
-> gatt
-
+```sh
+vim@ubuntu:~$ ls $GOPATH/src/github.com/wowotech/ 
+gatt
+```
 然后，手动将代码中所有的“github.com/paypal”类型的import修改为“github.com/wowotech”（fuck Go！！）
 
 > cd $GOPATH/src/github.com/wowotech/gatt
@@ -324,7 +323,7 @@ _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http:/
 
 标签: [蓝牙](http://www.wowotech.net/tag/%E8%93%9D%E7%89%99) [Bluetooth](http://www.wowotech.net/tag/Bluetooth) [BLE](http://www.wowotech.net/tag/BLE) [golang](http://www.wowotech.net/tag/golang) [微信](http://www.wowotech.net/tag/%E5%BE%AE%E4%BF%A1) [airsync](http://www.wowotech.net/tag/airsync) [iot](http://www.wowotech.net/tag/iot)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux调度器：进程优先级](http://www.wowotech.net/process_management/process-priority.html) | [Linux调度器：用户空间接口](http://www.wowotech.net/process_management/scheduler-API.html)»
 

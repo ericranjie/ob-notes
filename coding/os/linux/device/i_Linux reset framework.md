@@ -1,103 +1,96 @@
-# [蜗窝科技](http://www.wowotech.net/)
+作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-9-1 10:46 分类：[电源管理子系统](http://www.wowotech.net/sort/pm_subsystem)
 
-### 慢下来，享受技术。
+## 1. 前言
 
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
+大家都知道，复杂IC内部有很多具有独立功能的硬件模块，例如CPU cores、GPU cores、USB控制器、MMC控制器、等等，出于功耗、稳定性等方面的考虑，有些IC在内部为这些硬件模块设计了复位信号（reset signals），软件可通过寄存器（一般1个bit控制1个硬件）控制这些硬件模块的复位状态。
 
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
+Linux kernel为了方便设备驱动的编写，抽象出一个简单的软件框架----reset framework，为reset的provider提供统一的reset资源管理手段，并为reset的consumer（各个硬件模块）提供便捷、统一的复位控制API。
 
-﻿
+reset framework的思路、实现和使用都非常简单、易懂（参考kernel有关的API--include/linux/reset-controller.h、include/linux/reset.h可知），不过麻雀虽小，五脏俱全，通过它可以加深对Linux kernel的设备模型、驱动框架、分层设计、provider/consumer等设计思想的理解，因此本文将对其进行一个简单的罗列和总结。
 
-## 
+## 2. 从consumer的角度看
 
-作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2016-10-15 9:12 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
+从某一个硬件模块的驱动设计者来看，他的要求很简单：我只是想复位我的硬件，而不想知道到底用什么手段才能复位（例如控制哪个寄存器的哪个bit位，等等）。
 
-随着系统对内存容量、带宽、性能等方面的需求提高，系统会接入多个 DRAM Devices。而多个 DRAM Devices 不同的组织方式，会带来不同的效果。本文将对不同的组织方式及其效果进行简单介绍。
+> 这个要求其实体现了软件设计（甚至是任何设计）中的一个最最质朴的设计理念：封装和抽象。对设备驱动来说，它期望看到是“reset”这个通用概念，用这个通用概念去发号施令的话，这个驱动就具备了通用性和可移植性（无论在周围的环境如何变化，“reset”本身不会变化）。而至于怎么reset，是通过寄存器A的bit m，还是寄存器B的bit n，则是平台维护者需要关心的事情（就是本文的reset provider）。
 
-相关文章：
+看到这样的要求，Linux kernel说：OK，于是reset framework出场，提供了如下的机制（基于device tree）：
 
-[DRAM 原理 1 ：DRAM Storage Cell](http://www.wowotech.net/basic_tech/307.html)
+1）首先，提供描述系统中reset资源的方法（参考下面第3章的介绍），这样consumer可以基于这种描述在自己的dts node中引用所需的reset信号。
 
-[DRAM 原理 2 ：DRAM Memory Organization](http://www.wowotech.net/basic_tech/309.html)
+2）然后，consumer设备在自己的dts node中使用“resets”、“reset-names”等关键字声明所需的reset的资源，例如[1]（“resets”字段的具体格式由reset provider决定”）：
+```cpp
+device {                                                                 
+resets = <&rst 20>;                                              
+reset-names = "reset";                                           
+};
+```
+3）最后，consumer driver在需要的时候，可以调用下面的API复位自己（具体可参考“include/linux/reset.h“）：
 
-[DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)  
+3-a）只有一个reset信号的话，可以使用最简单的device_reset API
 
-[DRAM 原理 4 ：DRAM Timing](http://www.wowotech.net/basic_tech/330.html)
+> int device_reset(struct device *dev);
 
-## 1. Single Channel DRAM Controller 组织方式
+3-b）如果需要更为复杂的控制（例如有多个reset信号、需要控制处于reset状态的长度的等），可以使用稍微复杂的API
+```cpp
+/* 通过reset_control_get或者devm_reset_control_get获得reset句柄 */  
+struct reset_control *reset_control_get(struct device *dev, const char *id);     
+void reset_control_put(struct reset_control *rstc);                              
+struct reset_control *devm_reset_control_get(struct device *dev, const char *id);
 
-Single Channel 指 DRAM Controller 只有一组控制和数据总线。 在这种场景下，DRAM Controller 与单个或者多个 DRAM Devices 的连接方式如下所示：
+/* 通过reset_control_reset进行复位，或者通过reset_control_assert使设备处于复位生效状态，通过reset_control_deassert使复位失效 */  
+int reset_control_reset(struct reset_control *rstc);                             
+int reset_control_assert(struct reset_control *rstc);                            
+int reset_control_deassert(struct reset_control *rstc);
+```
+## 3. 从provider的角度看
 
-### 1.1 连接单个 DRAM Device
+kernel为reset provider提供的API位于“include/linux/reset-controller.h”中，很简单，无非就是：创建并填充reset controller设备（struct reset_controller_dev），并调用相应的接口（reset_controller_register/reset_controller_unregister）注册或者注销之。
 
-![](https://linux.codingbelief.com/zh/memory/dram/single_channel_single_device.png)
+reset controller的抽象也很简单：
 
-Single Channel 连接单个 DRAM Device 是最常见的一种组织方式。 由于成本、工艺等方面的因素，单个 DRAM Device 在总线宽度、容量上有所限制，在需要大带宽、大容量的产品中，通常接入多个 DRAM Devices。
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| struct reset_controller_dev {                                                    <br>        struct reset_control_ops *ops;                                           <br>        struct module *owner;                                                    <br>        struct list_head list;                                                   <br>        struct device_node *of_node;                                             <br>        int of_reset_n_cells;                                                    <br>        int (*of_xlate)(struct reset_controller_dev *rcdev,                      <br>                        const struct of_phandle_args *reset_spec);               <br>        unsigned int nr_resets;  <br>}; |
 
-### 1.2 连接多个 DRAM Devices
+> ops提供reset操作的实现，基本上是reset provider的所有工作量。
+> 
+> of_xlate和of_reset_n_cells用于解析consumer device dts node中的“resets = ; ”节点，如果reset controller比较简单（仅仅是线性的索引），可以不实现，使用reset framework提供的简单版本----of_reset_simple_xlate即可。
+> 
+> nr_resets，该reset controller所控制的reset信号的个数。
+> 
+> 其它字段内部使用，provider不需要关心。
 
-![](https://linux.codingbelief.com/zh/memory/dram/single_channel_multi_devices_1.png)
+struct reset_control_ops也比较单纯，如下：
 
-上图中，多个 DRAM Devices 共享控制和数据总线，DRAM Controller 通过 Chip Select 分时单独访问各个 DRAM Devices。此外，在其中一个 Device 进入刷新周期时，DRAM Controller 可以按照一定的调度算法，优先执行其他 Device 上的访问请求，提高系统整体内存访问性能。
+|   |
+|---|
+|struct reset_control_ops {                                                       <br>        int (*reset)(struct reset_controller_dev *rcdev, unsigned long id);      <br>        int (*assert)(struct reset_controller_dev *rcdev, unsigned long id);     <br>        int (*deassert)(struct reset_controller_dev *rcdev, unsigned long id);  <br>};|
 
-> NOTE：  
-> CS0 和 CS1 在同一时刻，只有一个可以处于使能状态，即同一时刻，只有一个 Device 可以被访问。
+> reset可控制设备完成一次完整的复位过程。
+> 
+> assert和deassert分别控制设备reset状态的生效和失效。
 
-上述的这种组织方式只增加总体容量，不增加带宽。下图中描述的组织方式则可以既增加总体容量，也增加带宽。
+## 4. 参考文档
 
-![](https://linux.codingbelief.com/zh/memory/dram/single_channel_multi_devices_2.png)
+[1] Documentation/devicetree/bindings/reset/reset.txt
 
-上图中，多个 DRAM Devices 共享控制总线和 Chip Select 信号，DRAM Controller 同时访问每个 DRAM Devices，各个 Devices 的数据合并到一起，例如 Device 1 的数据输出到数据总线的 DATA[0:7] 信号上，Device 2 的数据输出到数据总线的 DATA[8:15] 上。这样的组织方式下，访问 16 bits 的数据就只需要一个访问周期就可以完成，而不需要分解为两个 8 bits 的访问周期。
+_原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http://www.wowotech.net/pm_subsystem/reset_framework.html)。
 
-## 2. Multi Channel DRAM Controller 组织方式
-
-Multi Channel 指 DRAM Controller 只有多组控制和数据总线，每一组总线可以独立访问 DRAM Devices。 在这种场景下，DRAM Controller 与 DRAM Devices 的连接方式如下所示：
-
-### 2.1 连接 Single Channel DRAM Devices
-
-![](https://linux.codingbelief.com/zh/memory/dram/multi_channel_controller_single_channel_devices.png)
-
-这种组织方式的优势在于多个 Devices 可以同时工作，DRAM Controller 可以对不同 Channel 上的 Devices 同时发起读写请求，提高了读写请求的吞吐率。
-
-> NOTE：  
-> CS0 和 CS1 在同一时刻，可以同时处于使能状态，即同一时刻，两个 Devices 可以同时被访问。
-
-### 2.2 连接 Multi Channel DRAM Device
-
-![](https://linux.codingbelief.com/zh/memory/dram/multi_channel_controller_Multi_channel_devices.png)
-
-在一些 DRAM 产品中，例如 LPDDR3、LPDDR4 等，引入了 Multi Channel 的设计，即一个 DRAM Devices 中包括多个 Channel。这样就可以在单个 Device 上达成 Multi Channel 同时访问的效果，最终带来读写请求吞吐率的提升。
-
-  
-
-_原创文章，转发请注明出处。蜗窝科技_  
-
-标签: [SDRAM](http://www.wowotech.net/tag/SDRAM) [dram](http://www.wowotech.net/tag/dram)
+标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [framework](http://www.wowotech.net/tag/framework) [reset](http://www.wowotech.net/tag/reset)
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [Linux TTY framework(4)_TTY driver](http://www.wowotech.net/tty_framework/tty_driver.html) | [Linux TTY framework(3)_从应用的角度看TTY设备](http://www.wowotech.net/tty_framework/application_view.html)»
+« [蓝牙协议分析(11)_BLE安全机制之SM](http://www.wowotech.net/bluetooth/le_security_manager.html) | [页面回收的基本概念](http://www.wowotech.net/memory_management/page_reclaim_basic.html)»
 
 **评论：**
 
-**Marvin**  
-2023-08-04 17:13
+**shousi**  
+2024-06-09 20:18
 
-这个系列写的太好了，非常有帮助，感谢！
+挺巧妙的
 
-[回复](http://www.wowotech.net/basic_tech/343.html#comment-8802)
-
-**Yogi**  
-2023-05-06 20:12
-
-图片看不见了，是否可以重新上传一下
-
-[回复](http://www.wowotech.net/basic_tech/343.html#comment-8780)
+[回复](http://www.wowotech.net/pm_subsystem/reset_framework.html#comment-8906)
 
 **发表评论：**
 
@@ -122,18 +115,18 @@ _原创文章，转发请注明出处。蜗窝科技_
     ](http://www.wowotech.net/support_list)
 - ### 最新评论
     
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
     - ja  
         [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
     - 元神高手  
         [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
     - 十七  
         [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+    - lw  
+        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+    - 肥饶  
+        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+    - orange  
+        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
 - ### 文章分类
     
     - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
@@ -163,11 +156,11 @@ _原创文章，转发请注明出处。蜗窝科技_
         - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
 - ### 随机文章
     
-    - [KASAN实现原理](http://www.wowotech.net/memory_management/424.html)
-    - [Linux MMC framework(1)_软件架构](http://www.wowotech.net/comm/mmc_framework_arch.html)
+    - [CMA模块学习笔记](http://www.wowotech.net/memory_management/cma.html)
+    - [快讯：蓝牙5.0发布（新特性速览）](http://www.wowotech.net/bluetooth/bluetooth_5_0_overview.html)
+    - [从“码农”说起](http://www.wowotech.net/tech_discuss/111.html)
     - [内存初始化代码分析（三）：创建系统内存地址映射](http://www.wowotech.net/memory_management/mem_init_3.html)
-    - [X-000-PRE-开发环境搭建](http://www.wowotech.net/x_project/develop_env.html)
-    - [Linux kernel内存管理的基本概念](http://www.wowotech.net/memory_management/concept.html)
+    - [防冲突机制介绍](http://www.wowotech.net/basic_tech/103.html)
 - ### 文章存档
     
     - [2024年2月(1)](http://www.wowotech.net/record/202402)

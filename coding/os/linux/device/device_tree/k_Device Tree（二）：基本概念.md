@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-5-30 16:47 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
 一、前言
@@ -26,7 +9,6 @@
 本文主要描述下面两个主题：
 
 1、Device Tree source file语法介绍
-
 2、Device Tree binaryfile格式介绍
 
 二、Device Tree的结构
@@ -34,40 +16,40 @@
 在描述Device Tree的结构之前，我们先问一个基础问题：是否Device Tree要描述系统中的所有硬件信息？答案是否定的。基本上，那些可以动态探测到的设备是不需要描述的，例如USB device。不过对于SOC上的usb host controller，它是无法动态识别的，需要在device tree中描述。同样的道理，在computer system中，PCI device可以被动态探测到，不需要在device tree中描述，但是PCI bridge如果不能被探测，那么就需要描述之。
 
 为了了解Device Tree的结构，我们首先给出一个Device Tree的示例：
-
-> / o device-tree  
->       |- name = "device-tree"  
->       |- model = "MyBoardName"  
->       |- compatible = "MyBoardFamilyName"  
->       |- #address-cells = <2>  
->       |- #size-cells = <2>  
->       |- linux,phandle = <0>  
->       |  
->       o cpus  
->       | | - name = "cpus"  
->       | | - linux,phandle = <1>  
->       | | - #address-cells = <1>  
->       | | - #size-cells = <0>  
->       | |  
->       | o PowerPC,970@0  
->       |   |- name = "PowerPC,970"  
->       |   |- device_type = "cpu"  
->       |   |- reg = <0>  
->       |   |- clock-frequency = <0x5f5e1000>  
->       |   |- 64-bit  
->       |   |- linux,phandle = <2>  
->       |  
->       o memory@0  
->       | |- name = "memory"  
->       | |- device_type = "memory"  
->       | |- reg = <0x00000000 0x00000000 0x00000000 0x20000000>  
->       | |- linux,phandle = <3>  
->       |  
->       o chosen  
->         |- name = "chosen"  
->         |- bootargs = "root=/dev/sda2"  
->         |- linux,phandle = <4>
-
+```cpp
+/ o device-tree  
+|- name = "device-tree"  
+|- model = "MyBoardName"  
+|- compatible = "MyBoardFamilyName"  
+|- address-cells = <2>  
+|- size-cells = <2>  
+|- linux,phandle = <0>  
+|  
+o cpus  
+| | - name = "cpus"  
+| | - linux,phandle = <1>  
+| | - address-cells = <1>  
+| | - size-cells = <0>  
+| |  
+| o PowerPC,970@0  
+|   |- name = "PowerPC,970"  
+|   |- device_type = "cpu"  
+|   |- reg = <0>  
+|   |- clock-frequency = <0x5f5e1000>  
+|   |- 64-bit  
+|   |- linux,phandle = <2>  
+|  
+o memory@0  
+| |- name = "memory"  
+| |- device_type = "memory"  
+| |- reg = <0x00000000 0x00000000 0x00000000 0x20000000>  
+| |- linux,phandle = <3>  
+|  
+o chosen  
+|- name = "chosen"  
+|- bootargs = "root=/dev/sda2"  
+|- linux,phandle = <4>
+```
 从上图中可以看出，device tree的基本单元是node。这些node被组织成树状结构，除了root node，每个node都只有一个parent。一个device tree文件中只能有一个root node。每个node中包含了若干的property/value来描述该node的一些特性。每个node用节点名字（node name）标识，节点名字的格式是[node-name@unit-address](mailto:node-name@unit-address)。如果该node没有reg属性（后面会描述这个property），那么该节点名字中必须不能包括@和unit-address。unit-address的具体格式是和设备挂在那个bus上相关。例如对于cpu，其unit-address就是从0开始编址，以此加一。而具体的设备，例如以太网控制器，其unit-address就是寄存器地址。root node的node name是确定的，必须是“/”。
 
 在一个树状结构的device tree中，如何引用一个node呢？要想唯一指定一个node必须使用full path，例如/node-name-1/node-name-2/node-name-N。在上面的例子中，cpu node我们可以通过/cpus/PowerPC,970@0访问。
@@ -75,48 +57,44 @@
 属性（property）值标识了设备的特性，它的值（value）是多种多样的：
 
 1、可能是空，也就是没有值的定义。例如上图中的64-bit ，这个属性没有赋值。
-
 2、可能是一个u32、u64的数值（值得一提的是cell这个术语，在Device Tree表示32bit的信息单位）。例如#address-cells = <1> 。当然，可能是一个数组。例如<0x00000000 0x00000000 0x00000000 0x20000000>
-
 4、可能是一个字符串。例如device_type = "memory" ，当然也可能是一个string list。例如"PowerPC,970"
 
 三、Device Tree source file语法介绍
 
 了解了基本的device tree的结构后，我们总要把这些结构体现在device tree source code上来。在linux kernel中，扩展名是dts的文件就是描述硬件信息的device tree source file，在dts文件中，一个node被定义成：
-
-> [label:] node-name[@unit-address] {  
->    [properties definitions]  
->    [child nodes]  
-> }
-
+```cpp
+label: node-name@unit-address {  
+properties definitions  
+child nodes  
+}
+```
 “[]”表示option，因此可以定义一个只有node name的空节点。label方便在dts文件中引用，具体后面会描述。child node的格式和node是完全一样的，因此，一个dts文件中就是若干嵌套组成的node，property以及child note、child note property描述。
 
 考虑到空泛的谈比较枯燥，我们用实例来讲解Device Tree Source file 的数据格式。假设蜗窝科技制作了一个S3C2416的开发板，我们把该development board命名为snail，那么需要撰写一个s3c2416-snail.dts的文件。如果把所有的开发板的硬件信息（SOC以及外设）都描述在一个文件中是不合理的，因此有可能其他公司也使用S3C2416搭建自己的开发板并命令pig、cow什么的，如果大家都用自己的dts文件描述硬件，那么其中大部分是重复的，因此我们把和S3C2416相关的硬件描述保存成一个单独的dts文件可以供使用S3C2416的target board来引用并将文件的扩展名变成dtsi（i表示include）。同理，三星公司的S3C24xx系列是一个SOC family，这些SOCs（2410、2416、2450等）也有相同的内容，因此同样的道理，我们可以将公共部分抽取出来，变成s3c24xx.dtsi，方便大家include。同样的道理，各家ARM vendor也会共用一些硬件定义信息，这个文件就是skeleton.dtsi。我们自下而上（类似C＋＋中的从基类到顶层的派生类）逐个进行分析。
 
 1、skeleton.dtsi。位于linux-3.14\arch\arm\boot\dts目录下，具体该文件的内容如下：
-
-> / {  
->     #address-cells = <1>;  
->     #size-cells = <1>;  
->     chosen { };  
->     aliases { };  
->     memory { device_type = "memory"; reg = <0 0>; };  
-> };
-
+```cpp
+/ {  
+address-cells = <1>;  
+size-cells = <1>;  
+chosen { };  
+aliases { };  
+memory { device_type = "memory"; reg = <0 0>; };  
+};
+```
 device tree顾名思义是一个树状的结构，既然是树，必然有根。“/”是根节点的node name。“{”和“}”之间的内容是该节点的具体的定义，其内容包括各种属性的定义以及child node的定义。chosen、aliases和memory都是sub node，sub node的结构和root node是完全一样的，因此，sub node也有自己的属性和它自己的sub node，最终形成了一个树状的device tree。属性的定义采用property ＝ value的形式。例如#address-cells和#size-cells就是property，而<1>就是value。value有三种情况：
 
 1）属性值是text string或者string list，用双引号表示。例如device_type = "memory"
-
 2）属性值是32bit unsigned integers，用尖括号表示。例如#size-cells = <1>
-
 3）属性值是binary data，用方括号表示。例如`binary-property = [0x01 0x23 0x45 0x67]`
 
 如果一个device node中包含了有寻址需求（要定义reg property）的sub node（后文也许会用child node，和sub node是一样的意思），那么就必须要定义这两个属性。“#”是number的意思，#address-cells这个属性是用来描述sub node中的reg属性的地址域特性的，也就是说需要用多少个u32的cell来描述该地址域。同理可以推断#size-cells的含义，下面对reg的描述中会给出更详细的信息。
 
 chosen node主要用来描述由系统firmware指定的runtime parameter。如果存在chosen这个node，其parent node必须是名字是“/”的根节点。原来通过tag list传递的一些linux kernel的运行时参数可以通过Device Tree传递。例如command line可以通过bootargs这个property这个属性传递；initrd的开始地址也可以通过linux,initrd-start这个property这个属性传递。在本例中，chosen节点是空的，在实际中，建议增加一个bootargs的属性，例如：
-
-> "root=/dev/nfs nfsroot=1.1.1.1:/nfsboot ip=1.1.1.2:1.1.1.1:1.1.1.1:255.255.255.0::usbd0:off console=ttyS0,115200 mem=64M@0x30000000"
-
+```cpp
+"root=/dev/nfs nfsroot=1.1.1.1:/nfsboot ip=1.1.1.2:1.1.1.1:1.1.1.1:255.255.255.0::usbd0:off console=ttyS0,115200 mem=64M@0x30000000"
+```
 通过该command line可以控制内核从usbnet启动，当然，具体项目要相应修改command line以便适应不同的需求。我们知道，device tree用于HW platform识别，runtime parameter传递以及硬件设备描述。chosen节点并没有描述任何硬件设备节点的信息，它只是传递了runtime parameter。
 
 aliases 节点定义了一些别名。为何要定义这个node呢？因为Device tree是树状结构，当要引用一个node的时候要指明相对于root node的full path，例如/node-name-1/node-name-2/node-name-N。如果多次引用，每次都要写这么复杂的字符串多少是有些麻烦，因此可以在aliases 节点定义一些设备节点full path的缩写。skeleton.dtsi中没有定义aliases，下面的section中会进一步用具体的例子描述之。
@@ -346,7 +324,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net。](ht
 
 标签: [Device](http://www.wowotech.net/tag/Device) [tree](http://www.wowotech.net/tag/tree)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Device Tree（三）：代码分析](http://www.wowotech.net/device_model/dt-code-analysis.html) | [Linux电源管理(4)_Power Management Interface](http://www.wowotech.net/pm_subsystem/pm_interface.html)»
 
