@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/device/bn_学习下 eMMC.md",
+                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/device/bn_学习下 eMMC.md",
+                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/device/bn_学习下 eMMC.md",
+                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/device/bn_学习下 eMMC.md"
+                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md"
               }
             }
           }
@@ -148,6 +148,7 @@
   },
   "active": "24e3f17feddf85ca",
   "lastOpenFiles": [
+    "coding/os/linux/device/bn_学习下 eMMC.md",
     "coding/os/linux/device/a_中断唤醒系统流程.md",
     "README.md",
     "zx99-image/Pasted image 20241003223815.png",
@@ -184,7 +185,6 @@
     "interview/a_C语言与C++面试知识总结.md",
     "auxiliary/test/alloctor.md",
     "coding/cpp/grammar/a_终极 C++避坑指南.md",
-    "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
