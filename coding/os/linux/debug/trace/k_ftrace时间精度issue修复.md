@@ -1,21 +1,4 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
-作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-4-16 19:07 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
+ 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-4-16 19:07 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 一、前言
 
@@ -92,53 +75,53 @@
 三、问题的发现
 
 /tmp/trace.txt文件如下：
+```cpp
+# tracer: irqsoff  
+#  
+# irqsoff latency trace v1.1.5 on 4.4.19  
+# --------------------------------------------------------------------  
+# latency: 10000 us, 441/441, CPU#0 | (M:server VP:0, KP:0, SP:0 HP:0)  
+#    -----------------  
+#    | task: swapper-0 (uid:0 nice:0 policy:0 rt_prio:0)  
+#    -----------------  
+#  => started at: irq_svc  
+#  => ended at:   __do_softirq  
+#  
+#  
+#                  ------=> CPU#  
+#                 / _-----=> irqs-off  
+#                | / _----=> need-resched  
+#                || / _---=> hardirq/softirq  
+#                ||| / _--=> preempt-depth  
+#                |||| /     delay  
+#  cmd     pid   ||||| time  |   caller  
+#     \   /      |||||  \    |   /  
+<...>-593     0d...    0us : do_work_pending  
+<...>-593     0d...    0us : do_work_pending  
+<...>-593     0d...    0us : trace_hardirqs_on <-do_work_pending
 
-> # tracer: irqsoff  
-> #  
-> # irqsoff latency trace v1.1.5 on 4.4.19  
-> # --------------------------------------------------------------------  
-> # latency: 10000 us, #441/441, CPU#0 | (M:server VP:0, KP:0, SP:0 HP:0)  
-> #    -----------------  
-> #    | task: swapper-0 (uid:0 nice:0 policy:0 rt_prio:0)  
-> #    -----------------  
-> #  => started at: __irq_svc  
-> #  => ended at:   __do_softirq  
-> #  
-> #  
-> #                  _------=> CPU#  
-> #                 / _-----=> irqs-off  
-> #                | / _----=> need-resched  
-> #                || / _---=> hardirq/softirq  
-> #                ||| / _--=> preempt-depth  
-> #                |||| /     delay  
-> #  cmd     pid   ||||| time  |   caller  
-> #     \   /      |||||  \    |   /  
->    <...>-593     0d...    0us : do_work_pending  
->    <...>-593     0d...    0us : do_work_pending  
->    <...>-593     0d...    0us : trace_hardirqs_on <-do_work_pending
-> 
-> ……
-> 
-> -0       0d.h.    0us : tick_handle_periodic <-ch2_irq  
-> -0       0d.h.    0us : tick_periodic.constprop.5 <-tick_handle_periodic  
-> **-0       0d.h.    0us#: do_timer <-tick_periodic.constprop.5  
-> -0       0d.h. 10000us : calc_global_load <-do_timer**  
-> -0       0d.h. 10000us : update_wall_time <-tick_periodic.constprop.5  
-> -0       0d.h. 10000us : tc_get_cycles32 <-update_wall_time
-> 
-> ……
+……
 
+-0       0d.h.    0us : tick_handle_periodic <-ch2_irq  
+-0       0d.h.    0us : tick_periodic.constprop.5 <-tick_handle_periodic  
+**-0       0d.h.    0us#: do_timer <-tick_periodic.constprop.5  
+-0       0d.h. 10000us : calc_global_load <-do_timer**  
+-0       0d.h. 10000us : update_wall_time <-tick_periodic.constprop.5  
+-0       0d.h. 10000us : tc_get_cycles32 <-update_wall_time
+……
+```
 通过这个文件，我们可以看成跟踪到的最大中断延迟（最长的关闭中断的时间）是10000us，高达10ms的关中断时间，这有点离谱啊。不过还好后面有更详细的信息：header中的started at和ended at给出了关中断的函数区间，后面给出了详细的栈的回溯信息。这里有一个很奇怪的地方（上面黑色粗体的两行），时间戳在这两行中有一个跳变，从0之间跳变到了10000us，很显然，ftrace给出的时间戳精度不足。
 
 四、寻找问题原因
 
 ftrace中的时间戳信息是通过sched_clock实现的，从名字也能看出来，这是调度器模块相关的函数，在调度器代码中（kernel/sched/clock.c）有一个弱符号定义：
-
-> unsigned long long __weak sched_clock(void)  
-> {  
->     return (unsigned long long)(jiffies - INITIAL_JIFFIES)  
->                     * (NSEC_PER_SEC / HZ);  
-> }
+```cpp
+unsigned long long weak sched_clock(void)  
+{  
+return (unsigned long long)(jiffies - INITIAL_JIFFIES)  
+* (NSEC_PER_SEC / HZ);  
+}
+```
 
 显然这是一个基于jiffies的clock，其精度和tick相关。在我们的系统中，HZ=100，每10ms产生一次tick，符合上面的观察：ftrace的时间戳精度是10ms。
 
@@ -149,23 +132,23 @@ ftrace中的时间戳信息是通过sched_clock实现的，从名字也能看出
 既然如此，看来我们需要修改一下ATMEL SAMA5D3的timer驱动代码。这里我们还需要了解一件事情：在内核时间子系统的代码中（kernel/time/sched_clock.c）有通用sched clock的支持。本身sched clock需要是64bit（不容易溢出），ns为单位、单调上升，更重要的是要快。当然未必所有平台都支持64 bit的一个HW counter，因此时间子系统提供了这样一个通用模块，当你的平台的counter不足64 bit的时候，你可以借用它来扩展成64 bit的sched clock。
 
 ATMEL SAMA5D3的timer驱动代码位于drivers/clocksource/tcb_clksrc.c中，首先在头文中中增加一行：
-
-> #include <linux/sched_clock.h>
-
+```cpp
+include <linux/sched_clock.h>
+```
 之所以要包含这个头文件是因为下面我们要调用时间子系统的通用sched clock模块的sched_clock_register接口。
 
 时间子系统的通用sched clock模块仍然需要底层HW counter（不足64bit）的支持，在ATMEL SAMA5D3平台中，我们有3个32bit的Time Counter channel，我们选择其一作为sched clock，并定义如下函数获取这个32 bit counter的cycle值：
-
-> static cycle_t tc_read_cycles(void)  
-> {  
->     return __raw_readl(tcaddr + ATMEL_TC_REG(0, CV));  
-> }
-
+```cpp
+static cycle_t tc_read_cycles(void)  
+{  
+return raw_readl(tcaddr + ATMEL_TC_REG(0, CV));  
+}
+```
 最后一步就是注册了，在注册完clocksource之后增加注册sched clock的代码：
-
-> /* register sched clock */  
-> sched_clock_register(tc_read_cycles, 32, divided_rate);
-
+```cpp
+/* register sched clock */  
+sched_clock_register(tc_read_cycles, 32, divided_rate);
+```
 OK，一切大功告成。
 
 六、问题验证
@@ -176,7 +159,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [ftrace](http://www.wowotech.net/tag/ftrace) [sched_clock](http://www.wowotech.net/tag/sched_clock)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [tty驱动分析](http://www.wowotech.net/tty_framework/435.html) | [致驱动工程师的一封信](http://www.wowotech.net/device_model/429.html)»
 

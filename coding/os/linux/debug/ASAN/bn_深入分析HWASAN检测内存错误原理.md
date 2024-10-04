@@ -7,49 +7,41 @@ Original 字节跳动STE团队 字节跳动SYS Tech
 
 在字节跳动，C++语言被广泛应用在各个业务中，由于C++语言的特性，导致 C++ 程序很容易出现内存问题。ASAN 等内存检测工具在字节跳动内部已经取得了可观的收益和效果（更多内容请查看视频分享：Sanitizer 在字节跳动 C/C++ 业务中的实践：https://www.bilibili.com/video/BV1YT411Q7BU/），服务于60个业务线，近一年协助修复上百个内存缺陷。但是仍然有很大的提升空间，特别是在性能开销方面。随着 ARM 进入服务器芯片市场，ARM 架构下的一些硬件特性可以用来缓解 ASAN 工具的性能问题，利用这些硬件特性研发的 HWASAN 检测工具在超大型 C++ 服务上的检测能力还有待确认。
 
-  
 为此，STE 团队对 HWASAN 进行了深入分析，并在字节跳动 C++ 核心服务上进行了落地验证。在落地 HWASAN 过程中，修复了 HWASAN 实现中的一些关键 bug，并对易用性进行了提升。相关 patch 已经贡献到LLVM开源社区（详情请查看文末链接）。本篇文章将深入分析 HWASAN 检测内存错误的原理，帮助大家更好地理解和使用 HWASan 来排查程序中存在的疑难内存错误。
-
 
 **概述**
 
 HWASAN: **H**ard**W**are-assisted **A**ddress**San**itizer, a tool similar to AddressSanitizer, but based on partial hardware assistance and consumes much less memory.
 
-  
-
 这里所谓的 "partial hardware assistance" 就是指 AArch64 的 TBI (Top Byte Ignore) 特性。
-
-  
 
 > **TBI** (Top Byte Ignore) feature of AArch64: bits [63:56] are ignored in address translation and can be used to store a tag.
 
-  
 
 以如下代码举例，Linux/AArch64 下将指针 x 的 top byte 设置为 0xfe，不影响程序执行：
 
-```
+```c
 // $ cat tbi.cpp
+int main(int argc, char **argv) {   int * volatile x = (int *)malloc(sizeof(int));   *x = 666;   printf("address: %p, value: %d\n", x, *x);   x = reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(x) | (0xfeULL << 56));   printf("address: %p, value: %d\n", x, *x);   free(x);   return 0; } // $ clang++ tbi.cpp && ./a.out address: 0xaaab1845fe70, value: 666 address: 0xfe00aaab1845fe70, value: 666
 ```
 
 AArch64 的 TBI 特性使得软件可以在 64-bit 虚拟地址的最高字节中存储任意数据，HWASAN 正是基于 TBI 这一特性设计并实现的内存错误检测工具。
 
-  
-
 举个例子，以下代码中存在
 
-```
+```c
 // cat test.c
+#include <stdlib.h>
+int main() {     int * volatile x = (int *)malloc(sizeof(int)*10);     x[10] = 0;     free(x); }
 ```
 
 使用 HWASAN 检测上述代码中的 heap-buffer-overflow bug：
 
-```
-$ clang -fuse-ld=lld -g -fsanitize=hwaddress ./test.c && ./a.out
+```c
+$ clang -fuse-ld=lld -g -fsanitize=hwaddress ./test.c && ./a.out ==3581920==ERROR: HWAddressSanitizer: tag-mismatch on address 0xec2bfffe0028 at pc 0xaaad830db1a4 WRITE of size 4 at 0xec2bfffe0028 tags: 69/08(69) (ptr/mem) in thread T0     #0 0xaaad830db1a4 in main ./test.c:4:11     #1 0xfffd07350da0 in __libc_start_main libc-start.c:308:16     #2 0xaaad83090820 in _start (./a.out+0x40820)  [0xec2bfffe0000,0xec2bfffe0030) is a small allocated heap chunk; size: 48 offset: 40  Cause: heap-buffer-overflow 0xec2bfffe0028 is located 0 bytes after a 40-byte region [0xec2bfffe0000,0xec2bfffe0028) allocated by thread T0 here:     #0 0xaaad83099248 in __sanitizer_malloc.part.13 llvm-project/compiler-rt/lib/hwasan/hwasan_allocation_functions.cpp:151:3     #1 0xaaad830db17c in main ./test.c:3:31     #2 0xfffd07350da0 in __libc_start_main libc-start.c:308:16     #3 0xaaad83090820 in _start (/a.out+0x40820)  Thread: T0 0xeffc00002000 stack: [0xffffc3a10000,0xffffc4210000) sz: 8388608 tls: [0xfffd076a5030,0xfffd076a5e70) Memory tags around the buggy address (one tag corresponds to 16 bytes):   0xec2bfffdf800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdf900: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdfa00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdfb00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdfc00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdfd00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdfe00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffdff00: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 =>0xec2bfffe0000: 69  69 [08] 00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0100: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0200: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0300: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0400: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0500: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0600: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0700: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00   0xec2bfffe0800: 00  00  00  00  00  00  00  00  00  00  00  00  00  00  00  00 Tags for short granules around the buggy address (one tag corresponds to 16 bytes):   0xec2bfffdff00: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. =>0xec2bfffe0000: ..  .. [69] ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..   0xec2bfffe0100: ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  .. See https://clang.llvm.org/docs/HardwareAssistedAddressSanitizerDesign.html#short-granules for a description of short granule tags Registers where the failure occurred (pc 0xaaad830db1a4):     x0  a100ffffc4201580  x1  6900ec2bfffe0028  x2  0000000000000000  x3  0000000000000000     x4  0000000000000020  x5  0000000000000000  x6  0000000000100000  x7  fffffffffff00005     x8  6900ec2bfffe0000  x9  6900ec2bfffe0000  x10 0030f15d14c79f97  x11 00ffffffffffffff     x12 00001f0d780b69d2  x13 0000000000000001  x14 0000ffffc4200b60  x15 0000000000000696     x16 0000aaad830a3540  x17 000000000000000b  x18 0000000000000100  x19 0000aaad830db600     x20 0200effd00000000  x21 0000aaad830907f0  x22 0000000000000000  x23 0000000000000000     x24 0000000000000000  x25 0000000000000000  x26 0000000000000000  x27 0000000000000000     x28 0000000000000000  x29 0000ffffc4201590  x30 0000aaad830db1a8   sp 0000ffffc4201550 SUMMARY: HWAddressSanitizer: tag-mismatch ./test.c:4:11 in main
 ```
 
 如上所示，HWASAN 与 ASAN 相比不管是用法 (-fsanitize=hwaddress v.s. -fsanitize=address) 还是检测到错误后的报告都很相似。
-
-  
 
 下面对比分析 ASAN 与 HWASAN 检测内存错误的技术原理：
 
@@ -81,15 +73,13 @@ $ clang -fuse-ld=lld -g -fsanitize=hwaddress ./test.c && ./a.out
 
 - **检测 heap-buffer-overflow**：假设 HWASAN 为 new char[20] 生成的 tag 为 0xa 即绿色，所以指针 p 的 top byte 为 0xa。执行 delete[] p 释放内存时，HWASAN 将这块释放的内存 retag 为紫色，即将这块释放的内存对应的 shadow memory 从绿色修改为紫色。在通过 p[0] 访问内存时，HWASAN 会检查保存在指针 p 的 tag 与 p[0] 指向的内存所对应的 shadow memory 中保存的 tag 是否一致。显然保存在指针 p 的 tag 是绿色 而p[0] 指向的内存所对应的 shadow memory 中保存的 tag 是紫色，即 tag 是不匹配的，这说明访问 p[0] 时存在内存错误。
     
-
+![[Pasted image 20241004165853.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - **检测 use-after-free**：假设 HWASAN 为 new char[20] 生成的 tag 为 0xa 即绿色，所以指针 p 的 top byte 为 0xa。在通过 p[32] 访问内存时，HWASAN 会检查保存在指针 p 的 tag 与 p[32] 指向的内存所对应的 shadow memory 中保存的 tag 是否一致。显然保存在指针 p 的 tag 是绿色 而p[32] 指向的内存所对应的 shadow memory 中保存的 tag 是蓝色，即 tag 是不匹配的，这说明访问 p[32] 时存在内存错误。
     
-
+![[Pasted image 20241004165859.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 **算法**
 
@@ -101,7 +91,6 @@ $ clang -fuse-ld=lld -g -fsanitize=hwaddress ./test.c && ./a.out
     
 - 在每一处内存读写之前插桩：比较保存在指针 top byte 的 tag 和保存在 shadow memory 中的 tag 是否一致，如果不一致则报错。
     
-
 **实现**
 
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
@@ -111,28 +100,26 @@ $ clang -fuse-ld=lld -g -fsanitize=hwaddress ./test.c && ./a.out
 HWASAN 与 ASAN 一样都使用了 shadow memory 技术。ASAN 默认使用 static shadow mapping，只有对 IOS 和 32-bit Android 平台才使用 dynamic shadow mapping。而 HWASAN 则总是使用 dynamic shadow mapping。
 
 - ASAN: static shadow mapping。在 llvm-project/compiler-rt/lib/asan/asan_mapping.h 中预定义了不同平台下 shadow memory 的布局：HighMem, HighShadow, ShadowGap, LowShadow, LowMem 的地址区间。
-    
 - Linux/x86_64 下 ASAN 的 shadow mapping 如下所示：
-    
 
-```
-// Typical shadow mapping on Linux/x86_64 with SHADOW_OFFSET == 0x00007fff8000:
+```c
+// Typical shadow mapping on Linux/x86_64 with SHADOW_OFFSET == 0x00007fff8000: 
+|| `[0x10007fff8000, 0x7fffffffffff]` || HighMem    || || `[0x02008fff7000, 0x10007fff7fff]` || HighShadow || || `[0x00008fff7000, 0x02008fff6fff]` || ShadowGap  || || `[0x00007fff8000, 0x00008fff6fff]` || LowShadow  || || `[0x000000000000, 0x00007fff7fff]` || LowMem     ||
 ```
 
 - 给定 application memory 地址 addr，计算其对应的 shadow memory 地址的公式如下：
     
-
-```
+```c
 uptr MemToShadow(uptr addr) { return (addr >> 3) + 0x7fff8000; }
 ```
 
 - HWASAN: dynamic shadow mapping。根据 MaxUserVirtualAddress 计算 shadow memory 所需要的总大小 shadow_size，通过 mmap(shadow_size) 得到 shadow memory 区间，再具体划分 HighMem, HighShadow, ShadowGap, LowShadow, LowMem 的地址区间。
     
 - 伪算法如下（未考虑对齐）：
-    
 
-```
-kHighMemEnd = GetMaxUserVirtualAddress();shadow_size = MemToShadowSize(kHighMemEnd);__hwasan_shadow_memory_dynamic_address = mmap(shadow_size);// Place the low memory first.kLowMemEnd = __hwasan_shadow_memory_dynamic_address - 1;kLowMemStart = 0;// Define the low shadow based on the already placed low memory.kLowShadowEnd = MemToShadow(kLowMemEnd);kLowShadowStart = __hwasan_shadow_memory_dynamic_address;// High shadow takes whatever memory is left up there.kHighShadowEnd = MemToShadow(kHighMemEnd);kHighShadowStart = Max(kLowMemEnd, MemToShadow(kHighShadowEnd)) + 1;// High memory starts where allocated shadow allows.kHighMemStart = ShadowToMem(kHighShadowStart);uptr MemToShadow(uptr untagged_addr) {  return (untagged_addr >> 4) + __hwasan_shadow_memory_dynamic_address;}uptr ShadowToMem(uptr shadow_addr) {  return (shadow_addr - __hwasan_shadow_memory_dynamic_address) << 4;}
+```c
+kHighMemEnd = GetMaxUserVirtualAddress();shadow_size = MemToShadowSize(kHighMemEnd);__hwasan_shadow_memory_dynamic_address = mmap(shadow_size);// Place the low memory first.
+kLowMemEnd = __hwasan_shadow_memory_dynamic_address - 1;kLowMemStart = 0;// Define the low shadow based on the already placed low memory.kLowShadowEnd = MemToShadow(kLowMemEnd);kLowShadowStart = __hwasan_shadow_memory_dynamic_address;// High shadow takes whatever memory is left up there.kHighShadowEnd = MemToShadow(kHighMemEnd);kHighShadowStart = Max(kLowMemEnd, MemToShadow(kHighShadowEnd)) + 1;// High memory starts where allocated shadow allows.kHighMemStart = ShadowToMem(kHighShadowStart);uptr MemToShadow(uptr untagged_addr) {  return (untagged_addr >> 4) + __hwasan_shadow_memory_dynamic_address;}uptr ShadowToMem(uptr shadow_addr) {  return (shadow_addr - __hwasan_shadow_memory_dynamic_address) << 4;}
 ```
 
 ```
@@ -141,12 +128,9 @@ uptr MemToShadow(uptr untagged_addr) {
 
 - Linux/AArch64 下 HWASAN 的某种 shadow mapping 如下所示：
     
-
+```c
+uptr MemToShadow(uptr untagged_addr) {   return (untagged_addr >> 4) + __hwasan_shadow_memory_dynamic_address; } uptr ShadowToMem(uptr shadow_addr) {   return (shadow_addr - __hwasan_shadow_memory_dynamic_address) << 4; }
 ```
-// Typical mapping on Linux/AArch64
-```
-
-  
 
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -157,8 +141,9 @@ uptr MemToShadow(uptr untagged_addr) {
 - 每个 stack 内存对象的 tag 是通过 stack_base_tag ^ RetagMask(AllocaNo) 计算得到的。stack_base_tag 对于不同的 stack frame 是不同的值，RetagMask(AllocaNo) 的实现如下（AllocaNo 可以看作是 stack 内存对象的序号）。
     
 
-```
-  static unsigned RetagMask(unsigned AllocaNo) {
+```c
+static unsigned RetagMask(unsigned AllocaNo) {   // A list of 8-bit numbers that have at most one run of non-zero bits.   // x = x ^ (mask << 56) can be encoded as a single armv8 instruction for these   // masks.   // The list does not include the value 255, which is used for UAR.   //   // Because we are more likely to use earlier elements of this list than later   // ones, it is sorted in increasing order of probability of collision with a   // mask allocated (temporally) nearby. The program that generated this list   // can be found at:   // https://github.com/google/sanitizers/blob/master/hwaddress-sanitizer/sort_masks.py   
+static unsigned FastMasks[] = {0,  128, 64,  192, 32,  96,  224, 112, 240,                                  48, 16,  120, 248, 56,  24,  8,   124, 252,                                  60, 28,  12,  4,   126, 254, 62,  30,  14,                                  6,  2,   127, 63,  31,  15,  7,   3,   1};   return FastMasks[AllocaNo % std::size(FastMasks)]; }
 ```
 
 - heap 内存对象：随机 tag 是在运行时申请 heap 内存对象时由 HWASAN 的内存分配器生成的。
@@ -171,27 +156,23 @@ uptr MemToShadow(uptr untagged_addr) {
     
 - 在编译时插桩阶段 HWASAN 会插入代码来将生成的随机 tag 保存在 global 内存对象指针的 top byte，而将随机 tag 保存到这些 global 内存对象对应的 shadow memory 中则是由 HWASAN runtime 在程序启动阶段做的。对于每一个 global 内存对象，HWASAN 在编译插桩阶段都会创建一个 descriptor 保存在 "hwasan_globals" section 中，descriptor 中保存了 global 内存对象的大小以及 tag 等信息，程序启动时 HWASAN runtime 会遍历 "hwasan_globals" section 中所有的 descriptor 来设置每个 global 内存对象对应的 shadow memory tag。
     
-      
-    
-
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **short granules**
 
 每个 heap/stack/global 内存对象都会被对齐到 16-bytes，heap/stack/global 内存对象原本大小记作 size，如果 size % 16 != 0，那么就需要 padding，heap/stack/global 内存对象最后不足 16-bytes 的部分就被称为 short granule。此时会将 tag 存储到 padding 的最后一个字节，而 padding 所在的 16-bytes 内存对应的 1-byte shadow memory 中存储的则是 short granule size 即 size % 16。
 
-  
-
 举例如下：
 
-```
+```c
 uint8_t buf[20];
 ```
 
 uint8_t buf[20] 开启 HWASAN 后会变为：
 
-```
-uint8_t buf[32]; // 20-bytes aligned to 16-bytes -> 32-bytes
+```c
+uint8_t buf[32]; // 20-bytes aligned to 16-bytes -> 32-bytes 
+uint8_t tag = __hwasan_generate_tag(); buf[31] = tag; *(char *)MemToShadow(buf) = tag; *((char *)MemToShadow(buf)+1) = 20 % 16; uint8_t *tagged_buf = reinterpret_cast<int8_t *>(                      reinterpret_cast<uintptr_t>(buf) | (tag << 56)); // Replace all uses of `buf` with `tagged_buf`
 ```
 
 因为 short granules 的存在，所以在比较保存在指针 top byte 的 tag 和保存在 shadow memory 中的 tag 是否一致时，需要考虑如下两种可能：
@@ -200,22 +181,16 @@ uint8_t buf[32]; // 20-bytes aligned to 16-bytes -> 32-bytes
     
 - 保存在 shadow memory 中的 tag 实际上是 short granule size，保存在指针 top byte 的 tag 等于保存在指针指向的内存所在的 16-bytes 内存的最后一个字节的 tag。
     
-
+![[Pasted image 20241004170130.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **为什么需要 short granules ？**
 
 考虑 uint8_t buf[20]，假设代码中存在访问 buf[22] 导致的 buffer-overflow。因为 HWASAN 会将 heap/stack/global 内存对象对齐到 16-bytes，所以实际为 uint8_t buf[20] 申请的空间是 uint8_t buf[32]。
 
-  
-
 如果没有 short granules，那么保存在 buf 指针 top byte 的 tag 为 0xa1，保存在 buf[22] 对应的 shadow memory 中的 tag 为 0xa1，尽管访问 buf[22] 时发生了 buffer-overflow，此时 HWASAN 也检测不到，因为保存在指针 top byte 的 tag 和保存在 shadow memory 中的 tag 是否一致的。
 
-  
-
 有了 short granules，保存在 buf 指针 top byte 的 tag 为 0xa1，保存在 buf[22] 对应的 shadow memory 中的 tag 则是 short granule size 即 20 % 16 = 4。访问 buf[22] 时，HWASAN 发现保存在指针 top byte 的 tag 和保存在 shadow memory 中的 tag 不一致，保存在 buf[22] 对应的 shadow memory 中的 tag 是 short granule size 为 4，这意味着 buf[22] 所在的 16-bytes 内存只有前 4-bytes 是可以合法访问的，而 buf[22] 访问的却是其所在 16-bytes 内存的第 7 个 byte，说明访问 buf[22] 时发生了 buffer-overflow！
-
-  
 
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
@@ -227,40 +202,34 @@ uint8_t buf[32]; // 20-bytes aligned to 16-bytes -> 32-bytes
 
 开启 HWASAN 后，HWAddressSanitizer instrumentation pass 会在 LLVM IR 层面进行插桩。默认情况下，HWASAN 在每一处内存读写之前添加对 llvm.hwasan.check.memaccess.shortgranules intrinsic 的调用。该 llvm.hwasan.check.memaccess.shortgranules intrinsic 会在生成汇编代码时转换为对相应函数的调用。
 
-  
-
 还是以如下代码为例说明：
 
-```
-// cat test.c
+```c
+// cat test.c 
+#include <stdlib.h> 
+int main() {     int * volatile x = (int *)malloc(sizeof(int)*10);     x[10] = 0;     free(x); }
 ```
 
 上述代码 clang -O1 -fsanitize=hwaddress test.c -S -emit-llvm 开启 HWASAN 生成的 LLVM IR 如下：
 
-```
-%5 = alloca ptr, align 8
+```c
+%5 = alloca ptr, align 8 %6 = call noalias ptr @malloc(i64 noundef 40) store ptr %6, ptr %5, align 8 %7 = load volatile ptr, ptr %5, align 8 %8 = getelementptr inbounds i32, ptr %7, i64 10 call void @llvm.hwasan.check.memaccess.shortgranules(ptr %__hwasan_shadow_memory_dynamic_address, ptr %8, i32 18) store i8 0, ptr %8, align 4 %9 = load volatile ptr, ptr %5, align 8 call void @free(ptr noundef %9)
 ```
 
 llvm.hwasan.check.memaccess.shortgranules intrinsic 有三个参数：
 
 1. __hwasan_shadow_memory_dynamic_address
-    
 2. 本次 memory access 访问的内存地址
-    
 3. 常数 AccessInfo，编码了本次 memory access 的相关信息。计算公式如下：
     
-
-```
-int64_t HWAddressSanitizer::getAccessInfo(bool IsWrite,
+```c
+int64_t HWAddressSanitizer::getAccessInfo(bool IsWrite,                                           unsigned AccessSizeIndex) {   return (CompileKernel << HWASanAccessInfo::CompileKernelShift) |          (MatchAllTag.has_value() << HWASanAccessInfo::HasMatchAllShift) |          (MatchAllTag.value_or(0) << HWASanAccessInfo::MatchAllShift) |          (Recover << HWASanAccessInfo::RecoverShift) |          (IsWrite << HWASanAccessInfo::IsWriteShift) |          (AccessSizeIndex << HWASanAccessInfo::AccessSizeShift); }  // Bit field positions for the accessinfo parameter to // llvm.hwasan.check.memaccess. Shared between the pass and the backend. Bits // 0-15 are also used by the runtime. 
+enum {   AccessSizeShift = 0, // 4 bits   IsWriteShift = 4,   RecoverShift = 5,   MatchAllShift = 16, // 8 bits   HasMatchAllShift = 24,   CompileKernelShift = 25, };
 ```
 
 IsWrite 布尔值，0 表示本次 memory access 是读操作，1 表示本次 memory access 为 写操作。
 
-  
-
 AccessSizeIndex 由 __builtin_ctz(AccessSize) 计算得到。AccessSize 为 1-byte, 2-bytes, 4-bytes, 8-bytes, 16-bytes 时，AccessSizeIndex 分别为 0, 1, 2, 3, 4。
-
-  
 
 CompileKernel 布尔值，只有 HWASAN 用于 KernelHWAddressSanitizer 时 CompileKernel 值才为 1。
 
@@ -295,8 +264,8 @@ llvm.hwasan.check.memaccess.shortgranules intrinsic 会根据参数不同而生�
 
 __hwasan_check_x0_18_short_v2 完整的汇编代码如下：
 
-```
-__hwasan_check_x0_18_short_v2:
+```c
+__hwasan_check_x0_18_short_v2:   sbfx    x16, x0, #4, #52    // shadow offset   ldrb    w16, [x20, x16]     // load shadow tag   cmp     x16, x0, lsr #56    // extract address tag, compare with shadow tag   b.ne    .Ltmp0              // jump to short tag handler on mismatch .Ltmp1:   ret .Ltmp0:   cmp     w16, #15            // is this a short tag?   b.hi    .Ltmp2              // if not, error   and     x17, x0, #0xf       // find the address's position in the short granule   add     x17, x17, #3        // adjust to the position of the last byte loaded   cmp     w16, w17            // check that position is in bounds   b.ls    .Ltmp2              // if not, error   orr     x16, x0, #0xf       // compute address of last byte of granule   ldrb    w16, [x16]          // load tag from it   cmp     x16, x0, lsr #56    // compare with pointer tag   b.eq    .Ltmp1              // if matches, continue .Ltmp2:   // save original x0, x1 on stack (they will be overwritten)   stp     x0, x1, [sp, #-256]!   // create frame record   stp     x29, x30, [sp, #232]   // set x1 to a constant indicating the type of failure   mov     x1, #18   // call runtime function to save remaining registers and report error   adrp    x16, :got:__hwasan_tag_mismatch_v2   // (load address from GOT to avoid potential register clobbers in delay load handler)   ldr     x16, [x16, :got_lo12:__hwasan_tag_mismatch_v2]   br      x16
 ```
 
 前面内容提到，HWASAN 在编译插桩时，默认情况下是在每一处内存读写之前添加对 llvm.hwasan.check.memaccess.shortgranules intrinsic 的调用，那非默认情况呢？
@@ -305,9 +274,8 @@ __hwasan_check_x0_18_short_v2:
     
 - 还是以本文开头的示例代码进行说明，clang -O1 -fsanitize=hwaddress -mllvm -hwasan-instrument-with-calls=true test.c -S -emit-llvm 生成的 LLVM IR 如下：
     
-
-```
-  %2 = alloca ptr, align 8
+```c
+ %2 = alloca ptr, align 8   %3 = call noalias ptr @malloc(i64 noundef 40)   store volatile ptr %3, ptr %2, align 8   %4 = load volatile ptr, ptr %2, align 8   %5 = getelementptr inbounds i32, ptr %4, i64 10   %6 = ptrtoint ptr %5 to i64   call void @__hwasan_store4(i64 %6)   store i32 0, ptr %5, align 4   %7 = load volatile ptr, ptr %2, align 8   call void @free(ptr noundef %7)
 ```
 
 - __hwasan_[load|store][1|2|4|8|16|n] 函数由 HWASAN runtime 中实现，代码位于 compiler-rt/lib/hwasan/hwasan.cpp。根据本次 memory access 为读操作或写操作，调用 ___hwasan_load 或 ___hwasan_store；根据本次 memory access 读写的内存大小（字节），调用相应的版本，如本次 memory acesss 是对 4-bytes 内存的写操作，HWASAN 插入的是就对 ___hwasan_store4 的调用。
@@ -315,17 +283,16 @@ __hwasan_check_x0_18_short_v2:
 - __hwasan_[load|store][1|2|4|8|16|n] 函数的实现几乎一致，下面给出 ___hwasan_store4 的代码实现：
     
 
-```
-void __hwasan_store4(uptr p) {
+```c
+void __hwasan_store4(uptr p) {   CheckAddress<ErrorAction::Abort, AccessType::Store, 2>(p); }  template <ErrorAction EA, AccessType AT, unsigned LogSize> __attribute__((always_inline, nodebug)) static void CheckAddress(uptr p) {   if (!InTaggableRegion(p))     return;   uptr ptr_raw = p & ~kAddressTagMask;   tag_t mem_tag = *(tag_t *)MemToShadow(ptr_raw);   if (UNLIKELY(!PossiblyShortTagMatches(mem_tag, p, 1 << LogSize))) {     SigTrap<EA, AT, LogSize>(p);     if (EA == ErrorAction::Abort)       __builtin_unreachable();   } }  __attribute__((always_inline, nodebug)) static inline bool PossiblyShortTagMatches(tag_t mem_tag, uptr ptr, uptr sz) {   DCHECK(IsAligned(ptr, kShadowAlignment));   tag_t ptr_tag = GetTagFromPointer(ptr);   if (ptr_tag == mem_tag)     return true;   if (mem_tag >= kShadowAlignment)     return false;   if ((ptr & (kShadowAlignment - 1)) + sz > mem_tag)     return false;   return *(u8 *)(ptr | (kShadowAlignment - 1)) == ptr_tag; }
 ```
 
 - 如果在编译时添加选项 -mllvm -hwasan-inline-all-checks=true，那么编译插桩时 HWASAN 会直接在 LLVM IR 上实现检查保存在指针 top byte 的 tag 和保存在 shadow memory 中的 tag 是否匹配的逻辑。
     
 - 还是以本文开头的示例代码进行说明，clang -O1 -fsanitize=hwaddress -mllvm -hwasan-inline-all-checks=true test.c -S -emit-llvm 生成的 LLVM IR 如下：
-    
 
-```
-  %5 = alloca ptr, align 8
+```c
+  %5 = alloca ptr, align 8   %6 = call noalias  ptr @malloc(i64 noundef 40)   store volatile ptr %6, ptr %5, align 8   %7 = load volatile ptr, ptr %5, align 8   %8 = getelementptr inbounds i8, ptr %7, i64 30   %9 = ptrtoint ptr %8 to i64   %10 = lshr i64 %9, 56   ; extrac pointer tag   %11 = trunc i64 %10 to i8   %12 = and i64 %9, 72057594037927935   ; shadow offset   %13 = lshr i64 %12, 4   ; shadow base + shadow offset   %14 = getelementptr i8, ptr %4, i64 %13   ; load shadow tag   %15 = load i8, ptr %14, align 1   ; compare pointer tag with shadow tag   %16 = icmp ne i8 %11, %15   ; jump to short tag handler on mismatch   br i1 %16, label %17, label %31  17:                                               ; preds = %0   ; is this a short tag?   %18 = icmp ugt i8 %15, 15   ; if not, error   br i1 %18, label %19, label %20  19:                                               ; preds = %25, %20, %17   call void asm sideeffect "brk #2320", "{x0}"(i64 %9)   unreachable  20:                                               ; preds = %17   ; find the address's position in the short granule   %21 = and i64 %9, 15   %22 = trunc i64 %21 to i8   ; adjust to the position of the last byte loaded   %23 = add i8 %22, 3   ; check that position is in bounds   %24 = icmp uge i8 %23, %15   ; if not, error   br i1 %24, label %19, label %25  25:                                               ; preds = %20   ; compute address of last byte of granule   %26 = or i64 %12, 15   %27 = inttoptr i64 %26 to ptr   ; load tag from it   %28 = load i8, ptr %27, align 1   ; compare with pointer tag   %29 = icmp ne i8 %11, %28   ; if mismatche, error   br i1 %29, label %19, label %30  30:                                               ; preds = %25   br label %31  31:                                               ; preds = %0, %30   store i8 0, ptr %8, align 4   %32 = load volatile ptr, ptr %5, align 8   call void @free(ptr noundef %32)
 ```
 
 **开源社区贡献**

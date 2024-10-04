@@ -1,43 +1,28 @@
-# 
 
 张铭轩 Linux内核之旅
-
  _2023年10月11日 20:35_ _陕西_
 
 **作者简介：**
-
-  
-
     张铭轩，西安邮电大学计算机专业研一学生，导师陈莉君老师，热衷于探索Linux内核。
-
-  
-
-  
-
 **本文的源码出自谢宝友老师的文章《Load高故障分析》**
 
-**01**
-
-**如何观察load指标**
-  
+**01** 如何观察load指标
 
 load指标代表系统运行负载，表示在一段时间内，系统又多少个正在运行的任务。
-
 一般通过top、uptime命令查看最近1min、5min、15min的平均load指标以及iowait指标。
-
 #### 可利用如下指令去模拟高负载场景
 
 使用`while :;do :;done &`命令来模拟CPU密集型任务：
 ![[Pasted image 20240911000853.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-`sudo sh -c "while :; do fio -name=mytest -filename=test.data -direct=0 -thread -rw=randread -ioengine=psync -bs=4k -size=1M -numjobs=2 -runtime=10 -group_reporting;echo 1 > /proc/sys/vm/drop_caches; done"`利用fio工具来模拟IO密集型任务：
+```cpp
+sudo sh -c "while :; do fio -name=mytest -filename=test.data -direct=0 -thread -rw=randread -ioengine=psync -bs=4k -size=1M -numjobs=2 -runtime=10 -group_reporting;echo 1 > /proc/sys/vm/drop_caches; done"
+```
+利用fio工具来模拟IO密集型任务：
 ![[Pasted image 20240911000859.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**02**
 
-**编写工具**
+**02** 编写工具
 ```c
 Makefile
 
@@ -65,7 +50,7 @@ make -C $(KERNEL_BUILD_PATH) M=$(PWD) clean
 endif
 ```
 main.c
-
+```cpp
 #include <linux/version.h>  
 #include <linux/module.h>  
 #include <linux/kallsyms.h>  
@@ -169,7 +154,7 @@ module_init(load_monitor_init)
 module_exit(load_monitor_exit)  
   
 MODULE_LICENSE("GPL v2");
-
+```
 load.h
 
 /*无实际内容*/
@@ -178,13 +163,10 @@ load.h
 
 对于被rcu锁保护的结构，读者不需要任何锁就可以访问它，但是写者写时，需要先拷贝一个副本，然后对副本进行修改，最后使用callback回调机制当所有cpu都退出对共享数据的操作时将指向原来数据的指针重新指向新的被修改的数据，适用于读多写少的情况。
 
-**03**
-
-**报错解决**
+**03** **报错解决**
 
 在插入模块时会导致虚拟机崩溃。  
 ![[Pasted image 20240911000944.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 认为是没有对ptr_avenrun进行初始化
 
@@ -196,18 +178,17 @@ ptr_avenrun = (void *)kallsyms_lookup_name("avenrun")，在低版本中可用，
 
 查看源码，可以看到
 ![[Pasted image 20240911000955.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们将ptr_avenrun这层嵌套去掉，直接引入头文件后`\#include <linux/sched/loadavg.h>`直接读取avenrun
 
 **规范化**
-
+```cpp
 //以下的这些宏，在源码中用于规范读取load average的值（10进制读取）  
 #define FSHIFT11/* nr of bits of precision */  
 #define FIXED_1(1<<FSHIFT)//1左移FSHIFT位得到的固定点数中的1.0  
 #define LOAD_INT(x) ((x) >> FSHIFT)//x右移FSHIFT位来提取整数部分即将固定点数转换为整数  
 #define LOAD_FRAC(x) LOAD_INT(((x) & (FIXED_1-1)) * 100)
-
+```
 avenrun中低11位存放load的小数部分，第11位开始存放load的整数部分，我们只需要其整数部分所以需要相关宏进行处理
 
 (x) & (FIXED_1-1): 通过与运算将x的整数部分清零，只保留小数部分。((x) & (FIXED_1-1)) * 100: 将保留的小数部分乘以100，以将其转换为0到99之间的值。LOAD_INT(...): 通过调用LOAD_INT宏将结果转换为整数即固定点数的小数部分转换为0到99之间的整数。比如说x=123456，那么我们左移动11位即* 2^11 = 2073600，可以知道它的固定点数是1.23456，通过LOAD_INT宏将它右移11位提取整数部分1，通过LOAD_FRAC宏首先通过与运算将x的整数部分清零，只保留小数部分23456。将它保留的小数部分乘以100，以将其转换为0到99之间的值。最后，它调用LOAD_INT`宏将结果转换为整数。
@@ -227,25 +208,24 @@ avenrun中低11位存放load的小数部分，第11位开始存放load的整数�
 发现`CONFIG_ARCH_STACKWALK`值为y，判断时会跳过编译此段定义，于是尝试性的将源码复制到代码中，发现即可使用
 
 **后续报错**
-
+```cpp
 //编译后报错  
 save_stack_trace_tsk(p, &trace);            
 print_stack_trace(&trace, 0)
+```
 ![[Pasted image 20240911001022.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 
 在源码中查看相关函数，以第一个为例
 ![[Pasted image 20240911001031.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发现其在`stacktrace.h`文件中有声明，但没有在x86架构下的相关实现，通过查看https://github.com/torvalds/linux 相关文件对应的history，发现其在Linux 5.1版本中已被删除，且经尝试发现其中有相应的内部函数没有实现，不能复现其函数内容。
 ![[Pasted image 20240911001037.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过查找资料和阅读源码后，找到有类似的功能的函数，其函数原型如下
-
-`stack_trace_save_tsk(struct task_struct *task, unsigned long *store, unsigned int size, unsigned int skipnr)`
-
+```cpp
+stack_trace_save_tsk(struct task_struct *task, unsigned long *store, unsigned int size, unsigned int skipnr)
+```
 在源码中进行查找，可以看到有两组实现，其是由`CONFIG_ARCH_STACKWALK`这个宏的值决定的
 ![[Pasted image 20240911001042.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
@@ -260,10 +240,9 @@ print_stack_trace(&trace, 0)
 
 通过`cat config-6.2.0-34-generic | grep CONFIG_ARCH_STACKWALK`命令查看配置文件获取其值
 ![[Pasted image 20240911001103.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 所以我们对其对应的实现进行分析，并加以注释
-
+```cpp
 unsigned int stack_trace_save_tsk(struct task_struct *tsk, unsigned long *store,unsigned int size, unsigned int skipnr)//参数是任务指针 tsk、存储数组指针 store、存储数组的大小 size，以及要跳过的栈帧数目 skipnr  
 {  
 stack_trace_consume_fn consume_entry = stack_trace_consume_entry_nosched;//函数指针用于处理每个栈帧的信息。  
@@ -281,13 +260,13 @@ arch_stack_walk(consume_entry, &c, tsk, NULL);//行了堆栈遍历操作，�
 put_task_stack(tsk);//这一步用于释放之前获取的任务堆栈信息，确保没有资源泄漏  
 return c.len;//函数返回了存储在存储数组中的栈帧数量  
 }
-
+```
 这个函数的主要作用是获取指定任务的调用栈信息，并将栈帧信息存储到一个数组中，同时可以跳过一定数量的栈帧，但尝试时发现不能调用，发现其在源码中与先前的kallsyms_lookup_name函数同样没有EXPORT出来，我们不能使用。
 
 **于是设想，有没有一种方法可以调用没有EXPORT的函数？**
 
 经询问师兄，我们使用kprobes技术来执行它，我们对源码 main.c进行了修改
-
+```cpp
 #include <linux/stacktrace.h> /* for stack_trace_print */  
 #include <linux/module.h> /* for module_*, MODULE_*, printk */  
 #include <linux/hrtimer.h> /* for hrtimer_*, ktime_* */  
@@ -395,7 +374,7 @@ void *find_kallsyms_lookup_name(char *sym) { /* 通过kprobe找到函数入�
    unregister_kprobe(&kp);//注销kprobe  
    return p;//返回找到的内核函数地址  
 }
-
+```
 kprobes技术作用是跟踪内核函数的执行状态，即可以在运行的内核中动态的插入探测跟踪点，当内核运行到我们设定的探测跟踪点的时候，我们可以执行预定义的回调函数，得到内核函数的地址，kprobes包括kprobe、jprobe和kretprobe三种探测手段
 
 kprobe：实现jprobe和kretprobe的基础。可以在内核中任意位置放置探测点并且提供了三种回调方式，分别是pre_handler（在被探测指令执行前调用）、post_handler（在被探测指令执行后调用）和fault_handler（在内存访问出错时调用）。
@@ -426,23 +405,21 @@ kretprobe：获取被探测函数的返回值。函数出口插入探测点，�
 ![[Pasted image 20240911001142.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**04**
-
-**问题解答**
+**04** **问题解答**
 
 
 **1、为什么要定义OS_VER这个变量？**
-
+```cpp
 OS_VER := UNKOWN  
 UNAME := $(shell uname -r)  
 ifneq ($(findstring 6.2.0-34-generic,$(UNAME)),)  
     OS_VER := UBUNTU_2204  
 endif
-
+```
 当在$(UNAME)中找不到6.2.0-34-generic时，将OS_VER定义为UBUNTU_2204
-
+```cpp
 	make CFLAGS_MODULE=-D$(OS_VER) -C /lib/modules/`uname -r`/build M=`pwd` modules
-
+```
 这部分设置了一个名为 `CFLAGS_MODULE` 的环境变量，并将其值设置为 `-D$(OS_VER)`。`-D` 标志通常用于在 C/C++ 程序中定义预处理宏。
 
 OS_VER用于在编译时指定某个操作系统的版本或其他相关信息，以便进行版本控制，在源程序中可以配合条件编译，使其编译对应部分的代码，从而提高程序兼容性
@@ -460,7 +437,6 @@ OS_VER用于在编译时指定某个操作系统的版本或其他相关信息�
 **4、某些版本的Linux内核不能直接调用kallsyms_lookup_name，有哪些办法获得内核函数/变量的地址？**
 
 （1）可以通过kprobe找到其地址来进行调用，如本例中`调用stack_trace_save_tsk`函数
-
 （2）查看System.map，其为内核的符号表，在内核编译时被构建
 
 `sudo cat System.map-6.2.0-34-generic |grep kallsyms_lookup_name`
@@ -476,12 +452,12 @@ OS_VER用于在编译时指定某个操作系统的版本或其他相关信息�
 **5、模块代码还有哪些值得改进的地方？**
 
 （1）可以将判断标准与时间间隔写成宏定义的形式，便于后续修改代码
-
+```cpp
 #define CHECK_TIME 10  
 #define PRINT_TIME 20
-
+```
 （2）在计算间隔时，又于每一次进入check_load（）函数都间隔10ms，所以我们可以使用cnt来进行判断，而不使用相关的变量及`**ktime_to_ms**(**ktime_sub**(**ktime_get**(), last))`函数,这样就可以减轻由于监控系统负载而产生的负载，但精度可能会低、没有准确保障。
-
+```cpp
 static void check_load(void)  
 {  
 	int load =LOAD_INT(ptr_avenrun[0]);  
@@ -494,15 +470,12 @@ static void check_load(void)
     print_all_task_stack();  
     cnt=0;  
 }
-
+```
 **6、你还有其他方法跟踪Load高问题吗？不同的方法什么优缺点？**
 
 （1）使用top、htop、ps来看进程列表和相关资源使用情况，优点可以快速查看到系统的负载，查看哪些进程占用了资源，便于定位问题进程，缺点是需要手动分析
-
 （2）查看系统日志文档，如`var/log/messages`以及`var/log/syslog`以查找可能与负载高相关的错误消息或警告，优点是可以捕获系统事件和错误，有助于了解系统问题的根本原因，缺点是需要具备日志分析的技能，而且可能需要花费时间来查找相关信息
-
 （3）使用性能分析工具如 `perf`, `strace`, `dtrace` 或 `systemtap` 来分析进程的系统调用和性能瓶颈。优点是提供详细的系统性能数据缺点，缺点是会引入额外的开销。
-
 （4）使用监控工具如 `Nagios`, `Zabbix`, `Prometheus` 等来实时监控系统性能，优点是自动化监控，提供实时警报，有助于快速响应问题，缺点是需要配置和管理监控系统，会引入一些性能开销
 
   

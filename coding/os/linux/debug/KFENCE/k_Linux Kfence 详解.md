@@ -1,16 +1,13 @@
-# 
 
-Original 晓泰 泰晓科技  _2022年06月07日 15:00_ _广东_
-
+Original 晓泰 泰晓科技 
+_2022年06月07日 15:00_ _广东_
 > Author:  pwl999  
 > Date:    2022/04/28  
 > Project: [RISC-V Linux 内核剖析](http://mp.weixin.qq.com/s?__biz=MzA5NDQzODQ3MQ==&mid=2648188624&idx=1&sn=76c8067aa544cc14d97c60865ccb2382&chksm=886213f8bf159aeeefc92c02670e556a7404647697e48be49477f2d54a77ce2ae1b910ead596&scene=21#wechat_redirect)  
 
 **说明**：RISC-V Linux 内核兴趣小组旨在围绕 RISC-V 处理器架构系统地研究 Linux 内核以及上下栈中的技术，为国内 RISC-V 生态做出泰晓科技 Linux 内核社区应有的贡献，活动已经持续了整整 3 个月，有数百人参与、已经产出了数十篇专题文章和十数次线上技术交流分享，目前还在火热地开展中。
 
-#   
-
-# **欢迎在校学生和在职工程师报名参加，参与度和贡献度较高的同学都可以申请开源补贴。参与方式请查看：[RISC-V Linux 内核兴趣小组召集爱好者-ing](http://mp.weixin.qq.com/s?__biz=MzA5NDQzODQ3MQ==&mid=2648188624&idx=1&sn=76c8067aa544cc14d97c60865ccb2382&chksm=886213f8bf159aeeefc92c02670e556a7404647697e48be49477f2d54a77ce2ae1b910ead596&scene=21#wechat_redirect)**
+**欢迎在校学生和在职工程师报名参加，参与度和贡献度较高的同学都可以申请开源补贴。参与方式请查看：[RISC-V Linux 内核兴趣小组召集爱好者-ing](http://mp.weixin.qq.com/s?__biz=MzA5NDQzODQ3MQ==&mid=2648188624&idx=1&sn=76c8067aa544cc14d97c60865ccb2382&chksm=886213f8bf159aeeefc92c02670e556a7404647697e48be49477f2d54a77ce2ae1b910ead596&scene=21#wechat_redirect)**
 
 ## 1. 原理介绍
 
@@ -73,23 +70,22 @@ Kfence 把自己 hook 到 `slub/slab` 的 `malloc()/free()` 流程当中去�
 ### 2.1 kfence_protect()
 
 把 `fence page` 设置成不可访问的核心就是通过 MMU 清除掉 PTE 中的 `present` 标志位：
-
-`kfence_init_pool() → kfence_protect() → kfence_protect_page():   kfence_free() → __kfence_free() → kfence_guarded_free() → kfence_protect() → kfence_protect_page():      linux-5.16.14\arch\riscv\include\asm\kfence.h:      static inline bool kfence_protect_page(unsigned long addr, bool protect)   {    pte_t *pte = virt_to_kpte(addr);       if (protect)     set_pte(pte, __pte(pte_val(*pte) & ~_PAGE_PRESENT));    else     set_pte(pte, __pte(pte_val(*pte) | _PAGE_PRESENT));       flush_tlb_kernel_range(addr, addr + PAGE_SIZE);       return true;   }   `
+```cpp
+kfence_init_pool() → kfence_protect() → kfence_protect_page():   kfence_free() → __kfence_free() → kfence_guarded_free() → kfence_protect() → kfence_protect_page():      linux-5.16.14\arch\riscv\include\asm\kfence.h:      static inline bool kfence_protect_page(unsigned long addr, bool protect)   {    pte_t *pte = virt_to_kpte(addr);       if (protect)     set_pte(pte, __pte(pte_val(*pte) & ~_PAGE_PRESENT));    else     set_pte(pte, __pte(pte_val(*pte) | _PAGE_PRESENT));       flush_tlb_kernel_range(addr, addr + PAGE_SIZE);       return true;   }  ```
 
 ### 2.2 kfence_alloc_pool()
 
 在系统启动时保留 Kfence 需要用到的内存 Page，默认保留 255 个 `data page`：
-
-`start_kernel() → mm_init() → kfence_alloc_pool():      void __init kfence_alloc_pool(void)   {    if (!kfence_sample_interval)     return;       __kfence_pool = memblock_alloc(KFENCE_POOL_SIZE, PAGE_SIZE);       if (!__kfence_pool)     pr_err("failed to allocate pool\n");   }      #define KFENCE_POOL_SIZE ((CONFIG_KFENCE_NUM_OBJECTS + 1) * 2 * PAGE_SIZE)      config KFENCE_NUM_OBJECTS    int "Number of guarded objects available"    range 1 65535    default 255   `
-
+```cpp
+start_kernel() → mm_init() → kfence_alloc_pool():      void __init kfence_alloc_pool(void)   {    if (!kfence_sample_interval)     return;       __kfence_pool = memblock_alloc(KFENCE_POOL_SIZE, PAGE_SIZE);       if (!__kfence_pool)     pr_err("failed to allocate pool\n");   }      #define KFENCE_POOL_SIZE ((CONFIG_KFENCE_NUM_OBJECTS + 1) * 2 * PAGE_SIZE)      config KFENCE_NUM_OBJECTS    int "Number of guarded objects available"    range 1 65535    default 255   
+```
 ### 2.3 kfence_init()
-
-`void __init kfence_init(void)   {    /* Setting kfence_sample_interval to 0 on boot disables KFENCE. */    if (!kfence_sample_interval)     return;       stack_hash_seed = (u32)random_get_entropy();       /* (1) 初始化 kfence pool 内存池 */    if (!kfence_init_pool()) {     pr_err("%s failed\n", __func__);     return;    }       if (!IS_ENABLED(CONFIG_KFENCE_STATIC_KEYS))     static_branch_enable(&kfence_allocation_key);    WRITE_ONCE(kfence_enabled, true);       /* (2) 初始化定时释放 guard 的 timer */    queue_delayed_work(system_unbound_wq, &kfence_timer, 0);    pr_info("initialized - using %lu bytes for %d objects at 0x%p-0x%p\n", KFENCE_POOL_SIZE,     CONFIG_KFENCE_NUM_OBJECTS, (void *)__kfence_pool,     (void *)(__kfence_pool + KFENCE_POOL_SIZE));   }   `
-
+```cpp
+void __init kfence_init(void)   {    /* Setting kfence_sample_interval to 0 on boot disables KFENCE. */    if (!kfence_sample_interval)     return;       stack_hash_seed = (u32)random_get_entropy();       /* (1) 初始化 kfence pool 内存池 */    if (!kfence_init_pool()) {     pr_err("%s failed\n", __func__);     return;    }       if (!IS_ENABLED(CONFIG_KFENCE_STATIC_KEYS))     static_branch_enable(&kfence_allocation_key);    WRITE_ONCE(kfence_enabled, true);       /* (2) 初始化定时释放 guard 的 timer */    queue_delayed_work(system_unbound_wq, &kfence_timer, 0);    pr_info("initialized - using %lu bytes for %d objects at 0x%p-0x%p\n", KFENCE_POOL_SIZE,     CONFIG_KFENCE_NUM_OBJECTS, (void *)__kfence_pool,     (void *)(__kfence_pool + KFENCE_POOL_SIZE));   }   
+```
 ### 2.4 kfence_alloc()
 
 内存分配流程：
-
 `kmem_cache_alloc() → slab_alloc() → kfence_alloc() → __kfence_alloc() → kfence_guarded_alloc():   `
 
 ### 2.5 kfence_free()
@@ -104,13 +100,3 @@ Kfence 把自己 hook 到 `slub/slab` 的 `malloc()/free()` 流程当中去�
 2.Kernel Electric-Fence (KFENCE)  
 3.Linux Kernel Sanitizers  
 4.Linux开源动态之一种新的内存非法访问检查工具KFence
-
-  
-
-[Read more](https://tinylab.org/riscv-linux-kfence/)
-
-​
-
-![](https://mp.weixin.qq.com/rr?timestamp=1727525222&src=11&ver=1&signature=21mioE8ryWO7Z7AcSqRaF9AvfaK9CXr6eBtUdaNl5f57aeW0X4DFHZBuWhsem0DZ1mw5g*2zrxzRKP-iJpemeqinUuEJKT3XcoMeRE2c1WM=)
-
-Scan to Follow

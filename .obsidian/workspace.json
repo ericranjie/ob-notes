@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
+                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
+                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
+                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md"
+                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md"
               }
             }
           }
@@ -148,6 +148,16 @@
   },
   "active": "21d9fe15fdd168c6",
   "lastOpenFiles": [
+    "coding/os/linux/debug/p_冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
+    "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
+    "coding/os/linux/debug/trace/k_ftrace时间精度issue修复.md",
+    "coding/os/linux/debug/KFENCE/k_Linux Kfence 详解.md",
+    "zx99-image/Pasted image 20241004165853.png",
+    "README.md",
+    "coding/os/linux/debug/GDB/p_使用 GDB + Qemu 调试 Linux 内核.md",
+    "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
+    "zx99-image/Pasted image 20241004170130.png",
+    "zx99-image/Pasted image 20241004165859.png",
     "coding/os/linux/device/kn_libdrm-modetest 原理及图显系统验证方法.md",
     "coding/os/linux/device/kn_Linux V4L2子系统与视频编解码设备介绍.md",
     "coding/os/linux/device/i_Linux reset framework.md",
@@ -167,13 +177,6 @@
     "coding/os/linux/device/DRAM/k_DRAM 原理 4 ：DRAM Timing.md",
     "coding/os/linux/device/DRAM/i_DRAM 原理 1 ：DRAM Storage Cell.md",
     "coding/os/linux/device/device_tree/b_Device Tree（四）：文件结构解析.md",
-    "coding/os/linux/device/device_tree/k_Device Tree（二）：基本概念.md",
-    "coding/os/linux/device/device_tree/b_Device Tree（三）：代码分析.md",
-    "coding/os/linux/device/device_tree/i_Device Tree（一）：背景介绍.md",
-    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(11)_BLE安全机制之SM.md",
-    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(10)_BLE安全机制之LE Encryption.md",
-    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(9)_BLE安全机制之LL Privacy.md",
-    "coding/os/linux/device/bluetooth/k_玩转BLE(3)_使用微信蓝牙精简协议伪造记步数据.md",
     "zx99-image/Pasted image 20241003223815.png",
     "zx99-image/Pasted image 20241003224039.png",
     "zx99-image/Pasted image 20241003224023.png",
@@ -181,9 +184,6 @@
     "zx99-image/Pasted image 20241003224009.png",
     "zx99-image/Pasted image 20241003224001.png",
     "zx99-image/Pasted image 20241003223947.png",
-    "Pasted image 20241003223919.png",
-    "Pasted image 20241003223857.png",
-    "zx99-image/Pasted image 20241003192825.png",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",

@@ -1,7 +1,4 @@
-# 
-
 Linux云计算网络
-
  _2021年12月04日 08:13_
 
 ## 1. 概述
@@ -26,8 +23,6 @@ $ cd linux-4.19.172/$ make menuconfig
 Kernel hacking —> Compile-time checks and compiler options —> [ ] Compile the kernel with debug info
 ![[Pasted image 20240928132246.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 以上配置完成后会在当前目录生成 `.config` 文件，我们可以使用 `grep` 进行验证：
 
@@ -64,13 +59,13 @@ echo "{==DBG==} INIT SCRIPT"mkdir /tmpmount -t proc none /procmount -t�
 
 在编译过程中出现以下报错：
 
-```
+```c
 /bin/ld: cannot find -lcrypt/bin/ld: cannot find -lm/bin/ld: cannot find -lresolv/bin/ld: cannot find -lrtcollect2: error: ld returned 1 exit statusNote: if build needs additional libraries, put them in CONFIG_EXTRA_LDLIBS.Example: CONFIG_EXTRA_LDLIBS="pthread dl tirpc audit pam"
 ```
 
 出错的原因是因为我们采用静态编译依赖的底层库没有安装，如果不清楚这些库有哪些 rpm 安装包提供，则可以通过 `yum provides` 命令查看，然后安装相关依赖包重新编译即可。
 
-```
+```c
 $ yum provides */libm.a// ...glibc-static-2.17-317.el7.x86_64 : C library static libraries for -static linking.Repo        : baseMatched from:Filename    : /usr/lib64/libm.a
 ```
 
@@ -78,7 +73,7 @@ $ yum provides */libm.a// ...glibc-static-2.17-317.el7.x86_64 : C library
 
 在上述步骤准备好以后，我们需要在调试的 Ubuntu 20.04 的系统中安装 Qemu 工具，其中调测的 Ubuntu 系统使用 VirtualBox 安装。
 
-```
+```c
 $ apt install qemu qemu-utils qemu-kvm virt-manager libvirt-daemon-system libvirt-clients bridge-utils
 ```
 
@@ -86,35 +81,26 @@ $ apt install qemu qemu-utils qemu-kvm virt-manager libvirt-daemon-system
 
 拷贝 Linux 编译的源码主要是在 gdb 的调试过程中查看源码，其中 vmlinux 和 linux 源码处于相同的目录，本例中 vmlinux 位于 linux-4.19.172 源目录中。
 
-```
+```c
 $ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokaslr console=ttyS0" -s -S -nographic
 ```
 
 使用上述命令启动调试，启动后会停止在界面处，并等待远程 gdb 进行调试，在使用 GDB 调试之前，可以先使用以下命令进程测试内核启动是否正常。
 
-```
+```c
 qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokaslr console=ttyS0" -nographic
 ```
 
 其中命令行中各参数如下：  
 
 - `-kernel ./bzImage`：指定启用的内核镜像；
-    
 - `-initrd ./rootfs.img`：指定启动的内存文件系统；
-    
 - `-append "nokaslr console=ttyS0"` ：附加参数，其中 `nokaslr` 参数必须添加进来，防止内核起始地址随机化，这样会导致 gdb 断点不能命中；参数说明可以参见这里。
-    
 - `-s` ：监听在 gdb 1234 端口；
-    
 - `-S` ：表示启动后就挂起，等待 gdb 连接；
-    
 - `-nographic`：不启动图形界面，调试信息输出到终端与参数 `console=ttyS0` 组合使用；
-    
 
 ![[Pasted image 20240928132618.png]]
-##
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 ## 4. GDB 调试
 
 在使用 `qemu-system-x86_64` 命令启动内核以后，进入到我们从编译机器上拷贝过来的 Linux 内核源代码目录中，在另外一个终端我们来启动 gdb 命令：
@@ -125,7 +111,6 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 
 整体运行界面如下：  
 ![[Pasted image 20240928132635.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 5. Eclipse 图像化调试  
 
@@ -138,23 +123,16 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 在 “Run” -> “Debug Configurations” 选项中，创建一个 ”C/C++ Attach to Application“ 的调试选项。
 
 - Project：选择我们刚才创建的项目名字；
-    
 - C/C++ Application：选择编译 Linux 内核带符号信息表的 vmlinux；
-    
 - Build before launching：选择 ”Disable auto build“；
-    
 - Debugger：选择 gdbserver，具体设置如下图；
-    
 - 在 Debugger 中的 Connection 信息中选择 ”TCP“，并填写端口为 ”1234“；
-    
 
 启动 Debug 调试，即可看到与 gdb 类似的窗口。
 ![[Pasted image 20240928132655.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 启动 ”Debug“ 调试以后的窗口如下，在 Debug 窗口栏中，设置与 gdb 调试相同的步骤即可。
 ![[Pasted image 20240928132702.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 6. 参考
 

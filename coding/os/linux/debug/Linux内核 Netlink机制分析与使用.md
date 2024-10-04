@@ -1,16 +1,9 @@
-# 
-
 原创 董旭 技术简说
-
  _2021年12月31日 08:51_
-
-Linux内核 netlink机制分析与使用  
 
 
 **前面文章分析了sockfs文件系统、socket底层的原理：**  
-
 1、[浅析Linux sockfs文件系统](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247484140&idx=1&sn=2d9bd9abf3cf2c5c5e37fe0875d8bc69&chksm=cfcacc27f8bd453123a37ee9c877384340069da85bff6ceb624447d7d57bfab628b7d5be794c&scene=21#wechat_redirect)
-
 2、[Linux内核 | socket底层的来龙去脉](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247484240&idx=1&sn=38b7bc12fb6720b389b16bfb158bf329&chksm=cfcacd9bf8bd448d7325d8d94d80b7a019d0389cab7c8cfeddd441ca8c28da0f0882a6311cfb&scene=21#wechat_redirect)
 
 **在两章的基础上分析Netlink机制，并编写使用Netlink机制的案例**
