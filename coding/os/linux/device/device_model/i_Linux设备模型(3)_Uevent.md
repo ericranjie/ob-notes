@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-3-10 20:39 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
@@ -47,41 +31,32 @@ Uevent的代码比较简单，主要涉及kobject.h和kobject_uevent.c两个文�
 kobject.h定义了uevent相关的常量和数据结构，如下：
 
 - kobject_action
-
+```cpp
  1: /* include/linux/kobject.h, line 50 */
-
  2: enum kobject_action {   
-
  3:     KOBJ_ADD,
-
  4:     KOBJ_REMOVE,    
-
  5:     KOBJ_CHANGE, 
-
  6:     KOBJ_MOVE,
-
  7:     KOBJ_ONLINE, 
-
  8:     KOBJ_OFFLINE,
-
  9:     KOBJ_MAX 
-
  10: };
-
+```
 kobject_action定义了event的类型，包括：
 
-> ADD/REMOVE，Kobject（或上层数据结构）的添加/移除事件。
-> 
-> ONLINE/OFFLINE，Kobject（或上层数据结构）的上线/下线事件，其实是是否使能。
-> 
-> CHANGE，Kobject（或上层数据结构）的状态或者内容发生改变。
-> 
-> MOVE，Kobject（或上层数据结构）更改名称或者更改Parent（意味着在sysfs中更改了目录结构）。
-> 
-> CHANGE，如果设备驱动需要上报的事件不再上面事件的范围内，或者是自定义的事件，可以使用该event，并携带相应的参数。
+ADD/REMOVE，Kobject（或上层数据结构）的添加/移除事件。
+
+ONLINE/OFFLINE，Kobject（或上层数据结构）的上线/下线事件，其实是是否使能。
+
+CHANGE，Kobject（或上层数据结构）的状态或者内容发生改变。
+
+MOVE，Kobject（或上层数据结构）更改名称或者更改Parent（意味着在sysfs中更改了目录结构）。
+
+CHANGE，如果设备驱动需要上报的事件不再上面事件的范围内，或者是自定义的事件，可以使用该event，并携带相应的参数。
 
 - kobj_uevent_env
-
+```cpp
  1: /* include/linux/kobject.h, line 31 */
 
  2: #define UEVENT_NUM_ENVP         32 /* number of env pointers */
@@ -102,8 +77,8 @@ kobject_action定义了event的类型，包括：
 
  10:    int buflen;
 
- 11: };
-
+ 11: }
+```
 前面有提到过，在利用Kmod向用户空间上报event事件时，会直接执行用户空间的可执行文件。而在Linux系统，可执行文件的执行，依赖于环境变量，因此kobj_uevent_env用于组织此次事件上报时的环境变量。
 
 > envp，指针数组，用于保存每个环境变量的地址，最多可支持的环境变量数量为UEVENT_NUM_ENVP。
@@ -115,21 +90,15 @@ kobject_action定义了event的类型，包括：
 > buflen，访问buf的变量。
 
 - kset_uevent_ops
-
+```cpp
  1: /* include/linux/kobject.h, line 123 */
-
  2: struct kset_uevent_ops {
-
  3:     int (* const filter)(struct kset *kset, struct kobject *kobj);
-
  4:     const char *(* const name)(struct kset *kset, struct kobject *kobj);
-
  5:     int (* const uevent)(struct kset *kset, struct kobject *kobj,
-
  6:                         struct kobj_uevent_env *env);
-
  7: };
-
+```
 kset_uevent_ops是为kset量身订做的一个数据结构，里面包含filter和uevent两个回调函数，用处如下：
 
 > filter，当任何Kobject需要上报uevent时，它所属的kset可以通过该接口过滤，阻止不希望上报的event，从而达到从整体上管理的目的。
@@ -141,27 +110,18 @@ kset_uevent_ops是为kset量身订做的一个数据结构，里面包含filter�
 ##### 3.3 内部动作
 
 通过kobject.h，uevent模块提供了如下的API（这些API的实现是在"lib/kobject_uevent.c”文件中）：
-
+```cpp
  1: /* include/linux/kobject.h, line 206 */
-
  2: int kobject_uevent(struct kobject *kobj, enum kobject_action action);
-
  3: int kobject_uevent_env(struct kobject *kobj, enum kobject_action action,
-
  4:                         char *envp[]);
-
  5:  
-
  6: __printf(2, 3)
-
  7: int add_uevent_var(struct kobj_uevent_env *env, const char *format, ...);
-
  8:  
-
  9: int kobject_action_type(const char *buf, size_t count,
-
  10:                         enum kobject_action *type);
-
+```
 > kobject_uevent_env，以envp为环境变量，上报一个指定action的uevent。环境变量的作用是为执行用户空间程序指定运行环境。具体动作如下：
 > 
 > - 查找kobj本身或者其parent是否从属于某个kset，如果不是，则报错返回（注2：由此可以说明，如果一个kobject没有加入kset，是不允许上报uevent的）
@@ -193,7 +153,7 @@ _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http:/
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [设备模型](http://www.wowotech.net/tag/%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B) [Uevent](http://www.wowotech.net/tag/Uevent)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [蓝牙协议中LQ和RSSI的原理及应用场景](http://www.wowotech.net/bluetooth/lqi_rssi.html) | [调试手段之sys节点](http://www.wowotech.net/linux_application/15.html)»
 

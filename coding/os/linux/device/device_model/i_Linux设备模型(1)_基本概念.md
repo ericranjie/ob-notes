@@ -49,7 +49,7 @@ _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http:/
 
 标签: [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [设备模型](http://www.wowotech.net/tag/%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B) [Device](http://www.wowotech.net/tag/Device) [Model](http://www.wowotech.net/tag/Model) [驱动开发](http://www.wowotech.net/tag/%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux设备模型(2)_Kobject](http://www.wowotech.net/device_model/kobject.html) | [Linux内核的整体架构](http://www.wowotech.net/linux_kenrel/11.html)»
 

@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
+                "file": "coding/os/linux/device/bluetooth/玩转BLE(3)_使用微信蓝牙精简协议伪造记步数据.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
+                "file": "coding/os/linux/device/bluetooth/玩转BLE(3)_使用微信蓝牙精简协议伪造记步数据.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
+                "file": "coding/os/linux/device/bluetooth/玩转BLE(3)_使用微信蓝牙精简协议伪造记步数据.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md"
+                "file": "coding/os/linux/device/bluetooth/玩转BLE(3)_使用微信蓝牙精简协议伪造记步数据.md"
               }
             }
           }
@@ -148,9 +148,14 @@
   },
   "active": "24e3f17feddf85ca",
   "lastOpenFiles": [
+    "coding/os/linux/device/device_model/Linux设备模型(5)_device和device driver.md",
+    "coding/os/linux/device/device_model/i_Linux设备模型(4)_sysfs.md",
+    "README.md",
+    "coding/os/linux/device/device_model/i_Linux设备模型(3)_Uevent.md",
+    "coding/os/linux/device/device_model/k_Linux设备模型(2)_Kobject.md",
+    "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
     "coding/os/linux/device/bn_学习下 eMMC.md",
     "coding/os/linux/device/a_中断唤醒系统流程.md",
-    "README.md",
     "zx99-image/Pasted image 20241003223815.png",
     "coding/os/linux/network/TCP/b_Google的TCP BBR拥塞控制算法深度解析.md",
     "zx99-image/Pasted image 20241003224039.png",
@@ -180,11 +185,6 @@
     "coding/os/linux/network/d_以太网驱动的流程浅析(二)-Ifconfig的详细代码流程.md",
     "coding/os/linux/network/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
     "interview/kn_这些年背过的面试题——网络和操作系统基础篇.md",
-    "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
-    "coding/cpp/grammar/pointer/k_如何正确的理解指针和结构体指针、指针函数、函数指针这些东西？.md",
-    "interview/a_C语言与C++面试知识总结.md",
-    "auxiliary/test/alloctor.md",
-    "coding/cpp/grammar/a_终极 C++避坑指南.md",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",

@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-3-7 0:25 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
@@ -59,37 +43,23 @@ Ktype代表Kobject（严格地讲，是包含了Kobject的数据结构）的属�
 Kset是一个特殊的Kobject（因此它也会在"/sys/“文件系统中以目录的形式出现），它用来集合相似的Kobject（这些Kobject可以是相同属性的，也可以不同属性的）。
 
 - 首先看一下Kobject的原型
-
+```cpp
  1: /* Kobject: include/linux/kobject.h line 60 */
-
  2: struct kobject {
-
  3:     const char *name;
-
  4:     struct list_head    entry;
-
  5:     struct kobject      *parent;
-
  6:     struct kset     *kset;
-
  7:     struct kobj_type    *ktype;
-
  8:     struct sysfs_dirent *sd;
-
  9:     struct kref     kref;
-
  10:    unsigned int state_initialized:1;
-
  11:    unsigned int state_in_sysfs:1;
-
  12:    unsigned int state_add_uevent_sent:1;
-
  13:    unsigned int state_remove_uevent_sent:1;
-
  14:    unsigned int uevent_suppress:1;
-
  15: };
-
+```
 > name，该Kobject的名称，同时也是sysfs中的目录名称。由于Kobject添加到Kernel时，需要根据名字注册到sysfs中，之后就不能再直接修改该字段。如果需要修改Kobject的名字，需要调用kobject_rename接口，该接口会主动处理sysfs的相关事宜。
 > 
 > entry，用于将Kobject加入到Kset中的list_head。
@@ -115,45 +85,32 @@ Kset是一个特殊的Kobject（因此它也会在"/sys/“文件系统中以目
 > 注4：Uevent提供了“用户空间通知”的功能实现，通过该功能，当内核中有Kobject的增加、删除、修改等动作时，会通知用户空间。有关该功能的具体内容，会在其它文章详细描述。
 
 - Kset的原型为
-
+```cpp
  1: /* include/linux/kobject.h, line 159 */
-
  2: struct kset {
-
  3:     struct list_head list;
-
  4:     spinlock_t list_lock;
-
  5:     struct kobject kobj;
-
  6:     const struct kset_uevent_ops *uevent_ops;
-
  7: };
+```
+list/list_lock，用于保存该kset下所有的kobject的链表。
 
-> list/list_lock，用于保存该kset下所有的kobject的链表。
-> 
-> kobj，该kset自己的kobject（kset是一个特殊的kobject，也会在sysfs中以目录的形式体现）。
-> 
-> uevent_ops，该kset的uevent操作函数集。当任何Kobject需要上报uevent时，都要调用它所从属的kset的uevent_ops，添加环境变量，或者过滤event（kset可以决定哪些event可以上报）。因此，如果一个kobject不属于任何kset时，是不允许发送uevent的。
+kobj，该kset自己的kobject（kset是一个特殊的kobject，也会在sysfs中以目录的形式体现）。
+
+uevent_ops，该kset的uevent操作函数集。当任何Kobject需要上报uevent时，都要调用它所从属的kset的uevent_ops，添加环境变量，或者过滤event（kset可以决定哪些event可以上报）。因此，如果一个kobject不属于任何kset时，是不允许发送uevent的。
 
 - Ktype的原型为
-
+```cpp
  1: /* include/linux/kobject.h, line 108 */
-
  2: struct kobj_type {
-
  3:     void (*release)(struct kobject *kobj);
-
  4:     const struct sysfs_ops *sysfs_ops;
-
  5:     struct attribute **default_attrs;
-
  6:     const struct kobj_ns_type_operations *(*child_ns_type)(struct kobject *kobj);
-
  7:     const void *(*namespace)(struct kobject *kobj);
-
  8: };
-
+```
 > release，通过该回调函数，可以将包含该种类型kobject的数据结构的内存空间释放掉。
 > 
 > sysfs_ops，该种类型的Kobject的sysfs文件系统接口。
@@ -162,11 +119,9 @@ Kset是一个特殊的Kobject（因此它也会在"/sys/“文件系统中以目
 > 
 > child_ns_type/namespace，和文件系统（sysfs）的命名空间有关，这里不再详细说明。
 
-|   |
-|---|
-|**总结，Ktype以及整个Kobject机制的理解。  <br>**Kobject的核心功能是：保持一个引用计数，当该计数减为0时，自动释放（由本文所讲的kobject模块负责） Kobject所占用的meomry空间。这就决定了Kobject必须是动态分配的（只有这样才能动态释放）。  <br>  <br>而Kobject大多数的使用场景，是内嵌在大型的数据结构中（如Kset、device_driver等），因此这些大型的数据结构，也必须是动态分配、动态释放的。那么释放的时机是什么呢？是内嵌的Kobject释放时。但是Kobject的释放是由Kobject模块自动完成的（在引用计数为0时），那么怎么一并释放包含自己的大型数据结构呢？  <br>  <br>这时Ktype就派上用场了。我们知道，Ktype中的release回调函数负责释放Kobject（甚至是包含Kobject的数据结构）的内存空间，那么Ktype及其内部函数，是由谁实现呢？是由上层数据结构所在的模块！因为只有它，才清楚Kobject嵌在哪个数据结构中，并通过Kobject指针以及自身的数据结构类型，找到需要释放的上层数据结构的指针，然后释放它。  <br>  <br>讲到这里，就清晰多了。所以，每一个内嵌Kobject的数据结构，例如kset、device、device_driver等等，都要实现一个Ktype，并定义其中的回调函数。同理，sysfs相关的操作也一样，必须经过ktype的中转，因为sysfs看到的是Kobject，而真正的文件操作的主体，是内嵌Kobject的上层数据结构！  <br>  <br>  <br>顺便提一下，Kobject是面向对象的思想在Linux kernel中的极致体现，但C语言的优势却不在这里，所以Linux kernel需要用比较巧妙（也很啰嗦）的手段去实现，|
-
-  
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **总结，Ktype以及整个Kobject机制的理解。  <br>**Kobject的核心功能是：保持一个引用计数，当该计数减为0时，自动释放（由本文所讲的kobject模块负责） Kobject所占用的meomry空间。这就决定了Kobject必须是动态分配的（只有这样才能动态释放）。  <br>  <br>而Kobject大多数的使用场景，是内嵌在大型的数据结构中（如Kset、device_driver等），因此这些大型的数据结构，也必须是动态分配、动态释放的。那么释放的时机是什么呢？是内嵌的Kobject释放时。但是Kobject的释放是由Kobject模块自动完成的（在引用计数为0时），那么怎么一并释放包含自己的大型数据结构呢？  <br>  <br>这时Ktype就派上用场了。我们知道，Ktype中的release回调函数负责释放Kobject（甚至是包含Kobject的数据结构）的内存空间，那么Ktype及其内部函数，是由谁实现呢？是由上层数据结构所在的模块！因为只有它，才清楚Kobject嵌在哪个数据结构中，并通过Kobject指针以及自身的数据结构类型，找到需要释放的上层数据结构的指针，然后释放它。  <br>  <br>讲到这里，就清晰多了。所以，每一个内嵌Kobject的数据结构，例如kset、device、device_driver等等，都要实现一个Ktype，并定义其中的回调函数。同理，sysfs相关的操作也一样，必须经过ktype的中转，因为sysfs看到的是Kobject，而真正的文件操作的主体，是内嵌Kobject的上层数据结构！  <br>  <br>  <br>顺便提一下，Kobject是面向对象的思想在Linux kernel中的极致体现，但C语言的优势却不在这里，所以Linux kernel需要用比较巧妙（也很啰嗦）的手段去实现， |
 
 ##### 3.3 功能分析
 
@@ -188,25 +143,17 @@ Kobject大多数情况下（有一种例外，下面会讲）会嵌在其它数�
 前面讲过，Kobject必须动态分配，而不能静态定义或者位于堆栈之上，它的分配方法有两种。
 
 1. 通过kmalloc自行分配（一般是跟随上层数据结构分配），并在初始化后添加到kernel。这种方法涉及如下接口：
-
+```cpp
  1: /* include/linux/kobject.h, line 85 */
-
  2: extern void kobject_init(struct kobject *kobj, struct kobj_type *ktype);
-
  3: extern __printf(3, 4) __must_check
-
  4: int kobject_add(struct kobject *kobj, struct kobject *parent,
-
  5:                 const char *fmt, ...);
-
  6: extern __printf(4, 5) __must_check
-
  7: int kobject_init_and_add(struct kobject *kobj,
-
  8:             struct kobj_type *ktype, struct kobject *parent,
-
  9:             const char *fmt, ...);
-
+```
 > kobject_init，初始化通过kmalloc等内存分配函数获得的struct kobject指针。主要执行逻辑为：
 > 
 > - 确认kobj和ktype不为空
@@ -240,37 +187,23 @@ Kobject大多数情况下（有一种例外，下面会讲）会嵌在其它数�
 2. 使用kobject_create创建
 
 Kobject模块可以使用kobject_create自行分配空间，并内置了一个ktype（dynamic_kobj_ktype），用于在计数为0是释放空间。代码如下：
-
+```cpp
  1: /* include/linux/kobject.h, line 96 */
-
  2: extern struct kobject * __must_check kobject_create(void);
-
  3: extern struct kobject * __must_check kobject_create_and_add(const char *name,
-
  4:             struct kobject *parent);
-
  1: /* lib/kobject.c, line 605 */
-
  2: static void dynamic_kobj_release(struct kobject *kobj)
-
  3: {
-
  4:     pr_debug("kobject: (%p): %s\n", kobj, __func__);
-
  5:     kfree(kobj);
-
  6: }
-
  7:  
-
  8: static struct kobj_type dynamic_kobj_ktype = {
-
  9:     .release    = dynamic_kobj_release,
-
  10:    .sysfs_ops  = &kobj_sysfs_ops,
-
  11: };
-
+```
 > kobject_create，该接口为kobj分配内存空间，并以dynamic_kobj_ktype为参数，调用kobject_init接口，完成后续的初始化操作。
 > 
 > kobject_create_and_add，是kobject_create和kobject_add的组合，不再说明。
@@ -280,13 +213,11 @@ Kobject模块可以使用kobject_create自行分配空间，并内置了一个kt
 **3.3.3 Kobject引用计数的修改**
 
 通过kobject_get和kobject_put可以修改kobject的引用计数，并在计数为0时，调用ktype的release接口，释放占用空间。
-
+```cpp
  1: /* include/linux/kobject.h, line 103 */
-
  2: extern struct kobject *kobject_get(struct kobject *kobj);
-
  3: extern void kobject_put(struct kobject *kobj);
-
+```
 > kobject_get，调用kref_get，增加引用计数。
 > 
 > kobject_put，以内部接口kobject_release为参数，调用kref_put。kref模块会在引用计数为零时，调用kobject_release。
@@ -306,21 +237,15 @@ Kobject模块可以使用kobject_create自行分配空间，并内置了一个kt
 **3.3.4 Kset的初始化、注册**
 
 Kset是一个特殊的kobject，因此其初始化、注册等操作也会调用kobject的相关接口，除此之外，会有它特有的部分。另外，和Kobject一样，kset的内存分配，可以由上层软件通过kmalloc自行分配，也可以由Kobject模块负责分配，具体如下。
-
+```cpp
  1: /* include/linux/kobject.h, line 166 */
-
  2: extern void kset_init(struct kset *kset);
-
  3: extern int __must_check kset_register(struct kset *kset);
-
  4: extern void kset_unregister(struct kset *kset);
-
  5: extern struct kset * __must_check kset_create_and_add(const char *name,
-
  6:             const struct kset_uevent_ops *u,
-
  7:             struct kobject *parent_kobj);
-
+```
 > kset_init，该接口用于初始化已分配的kset，主要包括调用kobject_init_internal初始化其kobject，然后初始化kset的链表。需要注意的时，如果使用此接口，上层软件必须提供该kset中的kobject的ktype。
 > 
 > kset_register，先调用kset_init，然后调用kobject_add_internal将其kobject添加到kernel。
@@ -337,7 +262,7 @@ _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http:/
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [设备模型](http://www.wowotech.net/tag/%E8%AE%BE%E5%A4%87%E6%A8%A1%E5%9E%8B) [kobject](http://www.wowotech.net/tag/kobject) [ktype](http://www.wowotech.net/tag/ktype) [kset](http://www.wowotech.net/tag/kset)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [调试手段之sys节点](http://www.wowotech.net/linux_application/15.html) | [Linux设备模型(1)_基本概念](http://www.wowotech.net/device_model/13.html)»
 
