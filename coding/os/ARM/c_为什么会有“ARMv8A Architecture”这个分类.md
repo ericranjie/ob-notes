@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-12-6 15:40 分类：[ARMv8A Arch](http://www.wowotech.net/sort/armv8a_arch)
 
 2013年9月11日（是的，911），在ARM公司发布UEFI 64-bit之后，ARM社区release了ARMv8A版本的ARM Architecture Reference Manual（我已经下载，感兴趣的同学可以找我要）。在[release note](http://community.arm.com/groups/processors/blog/2013/10/09/arm-architecture-reference-manual-for-armv8-a-64-bit-publicly-released)中，作者给出了这样一个设问句：“Why develop ARMv8-A?”。本文也效仿一下，以自问自答的形式，说明为什么会在博客中增加这样一个分类，以及期望达成的目的。
@@ -37,7 +20,7 @@
 
 标签: [Architecture](http://www.wowotech.net/tag/Architecture) [arm64](http://www.wowotech.net/tag/arm64) [aarch64](http://www.wowotech.net/tag/aarch64) [armv8-a](http://www.wowotech.net/tag/armv8-a)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux时间子系统之（十六）：clockevent](http://www.wowotech.net/timer_subsystem/clock-event.html) | [kobject在字符设备中的使用](http://www.wowotech.net/116.html)»
 

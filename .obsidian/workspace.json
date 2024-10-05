@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md",
+                "file": "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md",
+                "file": "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md",
+                "file": "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md"
+                "file": "coding/os/linux/memory/深入理解Linux内核页表映射分页机制原理.md"
               }
             }
           }
@@ -161,26 +161,34 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
+    "coding/os/linux/memory/a_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
+    "coding/os/linux/memory/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "coding/os/FreeRTOS/k_FreeRTOS学习笔记 基础知识体系梳理.md",
+    "zx99-image/Pasted image 20241006071713.png",
+    "zx99-image/Pasted image 20241006071850.png",
+    "zx99-image/Pasted image 20241006071833.png",
+    "zx99-image/Pasted image 20241006071826.png",
+    "zx99-image/Pasted image 20241006071813.png",
+    "zx99-image/Pasted image 20241006071808.png",
+    "zx99-image/Pasted image 20241006071758.png",
+    "zx99-image/Pasted image 20241006071733.png",
+    "zx99-image/Pasted image 20241006071725.png",
+    "coding/os/ARM/c_为什么会有“ARMv8A Architecture”这个分类.md",
+    "coding/os/ARM/init/b_ARM64的启动过程之（一）：内核第一个脚印.md",
+    "coding/os/ARM/init/b_ARM64的启动过程之（二）：创建启动阶段的页表.md",
+    "coding/compiler/b_编译乱序(Compiler Reordering).md",
+    "coding/compiler/k_利用Makfile给多文件、多目录C源码建立工程.md",
+    "README.md",
     "auxiliary/self-improvement/hair/hair-quote.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "interview/c_华为OD笔试面试参考.md",
     "coding/coding-quote.md",
     "zx99-image/Pasted image 20241005155350.png",
     "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
-    "zx99-image/Pasted image 20241005114209.png",
-    "zx99-image/Pasted image 20241005114311.png",
     "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
-    "zx99-image/Pasted image 20241005114447.png",
-    "zx99-image/Pasted image 20241005114443.png",
-    "zx99-image/Pasted image 20241005114438.png",
-    "zx99-image/Pasted image 20241005114433.png",
-    "zx99-image/Pasted image 20241005114428.png",
-    "zx99-image/Pasted image 20241005114416.png",
-    "zx99-image/Pasted image 20241005114407.png",
     "coding/reverse-engineering/k_浅谈编译器对代码的优化.md",
     "coding/reverse-engineering/i_链接加载原理及ELF文件格式.md",
-    "README.md",
     "coding/reverse-engineering/bn_内核、容器与eBPF攻防初探.md",
     "coding/reverse-engineering/n_内核学习-异常处理(win).md",
     "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
@@ -190,14 +198,6 @@
     "coding/reverse-engineering/kn_一文搞懂  ARM MMU.md",
     "coding/reverse-engineering/kn_Kernel从0开始.md",
     "coding/os/linux/debug/bn_问题排查利器：Linux 原生跟踪工具 Ftrace 必知必会.md",
-    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
-    "coding/os/linux/debug/bn_Linux内核 Netlink机制分析与使用.md",
-    "coding/os/linux/debug/p_冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
-    "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
-    "coding/os/linux/debug/trace/k_ftrace时间精度issue修复.md",
-    "coding/os/linux/debug/KFENCE/k_Linux Kfence 详解.md",
-    "coding/os/linux/debug/GDB/p_使用 GDB + Qemu 调试 Linux 内核.md",
-    "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
