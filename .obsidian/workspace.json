@@ -11,13 +11,28 @@
             "id": "21d9fe15fdd168c6",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241005114209.png"
+                "file": "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "e2d90085bd089a6c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "interview/c_华为OD笔试面试参考.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -46,7 +61,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#1、正常UAF",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -83,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241005114209.png",
+                "file": "interview/c_华为OD笔试面试参考.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241005114209.png",
+                "file": "interview/c_华为OD笔试面试参考.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241005114209.png"
+                "file": "interview/c_华为OD笔试面试参考.md"
               }
             }
           }
@@ -146,6 +161,11 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/coding-quote.md",
+    "interview/c_华为OD笔试面试参考.md",
+    "zx99-image/Pasted image 20241005155350.png",
+    "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
+    "zx99-image/Pasted image 20241005114209.png",
     "zx99-image/Pasted image 20241005114311.png",
     "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
     "zx99-image/Pasted image 20241005114447.png",
@@ -155,9 +175,6 @@
     "zx99-image/Pasted image 20241005114428.png",
     "zx99-image/Pasted image 20241005114416.png",
     "zx99-image/Pasted image 20241005114407.png",
-    "zx99-image/Pasted image 20241005114400.png",
-    "zx99-image/Pasted image 20241005114354.png",
-    "zx99-image/Pasted image 20241005114340.png",
     "coding/reverse-engineering/k_浅谈编译器对代码的优化.md",
     "coding/reverse-engineering/i_链接加载原理及ELF文件格式.md",
     "README.md",
@@ -180,8 +197,6 @@
     "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
     "coding/os/linux/device/kn_libdrm-modetest 原理及图显系统验证方法.md",
     "coding/os/linux/device/kn_Linux V4L2子系统与视频编解码设备介绍.md",
-    "coding/os/linux/device/i_Linux reset framework.md",
-    "coding/os/linux/device/i_基于Hikey的 Boot from USB 调试.md",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
