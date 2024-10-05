@@ -11,9 +11,11 @@
             "id": "21d9fe15fdd168c6",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241004194221.png"
+                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241004194221.png",
+                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241004194221.png",
+                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241004194221.png"
+                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md"
               }
             }
           }
@@ -144,8 +146,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "21d9fe15fdd168c6",
   "lastOpenFiles": [
+    "coding/reverse-engineering/bn_16位实模式切换32位保护模式过程详解.md",
+    "zx99-image/Pasted image 20241004194221.png",
     "coding/reverse-engineering/bn_高Glibc版本下的堆骚操作解析.md",
     "zx99-image/Pasted image 20241004202413.png",
     "zx99-image/Pasted image 20241004202218.png",
@@ -159,7 +163,6 @@
     "coding/os/linux/debug/bn_问题排查利器：Linux 原生跟踪工具 Ftrace 必知必会.md",
     "README.md",
     "zx99-image/Pasted image 20241004194309.png",
-    "zx99-image/Pasted image 20241004194221.png",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
     "coding/os/linux/debug/bn_Linux内核 Netlink机制分析与使用.md",
     "coding/os/linux/debug/p_冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
