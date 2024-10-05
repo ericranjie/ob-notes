@@ -1,9 +1,5 @@
-# 
-
 原创 baron 人人极客社区
-
  _2022年02月23日 08:28_
-
 ## MMU概念介绍
 
 MMU分为两个部分: TLB maintenance 和 address translation
@@ -90,9 +86,7 @@ translation tables为每一块region(entry)都定义了一个memory attributes�
 参考 ：SCTLR_EL1.WXN、SCTLR.UWXN![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)执行权限:
 
 - non-executable (Execute Never (XN))
-    
 - The Unprivileged Execute Never (UXN)
-    
 - Privileged Execute Never (PXN)
     
 
@@ -101,7 +95,6 @@ translation tables为每一块region(entry)都定义了一个memory attributes�
 MMU(address translation /TLB maintenance)、cache maintenance相关的寄存器
 
 1. address translation
-    
 
 address translation 共计14个寄存器
 
@@ -127,70 +120,45 @@ TLB maintenance数十个寄存器
 **TTBR0_ELx TTBR1_ELx**
 
 (aarch64)
-
 - TTBR0_EL1
-    
 - TTBR0_EL2
-    
 - TTBR0_EL3
-    
 - TTBR1_EL1
-    
 - VTTBR_EL2
     
 
 (aarch32)
-
 - TTBR0
-    
 - TTBR1
-    
 - HTTBR
-    
 - VTTBR
     
 
 **TCR_ELx**
 
 (aarch64)
-
 - TCR_EL1
-    
 - TCR_EL2
-    
 - TCR_EL3
-    
 - VTCR_EL2
     
-
 (aarch32)
-
 - TTBCR(NS)
-    
 - HTCR
-    
 - TTBCR(S)
-    
 - VTCR
     
-
 **MAIR_ELx**
-
 - MAIR_EL1
-    
 - MAIR_EL2
-    
 - MAIR_EL3
     
 
 ## 系统寄存器 — TCR寄存器介绍
 
 在ARM Core中(aarch64)，还有几个相关的系统寄存器:
-
 - TCR_EL1 banked
-    
 - TCR_EL2
-    
 - TCR_EL3
     
 
@@ -199,13 +167,8 @@ TLB maintenance数十个寄存器
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. T1SZ、T0SZ
-    
-
 - T1SZ, bits [21:16] 通过TTBR1寻址的内存区域的大小偏移量，也就是TTBR1基地址下的一级页表的大小
-    
 - T0SZ, bits [5:0]
-    
-
 2. ORGN1、IRGN1、ORGN0、IRGN0
     
 

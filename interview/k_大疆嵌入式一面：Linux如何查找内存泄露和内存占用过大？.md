@@ -1,20 +1,9 @@
-# 
-
 Original 往事敬秋风 深度Linux
-
  _2024年08月23日 09:10_ _湖南_
 
 作为程序员，最常见的就是排查内存泄漏，不过我们一般的内存泄漏是针对特定的程序去排查，相对来说比较容易,但是如果是维护人员，不知道哪个程序有内存泄漏,甚至是应用程序的内存泄漏，还是内核的内存泄漏都不明确，所以一定要有一定的查内存泄漏的章法。
 
-![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
-
-**深度Linux**
-
 拥有15年项目开发经验及丰富教学经验，曾就职国内知名企业项目经理，部门负责人等职务。研究领域：Windows&Linux平台C/C++后端开发、Linux系统内核等技术。
-
-183篇原创内容
-
-公众号
 
 (1)内存泄漏是什么？
 
@@ -98,10 +87,9 @@ pidstat 基本说明如下：
     
 - T { TASK | CHILD | ALL }
     
-
 假如我们观察到如下的内存占用情况：`pidstat -r -p pid 5`
 
-```
+```c
 [root@VM-0-2-centos ~]# pidstat -r -p 5981 5Linux 3.10.0-1127.19.1.el7.x86_64 (VM-0-2-centos)   07/24/2021  _x86_64_    (1 CPU)06:25:55 PM   UID       PID  minflt/s  majflt/s     VSZ    RSS   %MEM  Command06:26:00 PM     0      5981      0.20      0.00    4416    352   0.02  a.out06:26:05 PM     0      5981      0.00      0.00    4416    352   0.02  a.out06:26:10 PM     0      5981      0.20      0.00    4456    352   0.02  a.out06:26:15 PM     0      5981      0.00      0.00    4456    352   0.02  a.out06:26:20 PM     0      5981      0.00      0.00    4456    352   0.02  a.out06:26:25 PM     0      5981      0.20      0.00    4496    352   0.02  a.out06:26:30 PM     0      5981      0.00      0.00    4496    352   0.02  a.out06:26:35 PM     0      5981      0.20      0.00    4536    352   0.02  a.out06:26:40 PM     0      5981      0.00      0.00    4536    352   0.02  a.out06:26:45 PM     0      5981      0.20      0.00    4576    352   0.02  a.out06:26:50 PM     0      5981      0.00      0.00    4576    352   0.02  a.out06:26:55 PM     0      5981      0.20      0.00    4616    352   0.02  a.out 
 ```
 
@@ -111,13 +99,13 @@ pidstat 基本说明如下：
 
 我们来分析这个进程的内存分布情况，来分析这泄露的内存有什么特点：
 
-```
+```c
 [root@VM-0-2-centos ~]# pmap -x 59815981:   ./a.outAddress           Kbytes     RSS   Dirty Mode  Mapping0000000000400000       4       4       0 r-x-- a.out0000000000600000       4       4       4 r---- a.out0000000000601000       4       4       4 rw--- a.out00007faab436e000    2720     272     272 rw---   [ anon ]00007faab4616000    1804     260       0 r-x-- libc-2.17.so00007faab47d9000    2048       0       0 ----- libc-2.17.so00007faab49d9000      16      16      16 r---- libc-2.17.so00007faab49dd000       8       8       8 rw--- libc-2.17.so00007faab49df000      20      12      12 rw---   [ anon ]00007faab49e4000     136     108       0 r-x-- ld-2.17.so00007faab4a06000    2012     212     212 rw---   [ anon ]00007faab4c03000       8       8       8 rw---   [ anon ]00007faab4c05000       4       4       4 r---- ld-2.17.so00007faab4c06000       4       4       4 rw--- ld-2.17.so00007faab4c07000       4       4       4 rw---   [ anon ]00007ffe0f3f5000     132      16      16 rw---   [ stack ]00007ffe0f47c000       8       4       0 r-x--   [ anon ]ffffffffff600000       4       0       0 r-x--   [ anon ]---------------- ------- ------- ------- total kB            8940     940     564
 ```
 
 其中Address为开始的地址，Kbytes是虚拟内存的大小，RSS为真实内存的大小，Dirty为未同步到磁盘上的脏页，Mode为内存的权限，rw为可写可读，rx为可读和可执行。通过几次观察，我们发现：
 
-```
+```c
 00007faab436e000    2720     272     272 rw---   [ anon ]
 ```
 
@@ -125,20 +113,29 @@ pidstat 基本说明如下：
 
 此时还是只能大概知道内存泄露的位置，我们还先找到具体的代码位置，这个该怎么分析？代码的申请，无非是通过malloc和brk这些库函数进行内存调用，我们可以用strace跟踪下。
 
-```
+```c
 [root@VM-0-2-centos ~]# strace -f -t -p 5981 -o trace.stracestrace: Process 5981 attachedstrace: Process 8519 attachedstrace: Process 8533 attachedstrace: Process 8547 attachedstrace: Process 8557 attachedstrace: Process 8575 attached^Cstrace: Process 5981 detached
 ```
 
 我们通过-t选项来显示时间，-f来跟踪子进程。直接用cat命令查看跟踪的文件内容，会发现内容相当多，只要是系统调用都打印了出来，可以通过每次增加40k这个有用的信息搜索下：
 
-```
+```c
 [root@VM-0-2-centos ~]# grep 40960  trace.strace 5981  19:01:44 mmap(NULL, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7faab403a0005981  19:01:55 mmap(NULL, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7faab40300005981  19:02:06 mmap(NULL, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7faab40260005981  19:02:17 mmap(NULL, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7faab401c0005981  19:02:28 mmap(NULL, 40960, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0) = 0x7faab4012000
 ```
 
 至此我们找到了具体的泄露代码位置。看下这个测试代码：
 
-```
-#include <stdio.h>#include <unistd.h>#include <sys/mman.h>#include <sys/types.h>#include <sys/wait.h>#define _SCHED_H #define __USE_GNU #include <bits/sched.h> #define STACK_SIZE 40960 int func(void *arg){    printf("thread enter.\n");    sleep(1);    printf("thread exit.\n");     return 0;}int main(){    int thread_pid;    int status;    int w;     while (1) {        void *addr = mmap(NULL, STACK_SIZE, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0);        if (addr == NULL) {            perror("mmap");            goto error;        }        printf("creat new thread...\n");        thread_pid = clone(&func, addr + STACK_SIZE, CLONE_SIGHAND|CLONE_FS|CLONE_VM|CLONE_FILES, NULL);        printf("Done! Thread pid: %d\n", thread_pid);        if (thread_pid != -1) {            do {                w = waitpid(-1, NULL, __WCLONE | __WALL);                if (w == -1) {                    perror("waitpid");                    goto error;                }            } while (!WIFEXITED(status) && !WIFSIGNALED(status));        }        sleep(10);   } error:    return 0;}
+```c
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#define _SCHED_H 
+#define __USE_GNU 
+#include <bits/sched.h> 
+#define STACK_SIZE 40960 
+int func(void *arg){    printf("thread enter.\n");    sleep(1);    printf("thread exit.\n");     return 0;}int main(){    int thread_pid;    int status;    int w;     while (1) {        void *addr = mmap(NULL, STACK_SIZE, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS|MAP_STACK, -1, 0);        if (addr == NULL) {            perror("mmap");            goto error;        }        printf("creat new thread...\n");        thread_pid = clone(&func, addr + STACK_SIZE, CLONE_SIGHAND|CLONE_FS|CLONE_VM|CLONE_FILES, NULL);        printf("Done! Thread pid: %d\n", thread_pid);        if (thread_pid != -1) {            do {                w = waitpid(-1, NULL, __WCLONE | __WALL);                if (w == -1) {                    perror("waitpid");                    goto error;                }            } while (!WIFEXITED(status) && !WIFSIGNALED(status));        }        sleep(10);   } error:    return 0;}
 ```
 
 这个测试程序利用mmap申请一块匿名私有的内存，clone为系统函数，pthread_create 和fork底层都是调用它，用来创建进程/线程，将func的地址指针存放在子进程堆栈的某个位置处，该位置就是该封装函数本身返回地址存放的位置，最后一个参数为func的执行参数。clone可以更灵活控制共享，比如可以控制是否共享内存空间，是否共享打开文件，是否共享相同的信号处理函数等。
@@ -152,23 +149,16 @@ pidstat 基本说明如下：
 > 我们平时开发过程中不可避免的会遇到内存泄漏问题，这是常见的问题。既然发生了内存泄漏，我们就要排查内存泄漏的问题。想必大家也经常会用到以下排查内存问题的工具，如下：
 
 - memwatch
-    
 - mtrace
-    
 - dmalloc
-    
 - ccmalloc
-    
 - valgrind
-    
 - debug_new
-    
-
 ## 四、valgrind 分析程序内存泄露
 
 这个是比较常见的方法，一般通过下面命令来查看内存泄露：
 
-```
+```c
 valgrind --tool=memcheck --leak-check=full ./b[root@VM-0-2-centos test]# valgrind --tool=memcheck --leak-check=full ./b==14374== Memcheck, a memory error detector==14374== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.==14374== Using Valgrind-3.15.0 and LibVEX; rerun with -h for copyright info==14374== Command: ./b==14374== ==14374== Warning: set address range perms: large range [0x5205040, 0x24605040) (undefined)address:0x5205040==14374== Warning: set address range perms: large range [0x5205040, 0x24605040) (defined)524288000==14374== ==14374== HEAP SUMMARY:==14374==     in use at exit: 524,288,000 bytes in 1 blocks==14374==   total heap usage: 1 allocs, 0 frees, 524,288,000 bytes allocated==14374== ==14374== 524,288,000 bytes in 1 blocks are possibly lost in loss record 1 of 1==14374==    at 0x4C29F73: malloc (vg_replace_malloc.c:309)==14374==    by 0x400675: main (test.c:17)==14374== ==14374== LEAK SUMMARY:==14374==    definitely lost: 0 bytes in 0 blocks==14374==    indirectly lost: 0 bytes in 0 blocks==14374==      possibly lost: 524,288,000 bytes in 1 blocks==14374==    still reachable: 0 bytes in 0 blocks==14374==         suppressed: 0 bytes in 0 blocks
 ```
 
@@ -191,14 +181,15 @@ ASan在编译时通过插入额外的代码来动态地检测程序运行过程�
 - 可选择-O1或者更高的优化级别编译
     
 
-```
+```c
 gcc -fsanitize=address -o main -g main.c 
 ```
 
 案例分析：
 
-```
-#include <iostream>int main() {    int* arr = new int[5];    // 内存访问错误 - 越界访问数组    for (int i = 0; i <= 5; ++i) {        arr[i] = i;    }    delete[] arr;    return 0;}
+```c
+#include <iostream>
+int main() {    int* arr = new int[5];    // 内存访问错误 - 越界访问数组    for (int i = 0; i <= 5; ++i) {        arr[i] = i;    }    delete[] arr;    return 0;}
 ```
 
 在使用ASan进行编译和运行时，你可以按照以下步骤：
@@ -209,13 +200,13 @@ gcc -fsanitize=address -o main -g main.c
 
 （3）执行以下命令来编译程序，并启用ASan工具：
 
-```
+```c
 clang++ -fsanitize=address -g main.cpp -o test
 ```
 
 （4）运行生成的可执行文件：
 
-```
+```c
 ./test
 ```
 
@@ -225,7 +216,7 @@ clang++ -fsanitize=address -g main.cpp -o test
 
 其实上面的内存泄露是我们知道了具体的泄露的进程，然后再做详细分析。那么如果不知道哪里内存泄露了，有什么办法，可以通过分析meminfo文件，来观察泄露的类型。
 
-```
+```c
 [root@VM-0-2-centos test]# cat /proc/meminfoMemTotal:        1882008 kBMemFree:          752948 kBMemAvailable:    1610108 kBBuffers:          564900 kBCached:           399584 kBSwapCached:            0 kBActive:           808140 kBInactive:         220812 kBActive(anon):      64548 kBInactive(anon):      488 kBActive(file):     743592 kBInactive(file):   220324 kBUnevictable:           0 kBMlocked:               0 kBSwapTotal:             0 kBSwapFree:              0 kB....
 ```
 
@@ -234,48 +225,30 @@ clang++ -fsanitize=address -g main.cpp -o test
 meminfo文件包含的主要信息及其含义如下：
 
 - ‌MemTotal‌：系统总内存大小。
-    
 - ‌MemFree‌：系统空闲内存大小。
-    
 - ‌MemAvailable‌：可用内存大小，包括空闲内存和缓存。
-    
 - ‌Buffers‌：用于缓存数据的内存大小。
-    
 - ‌Cached‌：用于缓存文件系统的内存大小。
-    
 - ‌SwapCached‌：用于缓存交换分区的内存大小。
     
 - ‌Active‌ 和 ‌Inactive‌：分别表示活动和非活动内存大小，即正在使用或最近使用的内存和最近没有使用的内存。
-    
 - ‌SwapTotal‌ 和 ‌SwapFree‌：交换分区总大小和空闲大小。
-    
 - ‌Dirty‌ 和 ‌Writeback‌：等待写回到磁盘的内存大小和正在写回到磁盘的内存大小。
-    
 - ‌AnonPages‌、‌Mapped‌、‌Shmem‌ 等：分别表示用于匿名映射、已映射到文件的内存、共享内存大小等。
-    
 - ‌Slab‌、‌SReclaimable‌、‌SUnreclaim‌ 等：内核数据结构缓存的内存大小以及可回收和不可回收的Slab内存大小。
-    
 - ‌KernelStack‌、‌PageTables‌ 等：内核栈的内存大小和页面表的内存大小。
-    
 - ‌CommitLimit‌ 和 ‌Committed_AS‌：可用内存可支持的最大内存大小和已分配的内存大小，包括内存和交换分区。
-    
 - ‌VmallocTotal‌、‌VmallocUsed‌ 等：虚拟内存总大小和已使用的虚拟内存大小。
     
 
 排查内存问题时，可以通过以下步骤进行：
 
 - 首先，使用`cat /proc/meminfo`命令查看meminfo文件的内容，了解系统的整体内存使用情况。
-    
 - 分析MemTotal和MemFree的值，了解系统的总内存和可用空闲内存。
-    
 - 注意MemAvailable的值，它表示应用程序可用的内存，与MemFree的区别在于MemAvailable考虑了Buffers和Cached的大小，这些通常在系统需要时可以被回收。
-    
 - 检查SwapUsage（虽然meminfo文件中没有直接显示SwapUsage，但可以通过SwapTotal和SwapFree计算得出），如果Swap空间被大量使用，可能意味着物理内存不足。
-    
 - 注意Active、Inactive、Dirty和Writeback等值，这些指标可以帮助你了解系统当前的内存使用模式和可能的性能瓶颈。
-    
 - 如果发现某些特定类型的内存使用异常高（如AnonPages、Shmem等），可能需要进一步调查这些类型的内存使用情况，以确定是否存在内存泄漏或其他问题。
-    
 - 使用其他工具如`free`、`vmstat`、`top`或`htop`等命令提供的信息与meminfo文件的内容进行对比，以获得更全面的系统内存使用情况视图。
     
 

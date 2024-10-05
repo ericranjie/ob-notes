@@ -1,159 +1,92 @@
-# 
-
 PIG-007 看雪学苑
-
  _2021年09月16日 18:05_
-
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_jpg/1UG7KPNHN8HCyhMUtZXd3eVzibDcTBuUomJeo20HH6L8MrjNMJD4z5SDhia4Fyt2UBZMAh1rlsEM7eaEhjbPCD0A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)  
-
 本文为看雪论坛精华文章  
 看雪论坛作者ID：PIG-007  
 
-  
-
 Glibc2.29及以上版本堆的利用技巧越来越复杂，简直就是神仙打架，实在学得有点头晕。并且很多时候就算我们有了复用堆块在出题人的各种围追堵截的限制下，也可能没办法getshell，所以一直在不断开发新的利用姿势。
 
-  
-
-  
-
-一
-
-  
-
-# **House of KIWI**
-
-  
-
+# **一 House of KIWI**
 House OF Kiwi - 安全客，安全资讯平台 (anquanke.com)
-
 （_https://www.anquanke.com/post/id/235598_）
-
-  
-
 ## **1、原理分析**
-
-  
 
 函数调用链：assert->malloc_assert->fflush->_IO_file_jumps结构体中的__IO_file_sync
 
 调用时的寄存器为：
-
+![[Pasted image 20241004201944.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么如果可以在不同版本下劫持对应setcontext中的赋值参数，即rdi或者rdx，就可以设置寄存器来调用我们想调用的函数。
-
-  
-
 ### (1)rdi和rdx互相转换
 
-  
-
 ①getkeyserv_handle+576：
-
+```c
+plaintext   #注释头   mov rdx, [rdi+8] mov [rsp+0C8h+var_C8], rax call qword ptr [rdx+20h]
 ```
-plaintext
-```
-
-  
 
 通过rdi控制rdx，同样2.29以后不同版本都不太一样，需要再调试看看，比如2.31里就是：
 
+```c
+plaintext   #注释头   mov rdx,QWORD PTR [rdi+0x8] mov QWORD PTR [rsp],rax call QWORD PTR [rdx+0x20]
 ```
-plaintext
-```
-
-  
 
 ②svcudp_reply+26:
 
+```c
+plaintext   #注释头   mov rbp, qword ptr [rdi + 0x48]; mov rax, qword ptr [rbp + 0x18]; lea r13, [rbp + 0x10]; mov dword ptr [rbp + 0x10], 0; mov rdi, r13; call qword ptr [rax + 0x28];
 ```
-plaintext
-```
-
-  
 
 通过rdi控制rbp实现栈迁移，然后即可任意gadget了。
 
 其中2.31版本下还是一样的，如下：
 
+```c
+plaintext   #注释头   mov rbp,QWORD PTR [rdi+0x48] mov rax,QWORD PTR [rbp+0x18] lea r13,[rbp+0x10] mov DWORD PTR [rbp+0x10],0x0 mov rdi,r13 call QWORD PTR [rax+0x28]
 ```
-plaintext
-```
-
-###   
 
 ### (2)不同劫持
 
-  
-
 这里观察寄存器就可以知道，不同版本的setcontext对应的rdi和rdx，这里就劫持哪一个。另外这里的rdi为_IO_2_1_stderr结构体，是从stderr@@GLIBC_2.2.5取值过来的，也就是data段上的数据，如果可以取得ELF基地址，直接劫持该指针为chunk地址也是可以的，这样就能劫持RDI寄存器了。
-
+![[Pasted image 20241004202135.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这样如果劫持__IO_file_sync函数指针为setcontext，配合劫持的rdi和rdx就可以来调用我们想调用函数从而直接getshell或者绕过orw。
 
-  
-
 ## **2、触发条件**
-
-  
 
 只要assert判断出错都可以，常用以下几个：
 
 (1)top_chunk改小，并置pre_inuse为0，当top_chunk不足分配时会触发一个assert。(该assert函数在sysmalloc函数中被调用)
-
+![[Pasted image 20241004202154.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (2)largebin chunk的size中的flag位，这个不太清楚。
 
 (3)如果是2.29及以下，因为在tcache_put和tcacheget中还存在assert的关系，所以如果可以修改掉mp.tcache_bins，将之改大，(利用largebin attack)就会触发assert。
 
-```
-//2.29
+```c
+//2.29 
+tcache_put (mchunkptr chunk, size_t tc_idx) {   tcache_entry *e = (tcache_entry *) chunk2mem (chunk);   assert (tc_idx < TCACHE_MAX_BINS);     /* Mark this chunk as "in the tcache" so the test in _int_free will      detect a double free.  */   e->key = tcache;     e->next = tcache->entries[tc_idx];   tcache->entries[tc_idx] = e;   ++(tcache->counts[tc_idx]); }   //2.29 tcache_get (size_t tc_idx) {   tcache_entry *e = tcache->entries[tc_idx];   assert (tc_idx < TCACHE_MAX_BINS);   assert (tcache->entries[tc_idx] > 0);   tcache->entries[tc_idx] = e->next;   --(tcache->counts[tc_idx]);   e->key = NULL;   return (void *) e; }
 ```
 
-  
-
+![[Pasted image 20241004202218.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 ## **3、适用条件**
 
-  
-
 如果将exit函数替换成_exit函数,最终结束的时候,则是进行了syscall来结束,并没有机会调用_IO_cleanup,若再将__malloc_hook和__free_hook给ban了,且在输入和输出都用read和write的情况下,无法hook且无法通过IO刷新缓冲区的情况下。这时候可以借用malloc出错调用malloc_assert->fflush->_IO_file_sync函数指针。且进入的时候rdx为_IO_helper_jumps_addr，rdi为_IO_2_1_stderr_addr。
 
-  
-
-  
-
-二
-
-  
-
-# **House of Husk**
-
-  
-
+# **二 House of Husk**
 house-of-husk学习笔记 (juejin.cn)
-
 （_https://juejin.cn/post/6844904117119385614_）  
-
-  
 
 ## **1、原理分析**
 
-  
-
 函数调用链:
 
-```
+```c
 printf->vfprintf->printf_positional->__parse_one_specmb->__printf_arginfo_table(spec)
 ```
-
-  
 
 __parse_one_specmb 函数 会调用 __printf_arginfo_table和__printf_function_table两个函数指针中对应spec索引的函数指针printf_arginfo_size_function
 
@@ -167,57 +100,38 @@ __parse_one_specmb 函数 会调用 __printf_arginfo_table和__printf_function
 
 同时如果选择这个方法，就得需要__printf_arginfo_table和__printf_function_table均不为0才行。
 
-```
+```c
 //2.31 vfprintf-internal.c(stdio-common)
+/* Use the slow path in case any printf handler is registered.  */
+if (__glibc_unlikely (__printf_function_table != NULL                       || __printf_modifier_table != NULL                       || __printf_va_arg_table != NULL))     goto do_positional;     do_positional: if (__glibc_unlikely (workstart != NULL)) {     free (workstart);     workstart = NULL; } done = printf_positional (s, format, readonly_format, ap, &ap_save,                           done, nspecs_done, lead_str_end, work_buffer,                           save_errno, grouping, thousands_sep, mode_flags);
 ```
 
+```c
+//2.31 vfprintf-internal.c(stdio-common)   
+(void) (*__printf_arginfo_table[specs[cnt].info.spec]) (&specs[cnt].info,  specs[cnt].ndata_args, &args_type[specs[cnt].data_arg],  &args_size[specs[cnt].data_arg]);     /* Call the function.  */ function_done = __printf_function_table[(size_t) spec]     (s, &specs[nspecs_done].info, ptr);
 ```
-//2.31 vfprintf-internal.c(stdio-common)
-```
-
-  
 
 即如果table不为空，则调用printf_positional函数，然后如果spec不为空，则调用对应spec索引函数。但是有时候不知道printf最终会调用哪个spec，可能隐藏在哪，所以直接把干脆_printf_arginfo_table和__printf_function_table中的值全给改成one_gadget算了。
 
 综上，得出以下条件：
 
+```c
+A.    __printf_function_table = heap_addr     __printf_arginfo_table != 0 //其中__printf_arginfo_table和__printf_function_table可以对调 B. heap_addr+'spec'*8 = one_gadget
 ```
-A.    __printf_function_table = heap_addr
-```
-
   
-
+![[Pasted image 20241004202413.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在2.29下可以直接用largebin attack爆破修改两个地方，当然还是需要先泄露地址的。
 
-  
-
 ## **2、触发条件**
-
-  
 
 即需要printf家族函数被调用，且其中需带上格式化字符，比如%s，%x等，用来计算spec，这个和libc版本无关，相当于只针对printf家族函数进行攻击的。
 
-  
-
 ## **3、适用条件**
 
-  
-
 具有printf家族函数，并且存在spec，合适地方会调用。
-
-#   
-
-  
-
-三
-
-  
-
-# **House of Pig**
-
-  
+# **三 House of Pig**
 
 house of pig一个新的堆利用详解 - 安全客，安全资讯平台 (anquanke.com)
 

@@ -11,11 +11,9 @@
             "id": "21d9fe15fdd168c6",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241004194221.png"
               }
             }
           }
@@ -48,7 +46,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#define",
+                "query": "tag:#1、正常UAF",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md",
+                "file": "zx99-image/Pasted image 20241004194221.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md",
+                "file": "zx99-image/Pasted image 20241004194221.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/debug/Linux内核 Netlink机制分析与使用.md"
+                "file": "zx99-image/Pasted image 20241004194221.png"
               }
             }
           }
@@ -146,18 +144,32 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "21d9fe15fdd168c6",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/reverse-engineering/bn_高Glibc版本下的堆骚操作解析.md",
+    "zx99-image/Pasted image 20241004202413.png",
+    "zx99-image/Pasted image 20241004202218.png",
+    "zx99-image/Pasted image 20241004202154.png",
+    "zx99-image/Pasted image 20241004202135.png",
+    "Pasted image 20241004202131.png",
+    "zx99-image/Pasted image 20241004201944.png",
+    "coding/reverse-engineering/an_VM逆向，一篇就够了.md",
+    "coding/reverse-engineering/kn_一文搞懂  ARM MMU.md",
+    "coding/reverse-engineering/kn_Kernel从0开始.md",
+    "coding/os/linux/debug/bn_问题排查利器：Linux 原生跟踪工具 Ftrace 必知必会.md",
+    "README.md",
+    "zx99-image/Pasted image 20241004194309.png",
+    "zx99-image/Pasted image 20241004194221.png",
+    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+    "coding/os/linux/debug/bn_Linux内核 Netlink机制分析与使用.md",
     "coding/os/linux/debug/p_冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
     "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
     "coding/os/linux/debug/trace/k_ftrace时间精度issue修复.md",
     "coding/os/linux/debug/KFENCE/k_Linux Kfence 详解.md",
     "zx99-image/Pasted image 20241004165853.png",
-    "README.md",
     "coding/os/linux/debug/GDB/p_使用 GDB + Qemu 调试 Linux 内核.md",
     "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
     "zx99-image/Pasted image 20241004170130.png",
-    "zx99-image/Pasted image 20241004165859.png",
     "coding/os/linux/device/kn_libdrm-modetest 原理及图显系统验证方法.md",
     "coding/os/linux/device/kn_Linux V4L2子系统与视频编解码设备介绍.md",
     "coding/os/linux/device/i_Linux reset framework.md",
@@ -169,21 +181,6 @@
     "coding/os/linux/device/eMMC/k_Linux MMC framework(2)_host controller driver.md",
     "coding/os/linux/device/eMMC/i_MMC SD SDIO介绍.md",
     "coding/os/linux/device/eMMC/i_Linux MMC framework(1)_软件架构.md",
-    "coding/os/linux/device/eMMC/i_eMMC 原理 2 ：eMMC 简介.md",
-    "coding/os/linux/device/eMMC/k_eMMC 原理 4 ：总线协议.md",
-    "coding/os/linux/device/eMMC/i_eMMC 原理 1 ：Flash Memory 简介.md",
-    "coding/os/linux/device/DRAM/i_DRAM 原理 5 ：DRAM Devices Organization.md",
-    "coding/os/linux/device/DRAM/i_DRAM 原理 3 ：DRAM Device.md",
-    "coding/os/linux/device/DRAM/k_DRAM 原理 4 ：DRAM Timing.md",
-    "coding/os/linux/device/DRAM/i_DRAM 原理 1 ：DRAM Storage Cell.md",
-    "coding/os/linux/device/device_tree/b_Device Tree（四）：文件结构解析.md",
-    "zx99-image/Pasted image 20241003223815.png",
-    "zx99-image/Pasted image 20241003224039.png",
-    "zx99-image/Pasted image 20241003224023.png",
-    "zx99-image/Pasted image 20241003224016.png",
-    "zx99-image/Pasted image 20241003224009.png",
-    "zx99-image/Pasted image 20241003224001.png",
-    "zx99-image/Pasted image 20241003223947.png",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",

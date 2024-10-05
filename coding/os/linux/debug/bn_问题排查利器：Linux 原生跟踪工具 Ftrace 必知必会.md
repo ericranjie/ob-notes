@@ -1,20 +1,8 @@
-# 
-
 Linux内核之旅
-
  _2022年03月16日 10:20_
-
 以下文章来源于深入浅出BPF ，作者davaddi
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6qJiaaicEDXMrKNnhx5D6WCIYOhyctx1l1TLk6mT7zwsBQ/0)
-
 **深入浅出BPF**.
-
 专注 BPF 及相关基础技术
-
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664611747&idx=1&sn=f9ff6eab75e33076af1dbc777a166f75&chksm=f04d9246c73a1b50e6424f0d36fb8af585b2f01f923e872db0b27945e8d4cca863e07a0f9c51&mpshare=1&scene=24&srcid=0316u3HJq8hD4DjFH47m73Zz&sharer_sharetime=1647408495599&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0c80d839d9535b5b713ca2133267160bf9f9d2982d150a53054b4713115aaa0c5d0399df0beb800f0a0ca0514904786afb2ee16fb857b54dbd7073c0ea25a6595d42c30a00cd4dcdcf4f72d38c7cb16656453536fec514606d380b9054a6e52edf78449d312b90bd4db81472a9504ddd94b2169fbf4c00508&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQshOYzhvDSt3iHbjdXLp19BLmAQIE97dBBAEAAAAAAMiAMXx9ulUAAAAOpnltbLcz9gKNyK89dVj0UVaeLiCPeXpBOX01dq%2BWRUtNUwfeOzGLev1095pjMSajW86st00VMjcI7yYOJjPONyVQSWzw2drx0vOemfRPgTxC%2Bz5QxyYrFK8P0V%2F3RGa%2Fm6BDrYofetVnLOH30cTJticd5YkB6xM3hMyme2NK1ee4DLz%2BLDpOJ1IJZjTjSGAHLfddh2K9UtXHOGCSdZvxvBnRufpgaL3deW3A5RVd9Tb3qVnYpARbo407JIt1xvDNIX1G3J8z3%2FPxpEgZc26t&acctmode=0&pass_ticket=FFsnrGeUx79YKwhg1yM%2BGzkvzcFR5CcuJfX9bP%2FehnnK2Jd0z2rvygBUeGQhXOdK&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 TLDR：建议收藏，需要时查阅。  
 
@@ -23,24 +11,17 @@ TLDR：建议收藏，需要时查阅。
 快速说明：
 
 - kprobe 为内核中提供的动态跟踪机制，`/proc/kallsym` 中的函数几乎都可以用于跟踪，但是内核函数可能随着版本演进而发生变化，为非稳定的跟踪机制，数量比较多。
-    
 - uprobe 为用户空间提供的动态机制；
-    
 - tracepoint 是内核提供的静态跟踪点，为稳定的跟踪点，需要研发人员代码编写，数量有限；
-    
 - usdt 为用户空间提供的静态跟踪点 【本次暂不涉及】
     
 
 Ftrace 是 Linux 官方提供的跟踪工具，在 Linux 2.6.27 版本中引入。Ftrace 可在不引入任何前端工具的情况下使用，让其可以适合在任何系统环境中使用。
 
 Ftrace 可用来快速排查以下相关问题：
-
 - 特定内核函数调用的频次 （function）
-    
 - 内核函数在被调用的过程中流程（调用栈） （function + stack）
-    
 - 内核函数调用的子函数流程（子调用栈）（function graph）
-    
 - 由于抢占导致的高延时路径等
     
 
@@ -71,15 +52,15 @@ Ftrace 跟踪工具由性能分析器（profiler）和跟踪器（tracer）两�
     
 
 除了操作原始的文件接口外，也有一些基于 Ftrace 的前端工具，比如 perf-tools 和 trace-cmd （界面 KernelShark）等。整体跟踪及前端工具架构图如下：
-
+![[Pasted image 20241004194221.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图片来自于 《Systems Performance Enterprise and the Cloud 2nd Edition》 14.1 P706
 
 Ftrace 的使用的接口为 tracefs 文件系统，需要保证该文件系统进行加载：
-
-`$ sysctl -q kernel.ftrace_enabled=1   $ mount -t tracefs tracefs /sys/kernel/tracing      $ mount -t debugfs,tracefs   tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)   debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)   tracefs on /sys/kernel/debug/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)      $ ls -F /sys/kernel/debug/tracing  # 完整目录如下图   `
-
+```cpp
+$ sysctl -q kernel.ftrace_enabled=1   $ mount -t tracefs tracefs /sys/kernel/tracing      $ mount -t debugfs,tracefs   tracefs on /sys/kernel/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)   debugfs on /sys/kernel/debug type debugfs (rw,nosuid,nodev,noexec,relatime)   tracefs on /sys/kernel/debug/tracing type tracefs (rw,nosuid,nodev,noexec,relatime)      $ ls -F /sys/kernel/debug/tracing  # 完整目录如下图   
+```
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 tracing 目录下核心文件介绍如下表格，当前可仅关注黑体加粗的项，其他项可在需要的时候再进行回顾：
@@ -107,7 +88,7 @@ tracing 目录下核心文件介绍如下表格，当前可仅关注黑体加粗
 ## 1. 内核函数调用跟踪
 
 基于 Ftrace 的内核函数调用跟踪整体架构如下所示：
-
+![[Pasted image 20241004194309.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图片来自于 《Systems Performance Enterprise and the Cloud 2nd Edition》 14.4 P713  
@@ -117,9 +98,15 @@ tracing 目录下核心文件介绍如下表格，当前可仅关注黑体加粗
 在不同的体系结构下，可以在 `/proc/kallsym` 文件中搜索确认。
 
 > 后续的目录，如无特殊说明，都默认位于 `/sys/kernel/debug/tracing/` 根目录。
-
-`# 使用 function 跟踪器，并将其设置到 current_tracer   $ sudo echo function > current_tracer      # 将跟踪函数 __arm64_sys_openat 设置到 set_ftrace_filter 文件中   $ sudo echo __arm64_sys_openat > set_ftrace_filter      # 开启全局的跟踪使能   $ sudo echo 1 > tracing_on      # 运行 ls 命令触发 sys_openat 系统调用，新的内核版本中直接调用 sys_openat   $ ls -hl      # 关闭   $ sudo echo 0 > tracing_on   $ sudo echo nop > current_tracer      # 需要主要这里的 echo 后面有一个空格，即 “echo+ 空格>"   $ sudo echo  > set_ftrace_filter      # 通过 cat trace 文件进行查看   $ sudo cat trace   # tracer: function   #   # entries-in-buffer/entries-written: 224/224   #P:4   #   #                                _-----=> irqs-off   #                               / _----=> need-resched   #                              | / _---=> hardirq/softirq   #                              || / _--=> preempt-depth   #                              ||| /     delay   #           TASK-PID     CPU#  ||||   TIMESTAMP  FUNCTION   #              | |         |   ||||      |         |               sudo-15099   [002] .... 29469.444400: __arm64_sys_openat <-invoke_syscall               sudo-15099   [002] .... 29469.444594: __arm64_sys_openat <-invoke_syscall   `
-
+```cpp
+# 使用 function 跟踪器，并将其设置到 current_tracer   
+$ sudo echo function > current_tracer      
+# 将跟踪函数 __arm64_sys_openat 设置到 set_ftrace_filter 文件中   
+$ sudo echo __arm64_sys_openat > set_ftrace_filter      # 开启全局的跟踪使能   $ sudo echo 1 > tracing_on      # 运行 ls 命令触发 sys_openat 系统调用，新的内核版本中直接调用 sys_openat   $ ls -hl      # 关闭   $ sudo echo 0 > tracing_on   $ sudo echo nop > current_tracer      # 需要主要这里的 echo 后面有一个空格，即 “echo+ 空格>"   $ sudo echo  > set_ftrace_filter      
+# 通过 cat trace 文件进行查看   $ sudo cat trace   
+# tracer: function   
+#   # entries-in-buffer/entries-written: 224/224   #P:4   #   #                                _-----=> irqs-off   #                               / _----=> need-resched   #                              | / _---=> hardirq/softirq   #                              || / _--=> preempt-depth   #                              ||| /     delay   #           TASK-PID     CPU#  ||||   TIMESTAMP  FUNCTION   #              | |         |   ||||      |         |               sudo-15099   [002] .... 29469.444400: __arm64_sys_openat <-invoke_syscall               sudo-15099   [002] .... 29469.444594: __arm64_sys_openat <-invoke_syscall 
+```
 我们可以看到上述的结果表明了函数调用的任务名称、PID、CPU、标记位、时间戳及函数名字。
 
 在 perf_tools[5] 工具集中的前端封装工具为 functrace[6] ，需要注意的是该工具默认不会设置 tracing_on 为 1， 需要在启动前进行设置，即 ”echo 1 > tracing_on“。
@@ -129,41 +116,42 @@ perf_tools[7] 工具集中 kprobe[8] 也可以实现类似的效果，底层�
 ## 2. 函数被调用流程（栈）
 
 在第 1 部分我们获得了内核函数的调用，但是有些场景我们更可能希望获取调用该内核函数的流程（即该函数是在何处被调用），这需要通过设置 `options/func_stack_trace` 选项实现。
-
-`$ sudo echo function > current_tracer   $ sudo echo __arm64_sys_openat > set_ftrace_filter   $ sudo echo 1 > options/func_stack_trace # 设置调用栈选项   $ sudo echo 1 > tracing_on      $ ls -hl      $ sudo echo 0 > tracing_on      $ sudo cat trace   # tracer: function   #   # entries-in-buffer/entries-written: 292/448   #P:4   #   #                                _-----=> irqs-off   #                               / _----=> need-resched   #                              | / _---=> hardirq/softirq   #                              || / _--=> preempt-depth   #                              ||| /     delay   #           TASK-PID     CPU#  ||||   TIMESTAMP  FUNCTION   #              | |         |   ||||      |         |               sudo-15134   [000] .... 29626.670430: __arm64_sys_openat <-invoke_syscall               sudo-15134   [000] .... 29626.670431: <stack trace>    => __arm64_sys_openat    => invoke_syscall    => el0_svc_common.constprop.0    => do_el0_svc    => el0_svc    => el0_sync_handler    => el0_sync      # 关闭   $ sudo echo nop > current_tracer   $ sudo echo  > set_ftrace_filter   $ sudo echo 0 > options/func_stack_trace   `
-
+```cpp
+$ sudo echo function > current_tracer   $ sudo echo __arm64_sys_openat > set_ftrace_filter   $ sudo echo 1 > options/func_stack_trace # 设置调用栈选项   $ sudo echo 1 > tracing_on      $ ls -hl      $ sudo echo 0 > tracing_on      $ sudo cat trace   # tracer: function   #   # entries-in-buffer/entries-written: 292/448   #P:4   #   #                                _-----=> irqs-off   #                               / _----=> need-resched   #                              | / _---=> hardirq/softirq   #                              || / _--=> preempt-depth   #                              ||| /     delay   #           TASK-PID     CPU#  ||||   TIMESTAMP  FUNCTION   #              | |         |   ||||      |         |               sudo-15134   [000] .... 29626.670430: __arm64_sys_openat <-invoke_syscall               sudo-15134   [000] .... 29626.670431: <stack trace>    => __arm64_sys_openat    => invoke_syscall    => el0_svc_common.constprop.0    => do_el0_svc    => el0_svc    => el0_sync_handler    => el0_sync      # 关闭   $ sudo echo nop > current_tracer   $ sudo echo  > set_ftrace_filter   $ sudo echo 0 > options/func_stack_trace   
+```
 通过上述跟踪记录，我们可以发现记录同时展示了函数调用的记录和被调用的函数流程，`__arm64_sys_openat` 的被调用栈如下：
-
-`=> __arm64_sys_openat    => invoke_syscall    => el0_svc_common.constprop.0    => do_el0_svc    => el0_svc    => el0_sync_handler    => el0_sync   `
-
+```cpp
+=> __arm64_sys_openat    => invoke_syscall    => el0_svc_common.constprop.0    => do_el0_svc    => el0_svc    => el0_sync_handler    => el0_sync   
+```
 perf_tools[9] 工具集中 kprobe[10] 通过添加 ”-s“ 参数实现同样的功能，运行的命令如下：
-
-`$ ./kprobe -s 'p:__arm64_sys_openat'   `
-
+```cpp
+$ ./kprobe -s 'p:__arm64_sys_openat'   
+```
 ## 3. 函数调用子流程跟踪（栈）
 
 如果想要分析内核函数调用的子流程（即本函数调用了哪些子函数，处理的流程如何），这时需要用到 `function_graph` 跟踪器，从字面意思就可看出这是函数调用关系跟踪。
 
 基于 `__arm64_sys_openat` 子流程调用关系的跟踪的完整设置过程如下：
-
-`# 将当前 current_tracer 设置为 function_graph   $ sudo echo function_graph > current_tracer   $ sudo echo __arm64_sys_openat > set_graph_function      # 设置跟踪子函数的最大层级数   $ sudo echo 3 > max_graph_depth  # 设置最大层级   $ sudo echo 1 > tracing_on      $ ls -hl      $ sudo echo 0 > tracing_on   #$ echo nop > set_graph_function   $ sudo cat trace   # tracer: function_graph   #   # CPU  DURATION                  FUNCTION CALLS   # |     |   |                     |   |   |   |    1)               |  __arm64_sys_openat() {    1)               |    do_sys_openat2() {    1)   0.875 us    |      getname();    1)   0.125 us    |      get_unused_fd_flags();    1)   2.375 us    |      do_filp_open();    1)   0.084 us    |      put_unused_fd();    1)   0.125 us    |      putname();    1)   4.083 us    |    }    1)   4.250 us    |  }   `
-
+```cpp
+# 将当前 current_tracer 设置为 function_graph   
+$ sudo echo function_graph > current_tracer   $ sudo echo __arm64_sys_openat > set_graph_function      # 设置跟踪子函数的最大层级数   $ sudo echo 3 > max_graph_depth  # 设置最大层级   $ sudo echo 1 > tracing_on      $ ls -hl      $ sudo echo 0 > tracing_on   #$ echo nop > set_graph_function   $ sudo cat trace   # tracer: function_graph   #   # CPU  DURATION                  FUNCTION CALLS   # |     |   |                     |   |   |   |    1)               |  __arm64_sys_openat() {    1)               |    do_sys_openat2() {    1)   0.875 us    |      getname();    1)   0.125 us    |      get_unused_fd_flags();    1)   2.375 us    |      do_filp_open();    1)   0.084 us    |      put_unused_fd();    1)   0.125 us    |      putname();    1)   4.083 us    |    }    1)   4.250 us    |  }   
+```
 在本样例中 `__arm64_sys_openat` 函数的调用子流程仅包括 `do_sys_openat2()` 子函数，而 `do_sys_openat2()` 函数又调用了 `getname()/get_unused_fd_flags()` 等子函数。
 
 这种完整的子函数调用关系，对于我们学习内核源码和分析线上的问题都提供了便利，排查问题时则可以顺藤摸瓜逐步缩小需要分析的范围。
 
 在 perf_tools[11] 工具集的前端工具为 funcgraph[12] ，使用 funcgraph 启动命令如下所示：
-
-`$./funcgraph -m 3 __arm64_sys_openat   `
-
+```cpp
+$./funcgraph -m 3 __arm64_sys_openat   
+```
 如果函数调用栈比较多，直接查看跟踪记录则非常不方便，基于此社区补丁 [PATCH] ftrace: Add vim script to enable folding for function_graph traces[13] 提供了一个基于 vim 的配置，可通过树状关系来折叠和展开函数调用的最终记录，vim 设置完整如下：
-
-`" Enable folding for ftrace function_graph traces.   "   " To use, :source this file while viewing a function_graph trace, or use vim's   " -S option to load from the command-line together with a trace.  You can then   " use the usual vim fold commands, such as "za", to open and close nested   " functions.  While closed, a fold will show the total time taken for a call,   " as would normally appear on the line with the closing brace.  Folded   " functions will not include finish_task_switch(), so folding should remain   " relatively sane even through a context switch.   "   " Note that this will almost certainly only work well with a   " single-CPU trace (e.g. trace-cmd report --cpu 1).      function! FunctionGraphFoldExpr(lnum)     let line = getline(a:lnum)     if line[-1:] == '{'       if line =~ 'finish_task_switch() {$'         return '>1'       endif       return 'a1'     elseif line[-1:] == '}'       return 's1'     else       return '='     endif   endfunction      function! FunctionGraphFoldText()     let s = split(getline(v:foldstart), '|', 1)     if getline(v:foldend+1) =~ 'finish_task_switch() {$'       let s[2] = ' task switch  '     else       let e = split(getline(v:foldend), '|', 1)       let s[2] = e[2]     endif     return join(s, '|')   endfunction      setlocal foldexpr=FunctionGraphFoldExpr(v:lnum)   setlocal foldtext=FunctionGraphFoldText()   setlocal foldcolumn=12   setlocal foldmethod=expr   `
-
+```cpp
+" Enable folding for ftrace function_graph traces.   "   " To use, :source this file while viewing a function_graph trace, or use vim's   " -S option to load from the command-line together with a trace.  You can then   " use the usual vim fold commands, such as "za", to open and close nested   " functions.  While closed, a fold will show the total time taken for a call,   " as would normally appear on the line with the closing brace.  Folded   " functions will not include finish_task_switch(), so folding should remain   " relatively sane even through a context switch.   "   " Note that this will almost certainly only work well with a   " single-CPU trace (e.g. trace-cmd report --cpu 1).      function! FunctionGraphFoldExpr(lnum)     let line = getline(a:lnum)     if line[-1:] == '{'       if line =~ 'finish_task_switch() {$'         return '>1'       endif       return 'a1'     elseif line[-1:] == '}'       return 's1'     else       return '='     endif   endfunction      function! FunctionGraphFoldText()     let s = split(getline(v:foldstart), '|', 1)     if getline(v:foldend+1) =~ 'finish_task_switch() {$'       let s[2] = ' task switch  '     else       let e = split(getline(v:foldend), '|', 1)       let s[2] = e[2]     endif     return join(s, '|')   endfunction      setlocal foldexpr=FunctionGraphFoldExpr(v:lnum)   setlocal foldtext=FunctionGraphFoldText()   setlocal foldcolumn=12   setlocal foldmethod=expr   
+```
 将上述指令保存为 function-graph-fold.vim 文件，在 vim 使用时通过 -S 参数指定上述配置，就可实现按照层级展示跟踪记录。在 vim 中，可通过 za 展开，zc 折叠跟踪记录。（通过文件分析，我们需要在 `cat trace` 文件时候重定向到文件）。
-
-`$ vim -S function-graph-fold.vim trace.log   `
-
+```cpp
+$ vim -S function-graph-fold.vim trace.log   
+```
 ## 4. 内核跟踪点（tracepoint）跟踪
 
 可基于 ftrace 跟踪内核静态跟踪点，可跟踪的完整列表可通过 available_events 查看。events 目录下查看到各分类的子目录，详见下图：
@@ -171,9 +159,11 @@ perf_tools[9] 工具集中 kprobe[10] 通过添加 ”-s“ 参数实现同�
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
-
-`# available_events 文件中包括全部可用于跟踪的静态跟踪点   $ sudo grep openat available_events   syscalls:sys_exit_openat2   syscalls:sys_enter_openat2   syscalls:sys_exit_openat   syscalls:sys_enter_openat      # 我们可以在 events/syscalls/sys_enter_openat 中查看该跟踪点相关的选项   $ sudo ls -hl events/syscalls/sys_enter_openat   total 0   -rw-r----- 1 root root 0 Jan  1  1970 enable  # 是否启用跟踪 1 启用   -rw-r----- 1 root root 0 Jan  1  1970 filter  # 跟踪过滤   -r--r----- 1 root root 0 Jan  1  1970 format  # 跟踪点格式   -r--r----- 1 root root 0 Jan  1  1970 hist   -r--r----- 1 root root 0 Jan  1  1970 id   --w------- 1 root root 0 Jan  1  1970 inject   -rw-r----- 1 root root 0 Jan  1  1970 trigger         $ sudo cat events/syscalls/sys_enter_openat/format   name: sys_enter_openat   ID: 555   format:    field:unsigned short common_type; offset:0; size:2; signed:0;    field:unsigned char common_flags; offset:2; size:1; signed:0;    field:unsigned char common_preempt_count; offset:3; size:1; signed:0;    field:int common_pid; offset:4; size:4; signed:1;       field:int __syscall_nr; offset:8; size:4; signed:1;    field:int dfd; offset:16; size:8; signed:0;    field:const char * filename; offset:24; size:8; signed:0;    field:int flags; offset:32; size:8; signed:0;    field:umode_t mode; offset:40; size:8; signed:0;      print fmt: "dfd: 0x%08lx, filename: 0x%08lx, flags: 0x%08lx, mode: 0x%08lx", ((unsigned long)(REC->dfd)), ((unsigned long)(REC->filename)), ((unsigned long)(REC->flags)), ((unsigned long)(REC->mode))   `
-
+```cpp
+# available_events 文件中包括全部可用于跟踪的静态跟踪点   
+$ sudo grep openat available_events   syscalls:sys_exit_openat2   syscalls:sys_enter_openat2   syscalls:sys_exit_openat   syscalls:sys_enter_openat      # 我们可以在 events/syscalls/sys_enter_openat 中查看该跟踪点相关的选项   
+$ sudo ls -hl events/syscalls/sys_enter_openat   total 0   -rw-r----- 1 root root 0 Jan  1  1970 enable  # 是否启用跟踪 1 启用   -rw-r----- 1 root root 0 Jan  1  1970 filter  # 跟踪过滤   -r--r----- 1 root root 0 Jan  1  1970 format  # 跟踪点格式   -r--r----- 1 root root 0 Jan  1  1970 hist   -r--r----- 1 root root 0 Jan  1  1970 id   --w------- 1 root root 0 Jan  1  1970 inject   -rw-r----- 1 root root 0 Jan  1  1970 trigger         $ sudo cat events/syscalls/sys_enter_openat/format   name: sys_enter_openat   ID: 555   format:    field:unsigned short common_type; offset:0; size:2; signed:0;    field:unsigned char common_flags; offset:2; size:1; signed:0;    field:unsigned char common_preempt_count; offset:3; size:1; signed:0;    field:int common_pid; offset:4; size:4; signed:1;       field:int __syscall_nr; offset:8; size:4; signed:1;    field:int dfd; offset:16; size:8; signed:0;    field:const char * filename; offset:24; size:8; signed:0;    field:int flags; offset:32; size:8; signed:0;    field:umode_t mode; offset:40; size:8; signed:0;      print fmt: "dfd: 0x%08lx, filename: 0x%08lx, flags: 0x%08lx, mode: 0x%08lx", ((unsigned long)(REC->dfd)), ((unsigned long)(REC->filename)), ((unsigned long)(REC->flags)), ((unsigned long)(REC->mode))   
+```
 这里直接使用 tracepoint 跟踪 `sys_openat` 系统调用，设置如下：
 
 `$ sudo echo 1 > events/syscalls/sys_enter_openat/enable   $ sudo echo 1 > tracing_on   $ sudo cat trace   # tracer: nop   #   # entries-in-buffer/entries-written: 19/19   #P:4   #   #                                _-----=> irqs-off   #                               / _----=> need-resched   #                              | / _---=> hardirq/softirq   #                              || / _--=> preempt-depth   #                              ||| /     delay   #           TASK-PID     CPU#  ||||   TIMESTAMP  FUNCTION   #              | |         |   ||||      |         |                cat-16961   [003] .... 47683.934082: sys_openat(dfd: ffffffffffffff9c, filename: ffff9abf20f0, flags: 80000, mode: 0)                cat-16961   [003] .... 47683.934326: sys_openat(dfd: ffffffffffffff9c, filename: ffff9ac09f20, flags: 80000, mode: 0)                cat-16961   [003] .... 47683.935468: sys_openat(dfd: ffffffffffffff9c, filename: ffff9ab75150, flags: 80000, mode: 0)      # 关闭   $ sudo echo 0 > events/syscalls/sys_enter_openat/enable   `

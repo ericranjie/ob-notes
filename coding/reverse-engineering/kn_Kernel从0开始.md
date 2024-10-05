@@ -1,54 +1,33 @@
-# 
-
 PIG-007 看雪学苑
-
  _2021年12月23日 18:14_
-
-![](https://mmbiz.qpic.cn/mmbiz_jpg/kR3MmOkZ9r6RCfZdjHqC2hBw0D2yFgfQKXWxevAC2pG4D1JAqGAYb0WheBVWzyJl4DMoKBaICJRMrfehMokp3g/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)  
-
 本文为看雪论坛优秀文章  
 看雪论坛作者ID：PIG-007
 
-  
-
-  
-
-一
-
-  
-
-**简介**
-
-  
+一 **简介**
 
 这里就尝试用堆来解题，由于kernel的解法多种多样，这里我们从最简单的UAF入手。
 
 给出自己设计的堆题目，存在很多的漏洞，read越界读，edit越界写，UAF，Double Free等：
 
+```c
+#include <linux/module.h> 
+#include <linux/version.h> 
+#include <linux/kernel.h> 
+#include <linux/types.h> 
+#include <linux/kdev_t.h> 
+#include <linux/fs.h> 
+#include <linux/device.h> 
+#include <linux/cdev.h> 
+#include <asm/uaccess.h> 
+#include <linux/slab.h>   
+//设备驱动常用变量 
+static char *buffer_var; static struct class *devClass; 
+// Global variable for the device class 
+static struct cdev cdev; static dev_t stack_dev_no;     static ssize_t stack_read(struct file *filp, char __user *buf, size_t count,         loff_t *f_pos);   static ssize_t stack_write(struct file *filp, const char __user *buf, size_t len, loff_t *f_pos);   static long stack_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);   // static int stack_open(struct inode *i, struct file *f) // { //   printk(KERN_INFO "[i] Module vuln: open()\n"); //   return 0; // }   // static int stack_close(struct inode *i, struct file *f) // { //   printk(KERN_INFO "[i] Module vuln: close()\n"); //   return 0; // }   static struct file_operations stack_fops =         {                 .owner = THIS_MODULE,                 // .open = stack_open,                 // .release = stack_close,                 .write = stack_write,                 .read = stack_read         };   // 设备驱动模块加载函数 static int __init stack_init(void) {     buffer_var=kmalloc(100,GFP_DMA);     printk(KERN_INFO "[i] Module stack registered");     if (alloc_chrdev_region(&stack_dev_no, 0, 1, "stack") < 0)     {         return -1;     }     if ((devClass = class_create(THIS_MODULE, "chardrv")) == NULL)     {         unregister_chrdev_region(stack_dev_no, 1);         return -1;     }     if (device_create(devClass, NULL, stack_dev_no, NULL, "stack") == NULL)     {         printk(KERN_INFO "[i] Module stack error");         class_destroy(devClass);         unregister_chrdev_region(stack_dev_no, 1);         return -1;     }     cdev_init(&cdev, &stack_fops);     if (cdev_add(&cdev, stack_dev_no, 1) == -1)     {         device_destroy(devClass, stack_dev_no);         class_destroy(devClass);         unregister_chrdev_region(stack_dev_no, 1);         return -1;     }       printk(KERN_INFO "[i] <Major, Minor>: <%d, %d>\n", MAJOR(stack_dev_no), MINOR(stack_dev_no));     return 0;   }   // 设备驱动模块卸载函数 static void __exit stack_exit(void) {     // 释放占用的设备号     unregister_chrdev_region(stack_dev_no, 1);     cdev_del(&cdev); }     // 读设备 ssize_t stack_read(struct file *filp, char __user *buf, size_t count,         loff_t *f_pos) {     printk(KERN_INFO "Stack_read function" );     if(strlen(buffer_var)>0) {         printk(KERN_INFO "[i] Module vuln read: %s\n", buffer_var);         kfree(buffer_var);         buffer_var=kmalloc(100,GFP_DMA);         return 0;     } else {         return 1;     } }   // 写设备 ssize_t stack_write(struct file *filp, const char __user *buf, size_t len, loff_t *f_pos) {     printk(KERN_INFO "Stack_write function" );     char buffer[100]={0};     if (_copy_from_user(buffer, buf, len))         return -EFAULT;     buffer[len-1]='\0';     printk("[i] Module stack write: %s\n", buffer);     strncpy(buffer_var,buffer,len);     return len; }       // ioctl函数命令控制 long stack_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {     switch (cmd) {         case 1:             break;         case 2:             break;         default:             // 不支持的命令             return -ENOTTY;     }     return 0; }     module_init(stack_init); module_exit(stack_exit);   MODULE_LICENSE("GPL"); // MODULE_AUTHOR("blackndoor"); // MODULE_DESCRIPTION("Module vuln overflow");
 ```
-#include <linux/module.h>
-```
-
-#   
-
-  
-
-二
-
-  
-
-**利用Cred结构体提权**
-
-##   
-
-## 1、正常UAF
-
-###   
-
+#   二 **利用Cred结构体提权**
+##   1、正常UAF
 ### 前置知识
-
-  
-
 由于是UAF漏洞，所以直接尝试再重启一个进程，这样新进程启动时就会申请一个Cred结构体(这里大小为0xa8)。而如果此时申请的结构体恰好落在我们释放过的堆块上，那么我们就可以利用UAF漏洞修改Cred结构体，将其uid和gid改为0，再利用该进程原地起shell，就能获得root权限的shell了。
 
 这里同样需要一点前置知识，之前也写过类似的，其实就相当于修改某个进程的cred结构体中的uid和gid就能将该进程提权了，之后利用提权后的进程起shell得到的shell就是提权后的shell。
