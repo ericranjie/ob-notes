@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/c_华为OD笔试面试参考.md",
+                "file": "auxiliary/self-improvement/hair/hair-quote.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/c_华为OD笔试面试参考.md",
+                "file": "auxiliary/self-improvement/hair/hair-quote.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/c_华为OD笔试面试参考.md",
+                "file": "auxiliary/self-improvement/hair/hair-quote.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/c_华为OD笔试面试参考.md"
+                "file": "auxiliary/self-improvement/hair/hair-quote.md"
               }
             }
           }
@@ -159,10 +159,13 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "coding/coding-quote.md",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
+    "auxiliary/self-improvement/hair/hair-quote.md",
+    "auxiliary/self-improvement/Chrisma/Untitled",
     "interview/c_华为OD笔试面试参考.md",
+    "coding/coding-quote.md",
     "zx99-image/Pasted image 20241005155350.png",
     "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
     "zx99-image/Pasted image 20241005114209.png",
@@ -195,8 +198,6 @@
     "coding/os/linux/debug/KFENCE/k_Linux Kfence 详解.md",
     "coding/os/linux/debug/GDB/p_使用 GDB + Qemu 调试 Linux 内核.md",
     "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
-    "coding/os/linux/device/kn_libdrm-modetest 原理及图显系统验证方法.md",
-    "coding/os/linux/device/kn_Linux V4L2子系统与视频编解码设备介绍.md",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
@@ -207,7 +208,6 @@
     "0x01-leetcode/2-dimensional/tree/traversal/inorder",
     "0x01-leetcode/2-dimensional/tree/traversal/preorder",
     "0x01-leetcode/2-dimensional/tree/traversal/level-order/populate-right-pointer",
-    "0x01-leetcode/2-dimensional/tree/traversal/level-order",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
   ]
