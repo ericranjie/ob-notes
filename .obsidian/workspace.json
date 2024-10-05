@@ -11,11 +11,9 @@
             "id": "21d9fe15fdd168c6",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241005114209.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
+                "file": "zx99-image/Pasted image 20241005114209.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
+                "file": "zx99-image/Pasted image 20241005114209.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md"
+                "file": "zx99-image/Pasted image 20241005114209.png"
               }
             }
           }
@@ -146,44 +144,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "21d9fe15fdd168c6",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "zx99-image/Pasted image 20241005114311.png",
+    "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
+    "zx99-image/Pasted image 20241005114447.png",
+    "zx99-image/Pasted image 20241005114443.png",
+    "zx99-image/Pasted image 20241005114438.png",
+    "zx99-image/Pasted image 20241005114433.png",
+    "zx99-image/Pasted image 20241005114428.png",
+    "zx99-image/Pasted image 20241005114416.png",
+    "zx99-image/Pasted image 20241005114407.png",
+    "zx99-image/Pasted image 20241005114400.png",
+    "zx99-image/Pasted image 20241005114354.png",
+    "zx99-image/Pasted image 20241005114340.png",
+    "coding/reverse-engineering/k_浅谈编译器对代码的优化.md",
+    "coding/reverse-engineering/i_链接加载原理及ELF文件格式.md",
+    "README.md",
+    "coding/reverse-engineering/bn_内核、容器与eBPF攻防初探.md",
+    "coding/reverse-engineering/n_内核学习-异常处理(win).md",
+    "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
     "coding/reverse-engineering/bn_16位实模式切换32位保护模式过程详解.md",
-    "zx99-image/Pasted image 20241004194221.png",
     "coding/reverse-engineering/bn_高Glibc版本下的堆骚操作解析.md",
-    "zx99-image/Pasted image 20241004202413.png",
-    "zx99-image/Pasted image 20241004202218.png",
-    "zx99-image/Pasted image 20241004202154.png",
-    "zx99-image/Pasted image 20241004202135.png",
-    "Pasted image 20241004202131.png",
-    "zx99-image/Pasted image 20241004201944.png",
     "coding/reverse-engineering/an_VM逆向，一篇就够了.md",
     "coding/reverse-engineering/kn_一文搞懂  ARM MMU.md",
     "coding/reverse-engineering/kn_Kernel从0开始.md",
     "coding/os/linux/debug/bn_问题排查利器：Linux 原生跟踪工具 Ftrace 必知必会.md",
-    "README.md",
-    "zx99-image/Pasted image 20241004194309.png",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
     "coding/os/linux/debug/bn_Linux内核 Netlink机制分析与使用.md",
     "coding/os/linux/debug/p_冰河为啥有很多时间写文章，录视频？关键在于事倍功倍！！.md",
     "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
     "coding/os/linux/debug/trace/k_ftrace时间精度issue修复.md",
     "coding/os/linux/debug/KFENCE/k_Linux Kfence 详解.md",
-    "zx99-image/Pasted image 20241004165853.png",
     "coding/os/linux/debug/GDB/p_使用 GDB + Qemu 调试 Linux 内核.md",
     "coding/os/linux/debug/ASAN/bn_深入分析HWASAN检测内存错误原理.md",
-    "zx99-image/Pasted image 20241004170130.png",
     "coding/os/linux/device/kn_libdrm-modetest 原理及图显系统验证方法.md",
     "coding/os/linux/device/kn_Linux V4L2子系统与视频编解码设备介绍.md",
     "coding/os/linux/device/i_Linux reset framework.md",
     "coding/os/linux/device/i_基于Hikey的 Boot from USB 调试.md",
-    "coding/os/linux/device/k_如何使能500个virtio_blk设备.md",
-    "coding/os/linux/device/i_致驱动工程师的一封信.md",
-    "coding/os/linux/device/i_驱动加载的本质.md",
-    "coding/os/linux/device/GPIO/i_linux内核中的GPIO系统之（1）：软件框架.md",
-    "coding/os/linux/device/eMMC/k_Linux MMC framework(2)_host controller driver.md",
-    "coding/os/linux/device/eMMC/i_MMC SD SDIO介绍.md",
-    "coding/os/linux/device/eMMC/i_Linux MMC framework(1)_软件架构.md",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",

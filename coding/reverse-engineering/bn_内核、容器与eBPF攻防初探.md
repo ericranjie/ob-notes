@@ -1,140 +1,97 @@
-# 
-
 ScUpax0s 看雪学苑
-
- _2022年02月11日 17:58_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/kR3MmOkZ9r5PdQaibib7Zg7KLY47zx7cA1zjFypBicmsKK9ghWsIsKS8v1VjDYlc9Mr1f6g0pzDLWia98VBibrvgT1A/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)  
-
+ _2022年02月11日 17:58_  
 本文为看雪论坛精华文章
-
 看雪论坛作者ID：ScUpax0s
 
-  
-
-#   
-
 # **环境搭建**
-
-  
-
 最终要产生这样一个环境：
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/kR3MmOkZ9r7ouW9ItrawF5VVR7IWmjmRoJXicpibru3qUaU2lJQOyRbQN1qQLRibzic5Xaek06icicwk04gA3d3PgBFw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 目前看到网上的貌似都是双机调试，但是双机还是比较麻烦，于是最好就是用QEMU来做。
 
-  
-
 1、首先编译对应的内核，得到vmlinux，bzImage。
-
-  
 
 注意，在编译内核时一定要打开：CONFIG_OVERLAY_FS=y 因为docker需要对应的文件系统的支持。
 
-  
 
 打开 CONFIG_GDB_SCRIPTS=y , CONFIG_DEBUG_INFO=y 如果后续要调试内核的话。
 
-  
-
 2、然后利用syzkaller的 create-image.sh。
-
-  
 
 修改添加对cgroup的挂载：
 
+```c
+echo 'debugfs /sys/kernel/debug debugfs defaults 0 0' | sudo tee -a $DIR/etc/fstab echo 'securityfs /sys/kernel/security securityfs defaults 0 0' | sudo tee -a $DIR/etc/fstab echo 'configfs /sys/kernel/config/ configfs defaults 0 0' | sudo tee -a $DIR/etc/fstab echo 'binfmt_misc /proc/sys/fs/binfmt_misc binfmt_misc defaults 0 0' | sudo tee -a $DIR/etc/fstab echo 'tmpfs /sys/fs/cgroup cgroup defaults 0 0' | sudo tee -a $DIR/etc/fstab
 ```
-echo 'debugfs /sys/kernel/debug debugfs defaults 0 0' | sudo tee -a $DIR/etc/fstab
-```
-
-  
 
 执行：./create-image.sh 生成文件系统。
 
-  
-
 3、qemu启动脚本：
 
+```c
+qemu-system-x86_64 \ -drive file=./stretch.img,format=raw \ -m 256 \ -net nic \ -net user,host=10.0.2.10,hostfwd=tcp::23505-:22 \ -enable-kvm \ -kernel ./bzImage \ -append "console=ttyS0 root=/dev/sda earlyprintk=serial" \ -nographic \ -pidfile vm.pid \
 ```
-qemu-system-x86_64 \
-```
-
-  
 
 4、启动起来之后的连接命令：
 
-```
+```c
 ssh-keygen -f "/root/.ssh/known_hosts" -R "[localhost]:23505"
+ssh -i ./stretch.id_rsa -p 23505 root@localhost
 ```
-
-  
 
 5、最终可以通过ssh进入系统。
 
-```
+```c
 root@syzkaller:~#
 ```
 
-  
-
 6、修改登陆密码：  
 
+```c
+apt install docker-ce   
+vim /etc/ssh/sshd_config
+PermitRootLogin yes
+passwd root
+poweroff
 ```
-apt install docker-ce
-```
-
-  
 
 如果第一步失败就按照：
 
 _https://docs.docker.com/engine/install/debian/_
-
-_https://stackoverflow.com/questions/48002345/docker-ce-depends-libseccomp2-2-3-0-but-2-2-3-3ubuntu3-is-to-be-installe_
-
-  
+https://stackoverflow.com/questions/48002345/docker-ce-depends-libseccomp2-2-3-0-but-2-2-3-3ubuntu3-is-to-be-installe_
 
 7、重新登陆确认：
 
+```bash
+Debian GNU/Linux 9 syzkaller ttyS0   syzkaller login: root Password: Unable to get valid context for root Last login: Fri Dec  3 14:09:17 UTC 2021 from 10.0.2.10 on pts/0 Linux syzkaller 5.16.0-rc1 #3 SMP PREEMPT Wed Dec 1 09:46:37 PST 2021 x86_64   The programs included with the Debian GNU/Linux system are free software; the exact distribution terms for each program are described in the individual files in /usr/share/doc/*/copyright.   
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent permitted by applicable law. root@syzkaller:~#
 ```
-Debian GNU/Linux 9 syzkaller ttyS0
-```
-
-  
 
 8、安装对应的docker-ce，方法：
 
 _https://docs.docker.com/engine/install/debian/_
 
-  
-
 9、这里有一个官方提供的用于检查对应的docker运行时环境的。
 
 _https://github.com/moby/moby/blob/master/contrib/check-config.sh_
 
-  
-
 使用方式：
 
-```
+```c
 ./check-config.sh /path/to/kernel/.config
 ```
-
-  
 
 如果启动不起来什么的，就运行一下这个脚本check一下环境
 
 然后开启对应的需要的CONFIG，重新编译即可。
 
-  
-
 **如果以上步骤之后，还是无法直接运行dockerd，那么请按照下面的步骤由runc来直接手动创建容器。**
 
+```bash
+# 1. Get rootfs(out of VM) 
+docker export $(docker create busybox) -o busybox.tar   # 2. put rootfs into VM's .img root@ubuntu:~/container# mount -o loop ./stretch.img /mnt/chroot/ root@ubuntu:~/container# cp ./busybox.tar /mnt/chroot/root/ root@ubuntu:~/container# umount /mnt/chroot/   # 3. Finally, boot the QEMU, and untar the busybox.tar in ~ to rootfs/ root@syzkaller:~# cd rootfs/ root@syzkaller:~/rootfs# pwd /root/rootfs root@syzkaller:~/rootfs# ls bin  dev  etc  home  proc  root  sys  tmp  usr  var   # 4. Generate OCI config docker-runc spec root@syzkaller:~# ls config.json  rootfs   # 5. Run manually, docker-runc run <ContainerName> root@syzkaller:~# docker-runc run guoziyi / # ls bin   dev   etc   home  proc  root  sys   tmp   usr   var / # id uid=0(root) gid=0(root) / # ps -ef PID   USER     TIME  COMMAND     1 root      0:00 sh     7 root      0:00 ps -ef / # exit   # 6. vim config.json "root": {     "path":"root",     "readonly":"false" }
 ```
-# 1. Get rootfs(out of VM)
-```
-
-  
 
 10、最终效果：
 

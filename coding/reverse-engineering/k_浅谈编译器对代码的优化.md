@@ -1,12 +1,6 @@
-
 彼岸风 看雪学苑
-
  _2023年01月23日 17:59_ _安徽_
-
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_jpg/1UG7KPNHN8Eqic51RIXYMYyr8uCAmQoDu4J9AYUhDEnCSuLSnbaETLmlVb71ic5hQPNcaVVxlxKOiaVBYb0zgThQA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)  
-
 本文为看雪论坛优秀文章
-
 看雪论坛作者ID：彼岸风
 
 在学习 Andorid 逆向的过程中，发现无论是哪种编译器，生成哪个平台的代码，其优化思路在本质上如出一辙，在 Windwos 平台所使用的技巧，在安卓平台仍然适用，不外乎乘法除法计算的优化，swtich 判定树的优化，对 if 条件句的优化，while 循环的优化等等，编写本文的目的也就是为了对已学的知识进行总结。
@@ -18,45 +12,31 @@
 # 优化方向  
 
 - 编译速度优化
-    
 - 执行速度优化
-    
 - 程序体积优化
     
-
 > 对于 Debug 版程序，编译器为了满足单步调试需求，不会对无意义的代码进行优化。无意义的意思是没有发生传递，没有赋值到内存空间。
-
-  
-
-  
-
-一  
-
-  
-
-**常见的优化类型**
-
-  
+# 一  常见的优化类型
 
 ## **常量折叠**
 
 更像是预处理，编译器会将所有可预见的值直接写成立即数。
 
+```c
+int n = 2 + 3 * 6; 
+// 编译器在处理这段代码时会直接将变量赋予立即数+ 
+// mov n, 20
 ```
-int n = 2 + 3 * 6;
-```
-
-##   
 
 ## **常量传播**
 
 是常量折叠的“进阶版”，编译器会扫描整个代码段，对所有非变量运算直接计算出结果。
 
+```c
+int n = 2 + 3 * 6; 
+int m = n * 10; 
+// mov m, 200
 ```
-int n = 2 + 3 * 6;
-```
-
-##   
 
 ## **减少变量**
 
@@ -64,33 +44,21 @@ int n = 2 + 3 * 6;
 
 编译虽然能通过，但不会产生任何代码，因为没有传递结果，对后续的代码执行不会造成任何影响。
 
+```c
+int funtion1() {     int n = 2 + 3 * 6;     int m = n * 10;     return 0; } // 无意义的变量，这个函数被编译为汇编也将只有一句代码 // mov eax, 0    int funtion2() {     int n = 2 + 3 * 6;     int m = n * 10;     return m; } // 有意义的变量，但因为常量传播，也只有一句代码 // mov eax, 200
 ```
-int funtion1() {
-```
-
-##   
 
 ## **分支优化**
 
 对于所有不可达的分支也会直接被裁剪。
 
-```
-if(false) {
+```c
+if(false) {     printf("you can't find me"); }
 ```
 
 > 在书中还有更多优化示例，这里不做过多列举，其根本就是以上几种优化方式，无意义的代码将被删除，冗余的代码将会被精简，照着这种思路想就对了。得益于编译器的强大，使得再烂的代码也能保持高效。
 
-#   
-
-  
-
-二  
-
-  
-
-# **数学计算上对算法的优化**
-
-  
+# **二  数学计算上对算法的优化**
 
 我将会穿插使用 x86 和 arm 汇编，主要指令都大差不差，理解意义即可。
 
@@ -101,22 +69,19 @@ if(false) {
 ## **减法**
 
 理论上加法和减法的指令周期是一致的，也不排除有些编译器会将减数转成补码进行相加，遇到补码也能一眼看出来，直接就可以认定这条指令为减法。
-
 ## **乘法**
 
 ### 变量乘常量
 
 - 常量为2的幂
-    
 
 乘法将会被替换为执行周期更短的移位指令。
 
-```
-int fun(int n) {
+```c
+int fun(int n) {     return n * 16; } // mov eax, n // shl eax, 4
 ```
 
 - 常量为非2的幂
-    
 
 因为 thumb 和 x86 指令集的差异，安卓平台上处理的更好一些。
 
@@ -125,23 +90,17 @@ int fun(int n) {
 编译器会对非2的幂进行拆解，例如：
 
 - n * 15 = n * 16 - n = n << 4 - n
-    
 - n * 12 = n * 3 * 4 = (n << 1 + n) << 2
     
-
-  
-
-```
-int value = n * 15;
+```c
+int value = n * 15; // rsb.w r0, r1, r1, lsl #4   int value = n * 12; // add.w r0, r1, r1, lsl #1
 ```
 
 当然 windows 平台也不是一无是处，某些乘法会通过 lea 将两条指令合并成一条。
-
 - n * 4 + 5 = lea edx, [ecx * 4 + 5]
-    
 
-```
-printf("%d", n * 4 + 5);
+```c
+printf("%d", n * 4 + 5); // mov ecx, n // lea edx, [ecx * 4 + 5] // push edx
 ```
 
 至于值为不可拆分的素数，就改用 mul 指令。  
@@ -150,66 +109,43 @@ printf("%d", n * 4 + 5);
 
 这一步没有什么优化空间，因为都是未知的，只能老老实实用 mul 指令。
 
-```
-int fun(int n, int m) {
+```c
+int fun(int n, int m) {     return n * m; } // mov eax, n // mov ecx, m // imul ecx
 ```
 
-##   
 
 ## **除法**
 
 在看下面内容之前，不妨再问问自己，真的了解除法吗？除法的本质是什么？  
-
 ok，现在是复习时间，简单总结一下以下两个问题。
-
 - 符号问题
-    
-
 1. 两个无符号整数相除，结果依然是无符号
-    
 2. 两个有符号整数相除，结果依然是有符号
-    
 3. 混除，参数全被当成无符号计算，结果是无符号
     
-      
-    
-
 - 取整问题
-    
-
 1. 向下取整 —— floor 函数    存在误差 => ( - a / b ) + ( a / b ) != - ( a / b ) - ( a / b )
-    
 2. 向上取整 —— ceil 函数      存在误差 => ( - a / b ) != - ( a / b )
-    
 3. 向零取整 —— 截断除法(Truncate)，可以理解为放弃小数部分，只取整数部分，可以在任何情况保持恒等，大部分语言用的都是截断除法
-    
-
-###   
-
 ### 除数为无符号数
-
 - 大数（负数）
     
-
 在无符号中，负数的值是很大的，例如 -8 = 0xFFFFFFF8。
-
 而除以这种大数，只能出现两种情况，1或 0，换个思路来想就可以写成这样：[被除数] >= [除数] ? 1 : 0  
-
 我们来看看 thumb 下是怎么优化的？
 
-```
-UINT value = (UINT)n / -8;
+```c
+UINT value = (UINT)n / -8; // cmn.w r0, #9    ; cmp r0, -9 // it hi // movhi r1, #1    ; n > -9 ? 1 : 0
 ```
 
 他这里做了一个小小的变形：[被除数] > [除数 - 1] ? 1 : 0，逻辑上仍然成立。
 
 - 2的幂
-    
 
 简单的移位
 
-```
-UINT value = (UINT)n / 4;
+```c
+UINT value = (UINT)n / 4; // lsrs r1, r0, #2
 ```
 
 - 非2的幂
@@ -220,11 +156,11 @@ UINT value = (UINT)n / 4;
 我们这里的魔数稍有不同，它是用来优化除法的，而且逻辑上也相对容易理解一些，废话不多说，进入正题。
 
 对于普通除法，我们可以得到以下的换算：（x => 被除数变量，c => 除数常量，M => 魔数）
-
+![[Pasted image 20241005112543.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 假设用 M 代替 2^n / c 这个 Magic 变量，于是有：
-
+![[Pasted image 20241005112547.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 也就是说，除法将会被转会成 (x * M) >> n 的逻辑进行运算，至于 M 和 n 值怎么来的，我们不关心，这是编译器根据除数算出来的最优值，会尽力保证偏差达到最小，我们要做的是认出魔数和移了多少位，然后根据 m = 2^n/c 公式求得原本的除数 c = 2^n/m
@@ -233,35 +169,18 @@ UINT value = (UINT)n / 4;
 
 以下代码为例：
 
+```c
+printf("%u", (unsigned)argc / 3); // mov eax, 0xAAAAAAAB   ; M // mul [argc]            ; edx:eax = argc * M // shr edx, 1            ; edx = argc * M >> 32 >> 1 // push edx
 ```
-printf("%u", (unsigned)argc / 3);
-```
-
+![[Pasted image 20241005112610.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个属于总结篇，windows篇可以先看我以前的笔记：_https://note.youdao.com/s/5tc2zdgo_
 
-  
-
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
 **看雪ID：彼岸风**
-
 https://bbs.pediy.com/user-home-937323.htm
-
 *本文由看雪论坛 彼岸风 原创，转载请注明来自看雪社区
 
-  
-
-[![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458493144&idx=1&sn=bbd89665eab40db68e01bcf6d824ae81&chksm=b18e905286f9194494e50458e8da43d840d1d07cb994b10c28783425d127625d8eca756797d1&scene=21#wechat_redirect)
-
-  
-
-  
 
 **#** **往期推荐**
 
