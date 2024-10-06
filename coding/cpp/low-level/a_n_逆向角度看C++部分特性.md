@@ -1,367 +1,259 @@
-# 
-
 唱过阡陌 看雪学苑
-
  _2022年04月02日 17:59_
-
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_jpg/1UG7KPNHN8Edqm0iaLicibArzJ2Guib4IFQUtZUXCs0NpicCqQmibXIibib7rEWMkqgnm6a1K3OWrMa5fO1aRbO2tQurkg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)  
-
 本文为看雪论坛优秀文章  
 看雪论坛作者ID：唱过阡陌
 
-  
-
-  
-
-#### **单/多继承**
-
-  
-
-**单继承**
-
-  
+# **单/多继承**
+## **单继承**
 
 测试源码：
 
+```c
+#define MAIN __attribute__((constructor)) 
+#define NOINLINE __attribute__((__noinline__))  
+class BaseClass{ public:     int a,b;     BaseClass(int mA=1,int mB=2,int mC=3,int mD=4){         this->a = mA;         this->b = mB;         this->c = mC;         this->d = mD;     } private:     int c; protected:     int d; };  class ChildClass: public BaseClass{ public:     int m,n;     ChildClass(int mM=5,int mN=6){         this->m = mM;         this->n = mN;     } };  MAIN void test0(){     auto* baseClass = new BaseClass();     LOGD("baseClass   : %p sizeof: %d ",baseClass,sizeof(*baseClass));      auto* child1 = new ChildClass(10,20);     LOGD("child1  : %p sizeof: %d", child1, sizeof(*child1)); }
 ```
-#define MAIN __attribute__((constructor))
-```
-
-  
 
 LOG日志：  
+![[Pasted image 20241006170358.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 内存情况：  
+![[Pasted image 20241006170404.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到实际上单继承就是把 baseClass 的成员变量完全copy了一份放在了我们childClass的前面。
+## **多继承**
 
-  
-
-**多继承**
-
-```
-// 新增一个BaseNewClass，让ChildClass:BaseClass继承这两个Class
+```c
+// 新增一个BaseNewClass，让ChildClass:BaseClass继承这两个Class 
+class BaseNewClass{ public:     int p,q;     BaseNewClass(int mP=10,int mQ=11){         this->p = mP;         this->q = mQ;     } };  class ChildClass:BaseClass,BaseNewClass{ public:     int m,n;     ChildClass(int mM=5,int mN=6){         this->m = mM;         this->n = mN;     } };
 ```
 
+```c
+// LOG()日志 
+D/ZZZ: baseClass   : 0xf216dd70 sizeof: 16 
+D/ZZZ: childClass  : 0xea17e280 sizeof: 32  
+// 内存情况 
+[Pixel XL::XXX]-> seeHexA(0xea17e280,32)            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF ea17e280  01 00 00 00 02 00 00 00 03 00 00 00 04 00 00 00  ................ ea17e290  0a 00 00 00 0b 00 00 00 05 00 00 00 06 00 00 00  ................
 ```
-// LOG()日志
-```
-
-  
 
 其实也都是成员变量按顺序往后排就完事。
+## **虚函数**
 
-####   
-
-#### **虚函数**
-
-```
-// 测试源码
+```c
+// 测试源码 
+class BaseClass{ public:     int a,b;     BaseClass(int mA=1,int mB=2,int mC=3,int mD=4){         this->a = mA;         this->b = mB;         this->c = mC;         this->d = mD;     }     virtual void showLOG(){         LOGD("Called BaseClass showLOG");     }     virtual void showLOG1(){         LOGD("Called BaseClass showLOG1");     } private:     int c; protected:     int d; };  class ChildClass:BaseClass{ public:     int m,n;     ChildClass(int mM=5,int mN=6){         this->m = mM;         this->n = mN;     }     virtual void showLOG(){         LOGD("Called ChildClass showLOG");     }     virtual void showLOG1(){         LOGD("Called ChildClass showLOG1");     }     virtual void showLOG2(){         LOGD("Called ChildClass showLOG2");     } };  MAIN void test0(){     auto* baseClass = new BaseClass();     LOGD("baseClass   : %p sizeof: %d",baseClass,sizeof(*baseClass));      auto* childClass = new ChildClass();     LOGD("childClass  : %p sizeof: %d",childClass,sizeof(*childClass)); }
 ```
 
-  
-
+```c
+// 日志 
+D/ZZZ: baseClass   : 0xe75a7648 sizeof: 20 D/ZZZ: childClass  : 0xe75d8d00 sizeof: 28  
+// 内存情况 
+[Pixel XL::XXX]-> seeHexA(0xe75a7648,20)            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF e75a7648  24 59 5f d2 01 00 00 00 02 00 00 00 03 00 00 00  $Y_............. e75a7658  04 00 00 00                                      .... [Pixel XL::XXX]-> seeHexA(0xe75d8d00,28)            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF e75d8d00  3c 59 5f d2 01 00 00 00 02 00 00 00 03 00 00 00  <Y_............. e75d8d10  04 00 00 00 05 00 00 00 06 00 00 00              ............
 ```
-// 日志
-```
-
-  
 
 由上我们可以看到这两个Class的地址的开始位置都多了一个指针，指针后面的才是我们真实的结构体值，这第一个指针就是 vptr(虚函数指针)，指向了虚函数表，然后再去读一下这个指针。
 
+```c
+//读取vptr指向的位置 
+[Pixel XL::XXX]-> seeHexA(ptr(0xe75a7648).readPointer(),0x20)            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF d25f5924  b1 fa 5a d2 c9 fa 5a d2 d4 60 5f d2 39 29 5f d2  ..Z...Z..`_.9)_. d25f5934  00 00 00 00 48 59 5f d2 e1 fa 5a d2 f9 fa 5a d2  ....HY_...Z...Z.  [Pixel XL::XXX]-> Module.findBaseAddress("libdynamic.so") "0xd2593000" [Pixel XL::XXX]-> ptr(0xd25f5924).readPointer().sub(0xd2593000) "0x1cab1" [Pixel XL::XXX]-> ptr(0xd25f5928).readPointer().sub(0xd2593000) "0x1cac9" [Pixel XL::XXX]-> ptr(0xd25f592c).readPointer().sub(0xd2593000) "0x630d4" [Pixel XL::XXX]-> ptr(0xd25f5930).readPointer().sub(0xd2593000) "0x5f939"
 ```
-//读取vptr指向的位置
-```
-
-  
 
 此时打开IDA验证一下这前两个地址就是真实的函数地址。
-
-  
 // IDA查看地址：  
+![[Pasted image 20241006170647.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 同理我们去看看另一个childClass类也会得到类似的结果：
 
+```c
+// 
+[Pixel XL::XXX]-> seeHexA(ptr(0xe75d8d00).readPointer(),0x20)            0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F  0123456789ABCDEF 
+d25f593c  e1 fa 5a d2 f9 fa 5a d2 11 fb 5a d2 30 61 5f d2  ..Z...Z...Z.0a_. d25f594c  44 29 5f d2 00 00 00 00 01 00 00 00 2c 59 5f d2  D)_.........,Y_.  [Pixel XL::XXX]-> ptr(0xd25f593c).readPointer().sub(0xd2593000) "0x1cae1" [Pixel XL::XXX]-> ptr(0xd25f5940).readPointer().sub(0xd2593000) "0x1caf9" [Pixel XL::XXX]-> ptr(0xd25f5944).readPointer().sub(0xd2593000) "0x1cb11" [Pixel XL::XXX]-> ptr(0xd25f5948).readPointer().sub(0xd2593000) "0x63130" [Pixel XL::XXX]-> ptr(0xd25f594c).readPointer().sub(0xd2593000) "0x5f944"
 ```
-//
-```
-
-  
 
 第一二三个：明显就是对应的虚函数具体的函数地址。第四五个：应该是和 **C++中的RTTI机制** 相关。
 
 // IDA查看地址：  
+![[Pasted image 20241006170912.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 简单归纳一下：
 
-  
-
 ① 继承这种操作其实就是得到了一个父类数据结构的副本，他们的vptr和属于子类部分的数据结构都是独有的。
-
-  
-
 ② 继承后父类的虚函数表也会被子类完全继承。若无覆盖时，子类的虚函数表会完全拷贝一份父类的虚函数表项，并将自己子类的虚函数表项拼接在上表后面。
-
-  
-
 ③ 如果子类覆盖了父类的某一个虚函数，虚函数表项值改变顺序不变。
 
-  
 
 这里简单的提及了一下，更详细的关于虚函数的介绍可以查看 这篇文章（_https://blog.csdn.net/smartgps2008/article/details/90745271_）。
 
 至于里面提到的关于 安全性 的反思：
 
-  
-
 ① Base1 b1 = new Derive(); 将子类的指针转为一个父类指针，只是在c++语法上限制了其对部分操作的可能性。 "子类中的未覆盖父类的成员函数" ，对它的理解应该是：它本是是什么还是什么，语法上的限制完全可以使用指针操作来实现一定程度和语法的背道而驰。他提出的第二点 *"访问non-public的虚函数" 其实和上述这一点也差不多的意思。
 
-  
-
 ② 补充一点：其实对于继承中的成员变量也有同样类似的效果，父类不管把成员的访问权限设置为什么，其实子类都有一个完整的拷贝，同样可以通过指针操作绕过c++语法的禁止，去访问并修改父类非公开成员变量。
-
-####   
-
-#### **拷贝构造**
-
-####   
+### **拷贝构造**
 
 #### 源码以及汇编情况：
 
+```cpp
+NOINLINE void test1(ChildClass* cls){     cls->showLOG(); }  NOINLINE void test2(ChildClass &cls){     cls.showLOG(); }  NOINLINE void test3(ChildClass cls){     cls.showLOG1(); }  NOINLINE ChildClass test4(ChildClass cls){     return cls; }  MAIN void test0(){     auto* baseClass = new BaseClass();     LOGD("baseClass   : %p sizeof: %d  typeid: %s",baseClass,sizeof(*baseClass),typeid(baseClass).name());      auto* child1 = new ChildClass(10,20);     LOGD("child1  : %p sizeof: %d  typeid: %d", child1, sizeof(*child1), typeid(child1).hash_code());      auto* child2 = new ChildClass(*child1);     child2->showLOG();      test1(child2);     test2(*child2);     test3(*child2);     test4(*child2); }
 ```
-NOINLINE
-```
-
-  
 
 // 全局视图：  
+![[Pasted image 20241006171005.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
 列举出以下的几种情况：函数参数值传递（值传递和引用传递）
-
-  
 
 参见 test1 test2 可见：
 
 值传递对于基础数据类型会直接mov出一个副本，值传递对象(class/struct)的话会调用对象的拷贝构造函数得到一个新的副本，所以对于类对象太大的情况建议使用指针传递或者使用引用传递（指针传递和引用传递在汇编层面其实是一样的都是传递了一个指针[见上图]）。
 
-  
-
 参见 test3 可见：
 
 test3进行了值传递，在进入函数前先对ChildClass调用了一次拷贝构造函数，将栈上拷贝出来的该类传递进了 test3。
 
-  
-
 函数返回值
-
-  
 
 参见 test4 可见：
 
 test4 和 test3 同样在调用前都先调用了一次拷贝构造函数，但是test4的第一个参数是在栈上提前申请好预留给test4返回的空间，第二个参数为拷贝好的指向副本的类指针，进入test4后也会发现在内部在调用了一次拷贝构造函数，也就是说值传递加上返回值这种写法相比直接引用传递会多调用两次拷贝构造函数。
 
-  
-
 从一个类创建另一个类
-
-  
 
 参见 test1(v4) 上面的两句：其实也是调用的拷贝构造函数，v4指向的拷贝好的类在栈上的首地址，第一个代表读取vptr，第二个代表读取vtable的第一个函数（child2->showLOG();就是ChildClass的第一个虚函数），然后再把自己（v4）当成this传递给这个虚函数调用。
 
-  
-
 拷贝构造拷贝父类
 
-  
-
 详见下图：// 由编译器为我们生成的拷贝构造函数
-
+![[Pasted image 20241006171031.png]]
   
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
+```cpp
+ChildClass(const ChildClass &child){     this->m = child.m;     this->n = 12;     LOGD("called ChildClass拷贝构造函数"); }
 ```
-ChildClass(const ChildClass &child){
-```
-
-  
 
 // 由我们自己编写的拷贝构造函数：
-
+![[Pasted image 20241006171055.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 // 虚函数表：  
+![[Pasted image 20241006171100.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由此可见调用子类的拷贝构造函数会先调用父类的构造函数，然后在调用当前类的拷贝构造，这里的off_85600就是 vptr ，从虚函数表中也可以看见，子类覆盖了父类的虚函数就会指向子类的虚函数。
 
-  
-
 若没有覆盖，表项中依旧是指向父类的函数地址，而且顺序是按照父类的虚函数表顺序排列，子类中父类没有的虚函数会按顺序继续排在后面，不同类的虚函数表其实都是在编译期就已经确定了的，不同类的虚函数表处于临近的内存区域。
 
-  
-
-#### **类的 构造/析构 函数调用时机**
-
-####   
+### **类的 构造/析构 函数调用时机**
 
 #### 详见下图（ChildClass中新增了一个析构函数），// 新增析构函数：
-
+![[Pasted image 20241006171112.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-####   
-
-#### **类继承权限**
-
-####   
+### **类继承权限**
 
 #### 类的继承权限并不会影响子类继承父类子类所拥有的父类的成员变量个数，换句话说，不管父类的成员变量是什么权限，之类都完全拥有一份父类的成员变量的拷贝（这里就不展示）。
 
-####   
-
-#### **类型的强转**
-
-####   
-
+### **类型的强转**
 #### 主要是针对 dynamic_cast 向下转型的情况。
 
+```c
+BaseClass* baseTmp = dynamic_cast<BaseClass*>(child1); if (baseTmp!= nullptr){     baseTmp->showLOG1(); }  BaseClass* baseTmp1 = static_cast<BaseClass*>(child1); if (baseTmp1!= nullptr){     baseTmp1->showLOG1(); }  ChildClass* baseTmp2 = dynamic_cast<ChildClass*>(baseTmp); if (baseTmp2!= nullptr){     baseTmp2->showLOG1(); }
 ```
-BaseClass* baseTmp = dynamic_cast<BaseClass*>(child1);
-```
-
-  
 
 // 向下转型  
+![[Pasted image 20241006171156.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 由上两图可见对于类 向上转型 dynamic_cast 和 static_cast 本质是一样的，没有做任何处理。
 
-  
-
 dynamic_cast 向下转型的时候是借助了 RTTI 机制，就是我们前面图中看到的vptr->vtable 除了虚函数以后的指针标识该类的类型用于动态类型转换，同样也是typeid这个操作符的信息来源，具体可以参考 这篇文章（_http://c.biancheng.net/view/2343.html_）。
-
-  
 
 其实虚表什么的都是在编译期间就已经完全确定了，之前还误解以为动态类型转换中的向上转型可以让该子对象调用已经被子对象覆盖的父对象的方法，想多了想多了... 但是如果真想实现这样的"向上转型"也不是不行，借助指针去操作虚函数表即可 ↓  
 
   
 
 // 实现所谓的"向上转型"  
-
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20241006171210.png]]
   
 
 // 效果图  
-
+![[Pasted image 20241006171217.png]]
   
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
 最后两条日志可见，我们对同一对象调用 showLOG() 一个是父函数，一个是子函数，对应代码 815 和 819 行。
 
-  
-
-#### **简介 lambda**
-
-####   
+### **简介 lambda**
 
 #### 细节介绍参考 
-
 #### 这个（_https://en.cppreference.com/w/cpp/language/lambda_） 和 
-
 #### 这篇文章（_https://zhuanlan.zhihu.com/p/384314474_）
 
-  
 
 引用传递和值传递  
+![[Pasted image 20241006171226.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-####   
 
 #### **关于lambda表达式分为三部分解析**
 
-#####   
-
 ##### 1、表达式位于类中 （为了看到最原始的实现，不要开编译器优化）
 
+```c
+#define xASM(x) __asm __volatile__ (x) 
+using namespace std;
+class testA{ private:     int tempInt0 = 123;     int tempInt1 = 321;     int tempInt2 = 110; public:     testA(){         testFunction();     }      NOINLINE     void testFunction(){         [&]()-> void {             LOGD("testA anonymous_0 -> tempInt2:%d",this->tempInt2);         }();          []()-> void {             xASM("MOV r4, r0":::"r4");             int** tmp = nullptr;             xASM("MOV %0, r4":"=r"(tmp)::);             LOGD("testA anonymous_1 -> tempInt0:%d",**(tmp + 0x1));         }();          []()-> void {             xASM("MOV r4, r0":::"r4");             int tmp = 0;             xASM("LDR r4, [r4, #0x8]":::"r4");             xASM("LDR r4, [r4, #0x4]":::"r4");             xASM("MOV %0, r4":"=r"(tmp)::"r4");             LOGD("testA anonymous_2 -> tempInt1:%d",tmp);         }();     } };
 ```
-#define xASM(x) __asm __volatile__ (x)
-```
-
-  
 
 构造以及调用testFunction  
+![[Pasted image 20241006171307.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 testFunction汇编也可以明显看到被IDA识别为了lambda表达式。  
+![[Pasted image 20241006171313.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 从这里我们可以看到虽然源码后面两个lambda表达式虽然没有捕获参数，但是依旧有一个栈地址的传递(可以理解为一个空 this)。
 
 传递栈上地址逐个相差一个指针长度。  
+![[Pasted image 20241006171321.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-```
+```c
 0x4*6 = 24(0x18)  sp+0x4 sp+0x8 sp+0xc
 ```
 
-  
-
 上述源代码中没有表现出来，即便是空 lambda 实现，编译器依旧会传递一个栈上地址过去，这里也不做展示了。
-
-  
-
 然后后面两个 lambda 实现主要是为了实践，即使不捕获任何的参数，依旧可以拿到类实例，以及去读取类成员变量。
-
-  
-
 在类里面的 lambda 可以理解为对 () 的重载（被IDA也是识别为重载 operator()）。
 
-  
-
 读取类成员变量日志  
+![[Pasted image 20241006171337.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #####   
 
 ##### 2、表达式位于类外无捕获参数
 
-```
-NOINLINE
+```c
+NOINLINE void testB(){     auto testNoCatch = [](int s) -> int {         LOGD("testB called lambda function : %d", ++s);         return s;     };      LOGD("testB testNoCatch ---> %p",*testNoCatch);  //    using TypeFunc = int(*)(int);     auto testNoCatchNew = *testNoCatch;     testNoCatchNew(5);     testNoCatch(10); }
 ```
 
   
 
 表达式位于类外无捕获参数  
+![[Pasted image 20241006171400.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 中间函数用来返回lambda函数真实的地址  
+![[Pasted image 20241006171406.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 中间跳板函数  
+![[Pasted image 20241006171414.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 lambda函数的实现，和普通函数没有啥差别。  
+![[Pasted image 20241006171420.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 类外 lambda 函数，*lambda 都会生产这样的一个跳转逻辑。  
@@ -371,6 +263,7 @@ lambda函数的实现，和普通函数没有啥差别。
   
 
 testB 日志  
+![[Pasted image 20241006171426.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #####   
