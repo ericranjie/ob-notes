@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
+                "file": "coding/cpp/low-level/k_大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
+                "file": "coding/cpp/low-level/k_大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
+                "file": "coding/cpp/low-level/k_大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md"
+                "file": "coding/cpp/low-level/k_大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md"
               }
             }
           }
@@ -161,8 +161,8 @@
   },
   "active": "bf7c920437bcedfb",
   "lastOpenFiles": [
-    "README.md",
     "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
+    "README.md",
     "coding/cpp/grammar/k_n_使用 C++ 中的 final 关键字，到底能否提升性能？.md",
     "coding/cpp/grammar/i_std span查看连续内存.md",
     "coding/cpp/low-level/谷歌正寻求提高 C++ 内存安全.md",
