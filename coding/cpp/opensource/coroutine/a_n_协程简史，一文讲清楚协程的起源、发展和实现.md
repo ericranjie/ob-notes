@@ -1,125 +1,50 @@
- 
 陈蒙 郭霖
-
  _2022年10月08日 08:00_ _江苏_
 
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/v1LbPPWiaSt5u4qlRDV7JCPTlhLruwgCE7IwG1NBPXaJxfvDKvhCWSDe0PMuVbEb1pavYAiaAjbELXcNC1UPzbJw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)  
-
-  
-
 /   今日科技快讯   /
-
-  
-
 北京时间10月5日下午，在瑞典首都斯德哥尔摩，瑞典皇家科学院宣布，将2022年诺贝尔化学奖授予美国化学家卡罗琳·贝尔托西、丹麦化学家摩顿·梅尔达尔和美国化学家卡尔·巴里·夏普莱斯，以表彰他们在点击化学和生物正交化学研究方面的贡献。其中，卡尔·巴里·夏普利斯第二次获得诺贝尔化学奖。
 
-  
-
 /   作者简介   /  
-
-  
-
 大家好，国庆假期结束，我们又如期见面了。记得从今天起要连上7天班哦。
-
-  
-
 本篇文章来自陈蒙的投稿，文章主要分享了协程的起源，发展和常见实现，相信会对大家有所帮助！同时也感谢作者贡献的精彩文章。
-
-  
-
 陈蒙的博客地址：
-
 > https://chenmeng.blog.csdn.net/?type=blog
-
-  
 
 /   前言   /
 
-  
-
 如果说大前端开发有什么金规铁律的话，那「不要阻塞主线程」肯定算一个。特别是面对网络请求等耗时任务时，异步编程是避免主线程卡死的常见解决方案。协程是诸多异步编程范式中的一种。相较于多线程、回调、Promise、响应式编程等其他异步编程范式，协程具有轻量级、代码可读性好等优点。当前主流编程语言要么已经支持了协程，要么正在支持的路上。本文将从起源、发展历史、常见语言实现等角度进行介绍，力求为大家展示协程的全貌。
-
-  
 
 /   概念释义   /
 
-  
-
 **协程定义**
 
-  
-
 维基百科对协程定义的英文原文：
-
-  
-
 **Coroutines are computer program components that generalize subroutines for non-preemptive multitasking, by allowing execution to be suspended and resumed.**
-
-  
-
 是不是觉得晦涩难懂？每个单词都认识，但是连在一起就不知所云了。我们先往下看，后面再逐词解释。
-
-  
 
 除了维基百科，我们也许还见过别的定义，这些定义多是从某个角度描述协程特性的。
 
-  
-
 比如侧重其轻量级特性的：
 
-  
-
 **Coroutines are very light-weight threads.**
-
-  
-
 或者
-
-  
-
 **Coroutines are like very light-weight threads.**
 
-  
-
 虽只有一字之差，却是天壤之别。
-
-  
-
 侧重其暂停/恢复特性的：
-
-  
-
 **A coroutine is an instance of suspendable computation.**
-
-  
-
 侧重其表现形式的：
-
-  
-
 **A variant of functions that enables concurrency via cooperative multitasking.**
-
-  
 
 CoRoutine，其中 Co 是 Cooperative，意为平等、协作，指多段程序之间相互转移控制权；Routine 一词在高级语言中对应函数/方法等概念，即 Routine 与 Program、Subprogram、Function、Method、Subroutine、Procedure、Callable Unit 等词同义。故协程可以简称为协作的程序。
 
-  
-
 普通程序是主程序（Main）-子程序（Subroutine）的关系，一旦主程序调用（call）子程序，那么子程序独占控制权直到执行完成（return），是一种 call-return 的结构。通常，子程序一旦返回主程序，子程序的上下文就消失了，当主程序再次调用子程序时子程序需要重头开始执行一遍。
-
-  
 
 而协程不是 call-return 的结构，而是 suspend-resume 的结构，即在其中一段程序尚未执行完成时就向另一段程序移交控制权，而且前者会保存自己的上下文，以便稍后恢复现场继续执行。
 
-  
-
 从协程的调用行为上看，主程序既可以调用子程序，子程序也可以调用主程序，是一个双向的调用关系，并不是普通程序那种单向的调用-被调用的关系。
 
-  
-
 所以协程可以看做是对普通程序（Subroutine）的泛化（generalize），而普通程序是协程的一种特例（0个暂停点、单向的调用关系）。就像是打排球一样，如果把双方看成是有调用关系的程序，双方你来我往，地位是对等的，所以是一种 Co 的关系。引用发明协程这一概念的作者的原话，协程是：“as subroutines who act as the master program”。
-
-  
 
 普通程序和协程的对比见下图：
 

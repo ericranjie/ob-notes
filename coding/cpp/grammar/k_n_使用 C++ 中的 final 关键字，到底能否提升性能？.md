@@ -1,13 +1,9 @@
-
-
 CPP与系统软件联盟
-
  _2024年04月25日 17:29_ _江苏_
 
 使用 C++ 中的 final 关键字，到底能否提升性能？不少开发者认为可以，却没能给出数据依据。为此，本文作者进行了一次测试，亲自验证这个说法的真实性。  
 
 原文链接：https://16bpp.net/blog/post/the-performance-impact-of-cpp-final-keyword/
-
 译者 | 郑丽媛
 
 如果你选择用 C++ 写代码，一定是有理由的，而这个理由很可能就是性能。
@@ -30,19 +26,19 @@ CPP与系统软件联盟
 
 利用构建系统，我在 CMakeLists.txt 中添加了一个额外选项：
 
-```
+```c
 option(WITH_FINAL "Use the `final` specifier on derived classes (faster?)" OFF) 
 ```
 
 然后在 C++ 中，我们可以使用预处理器来创建一个 FINAL 宏：
 
-```
+```c
 #ifdef USE_FINAL 
 ```
 
 而且，它可以轻松地添加到任何你感兴趣的类中：
 
-```
+```c
 $ rg FINAL 
 ```
 

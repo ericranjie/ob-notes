@@ -20,12 +20,12 @@
             }
           },
           {
-            "id": "e2d90085bd089a6c",
+            "id": "bf7c920437bcedfb",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
+                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
                 "mode": "source",
                 "source": false
               }
@@ -82,7 +82,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 359.50390243530273
+    "width": 300.50390243530273
   },
   "right": {
     "id": "0ed372e18b255e27",
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
+                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
+                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md"
+                "file": "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md"
               }
             }
           }
@@ -159,21 +159,36 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e2d90085bd089a6c",
+  "active": "bf7c920437bcedfb",
   "lastOpenFiles": [
-    "zx99-image/Pasted image 20241006113404.png",
-    "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
-    "zx99-image/Pasted image 20241006113400.png",
-    "zx99-image/Pasted image 20241006113355.png",
-    "zx99-image/Pasted image 20241006113351.png",
-    "zx99-image/Pasted image 20241006113346.png",
-    "zx99-image/Pasted image 20241006113344.png",
-    "zx99-image/Pasted image 20241006113331.png",
-    "zx99-image/Pasted image 20241006113327.png",
-    "zx99-image/Pasted image 20241006113323.png",
-    "zx99-image/Pasted image 20241006113319.png",
-    "coding/app/nginx/b_万字多图，搞懂 Nginx 高性能网络工作原理！.md",
     "README.md",
+    "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
+    "coding/cpp/grammar/k_n_使用 C++ 中的 final 关键字，到底能否提升性能？.md",
+    "coding/cpp/grammar/i_std span查看连续内存.md",
+    "coding/cpp/low-level/谷歌正寻求提高 C++ 内存安全.md",
+    "coding/cpp/grammar/k_C++为什么要弄出虚表这个东西？.md",
+    "zx99-image/Pasted image 20241006161944.png",
+    "zx99-image/Pasted image 20241006162004.png",
+    "zx99-image/Pasted image 20241006161956.png",
+    "coding/cpp/opensource/coroutine/a_n_协程简史，一文讲清楚协程的起源、发展和实现.md",
+    "coding/cpp/opensource/coroutine/k_n_谈谈协程的历史与现状.md",
+    "coding/cpp/opensource/STL/万字长文 STL 算法总结.md",
+    "coding/cpp/opensource/a_400 行 C 代码实现一个虚拟机.md",
+    "zx99-image/Pasted image 20241006123532.png",
+    "zx99-image/Pasted image 20241006123642.png",
+    "zx99-image/Pasted image 20241006123639.png",
+    "zx99-image/Pasted image 20241006123620.png",
+    "zx99-image/Pasted image 20241006123551.png",
+    "coding/cpp/k_冷门知识点：进程间通信如何加锁？.md",
+    "coding/cpp/i_sizeof(void)之谜.md",
+    "coding/cpp/k_内存池设计与实现.md",
+    "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
+    "zx99-image/Pasted image 20241006122616.png",
+    "zx99-image/Pasted image 20241006114714.png",
+    "Welcome.md",
+    "04-左耳听风.epub",
+    "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
+    "coding/app/nginx/b_万字多图，搞懂 Nginx 高性能网络工作原理！.md",
     "coding/app/nginx/c_又一款Nginx 管理可视化神器！通过界面完成配置监控，一条龙！.md",
     "coding/app/nginx/b_p_Nginx 从安装到高可用.md",
     "coding/app/nginx",
@@ -184,20 +199,7 @@
     "coding/os/ARM/init/b_ARM64的启动过程之（二）：创建启动阶段的页表.md",
     "coding/os/ARM/init/b_ARM64的启动过程之（一）：内核第一个脚印.md",
     "coding/os/ARM/c_为什么会有“ARMv8A Architecture”这个分类.md",
-    "coding/compiler/k_利用Makfile给多文件、多目录C源码建立工程.md",
-    "coding/compiler/b_编译乱序(Compiler Reordering).md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
     "auxiliary/self-improvement/Chrisma/Untitled",
-    "interview/c_华为OD笔试面试参考.md",
-    "coding/coding-quote.md",
-    "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
-    "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
-    "coding/reverse-engineering/k_浅谈编译器对代码的优化.md",
-    "coding/reverse-engineering/i_链接加载原理及ELF文件格式.md",
-    "coding/reverse-engineering/bn_内核、容器与eBPF攻防初探.md",
-    "coding/reverse-engineering/n_内核学习-异常处理(win).md",
-    "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
-    "coding/reverse-engineering/bn_16位实模式切换32位保护模式过程详解.md",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
@@ -206,7 +208,6 @@
     "0x01-leetcode/2-dimensional/tree/path-sum",
     "0x01-leetcode/2-dimensional/tree/traversal/postorder",
     "0x01-leetcode/2-dimensional/tree/traversal/inorder",
-    "0x01-leetcode/2-dimensional/tree/traversal/preorder",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
   ]

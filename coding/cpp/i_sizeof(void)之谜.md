@@ -1,61 +1,38 @@
-# 
-
 Original 雨乐 高性能架构探索
-
  _2024年09月11日 12:07_ _北京_
-
-![](http://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhKgtwWvzaYZodgfpphdA6WWKEMXTn6ImCCCuEzlPKicNBcpzBUyjK1XicWwqIwusqLGpwyyOc87JPQ/300?wx_fmt=png&wxfrom=19)
-
-**高性能架构探索**
-
-专注于分享干货，硬货，欢迎关注😄
-
-93篇原创内容
-
-公众号
 
 你好，我是雨乐~
 
 在 C 和 C++ 中，`void` 类型和 `sizeof` 运算符是每位程序员都应掌握的基本概念。然而，`sizeof(void)` 的概念可能会让人感到困惑，特别是对于这些语言的新手来说。本文将解释 `void` 是什么，为什么 `sizeof(void)` 在传统意义上没有意义，以及这些概念在实际编程中的应用。
-
 ## 什么是void？
-
 在 C 和 C++ 中，`void`是用于表示不存在任何类型的关键字。它通常用于三种场景。
-
 ### 函数
-
 当某个函数的返回值被声明为void，即意味着该函数不返回任何内容，那么获取函数返回内容的操作将是非法或者未定义的行为。
 
-```
+```c
 void Print() {  std::cout << "Hello world!!!" << std::endl;}
 ```
 
 在这个函数中，只有一行输出操作，不返回任何类型。
-
 ### 空指针
 
 空指针`void`( `void *`) 是一种特殊类型的指针，可以指向任何数据类型。但是，由于未指定类型，因此在解引用之前必须将其转换为适当的类型。
 
+```c
+void* ptr;int num = 42;ptr = &num; // void 指针可以指向 int 类型的地址
+int* intPtr = (int*)ptr; // 需要将 void 指针转换为具体类型
 ```
-void* ptr;int num = 42;ptr = &num; // void 指针可以指向 int 类型的地址int* intPtr = (int*)ptr; // 需要将 void 指针转换为具体类型
-```
-
 ### 函数参数
-
 相信很多从事C开发的人，经常会见到形如`fun(void)`这种代码，在这种代码中，void作为函数参数的意思是该函数没有参数，或者说指定函数不接受任何参数，与`fun()`等同，不过这种写法现在已经很少见了~
-
-```
+```c
 void fun(void) {    // 函数体}
 ```
-
 ## sizeof操作符
 
 在 C++ 中，`sizeof` 操作符是一个编译时运算符，用于获取数据类型或对象的内存大小。它是一个非常重要的工具，可以帮助程序员了解变量、类型或数据结构的内存占用情况。
-
-```
+```c
 int x = 10;printf("size of int: %d bytes\n", sizeof(int));printf("size of x: %d bytes\n", sizeof(x));
 ```
-
 ## sizeof(void)
 
 好了，前面的一系列铺垫，就是为了引入本节主题。
@@ -64,33 +41,32 @@ int x = 10;printf("size of int: %d bytes\n", sizeof(int));printf("size 
 
 // size.c
 
+```c
+#include <stdio.h>
+int main() {  printf("sizeof void is %d bytes\n", sizeof(void));  return 0;}
 ```
-#include <stdio.h>int main() {  printf("sizeof void is %d bytes\n", sizeof(void));  return 0;}
-```
-
 以及
-
 // size.cc
 
-```
-#include <iostream>int main() {  std::cout << "sizeof void is: " << sizeof(void) << std::endl;  return 0;}
+```c
+#include <iostream>
+int main() {  std::cout << "sizeof void is: " << sizeof(void) << std::endl;  return 0;}
 ```
 
 对于size.c，尝试使用gcc和clang进行编译：
-
-```
+```c
 clang size.c -o size // clanggcc size.c -o size // gcc
 ```
 
 输出都是
 
-```
+```c
 sizeof void is 1 bytes
 ```
 
 但是，对于size.cc即对于c++版本的，g++可以编译通过，输出同c版本，而clang++则编译失败，输出如下：
 
-```
+```c
 size.cc:4:38: error: invalid application of 'sizeof' to an incomplete type 'void'    4 |   std::cout << "sizeof void is: " << sizeof(void) << std::endl;      |                                      ^     ~~~~~~1 error generated.
 ```
 
@@ -126,31 +102,7 @@ size.cc:4:38: error: invalid application of 'sizeof' to an incomplete t
 
 如果对本文有疑问可以加笔者**微信**直接交流，笔者也建了C/C++相关的技术群，有兴趣的可以联系笔者加群。  
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhKgtwWvzaYZodgfpphdA6WWKEMXTn6ImCCCuEzlPKicNBcpzBUyjK1XicWwqIwusqLGpwyyOc87JPQ/300?wx_fmt=png&wxfrom=19)
-
-**高性能架构探索**
-
-专注于分享干货，硬货，欢迎关注😄
-
-93篇原创内容
-
-公众号
-
-Reads 1855
-
-​
-
-[](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhKgtwWvzaYZodgfpphdA6WWKEMXTn6ImCCCuEzlPKicNBcpzBUyjK1XicWwqIwusqLGpwyyOc87JPQ/300?wx_fmt=png&wxfrom=18)
-
-高性能架构探索
-
-28659
-
-8
+---
 
 Comment
 

@@ -1,6 +1,4 @@
-
 原创 程序喵大人 程序喵大人
-
  _2022年02月07日 08:59_
 
 这是[每日一题]栏目的第三题，如图：
@@ -8,134 +6,89 @@
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/JeibBY5FJRBHBFpA2wMy79B3fibuVMFFgHicqLRRBOlxCMY7yjLTEZsRE94gibT99jKAtm1qmgicI81LekqwOEy9VRg/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 关于进程间的通信方式估计大多数人都知道，这也是常见的面试八股文之一。
-
-  
-
 个人认为这种面试题没什么意义，无非就是答几个关键词而已，更深入的可能面试官和面试者都不太了解。
-
-  
-
 关于进程间通信方式和优缺点我之前在【这篇文章】中有过介绍，感兴趣的可以移步去看哈。
-
-  
-
 进程间通信有一种[共享内存]方式，大家有没有想过，这种通信方式中如何解决数据竞争问题？
-
-  
-
 我们可能自然而然的就会想到用锁。但我们平时使用的锁都是用于解决线程间数据竞争问题，貌似没有看到过它用在进程中，那怎么办？
-
-  
-
 我找到了两种方法，信号量和互斥锁。
-
-  
-
 直接给大家贴代码吧，首先是信号量方式：
 
-```
-#include <fcntl.h>
+```c
+ #include <fcntl.h> 
+ #include <pthread.h> 
+ #include <semaphore.h> 
+ #include <stdio.h> 
+ #include <stdlib.h> 
+ #include <sys/mman.h> 
+ #include <sys/stat.h> 
+ #include <sys/types.h> 
+ #include <sys/wait.h> 
+ #include <unistd.h>  
+ constexpr int kMappingSize = 4096;  void sem() {     const char* mapname = "/mapname";     int mapfd = shm_open(mapname, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);      MEOW_DEFER {         if (mapfd > 0) {             close(mapfd);             mapfd = 0;         }         shm_unlink(mapname);     };      if (mapfd == -1) {         perror("shm_open failed \n");         exit(EXIT_FAILURE);     }      if (ftruncate(mapfd, kMappingSize) == -1) {         perror("ftruncate failed \n");         exit(EXIT_FAILURE);     }      void* sp = mmap(nullptr, kMappingSize, PROT_READ | PROT_WRITE, MAP_SHARED, mapfd, 0);     if (!sp) {         perror("mmap failed \n");         exit(EXIT_FAILURE);     }      sem_t* mutex = (sem_t*)sp;      if (sem_init(mutex, 1, 1) != 0) {         perror("sem_init failed \n");         exit(EXIT_FAILURE);     }      MEOW_DEFER { sem_destroy(mutex); };      int* num = (int*)((char*)sp + sizeof(sem_t));     int cid, proc_count = 0, max_proc_count = 8;     for (int i = 0; i < max_proc_count; ++i) {         cid = fork();         if (cid == -1) {             perror("fork failed \n");             continue;         }         if (cid == 0) {             sem_wait(mutex);             (*num)++;             printf("process %d : %d \n", getpid(), *num);             sem_post(mutex);              if (munmap(sp, kMappingSize) == -1) {                 perror("munmap failed\n");             }             close(mapfd);             exit(EXIT_SUCCESS);         }         ++proc_count;     }      int stat;     while (proc_count--) {         cid = wait(&stat);         if (cid == -1) {             perror("wait failed \n");             break;         }     }      printf("ok \n"); }
 ```
 
-  
 
 代码中的MEOW_DEFER我在之前的RAII相关文章中介绍过，它内部的函数会在生命周期结束后触发。它的核心函数其实就是下面这四个：
 
+```c
+int sem_init(sem_t *sem,int pshared,unsigned int value); 
+int sem_post(sem_t *sem); 
+int sem_wait(sem_t *sem); 
+int sem_destroy(sem_t *sem);
 ```
-int sem_init(sem_t *sem,int pshared,unsigned int value);
-```
-
-  
 
 具体含义大家应该看名字就知道，这里的重点就是sem_init中的pshared参数，该参数为1表示可在进程间共享，为0表示只在进程内部共享。
 
-  
-
 第二种方式是使用锁，即pthread_mutex_t，可是pthread_mutex不是用作线程间数据竞争的吗，怎么能用在进程间呢？
-
-  
 
 我也是最近才知道，可以给它配置一个属性，示例代码如下：
 
+```c
+pthread_mutex_t* mutex; 
+pthread_mutexattr_t mutexattr;  
+pthread_mutexattr_init(&mutexattr); pthread_mutexattr_setpshared(&mutexattr, PTHREAD_PROCESS_SHARED); pthread_mutex_init(mutex, &mutexattr);
 ```
-pthread_mutex_t* mutex;
-```
-
-  
 
 它的默认属性是进程内私有，但是如果给它配置成PTHREAD_PROCESS_SHARED，它就可以用在进程间通信中。
 
-  
-
 完整代码如下：
 
+```c
+void func() {     const char* mapname = "/mapname";     int mapfd = shm_open(mapname, O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);      MEOW_DEFER {         if (mapfd > 0) {             close(mapfd);             mapfd = 0;         }         shm_unlink(mapname);     };      if (mapfd == -1) {         perror("shm_open failed \n");         exit(EXIT_FAILURE);     }      if (ftruncate(mapfd, kMappingSize) == -1) {         perror("ftruncate failed \n");         exit(EXIT_FAILURE);     }      void* sp = mmap(nullptr, kMappingSize, PROT_READ | PROT_WRITE, MAP_SHARED, mapfd, 0);     if (!sp) {         perror("mmap failed \n");         exit(EXIT_FAILURE);     }      pthread_mutex_t* mutex = (pthread_mutex_t*)sp;     pthread_mutexattr_t mutexattr;      pthread_mutexattr_init(&mutexattr);     pthread_mutexattr_setpshared(&mutexattr, PTHREAD_PROCESS_SHARED);     pthread_mutex_init(mutex, &mutexattr);      MEOW_DEFER {         pthread_mutexattr_destroy(&mutexattr);         pthread_mutex_destroy(mutex);     };      int* num = (int*)((char*)sp + sizeof(pthread_mutex_t));     int cid, proc_count = 0, max_proc_count = 8;     for (int i = 0; i < max_proc_count; ++i) {         cid = fork();         if (cid == -1) {             perror("fork failed \n");             continue;         }         if (cid == 0) {             pthread_mutex_lock(mutex);             (*num)++;             printf("process %d : %d \n", getpid(), *num);             pthread_mutex_unlock(mutex);              if (munmap(sp, kMappingSize) == -1) {                 perror("munmap failed\n");             }             close(mapfd);             exit(EXIT_SUCCESS);         }         ++proc_count;     }      int stat;     while (proc_count--) {         cid = wait(&stat);         if (cid == -1) {             perror("wait failed \n");             break;         }     }      printf("ok \n"); }
 ```
-void func() {
-```
-
-  
 
 我想这两种方式应该可以满足我们日常开发过程中的大多数需求。
 
-  
-
 锁的方式介绍完之后，可能很多朋友自然就会想到原子变量，这块我也搜索了一下。但是也不太确定C++标准中的atomic是否在进程间通信中有作用，不过看样子boost中的atomic是可以用在进程间通信中的。
-
-  
 
 其实在研究这个问题的过程中，还找到了一些很多解决办法，包括：
 
 - Disabling Interrupts
-    
 - Lock Variables
-    
 - Strict Alternation
-    
 - Peterson's Solution
-    
 - The TSL Instruction
-    
 - Sleep and Wakeup
-    
 - Semaphores
-    
 - Mutexes
-    
 - Monitors
-    
 - Message Passing
-    
 - Barriers
-    
 
 这里我就不过多介绍啦，大家感兴趣的可以自行查阅资料哈。
-
-  
-
 我也整理了一下自己找到的相关pdf资料，感兴趣的可以公众号后台回复“微信”加我好友，找我领取哈。
-
-  
-
 这次的分享就到这里，希望能够帮助到大家。
-
-  
 
      **参考链接**
 
 - http://husharp.today/2020/12/10/IPC-and-Lock/
-    
 - https://linux.die.net/man/3/pthread_mutexattr_init
-    
 - https://www.cnblogs.com/muyi23333/articles/13533291.html
-    
 - https://man7.org/linux/man-pages/man7/sem_overview.7.html
-    
 - https://codeantenna.com/a/uXNTzONHZI
-    
-
   
 
-  
+---
 
 往期推荐
 
