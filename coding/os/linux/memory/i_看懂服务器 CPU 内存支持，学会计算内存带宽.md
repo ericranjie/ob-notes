@@ -1,17 +1,3 @@
-# [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
-
-talk is cheap,  
-show me the code!
-
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
-
-# [看懂服务器 CPU 内存支持，学会计算内存带宽](https://kfngxl.cn/index.php/archives/787/)
-
 2024-05-13 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(630) 评论(0)
 
 大家好，我是飞哥！
@@ -20,7 +6,7 @@ show me the code!
 
 关于CPU内存控制器中会有很多专技术细节。例如下面是Skylake 代际 CPU 对内存的支持情况。参见[https://en.wikichip.org/wiki/intel/microarchitectures/skylake_](https://en.wikichip.org/wiki/intel/microarchitectures/skylake_)(server)
 
-```
+```c
 DRAM
   6 channels of DDR4, up to 2666 MT/s
   RDIMM and LRDIMM

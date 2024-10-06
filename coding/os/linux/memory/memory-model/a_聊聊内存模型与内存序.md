@@ -1,22 +1,6 @@
-
-
 C语言与CPP编程
-
  _2022年07月01日 08:40_
-
 以下文章来源于高性能架构探索 ，作者我是雨乐
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5l59Jsg6JicJQAuib8Sc0WPkC0P6LaJzVntCQerzf7bcPg/0)
-
-**高性能架构探索**.
-
-专注于分享干货，硬货，欢迎关注😄
-
-](https://mp.weixin.qq.com/s?__biz=MzkxNzQzNDM2Ng==&mid=2247493579&idx=1&sn=aecd3b5f0a2fa97177a7caa2129b1724&source=41&key=daf9bdc5abc4e8d021ea9677f534ec5bca7b491dd2c30d5f8c229accfb9920919b11502578940c635857214937fe66b266b20ea09d09e069f44f782ba8b98f4b5e7d18022c29e77d3c07c0b263c0422c85c90c6f877e10e7839cdc6cff8071b84feee69595d560b50df43b47a72a01a5e9986f2a53fe1db70c197af6a1a9088a&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQHq4%2FclS6EInpOTfVsQzjoxLmAQIE97dBBAEAAAAAAJclMPJ2bo4AAAAOpnltbLcz9gKNyK89dVj08UEoWDpUsnPtULa6X1N1LxV2Md0Xsi4EeQM%2FmR7sDvGjWsNElfB9FApvIwbAK2Pz%2FJR39AVZfp%2BQ4VAv0InvghYDfpavxRRu%2BHqyWI1%2FSWn3TXFVNmP4oK4trQKDOmKs5xdjJucsX92gS12NL%2BDaifT39%2FHNQ3%2BXPRjRdXNtA0oWJOf55dfAFVLqDsU6zWMdoOV3nwvzyI5BSda4XTs8ARGkD7R9VO81SFi8uqyaeO8Td%2FEmzjNRSnlypIxYfrOF&acctmode=0&pass_ticket=upfqRl%2BMXxR4ppX9b7LGh0Qr7h25v5XBDi5qXby5f8fQvfLiOPs3ioSz8iD29jpo&wx_header=1#)
-
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/0m4YX595Fom7dUgDLM0OJCxo425I9OKv3jfAgDFAcZH1cfSbV7rKJYKF8qgPJ7phxn55jLQhyRnicECicm1mOzIQ/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 最近群里聊到了`Memory Order`相关知识，恰好自己对这块的理解是模糊的、不成体系的，所以借助本文，重新整理下相关知识。
 
