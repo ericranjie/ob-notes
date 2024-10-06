@@ -1,23 +1,6 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-6-16 19:54 分类：[基础学科](http://www.wowotech.net/sort/basic_subject)
 
-一、前言
+# 一、前言
 
 最近一个问题经常萦绕在我的脑海：一个学习电子工程的机械师如何称为优秀的程序员？（注：本文作者本科学习机械设计，研究生转到电子工程系学习，毕业后却选择了系统程序员这样的职业）。经过思考，我认为阻挡我称为一个优秀程序员的障碍是计算机科学的理论知识。自然辩证法告诉我们：理论源于实践，又指导实践，她们是相辅相成的关系。虽然从业十余年，阅code无数，但计算机的理论不成体系，无法指导工程面具体技能的进一步提升。
 

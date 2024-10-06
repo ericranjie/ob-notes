@@ -1,37 +1,17 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-8-31 12:01 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-一、前言
+# 一、前言
 
 在linux内核中支持3中内存模型，分别是flat memory model，Discontiguous memory model和sparse memory model。所谓memory model，其实就是从cpu的角度看，其物理内存的分布情况，在linux kernel中，使用什么的方式来管理这些物理内存。另外，需要说明的是：本文主要focus在share memory的系统，也就是说所有的CPUs共享一片物理地址空间的。
 
 本文的内容安排如下：为了能够清楚的解析内存模型，我们对一些基本的术语进行了描述，这在第二章。第三章则对三种内存模型的工作原理进行阐述，最后一章是代码解析，代码来自4.4.6内核，对于体系结构相关的代码，我们采用ARM64进行分析。
-
-二、和内存模型相关的术语
-
-1、什么是page frame？
+# 二、和内存模型相关的术语
+## 1、什么是page frame？
 
 操作系统最重要的作用之一就是管理计算机系统中的各种资源，做为最重要的资源：内存，我们必须管理起来。在linux操作系统中，物理内存是按照page size来管理的，具体page size是多少是和硬件以及linux系统配置相关的，4k是最经典的设定。因此，对于物理内存，我们将其分成一个个按page size排列的page，每一个物理内存中的page size的内存区域我们称之page frame。我们针对每一个物理的page frame建立一个struct page的数据结构来跟踪每一个物理页面的使用情况：是用于内核的正文段？还是用于进程的页表？是用于各种file cache还是处于free状态……
 
 每一个page frame有一个一一对应的page数据结构，系统中定义了page_to_pfn和pfn_to_page的宏用来在page frame number和page数据结构之间进行转换，具体如何转换是和memory modle相关，我们会在第三章详细描述linux kernel中的3种内存模型。
 
-2、什么是PFN？
+## 2、什么是PFN？
 
 对于一个计算机系统，其整个物理地址空间应该是从0开始，到实际系统能支持的最大物理空间为止的一段地址空间。在ARM系统中，假设物理地址是32个bit，那么其物理地址空间就是4G，在ARM64系统中，如果支持的物理地址bit数目是48个，那么其物理地址空间就是256T。当然，实际上这么大的物理地址空间并不是都用于内存，有些也属于I/O空间（当然，有些cpu arch有自己独立的io address space）。因此，内存所占据的物理地址空间应该是一个有限的区间，不可能覆盖整个物理地址空间。
 
@@ -88,46 +68,46 @@ Memory model也是一个演进过程，刚开始的时候，使用flat memory去
 我们的代码分析主要是通过include/asm-generic/memory_model.h展开的。
 
 1、flat memory。代码如下：
-
-> #define __pfn_to_page(pfn)    (mem_map + ((pfn) - ARCH_PFN_OFFSET))  
-> #define __page_to_pfn(page)    ((unsigned long)((page) - mem_map) + ARCH_PFN_OFFSET)
-
+```cpp
+define pfn_to_page(pfn)    (mem_map + ((pfn) - ARCH_PFN_OFFSET))  
+define __page_to_pfn(page)    ((unsigned long)((page) - mem_map) + ARCH_PFN_OFFSET)
+```
 由代码可知，PFN和struct page数组（mem_map）index是线性关系，有一个固定的偏移就是ARCH_PFN_OFFSET，这个偏移是和估计的architecture有关。对于ARM64，定义在arch/arm/include/asm/memory.h文件中，当然，这个定义是和内存所占据的物理地址空间有关（即和PHYS_OFFSET的定义有关）。
 
 2、Discontiguous Memory Model。代码如下：
+```cpp
+define pfn_to_page(pfn)            \  
+({    unsigned long __pfn = (pfn);        \  
+unsigned long __nid = arch_pfn_to_nid(__pfn);  \  
+NODE_DATA(__nid)->node_mem_map + arch_local_page_offset(__pfn, __nid);\  
+})
 
-> #define __pfn_to_page(pfn)            \  
-> ({    unsigned long __pfn = (pfn);        \  
->     unsigned long __nid = arch_pfn_to_nid(__pfn);  \  
->     NODE_DATA(__nid)->node_mem_map + arch_local_page_offset(__pfn, __nid);\  
-> })
-> 
-> #define __page_to_pfn(pg)                        \  
-> ({    const struct page *__pg = (pg);                    \  
->     struct pglist_data *__pgdat = NODE_DATA(page_to_nid(__pg));    \  
->     (unsigned long)(__pg - __pgdat->node_mem_map) +            \  
->      __pgdat->node_start_pfn;                    \  
-> })
-
+define __page_to_pfn(pg)                        \  
+({    const struct page __pg = (pg);                    \  
+struct pglist_data *__pgdat = NODE_DATA(page_to_nid(__pg));    \  
+(unsigned long)(__pg - __pgdat->node_mem_map) +            \  
+__pgdat->node_start_pfn;                    \  
+})
+```
 Discontiguous Memory Model需要获取node id，只要找到node id，一切都好办了，比对flat memory model进行就OK了。因此对于__pfn_to_page的定义，可以首先通过arch_pfn_to_nid将PFN转换成node id，通过NODE_DATA宏定义可以找到该node对应的pglist_data数据结构，该数据结构的node_start_pfn记录了该node的第一个page frame number，因此，也就可以得到其对应struct page在node_mem_map的偏移。__page_to_pfn类似，大家可以自己分析。
 
 3、Sparse Memory Model。经典算法的代码我们就不看了，一起看看配置了SPARSEMEM_VMEMMAP的代码，如下：
-
-> #define __pfn_to_page(pfn)    (vmemmap + (pfn))  
-> #define __page_to_pfn(page)    (unsigned long)((page) - vmemmap)
-
+```cpp
+define pfn_to_page(pfn)    (vmemmap + (pfn))  
+define __page_to_pfn(page)    (unsigned long)((page) - vmemmap)
+```
 简单而清晰，PFN就是vmemmap这个struct page数组的index啊。对于ARM64而言，vmemmap定义如下：
-
-> #define vmemmap            ((struct page *)VMEMMAP_START - \  
->                  SECTION_ALIGN_DOWN(memstart_addr >> PAGE_SHIFT))
-
+```cpp
+define vmemmap            ((struct page )VMEMMAP_START - \  
+SECTION_ALIGN_DOWN(memstart_addr >> PAGE_SHIFT))
+```
 毫无疑问，我们需要在虚拟地址空间中分配一段地址来安放struct page数组（该数组包含了所有物理内存跨度空间page），也就是VMEMMAP_START的定义。
 
 _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http://www.wowotech.net/sort/linux_kenrel/kernel_config_overview.html)。
 
 标签: [Model](http://www.wowotech.net/tag/Model) [Memory](http://www.wowotech.net/tag/Memory)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [u-boot FIT image介绍](http://www.wowotech.net/u-boot/fit_image_overview.html) | [DRAM 原理 4 ：DRAM Timing](http://www.wowotech.net/basic_tech/330.html)»
 

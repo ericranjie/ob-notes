@@ -1,73 +1,58 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-2-22 21:49 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-1. 前言
+# 1. 前言
 
 在工作中，经常会遇到由于越界导致的各种奇怪的问题。为什么越界访问导致的问题很奇怪呢？在工作差不多半年的时间里我就遇到了很多越界访问导致的问题（不得不吐槽下IC厂商提供的driver，总是隐藏着bug）。比如说越界访问导致的死机问题，这种问题的出现一般需要长时间测试才能发现，而且发现的时候即使有panic log。你也没什么头绪。这是为什么呢？假设驱动A通过kmalloc()申请了一段内存，不注意越界改写了与其相邻的object的数据（经过我之前一篇SLUB的文章分析，你应该明白kmalloc基于kmem_cache实现的），假设被改写的object是B驱动使用的，巧合B驱动使用object存储的是地址数据，如果B驱动访问这个地址。那么完了，B驱动死了，panic也是怪B驱动。试想一下，这块被改写的object是哪个驱动使用，是不是哪个驱动就倒霉了？并且每一次死机的log中panic极有可能发生在不同的模块。但是真正的元凶却是A驱动，他没事你还不知道，是不是很恐怖？简直是借刀杀人啊！当然，越界访问也不一定会死机。之前就遇到一个很奇怪的问题。有两个全局数组变量（用作存储字符串）分别被模块C和D使用。这两个数组是上层需要显示的name信息。当C和D模块都工作的时候，发现C模块的name显示不对，但是D模块的name显示正常。将D模块remove，发现C模块的name显示正确。当时看了下System.map文件，发现这两个全局数组变量分配的内存是在一起的，由于D模块越界写导致的。而这种情况就不会死机。但是当你遇到这种情况的时候，你很惊讶，怎么会这样？两个模块之间根本就没关系啊！如果完全不借助检测工具去查找问题是相当费时间的。而且有可能还没什么头绪。这种问题我们该怎么定位？因此我们遇到一种debug的手段，可以检测out-of-bounds（oob）问题。刚才的第一种情况就可以SLUB自带debug功能。针对第二种情况就需要借助更加强大的KASAN工具（后续会有文章介绍）。  
 因此，我们需要一种debug手段帮助我们定位问题。SLUB DEBUG就是其中的一种。但是SLUB DEBUG仅仅针对从slub分配器分配的内存，如果你需要检测从栈中或者数据区分配内存的问题，就不行了。当然了，你可以选择KASAN。本文主要关注SLUB DEBUG的原理，如何定位这些问题的。  
 SLUB DEBUG检测oob问题原理也很简单，既然为了发现是否越界，那么就在分配出去的内存尾部添加一段额外的内存，填充特殊数字（magic num）。我们只需要检测这块额外的内存的数据是否被修改就可以知道是否发生了oob情况。而这段额外的内存就叫做Redzone。直译过来“红色区域”是不是有种神圣不可侵犯的感觉。  
 说明：slab是最早加入linux的,在那时只有slab的存在。随着时间的推移slub出现了，slub是在slab基础上进行的改进，在大型机上表现出色。而slob是针对小型系统设计的。由于slub实现的接口和slab接口保持一致（虽然你用的是slub分配器，但是很多函数名称和数据结构还是依然和slab一致），所以有时候用slab来统称slab, slub和slob。slab, slub和slob仅仅是分配内存策略不同。管理的思想基本一致。本篇文章中说的是slub分配器debug原理。但是针对分配器管理的内存，下文统称为slab缓存池。所以文章中slub和slab会混用，表示同一个意思。  
 注：文章代码分析基于linux-4.15.0-rc3。图片有点走形，请单独点开图片查看。 
-
-2. SLUB DEBUG功能 
+# 2. SLUB DEBUG功能 
 
 SLUB DEBUG可以检测内存越界（out-of-bounds）和访问已经释放的内存（use-after-free）等问题。  
-2.1. 如何打开功能  
+## 2.1. 如何打开功能  
 重新配置kernel选项，打开如下选项即可。  
+```cpp
 CONFIG_SLUB=y  
 CONFIG_SLUB_DEBUG=y  
 CONFIG_SLUB_DEBUG_ON=y  
-2.2. 如何使用  
+```
+## 2.2. 如何使用  
 程序中的bug如果想用SLUB DEBUG去检测，还需要slabinfo命令。因为，SLUB内存检测功能在某些情况下不能立刻检测出来，必须主动触发，因此我们需要借助slabinfo命令触发SLUB allocator检测功能。和KASAN相比较而言，这也是SLUB DEBUG的一个劣势。毕竟KASAN可以做到在越界问题出现时就报出问题。  
 slabinfo工具源码位于tools/vm目录。可以使用如下命令编译slabinfo工具（针对ARM64 architecture）。  
 aarch64-linux-gnu-gcc -o slabinfo slabinfo.c  
 当系统开机之后，就可以运行slabinfo –v命令触发SLUB allocator检测所有的object，并将log信息输出到syslog。接下来的任务就是查看log信息是否包含SLUB allocator输出的bug log。其实有些bug是不需要运行slabinfo命令即可捕捉，但是有些却必须使用slabinfo –v命令才可以。下一节将会介绍SLUB DEBUG的原理，为你揭开哪些bug不需要slabinfo命令。
-
-3. object layout 
+# 3. object layout 
 
 配置kernel选项CONFIG_SLUB_DEBUG_ON后，在创建kmem_cache的时候会传递很多flags（SLAB_CONSISTENCY_CHECKS、SLAB_RED_ZONE、SLAB_POISON、SLAB_STORE_USER）。针对这些flags，SLUB allocator管理的object对象的format将会发生变化。如下图所示。  
  [![12.png](http://www.wowotech.net/content/uploadfile/201802/9eb61519307945.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/9eb61519307945.png)  
 SLUBU DEBUG关闭的情况下，free pointer是内嵌在object之中的，但是SLUB DEBUG打开之后，free pointer是在object之外，并且多了很多其他的内存，例如red zone、trace和red_left_pad等。这里之所以将FP后移就是因为为了检测use-after-free问题,当free object时会在将object填充magic num(0x6b)。如果不后移的话，岂不是破坏了object之间的单链表关系。  
-3.1. Red zone有什么用  
+## 3.1. Red zone有什么用  
+
 从图中我们可以看到在object后面紧接着就是Red zone区域，那么Red zone有什么作用呢?既然紧随其后，自然是检测右边界越界访问（right out-of-bounds access）。原理很简单，在Red zone区域填充magic num，检查Red zone区域数据是否被修改即可知道是否发生right oob。  
 可能你会想到如果越过Red zone，直接改写了FP，岂不是检测不到oob了，并且链表结构也被破坏了。其实在check_object()函数中会调用check_valid_pointer()来检查FP是否valid，如果invalid，同样会print error syslog。  
-3.2. padding有什么用  
-padding是sizeof(void *) bytes的填充区域，在分配slab缓存池时，会将所有的内存填充0x5a。同样在free/alloc object的时候作为检测的一种途径。如果padding区域的数据不是0x5a，就代表发生了“Object padding overwritten”问题。这也是有可能，越界跨度很大。  
-3.3. red_left_pad有什么用  
+## 3.2. padding有什么用  
+
+padding是sizeof(void ) bytes的填充区域，在分配slab缓存池时，会将所有的内存填充0x5a。同样在free/alloc object的时候作为检测的一种途径。如果padding区域的数据不是0x5a，就代表发生了“Object padding overwritten”问题。这也是有可能，越界跨度很大。  
+## 3.3. red_left_pad有什么用
+
 red_left_pad和Red zone的作用一致。都是为了检测oob。区别就是Red zone检测right oob，而red_left_pad是检测left oob。如果仅仅看到上面图片中object layout。你可能会好奇，如果发生left oob，那么应该是前一个object的red_left_pad区域被改写，而不是当前object的red_left_pad。如果你注意到这个问题，还是很机智的，这都被你发现了。为了避免这种情况的发生，SLUB allocator在初始化slab缓存池的时候会做一个转换。  
  [![13.png](http://www.wowotech.net/content/uploadfile/201802/c00b1519307827.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/c00b1519307827.png)  
 如果你去追踪kmem_cache_create()，在calculate_sizes()中布局object。区域划分的layout就如同你看到上图的上半部分。当我第一次看到这段代码的时候，我也这么认为。实际上却不是这样的。在struct page结构中有一个freelist指针，freelist会指向第一个available object。在构建object之间的单链表的时候，object首地址实际上都会加上一个red_left_pad的偏移，这样实际的layout就如同图片中转换之后的layout。为什么会这样呢？因为在有SLUB DEBUG功能的时候，并没有检测left oob功能。这种转换是后续一个补丁的修改。补丁就是为了增加left oob检测功能。  
 做了转换之后的red_left_pad就可以检测left oob。检测的方法和Red zone区域一样，填充的magic num也一样，差别只是检测的区域不一样而已。
 
-4. SLUB DEBUG原理 
+# 4. SLUB DEBUG原理 
 
 经过上一节分析应该很清楚了大概的原理了。从high level考虑，SLUB就是利用特殊区域填充特殊的magic num，在每一次alloc/free的时候检查magic num是否被意外修改。  
-4.1. magic num  
+## 4.1. magic num  
 SLUB 中有哪些magic num呢?所有使用的magic num都宏定义在include/linux/poison.h文件。
-
+```cpp
 1. #define SLUB_RED_INACTIVE   0xbb
 2. #define SLUB_RED_ACTIVE     0xcc
 3. /* ...and for poisoning */
 4. #define POISON_INUSE         0x5a    /* for use-uninitialised poisoning */
 5. #define POISON_FREE          0x6b    /* for use-after-free poisoning */
 6. #define POISON_END           0xa5    /* end-byte of poisoning */
-
+```
 SLUB_RED_INACTIVE和SLUB_RED_ACTIVE用来填充Red zone和red_left_pad，目的是检测oob。POISON_INUSE用来填充padding区域，同样可以用来检测oob，只不过是poison overwrite。POISON_FREE作用是检测use-after-free问题。POISON_END是object可用区域的最后一个字节填充。  
 4.2. slab缓存池填充  
 当SLUB allocator申请一块内存作为slab 缓存池的时候，会将整块内存填充POISON_INUSE。如下图所示。  
@@ -89,7 +74,7 @@ SLUB_RED_INACTIVE和SLUB_RED_ACTIVE用来填充Red zone和red_left_pad，目的�
 alloc object layout和free object layout相比较而言，也仅仅是red_left_pad和Red zone的不同。既然该填充的数据都搞定了，下面就是如何检查oob、use-after-free等问题了。  
 4.5. out-of-bounds bugs detect  
 下面使用demo例程来说明oob检测。我们使用kmalloc分配32 bytes内存，然后制造越界访问第33个元素，必然会越界访问。由于kmalloc是基于SLUB allocator，因此此bug可以检测。  
-
+```cpp
 1. void right_oob(void)
 2. {
 3.     char *p = kmalloc(32, GFP_KERNEL);
@@ -98,7 +83,7 @@ alloc object layout和free object layout相比较而言，也仅仅是red_left_p
 6.     p[32] = 0x88;
 7.     kfree(p);
 8. }
-
+```
 运行后的object layout如下图所示。  
  [![18.png](http://www.wowotech.net/content/uploadfile/201802/88391519307837.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/88391519307837.png)  
 我们可以看到，Red zone区域本来应该0xcc的地方被修改成了0x88。很明显这是一个Redzone overwritten问题。那么系统什么时候会检测到这个严重的bug呢？就在你kfree()之后。kfree()中会去检测释放的object中各个区域的值是否valid。Red zone区域的值全是0xcc就是valid，因此这里会检测0x88不是0xcc，进而输出error syslog。kfree()最终会调用free_consistency_checks()检测object。free_consistency_checks()函数如下。  

@@ -20,14 +20,9 @@ Original 徐琪 Linux内核之旅
 
 #### **1.1.2 保护模式：**
 ![[Pasted image 20241006090124.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 - 保护模式下段寄存器中不再是段地址，而是一个段选择子
-    
 - 逻辑地址由16位段选择符和32位偏移量组成，段选择符存放段寄存器中。有六个段寄存器，分别是cs,ss,ds,es,fs和gs。每个段选择符有一个TI位表示是哪个描述符表，RPL位表示访问权限，13位索引号字段表示是段描述符表中的哪一个。
-    
 - 有两类段描述符表：GDT和LDT；GDT的地址和大小再gdtr控制寄存器定义，LDT在ldtr控制寄存器中定义
-    
 - 此时访问一个地址，先将该地址所在段的段选择子放入段寄存器，根据索引字段找到段描述符，找到段基址，再加上偏移量，就转换成了线性地址；在这个过程中，通过段访问权限，可以控制进程无法访问非法地址
     
 ![[Pasted image 20241006090134.png]]
@@ -42,24 +37,18 @@ Original 徐琪 Linux内核之旅
 
 32位地址表示4GB空间，CPU采用的页大小定为4KB，那么4GB地址空间被划分为4GB/4KB=1M个页；那么4GB地址空间可以将32位地址分为高低两部分；虚拟地址高20位用来索引一个页，低12位用来页内寻址。
 ![[Pasted image 20241006090147.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 **线性地址转换为物理地址**
 
 线性地址高20位作为页表项的索引，每个页表项占用4字节大小，故高20位的索引乘以4后才是该页表项相对于页表物理地址的字节偏移量。用CR3寄存器中的页表物理地址加上此偏移量便是该页表项的物理地址，从该页表项中得到映射的物理地址，然后再用线性地址的低12位与该物理页地址相加，所得地址之和便是最终要访问的物理地址。
 ![[Pasted image 20241006090157.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 #### 1.2.3 二级页表
 
 - 将每个页表的物理地址存放在页目录表中都以页目录项（PDE）的形式存储，页目录项大小同页表项一样都为4KB，PDE用来描述一个物理页的物理地址
 - 页目录表和所有页表都放在物理内存中
 ![[Pasted image 20241006090204.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - 页目录项和页表项
-    
-    页目录项和页表项都是4字节大小，用来存储物理页地址。具体结构如下图所示：![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+    页目录项和页表项都是4字节大小，用来存储物理页地址。具体结构如下图所示：
 ![[Pasted image 20241006090227.png]]
 
 **二级页表的地址转换原理**
@@ -67,13 +56,10 @@ Original 徐琪 Linux内核之旅
 二级页表地址转换原理是将32位虚拟地址拆分为高10位、中间10位、低12位三部分；
 
 - 高10位作为页表的索引，用于在页目录表中定为一个页目录项PDE，页目录项中有页表的物理地址，也就是定位到了某个页表
-    
 - 中间10位作为物理页的索引，用于在页表内定位到某个页表项篇TE，页表项中有分配的物理页地址，也就是定位到了某个物理页
-    
 - 低12位作为页内偏移量用于在已经定位到的物理页寻址
     
 ![[Pasted image 20241006090234.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 #### 1.2.4 启动分页机制的3个步骤：
 1）准备好页目录表及页表
 2）将页表地址写入控制寄存器CR3
@@ -88,7 +74,6 @@ Original 徐琪 Linux内核之旅
 #### 2.1.1 PGDIR_SHIFT及相关的宏
 
 - 表示线性地址中的offset字段，Table字段，Middle Dir字段和Upper Dir 字段，PGDIR_SIZE用于计算页全局目录中一个表项能映射区域的大小。PGDIR_MASK用于屏蔽线性地址中Middle Dir字段、Table字段和offset字段所在位。
-    
 - 在四级分页模型中，PGDIR_SHIFT占据39位，即9位页上级目录、9位页中间目录、9位页表和12位偏移。页全局目录同样占线性地址的9位，因此PTRS_PER_PGD（表示的是PGD对应的页表中有多少个表项）为512。
     
 ```cpp
@@ -142,7 +127,6 @@ ARMv8中，Kernel Space的页表基地址存放在`TTBR1_EL1`寄存器中，User
 
 结合有效虚拟地址位， 页面大小，页表的级数，可以组合成不同的页表映射方式。以下以内核配置为：39位有效位，4KB大小页面，3级页表来介绍
 ![[Pasted image 20241006090437.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 虚拟地址[63:39]用于区分内核空间与用户空间，从而选择不同的TTBRn寄存器来获取Level 1页表基地址；
 2. 虚拟地址[38:30]放置Level 1页表中的索引，从而找到对应的描述符地址并获取描述符内容，根据描述符中的内容获取Level 2页表基地址;
@@ -153,7 +137,6 @@ ARMv8中，Kernel Space的页表基地址存放在`TTBR1_EL1`寄存器中，User
 
 内核中关于页表的操作如图所示：
 ![[Pasted image 20241006090451.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 代码路径：
 
@@ -164,11 +147,9 @@ arch/arm64/include/asm/pgtable-types.h：定义`pgd_t, pud_t, pmd_t, pte_t`等�
 - 当`CONFIG_PGTABLE_LEVELS=4`时：`pgd-->pud-->pmd-->pte`;
 - 当`CONFIG_PGTABLE_LEVELS=3`时，没有`PUD`页表：`pgd(pud)-->pmd-->pte`;
 - 当`CONFIG_PGTABLE_LEVELS=2`时，没有`PUD`和`PMD`页表：`pgd(pud, pmd)-->pte`
-    
 
 常用的宏定义
 ![[Pasted image 20241006090503.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 页表处理
 ```cpp
@@ -189,7 +170,9 @@ typedef struct { pteval_t pte; } pte_t;   typedef struct { pmdval_t pm
 2. `create_block_map`
     
 ```cpp
-/*    * Macro to populate block entries in the page table for the start..end    * virtual range (inclusive).    *    * Preserves: tbl, flags    * Corrupts: phys, start, end, pstate    */    .macro create_block_map, tbl, flags, phys, start, end    lsr \phys, \phys, #SWAPPER_BLOCK_SHIFT    lsr \start, \start, #SWAPPER_BLOCK_SHIFT    and \start, \start, #PTRS_PER_PTE - 1 // table index    orr \phys, \flags, \phys, lsl #SWAPPER_BLOCK_SHIFT // table entry    lsr \end, \end, #SWAPPER_BLOCK_SHIFT    and \end, \end, #PTRS_PER_PTE - 1  // table end index   9999: str \phys, [\tbl, \start, lsl #3]  // store the entry    add \start, \start, #1   // next entry    add \phys, \phys, #SWAPPER_BLOCK_SIZE  // next block    cmp \start, \end    b.ls 9999b    .endm      
+/*    * Macro to populate block entries in the page table for the start..end    * virtual range (inclusive).    *    * Preserves: tbl, flags    * Corrupts: phys, start, end, pstate    */    .macro create_block_map, tbl, flags, phys, start, end    lsr \phys, \phys, #SWAPPER_BLOCK_SHIFT    lsr \start, \start, #SWAPPER_BLOCK_SHIFT    and \start, \start, #PTRS_PER_PTE - 1 // table index
+ orr \phys, \flags, \phys, lsl #SWAPPER_BLOCK_SHIFT // table entry
+ lsr \end, \end, #SWAPPER_BLOCK_SHIFT    and \end, \end, #PTRS_PER_PTE - 1  // table end index   9999: str \phys, [\tbl, \start, lsl #3]  // store the entry    add \start, \start, #1   // next entry    add \phys, \phys, #SWAPPER_BLOCK_SIZE  // next block    cmp \start, \end    b.ls 9999b    .endm      
 ```
 3. `create_table_entry`
     
@@ -198,7 +181,6 @@ typedef struct { pteval_t pte; } pte_t;   typedef struct { pmdval_t pm
 ```
 上述三个函数创建页表项，并且返回下一个Level的页表地址
 ![[Pasted image 20241006090617.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 三、动手实践
 
@@ -229,7 +211,6 @@ MODULE_AUTHOR("wang.com");   MODULE_DESCRIPTION("vitual address to physics addre
 - 通过dmesg查看打印的信息：
     
 ![[Pasted image 20241006090723.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到相关的宏，以及线性地址对应的物理地址
 

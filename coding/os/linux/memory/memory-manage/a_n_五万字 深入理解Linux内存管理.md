@@ -1,126 +1,62 @@
-
 Linux内核之旅
-
  _2022年08月09日 09:18_ _陕西_
-
 以下文章来源于人人都是极客 ，作者程磊
-
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4OTSB4zfwr5HJ5plpabZhz6p0bMbicicnAGn9Hwicp01JVw/0)
-
-**人人都是极客**.
-
-工程师们自己的Linux底层技术社区，分享体系架构、内核、网络、安全和驱动。
-
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664613100&idx=1&sn=2d2205a18332f3ce3e595d57a64dde66&chksm=f04de909c73a601f500014657bccf96d77757cc73e06f630a64f987448832add7cb561198e81&mpshare=1&scene=24&srcid=0809rTRihMZI72LtHu9xgcWI&sharer_sharetime=1660044113504&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0530ccce6de4eb1dc5587efe215f5aa74e504aeed9a7a67cdb276d50fdfe97959b86beb61b98cc752dfd3709213ee7601a65c9cc80a7bafb676469c9abec513360de30fef2efcb4e9f269eec6d74992637710a46fba0e70e3e11201b0b51846bc379a326c9144b7fb96cf862dee386c52aab0f680846b53a3&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQjETqkKLmmaa34hqTBgJszhLmAQIE97dBBAEAAAAAABcjAwQC7cwAAAAOpnltbLcz9gKNyK89dVj01ENYIxSfKe2zsD5igV86REGgWv74q%2FZVXQ54TRjVKecUc%2F6SYqzb6cTLMB2jRxYlzR68XKQlnm%2BxLhkcDgtraKFJ1pg0A%2FnoPLcvr7nJhpCWsVGZDA5v2FNJS9NH5vUr%2FjLNhgDBW2L0IejBiaKucRtL6jpCS0NMNbzj1wPf325tvTE5X0C%2B1eaemwkGcUh2xoYefJOzwyrhpUT6XaGuPfvOxcnTpipQy%2FXlRs7QqWExUKKXuvLQVbqR9fmGVk0f&acctmode=0&pass_ticket=izzEoHLyejpo%2B5zX3k32GF0%2Br9Q2DJltX1UwjS2i1J%2FTlEO8ZD6VUgwC2ADPeRm9&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
-
-> 作者简介：
-> 
-> 程磊，一线码农，在某手机公司担任系统开发工程师，日常喜欢研究内核基本原理。
+作者简介：
+程磊，一线码农，在某手机公司担任系统开发工程师，日常喜欢研究内核基本原理。
 
 - 1.1 内存管理的意义
-    
 - 1.2 原始内存管理
-    
 - 1.3 分段内存管理
-    
 - 1.4 分页内存管理
-    
 - 1.5 内存管理的目标
-    
 - 1.6 Linux内存管理体系
-    
 - 2.1 物理内存节点
-    
 - 2.2 物理内存区域
-    
 - 2.3 物理内存页面
-    
 - 2.4 物理内存模型
-    
 - 2.5 三级区划关系
-    
 - 3.1 Buddy System
-    
-
 - 3.1.1 伙伴系统的内存来源
-    
 - 3.1.2 伙伴系统的管理数据结构
-    
 - 3.1.3 伙伴系统的算法逻辑
-    
 - 3.1.4 伙伴系统的接口
-    
 - 3.1.5 伙伴系统的实现
-    
-
 - 3.2 Slab Allocator
-    
-
 - 3.2.1 Slab接口
-    
 - 3.2.2 Slab实现
-    
 - 3.2.3 Slob实现
-    
 - 3.2.4 Slub实现
-    
-
 - 3.3 Kmalloc
-    
 - 3.4 Vmalloc
-    
 - 3.5 CMA
-    
 - 4.1 内存规整
-    
 - 4.2 页帧回收
-    
 - 4.3 交换区
-    
 - 4.4 OOM Killer
-    
 - 5.1 ZRAM
-    
 - 5.2 ZSwap
-    
 - 5.3 ZCache
-    
 - 6.1 页表
-    
 - 6.2 MMU
-    
 - 6.3 缺页异常
-    
 - 7.1 内核空间
-    
 - 7.2 用户空间
-    
 - 8.1 总体统计
-    
 - 8.2 进程统计
-    
-
-  
-
 # 一、内存管理概览
 
 内存是计算机最重要的资源之一，内存管理是操作系统最重要的任务之一。内存管理并不是简单地管理一下内存而已，它还直接影响着操作系统的风格以及用户空间编程的模式。可以说内存管理的方式是一个系统刻入DNA的秉性。既然内存管理那么重要，那么今天我们就来全面系统地讲一讲Linux内存管理。  
-
 ## 1.1 内存管理的意义
 
 外存是程序存储的地方，内存是进程运行的地方。外存相当于是军营，内存相当于是战场。选择一个良好的战场才有利于军队打胜仗，实现一个完善的内存管理机制才能让进程多快好省地运行。如何更好地实现内存管理一直是操作系统发展的一大主题。在此过程中内存管理的基本模式也经历了好几代的发展，下面我们就来看一下。  
-
 ## 1.2 原始内存管理
 
 最初的时候，内存管理是十分的简陋，大家都运行在物理内存上，内核和进程运行在一个空间中，内存分配算法有首次适应算法(FirstFit)、最佳适应算法(BestFit)、最差适应算法(WorstFit)等。显然，这样的内存管理方式问题是很明显的。内核与进程之间没有做隔离，进程可以随意访问(干扰、窃取)内核的数据。而且进程和内核没有权限的区分，进程可以随意做一些敏感操作。还有一个问题就是当时的物理内存非常少，能同时运行的进程比较少，运行进程的吞吐量比较少。  
-
 ## 1.3 分段内存管理
 
 于是第二代内存管理方式，分段内存管理诞生了。分段内存管理需要硬件的支持和软件的配合。在分段内存中，软件可以把物理内存分成一个一个的段，每个段都有段基址和段限长，还有段类型和段权限。段基址和段限长确定一个段的范围，可以防止内存访问越界。段与段之间也可以互相访问，但是不能随便访问，有一定的规则限制。段类型分为代码段和数据段，正好对应程序的代码和数据，代码段是只读和可执行的，数据段有只读数据段和读写数据段。代码段是不可写的，只读数据段也是不可写，数据段是不可执行的，这样又增加了一层安全性。段权限分为有特权(内核权限)和无特权(用户权限)，内核的代码段和数据段都设置为特权段，进程的代码段和数据段都设置为用户段，这样进程就不能随意访问内核了。当CPU执行特权段代码的时候会把自己设置为特权模式，此时CPU可以执行所以的指令。当CPU执行用户段代码的时候会把自己设置为用户模式，此时CPU只能执行普通指令，不能执行敏感指令。
 
-至此，分段内存管理完美解决了原始内存管理存在的大部分问题：进程与内核之间的隔离实现了，进程不能随意访问内核了；CPU特权级实现了，进程无法再执行敏感指令了；内存访问的安全性提高了，越界访问和野指针问题得到了一定程度的遏制。但是分段内存管理还有一个严重的问题没有解决，那就是当时的物理内存非常少的问题。为此当时想的办法是用软件方法来解决，而且是进程自己解决。程序员在编写程序的时候就要想好，把程序分成几个模块，关联不大的模块，它们占用相同的物理地址。然后再编写一个overlay manager，在程序运行的时候，动态地加载即将会运行的模块，覆盖掉暂时不用的模块。这样一个程序占用较少的物理内存，也能顺利地运行下去。显然这样的方法很麻烦，每个程序都要写overlay manager也不太优雅。  
-
+至此，分段内存管理完美解决了原始内存管理存在的大部分问题：进程与内核之间的隔离实现了，进程不能随意访问内核了；CPU特权级实现了，进程无法再执行敏感指令了；内存访问的安全性提高了，越界访问和野指针问题得到了一定程度的遏制。但是分段内存管理还有一个严重的问题没有解决，那就是当时的物理内存非常少的问题。为此当时想的办法是用软件方法来解决，而且是进程自己解决。程序员在编写程序的时候就要想好，把程序分成几个模块，关联不大的模块，它们占用相同的物理地址。然后再编写一个overlay manager，在程序运行的时候，动态地加载即将会运行的模块，覆盖掉暂时不用的模块。这样一个程序占用较少的物理内存，也能顺利地运行下去。显然这样的方法很麻烦，每个程序都要写overlay manager也不太优雅。 
 ## 1.4 分页内存管理
 
 于是第三代内存管理方式，虚拟内存管理(分页内存管理)诞生了。虚拟内存管理也是需要硬件的支持和软件的配合。在虚拟内存中，CPU访问任何内存都是通过虚拟内存地址来访问的，但是实际上最终访问内存还是得用物理内存地址。所以在CPU中存在一个MMU，负责把虚拟地址转化为物理地址，然后再去访问内存。而MMU把虚拟地址转化为物理的过程需要页表的支持，页表是由内核负责创建和维护的。一套页表可以用来表达一个虚拟内存空间，不同的进程可以用不同的页表集，页表集是可以不停地切换的，哪个进程正在运行就切换到哪个进程的页表集。于是一个进程就只能访问自己的虚拟内存空间，而访问不了别人的虚拟内存空间，这样就实现了进程之间的隔离。一个虚拟内存空间又分为两部分，内核空间和用户空间，内核空间只有一个，用户空间有N个，所有的虚拟内存空间都共享同一个内核空间。内核运行在内核空间，进程运行在用户空间，内核空间有特权，用户空间无特权，用户空间不能随意访问内核空间。这样进程和内核之间的隔离就形成了。内核空间的代码运行的时候，CPU会把自己设置为特权模式，可以执行所有的指令。用户空间运行的时候，CPU会把自己设置为用户模式，只能执行普通指令，不能执行敏感指令。
@@ -142,7 +78,6 @@ Linux内核之旅
 3.内存分配效率要高。内存分配要尽量快地完成，比如说你设计了一种算法，能完全解决内存碎片问题，但是内存算法实现得特别复杂，每次分配都需要1毫秒的时间，这就不可取了。
 
 4.提高物理内存的利用率。比如及时回收物理内存、对内存进行压缩。  
-
 ## 1.6 Linux内存管理体系
 
 Linux内存管理的整体模式是虚拟内存管理(分页内存管理)，并在此基础上建立了一个庞大的内存管理体系。我们先来看一下总体结构图。![图片](https://mmbiz.qpic.cn/mmbiz_png/9sNwsXcN68o2ZKEYRHLolv8Z2MYFOZOWZ1u3RCibCQ5dly9WZRFU0cRqUduuFf35ic292SaYKCDbicy69lM5kMgAw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)整个体系分为3部分，左边是物理内存，右边是虚拟内存，中间是虚拟内存映射(分页机制)。我们先从物理内存说起，内存管理的基础还是物理内存的管理。
@@ -169,30 +104,32 @@ Linux内存管理的整体模式是虚拟内存管理(分页内存管理)，并�
 
 我国的省为什么要按照现在的这个形状来划分呢，主要是依据山川地形还有民俗风情等历史原因。那么物理内存划分为节点的原因是什么呢？这就要从UMA、NUMA说起了。我们用三个图来看一下。
 ![[Pasted image 20240927100321.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-![[Pasted image 20240927100345.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![[Pasted image 20240927100400.png]]![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)图中的CPU都是物理CPU。当一个系统中的CPU越来越多、内存越来越多的时候，内存总线就会成为一个系统的瓶颈。如果大家都还挤在同一个总线上，速度必然很慢。于是我们可以采取一种方法，把一部分CPU和一部分内存直连在一起，构成一个节点，不同节点之间CPU访问内存采用间接方式。节点内的内存访问速度就会很快，节点之间的内存访问速度虽然很慢，但是我们可以尽量减少节点之间的内存访问，这样系统总的内存访问速度就会很快。
+![[Pasted image 20240927100345.png]]
+
+![[Pasted image 20240927100400.png]]
+图中的CPU都是物理CPU。当一个系统中的CPU越来越多、内存越来越多的时候，内存总线就会成为一个系统的瓶颈。如果大家都还挤在同一个总线上，速度必然很慢。于是我们可以采取一种方法，把一部分CPU和一部分内存直连在一起，构成一个节点，不同节点之间CPU访问内存采用间接方式。节点内的内存访问速度就会很快，节点之间的内存访问速度虽然很慢，但是我们可以尽量减少节点之间的内存访问，这样系统总的内存访问速度就会很快。
 
 Linux中的代码对UMA和NUMA是统一处理的，因为UMA可以看成是只有一个节点的NUMA。如果编译内核时配置了CONFIG_NUMA，内核支持NUMA架构的计算机，内核中会定义节点指针数组来表示各个node。如果编译内核时没有配置CONFIG_NUMA，则内核只支持UMA架构的计算机，内核中会定义一个内存节点。这样所有其它的代码都可以统一处理了。
 
 下面我们先来看一下节点描述符的定义。linux-src/include/linux/mmzone.h
-
-`typedef struct pglist_data {    /*     * node_zones contains just the zones for THIS node. Not all of the     * zones may be populated, but it is the full list. It is referenced by     * this node's node_zonelists as well as other node's node_zonelists.     */    struct zone node_zones[MAX_NR_ZONES];       /*     * node_zonelists contains references to all zones in all nodes.     * Generally the first zones will be references to this node's     * node_zones.     */    struct zonelist node_zonelists[MAX_ZONELISTS];       int nr_zones; /* number of populated zones in this node */   #ifdef CONFIG_FLATMEM /* means !SPARSEMEM */    struct page *node_mem_map;   #ifdef CONFIG_PAGE_EXTENSION    struct page_ext *node_page_ext;   #endif   #endif   #if defined(CONFIG_MEMORY_HOTPLUG) || defined(CONFIG_DEFERRED_STRUCT_PAGE_INIT)    /*     * Must be held any time you expect node_start_pfn,     * node_present_pages, node_spanned_pages or nr_zones to stay constant.     * Also synchronizes pgdat->first_deferred_pfn during deferred page     * init.     *     * pgdat_resize_lock() and pgdat_resize_unlock() are provided to     * manipulate node_size_lock without checking for CONFIG_MEMORY_HOTPLUG     * or CONFIG_DEFERRED_STRUCT_PAGE_INIT.     *     * Nests above zone->lock and zone->span_seqlock     */    spinlock_t node_size_lock;   #endif    unsigned long node_start_pfn;    unsigned long node_present_pages; /* total number of physical pages */    unsigned long node_spanned_pages; /* total size of physical page             range, including holes */    int node_id;    wait_queue_head_t kswapd_wait;    wait_queue_head_t pfmemalloc_wait;    struct task_struct *kswapd; /* Protected by           mem_hotplug_begin/end() */    int kswapd_order;    enum zone_type kswapd_highest_zoneidx;       int kswapd_failures;  /* Number of 'reclaimed == 0' runs */      #ifdef CONFIG_COMPACTION    int kcompactd_max_order;    enum zone_type kcompactd_highest_zoneidx;    wait_queue_head_t kcompactd_wait;    struct task_struct *kcompactd;    bool proactive_compact_trigger;   #endif    /*     * This is a per-node reserve of pages that are not available     * to userspace allocations.     */    unsigned long  totalreserve_pages;      #ifdef CONFIG_NUMA    /*     * node reclaim becomes active if more unmapped pages exist.     */    unsigned long  min_unmapped_pages;    unsigned long  min_slab_pages;   #endif /* CONFIG_NUMA */       /* Write-intensive fields used by page reclaim */    ZONE_PADDING(_pad1_)      #ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT    /*     * If memory initialisation on large machines is deferred then this     * is the first PFN that needs to be initialised.     */    unsigned long first_deferred_pfn;   #endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */      #ifdef CONFIG_TRANSPARENT_HUGEPAGE    struct deferred_split deferred_split_queue;   #endif       /* Fields commonly accessed by the page reclaim scanner */       /*     * NOTE: THIS IS UNUSED IF MEMCG IS ENABLED.     *     * Use mem_cgroup_lruvec() to look up lruvecs.     */    struct lruvec  __lruvec;       unsigned long  flags;       ZONE_PADDING(_pad2_)       /* Per-node vmstats */    struct per_cpu_nodestat __percpu *per_cpu_nodestats;    atomic_long_t  vm_stat[NR_VM_NODE_STAT_ITEMS];   } pg_data_t;   `
-
+```cpp
+typedef struct pglist_data {    /*     * node_zones contains just the zones for THIS node. Not all of the     * zones may be populated, but it is the full list. It is referenced by     * this node's node_zonelists as well as other node's node_zonelists.     */    struct zone node_zones[MAX_NR_ZONES];       /*     * node_zonelists contains references to all zones in all nodes.     * Generally the first zones will be references to this node's     * node_zones.     */    struct zonelist node_zonelists[MAX_ZONELISTS];       int nr_zones; /* number of populated zones in this node */   #ifdef CONFIG_FLATMEM /* means !SPARSEMEM */    struct page *node_mem_map;   #ifdef CONFIG_PAGE_EXTENSION    struct page_ext *node_page_ext;   #endif   #endif   #if defined(CONFIG_MEMORY_HOTPLUG) || defined(CONFIG_DEFERRED_STRUCT_PAGE_INIT)    /*     * Must be held any time you expect node_start_pfn,     * node_present_pages, node_spanned_pages or nr_zones to stay constant.     * Also synchronizes pgdat->first_deferred_pfn during deferred page     * init.     *     * pgdat_resize_lock() and pgdat_resize_unlock() are provided to     * manipulate node_size_lock without checking for CONFIG_MEMORY_HOTPLUG     * or CONFIG_DEFERRED_STRUCT_PAGE_INIT.     *     * Nests above zone->lock and zone->span_seqlock     */    spinlock_t node_size_lock;   #endif    unsigned long node_start_pfn;    unsigned long node_present_pages; /* total number of physical pages */    unsigned long node_spanned_pages; /* total size of physical page             range, including holes */    int node_id;    wait_queue_head_t kswapd_wait;    wait_queue_head_t pfmemalloc_wait;    struct task_struct *kswapd; /* Protected by           mem_hotplug_begin/end() */    int kswapd_order;    enum zone_type kswapd_highest_zoneidx;       int kswapd_failures;  /* Number of 'reclaimed == 0' runs */      #ifdef CONFIG_COMPACTION    int kcompactd_max_order;    enum zone_type kcompactd_highest_zoneidx;    wait_queue_head_t kcompactd_wait;    struct task_struct *kcompactd;    bool proactive_compact_trigger;   #endif    /*     * This is a per-node reserve of pages that are not available     * to userspace allocations.     */    unsigned long  totalreserve_pages;      #ifdef CONFIG_NUMA    /*     * node reclaim becomes active if more unmapped pages exist.     */    unsigned long  min_unmapped_pages;    unsigned long  min_slab_pages;   #endif /* CONFIG_NUMA */       /* Write-intensive fields used by page reclaim */    ZONE_PADDING(_pad1_)      #ifdef CONFIG_DEFERRED_STRUCT_PAGE_INIT    /*     * If memory initialisation on large machines is deferred then this     * is the first PFN that needs to be initialised.     */    unsigned long first_deferred_pfn;   #endif /* CONFIG_DEFERRED_STRUCT_PAGE_INIT */      #ifdef CONFIG_TRANSPARENT_HUGEPAGE    struct deferred_split deferred_split_queue;   #endif       /* Fields commonly accessed by the page reclaim scanner */       /*     * NOTE: THIS IS UNUSED IF MEMCG IS ENABLED.     *     * Use mem_cgroup_lruvec() to look up lruvecs.     */    struct lruvec  __lruvec;       unsigned long  flags;       ZONE_PADDING(_pad2_)       /* Per-node vmstats */    struct per_cpu_nodestat __percpu *per_cpu_nodestats;    atomic_long_t  vm_stat[NR_VM_NODE_STAT_ITEMS];   } pg_data_t;   
+```
 对于UMA，内核会定义唯一的一个节点。linux-src/mm/memblock.c
-
-`#ifndef CONFIG_NUMA   struct pglist_data __refdata contig_page_data;   EXPORT_SYMBOL(contig_page_data);   #endif   `
-
+```cpp
+#ifndef CONFIG_NUMA   
+struct pglist_data __refdata contig_page_data;   EXPORT_SYMBOL(contig_page_data);   
+#endif   
+```
 查找内存节点的代码如下：linux-src/include/linux/mmzone.h
-
-`extern struct pglist_data contig_page_data;   static inline struct pglist_data *NODE_DATA(int nid)   {    return &contig_page_data;   }   `
-
+```cpp
+extern struct pglist_data contig_page_data;   static inline struct pglist_data *NODE_DATA(int nid)   {    return &contig_page_data;   }   
+```
 对于NUMA，内核会定义内存节点指针数组，不同架构定义的不一定相同，我们以x86为例。linux-src/arch/x86/mm/numa.c
-
-`struct pglist_data *node_data[MAX_NUMNODES] __read_mostly;   EXPORT_SYMBOL(node_data);   `
-
+```cpp
+struct pglist_data *node_data[MAX_NUMNODES] __read_mostly;   EXPORT_SYMBOL(node_data);   
+```
 查找内存节点的代码如下：linux-src/arch/x86/include/asm/mmzone_64.h
 
 `extern struct pglist_data *node_data[];   #define NODE_DATA(nid)  (node_data[nid])   `

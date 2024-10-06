@@ -1,136 +1,71 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2020-3-30 20:54 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
-
-一、前言
+# 一、前言
 
 本文以一个在centos7.6内核发生的BUGON,描述一下常见BUGON导致panic的解bug流程。目前这个bug在centos7.6最新版本未合入，需要升级到centos7.7的3.10.0-1062.13.1.el7以上版本才能解决。文中涉及到iscsi模块，xfs模块，内核协议栈收发包，slab(slub)等内存结构信息。本文对内核初学者分析和理解常见的内核问题有一定的帮助。
-
-二、故障现象
+# 二、故障现象
 
 机器出现复位，收集到了crash文件，从日志中显示为BUGON。
-
+```cpp
 [85774.558604] usercopy: kernel memory exposure attempt detected from ffff9cba0bf75400 (kmalloc-512) (1024 bytes)
-
 [85774.559261] ------------[ cut here ]------------
-
 [85774.559839] kernel BUG at mm/usercopy.c:72!
-
 [85774.560367] invalid opcode: 0000 [#1] SMP
-
 [85774.560879] Modules linked in: cmac arc4 md4 nls_utf8 cifs ccm dns_resolver xfs iscsi_tcp libiscsi_tcp libiscsi iptable_raw iptable_mangle sch_sfq sch_htb scsi_transport_iscsi veth ipt_MASQUERADE nf_nat_masquerade_ipv4 xt_comment xt_mark iptable_nat nf_conntrack_ipv4 nf_defrag_ipv4 nf_nat_ipv4 xt_addrtype iptable_filter xt_conntrack nf_nat nf_conntrack br_netfilter bridge stp llc dm_thin_pool dm_persistent_data dm_bio_prison dm_bufio libcrc32c loop bonding fuse sunrpc dm_mirror dm_region_hash dm_log dm_mod dell_smbios dell_wmi_descriptor iTCO_wdt iTCO_vendor_support dcdbas skx_edac intel_powerclamp coretemp intel_rapl iosf_mbi kvm_intel kvm irqbypass crc32_pclmul ghash_clmulni_intel aesni_intel lrw gf128mul glue_helper ablk_helper cryptd ipmi_ssif sg pcspkr mei_me lpc_ich i2c_i801 mei wmi ipmi_si
 
 [85774.564343]  ipmi_devintf ipmi_msghandler acpi_pad acpi_power_meter ip_tables ext4 mbcache jbd2 sd_mod crc_t10dif crct10dif_generic crct10dif_pclmul crct10dif_common crc32c_intel mgag200 drm_kms_helper syscopyarea sysfillrect sysimgblt fb_sys_fops ttm megaraid_sas drm ixgbe ahci igb drm_panel_orientation_quirks libahci mdio libata ptp pps_core dca i2c_algo_bit nfit libnvdimm
-
 [85774.566809] CPU: 9 PID: 28054 Comm: tgtd Kdump: loaded **Not tainted** 3.10.0-957.27.2.el7.x86_64 #1
-
 [85774.567446] Hardware name: Dell Inc. PowerEdge R740/0YNX56, BIOS 2.4.8 11/26/2019
-
 [85774.568094] task: ffff9cb12e1e0000 ti: ffff9cb124224000 task.ti: ffff9cb124224000
-
 [85774.568754] RIP: 0010:[<ffffffff9803f557>]  [<ffffffff9803f557>] __check_object_size+0x87/0x250
-
 [85774.569419] RSP: 0018:ffff9cb124227b98  EFLAGS: 00010246
-
 [85774.570072] RAX: 0000000000000062 RBX: ffff9cba0bf75400 RCX: 0000000000000000
-
 [85774.570723] RDX: 0000000000000000 RSI: ffff9cc13bf13898 RDI: ffff9cc13bf13898
-
 [85774.571372] RBP: ffff9cb124227bb8 R08: 0000000000000000 R09: ffff9cb1313e6f00
-
 [85774.572017] R10: 000000000003bc95 R11: 0000000000000001 R12: 0000000000000400
-
 [85774.572669] R13: 0000000000000001 R14: ffff9cba0bf75800 R15: 0000000000000400
-
 [85774.573325] FS:  00007f41a122a740(0000) GS:ffff9cc13bf00000(0000) knlGS:0000000000000000
-
 [85774.573994] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-
 [85774.574655] CR2: 0000000003236fe0 CR3: 0000001023138000 CR4: 00000000007607e0
-
 [85774.575314] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-
 [85774.575964] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
 [85774.576609] PKRU: 55555554
-
 [85774.577242] Call Trace:
-
 [85774.577880]  [<ffffffff9818dd9d>] memcpy_toiovec+0x4d/0xb0
-
 [85774.578531]  [<ffffffff9842c858>] skb_copy_datagram_iovec+0x128/0x280
-
 [85774.579190]  [<ffffffff9849372a>] tcp_recvmsg+0x22a/0xb30
-
 [85774.579838]  [<ffffffff984c2340>] inet_recvmsg+0x80/0xb0
-
 [85774.580474]  [<ffffffff9841a6ec>] sock_aio_read.part.9+0x14c/0x170
-
 [85774.581097]  [<ffffffff9841a731>] sock_aio_read+0x21/0x30
-
 [85774.581714]  [<ffffffff98041b33>] do_sync_read+0x93/0xe0
-
 [85774.582328]  [<ffffffff98042615>] vfs_read+0x145/0x170
-
 [85774.582934]  [<ffffffff9804342f>] SyS_read+0x7f/0xf0
-
 [85774.583543]  [<ffffffff98576ddb>] system_call_fastpath+0x22/0x27
-
 [85774.584158] Code: 45 d1 48 c7 c6 05 c3 87 98 48 c7 c1 f6 57 88 98 48 0f 45 f1 49 89 c0 4d 89 e1 48 89 d9 48 c7 c7 00 27 88 98 31 c0 e8 30 e4 51 00 <0f> 0b 0f 1f 80 00 00 00 00 48 c7 c0 00 00 e0 97 4c 39 f0 73 0d
-
 [85774.585495] RIP  [<ffffffff9803f557>] __check_object_size+0x87/0x250
-
 [85774.586135]  RSP <ffff9cb124227b98>
-
-三、分析过程
+```
+# 三、分析过程
 
 1、可能存在问题的原因
 
 我们知道，在使能了CONFIG_HARDENED_USERCOPY的情况下，如果往用户态拷贝或者用户态往内核拷贝的话，会对访问的数据区进行检查，这里不展开，感兴趣的同学可以参照一下《[https://lwn.net/Articles/695991/](https://lwn.net/Articles/695991/)》来理解这种配置引入的背景。
 
 首先，我们来看一下对应BUGON的地方：
-
+```cpp
      61 static void report_usercopy(const void *ptr, unsigned long len,
-
      62                             bool to_user, const char *type)
-
      63 {
-
      64         pr_emerg("kernel memory %s attempt detected %s %p (%s) (%lu bytes)\n",
-
      65                 to_user ? "exposure" : "overwrite",
-
      66                 to_user ? "from" : "to", ptr, type ? : "unknown", len);
-
      67         /*
-
      68          * For greater effect, it would be nice to do do_group_exit(),
-
      69          * but BUG() actually hooks all the lock-breaking and per-arch
-
      70          * Oops code, so that is used here instead.
-
      71          */
-
      **72         BUG();----这行出现**
-
      73 }
-
+```
 从上面代码可以看出，我们报错日志的红色字体的第一行，就是pr_emerg打印出来的。在本案例中，有几个关键字需要特别关注：
 
 [85774.558604] usercopy: kernel memory **exposure** attempt detected **from ffff9cba0bf75400** (**kmalloc-512)** (**1024 bytes**)
@@ -138,99 +73,66 @@
 意思是，我们试图从ffff9cba0bf75400 拷贝到用户态，那么出现bugon，要么是地址问题，要么是长度问题，我们下面就要判断出，到底是地址问题还是长度问题。
 
 回到我们的堆栈，堆栈表示tgtd 进程在收tcp的网络包。
-
+```cpp
 [85774.577880]  [<ffffffff9818dd9d>] memcpy_toiovec+0x4d/0xb0
-
 [85774.578531]  [<ffffffff9842c858>] skb_copy_datagram_iovec+0x128/0x280
-
 [85774.579190]  [<ffffffff9849372a>] tcp_recvmsg+0x22a/0xb30
-
 [85774.579838]  [<ffffffff984c2340>] inet_recvmsg+0x80/0xb0
-
 [85774.580474]  [<ffffffff9841a6ec>] sock_aio_read.part.9+0x14c/0x170
-
 [85774.581097]  [<ffffffff9841a731>] sock_aio_read+0x21/0x30
-
 [85774.581714]  [<ffffffff98041b33>] do_sync_read+0x93/0xe0
-
 [85774.582328]  [<ffffffff98042615>] vfs_read+0x145/0x170
-
 [85774.582934]  [<ffffffff9804342f>] SyS_read+0x7f/0xf0
-
 [85774.583543]  [<ffffffff98576ddb>] system_call_fastpath+0x22/0x27
-
+```
 我们知道，收包的时候，我们从sock对象的sk_receive_queue中把存放数据的skb取出来，然后拷贝其中的数据到用户态。skb_copy_datagram_iovec的skb参数是压栈的，所以在堆栈中取出的skb如下：
-
+```cpp
 **crash> sk_buff.len ffff9cb0e3b388f8**
-
   **len = 1024**
-
 crash> sk_buff.data_len  ffff9cb0e3b388f8
-
   data_len = 1024
-
+ ```
 所以：int start = skb_headlen(skb); start为0
-
+```cpp
 crash> sk_buff.head  ffff9cb0e3b388f8
-
   head = 0xffff9cbf9c679400 ""
-
 crash> sk_buff.end  ffff9cb0e3b388f8 -x
-
   end = 0x2c0
-
+```
 所以，sk_buff这个结构在线性区之后，还有skb_shared_info 结构：
-
+```cpp
 crash> px  0xffff9cbf9c679400 + 0x2c0
-
 $5 = 0xffff9cbf9c6796c0
-
 crash> skb_shared_info 0xffff9cbf9c6796c0
-
 struct skb_shared_info {
-
+```
   nr_frags = 1 '\001', ----只有一个frag,这个值确定了从skb_frag_t的拷贝次数
 
 查看对应的page：
-
+```cpp
 crash> skb_shared_info.frags 0xffff9cbf9c6796c0
-
   frags = {{
-
       page = {
-
         p = **0xfffff597a42fdd40**----本堆栈中的page
-
       },
-
       page_offset = 1024,
-
       size = 1024
-
 }, {
-
+```
 。。。。。。。数组其他部分省略。。。。。。
 
 好的，下面我们结合bug报错的地址来看一下对应page的使用：
-
+```cpp
 crash> kmem ffff9cba0bf75400 ---报错的地址
-
 CACHE            NAME                 OBJSIZE  ALLOCATED     TOTAL  SLABS  SSIZE
-
 ffff9ca27fc07600 kmalloc-512              512     242454    464512   7258    32k
-
   SLAB              MEMORY            NODE  TOTAL  ALLOCATED  FREE
-
   fffff597a42fdc00  ffff9cba0bf70000     1     64         59     5
-
   FREE / [ALLOCATED]
-
   [ffff9cba0bf75400]
-
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
-
 **fffff597a42fdd40** 190bf75000                0        0  **0** 6fffff00008000 tail
-
+```
 可以看到，关联的page指针确实和我们skb中保存数据的page指针能对应上的。
 
 一开始，当我看到page的引用计数为0还愣住了一下，以为是个踩内存的问题，然后我看到tail标志，想起来这个页是一个复合页，所以这个非head的page没有slab的标记，同时引用计数为0就是合理的了，因为它的slab标志和引用计数都是放在head页面里的，到这一步，说明地址不是非法访问，**只是长度问题**。
@@ -240,35 +142,28 @@ ffff9ca27fc07600 kmalloc-512              512     242454    
 接下来，我们需要解决的疑问是，为什么会访问一个512字节的object的时候，长度却是1024字节。
 
 我们知道，如果从普通网卡收包，在skb分配的时候，除了线性区部分的内存，frag部分的内存应该都是按页分配的，哪怕修改过标准内核，这个page都应该是一个整页，而不应该是一个512字节的slab，所以要么这个数据被踩了，要么就是这个page不是从普通网卡收包而来，而是类似lo口的这种内部循环，不过，在收包到tcp的阶段，skb对应的dev指针已经被置为NULL了，我们无法通过这个指针来辨别对应的入向dev，所以我尝试从socket本身入手，看看这个是一个什么样的socket，
-
+```cpp
 crash> sk_buff.sk ffff9cb0e3b388f8
-
   sk = 0xffff9cc1242a8000---------skb对应的sock指针
-
+```
 使用net -s查看，可以看到详细的端口信息如下：
-
+```cpp
 66 ffff9cc11d941e00 ffff9cc1242a8000 INET:STREAM  127.0.0.1-3260 127.0.0.1-41654
-
+```
 可以看到，由于我们的socket是侦听在127的环回地址，端口为3260，所以这个page，还真是发送方传来的Page，而不是我们自己收包的时候申请的page。我们先查看一下对应512字节部分的数据是什么数据：
-
+```cpp
 crash> rd ffff9cba0bf75400 8
-
 ffff9cba0bf75400:  0100000046474158 0000e80301000000   XAGF............
-
 ffff9cba0bf75410:  0200000001000000 0100000000000000   ................
-
 ffff9cba0bf75420:  0000000001000000 0300000000000000   ................
-
 ffff9cba0bf75430:  fc62a00304000000 00000000f0ceba02   ......b.........
-
+```
 看起来像是一个xfs的agf的block，由于对xfs也不是很熟悉，看代码只是怀疑有点像，
-
+```cpp
 #define XFS_AGF_MAGIC   0x58414746  /* 'XAGF' */
-
 #define XFS_AGI_MAGIC   0x58414749  /* 'XAGI' */
-
 #define XFS_AGFL_MAGIC  0x5841464c  /* 'XAFL' */
-
+```
 然后开始有目的地在社区搜索相关xfs关键字，以及 usercopy 关键字相关的patch，一开始搜到下面这个：
 
 https://bugs.centos.org/view.php?id=15859#bugnotes
@@ -276,49 +171,32 @@ https://bugs.centos.org/view.php?id=15859#bugnotes
 出错的行号都一样，但我们目前内核已经合入ceph这个补丁，所以应该不是这个问题。再次陷入迷茫。。。
 
 然后在搜索的过程中，另外一名同学报了一个类似问题上来，也是同样的堆栈，同样的进程，于是我开始尝试了解tgtd对应的组件，原来它就是iscsi的target端的组件，那么xfs用它来传送AGF的元数据就能够说得通了，换句话说，ceph和iscsi的地位在这种场景下是类似的。这个时候开始搜索iscsi相关的补丁，找到了对应的补丁如下：
-
+```cpp
 commit 08b11eaccfcf86a3bac6755625d933ac15ccc27a
-
 Author: Vasily Averin <vvs@virtuozzo.com>
-
 Date:   Thu Feb 21 18:23:17 2019 +0300
-
     scsi: libiscsi: fall back to sendmsg for slab pages
-
     In "XFS over network block device" scenario XFS can create IO requests with
-
     slab-based XFS metadata. During processing such requests tcp_sendpage() can
-
     merge skb fragments with neighbour slab objects.
-
     If receiving side is located on the same host tcp_recvmsg() can trigger
-
     BUG_ON in hardening check and crash the host with following message:
-
     usercopy: kernel memory exposure attempt detected
-
                     from XXXXXXXX (kmalloc-512) (1024 bytes)
-
     This patch redirect such requests from sednpage to sendmsg path.  The
-
     problem is similar to one described in recent commit 7e241f647dc7
-
     ("libceph: fall back to sendmsg for slab pages")
-
     Signed-off-by: Vasily Averin <vvs@virtuozzo.com>
-
     Acked-by: Chris Leech <cleech@redhat.com>
-
     Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
-
+```
 原来，这个1024的长度，是tcp_sendpage将用户前后两次调用的时候，做了一个检查，如果发送的是同一个page，并且偏移能够衔接上，也就是skb_can_coalesce 函数的实现逻辑，则会将对应的发送合并，然后长度进行叠加，也就是说我们的1024长度，是两个xfs的512字节的slab叠加而成，所以既不是地址有问题，也不是长度有问题，而是叠加之后的page在开启hardened_usercopy=on的机器上报错而已。
 
 **但是，敲黑板，同学们请注意，它的改动是如下实现的：**
-
+```cpp
 -       if (page_count(sg_page(sg)) >= 1 && !recv)
-
 +       if (!recv && page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)))
-
+```
 这个改动**表面上看**是无法解决组合页的问题，只能解决单页的情况。因为compound的page需要取它的head来判断slab标志，就像本案例中遇到的情况那样，真正的改动应该是下面那样：
 
 -       if (page_count(sg_page(sg)) >= 1 && !recv)
