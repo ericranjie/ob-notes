@@ -1,34 +1,12 @@
-# 
-
 原创 程序喵大人 程序喵大人
-
  _2021年12月07日 08:24_
 
 最近研究了一波RTTI，整理了一下知识点，在这里分享一下，下面是目录：
-
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JeibBY5FJRBFsq4Fnnf9Mibyws8PfIxoAiaUwf3otyLJjpLbaCg8KUSQ3w7Uo7Vp7RhicBV4NiaDBaM9iaia6KYIyLdfQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
-
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JeibBY5FJRBFsq4Fnnf9Mibyws8PfIxoAiamnaJNkEtDL9iabuXDEzMyMibvvyibdrkWq8ib1ianGEHJt2MYmpiaeeqZDkw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 RTTI 是 Run Time Type Information 的缩写，从字面上来理解就是运行时期的类型信息，它的主要作用就是动态判断运行时期的类型。
 
 一般在dynamic_cast和typeid中用到，例如父类B的指针转换子类A的指针，dynamic_cast会判断B究竟是不是A的父类，如果不是，会返回nullptr，相对于强转会更加安全。依据什么判断的呢？就是RTTI。
 
-  
-
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JeibBY5FJRBFsq4Fnnf9Mibyws8PfIxoAiaRgtrtfbAhwibo5kUykGeKl08OckVu2zpbPkRXjd830TxBq8ficTSdKqA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 先看下面这段代码：
 

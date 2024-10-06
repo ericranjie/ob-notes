@@ -1,24 +1,13 @@
 
-
 原创 里缪 CppMore
-
  _2023年10月27日 19:59_ _美国_
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/9XBBCfGaPEmd1ia0ywHH7hoqsrN01lGbwiacggAUBx0m73g542PiaCbPqqnPHiceHuS78UHaLTOGIHf4EbFT3ZYVRQ/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
-
 桂花浮玉，梧桐叶落，堪堪秋意浓。
-
 因思上次书单更新乃是雪季，时秋已二转，犹未见新，理当出一期了。  
-
 本期多为22/23年间的书籍，领域多样，深浅不一，内容颇新。
 
-  
-
 **_C++ Software Design_**
-
 Klaus Iglberger | 2022
-
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/9XBBCfGaPEmOk4IJia4icGY3dZFt3WpZCkRvvh1tiaRUrohjndblWmXSalFxtq7sSf7MS8nEkCsNurDWGY4SjRHgg/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
 谈论 C++ 特性的书籍如满天繁星，但是讲如何使用 C++ 设计软件的书却指不多屈。
 
@@ -32,56 +21,32 @@ Klaus Iglberger | 2022
 
 总之，这本书值得一看，毕竟相关书籍寥寥无几，能够让你学习如何结合 Modern C++ 与传统设计模式。  
 
-  
 
 **_C++ Best Practices_**
-
 Jason Turner | 2022
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 条款书，篇幅短小，内容不多，对 Modern C++ 熟悉的老鸟可飘过，都是一些比较常见的东西。
-
 作者是 Youtube  _C++ Weekly_ 的作者，此书内容也像是频道内容的合订本。
-
 对照目录，如果有些技巧你恰巧不知道，也可以抽空快速浏览一下。  
 
-  
 
 **_Beautiful C++_**
-
 J. Davidson, K. Gregory | 2022
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 也属条款书，各章节由一些开发经验组合而成。
-
 告诉你不要做什么，建议你应该怎么做。就算不看本书，很多内容大家也都知道，不过依然会有一些章节恰好是你不知道的，那么同样适合快速浏览一下，补全相关知识。
-
 总之，本书比较适合 C++ 初/中级学习者。  
 
-  
-
 **_C++ Core Guidelines Explained_**
-
 Rainer Grimm | 2022
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 本书同样包含许多经验之谈，作者也是老面孔，modernscpp 的作者 Rainer Grimm。
-
 主题覆盖很广，包含资源管理、并发、错误处理、泛型编程等等内容，同时也含有太多过于基础的东西，一些内容与前两本条款书存在交叉，所以最多只属于中级层次的书。  
-
 一般来说，如果一本技术书籍覆盖的主题特别广泛，但作者却只有一人，基本可以断定是取广度而失深度。因为这里面的很多主题，单独拿出来都可构成一本书，寥寥数语怎能讲透？
-
 但侧重广度的书，只要不是字典书，还是值得一读的。此类书中一般包含作者对各个主题的理解，以及作者在每一部分的开发经验，是作者自己的内容，这就够了。  
-
 此书中文版今年刚出，名为 《C++ Core Guidelines 解析》，群友负责了部分翻译，推荐一下。
 
-  
-
 **_C++ Initialization Story_**
-
 Bartlomiej Filipek | 2023
 
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)

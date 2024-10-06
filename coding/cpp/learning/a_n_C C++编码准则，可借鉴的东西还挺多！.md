@@ -48,13 +48,13 @@ i) 缩进应该是每个程序都会做的，只要学程序过程序就应该�
 
 ii) 空格。空格能给程序带来什么损失吗？没有，有效的利用空格可以让你的程序读进来更加赏心悦目。而不一堆表达式挤在一起。看看下面的代码：
 
-```
+```c
 ha=(ha*128+*key++)%tabPtr->size;ha = ( ha * 128 + *key++ ) % tabPtr->size;
 ```
 
 有空格和没有空格的感觉不一样吧。一般来说，语句中要在各个操作符间加空格，函数调用时，要以各个参数间加空格。如下面这种加空格的和不加的：
 
-```
+```cpp
 if ((hProc=OpenProcess(PROCESS_ALL_ACCESS,FALSE,pid))==NULL){}if ( ( hProc = OpenProcess(PROCESS_ALL_ACCESS, FALSE, pid) ) == NULL ){}
 ```
 

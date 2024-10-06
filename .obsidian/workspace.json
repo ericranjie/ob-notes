@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/learning/a_n_C C++编码准则，可借鉴的东西还挺多！.md",
+                "file": "coding/cpp/grammar/k_n_C++嵌入式编程习语 MMIO 建模.md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/learning/a_n_C C++编码准则，可借鉴的东西还挺多！.md",
+                "file": "coding/cpp/grammar/k_n_C++嵌入式编程习语 MMIO 建模.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/learning/a_n_C C++编码准则，可借鉴的东西还挺多！.md",
+                "file": "coding/cpp/grammar/k_n_C++嵌入式编程习语 MMIO 建模.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/learning/a_n_C C++编码准则，可借鉴的东西还挺多！.md"
+                "file": "coding/cpp/grammar/k_n_C++嵌入式编程习语 MMIO 建模.md"
               }
             }
           }
@@ -161,10 +161,26 @@
   },
   "active": "bf7c920437bcedfb",
   "lastOpenFiles": [
+    "coding/cpp/grammar/a_s_n_终极 C++避坑指南.md",
+    "interview/cpp/a_C语言与C++面试知识总结.md",
+    "coding/cpp/grammar/pointer/i_共享指针四宗罪.md",
+    "README.md",
+    "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
+    "Pasted image 20241006175104.png",
+    "zx99-image/Pasted image 20241006174502.png",
+    "zx99-image/Pasted image 20241006174602.png",
+    "Pasted image 20241006174602.md",
+    "zx99-image/Pasted image 20241006174431.png",
+    "zx99-image/Pasted image 20241006174449.png",
+    "coding/cpp/grammar/k_n_那些值得使用的标准Attributes.md",
+    "coding/cpp/learning/Hands-On Design Patterns with C++ 讲义 第0章：开篇.md",
+    "coding/cpp/learning/a_n_一波书单，高薪有望.md",
+    "coding/cpp/learning/c_n_这种扯淡的嵌入式项目，尽量不要碰.md",
+    "coding/cpp/learning/i_n_研究了一波RTTI，再介绍软件开发的201个原则，文末再送6本书.md",
+    "coding/cpp/learning/a_n_C C++编码准则，可借鉴的东西还挺多！.md",
     "interview/cpp/a_n_C++高频面试题：网络编程核心技术详解.md",
     "interview/cpp/a_n_C++八股文面经总结（含答案），收藏起来慢慢看.md",
     "interview/cpp/a_n_C++高频面试题：操作系统面试热点.md",
-    "interview/cpp/a_C语言与C++面试知识总结.md",
     "interview/leetcode",
     "interview/cpp",
     "coding/cpp/learning/C++基础面试题：vector底层实现原理——杨辉三角.md",
@@ -175,13 +191,7 @@
     "zx99-image/Pasted image 20241006171420.png",
     "zx99-image/Pasted image 20241006171414.png",
     "zx99-image/Pasted image 20241006171406.png",
-    "zx99-image/Pasted image 20241006171400.png",
-    "zx99-image/Pasted image 20241006171337.png",
-    "zx99-image/Pasted image 20241006171321.png",
-    "zx99-image/Pasted image 20241006171313.png",
-    "zx99-image/Pasted image 20241006171307.png",
     "coding/cpp/low-level/k_为什么使用结构体效率会高？通过汇编代码给你讲透！.md",
-    "README.md",
     "coding/cpp/low-level/k_底软驱动 大厂面试爱考的C++内存你学会了吗？.md",
     "coding/cpp/low-level/k_大师级详解C++野指针、缓冲区溢出、内存无效、内存泄露等内存疑难问题定位.md",
     "coding/cpp/grammar/pointer/k_当我们谈论shared_ptr的线程安全性时，我们在谈论什么.md",
@@ -189,17 +199,7 @@
     "coding/cpp/grammar/i_std span查看连续内存.md",
     "coding/cpp/low-level/谷歌正寻求提高 C++ 内存安全.md",
     "coding/cpp/grammar/k_C++为什么要弄出虚表这个东西？.md",
-    "coding/cpp/opensource/coroutine/a_n_协程简史，一文讲清楚协程的起源、发展和实现.md",
-    "coding/cpp/opensource/coroutine/k_n_谈谈协程的历史与现状.md",
-    "coding/cpp/opensource/STL/万字长文 STL 算法总结.md",
-    "coding/cpp/opensource/a_400 行 C 代码实现一个虚拟机.md",
-    "coding/cpp/k_冷门知识点：进程间通信如何加锁？.md",
-    "coding/cpp/i_sizeof(void)之谜.md",
-    "coding/cpp/k_内存池设计与实现.md",
-    "coding/os/不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
-    "Welcome.md",
     "04-左耳听风.epub",
-    "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",

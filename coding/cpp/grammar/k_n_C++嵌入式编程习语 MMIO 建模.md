@@ -1,74 +1,26 @@
-# 
 
 Original 杨文波 CPP与系统软件联盟
-
  _2022年04月15日 20:00_
-
-  
-
-  
-
-  
-
-**点击蓝字**
-
-**关注我们**
-
-  
-
-  
-
 本文摘录自资深软件架构师杨文波老师「与大师为伍：走进Scott Meyers的C++世界」直播实录。
 
-  
-
-**01**
-
-**前言**
-
-  
-
-  
-
-  
-
+**01** **前言**
 在纯软件的编程实践中，学习许多语言的第一个例子是 Hello World 打印程序。嵌入开发中的 Hello World 是 blinky，点亮 LED 灯珠的程序。这个程序虽小，细想却也并不简单。MCU 身处于半导体的世界中，由数以十万计的与非门等组成，而与非门是由 PN 结组成，blinky 程序要让这样的一套集成电路通过 GPIO 反过来驱动外围物理世界的一个 PN 结，使它发光。blinky 这个例子也引出了嵌入式场景中的一类硬件——MMIO（内存映射的输入输出设备），具体来说是 GPIO，理解了 GPIO 的建模，可以推广到许多其他的外围设备。Scott Meyers 的嵌入式 C++ 最佳实践课程中总结了 C++ 建模 MMIO 的一套习语。下面我将分享，如何从 blinky 这个例子入手来学习它。
 
-  
-
-**02**
-
-**C建模 MMIO 的常见做法**
-
-  
-
-  
-
-  
-
+**02** **C建模 MMIO 的常见做法**
 首先回顾在嵌入式 C 编程中 MMIO 的常见实现，在此我们选取了较有代表性的两家嵌入式 MCU 方案，乐鑫 ESP32 和 NXP LPC55。
-
 乐鑫 ESP 系列，是较为流行的基于蓝牙 WiFi 一体模组的 IoT 方案。它的官方开发框架 Espressif IoT Development Framework 在 github 上的星数颇高，有着活跃的社区：
-
 esp-idf (_https://github.com/espressif/esp-idf)_
-
-  
-
 它的 blinky 是这样实现的：
 
-```
+```cpp
 #elif CONFIG_BLINK_LED_GPIOstatic void blink_led(void){    /* Set the GPIO level according to the state (LOW or HIGH)*/    gpio_set_level(BLINK_GPIO, s_led_state);}static void configure_led(void){    ESP_LOGI(TAG, "Example configured to blink GPIO LED!");    gpio_reset_pin(BLINK_GPIO);    /* Set the GPIO as a push/pull output */    gpio_set_direction(BLINK_GPIO, GPIO_MODE_OUTPUT);}#endifvoid app_main(void){    /* Configure the peripheral according to the LED type */    configure_led();    while (1) {        ESP_LOGI(TAG, "Turning the LED %s!", s_led_state == true ? "ON" : "OFF");        blink_led();        /* Toggle the LED state */        s_led_state = !s_led_state;        vTaskDelay(CONFIG_BLINK_PERIOD / portTICK_PERIOD_MS);    }}
 ```
 
-  
-
 程序先是配置了一个 GPIO，之后在 while 循环中让 GPIO 拉高拉低，“干活” 的函数是 `gpio_set_level()`。观察它的实现：
 
-```
+```cpp
 static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(GPIO_IS_VALID_OUTPUT_GPIO(gpio_num), "GPIO output gpio_num error", ESP_ERR_INVALID_ARG);    gpio_hal_output_enable(gpio_context.gpio_hal, gpio_num);    esp_rom_gpio_connect_out_signal(gpio_num, SIG_GPIO_OUT_IDX, false, false);    return ESP_OK;}// ... ...esp_err_t gpio_set_level(gpio_num_t gpio_num, uint32_t level){    GPIO_CHECK(GPIO_IS_VALID_OUTPUT_GPIO(gpio_num), "GPIO output gpio_num error", ESP_ERR_INVALID_ARG);    gpio_hal_set_level(gpio_context.gpio_hal, gpio_num, level);    return ESP_OK;}int gpio_get_level(gpio_num_t gpio_num){    return gpio_hal_get_level(gpio_context.gpio_hal, gpio_num);
 ```
-
-  
 
 注意到宏 `GPIO_CHECK` 在许多函数中都反复出现。
 
@@ -83,8 +35,6 @@ static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(G
 ```
 /** * Macro which can be used to check the condition. If the condition is not 'true', it prints the message * and returns with the supplied 'err_code'. */#define ESP_RETURN_ON_FALSE(a, err_code, log_tag, format, ...) do {                             \        if (unlikely(!(a))) {                                                                   \            ESP_LOGE(log_tag, "%s(%d): " format, __FUNCTION__, __LINE__, ##__VA_ARGS__);        \            return err_code;                                                                    \        }                                                                                       \    } while(0)
 ```
-
-  
 
 重复的调用违反了 DRY（Don't Repeat Yourself）的原则：`GPIO_CHECK` 宏包装的代码反复检查 GPIO 的 `port` 号是不是在合理的范围内，如果不是，会在运行期打印错误信息并返回一个错误。然而在运行期，每个配置 GPIO 的函数都会调用它，而每次调用操作 GPIO 的函数如 `gpio_set_level` 也都会调用它。
 
@@ -122,109 +72,62 @@ static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(G
 /** GPIO - Register Layout Typedef */typedef struct {  __IO uint8_t B[2][32];                           /**< Byte pin registers for all port GPIO pins, array offset: 0x0, array step: index*0x20, index2*0x1 */       uint8_t RESERVED_0[4032];  __IO uint32_t W[2][32];                          /**< Word pin registers for all port GPIO pins, array offset: 0x1000, array step: index*0x80, index2*0x4 */       uint8_t RESERVED_1[3840];  __IO uint32_t DIR[2];                            /**< Direction registers for all port GPIO pins, array offset: 0x2000, array step: 0x4 */       uint8_t RESERVED_2[120];  __IO uint32_t MASK[2];                           /**< Mask register for all port GPIO pins, array offset: 0x2080, array step: 0x4 */       uint8_t RESERVED_3[120];  __IO uint32_t PIN[2];                            /**< Port pin register for all port GPIO pins, array offset: 0x2100, array step: 0x4 */       uint8_t RESERVED_4[120];  __IO uint32_t MPIN[2];                           /**< Masked port register for all port GPIO pins, array offset: 0x2180, array step: 0x4 */       uint8_t RESERVED_5[120];  __IO uint32_t SET[2];                            /**< Write: Set register for port. Read: output bits for port, array offset: 0x2200, array step: 0x4 */       uint8_t RESERVED_6[120];  __O  uint32_t CLR[2];                            /**< Clear port for all port GPIO pins, array offset: 0x2280, array step: 0x4 */       uint8_t RESERVED_7[120];  __O  uint32_t NOT[2];                            /**< Toggle port for all port GPIO pins, array offset: 0x2300, array step: 0x4 */       uint8_t RESERVED_8[120];  __O  uint32_t DIRSET[2];                         /**< Set pin direction bits for port, array offset: 0x2380, array step: 0x4 */       uint8_t RESERVED_9[120];  __O  uint32_t DIRCLR[2];                         /**< Clear pin direction bits for port, array offset: 0x2400, array step: 0x4 */       uint8_t RESERVED_10[120];  __O  uint32_t DIRNOT[2];                         /**< Toggle pin direction bits for port, array offset: 0x2480, array step: 0x4 */} GPIO_Type;
 ```
 
-  
-
 `port` 的类型是 `uint32_t`，而硬件显然支持不了 4,294,967,296 个端口，实际只能支持到 2。注释中说，`NOT[2]` 对应的硬件的 mask 可以同时支持多个管脚，但对于点灯的应用来说，我们一次只希望反转一个管脚。库不做任何检查，参数相关的行为正确性就只能靠调用方自己来保证。如果调用方“不小心”调用 `GPIO_PortToggle(GPIO, 3, 1u << BOARD_LED_PIN)`，编译也会正常通过，但运行时也许什么都不会发生，也许会发生类似“打开电灯开关，空调会一起开了”这样的事。
 
-  
 
 以上的两段代码，是嵌入式共享库和半导体 SDK 中的常见实现方式，它们作为半导体的库而言是合格的，能完成基本功能，但用于工业级或更高要求的应用，还不够理想。前一种以运行期反复的检查来确保用户代码以各种方式使用库的接口时，不会出现严重的问题。重复的代码造成了运行时间和二进制尺寸的浪费。后一种库不做什么检查，一根指针传下去直接操作寄存器，由调用方来保证正确性。总结一下 C 语言抽象硬件容易出现的问题：
 
 - 一次变化带来多处改动，违背 DRY 原则；
-    
 - 为了保证安全，增加许多重复的检查，牺牲运行速度，增加代码尺寸；
-    
 - 如果减少检查，则将安全风险和责任都交给了调用方，而调用方往往并不具备对硬件的深入细致的认识，难以做好；
     
-
-  
-
 在编程实践中，为了弥补语言层面类型系统的不足，我们不得不借助于语言外的工具、框架以及工程师的“细心”，而这些语言外的机制都增加了工程复杂度和维护难度。C 语言在面向对象机制上的欠缺也让我们难以轻松表达一些硬件特性，比如：只写寄存器，硬件是否支持动态配置，模块的供电和时钟等。Linux 内核为了抽象 GPIO，设计了由众多指针和函数指针搭建的结构体作为抽象框架，同时维护了超过 150 种 GPIO，但是在小型嵌入式框架和工程中往往未必负担得起这种大而全的方式。
 
-  
-
-**03**
-
-**C++ 建模 MMIO**
-
-  
-
-  
-
-  
+**03** **C++ 建模 MMIO**
 
 下面结合 LPC55 的实际例子，探讨 Scott Meyers 总结的 C++ MMIO 设计习语。习语，大约等同于框架而非规定，它告诉我们将建模的硬件设备所需的特殊处理放在哪里。
-
-  
 
 建模之前，我们总结一下，什么是 MMIO。MMIO 出现在许多嵌入式 SoC 或 MCU 中，它将 IO 设备映射到程序地址空间的固定地方，通常：
 
 - 输入寄存器和输出寄存器分开。
-    
 - 控制/状态寄存器和数据寄存器分开。
-    
 - 不同的状态寄存器比特表达各种信息，如准备就绪情况或设备终端是否使能。
-    
-
-  
 
 而它所映射的内存跟一般的内存相比，常常会有这样的特点：
 
 - 原子的读/写可能需要显式同步。
-    
 - 单个比特有时会是只读的，而有时会是只写。
-    
 - 清零某个比特可能需要给它赋 1 。
-    
 - 一个状态寄存器可能控制或者对应超过一个数据寄存器。比如, 比特 0-3 控制一个数据寄存器，比特 4-7 控制另一个。
-    
-
-  
 
 使用 C++，能让 MMIO 设备看起来像是有着天然接口的对象。
 
-  
-
 首先，把控制寄存器写成 `private` 数据成员，这意味着其中的细节，尤其是上文中总结的这段特殊内存的一些特点和细节调用方无需关注。而调用方需要使用的操作抽象为 `public` 成员函数。在点灯的例子中，我们只用到了翻转和读端口的操作，所以暂且只写两个接口。
-
-  
 
 还有两处细节：特殊内存前面加上了 `volatile` 的限定，正如CP.200所指出的_(https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp200-use-volatile-only-to-talk-to-non-c-memory)_ ，表明这里将会访问不遵循 C++ 内存模型的硬件；另外，所有的函数都内联，所以在速度上会等同于前文 NXP 风格的驱动。
 
-  
-
 代码看起来是这样：
 
-```
+```cpp
 class  GpioControlReg {   public:      GpioControlReg()      {         printf("do something");      }      enum class Port_t : uint8_t      {         PORT0,         PORT1      };      enum class Level_t : uint8_t      {         LOW,         HIGH      };      enum class Pin_t : uint8_t      {         PIN6 = 6,         PIN9 = 9      };      inline void PortToggle(Port_t port, Pin_t pin)      {         base.NOT[(uint32_t)port] = uint32_t(1u << (uint32_t)pin);      }      inline Level_t GPIO_PinRead(Port_t port, Pin_t pin)      {         return (Level_t)base.B[(uint8_t)port][(uint8_t)pin];      }   private:      volatile GPIO_Type base;};
 ```
 
-  
-
 进入了 C++ 的世界，我们马上就可以把 `uint32_t` 换成强类型枚举，这样 `port`、`pin` 和 读出的电平都有了类型， 可以让编译器帮我们来检查。只要调用方尊重 C++ 的类型系统，就能避免访问越界或是进行没意义的访问。接着我们看看调用方怎么调用这个类。观察 `GPIO_Type` 的布局，发现其中包含了若干个 RESERVED_X 这样的空当，加起来有 10 几 KB，这样大段的内存不适合放在一般的 RAM 中，因为嵌入式系统中总的内存一般也只有几十 KB。这里就要用到一个 C++ 的语言特性：布置 `new`（placement `new`）。
-
-  
 
 C++ 中，`new` 表达式 `T *p = new T` 做两件事情：
 
 - 调用某个 `operator new` 函数，以确定将 T 对象放在哪里。
-    
 - 调用合适的 T 构造函数。
-    
-
-  
 
 请注意，`operator new` 的工作从根本上来说不是分配内存，而是要确定**某个对象应该去哪儿**。通常，这会造成动态的内存分配，比如调用 `malloc`。但有的时候我们知道对象该放在哪里，比如我们想要把对象放在某个 MMIO 地址，或者是把对象构造到某段内存缓冲区中去。这样的 `operator new` 实现大致是这样：
 
-```
+```cpp
 void* operator new(std::size_t, void *ptrToMemory){ return ptrToMemory; }
 ```
 
-  
-
 这就是布置 `new`（placement `new`），是得到广泛支持的一种标准形式。一个像 `T *p = new T` 这样的表达式会调用两个函数，`operator new` 和构造函数。前者要这样传参：
 
-```
+```cpp
 T *p = new(op new args) T;
 ```
 

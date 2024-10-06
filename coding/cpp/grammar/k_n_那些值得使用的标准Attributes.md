@@ -1,9 +1,7 @@
+
 今天这篇文章，我想跟大家探索下Attributes这个概念。
-
 如果你还没有听过这个概念，或是一知半解，没咋用过，那正好表明它处于一个被忽略或是低估的位置。
-
 Meeting C++曾经对此做过一份调查，结果如下：
-
 [https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEkV4xUJEK24xuSCjvpYz22jxD43SVIZGKFWmBUdibrKeZ0HINUW1U59pGy882ia4h5YUtpeoETb0EVg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEkV4xUJEK24xuSCjvpYz22jxD43SVIZGKFWmBUdibrKeZ0HINUW1U59pGy882ia4h5YUtpeoETb0EVg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 From Meeting C++ Community
