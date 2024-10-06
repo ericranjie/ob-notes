@@ -25,7 +25,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/app/神器 Nginx 的学习手册(建议收藏吃灰).md",
+                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
                 "mode": "source",
                 "source": false
               }
@@ -98,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/app/神器 Nginx 的学习手册(建议收藏吃灰).md",
+                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -115,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/app/神器 Nginx 的学习手册(建议收藏吃灰).md",
+                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -138,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/app/神器 Nginx 的学习手册(建议收藏吃灰).md"
+                "file": "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md"
               }
             }
           }
@@ -161,18 +161,19 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "zx99-image/Pasted image 20241006113404.png",
+    "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
+    "zx99-image/Pasted image 20241006113400.png",
+    "zx99-image/Pasted image 20241006113355.png",
+    "zx99-image/Pasted image 20241006113351.png",
+    "zx99-image/Pasted image 20241006113346.png",
+    "zx99-image/Pasted image 20241006113344.png",
+    "zx99-image/Pasted image 20241006113331.png",
+    "zx99-image/Pasted image 20241006113327.png",
+    "zx99-image/Pasted image 20241006113323.png",
+    "zx99-image/Pasted image 20241006113319.png",
     "coding/app/nginx/b_万字多图，搞懂 Nginx 高性能网络工作原理！.md",
-    "zx99-image/Pasted image 20241006102910.png",
     "README.md",
-    "zx99-image/Pasted image 20241006103052.png",
-    "zx99-image/Pasted image 20241006103045.png",
-    "zx99-image/Pasted image 20241006103041.png",
-    "zx99-image/Pasted image 20241006103032.png",
-    "zx99-image/Pasted image 20241006103026.png",
-    "zx99-image/Pasted image 20241006103019.png",
-    "zx99-image/Pasted image 20241006103005.png",
-    "zx99-image/Pasted image 20241006102955.png",
-    "zx99-image/Pasted image 20241006102944.png",
     "coding/app/nginx/c_又一款Nginx 管理可视化神器！通过界面完成配置监控，一条龙！.md",
     "coding/app/nginx/b_p_Nginx 从安装到高可用.md",
     "coding/app/nginx",
@@ -197,7 +198,6 @@
     "coding/reverse-engineering/n_内核学习-异常处理(win).md",
     "coding/reverse-engineering/k_ARM64 的多核启动流程分析.md",
     "coding/reverse-engineering/bn_16位实模式切换32位保护模式过程详解.md",
-    "coding/reverse-engineering/bn_高Glibc版本下的堆骚操作解析.md",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
