@@ -1,6 +1,4 @@
-
 原创 songsong001 Linux内核那些事
-
  _2022年03月14日 09:00_
 
 `eBPF（extended Berkeley Packet Filter）` 可谓 Linux 社区的新宠，很多大公司都开始投身于 `eBPF` 技术，如 Goole、Facebook、Twitter 等。
@@ -16,11 +14,8 @@ eBPF 究竟有什么魅力让大家都关注它呢？
 **本文分为3篇：**
 
 1. eBPF 的简单使用
-    
 2. eBPF 的实现原理
-    
 3. kprobes 在 eBPF 中的实现原理
-    
 
 看完这3篇文章，估计对 eBPF 也有较深的理解了。
 
@@ -36,29 +31,21 @@ eBPF 全称 extended Berkeley Packet Filter，中文意思是 `扩展的伯克�
 
 我们先来看看 eBPF 的架构，如下图所示：
 
-![](https://mmbiz.qpic.cn/mmbiz_png/ciab8jTiab9J7SmGOGyJ2zynNL9gJpicaPo1ty3CnaykS4pADuLqdxXkJA32kkXQUzGZkSicia3NU1bKbJWS7zo6I7w/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
+![[Pasted image 20241007185836.png]]
   
-
 下面用文字来描述一下：  
 
 **用户态**
 
 1. 用户编写 eBPF 程序，可以使用 eBPF 汇编或者 eBPF 特有的 C 语言来编写。
-    
 2. 使用 LLVM/CLang 编译器，将 eBPF 程序编译成 eBPF 字节码。
-    
 3. 调用 `bpf()` 系统调用把 eBPF 字节码加载到内核。
     
-
 **内核态**
 
 1. 当用户调用 `bpf()` 系统调用把 eBPF 字节码加载到内核时，内核先会对 eBPF 字节码进行安全验证。
-    
 2. 使用 `JIT（Just In Time）`技术将 eBPF 字节编译成本地机器码（Native Code）。
-    
 3. 然后根据 eBPF 程序的功能，将 eBPF 机器码挂载到内核的不同运行路径上（如用于跟踪内核运行状态的 eBPF 程序将会挂载在 `kprobes` 的运行路径上）。当内核运行到这些路径时，就会触发执行相应路径上的 eBPF 机器码。
-    
 
 > 如果大家使用过 Java 编写程序的话，会发现 eBPF 与 Java 的AOP（Aspect Oriented Programming 面向切面编程）概念很像。
 
@@ -67,23 +54,16 @@ eBPF 全称 extended Berkeley Packet Filter，中文意思是 `扩展的伯克�
 在 AOP 概念中，有两个很重要的角色：`切点` 和 `拦截器`。
 
 1. `切点`：程序中某个具体的业务点（方法）。
-    
 2. `拦截器`：拦截器其实是一段 Java 代码，用于拦截切点在执行前（或执行后），先运行这段 Java 代码。
-    
 
 eBPF 程序就像 AOP 中的拦截器，而内核的某个运行路径就像 AOP 中的切点。
 
 根据挂载点功能的不同，大概可以分为以下几个模块：
 
 1. **性能跟踪**
-    
 2. **网络**
-    
 3. **容器**
-    
 4. **安全**
-    
-
 ## eBPF 使用
 
 在介绍 eBPF 的实现前，我们先来介绍一下如何使用 eBPF 来跟踪 `fork()` 系统调用的运行情况。
@@ -121,10 +101,8 @@ BCC 工具可以让你使用 Python 和 C 语言组合来编写 eBPF 程序。
 使用 BCC 编写 eBPF 程序的步骤如下：
 
 1. 使用 C 语言编写 eBPF 程序的内核态功能（也就是运行在内核态的 eBPF 程序）。
-    
 2. 使用 Python 编写加载代码和用户态功能。
     
-
 为什么不能全部使用 Python 编写呢？这是因为 LLVM/Clang 只支持将 C 语言编译成 eBPF 字节码，而不支持将 Python 代码编译成 eBPF 字节码。
 
 所以，eBPF 内核态程序只能使用 C 语言编写。而 eBPF 的用户态程序可以使用 Python 进行编写，这样就能简化编写难度。
@@ -152,13 +130,9 @@ from bcc import BPF# 2) 加载 eBPF 内核态程序b = BPF(src_file="he
 下面我们来看看每一行代码的具体含义：
 
 - 导入了 BCC 库的 BPF 模块，以便接下来调用。
-    
 - 调用 BPF() 函数加载 eBPF 内核态程序（也就是我们编写的hello.c）。
-    
 - 将 eBPF 程序挂载到内核探针（简称 kprobe），其中 `do_sys_openat2()` 是系统调用 `openat()` 在内核中的实现。
-    
 - 读取内核调试文件 `/sys/kernel/debug/tracing/trace_pipe` 的内容（`bpf_trace_printk()` 函数会将信息写入到此文件），并打印到标准输出中。
-    
 
 **运行 eBPF 程序**
 
@@ -181,15 +155,3 @@ $ sudo python3 hello.pyb'         python3-31683   [001] .... 61
 因为本系列文章并不是介绍如何开发 eBPF 程序，而是介绍 eBPF 的原理和实现。如果大家有兴趣学习如何开发 eBPF 程序，那么建议大家看看《BPF性能之巅》这本书，这本书详细地介绍了如何开发 eBPF 程序。
 
 在下篇文章中，我们将介绍 eBPF 的实现原理，敬请期待。
-
-  
-
-![](https://mmbiz.qlogo.cn/mmbiz_jpg/3L4ic10JiaFticmDSGL5JOIwYJsxLuKSN4gibA34IIsKqkiaXzqKjLUzuLUpBPbZqLlK8sogSpvicicxNf6Ibwn4SMLXg/0?wx_fmt=jpeg)
-
-songsong001
-
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466643&idx=1&sn=422dadbb1aafd524cb59a9138cf77f44&chksm=87663976b011b060198ad58c1d358f505402554499a17a81065f9780d3dd84155b2c81903115&mpshare=1&scene=24&srcid=0314SB3wy90eLK8gckxwfx9l&sharer_sharetime=1647219775561&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b5f253bfbe301531a95db1e06d9915b5d4ff6c9a98fa70b41d32386cb4f11d4be2db31fe59e883efbe0de41eeff337c97dcd0ba8e570ef1153f73539ca2103df8ec9d68d927c89f610370ddbbeca43bb7bdd94d64cdaeae875962ce07b7f1229d169f2c4b52526262b95e68935ef686a85844e12bf9990cf&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQPUE%2FUzd8V%2FjAJfH8VIaB1RLmAQIE97dBBAEAAAAAALKSMgTW3JMAAAAOpnltbLcz9gKNyK89dVj0%2BJiv%2BHwuOtXPfqyBI8pKs2HF1Vpwvf8o4%2FrHltu2KSJ7ICSkloBlnGcWY3DwguZavvG1KtovXNJRyoRZYDfyS0hEu%2BngcoT2JOY2zoBO3%2F30M61ot3x9qATeAcGeINkVBfFAMqdN3CaMpiaDIuC1IBAqvOomTZRNNlb%2B2oxQMfwisSW26T1tzF91n7XEyHDMcygAlGvzwcgkvm8IqbMfm64xuu2%2FV5hTr0vv1oJMCLJS9Hxk%2FAJJKbpjY64vnSjF&acctmode=0&pass_ticket=1Tm0cxHF6vyHVp0xzIomv4Z2kmLvVABnmdhRW%2Bb2m5%2FlKr%2F5CeWQM3iKNnVom9BI&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1)喜欢作者
-
-阅读 2152
-
-​

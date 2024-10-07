@@ -1,27 +1,8 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-7-20 19:23 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-一、前言
+# 一、前言
 
 这是一篇指导驱动工程师如何使用DMA API的文档，为了方便理解，文档中给出了伪代码的例程。另外一篇文档dma-api.txt给出了相关API的简明描述，有兴趣也可以看看那一篇，这两份文档在DMA API的描述方面是一致的。
-
-二、从CPU角度看到的地址和从DMA控制器看到的地址有什么不同？
+# 二、从CPU角度看到的地址和从DMA控制器看到的地址有什么不同？
 
 在DMA API中涉及好几个地址的概念（物理地址、虚拟地址和总线地址），正确的理解这些地址是非常重要的。
 
@@ -34,8 +15,7 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 从设备的角度来看，DMA控制器使用总线地址空间，不过可能仅限于总线空间的一个子集。例如：即便是一个系统支持64位地址内存和64 位地址的PCI bar，但是DMA可以不使用全部的64 bit地址，通过IOMMU的映射，PCI设备上的DMA可以只使用32位DMA地址。
 
 我们用下面这样的系统结构来说明各种地址的概念：
-
-[![address](http://www.wowotech.net/content/uploadfile/201707/ffb6f273054d88a342a85f159c72247320170720112335.gif "address")](http://www.wowotech.net/content/uploadfile/201707/c5cff06fa0b64b43846538de4c05d03120170720112335.gif)
+![[Pasted image 20241007190209.png]]
 
 在PCI设备枚举（初始化）过程中，内核了解了所有的IO device及其对应的MMIO地址空间（MMIO是物理地址空间的子集），并且也了解了是PCI主桥设备将这些PCI device和系统连接在一起。PCI设备会有BAR（base address register），表示自己在PCI总线上的地址，CPU并不能通过总线地址A（位于BAR范围内）直接访问总线上的PCI设备，PCI host bridge会在MMIO（即物理地址）和总线地址之间进行mapping。因此，对于CPU，它实际上是可以通过B地址（位于MMIO地址空间）访问PCI设备（反正PCI host bridge会进行翻译）。地址B的信息保存在struct resource变量中，并可以通过/proc/iomem开放给用户空间。对于驱动程序，它往往是通过ioremap()把物理地址B映射成虚拟地址C，这时候，驱动程序就可以通过ioread32(C)来访问PCI总线上的地址A了。
 
@@ -55,7 +35,7 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 
 这个头文件中定义了dma_addr_t这种数据类型，而这种类型的变量可以保存任何有效的DMA地址，不管是什么总线，什么样的CPU arch。驱动调用了DMA API之后，返回的DMA地址（总线地址）就是这种类型的。
 
-三、什么样的系统内存可以被DMA控制器访问到？
+# 三、什么样的系统内存可以被DMA控制器访问到？
 
 既然驱动想要使用DMA mapping framework提供的接口，我们首先需要知道的就是是否所有的系统内存都是可以调用DMA API进行mapping？还是只有一部分？那么这些可以DMA控制器访问系统内存有什么特点？关于这一点，一直以来有一些不成文的规则，在本文中我们看看是否能够将其全部记录下来。
 
@@ -72,8 +52,7 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 块设备使用的I/O buffer和网络设备收发数据的buffer是如何确保其内存是可以进行DMA操作的呢？块设备I/O子系统和
 
 网络子系统在分配buffer的时候会确保这一点的。
-
-四、DMA寻址限制
+# 四、DMA寻址限制
 
 你的设备有DMA寻址限制吗？不同的硬件平台有不同的配置方式，有的平台没有限制，外设可以访问系统内存的每一个Byte，有些则不可以。例如：系统总线有32个bit，而你的设备通过DMA只能驱动低24位地址，在这种情况下，外设在发起DMA操作的时候，只能访问16M以下的系统内存。如果设备有DMA寻址的限制，那么驱动需要将这个限制通知到内核。如果驱动不通知内核，那么内核缺省情况下认为外设的DMA可以访问所有的系统总线的32 bit地址线。对于64 bit平台，情况类似，不再赘述。
 
@@ -94,9 +73,7 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 前者是设定streaming类型的DMA地址掩码，后者是设定coherent类型的DMA地址掩码。为了更好的理解这些接口，我们聊聊参数和返回值。dev指向该设备的struct device对象，一般来说，这个struct device对象应该是嵌入在bus-specific 的实例中，例如对于PCI设备，有一个struct pci_dev的实例与之对应，而在这里需要传入的dev参数则可以通过&pdev->dev得到（pdev指向struct pci_dev的实例）。mask表示你的设备支持的地址线信息。如果调用这些接口返回0，则说明一切OK，从该设备到指定mask的内存的DMA操作是可以被系统支持的（包括DMA controller、bus layer等）。如果返回值非0，那么说明这样的DMA寻址是不能正确完成的，如果强行这么做将会产生不可预知的后果。驱动必须检测返回值，如果不行，那么建议修改mask或者不使用DMA。也就是说，对上面接口调用失败后，你有三个选择：
 
 1、用另外的mask
-
 2、不使用DMA模式，采用普通I/O模式
-
 3、忽略这个设备的存在，不对其进行初始化
 
 一个可以寻址32 bit的设备，其初始化的示例代码如下：
