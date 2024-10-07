@@ -1,29 +1,11 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-11-24 12:08 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
-一、前言
+# 一、前言
 
 经过[内存初始化代码分析（一）](http://www.wowotech.net/memory_management/__create_page_tables_code_analysis.html)和[内存初始化代码分析（二）](http://www.wowotech.net/memory_management/memory-layout.html)的过渡，我们终于来到了内存初始化的核心部分：paging_init。当然本文不能全部解析完该函数（那需要的篇幅太长了），我们只关注创建系统内存地址映射这部分代码实现，也就是解析paging_init中的map_mem函数。
 
 同样的，我们选择的是4.4.6的内核代码，体系结构相关的代码来自ARM64。
-
-二、准备阶段
+# 二、准备阶段
 
 在进入实际的代码分析之前，我们首先回头看看目前内存的状态。偌大的物理地址空间中，系统内存占据了一段或者几段地址空间，这些信息被保存在了memblock模块中的memory type类型的数组中，数组中每一个memory region描述了一段系统内存信息（base、size以及node id）。OK，系统内存就这么多，但是也并非所有的memory type类型的数组中区域都是free的，实际上，有些已经被使用或者保留使用的内存区域需要从memory type类型的一段或者几段地址空间中摘取下来，并定义在reserved type类型的数组中。实际上，在整个系统初始化过程中（更具体的说是内存管理模块完成初始化之前），我们都需要暂时使用memblock这样一个booting阶段的内存管理模块来暂时进行内存的管理（收集内存布局信息只是它的副业），每次分配的内存都是在reserved type数组中增加一个新的item或者扩展其中一个memory region的size而已。
 
@@ -34,35 +16,35 @@
 三、概览
 
 创建系统内存地址映射的代码在map_mem中，如下：
+```cpp
+static void init map_mem(void)  {  
+struct memblock_region reg;  
+phys_addr_t limit;
 
-> static void __init map_mem(void)  {  
->     struct memblock_region *reg;  
->     phys_addr_t limit;
-> 
->     limit = PHYS_OFFSET + SWAPPER_INIT_MAP_SIZE;－－－－－－－－－－－－－－－（1）  
->     memblock_set_current_limit(limit);
-> 
->     for_each_memblock(memory, reg) {－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->         phys_addr_t start = reg->base;――确定该region的起始地址  
->         phys_addr_t end = start + reg->size; ――确定该region的结束地址
-> 
->         if (start >= end)－－参数检查  
->             break;
-> 
->         if (ARM64_SWAPPER_USES_SECTION_MAPS) {－－－－－－－－－－－－－－－－（3）  
->             if (start < limit)  
->                 start = ALIGN(start, SECTION_SIZE);  
->             if (end < limit) {  
->                 limit = end & SECTION_MASK;  
->                 memblock_set_current_limit(limit);  
->             }  
->         }  
->         __map_memblock(start, end);－－－－－－－－－－－－－－－－－－－－－－－－－（4）  
->     }
-> 
->     memblock_set_current_limit(MEMBLOCK_ALLOC_ANYWHERE);－－－－－－－－－－（5）  
-> }
+limit = PHYS_OFFSET + SWAPPER_INIT_MAP_SIZE;－－－－－－－－－－－－－－－（1）  
+memblock_set_current_limit(limit);
 
+for_each_memblock(memory, reg) {－－－－－－－－－－－－－－－－－－－－－－－－（2）  
+phys_addr_t start = reg->base;――确定该region的起始地址  
+phys_addr_t end = start + reg->size; ――确定该region的结束地址
+
+if (start >= end)－－参数检查  
+break;
+
+if (ARM64_SWAPPER_USES_SECTION_MAPS) {－－－－－－－－－－－－－－－－（3）  
+if (start < limit)  
+start = ALIGN(start, SECTION_SIZE);  
+if (end < limit) {  
+limit = end & SECTION_MASK;  
+memblock_set_current_limit(limit);  
+}  
+}  
+__map_memblock(start, end);－－－－－－－－－－－－－－－－－－－－－－－－－（4）  
+}
+
+memblock_set_current_limit(MEMBLOCK_ALLOC_ANYWHERE);－－－－－－－－－－（5）  
+}
+```
 （1）首先限制了当前memblock的上限。之所以这么做是因为在进行mapping的时候，如果任何一级的Translation table不存在的话都需要进行页表内存的分配。而在这个时间点上，伙伴系统没有ready，无法动态分配。当然，这时候memblock已经ready了，但是如果分配的内存都还没有创建地址映射（整个物理内存布局已知并且保存在了memblock模块中的memblock模块中，但是并非所有系统内存的地址映射都已经建立好的，而我们map_mem函数的本意就是要创建所有系统内存的mapping），内核一旦访问memblock_alloc分配的物理内存，悲剧就会发生了。怎么破？这里采用了限定memblock上限的方法。一旦设定了上限，那么memblock_alloc分配的物理内存不会高于这个上限。
 
 设定怎样的上限呢？基本思路就是在map_mem的调用过程中，不需要分配translation table，怎么做到呢？当然是尽量利用已经静态定义好的那些页表了。PHYS_OFFSET是物理内存的起始地址，SWAPPER_INIT_MAP_SIZE 是启动阶段kernel direct mapping的size。也就是说，从PHYS_OFFSET到PHYS_OFFSET + SWAPPER_INIT_MAP_SIZE的区域，所有的页表（各个level的translation table）都已经OK，不需要分配，只需要把描述符写入页表即可。因此，如果将当前memblock分配的上限设定在这里将不会产生内存分配的动作（因为页表都已经ready）。

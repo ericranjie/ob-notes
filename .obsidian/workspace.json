@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md",
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md",
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md",
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md"
+                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md"
               }
             }
           }
@@ -148,8 +148,9 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "README.md",
+    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
     "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md",
+    "README.md",
     "coding/os/linux/memory/memory-manage/slub/b_n_SLUB DEBUG原理.md",
     "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
     "coding/os/linux/memory/memory-model/k_计算机科学基础知识（一）The Memory Hierarchy.md",
@@ -184,7 +185,6 @@
     "coding/compiler/b_编译乱序(Compiler Reordering).md",
     "coding/compiler/k_利用Makfile给多文件、多目录C源码建立工程.md",
     "auxiliary/self-improvement/hair/hair-quote.md",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/e_783. Minimum Distance Between BST Nodes.md",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",

@@ -131,20 +131,20 @@ extern struct pglist_data contig_page_data;   static inline struct pglist_
 struct pglist_data *node_data[MAX_NUMNODES] __read_mostly;   EXPORT_SYMBOL(node_data);   
 ```
 查找内存节点的代码如下：linux-src/arch/x86/include/asm/mmzone_64.h
-
-`extern struct pglist_data *node_data[];   #define NODE_DATA(nid)  (node_data[nid])   `
-
+```cpp
+extern struct pglist_data *node_data[];   #define NODE_DATA(nid)  (node_data[nid])   
+```
 可以看出对于UMA，Linux是统一定义一个内存节点的，对于NUMA，Linux是在各架构代码下定义内存节点的。由于我们常见的电脑手机都是UMA的，后面的我们都以UMA为例进行讲解。pglist_data各自字段的含义我们在用到时再进行分析。  
 
 ## 2.2 物理内存区域
 
 内存节点下面再划分为不同的区域。划分区域的原因是什么呢？主要是因为各种软硬件的限制导致的。目前Linux中最多可以有6个区域，这些区域并不是每个都必然存在，有的是由config控制的。有些区域就算代码中配置了，但是在系统运行的时候也可能为空。下面我们依次介绍一下这6个区域。
 
-**ZONE_DMA：**由配置项CONFIG_ZONE_DMA决定是否存在。在x86上DMA内存区域是物理内存的前16M，这是因为早期的ISA总线上的DMA控制器只有24根地址总线，只能访问16M物理内存。为了兼容这些老的设备，所以需要专门开辟前16M物理内存作为一个区域供这些设备进行DMA操作时去分配物理内存。
+**ZONE_DMA：由配置项CONFIG_ZONE_DMA决定是否存在。在x86上DMA内存区域是物理内存的前16M，这是因为早期的ISA总线上的DMA控制器只有24根地址总线，只能访问16M物理内存。为了兼容这些老的设备，所以需要专门开辟前16M物理内存作为一个区域供这些设备进行DMA操作时去分配物理内存。
 
-**ZONE_DMA32：**由配置项CONFIG_ZONE_DMA32决定是否存在。后来的DMA控制器有32根地址总线，可以访问4G物理内存了。但是在32位的系统上最多只支持4G物理内存，所以没必要专门划分一个区域。但是到了64位系统时候，很多CPU能支持48位到52位的物理内存，于是此时就有必要专门开个区域给32位的DMA控制器使用了。
+**ZONE_DMA32：由配置项CONFIG_ZONE_DMA32决定是否存在。后来的DMA控制器有32根地址总线，可以访问4G物理内存了。但是在32位的系统上最多只支持4G物理内存，所以没必要专门划分一个区域。但是到了64位系统时候，很多CPU能支持48位到52位的物理内存，于是此时就有必要专门开个区域给32位的DMA控制器使用了。
 
-**ZONE_NORMAL：**常规内存，无配置项控制，必然存在，除了其它几个内存区域之外的内存都是常规内存ZONE_NORMAL。
+**ZONE_NORMAL：常规内存，无配置项控制，必然存在，除了其它几个内存区域之外的内存都是常规内存ZONE_NORMAL。
 
 **ZONE_HIGHMEM：**高端内存，由配置项CONFIG_HIGHMEM决定是否存在。只在32位系统上有，这是因为32位系统的内核空间只有1G，这1G虚拟空间中还有128M用于其它用途，所以只有896M虚拟内存空间用于直接映射物理内存，而32位系统支持的物理内存有4G，大于896M的物理内存是无法直接映射到内核空间的，所以把它们划为高端内存进行特殊处理。对于64位系统，从理论上来说，内核空间最大263-1，物理内存最大264，好像内核空间还是不够用。但是从现实来说，内核空间的一般配置为247，高达128T，物理内存暂时还远远没有这么多。所以从现实的角度来说，64位系统是不需要高端内存区域的。
 
@@ -153,13 +153,13 @@ struct pglist_data *node_data[MAX_NUMNODES] __read_mostly;   EXPORT_SYMBOL(no
 **ZONE_DEVICE：**设备内存，由配置项CONFIG_ZONE_DEVICE决定是否存在，用于放置持久内存(也就是掉电后内容不会消失的内存)。一般的计算机中没有这种内存，默认的内存分配也不会从这里分配内存。持久内存可用于内核崩溃时保存相关的调试信息。
 
 下面我们先来看一下这几个内存区域的类型定义。linux-src/include/linux/mmzone.h
-
-`enum zone_type {   #ifdef CONFIG_ZONE_DMA    ZONE_DMA,   #endif   #ifdef CONFIG_ZONE_DMA32    ZONE_DMA32,   #endif    ZONE_NORMAL,   #ifdef CONFIG_HIGHMEM    ZONE_HIGHMEM,   #endif    ZONE_MOVABLE,   #ifdef CONFIG_ZONE_DEVICE    ZONE_DEVICE,   #endif    __MAX_NR_ZONES   };   `
-
+```cpp
+enum zone_type {   #ifdef CONFIG_ZONE_DMA    ZONE_DMA,   #endif   #ifdef CONFIG_ZONE_DMA32    ZONE_DMA32,   #endif    ZONE_NORMAL,   #ifdef CONFIG_HIGHMEM    ZONE_HIGHMEM,   #endif    ZONE_MOVABLE,   #ifdef CONFIG_ZONE_DEVICE    ZONE_DEVICE,   #endif    __MAX_NR_ZONES   };   
+```
 我们再来看一下区域描述符的定义。linux-src/include/linux/mmzone.h
-
-`struct zone {    /* Read-mostly fields */       /* zone watermarks, access with *_wmark_pages(zone) macros */    unsigned long _watermark[NR_WMARK];    unsigned long watermark_boost;       unsigned long nr_reserved_highatomic;       /*     * We don't know if the memory that we're going to allocate will be     * freeable or/and it will be released eventually, so to avoid totally     * wasting several GB of ram we must reserve some of the lower zone     * memory (otherwise we risk to run OOM on the lower zones despite     * there being tons of freeable ram on the higher zones).  This array is     * recalculated at runtime if the sysctl_lowmem_reserve_ratio sysctl     * changes.     */    long lowmem_reserve[MAX_NR_ZONES];      #ifdef CONFIG_NUMA    int node;   #endif    struct pglist_data *zone_pgdat;    struct per_cpu_pages __percpu *per_cpu_pageset;    struct per_cpu_zonestat __percpu *per_cpu_zonestats;    /*     * the high and batch values are copied to individual pagesets for     * faster access     */    int pageset_high;    int pageset_batch;      #ifndef CONFIG_SPARSEMEM    /*     * Flags for a pageblock_nr_pages block. See pageblock-flags.h.     * In SPARSEMEM, this map is stored in struct mem_section     */    unsigned long  *pageblock_flags;   #endif /* CONFIG_SPARSEMEM */       /* zone_start_pfn == zone_start_paddr >> PAGE_SHIFT */    unsigned long  zone_start_pfn;       atomic_long_t  managed_pages;    unsigned long  spanned_pages;    unsigned long  present_pages;   #if defined(CONFIG_MEMORY_HOTPLUG)    unsigned long  present_early_pages;   #endif   #ifdef CONFIG_CMA    unsigned long  cma_pages;   #endif       const char  *name;      #ifdef CONFIG_MEMORY_ISOLATION    /*     * Number of isolated pageblock. It is used to solve incorrect     * freepage counting problem due to racy retrieving migratetype     * of pageblock. Protected by zone->lock.     */    unsigned long  nr_isolate_pageblock;   #endif      #ifdef CONFIG_MEMORY_HOTPLUG    /* see spanned/present_pages for more description */    seqlock_t  span_seqlock;   #endif       int initialized;       /* Write-intensive fields used from the page allocator */    ZONE_PADDING(_pad1_)       /* free areas of different sizes */    struct free_area free_area[MAX_ORDER];       /* zone flags, see below */    unsigned long  flags;       /* Primarily protects free_area */    spinlock_t  lock;       /* Write-intensive fields used by compaction and vmstats. */    ZONE_PADDING(_pad2_)       /*     * When free pages are below this point, additional steps are taken     * when reading the number of free pages to avoid per-cpu counter     * drift allowing watermarks to be breached     */    unsigned long percpu_drift_mark;      #if defined CONFIG_COMPACTION || defined CONFIG_CMA    /* pfn where compaction free scanner should start */    unsigned long  compact_cached_free_pfn;    /* pfn where compaction migration scanner should start */    unsigned long  compact_cached_migrate_pfn[ASYNC_AND_SYNC];    unsigned long  compact_init_migrate_pfn;    unsigned long  compact_init_free_pfn;   #endif      #ifdef CONFIG_COMPACTION    /*     * On compaction failure, 1<<compact_defer_shift compactions     * are skipped before trying again. The number attempted since     * last failure is tracked with compact_considered.     * compact_order_failed is the minimum compaction failed order.     */    unsigned int  compact_considered;    unsigned int  compact_defer_shift;    int   compact_order_failed;   #endif      #if defined CONFIG_COMPACTION || defined CONFIG_CMA    /* Set to true when the PG_migrate_skip bits should be cleared */    bool   compact_blockskip_flush;   #endif       bool   contiguous;       ZONE_PADDING(_pad3_)    /* Zone statistics */    atomic_long_t  vm_stat[NR_VM_ZONE_STAT_ITEMS];    atomic_long_t  vm_numa_event[NR_VM_NUMA_EVENT_ITEMS];   } ____cacheline_internodealigned_in_smp;   `
-
+```cpp
+struct zone {    /* Read-mostly fields */       /* zone watermarks, access with *_wmark_pages(zone) macros */    unsigned long _watermark[NR_WMARK];    unsigned long watermark_boost;       unsigned long nr_reserved_highatomic;       /*     * We don't know if the memory that we're going to allocate will be     * freeable or/and it will be released eventually, so to avoid totally     * wasting several GB of ram we must reserve some of the lower zone     * memory (otherwise we risk to run OOM on the lower zones despite     * there being tons of freeable ram on the higher zones).  This array is     * recalculated at runtime if the sysctl_lowmem_reserve_ratio sysctl     * changes.     */    long lowmem_reserve[MAX_NR_ZONES];      #ifdef CONFIG_NUMA    int node;   #endif    struct pglist_data *zone_pgdat;    struct per_cpu_pages __percpu *per_cpu_pageset;    struct per_cpu_zonestat __percpu *per_cpu_zonestats;    /*     * the high and batch values are copied to individual pagesets for     * faster access     */    int pageset_high;    int pageset_batch;      #ifndef CONFIG_SPARSEMEM    /*     * Flags for a pageblock_nr_pages block. See pageblock-flags.h.     * In SPARSEMEM, this map is stored in struct mem_section     */    unsigned long  *pageblock_flags;   #endif /* CONFIG_SPARSEMEM */       /* zone_start_pfn == zone_start_paddr >> PAGE_SHIFT */    unsigned long  zone_start_pfn;       atomic_long_t  managed_pages;    unsigned long  spanned_pages;    unsigned long  present_pages;   #if defined(CONFIG_MEMORY_HOTPLUG)    unsigned long  present_early_pages;   #endif   #ifdef CONFIG_CMA    unsigned long  cma_pages;   #endif       const char  *name;      #ifdef CONFIG_MEMORY_ISOLATION    /*     * Number of isolated pageblock. It is used to solve incorrect     * freepage counting problem due to racy retrieving migratetype     * of pageblock. Protected by zone->lock.     */    unsigned long  nr_isolate_pageblock;   #endif      #ifdef CONFIG_MEMORY_HOTPLUG    /* see spanned/present_pages for more description */    seqlock_t  span_seqlock;   #endif       int initialized;       /* Write-intensive fields used from the page allocator */    ZONE_PADDING(_pad1_)       /* free areas of different sizes */    struct free_area free_area[MAX_ORDER];       /* zone flags, see below */    unsigned long  flags;       /* Primarily protects free_area */    spinlock_t  lock;       /* Write-intensive fields used by compaction and vmstats. */    ZONE_PADDING(_pad2_)       /*     * When free pages are below this point, additional steps are taken     * when reading the number of free pages to avoid per-cpu counter     * drift allowing watermarks to be breached     */    unsigned long percpu_drift_mark;      #if defined CONFIG_COMPACTION || defined CONFIG_CMA    /* pfn where compaction free scanner should start */    unsigned long  compact_cached_free_pfn;    /* pfn where compaction migration scanner should start */    unsigned long  compact_cached_migrate_pfn[ASYNC_AND_SYNC];    unsigned long  compact_init_migrate_pfn;    unsigned long  compact_init_free_pfn;   #endif      #ifdef CONFIG_COMPACTION    /*     * On compaction failure, 1<<compact_defer_shift compactions     * are skipped before trying again. The number attempted since     * last failure is tracked with compact_considered.     * compact_order_failed is the minimum compaction failed order.     */    unsigned int  compact_considered;    unsigned int  compact_defer_shift;    int   compact_order_failed;   #endif      #if defined CONFIG_COMPACTION || defined CONFIG_CMA    /* Set to true when the PG_migrate_skip bits should be cleared */    bool   compact_blockskip_flush;   #endif       bool   contiguous;       ZONE_PADDING(_pad3_)    /* Zone statistics */    atomic_long_t  vm_stat[NR_VM_ZONE_STAT_ITEMS];    atomic_long_t  vm_numa_event[NR_VM_NUMA_EVENT_ITEMS];   } ____cacheline_internodealigned_in_smp;
+```
 Zone结构体中各个字段的含义我们在用到的时候再进行解释。  
 
 ## 2.3 物理内存页面
@@ -169,9 +169,9 @@ Zone结构体中各个字段的含义我们在用到的时候再进行解释。
 物理内存页面也叫做页帧。物理内存从开始起每4K、4K的，构成一个个页帧，这些页帧的编号依次是0、1、2、3......。页帧的编号也叫做pfn(page frame number)。很显然，一个页帧的物理地址和它的pfn有一个简单的数学关系，那就是其物理地址除以4K就是其pfn，其pfn乘以4K就是其物理地址。由于4K是2的整数次幂，所以这个乘除运算可以转化为移位运算。下面我们看一下相关的宏操作。
 
 linux-src/include/linux/pfn.h
-
-`#define PFN_ALIGN(x) (((unsigned long)(x) + (PAGE_SIZE - 1)) & PAGE_MASK)   #define PFN_UP(x) (((x) + PAGE_SIZE-1) >> PAGE_SHIFT)   #define PFN_DOWN(x) ((x) >> PAGE_SHIFT)   #define PFN_PHYS(x) ((phys_addr_t)(x) << PAGE_SHIFT)   #define PHYS_PFN(x) ((unsigned long)((x) >> PAGE_SHIFT))   `
-
+```cpp
+#define PFN_ALIGN(x) (((unsigned long)(x) + (PAGE_SIZE - 1)) & PAGE_MASK)   #define PFN_UP(x) (((x) + PAGE_SIZE-1) >> PAGE_SHIFT)   #define PFN_DOWN(x) ((x) >> PAGE_SHIFT)   #define PFN_PHYS(x) ((phys_addr_t)(x) << PAGE_SHIFT)   #define PHYS_PFN(x) ((unsigned long)((x) >> PAGE_SHIFT))   
+```
 PAGE_SHIFT的值在大部分平台上都是等于12，2的12次方幂正好就是4K。
 
 下面我们来看一下页面描述符的定义。linux-src/include/linux/mm_types.h
