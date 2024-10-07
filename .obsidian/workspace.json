@@ -11,11 +11,9 @@
             "id": "e2d90085bd089a6c",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241007190526.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
+                "file": "zx99-image/Pasted image 20241007190526.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
+                "file": "zx99-image/Pasted image 20241007190526.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md"
+                "file": "zx99-image/Pasted image 20241007190526.png"
               }
             }
           }
@@ -146,16 +144,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e2d90085bd089a6c",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
     "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
     "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
     "coding/os/linux/memory/cache/k_n_arm64 cache机制分析.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/cache/b_n_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "Pasted image 20241007190607.png",
-    "Pasted image 20241007190526.png",
+    "zx99-image/Pasted image 20241007190607.png",
+    "zx99-image/Pasted image 20241007190526.png",
     "coding/os/linux/memory/k_深入理解Linux内核页表映射分页机制原理.md",
     "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
@@ -183,7 +182,6 @@
     "coding/app/SOTA技术概述.md",
     "coding/app/c_Apache 顶级项目 InLong“应龙” 正式毕业.md",
     "zx99-image/Pasted image 20241007095514.png",
-    "coding/cpp/grammar/reflect/b_n_C++ 反射：全方位解读 Lura 库的前世今生！.md",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
