@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md"
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md"
               }
             }
           }
@@ -148,10 +148,13 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "Pasted image 20241007190209.png",
+    "coding/os/linux/memory/k_深入理解Linux内核页表映射分页机制原理.md",
+    "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
+    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+    "zx99-image/Pasted image 20241007185836.png",
+    "zx99-image/Pasted image 20241007190209.png",
     "coding/os/linux/BPF/i_bpf在android逆向中的辅助效果.md",
     "coding/os/linux/BPF/i_一文看懂eBPF eBPF的简单使用.md",
-    "Pasted image 20241007185836.png",
     "coding/os/linux/BPF/a_BPF内核实现详解.md",
     "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
     "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
@@ -175,16 +178,13 @@
     "coding/cpp/grammar/reflect/b_n_C++ 反射：全方位解读 Lura 库的前世今生！.md",
     "zx99-image/Pasted image 20241007104818.png",
     "zx99-image/Pasted image 20241007104804.png",
-    "zx99-image/Pasted image 20241007104751.png",
     "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
     "coding/cpp/grammar/k_n_使用 C++ 中的 final 关键字，到底能否提升性能？.md",
     "coding/cpp/grammar/i_C++20 新特性的小细节.md",
     "coding/cpp/grammar/i_C++20那些事之宇宙飞船运算符.md",
     "coding/cpp/grammar/i_std span查看连续内存.md",
     "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
-    "coding/algorithm/十五大经典算法研究.md",
     "learning",
-    "coding/cpp/k_C++ 线程的使用.md",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",
