@@ -2,14 +2,12 @@ Original 字节跳动STE团队 字节跳动SYS Tech
  _2023年07月21日 19:33_ _北京_
 
 导语：ASAN(AddressSanitizer) 是 C/C++开发者常用的内存错误检测工具，主要用于检测缓冲区溢出、访问已释放的内存等内存错误。AArch64 上提供了 Top-Byte-Ingore 硬件特性，HWASan(HardWare-assisted AddressSanitizer) 就是利用 Top-Byte-Ignore 特性实现的增强版 ASan，与 ASAN 相比 HWASan 的内存开销更低，检测到的内存错误范围更大。因此在 AArch64 平台，建议使用 HWASAN。本篇文章将深入分析 HWASAN 检测内存错误的原理，帮助大家更好地理解和使用 HWASan 来排查程序中存在的疑难内存错误。
-
-**前言**
+# **前言**
 
 在字节跳动，C++语言被广泛应用在各个业务中，由于C++语言的特性，导致 C++ 程序很容易出现内存问题。ASAN 等内存检测工具在字节跳动内部已经取得了可观的收益和效果（更多内容请查看视频分享：Sanitizer 在字节跳动 C/C++ 业务中的实践：https://www.bilibili.com/video/BV1YT411Q7BU/），服务于60个业务线，近一年协助修复上百个内存缺陷。但是仍然有很大的提升空间，特别是在性能开销方面。随着 ARM 进入服务器芯片市场，ARM 架构下的一些硬件特性可以用来缓解 ASAN 工具的性能问题，利用这些硬件特性研发的 HWASAN 检测工具在超大型 C++ 服务上的检测能力还有待确认。
 
 为此，STE 团队对 HWASAN 进行了深入分析，并在字节跳动 C++ 核心服务上进行了落地验证。在落地 HWASAN 过程中，修复了 HWASAN 实现中的一些关键 bug，并对易用性进行了提升。相关 patch 已经贡献到LLVM开源社区（详情请查看文末链接）。本篇文章将深入分析 HWASAN 检测内存错误的原理，帮助大家更好地理解和使用 HWASan 来排查程序中存在的疑难内存错误。
-
-**概述**
+# **概述**
 
 HWASAN: **H**ard**W**are-assisted **A**ddress**San**itizer, a tool similar to AddressSanitizer, but based on partial hardware assistance and consumes much less memory.
 
@@ -17,12 +15,12 @@ HWASAN: **H**ard**W**are-assisted **A**ddress**San**itizer, a tool similar to 
 
 > **TBI** (Top Byte Ignore) feature of AArch64: bits [63:56] are ignored in address translation and can be used to store a tag.
 
-
 以如下代码举例，Linux/AArch64 下将指针 x 的 top byte 设置为 0xfe，不影响程序执行：
 
 ```c
 // $ cat tbi.cpp
-int main(int argc, char **argv) {   int * volatile x = (int *)malloc(sizeof(int));   *x = 666;   printf("address: %p, value: %d\n", x, *x);   x = reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(x) | (0xfeULL << 56));   printf("address: %p, value: %d\n", x, *x);   free(x);   return 0; } // $ clang++ tbi.cpp && ./a.out address: 0xaaab1845fe70, value: 666 address: 0xfe00aaab1845fe70, value: 666
+int main(int argc, char **argv) {   int * volatile x = (int *)malloc(sizeof(int));   *x = 666;   printf("address: %p, value: %d\n", x, *x);   x = reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(x) | (0xfeULL << 56));   printf("address: %p, value: %d\n", x, *x);   free(x);   return 0; } // $ clang++ tbi.cpp && ./a.out
+address: 0xaaab1845fe70, value: 666 address: 0xfe00aaab1845fe70, value: 666
 ```
 
 AArch64 的 TBI 特性使得软件可以在 64-bit 虚拟地址的最高字节中存储任意数据，HWASAN 正是基于 TBI 这一特性设计并实现的内存错误检测工具。
@@ -45,50 +43,35 @@ $ clang -fuse-ld=lld -g -fsanitize=hwaddress ./test.c && ./a.out ==3581920==ERRO
 
 下面对比分析 ASAN 与 HWASAN 检测内存错误的技术原理：
 
-**ASAN (AddressSanitizer)**
+# **ASAN (AddressSanitizer)**
 
 - 使用 shadow memory 技术，每 8-bytes 的 application memory 对应 1-byte 的 shadow memory。
-    
 - 使用 redzone 来检测 buffer-overflow。不管是栈内存还是堆内存，在申请内存时都会在原本内存的两侧额外申请一定大小的内存作为 redzone，一旦访问到了 redzone 则说明发生了缓冲区溢出。
-    
 - 使用 quarantine 检测 use-after-free。应用程序执行 delete 或 free 释放内存时，并不真正释放，而是放在一个暂存区 (quarantine) 中，一旦访问了位于 quarantine 中的内存则说明访问了已释放的内存。
-    
 - 每 1-byte 的 shadow memory 编码表示对应的 8-byte application memory 的信息，每次访问 application memory 之前 ASAN 都会检查对应的 shadow memory 判断本次内存访问是否合法。例如：shadow memory 的值为 0xfd 表示对应的 8-bytes application memory 是 freed memory，所以当访问的 application memory 其 shadow memory byte 为 0xfd 就说明此时访问的是已经释放的内存了即 use-after-free；shadow memory 为 0xfa 表示相应的 application memory 是堆内存的 redzone，所以当访问到的 appllcation memory 其 shadow memory 为 0xfa 就说明此时访问的是堆内存附近的 redzone 发生了堆缓冲区溢出错误即 heap-buffer-overflow
-    
-
-**HWASAN (HardWare-assisted AddressSanitizer)**
+# **HWASAN (HardWare-assisted AddressSanitizer)**
 
 - 同样使用 shadow memory 技术，不过与 ASAN 不同的是：HWASAN 每 16-bytes 的 application memory 对应 1-byte 的 shadow memory。
-    
 - 不依赖 redzone 检测 buffer-overflow，不依赖 quarantine 检测 use-after-free，仅基于 TBI 特性就能检测 buffer-overflow 和 use-after-free。
-    
 - 举例说明 HWASAN 检测内存错误的原理
-    
 - 因为 HWASAN 会将每 16-bytes 的 application memory 都对应 1-byte 的 shadow tag，所以 HWASAN 会将申请的内存都对齐到 16-bytes，因此下图中 new char[20] 实际申请的内存是 32-bytes。
-    
 - HWASAN 会生成一个随机 tag 保存在 operator new 返回的指针 p 的 top byte 中，同时会将 tag 保存在 p 指向的内存对应 shadow memory 中。
-    
 
 为了方便说明，下图中用不同的颜色表示不同的 tag，绿色表示 tag 0xa，蓝色表示 tag 0xb，紫色表示 tag 0xc。
 
 - **检测 heap-buffer-overflow**：假设 HWASAN 为 new char[20] 生成的 tag 为 0xa 即绿色，所以指针 p 的 top byte 为 0xa。执行 delete[] p 释放内存时，HWASAN 将这块释放的内存 retag 为紫色，即将这块释放的内存对应的 shadow memory 从绿色修改为紫色。在通过 p[0] 访问内存时，HWASAN 会检查保存在指针 p 的 tag 与 p[0] 指向的内存所对应的 shadow memory 中保存的 tag 是否一致。显然保存在指针 p 的 tag 是绿色 而p[0] 指向的内存所对应的 shadow memory 中保存的 tag 是紫色，即 tag 是不匹配的，这说明访问 p[0] 时存在内存错误。
     
 ![[Pasted image 20241004165853.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - **检测 use-after-free**：假设 HWASAN 为 new char[20] 生成的 tag 为 0xa 即绿色，所以指针 p 的 top byte 为 0xa。在通过 p[32] 访问内存时，HWASAN 会检查保存在指针 p 的 tag 与 p[32] 指向的内存所对应的 shadow memory 中保存的 tag 是否一致。显然保存在指针 p 的 tag 是绿色 而p[32] 指向的内存所对应的 shadow memory 中保存的 tag 是蓝色，即 tag 是不匹配的，这说明访问 p[32] 时存在内存错误。
     
 ![[Pasted image 20241004165859.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **算法**
 
 - shadow memory：每 16-bytes 的 application memory 对应 1-byte 的 shadow memory。
-    
 - 每个 heap/stack/global 内存对象都被对齐到 16-bytes，这样每个 heap/stack/global 内存对象至少对应的 1-byte shadow memory。
-    
 - 为每一个 heap/stack/global 内存对象生成一个 1-byte 的随机 tag，将该随机 tag 保存到指向这些内存对象的指针的 top byte 中，同样将该随机 tag 保存到这些内存对象对应的 shadow memory 中。
-    
 - 在每一处内存读写之前插桩：比较保存在指针 top byte 的 tag 和保存在 shadow memory 中的 tag 是否一致，如果不一致则报错。
     
 **实现**
