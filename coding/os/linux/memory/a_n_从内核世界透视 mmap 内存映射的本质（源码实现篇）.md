@@ -1,4 +1,3 @@
-# [从内核世界透视 mmap 内存映射的本质（源码实现篇）](https://www.cnblogs.com/binlovetech/p/17754173.html "发布于 2023-10-10 11:14")
 
 > 本文基于内核 5.4 版本源码讨论
 
@@ -15,8 +14,7 @@
 ```c
 SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
         unsigned long, prot, unsigned long, flags,
-        unsigned long, fd, unsigned long, off)
-{         
+        unsigned long, fd, unsigned long, off) {
     error = ksys_mmap_pgoff(addr, len, prot, flags, fd, off >> PAGE_SHIFT);
 }
 ```
@@ -24,8 +22,7 @@ SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
 ```c
 unsigned long ksys_mmap_pgoff(unsigned long addr, unsigned long len,
                   unsigned long prot, unsigned long flags,
-                  unsigned long fd, unsigned long pgoff)
-{
+                  unsigned long fd, unsigned long pgoff) {
     struct file *file = NULL;
     unsigned long retval;
 
@@ -81,11 +78,8 @@ out_fput:
 ksys_mmap_pgoff 函数主要是针对 mmap 大页映射的情况进行预处理，从该函数对大页的预处理逻辑中我们可以提取出如下几个关键信息：
 
 - 在使用 mmap 进行匿名映射的时候，必须在 flags 参数中指定 MAP_ANONYMOUS 标志，否则映射流程将会终止，并返回 `EBADF` 错误。
-    
 - mmap 在对文件进行大页映射的时候，映射文件必须是 hugetlbfs 中的文件，**flags 参数无需设置 MAP_HUGETLB**， mmap 不能对普通文件进行大页映射，这种映射方式必须提前手动挂载 hugetlbfs 文件系统到指定路径下。映射长度需要与大页尺寸进行对齐。
-    
 - MAP_HUGETLB 需要和 MAP_ANONYMOUS 配合一起使用，MAP_HUGETLB 只能支持匿名映射的方式来使用 HugePage，当 mmap 设置 MAP_HUGETLB 标志进行匿名大页映射的时候，在这里需要为进程在大页池（hstate）中预留好本次映射所需要的大页个数，注意此时只是预留，还并未分配给进程，大页池中被预留好的大页不能被其他进程使用。当进程发生缺页的时候，内核会直接从大页池中把这些提前预留好的内存映射到进程的虚拟内存空间中。
-    
 
 > 这部分被预留好的大页会记录在 `cat /proc/meminfo`  命令中的 HugePages_Rsvd 字段上。
 
@@ -247,7 +241,6 @@ static long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
 do_mmap 是 mmap 系统调用的核心函数，内核会在这里完成内存映射的整个流程，其中最为核心的是如下两个方面的内容：
 
 1. get_unmapped_area 函数用于在进程地址空间中寻找出一段长度为 len，并且还未映射的虚拟内存区域 vma 出来。返回值 addr 表示这段虚拟内存区域的起始地址。
-    
 2. mmap_region 函数是整个内存映射的核心，它首先会为这段选取出来的映射虚拟内存区域分配 vma 结构，并根据映射信息进行初始化，以及建立 vma 与相关映射文件的关系，最后将这段 vma 插入到进程的虚拟内存空间中。
     
 
