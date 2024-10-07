@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/algorithm/十五大经典算法研究.md",
+                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/algorithm/十五大经典算法研究.md",
+                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/algorithm/十五大经典算法研究.md",
+                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/algorithm/十五大经典算法研究.md"
+                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md"
               }
             }
           }
@@ -146,12 +146,25 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/cpp/grammar/reflect/b_n_C++ 反射：全方位解读 Lura 库的前世今生！.md",
+    "Pasted image 20241007104818.png",
+    "Pasted image 20241007104804.png",
+    "Pasted image 20241007104751.png",
+    "Pasted image 20241007104741.png",
+    "Pasted image 20241007104731.png",
+    "Pasted image 20241007104520.png",
+    "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
+    "coding/cpp/grammar/k_n_使用 C++ 中的 final 关键字，到底能否提升性能？.md",
+    "coding/cpp/grammar/i_C++20 新特性的小细节.md",
+    "coding/cpp/grammar/i_C++20那些事之宇宙飞船运算符.md",
+    "coding/cpp/grammar/i_std span查看连续内存.md",
+    "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
+    "coding/algorithm/十五大经典算法研究.md",
     "learning",
     "Pasted image 20241007095514.png",
     "coding/cpp/k_C++ 线程的使用.md",
-    "coding/algorithm/十五大经典算法研究.md",
     "coding/cpp/a_从新手到专业人士：探索 C++ STL 以获得终极性能.md",
     "interview/learn-quote.md",
     "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
@@ -170,20 +183,8 @@
     "coding/os/linux/memory/memory-model/k_计算机科学基础知识（一）The Memory Hierarchy.md",
     "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
     "coding/os/linux/debug/p_n_一例hardened_usercopy的bug解析.md",
-    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
     "zx99-image/Pasted image 20241006175104.png",
     "zx99-image/Pasted image 20241006174502.png",
-    "zx99-image/Pasted image 20241006174449.png",
-    "zx99-image/Pasted image 20241006174431.png",
-    "zx99-image/Pasted image 20241006171426.png",
-    "zx99-image/Pasted image 20241006171420.png",
-    "zx99-image/Pasted image 20241006171414.png",
-    "zx99-image/Pasted image 20241006171406.png",
-    "coding/cpp/grammar/a_s_n_终极 C++避坑指南.md",
-    "coding/app/nginx/章亦春（agentzh）谈ngx_lua之来龙去脉.md",
-    "coding/app/nginx/k_神器 Nginx 的学习手册(建议收藏吃灰).md",
-    "coding/app/nginx/c_又一款Nginx 管理可视化神器！通过界面完成配置监控，一条龙！.md",
-    "coding/app/nginx/b_万字多图，搞懂 Nginx 高性能网络工作原理！.md",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",
@@ -194,7 +195,6 @@
     "0x01-leetcode/2-dimensional/tree/path-sum",
     "0x01-leetcode/2-dimensional/tree/traversal/postorder",
     "0x01-leetcode/2-dimensional/tree/traversal/inorder",
-    "0x01-leetcode/2-dimensional/tree/traversal/preorder",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
   ]

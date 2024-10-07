@@ -1,171 +1,60 @@
-
-
 CPP开发者
-
  _2022年06月18日 17:05_ _浙江_
-
 以下文章来源于腾讯云开发者 ，作者沈芳
-
-
 **腾讯云开发者**.
-
 腾讯云官方社区公众号，汇聚技术开发者群体，分享技术干货，打造技术影响力交流社区。
-
-](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651171556&idx=2&sn=7f292c8d1b087ee038cafaa7f2a9e4d3&chksm=80647bbbb713f2ad4267f39f0708f12fc6ded86feb3e6e08d14a87e4d63f0397e131c0803782&mpshare=1&scene=24&srcid=0618eZLh9rbxGe735Fks7DQC&sharer_sharetime=1655548483879&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0d1559510651ef93428079e71e8caf7b1fb1c84e65d3a34eecf44af72d32baa50c7eb9afe3d9e1fc8345eba12622207be3223f75a7411fe414bc06710049fd428bf78447f82e69613d187da57617292ea8f780b98f2788b391158c9c9316dde95ddf537bb59118363ca734f7bc54af6f4c16cfdaf5471663a&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQHgga1De36uTKaaRolGc%2FixLmAQIE97dBBAEAAAAAAFDgCnDJEckAAAAOpnltbLcz9gKNyK89dVj038UH8xwu7vS9%2Bcg5Y4nOFl0snf6EzszA7AbIy%2BuCddpnyx2yQysJAxsSOSLFcYi8K0utBSHoMu2qnI%2FVMx8s59ty0k6R%2FXePZ06QDGxWOJOLIInKsKsFk4BJk1NWHHWiIYe3UP7WpOud8yJuBYVWyfGTECbI5AJYSqm37mOBTWTkpPooqLHyoVT90Ry2E0wmo0jIJufxIPTCAIRQqoVC5HoEyPNBmXhph4oKLzFdoQhhxFV3Sm98LQXwREB2Cv04&acctmode=0&pass_ticket=UZJ7%2BHk%2FdTceNx%2F3%2FZD2qbjHF89G%2BhsjOUPkEUW7Wc6%2BfR04W%2BV4xGs0bfpZV0B3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
-
-  
 
 导语 | 本文我们将以lura库为例，介绍如何以C++反射作为基础设施，以更简洁的方式来实现一版lua的bridge，主要围绕lura库的前世今生来逐步展开。(本文一些知识需要适当了解lua c api和lua的meta table相关知识，了解相关知识阅读效果更佳。)
 
-  
-
 在上篇_《_[_**C++反射：深入探究function实现机制！**_](http://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651170617&idx=1&sn=cd2ce5cdf7c540e4f400000077590baa&chksm=80647666b713ff7082e304116139723f739d6ed382d39a8291226b335d4208d3b75bdb2c0f31&scene=21#wechat_redirect)_》_中我们对反射中的Function实现做了相关的介绍，本篇将深入lura这部分进行阐述。
-
-  
-
-**一、lua bridge核心功能概述**
-
-  
+# **一、lua bridge核心功能概述**
 
 Lua的bridge层实现比较核心的功能是导出C++类到Lua中使用，基本都要完成如下图所示的几项功能:
-
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/VY8SELNGe97QyTOo9LT31eUOgoz73IVJpPvwwfG7x1WbDvHlNUCGfEcF25f3UB2P10ZkD0aQ2ViaNxYpFAVPrcQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
-  
+![[Pasted image 20241007104520.png]]
 
 ### **（一）函数的处理**
 
-  
-
 不管是“member functions”或者是“static functions”的处理，在bridge库上的实现都比较统一，整个过程与我们前面提到的函数的类型擦除基本是一致的。c++函数向lua注册的核心目的只有一个: 将需要在lua中调用的c++函数，转换为统一类型的lua c function。剩下的调用过程就比较简单了，正确填入参数，我们即可以像一个标准的lua函数那样使用这些c++函数了。
-
-  
 
 从上面提到的4个库的实现方式上来看，除tolua++外的luabind，luatinker，luabridge，它们的实现都会依赖C++模板来完成函数向lua c function的转换，细节可参考第三篇_《_[_**C++反射：深入探究function实现机制！**_](http://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651170617&idx=1&sn=cd2ce5cdf7c540e4f400000077590baa&chksm=80647666b713ff7082e304116139723f739d6ed382d39a8291226b335d4208d3b75bdb2c0f31&scene=21#wechat_redirect)_》_中关于lua c function注册的部分，区别在于这几者都向下兼容了c++98，相关的模板使用部分看起来会晦涩很多，因为varadic template在c++98尚未支持，我们会发现大量的从0个参数到N个参数展开的模板代码，导致他们函数类型统一部分的实现非常复杂，但实际上只是做了函数类型统一这一件事件。
 
-  
-
 tolua++的方式相对简单直接，通过自动生成大量的中间代码来将c++函数转换为lua c function，生成的代码量虽然比较多，但对比用模板的方式，因为不需要考虑模板的包装，小的功能扩展会简单直白不少。
-
-  
-
-  
 
 ### **（二）属性的处理**
 
-  
-
 这部分的实现基本都严重依赖下一节中c++对象到userdata的包装，核心功能是依托于自定义的meta get/set方法，完成对userdata中对应C++对象某成员变量的获取。
-
-  
-
-  
-
-**（三）c++对象->userdata**
-
-  
+### **（三）c++对象->userdata**
 
 这部分更多的是作为一个对象容器载体，然后通过meta table来方便lua访问这个载体，主要提供函数获取，属性获取等功能，基本上每个bridge库都会有自己的实现，以及在C++中实现特定的meta get，meta set函数，细节比较多，lura相关的功能实现基本都被UserObject代替，userdata再对UserObject进行包装即可，很多复杂度都转移到c++反射实现本身了，所以这里不详细展开相关的细节了。
-
-  
-
-  
-
-**二、Lura的前世-从过往说起**
-
-  
+# **二、Lura的前世-从过往说起**
 
 ### **（一）过往使用的lua bridge实现**
 
-  
-
 lua的bridge层实现特别多，就我自己用过的也不少，下面仅列出个人有在实际项目中使用过的:
 
-  
-
 - luabind: 依赖boost的一个lua实现，当时应该是各种特性提供的最多的lua bridge。
-    
-
-  
-
 - luatinker: 对比luabind简化了支持的特性，同时也完全不依赖boost库。
-    
-
-  
-
 - tolua++: Cocos2dx使用的lua bridge，不依赖模板等特性，利用生成器生成bridge代码。
-    
-
-  
-
 - luabridge: 某项目框架之前用到的一个lua bridge实现，有挺多优点，配合基于libclang实现的导出器，能够很好的完成bridge的工作。
-    
-
-  
 
 **注**：lua的bridge实现还有不少，像以zero overhead abstraction为卖点的sol2这些我们就不展开了，感觉参考意义大于实际项目使用的意义。另外还有一些c的FFI实现，比如luajit自带的FFI，不是本文关注的重点，这里也不详细赘述了。
-
-  
-
-  
-
 ### **（二）实践总结**
-
-  
 
 上面列举的这些库，**优点**还是挺明显的:
 
-  
-
 - 功能特性齐全，基本都覆盖了上面说到的bridge核心功能。
-    
-
-  
-
 - 配合自带或者项目自己维护的导出器, 日常维护使用便利。
-    
-
-  
-
 - 除luabind外核心代码都比较简洁, 调整难度不高。
-    
-
-  
-
 - C++与Lua的边界明确, 便于添加Debug和Profiler等功能。
-    
-
-  
-
 - 基于这些库实现一些复杂特性成本可空, 可以比较好的适配特定需求。
-    
-
-  
-
+ 
 如在Lua中override c++ class的virtual function等功能
-
-  
 
 上面介绍了Luabridge在使用过程中我们体验比较好的那部分，但它其实依然有很多跨语言库的通病:
 
-  
-
 - 对像唯一性
-    
-
-  
-
 - 类型丢失
-    
-
-  
-
 - 对象的生命周期管理
-    
-
-  
 
 这些都会存在一些坑点，外部使用者比较容易出现一些特定情况下出现诡异Bug没法排查的问题。它只是一个Bridge，能够很好的帮你完成Bridge相关的功能，但并不能帮我们梳理出清晰的跨语言机制，肯定没法依托机制本身来提供足够多的基础特性来保证跨语言的行为安全有效，在我们有了基本的c++反射机制后，可以尝试结合反射来组织更好的跨语言实现。
 
@@ -280,7 +169,7 @@ Lua注册:
 对比luabridge的实现，Lua注册部分namespace和class部分保留了，概念也基本对齐，但我们的具体property和function注册已经是由反射部分负责了，Lua部分不再重复相关的工作。
 
   
-
+![[Pasted image 20241007104731.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -320,7 +209,7 @@ lura整体的代码因为各种实际项目需求，还是比较多的，不过�
     
 
   
-
+![[Pasted image 20241007104741.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -371,7 +260,7 @@ __call用于直接在lua中构造一个对应的c++对象，我们将class table
     
 
   
-
+![[Pasted image 20241007104751.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -433,7 +322,7 @@ void LuaCFunctions::CreateInstanceMetaTable(lua_State* L, const MetaClass& 
 vec是什么，怎么支撑上面的.x，.y，.z成员获取和Length()函数的调用的呢? 答案就在上面提到过的LuaCFunctions::InstanceMetaCreate()函数上，我们结合相关的代码和图来了解一下实现原理:
 
   
-
+![[Pasted image 20241007104804.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
@@ -513,7 +402,7 @@ lura的协程处理主要完成了两件事:
 lura本体是直接选择了商用的FramePro，集成了它的SDK。因为跨语言边界处理的代码都非常集中，所以接入其他第三方的profiler也相对容易，这里直接上最后的效果图了:
 
   
-
+![[Pasted image 20241007104818.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
   
