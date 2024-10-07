@@ -1,23 +1,12 @@
-
 甄建勇 Linux阅码场
-
  _2021年11月17日 11:56_
 
 作者简介
-
 甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。
-
 感兴趣领域:经济学、心理学、哲学。
-
+# **概述**
   
-
-  
-
-**概  述**
-
-  
-
-## 爱因斯坦在他的相对论中告诉我们，没有绝对的时间和空间，在一定条件下时间和空间是可以相互转化的，是否我们的世界有一天能够把空间与时间转化回到历史的时期？
+ 爱因斯坦在他的相对论中告诉我们，没有绝对的时间和空间，在一定条件下时间和空间是可以相互转化的，是否我们的世界有一天能够把空间与时间转化回到历史的时期？
 
 唐代诗仙李白也曾有云：“夫天地者，万物之逆旅；光阴者，百代之过客”。是对空间和时间的另外一种表述。
 
@@ -25,11 +14,7 @@
 
 冯诺依曼结构与他之前的结构的最大不同就在于在计算机中引入了存储部件，也正是这个存储部件是计算机的设计进入了一个全新时代。也正是由于存储部件在计算机体系结构中的重要地位，无论是过去还是现在，无论是体系结构设计中，还是在操作系统设计中，存储组织的设计与管理一直是研究热点。在前面介绍了CPU的数据通路和控制通路之后，本章，我们将介绍举足轻重的存储器组织。
 
-  
-
 **TLB与cache简介**  
-
-  
 
 对于computerarchitecture，除了流水线（pipelining）之外，存储器层次组织（memoryhierarchy）是另外一个重要的部分。软件方面，对linuxkernel的研究中，MMU是篇幅最多，也是最复杂的一部分。硬件方面，TLB和cache这两个词就比较常见了。
 
@@ -38,9 +23,7 @@
 **首先，为什么要有memeryhierarchy？**
 
 （1）填补core和mainmemory之间的速度鸿沟。
-
 （2）填补SDRAM和mainmemory之间的cost鸿沟。
-
 （3）为了实现VirtualMemory
 
 **其次，为什么实现Virtual Memory？**
@@ -50,15 +33,12 @@
 最后是memory hierarchy内在原理，是局部性原理（principleof locality）这包括时间局部性（Temporallocality (locality in time)）和空间局部性（Spatiallocality (locality in space)）。 在介绍TLB 和 cache之前首先要明确几点：
 
 （1）汇编完的程序里用到的内存地址是虚拟地址。也就是说core执行的load/stor指令中的内存地址是虚拟地址。
-
 （2）对于多进程（线程）代码，编译时，操作系统会给每个进程分配不同的虚拟地址空间。
-
 （3）内存是按页（page）来管理和使用的，典型值是4K bytes。
 
 根据冯诺依曼体系结构，一切数据都来自内存。所以就需要访存（memoryaccess）。访问内存需要几步？大体上需要两步：
 
 （1）将虚拟地址转换成物理地址。
-
 （2）读/写这个物理地址的内容。
 
 详细步骤：将虚拟地址转换成物理地址，就需要虚拟地址到物理地址的一个映射表（具体映射方法有直接映射，组相联，全相联）。这个表，就是页表（pagetable），页表由很多项组成，每一项叫一个页表项，由操作系统维护。创建进程的时候生成这个进程执行过程中用到的所有的页表项，其中一部分加载到内存中，另外一部分放在硬盘上，即，交换区（swapspace）。由于访存动作很多，所以虚拟地址到物理地址的转换动作就很多，也就是访问页表的次数很多，所以根据局部性原理，就把一部分页表项放到一个地方，这个地方就是TLB（translation-lookasidebuffer）。
@@ -75,10 +55,6 @@
 
 下面是整体的流程。
 ![[Pasted image 20240914195551.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
 _图1 TLB与cache的整体流程_
 
 **TLB**
@@ -94,7 +70,6 @@ MMU，是硬件和软件配合最密切的部分之一，对于RISCCPU而言，�
 当时，主要由两方面的因素导致了MMU的产生：
 
 （1）从安全角度出发，确保多进程程序在执行时相互不影响。
-
 （2）从程序员的角度出发，采用MMU可以让程序员在编程时少受内容容量的限制。
 
 现在而言，第一个原因占主要。
@@ -217,110 +192,60 @@ _图4      两级页表的虚实地址转换_ 
 
 MMU，cache确实有它的好处，其重要性也是有目共睹，但并不是适用于所有方面，上面所说的内核空间的kseg0段是禁止MMU的，除此之外，kseg1段，MMU和cache都是禁止的。从这个角度来看，无论是什么事情，都要‘有所为有所不为’，不要跟风，不要认为是好东西就可以随便用，要取其长，补己短，该出手时才出手。
 
-  
-
 **代码清单 2        DTLB miss异常入口**
-
+```cpp
 1. /* ---[ 0x900: DTLB miss exception ]------------------------------------- */
-
 2.     .org 0x900  
-
 3.     l.j boot_dtlb_miss_handler  
-
 4.     l.nop  
-
+```
 **代码清单 3          DTLB miss 异常处理**
-
+```cpp
 1. /* ---[ boot dtlb miss handler ]----------------------------------------- */
-
 2.   
-
 3. boot_dtlb_miss_handler:  
-
-4.   
-
+4.  
 5. /* mask for DTLB_MR register: - (0) sets V (valid) bit,  
-
 6.  *                            - (31-12) sets bits belonging to VPN (31-12)  
-
 7.  */  
-
 8. #define DTLB_MR_MASK 0xfffff001  
-
 9.   
-
 10./* mask for DTLB_TR register: - (2) sets CI (cache inhibit) bit,  
-
 11. *                - (4) sets A (access) bit,  
-
 12. *                            - (5) sets D (dirty) bit,  
-
 13. *                            - (8) sets SRE (superuser read) bit  
-
-14. *                            - (9) sets SWE (superuser write) bit  
-
+14. *                            - (9) sets SWE (superuser write) bit 
 15. *                            - (31-12) sets bits belonging to VPN (31-12)  
-
 16. */  
-
 17.#define DTLB_TR_MASK 0xfffff332  
-
 18.  
-
 19./* These are for masking out the VPN/PPN value from the MR/TR registers...  
-
 20. * it's not the same as the PFN */  
-
 21.#define VPN_MASK 0xfffff000  
-
 22.#define PPN_MASK 0xfffff000  
-
 23.  
-
 24.  
-
 25.    EXCEPTION_STORE_GPR6  
-
 26.  
-
 27.#if 0  
-
 28.    l.mfspr r6,r0,SPR_ESR_BASE     //  
-
 29.    l.andi  r6,r6,SPR_SR_SM            // are we in kernel mode ?  
-
 30.    l.sfeqi r6,0                       // r6 == 0x1 --**>** SM  
-
 31.    l.bf    exit_with_no_dtranslation  //  
-
 32.    l.nop  
-
 33.#endif  
-
 34.  
-
 35.    /* this could be optimized by moving storing of  
-
 36.     * non r6 registers here, and jumping r6 restore  
-
 37.     * if not in supervisor mode  
-
 38.     */  
-
 39.  
-
 40.    EXCEPTION_STORE_GPR2  
-
 41.    EXCEPTION_STORE_GPR3  
-
 42.    EXCEPTION_STORE_GPR4  
-
 43.    EXCEPTION_STORE_GPR5  
-
 44.  
-
 45.    l.mfspr r4,r0,SPR_EEAR_BASE        // get the offending EA  
-
 46.  
 
 47.immediate_translation:  
@@ -416,14 +341,9 @@ MMU，cache确实有它的好处，其重要性也是有目共睹，但并不是
 92.    EXCEPTION_LOAD_GPR4  
 
 93.    l.j _di
+```
 
-  
-
-  
-
-  
-
-  
+  ---
 
 精彩回顾
 

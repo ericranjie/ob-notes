@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md"
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md"
               }
             }
           }
@@ -148,19 +148,28 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
+    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
+    "coding/os/linux/memory/memory-manage/k_Linux Kernel：内存分页机制核心原理.md",
+    "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
+    "README.md",
+    "zx99-image/Pasted image 20241007233004.png",
+    "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
+    "coding/os/linux/memory/memory-manage/i_图文详解 Linux 分页机制！.md",
+    "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
+    "coding/os/linux/memory/MMU/p_甄建勇：五分钟搞定MMU.md",
+    "zx99-image/Pasted image 20241007231324.png",
+    "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
     "coding/os/linux/memory/MMU/d_n_MMU内存管理单元.md",
     "coding/os/linux/memory/MMU/d_Arm MMU深度解读.md",
     "coding/os/linux/memory/virtual-memory/k_深入理解TLB原理.md",
-    "Pasted image 20241007231459.png",
+    "zx99-image/Pasted image 20241007231459.png",
     "coding/os/linux/memory/virtual-memory/t_深入理解TLB.md",
     "coding/os/linux/memory/virtual-memory/b_TLB flush操作.md",
-    "Pasted image 20241007231350.png",
-    "Pasted image 20241007231324.png",
+    "zx99-image/Pasted image 20241007231350.png",
     "coding/os/linux/memory/virtual-memory/b_RISC-V 内存虚拟化简析（一）.md",
     "coding/os/linux/memory/virtual-memory/b_虚拟内存 & IO & 零拷贝.md",
     "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
-    "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
-    "README.md",
     "coding/os/linux/debug/trace/b_n_问题排查利器：Linux 原生跟踪工具 Ftrace 必知必会.md",
     "Pasted image 20241007225825.png",
     "zx99-image/Pasted image 20241007225643.png",
@@ -174,16 +183,7 @@
     "coding/os/linux/debug/a_n_大厂干掉 OOM 的套路，不过如此.md",
     "coding/cpp/template/b_C++模板总结.md",
     "coding/cpp/template/a_n_四万字长文，这是我见过最好的模板元编程文章！.md",
-    "coding/cpp/template/i_模版定义一定要写在头文件中吗.md",
-    "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
-    "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
-    "coding/os/linux/schedule/b_深入理解 Linux 调度（GPU）虚拟化.md",
-    "coding/os/linux/schedule/lock/lock-free/b_如何利用CAS技术实现无锁队列.md",
-    "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
     "zx99-image/Pasted image 20241007192403.png",
-    "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
-    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
-    "zx99-image/Pasted image 20241007190526.png",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",

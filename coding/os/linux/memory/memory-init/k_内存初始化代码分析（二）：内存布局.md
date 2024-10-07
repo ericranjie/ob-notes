@@ -1,23 +1,5 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-11-18 18:25 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-一、前言
+# 一、前言
 
 同样的，本文是[内存初始化](http://www.wowotech.net/memory_management/mm-init-1.html)文章的一份补充文档，希望能够通过这样的一份文档，细致的展示在初始化阶段，Linux 4.4.6内核如何从device tree中提取信息，完成内存布局的任务。具体的cpu体系结构选择的是ARM64。
 

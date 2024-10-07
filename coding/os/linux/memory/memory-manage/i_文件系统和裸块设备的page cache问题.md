@@ -1,28 +1,10 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[阿克曼](http://www.wowotech.net/author/533) 发布于：2018-4-28 10:16 分类：[文件系统](http://www.wowotech.net/sort/filesystem)
 
 注：本文代码基于linux-3.18.31，此版本中块缓存已经合入页缓存。
-
 ## 普通文件的address space
 
 文件系统读取文件一般会使用do_generic_file_read()，mapping指向普通文件的address space。如果一个文件的某一块不在page cache中，在find_get_page函数中会创建一个page，并将这个page根据index插入到这个普通文件的address space中。这也是我们熟知的过程。
-
+```cpp
 1. static ssize_t do_generic_file_read(struct file *filp, loff_t *ppos,
 2.         struct iov_iter *iter, ssize_t written)
 3. {
@@ -61,11 +43,11 @@
 36.         }
 37.        ......//此处省略约200行
 38. }
-
+```
 ## 块设备的address space
 
 但是在读取文件系统元数据的时候，元数据对应的page会被加入到底层裸块设备的address space中。下面代码的bdev_mapping指向块设备的address space，调用find_get_page_flags()后，一个新的page（如果page不在这个块设备的address space）就被创建并且插入到这个块设备的address space。
-
+```cpp
 1. static struct buffer_head *
 2. __find_get_block_slow(struct block_device *bdev, sector_t block)
 3. {
@@ -84,13 +66,12 @@
 16.         goto out;
 17.     ......//此处省略几十行
 18. }
-
+```
 ## 两份缓存?
 
 前面提到的情况是正常的操作流程，属于普通文件的page放在文件的address space，元数据对应的page放在块设备的address space中，大家井水不犯河水，和平共处。但是世事难料，总有一些不按套路出牌的家伙。文件系统在块设备上欢快的跑着，如果有人绕过文件系统，直接去操作块设备上属于文件的数据块，这会出现什么情况？如果这个数据块已经在普通文件的address space中，这次直接的数据块修改能够立马体现到普通文件的缓存中吗？
 
 答案是直接修改块设备上块会新建一个对应这个块的page，并且这个page会被加到块设备的address space中。也就是同一个数据块，在其所属的普通文件的address space中有一个对应的page。同时，在这个块设备的address space中也会有一个与其对应的page，所有的修改都更新到这个块设备address space中的page上。除非重新从磁盘上读取这一块的数据，否则普通文件的文件缓存并不会感知这一修改。
-
 ## 实验
 
 口说无凭，实践是检验真理的唯一标准。我在这里准备了一个实验，先将一个文件的数据全部加载到page cache中，然后直接操作块设备修改这个文件的数据块，再读取文件的内容，看看有没有被修改。
@@ -104,7 +85,7 @@
 首先，我们找一个测试文件，就拿我家目录下的read.c来测试，这个文件的内容就是一些凌乱的c代码。
 
 ➜ ~ cat read.c 
-
+```cpp
 1. #include <stdio.h>
 2. #include <unistd.h>
 3. #include <fcntl.h>
@@ -132,18 +113,18 @@
 25. 	close(fd);
 26. }
 27. ➜  ~ 
-
+```
 接着运行vmtouch，看看这个文件是否在page cache中了，由于这个文件刚才被读取过，所以文件已经全部保存在page cache中了。
-
+```cpp
 1. ➜  ~ vmtouch read.c                   
 2.            Files: 1
 3.      Directories: 0
 4.   Resident Pages: 1/1  4K/4K  100%
 5.          Elapsed: 0.000133 seconds
 6. ➜  ~ 
-
+```
 然后我通过debugfs找到read.c的数据块，并且通过dd命令直接修改数据块。  
-
+```cpp
 1. Inode: 3945394   Type: regular    Mode:  0644   Flags: 0x80000
 2. Generation: 659328746    Version: 0x00000000:00000001
 3. User:     0   Group:     0   Project:     0   Size: 386
@@ -162,9 +143,9 @@
 16. 1+0 records in
 17. 1+0 records out
 18. 4096 bytes (4.1 kB, 4.0 KiB) copied, 0.000323738 s, 12.7 MB/s
-
+```
 修改已经完成，我们看看直接读取这个文件会怎么样。
-
+```cpp
 1. ➜  ~ cat read.c 
 2. #include <stdio.h>
 3. #include <unistd.h>
@@ -198,9 +179,9 @@
 31.      Directories: 0
 32.   Resident Pages: 1/1  4K/4K  100%
 33.          Elapsed: 0.00013 seconds
-
+```
 文件依然在page cache中，所以我们还是能够读取到文件的内容。然而当我们drop cache以后，再读取这个文件，会发现文件内容被清空。
-
+```cpp
 1. ➜  ~ vmtouch read.c 
 2.            Files: 1
 3.      Directories: 0
@@ -214,12 +195,12 @@
 11.          Elapsed: 0.000679 seconds
 12. ➜  ~ cat read.c
 13. ➜  ~ 
-
+```
 ## 总结
 
 普通文件的数据可以保存在它的地址空间中，同时直接访问块设备中此文件的块，也会将这个文件的数据保存在块设备的地址空间中。这两份缓存相互独立，kernel并不会为这种非正常访问同步两份缓存，从而避免了同步的开销。
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [fixmap addresses原理](http://www.wowotech.net/memory_management/440.html) | [一次触摸屏中断调试引发的深入探究](http://www.wowotech.net/linux_kenrel/437.html)»
 

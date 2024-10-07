@@ -38,7 +38,6 @@ memory@80000000 {
 
 来张图片看看虚拟地址空间：
 ![[Pasted image 20240927142032.png]]
-data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
 图中`fixed: 0xffffffbefe7fd000 - 0xffffffbefec00000`，描述的就是`Fixed map`的区域。
 

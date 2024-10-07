@@ -1,27 +1,8 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-10-13 12:05 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-一、前言
+# 一、前言
 
 一直以来，我都非常着迷于两种电影拍摄手法：一种是慢镜头，将每一个细节全方位的展现给观众。另外一种就是快镜头，多半是反应一个时代的变迁，从非常长的时间段中，截取几个典型的snapshot，合成在十几秒的镜头中，可以让观众很快的了解一个事物的发展脉络。对应到技术层面，慢镜头有点类似情景分析，把每一行代码都详细的进行解析，了解技术的细节。快镜头类似数据流分析，勾勒一个过程中，数据结构的演化。本文采用了快镜头的方法，对内存初始化部分进行描述，不纠缠于具体函数的代码实现，只是希望能给大家一个概略性的印象（有兴趣的同学可以自行研究代码）。BTW，在本文中我们都是基于ARM64来描述体系结构相关的内容。
-
-二、启动之前
+# 二、启动之前
 
 在详细描述linux kernel对内存的初始化过程之前，我们必须首先了解kernel在执行第一条语句之前所面临的处境。这时候的内存状况可以参考下图：
 
@@ -44,8 +25,7 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 上面的结论起始是适合大部分情况下的identity mapping，但是还是有特例（需要考虑的点主要和其物理地址的位置相关）。我们假设这样的一个配置：虚拟地址配置为39bit，而物理地址是48个bit，同时，IDMAP_TEXT这个block的地址位于高端地址（大于39 bit能表示的范围）。在这种情况下，上面的结论失效了，因为PGTABLE_LEVELS 是和虚拟地址的bit数、PAGE_SIZE的定义相关，而是和物理地址的配置无关。linux kernel使用了巧妙的方法解决了这个问题，大家可以自己看代码理解，这里就不多说了。
 
 一旦设定完了页表，那么打开MMU之后，kernel正式就会进入虚拟地址空间的世界，美中不足的是内核的虚拟世界没有那么大。原来拥有的整个物理地址空间都消失了，能看到的仅仅剩下kernel image mapping和identity mapping这两段地址空间是可见的。不过没有关系，这只是刚开始，内存初始化之路还很长。
-
-四、看见DTB
+# 四、看见DTB
 
 虽然可以通过kernel image mapping和identity mapping来窥探物理地址空间，但终究是管中窥豹，不了解全局，那么内核是如何了解对端的物理世界呢？答案就是DTB，但是问题来了，这时候，内核还没有为DTB这段内存创建映射，因此，打开MMU之后的kernel还不能直接访问，需要先创建dtb mapping，而要创建address mapping，就需要分配页表内存，而这时候，还没有了解内存布局，内存管理模块还没有初始化，如何来分配内存呢？
 
