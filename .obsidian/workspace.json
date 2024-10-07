@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+                "file": "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+                "file": "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+                "file": "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md"
+                "file": "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md"
               }
             }
           }
@@ -148,6 +148,8 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
+    "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
     "coding/os/linux/BPF/b_eBPF 简史.md",
     "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
     "coding/os/linux/build/b_计算机科学基础知识（三）静态库和静态链接.md",
@@ -183,8 +185,6 @@
     "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/memory/k_深入理解Linux内核页表映射分页机制原理.md",
     "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
-    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
-    "interview/interview-resources.md",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",

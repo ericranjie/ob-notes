@@ -1,14 +1,8 @@
-
 原创 极客重生 极客重生
-
  _2022年03月21日 12:39_
 
 自 3.15 以来，您可能一直在关注内核社区中扩展的 Berkeley 包过滤器 (eBPF) 的开发，或者您可能仍然将 Berkeley 包过滤器与 Van Jacobson 在 1992 年所做的工作联系在一起。您可能已经使用 BPF 和 tcpdump 多年，或者您可能已经开始在您的数据平面中使用！本文从网络性能的角度描述其关键发展，以及为什么现在这对网络运营商、系统管理员和企业解决方案提供商变得重要，就像它自成立以来就一直适用于运营商的大型数据中心和云计算网络。
-
 #### **BPF 或 eBPF——有什么区别？**
-
-#####   
-
 ##### **虚拟机**
 
 从根本上说，eBPF 仍然是 BPF：它是一个小型虚拟机，运行从用户空间注入并附加到内核中特定挂钩的程序。它可以对网络数据包进行分类和操作。多年来，它一直在 Linux 上用于过滤数据包并避免对用户空间进行昂贵的复制，例如使用 tcpdump。然而，虚拟机的范围在过去几年中已经发生了翻天覆地的变化。
@@ -21,30 +15,20 @@ eBPF通过使用扩展的寄存器和指令集、添加映射（没有任何大�
 
 但新功能不能以牺牲安全为代价。为确保正确行使 VM 增加的责任，内核中实现的验证程序已被修订和合并。这个验证器检查代码中的任何循环（这可能导致可能的无限循环，从而挂起内核）和任何不安全的内存访问。它拒绝任何不符合安全标准的程序。每次用户尝试注入程序时，都会在实时系统上执行此步骤，然后将 BPF 字节码 JITed 到所选平台的本机汇编指令中。
 ![[Pasted image 20240920201607.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 图 2. 主机上 eBPF 程序的编译流程。部分支持的 CPU 架构未显示。
 
 为了允许在 eBPF 的限制内难以实现或优化的任何关键功能，有许多帮助程序旨在协助执行过程，例如地图查找或随机数的生成。
-
 ##### ****钩子 - 数据包在哪里分类？****
 
 由于其灵活性和实用性，eBPF 的钩子数量正在激增。但是，我们将重点关注数据路径低端的那些。这里的关键区别在于 eBPF 在驱动程序空间中添加了一个额外的钩子。此挂钩称为 eXpress DataPath，或 XDP。这允许用户在将 skb（套接字缓冲区）元数据结构添加到数据包之前丢弃、反射或重定向数据包。性能可以提高约 4-5 倍。
 ![[Pasted image 20240920201613.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 图 3. 高性能网络相关 eBPF 钩子与简单用例的性能比较
-
 ### **将 eBPF 卸载到 NFP**
 ![[Pasted image 20240920201619.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 图 4. 包含 NFP JIT 的编译流程（未显示一些支持的 CPU 架构）
 
 这可能的关键原因是因为 BPF 机器映射到我们在 NFP 上的流处理内核的能力非常好，这意味着运行在 15-25W 之间的基于 NFP 的 Agilio CX SmartNIC 可以从主机卸载大量处理. 在下面的负载平衡示例中，NFP 处理的数据包数量与来自主机的近 12 个 x86 内核的总和相同，由于 PCIe 带宽限制，主机在物理上无法处理数量（使用的内核：Intel Xeon CPU E5-2630 v4 @ 2.20GHz）。
 ![[Pasted image 20240920201627.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 图 5. NFP 和 x86 CPU (E5-2630 v4) 上示例负载均衡器的性能对比
 
 性能是使用 BPF 硬件卸载是编程 SmartNIC 的正确技术的主要原因之一。但这不是唯一的：让我们回顾一下其他一些激励措施。
@@ -55,18 +39,14 @@ eBPF通过使用扩展的寄存器和指令集、添加映射（没有任何大�
 
 2. 延迟：通过卸载 eBPF，延迟显着减少，因为数据包不必跨越 PCIe 边界。这可以改善负载平衡或 NAT 用例的网络性能。请注意，通过避免 PCIe 边界，在 DDoS 预防案例中还有一个显着的好处，因为数据包不再跨越边界，否则可能会在构造良好的 DDoS 攻击下形成瓶颈。
 ![[Pasted image 20240920201635.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 图 6. 驱动程序中卸载 XDP 与 XDP 的延迟，注意使用卸载时延迟的一致性
 
 3. 用于对 SmartNIC 数据路径进行编程的接口：通过能够使用 eBPF 对 SmartNIC 进行编程，这意味着非常容易实现诸如速率限制、数据包过滤、不良行为缓解或其他传统 NIC 必须在芯片中实现的特性等特性. 这可以针对最终用户的特定用例进行定制。
-
 ##### **好的 - 这一切都很棒 - 但我如何实际使用它？**
 
 首先要做的是将内核更新到 4.16 或更高版本。我会推荐 4.17（撰写本文时的开发版本）或更高版本，以利用尽可能多的功能。请参阅用户指南以获取最新版本的功能，以及如何使用它们的示例。
 
 此处不赘述，还可以注意到，与 eBPF 工作流相关的工具正在开发中，并且已经在遗留 cBPF 版本方面得到了很大的改进。用户现在通常会用 C 编写程序，并使用 clang-LLVM 提供的后端将它们编译成 eBPF 字节码。也可以使用其他语言，包括 Go、Rust 或 Lua。对 eBPF 架构的支持被添加到传统工具中：llvm-objdump 可以以人类可读的格式转储 eBPF 字节码，llvm-mc 可以用作 eBPF 汇编器，strace 可以跟踪对 bpf() 系统调用的调用。其他工具的一些工作仍在进行中：binutils 反汇编器应该很快支持 NFP 微码，而 valgrind 即将获得对系统调用的支持。还创建了新工具：特别是 bpftool。
-
 ##### **bpfilter**
 
 对于企业系统管理员或 IT 架构师来说，目前仍然悬而未决的一个关键问题是，这如何适用于拥有经过多年完善和维护且基于 iptables 的设置的最终用户。更改此设置的风险在于，很明显，某些事情可能难以接受，必须修改编排层，应该构建新的 API，等等。要解决这个问题，请进入提议的 bpfilter 项目。正如昆汀今年早些时候所写：
@@ -79,8 +59,7 @@ _从技术上讲，用于配置防火墙的 iptables 二进制文件将保持不
 
 ![[Pasted image 20240920201654.png]]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)图 7. bpfilter 与旧 iptables 实现的性能比较
-
+图 7. bpfilter 与旧 iptables 实现的性能比较
 ### **概括**
 
 因此，我们有它。就目前而言，内核社区内正在产生的是一个巨大的网络转变。eBPF 是一个强大的工具，它为内核带来了可编程性。它可以处理**拥塞控制（TCP-BPF）、跟踪（kprobes、tracepoints）和高性能网络（XDP、cls_bpf）**。由于它在社区中的成功，可能会出现其他用例。除此之外，这种过渡一直延伸到最终用户，他们很快就能无缝地离开旧的 iptables 后端，转而使用更新的、更高效的基于 XDP 的后端——使用与今天相同的工具。特别是，这将允许直接的硬件卸载，并在用户迁移到 10G 及以上网络时提供必要的灵活性。
