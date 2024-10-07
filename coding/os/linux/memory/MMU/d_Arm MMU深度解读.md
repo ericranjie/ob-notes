@@ -1,10 +1,11 @@
-思考
+# 思考
+
 1、为什么要用虚拟地址？为什么要用MMU？
 2、MMU硬件完成了地址翻译，我们软件还需要做什么？
 3、MMU在哪里？MMU和SMMU是什么关系？
 本文转自 周贺贺，baron，代码改变世界ctw，Arm精选， armv8/armv9，trustzone/tee，secureboot，资深安全架构专家，11年手机安全/SOC底层安全开发经验。擅长trustzone/tee安全产品的设计和开发。文章有感而发。
+# 一、MMU概念介绍
 
-一、MMU概念介绍
 MMU分为两个部分: TLB maintenance 和 address translation
 
 MMU的作用，主要是完成地址的翻译，即虚拟地址到物理地址的转换，无论是main-memory地址(DDR地址)，还是IO地址(设备device地址)，在开启了MMU的系统中，CPU发起的指令读取、数据读写都是虚拟地址，在ARM Core内部，会先经过MMU将该虚拟地址自动转换成物理地址，然后在将物理地址发送到AXI总线上，完成真正的物理内存、物理设备的读写访问.
@@ -24,7 +25,7 @@ MMU的作用，主要是完成地址的翻译，即虚拟地址到物理地址�
 配置TCR_EL3 (Configure the translation regime)
 创建页表 (Generate the translation tables)
 Enable the MMU
-二、虚拟地址空间和物理地址空间
+# 二、虚拟地址空间和物理地址空间
 2.1、(虚拟/物理)地址空间的范围
 内核虚拟地址空间的范围是什么？应用程序的虚拟地址空间的范围是什么？
 以前我们在学习操作系统时，最常看到的一句话是：内核的虚拟地址空间范围是3G-4G地址空间，应用程序的虚拟地址空间的范围是0-3G地址空间； 到了aarch64上，则为 ： 内核的虚拟地址空间是0xffff_0000_0000_0000 - 0xffff_ffff_ffff_ffff , 应用程序的虚拟地址空间是: 0x0000_0000_0000_0000 - 0x0000_ffff_ffff_ffff.
@@ -68,23 +69,18 @@ TCR_EL1.IPS : Output address size : 告诉mmu，你需要给我输出多少位�
 
 TCR_EL1.T0SZ和TCR_EL1.T1SZ : Input address size : 告诉mmu，我输入的是多少有效位的虚拟地址
 ![[Pasted image 20240909130047.png]]
-
-
-三、Translation regimes
+# 三、Translation regimes
 内存管理单元 (MMU) 执行地址翻译。MMU 包含以下内容：
 
 The table walk unit : 它从内存中读取页表，并完成地址转换
-
 Translation Lookaside Buffers (TLBs) ： 缓存，相当于cache
 
 软件看到的所有内存地址都是虚拟的。 这些内存地址被传递到 MMU，它检查最近使用的缓存转换的 TLB。 如果 TLB没有找到最近缓存的翻译，那么翻译单元将从内存中读取适当的一个或多个表项目进行地址翻译，如下所示：
 ![[Pasted image 20240909130056.png]]
 
-
 Translation tables 的工作原理是将虚拟地址空间划分为大小相等的块，并在表中为每个块提供一个entry。
 Translation tables 中的entry 0 提供block 0 的映射，entry 1 提供block 1 的映射，依此类推。 每个entry都包含相应物理内存块的地址以及访问物理地址时要使用的属性。
 ![[Pasted image 20240909130102.png]]
-
 
 在当前的ARMV8/ARMV9体系中(暂不考虑armv9的RME扩展), 至少存在以下9类Translation regime：
 
@@ -110,9 +106,7 @@ Secure and Non-secure地址空间
 Two Stage Translations
 EL1&0 Translation regime处于VM(Virtual Machine)或SP(Secure Partition)时，EL2 enabled的情况下，是需要stage2转换的。对于EL2 Translation regime 和 EL3 Translation regime是没用stage2 转换的。
 ![[Pasted image 20240909130123.png]]
-
-
-四、地址翻译/几级页表？
+# 四、地址翻译/几级页表？
 4.1、思考：页表到底有几级？
 从以下图来看，有的页表从L2开始，有得从L1开始，有的从L0开始，还有从L-1开始的，都是到L3终止。
 那么我们的页表到底有几级呢？
@@ -149,9 +143,7 @@ EL1&0 Translation regime处于VM(Virtual Machine)或SP(Secure Partition)时，EL
 
 配置相关的代码如下：
 ![[Pasted image 20240909130232.png]]
-
-
-五、页表格式（Descriptor format）
+# 五、页表格式（Descriptor format）
 5.1、ARMV8支持的3种页表格式
 AArch64 Long Descriptor : 我们只学习这个
 Armv7-A Long Descriptor ： for Large Physical Address Extension (LPAE)

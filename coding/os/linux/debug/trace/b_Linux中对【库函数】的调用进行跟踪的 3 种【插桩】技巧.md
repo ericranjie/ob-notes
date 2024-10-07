@@ -1,40 +1,16 @@
-
 程序喵大人
-
  _2022年01月15日 19:15_
-
 编者荐语：
-
 非常不错的文章，分享给大家！
-
 以下文章来源于IOT物联网小镇 ，作者道哥
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4Ity70WLCicqljHPMcjBJicfmKibafuotbvsRqaZIic6N5dQ/0)
-
-**IOT物联网小镇**.
-
-深入的思考 + 直白的文字 + 实用的项目经验，这是我能为您提供的、最基本的知识服务！
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODU5MTYxMA==&mid=2247493364&idx=1&sn=dfe7a718c8546e1c7c95ca5dbe581694&source=41&key=daf9bdc5abc4e8d0a5ba55169ad63bcad6c832cf13ad1319607929f5b4998799e3fa60220566cf255ecbca4446eb515275ab68ac1fb4ebc7a3dd6b51c8cd6fcdca0cc3c5a21dfec7cd59ff2ea68bf3566f8711c1b0f82820d73cb9a6cb503b227c6c8b64590122e8ee11a02a59f4e5cb1f1f0fc9d8a52d5e83d47a5c616df2d0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQx0myPdj%2F16sFgVt07f507xLmAQIE97dBBAEAAAAAANxBICVFUcEAAAAOpnltbLcz9gKNyK89dVj0pGcy%2Bw0ZYRBCv13k3CSpW65fNns8YbrqlNtWLyWnWMFLYrvVhs05DJBXduA%2FU8M2KiCRAjyERdynhLPIeEcXlV%2BeykUbjUO9T7W8WinI8B%2BzicOZLSaZsxEo6N47r5%2FbEyt5rB8ygYOCWddaXoEt9IY8JRmR9V%2FFWEK8LAqzsVMoBvk6a5HKvVIl7KyAX%2BIS5iiM%2FoaVu%2BJlPYEdwlM34EJ2CEQ1jzeRN5MR0gYVTsBna2yZQNNsnWtvbpCnTm%2Bc&acctmode=0&pass_ticket=%2BwDbtZ7Rc6%2Bdsz%2F%2F2AdzTUkP270x1QvvXS92i8zvA01plANk5%2FwD93YIswBm1W%2F%2F&wx_header=1#)
-
-  
 
 目录
 
 - 什么是插桩？
-    
 - 插桩示例代码分析
-    
 - 在编译阶段插桩
-    
 - 链接阶段插桩
-    
 - 执行阶段插桩
-    
-
-别人的经验，我们的阶梯！
 
 ## 什么是插桩？
 
@@ -53,22 +29,17 @@
 关于程序插桩的官方定义，可以看一下【百度百科】中的描述：
 
 > 1. 程序插桩，最早是由J.C. Huang 教授提出的。
->     
 > 2. 它是在保证被测程序原有逻辑完整性的基础上在程序中插入一些探针（又称为“探测仪”，本质上就是进行信息采集的代码段，可以是赋值语句或采集覆盖信息的函数调用）。
->     
 > 3. 通过探针的执行并抛出程序运行的特征数据，通过对这些数据的分析，可以获得程序的控制流和数据流信息，进而得到逻辑覆盖等动态信息，从而实现测试目的的方法。
->     
 > 4. 根据探针插入的时间可以分为目标代码插桩和源代码插桩。
->     
 
 这篇文章，我们就一起讨论一下：在 Linux 环境下的 C 语言开发中，可以通过哪些方法来实现插桩功能。
-
 ## 插桩示例代码分析
 
 示例代码很简单：
-
-`├── app.c   └── lib       ├── rd3.h       └── librd3.so   `
-
+```cpp
+├── app.c   └── lib       ├── rd3.h       └── librd3.so   
+```
 假设动态库`librd3.so`是由第三方提供的，里面有一个函数：`int rd3_func(int, int);`。
 
 `// lib/rd3.h      #ifndef _RD3_H_   #define _RD3_H_   extern int rd3_func(int, int);   #endif   `
@@ -104,22 +75,30 @@
 
 所以我们需要新建一个假的 "rd3.h" 提供给`app.c`，并且要把函数`rd3_func(int, int)`"重导向"到一个包装函数，然后在包装函数中去调用真正的目标函数，如下图所示：
 ![[Pasted image 20240928174711.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 "重导向"函数：可以使用宏来实现。
 
 包装函数：新建一个`C`文件，在这个文件中，需要 `#include "lib/rd3.h"`，然后调用真正的目标文件。
 
 完整的文件结构如下：
-
-`├── app.c   ├── lib   │   ├── librd3.so   │   └── rd3.h   ├── rd3.h   └── rd3_wrap.c   `
-
+```cpp
+├── app.c   ├── lib   │   ├── librd3.so   │   └── rd3.h   ├── rd3.h   └── rd3_wrap.c   
+```
 最后两个文件是新建的：`rd3.h`, `rd3_wrap.c`，它们的内容如下：
+```cpp
+// rd3.h      
+#ifndef _LIB_WRAP_H_   
+#define _LIB_WRAP_H_      // 函数“重导向”，这样的话 app.c 中才能调用 wrap_rd3_func   
+#define rd3_func(a, b)   wrap_rd3_func(a, b)      // 函数声明   
+extern int wrap_rd3_func(int, int);      #endif   
 
-`// rd3.h      #ifndef _LIB_WRAP_H_   #define _LIB_WRAP_H_      // 函数“重导向”，这样的话 app.c 中才能调用 wrap_rd3_func   #define rd3_func(a, b)   wrap_rd3_func(a, b)      // 函数声明   extern int wrap_rd3_func(int, int);      #endif   `
-
-`// rd3_wrap.c      #include <stdio.h>   #include <stdlib.h>      // 真正的目标函数   #include "lib/rd3.h"      // 包装函数，被 app.c 调用   int wrap_rd3_func(int a, int b)   {       // 在调用目标函数之前，做一些处理       printf("before call rd3_func. do something... \n");              // 调用目标函数       int c = rd3_func(a, b);              // 在调用目标函数之后，做一些处理       printf("after call rd3_func. do something... \n");              return c;   }   `
-
+// rd3_wrap.c      
+#include <stdio.h>   
+#include <stdlib.h>      // 真正的目标函数   
+#include "lib/rd3.h"      // 包装函数，被 app.c 调用   
+int wrap_rd3_func(int a, int b)   {       // 在调用目标函数之前，做一些处理       
+printf("before call rd3_func. do something... \n");              // 调用目标函数       int c = rd3_func(a, b);              // 在调用目标函数之后，做一些处理       printf("after call rd3_func. do something... \n");              return c;   }   
+```
 让`app.c 和 rd3_wrap.c`一起编译：
 
 `$ gcc -I./ -L./lib -Wl,--rpath=./lib -o app app.c rd3_wrap.c -lrd3   `
@@ -224,15 +203,10 @@
 
 完美！
 
-  
+---
 
 往期推荐
 
-  
-
-  
-
-[
 
 探索CPU的调度原理
 

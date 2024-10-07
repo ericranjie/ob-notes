@@ -1,9 +1,5 @@
-
-
 原创 Hcoco TrustZone
-
  _2024年03月19日 07:31_ _四川_
-
 # 前言
 
 Hi，早啊！
@@ -15,7 +11,6 @@ Hi，早啊！
 在这里插入图片描述
 
 今天刚刚好看到了几篇前辈的文章，很是不错，于是这里来一起学习一下吧。
-
 # PART 一：MMU 架构篇
 
 **MMU（Memory Management Unit，内存管理单元）是一种硬件模块**，用于在**CPU和内存之间实现虚拟内存管理**。
@@ -44,9 +39,6 @@ Hi，早啊！
 
 而这个转换的过程是硬件执行的：虚拟地址不是被直接送到内存地址总线上，而是送到内存管理单元MMU。他由一个或一组芯片组成，一般存在与协处理器中，其功能是把虚拟地址映射为物理地址。
 ![[Pasted image 20240914200542.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
-在这里插入图片描述
 
 ## 2-微观理解
 
@@ -56,9 +48,6 @@ Hi，早啊！
 
 **所以在这种时候其实也要注意，你到底是使用的物理内存还是虚拟内存，使用的同一片内存，会不会出现踩踏内存的现象。**
 ![[Pasted image 20240914200547.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
-在这里插入图片描述
 
 **你可以为每个程序使用相同的虚拟内存地址空间**。
 
@@ -72,9 +61,6 @@ Hi，早啊！
 
 **操作系统对MMU进行编程，在这两个内存视图之间进行转换。**
 ![[Pasted image 20240914200554.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
-在这里插入图片描述
 
 要做到这一点，**虚拟内存系统中的硬件必须提供地址转换，即把处理器发出的虚拟地址转换为主内存中的物理地址**。
 
@@ -92,26 +78,18 @@ MMU将**代码和数据的虚拟地址映射成实际系统中的物理地址**�
 
 （安全地址与非安全地址的访问控制权限，检查页标签）
 ![[Pasted image 20240914200603.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
-在这里插入图片描述
 
 MMU使**任务或应用程序的编写方式要求它们对系统的物理内存图或可能同时运行的其他程序一无所知**。**这使你可以为每个程序使用相同的虚拟内存地址空间。**
 
 **它还允许你使用一个连续的虚拟内存地图，即使物理内存是碎片化的**。这个虚拟地址空间与系统中的实际物理内存地图是分开的。应用程序被编写、编译和链接以在虚拟内存空间中运行。
 
 这个就回到了我之前说的这个MMU本质上提供的能力。
-
 ### 1-CPU发出的虚拟地址
 
 CPU发出的虚拟地址由两部分组成：VPN和offset，VPN（virtual page number）是页表中的条目number，而offset是指页内偏移。
 
 最终转换后的物理地址也有两部分：PFN和offset，PFN（ Physical frame number）是物理页框number，offset和上面虚拟地址的offset相同，是页内偏移。
 ![[Pasted image 20240914200610.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
-在这里插入图片描述
-
 ### 2-MMU包含两个模块
 
 MMU包含两个模块TLB（Translation Lookaside Buffer）和TWU（Table Walk Unit）。
@@ -124,9 +102,6 @@ MMU由两部分组成：TLB(Translation Lookaside Buffer)和table walk unit。TL
 
 table walk unit在不同的CPU架构上有不同的叫法，但其作用是相同的，就是把内存页表走一走进行查表，完成虚拟地址到物理地址的转换。
 ![[Pasted image 20240914200616.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
-在这里插入图片描述
 
 ### 3-访问权限控制
 
@@ -134,16 +109,11 @@ TrustZone技术之所以能提高系统的安全性，是因为对外部资源�
 
 实现硬件层面的各种隔离，需要对整个系统的硬件和处理器核做出相应的扩展。这些扩展包括：
 
-- • □ 对处理器核的虚拟化，也就是将AMR处理器的运行状态分为安全态和非安全态。
-    
-- • □ 对总线的扩展，增加安全位读写信号线。
-    
-- • □ **对内存管理单元（Memory Management Unit, MMU）的扩展，增加页表的安全位。**
-    
-- • □ 对缓存（Cache）的扩展，增加安全位。
-    
-- • □ 对其他外围组件进行了相应的扩展，提供安全操作权限控制和安全操作信号。
-    
+- • 对处理器核的虚拟化，也就是将AMR处理器的运行状态分为安全态和非安全态。
+- • 对总线的扩展，增加安全位读写信号线。
+- • **对内存管理单元（Memory Management Unit, MMU）的扩展，增加页表的安全位。**
+- • 对缓存（Cache）的扩展，增加安全位。
+- • 对其他外围组件进行了相应的扩展，提供安全操作权限控制和安全操作信号。
 
 在支持TrustZone的SoC上，会对MMU进行虚拟化，使得寄存器TTBR0、TTBR1、TTBCR在安全状态和非安全状态下是相互隔离的，因此两种状态下的虚拟地址转换表是独立的。
 
@@ -155,9 +125,7 @@ Cache也同样进行了扩展，Cache中的每一项都会按照安全状态和�
 
 在REE(linux)和TEE(optee)双系统的环境下，可同时开启两个系统的MMU。在secure和non-secure中使用不同的页表.secure的页表可以映射non-secure的内存，**而non-secure的页表不能去映射secure的内存，否则在转换时会发生错误：**
 ![[Pasted image 20240914200623.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
 
-在这里插入图片描述
 
 在EL2系统中，MMU地址转换时，会自动使用TTBR2_EL1指向的页表。
 

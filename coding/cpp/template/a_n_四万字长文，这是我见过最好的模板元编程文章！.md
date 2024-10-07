@@ -1,20 +1,5 @@
-# 
-
 CPP开发者
-
  _2021年12月29日 11:55_
-
-↓推荐关注↓  
-
-![](http://mmbiz.qpic.cn/mmbiz_png/DSU8cv1j3ibStMRcibJLd4TkNlt53KNZj0A2IicORH4REC4ics87icsx703M5giby2wuofz3dicMsHVcXDMXTM6t6VBQw/300?wx_fmt=png&wxfrom=19)
-
-**开源前哨**
-
-点击获取10万+ star的开发资源库。 日常分享热门、有趣和实用的开源项目～
-
-167篇原创内容
-
-公众号
 
 模板元编程算是C++中一个非常难的知识点，虽说我们平时写业务代码时可能不会用到太多的模板元编程技巧，但懂这些技巧可以让我们在研究C++源码和开源项目时更有帮助。往下看吧：  
 
@@ -25,14 +10,13 @@ CPP开发者
 普通用户对 C++ 模板的使用可能不是很频繁，大致限于泛型编程，但一些系统级的代码，尤其是对通用性、性能要求极高的基础库（如 STL、Boost）几乎不可避免的都大量地使用 C++ 模板，一个稍有规模的大量使用模板的程序，不可避免的要涉及元编程（如类型计算）。本文就是要剖析 C++ 模板元编程的机制。
 
 下面所给的所有代码，想做实验又懒得打开编译工具？一个在线运行 C++ 代码的网站（GCC 4.8）很好~
-
 ### 1 C++模板的语法
 
 函数模板（function template）和类模板（class template）的简单示例如下：
 ```cpp
-
-`#include <iostream>      // 函数模板
-template<typename T>   bool equivalent(const T& a, const T& b){       return !(a < b) && !(b < a);   }   // 类模板   template<typename T=int> // 默认参数   class bignumber{       T _v;   public:       bignumber(T a) : _v(a) { }       inline bool operator<(const bignumber& b) const; // 等价于 (const bignumber<T>& b)   };   // 在类模板外实现成员函数   template<typename T>   bool bignumber<T>::operator<(const bignumber& b) const{       return _v < b._v;   }      int main()   {       bignumber<> a(1), b(1); // 使用默认参数，"<>"不能省略       std::cout << equivalent(a, b) << '\n'; // 函数模板参数自动推导       std::cout << equivalent<double>(1, 2) << '\n';       std::cin.get();          return 0;   }   `
+#include <iostream>      // 函数模板
+template<typename T>   bool equivalent(const T& a, const T& b){       return !(a < b) && !(b < a);   }   // 类模板   
+template<typename T=int> // 默认参数   class bignumber{       T _v;   public:       bignumber(T a) : _v(a) { }       inline bool operator<(const bignumber& b) const; // 等价于 (const bignumber<T>& b)   };   // 在类模板外实现成员函数   template<typename T>   bool bignumber<T>::operator<(const bignumber& b) const{       return _v < b._v;   }      int main()   {       bignumber<> a(1), b(1); // 使用默认参数，"<>"不能省略       std::cout << equivalent(a, b) << '\n'; // 函数模板参数自动推导       std::cout << equivalent<double>(1, 2) << '\n';       std::cin.get();          return 0;   }
 ```
 程序输出如下：
 
@@ -41,17 +25,12 @@ template<typename T>   bool equivalent(const T& a, const T& b){      �
 关于模板（函数模板、类模板）的**模板参数**（详见文献[1]第3章）：
 
 - 类型参数（type template parameter），用 typename 或 class 标记；
-    
 - 非类型参数（non-type template parameter）可以是：整数及枚举类型、对象或函数的指针、对象或函数的引用、对象的成员指针，非类型参数是模板实例的常量；
-    
 - 模板型参数（template template parameter），如“template<typename T, template<typename> class A> someclass {};”；
     
 - 模板参数可以有默认值（函数模板参数默认是从 C++11 开始支持）；
-    
 - 函数模板的和函数参数类型有关的模板参数可以自动推导，类模板参数不存在推导机制；
-    
 - C++11 引入变长模板参数，请见下文。
-    
 
 **模板特例化**（template specialization，又称特例、特化）的简单示例如下：
 

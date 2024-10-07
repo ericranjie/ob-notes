@@ -1,8 +1,5 @@
-# 
-
 Linux云计算网络  _2022年05月21日 15:21_ _广东_
-
-![Image](https://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6lL2zLKT3ORjQp4K3KJkJEmud3lmjtKkcEWpKZnPcib1dyCuibDJjllO11OInRsicBAoeCmia7SEHkK3g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241007231459.png]]
 
 来源：https://zhuanlan.zhihu.com/p/108425561
 

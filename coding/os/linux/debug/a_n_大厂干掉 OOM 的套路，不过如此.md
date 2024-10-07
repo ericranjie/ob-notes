@@ -1,75 +1,34 @@
-# 
-
 蓝师傅 石杉的架构笔记
-
  _2022年05月07日 07:52_ _湖北_
-
----
-
 文章来源：https://c1n.cn/5ug0H  
-
-  
-
-**目录**
+# **目录**
 
 - 前言
-    
 - OOM 问题分类
-    
 - 线程数太多
-    
 - 打开太多文件
-    
 - 内存不足
-    
 - 总结
-    
-
-  
-
-**前言**
-
-  
+# **前言**
 
 随着项目不断壮大，OOM（Out Of Memory）成为奔溃统计平台上的疑难杂症之一。
-
-  
 
 大部分业务开发人员对于线上 OOM 问题一般都是暂不处理：
 
 - 一方面是因为 OOM 问题没有足够的 log，无法在短期内分析解决。
-    
 - 另一方面可能是忙于业务迭代、身心疲惫，没有精力去研究 OOM 的解决方案。
-    
-
-  
 
 这篇文章将以线上 OOM 问题作为切入点，介绍常见的 OOM 类型、OOM 的原理、大厂 OOM 优化黑科技、以及主流的 OOM 监控方案。文章较长，请备好小板凳！
-
-  
-
-**OOM 问题分类**
-
-  
+# **OOM 问题分类**
 
 很多人对于 OOM 的理解就是 Java 虚拟机内存不足，但通过线上 OOM 问题分析，OOM 可以大致归为以下 3 类：
 
 - **线程数太多**
-    
 - **打开太多文件**
-    
 - **内存不足**
-    
-
-  
 
 接下来将分别围绕这三类问题进行展开分析。
-
-  
-
-**线程数太多**
-
-  
+## **线程数太多**
 
 #### **| 报错信息**
 
@@ -77,12 +36,8 @@
 pthread_create (1040KB stack) failed: Out of memory
 ```
 
-  
-
 这个是典型的创建新线程触发的 OOM 问题。
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/1J6IbIcPCLblWNl1brLK4Qw0WurUoUhdU2ULEfxVduJcOhhU8WsB70KlGM1VZxhUFgNCbz9GcRwj9PKu6ACk1A/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
+![[Pasted image 20241007224037.png]]
 #### **| 源码分析**
 
 pthread_create 触发的 OOM 异常，源码（Android 9）位置如下： 
@@ -91,7 +46,6 @@ pthread_create 触发的 OOM 异常，源码（Android 9）位置如下： 
 http://androidxref.com/9.0.0_r3/xref/art/runtime/thread.cc
 ```
 
-  
 
 ```c
 void Thread::CreateNativeThread(JNIEnv* env, jobject java_peer, size_t stack_size, bool is_daemon) {  ...  pthread_create_result = pthread_create(...)  //创建线程成功
@@ -99,12 +53,7 @@ if (pthread_create_result == 0) {      return;  }  //创建线程�
 																									...  {    std::string msg(child_jni_env_ext.get() == nullptr ?        StringPrintf("Could not allocate JNI Env: %s", error_msg.c_str()) :        StringPrintf("pthread_create (%s stack) failed: %s",                                 PrettySize(stack_size).c_str(), strerror(pthread_create_result)));    ScopedObjectAccess soa(env);    soa.Self()->ThrowOutOfMemoryError(msg.c_str());  }}
 ```
 
-  
-
-pthread_create 里面会调用 Linux 内核创建线程，那什么情况下会创建线程失败呢？  
-
-  
-
+pthread_create 里面会调用 Linux 内核创建线程，那什么情况下会创建线程失败呢？ 
 #### 查看系统对每个进程的线程数限制：
 
 ```c

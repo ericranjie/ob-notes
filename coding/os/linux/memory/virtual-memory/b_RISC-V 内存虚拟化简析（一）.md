@@ -1,8 +1,5 @@
-
 Original 晓泰 泰晓科技
-
  _2023年05月16日 15:09_ _广东_
-
 > Corrector: TinyCorrect v0.1-rc3 - [comments codeinline epw]  
 > Author:   XiakaiPan 13212017962@163.com  
 > Date:     2022/08/12  
@@ -14,43 +11,33 @@ Original 晓泰 泰晓科技
 本周继续连载 RISC-V 虚拟化系列文章，记得收藏分享+关注，写文章领补贴：gitee.com/tinylab/riscv-linux
 
 该活动统一采用泰晓社区自研 Linux Lab 开源实验环境，也可选用免装即插即跑 Linux Lab Disk (https://tinylab.org/linux-lab-disk)，某宝检索“泰晓 Linux”可找到。**Linux Lab v1.1 Inside —— 内核开发从未像今天这般简单！**
-
 # RISC-V 内存虚拟化简析（一）
-
 ## 前言
 
 本文首先简要介绍了 RISC-V 特权指令中的基本内存管理指令，包括 `SFENCE.VMA` (in S-Extension), `HFENCE.VVMA` 和 `HFENCE.GVMA` (in H-Extension) 等，随后分析了它们在指令集模拟器 Spike 中的实现，最后对与内存管理密切相关的两组 CSR（控制与状态寄存器）`xstatus` 和 `xatp` 的结构和功能进行了分析。
-
 ## RISC-V 特权指令集总览
 
 RISC-V 特权指令集如下表所示，包括 Trap 返回指令（`sret`, `mret`）、中断管理指令、S-Mode 内存管理指令和 H-Mode 指令（包含内存管理指令和加载、保存指令），其中 S-Mode 和 H-Mode 的内存管理指令功能类似。
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CuRxmicjibRWia0MxQRaN3E88B5fATF1bVebzQpGTfeu71gjLgP5UbNmrA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 priv-insts
-
 ### M-Level 指令
 
 `sret` 和 `mret` 指令涉及从 Trap 跳转处理中返回，其在虚拟化中的作用，可以参考 此文 的 **Trap 与虚拟化** 一节。
 
 `WFI`(`Waiting For Interrupt`) 指令有时被实现为无操作 `NOP` 指令。或者使 CPU 进入低功耗休眠状态，等待中断唤醒。
-
 ### S-Level 指令
 
 `SFENCE.VMA` 是 S 模式中的内存管理指令，而 `SINVAL.VMA`, `SFENCE.W.INVAL`, `SFENCE.INVAL.IR` 是其扩展指令，用于实现更细粒度的内存管理。
-
 ### H 扩展指令
 
 H 扩展的指令包括内存管理和数据加载存储指令两部分，其中，内存管理指令可以视为 S 模式的内存管理指令的变体，它们的功能相似；而 H 扩展的 `Load`, `Store` 指令与基础指令集里对应指令有所不同（指令生效的特权模式不同），而机器所在的特权模式（M，HS，VS，U）可通过特定 CSR 的特定位确定，故而其具体实现往往涉及特定 CSR 的读写和判断。
-
 ## 内存管理指令
 
 ### S 模式内存管理指令
 
 #### SFENCE.VMA 解读
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CmsiaDly52eUHts4QyMibARF9muiaGYqOg1gPKghUBWPxwfZsc0wYnhtEg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 sfence.vma
 
 该指令有两个作用：序列化对特定 PTE (Page Table Entry) 的读写；无效化对应于特定地址空间（Address Space, AS）的特定虚拟地址（Virtual Address, VA）的 PTE。
@@ -58,14 +45,11 @@ sfence.vma
 该指令有两个源操作数：`rs1` 和 `rs2`。`rs1` 用于指定虚拟地址（Virtual ADDRess），`rs2` 用于指定地址空间（Address Space IDentifier）。
 
 - 若 ，该指令将会对所有页表的页表项进行操作，若 ，该指令将对由  指定的虚拟地址对应的 PTE 进行操作。
-    
 - 若 ，该指令将会对所有地址空间进行操作，若 ，该指令将对由  指定的 AS 进行操作。
     
-
  表示 0。
 
 具体功能如下表所示：
-
 
 |操作（Order/Invalidate）|||||
 |---|---|---|---|---|

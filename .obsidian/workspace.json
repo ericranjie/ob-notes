@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "C++模板总结",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 359.50390243530273
+    "width": 368.5
   },
   "right": {
     "id": "0ed372e18b255e27",
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md"
+                "file": "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/memory/MMU/d_n_MMU内存管理单元.md",
+    "coding/os/linux/memory/MMU/d_Arm MMU深度解读.md",
+    "coding/os/linux/memory/virtual-memory/k_深入理解TLB原理.md",
+    "Pasted image 20241007231459.png",
+    "coding/os/linux/memory/virtual-memory/t_深入理解TLB.md",
+    "coding/os/linux/memory/virtual-memory/b_TLB flush操作.md",
+    "Pasted image 20241007231350.png",
+    "Pasted image 20241007231324.png",
+    "coding/os/linux/memory/virtual-memory/b_RISC-V 内存虚拟化简析（一）.md",
+    "coding/os/linux/memory/virtual-memory/b_虚拟内存 & IO & 零拷贝.md",
+    "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
+    "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
+    "README.md",
+    "coding/os/linux/debug/trace/b_n_问题排查利器：Linux 原生跟踪工具 Ftrace 必知必会.md",
+    "Pasted image 20241007225825.png",
+    "zx99-image/Pasted image 20241007225643.png",
+    "coding/os/linux/debug/b_n_案例分析 - 内存泄露的排查方法.md",
+    "coding/os/linux/debug/trace/b_Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
+    "zx99-image/Pasted image 20241007224037.png",
+    "coding/os/linux/debug/GDB/b_自己动手写一个GDB 设置断点（原理篇）.md",
+    "coding/os/linux/debug/b_Linux内核调试的方式以及工具集锦.md",
+    "zx99-image/Pasted image 20241007224451.png",
+    "zx99-image/Pasted image 20241007224127.png",
+    "coding/os/linux/debug/a_n_大厂干掉 OOM 的套路，不过如此.md",
+    "coding/cpp/template/b_C++模板总结.md",
+    "coding/cpp/template/a_n_四万字长文，这是我见过最好的模板元编程文章！.md",
+    "coding/cpp/template/i_模版定义一定要写在头文件中吗.md",
+    "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
     "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
     "coding/os/linux/schedule/b_深入理解 Linux 调度（GPU）虚拟化.md",
     "coding/os/linux/schedule/lock/lock-free/b_如何利用CAS技术实现无锁队列.md",
-    "README.md",
     "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
     "zx99-image/Pasted image 20241007192403.png",
     "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
     "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
-    "coding/os/linux/shell/i_使用 Linux 的 diff 和 patch 对文件进行协作.md",
-    "coding/os/linux/modules/i_谈一谈Linux写时拷贝(COW)的安全漏洞（1）.md",
     "zx99-image/Pasted image 20241007190526.png",
-    "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
-    "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
-    "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
-    "coding/os/linux/memory/cache/k_n_arm64 cache机制分析.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
-    "coding/os/linux/memory/cache/b_n_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "zx99-image/Pasted image 20241007190607.png",
-    "coding/os/linux/memory/k_深入理解Linux内核页表映射分页机制原理.md",
-    "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
-    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
-    "zx99-image/Pasted image 20241007185836.png",
-    "zx99-image/Pasted image 20241007190209.png",
-    "coding/os/linux/BPF/i_bpf在android逆向中的辅助效果.md",
-    "coding/os/linux/BPF/i_一文看懂eBPF eBPF的简单使用.md",
-    "coding/os/linux/BPF/a_BPF内核实现详解.md",
-    "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
-    "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
-    "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
-    "coding/os/linux/BPF/b_eBPF 简史.md",
-    "zx99-image/Pasted image 20241007172635.png",
-    "zx99-image/Pasted image 20241007172737.png",
-    "zx99-image/Pasted image 20241007172731.png",
-    "zx99-image/Pasted image 20241007172721.png",
-    "zx99-image/Pasted image 20241007172643.png",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",

@@ -1,29 +1,10 @@
-# 
-
 Linux阅码场
-
  _2022年01月24日 08:00_
-
 以下文章来源于程序猿的日常干货 ，作者谢昊成
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5LbYSYXWsW19fw75qOavTWZZuMWfW2tNswriaVynlfCNA/0)
-
-**程序猿的日常干货**.
-
-专注于 Linux 操作系统、内核以及嵌入式 IOT 领域知识分享与交流平台。
 
 ](https://mp.weixin.qq.com/s?__biz=Mzg2OTc0ODAzMw==&mid=2247502841&idx=1&sn=228e70c33cb2a70cde4b8423abcb281a&source=41&key=daf9bdc5abc4e8d06bc47932f851321204aa03f620b90368927765a85c91f4c9170a7d15962ebe095b1b8b582d6291a91a04bb1f29dee0c883afe05924b7437c9b2599ef1d01adcfead13aac3fad127572fb9892ee8ca98c12ea0f1fab16a5e54c5a28a39bda917c1f95e67afa6b2f262e68941d362154cbfc0b4a58ade49c59&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQR2ZFObWEhZsPInDdlHJovBLmAQIE97dBBAEAAAAAAM0uJwCRtagAAAAOpnltbLcz9gKNyK89dVj0JLIjpL2QwjlePpXI8%2B31BY%2BWgjIT%2Fu4LAAlPHdJlsYclch2yc5FtLO8p%2FgpV56LNXgpPctK2X00oX4DH%2Bfrt5nHYd1Z5613kK8MCYbQlRYcdl94Ty1V5ZxAIXIYMLmspQKiupyktvB9oLoi1bZ3w2Q3bdqfaB7ExlBsjH2KMUhM0XfJkgpmVB0swrtFyNUseQacr1cfV%2FqivJUkXVNY1Kfq6rHiFN%2BgobW%2BM5%2BfBBGhagJcy7rkNG14dKMXxxdTo&acctmode=0&pass_ticket=uf3La%2BlulmFRmsXLvPtwg%2BBYJXZ2h4GaW3DoY4WY2AQGRaByc5Ub%2F4ZRt%2BKuprHR&wx_header=1#)
 
 **“** 给小猿点个关注吧！**”**  
-
-  
-
----
-
-  
-
 ## 查看系统meminfo
 
 查看系统内存情况：
@@ -51,7 +32,6 @@ VMallocTotal — The total amount of memory, in kilobytes, of total allocated vi
 ```
 
 需要注意的是，在较新内核版本上这里的vmalloc指标已经被弃用，所以可能会看到输出为0，但是这种情况并不代表这系统中没有使用vmalloc内存。
-
 ## 查找泄露内存类型
 
 通过查看meminfo是可以知道系统的内存消耗情况，但是知道了不同类型的内存消耗，那么如何评估消耗多大才算是不正常呢？这个便是定位问题的关键。通常的做法是通过与一台刚启动没多久的机器（正常机）作对比，从而发现异常的指标。
@@ -63,7 +43,6 @@ free：差距有3708Mcache+buff:消耗量差不多VmallocUsed：差距有2678MSU
 ```
 
 通过上面的信息对比发现，后两种类型的内存差距相加等于3565M。因此认为内存泄露是泄露在slab+vmalloc上。
-
 ## 查看slabinfo
 
 ```c
@@ -85,7 +64,6 @@ slabtop也可以查看系统中的slab对象，并且可以按照不同的指标
 ```c
 slabtop -s -a
 ```
-
 ## 查看vmallocinfo：
 
 内核中申请内存，除了使用slab，还可能使用vmallocinfo申请，对于vmalloc的查看，需要借助于另外一个接口：
@@ -105,7 +83,6 @@ virtual address range of the area, size in bytes, caller information of the crea
 •占用的内核虚拟地址范围•占用的内存大小size，以字节为单位•申请vmalloc的函数•其他option信息
 
 对于option选项信息，参考下表：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
-
 ## 查看page alloc size
 
 对于内核使用alloc_page接口直接申请的内存，并没有指标可以进行查看，这一类型的内存申请一般都是由内核在使用，一般开发者比较少用，但同样可以通过计算得出：
