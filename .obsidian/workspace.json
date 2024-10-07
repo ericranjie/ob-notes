@@ -11,11 +11,9 @@
             "id": "e2d90085bd089a6c",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241007095514.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
+                "file": "zx99-image/Pasted image 20241007095514.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
+                "file": "zx99-image/Pasted image 20241007095514.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md"
+                "file": "zx99-image/Pasted image 20241007095514.png"
               }
             }
           }
@@ -146,15 +144,16 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e2d90085bd089a6c",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
     "coding/cpp/grammar/reflect/b_n_C++ 反射：全方位解读 Lura 库的前世今生！.md",
-    "Pasted image 20241007104818.png",
-    "Pasted image 20241007104804.png",
-    "Pasted image 20241007104751.png",
-    "Pasted image 20241007104741.png",
-    "Pasted image 20241007104731.png",
-    "Pasted image 20241007104520.png",
+    "zx99-image/Pasted image 20241007104818.png",
+    "zx99-image/Pasted image 20241007104804.png",
+    "zx99-image/Pasted image 20241007104751.png",
+    "zx99-image/Pasted image 20241007104741.png",
+    "zx99-image/Pasted image 20241007104731.png",
+    "zx99-image/Pasted image 20241007104520.png",
     "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
     "coding/cpp/grammar/k_n_使用 C++ 中的 final 关键字，到底能否提升性能？.md",
     "coding/cpp/grammar/i_C++20 新特性的小细节.md",
@@ -163,7 +162,7 @@
     "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
     "coding/algorithm/十五大经典算法研究.md",
     "learning",
-    "Pasted image 20241007095514.png",
+    "zx99-image/Pasted image 20241007095514.png",
     "coding/cpp/k_C++ 线程的使用.md",
     "coding/cpp/a_从新手到专业人士：探索 C++ STL 以获得终极性能.md",
     "interview/learn-quote.md",
@@ -182,7 +181,6 @@
     "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
     "coding/os/linux/memory/memory-model/k_计算机科学基础知识（一）The Memory Hierarchy.md",
     "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
-    "coding/os/linux/debug/p_n_一例hardened_usercopy的bug解析.md",
     "zx99-image/Pasted image 20241006175104.png",
     "zx99-image/Pasted image 20241006174502.png",
     "coding/app/nginx",
