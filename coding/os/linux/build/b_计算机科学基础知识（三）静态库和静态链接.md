@@ -1,27 +1,9 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-2-16 15:15 分类：[基础学科](http://www.wowotech.net/sort/basic_subject)
 
-三、将relocatable object file静态链接成可执行文件
+# 三、将relocatable object file静态链接成可执行文件
 
 将relocatable object file链接成可执行文件分成两步，第一步是符号分析（symbol resolution），第二步是符号重新定位（Relocation）。本章主要描述这两个过程，为了完整性，静态库的概念也会在本章提及。
-
-1、为什么会提出静态库的概念？
+## 1、为什么会提出静态库的概念？
 
 程序逻辑有共同的需求，例如数学库、字符串库等，如果每个程序员在撰写这些代码逻辑的时候都需要自己重新写那么该是多么麻烦的事情，而且容易出错，如果有现成的，何必自己制作轮子呢？因此，静态库的概念被提出来。静态库有下面的几种方案：
 
@@ -35,15 +17,15 @@
 > arm-linux-ld –r -o result.o a.o b.o c.o……
 
 命令行中的r表示链接的结果是一个relocatable file而不是一个executable file。当然，这种方法的缺陷是生成的目标文件太大（目前考虑静态链接），编译的的可执行文件中包括了.o中的所有内容，无论用到或者用不到。此外，由于所有的库函数都在一个.o文件中，任何一点改动都需要重新编译生成那个大的.o文件。针对这样的缺陷，我们可以考虑把一个大的.o文件分散成一个一个小的.o文件，并保存在一个特定的目录下。这样就解决了浪费磁盘空间的issue，只不过每次的编译都比较复杂，程序员需要知道自己调用了哪些库函数，涉及哪些.o的文件，并把这些.o文件作为输入文件传递给gcc。这样的使用对程序员而言是非常不方便的。最终的解决方案就是静态库，我们可以通过下面的命令来生成静态库：
-
-> arm-linux-ar rcs libtest.a a.o b.o c.o……
-
-2、Linker解析符号的顺序
+```cpp
+arm-linux-ar rcs libtest.a a.o b.o c.o……
+```
+## 2、Linker解析符号的顺序
 
 在生成可执行文件的时候，传递给linker的参数大概如下：
-
-> arm-linux-ld [all kinds of parameter] -o result a.o b.o c.o……aa.a bb.a  cc.a……
-
+```cpp
+arm-linux-ld [all kinds of parameter] -o result a.o b.o c.o……aa.a bb.a  cc.a……
+```
 也就是说，linker可以把一个个的.o文件（静态库本身也是.o文件的集合，只不过linker可以根据符号引用情况，智能的从.a文件中抽取它需要的.o文件）组合形成一个可执行文件。Linker扫描.o文件的顺序是从左到右，Scan的过程中维护三个集合  
 （1）集合E：E中包含了所有要merge成可执行文件的.o文件  
 （2）集合U：U中包含了所有的未定义的符号  
@@ -63,38 +45,37 @@
 > arm-linux-gcc -v -static -o hello main.c
 
 在控制台屏幕上跳动的是整个编译、链接的详细过程，当然，我们这里只关注link的过程，因此重点看看gcc是如何调用linker的，是传递了什么样的参数给linker：
-
-> /opt/arm-compiler/bin/../libexec/gcc/arm-none-linux-gnueabi/4.2.0/collect2 --sysroot=/opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc -Bstatic -dynamic-linker /lib/ld-linux.so.3 -X -m armelf_linux_eabi -o hello /opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib/crt1.o /opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib/crti.o /opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0/crtbeginT.o -L/opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0 -L/opt/arm-compiler/bin/../lib/gcc -L/opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0/../../../../arm-none-linux-gnueabi/lib -L/opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/lib -L/opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib /var/tmp/ccg9aX7V.o --start-group -lgcc -lgcc_eh -lc --end-group /opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0/crtend.o /opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib/crtn.o
-
+```cpp
+/opt/arm-compiler/bin/../libexec/gcc/arm-none-linux-gnueabi/4.2.0/collect2 --sysroot=/opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc -Bstatic -dynamic-linker /lib/ld-linux.so.3 -X -m armelf_linux_eabi -o hello /opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib/crt1.o /opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib/crti.o /opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0/crtbeginT.o -L/opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0 -L/opt/arm-compiler/bin/../lib/gcc -L/opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0/../../../../arm-none-linux-gnueabi/lib -L/opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/lib -L/opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib /var/tmp/ccg9aX7V.o --start-group -lgcc -lgcc_eh -lc --end-group /opt/arm-compiler/bin/../lib/gcc/arm-none-linux-gnueabi/4.2.0/crtend.o /opt/arm-compiler/bin/../arm-none-linux-gnueabi/libc/usr/lib/crtn.o
+```
 实际调用的不是ld，而是collect2，不过没有关系，它只不过是ld的马甲，都素一样一样D。--sysroot用来指定系统目录，这里替代了configure-time的缺省设置。-Bstatic表示创建静态链接的可执行文件，不要和动态库发生纠葛。-dynamic-linker就象其名字说明的，用来指明该可执行程序使用哪一个dynamic linker，当然，在我们这个场景下，设定dynamic linker没有意义。-X表示删除编译器生成的一些临时符号（有.L前缀）。-m用来指明linker处于哪一种emulation mode。我使用的linker支持armelf_linux_eabi和armelfb_linux_eabi两种mode，分别用来支持little endian的ARM和big endian的ARM。不同的emulation mode使用不同的链接脚本（可以参考arm-none-linux-gnueabi/lib/ldscripts目录下的内容），linker会根据gcc传递来的参数（静态编译还是动态编译、编译可执行文件还是编译动态库）以及emulation mode来选择合适的链接脚本（如果没有显示的使用-T来指定链接脚本的话）。当然，emulation mode还有一些其他的应用场景，我们这里浅尝辄止吧。
 
 --start-group archives --end-group的参数是和linker如何扫描静态库相关，所有用--start-group和--end-group包含的静态库（-lgcc -lgcc_eh -lc）都需要特别对待。一般而言，linker对每个静态库都只是扫描一遍，不过如果用--start-group和--end-group包围起来的库则是重复性的扫描，直到没有新的未定义的符号被创建。c库是在意料之中的库，gcc库和gcc_eh库是什么东东呢？libgcc库提供了一些底层的runtime库函数，可以使用ar命令和nm命令观察静态库文件：
-
-> arm-linux-ar –t libgcc.a        －－－－－该命令可以看看libgcc.a中有多少个.o文件
-> 
-> arm-linux-nm –a libgcc.a     －－－－－该命令可以看看libgcc.a中定义的符号情况
-
+```cpp
+arm-linux-ar –t libgcc.a     －－－－－该命令可以看看libgcc.a中有多少个.o文件
+arm-linux-nm –a libgcc.a    －－－－－该命令可以看看libgcc.a中定义的符号情况
+```
 libgcc库中多半是一些数学运算相关的函数，而这些函数在目标处理器上不能直接执行（没有对应的汇编指令），因此，在程序编译的时候，gcc编译器可以直接使用libgcc库中的代码来完成这些数学运算。例如：ARM处理器不支持除法，如果你的c代码中出现了整数的除法，实际上，compiler是无法使用div这样的指令来翻译c代码的，这种情况下，就需要libgcc库了，你可以自己写一段包括整数的除法的c代码，然后用objdump反汇编看看，在实际的汇编指令中，除法实际上是使用了__aeabi_idiv这个函数（位于libgcc库中的_divsi3.o模块中）。我们再来看libgcc_eh.a这个库，eh的含义是exception handler（我猜的），应该是和异常处理相关的。这里我也了解不多，暂且略过。
 
 除了真正的mian.c对应的/var/tmp/ccg9aX7V.o文件，其他还有几个有趣的.o文件：crt1.o crti.o crtbeginT.o crtend.o crtn.o（crt就是c runtime的意思）。有些系统使用crt0.o，有些使用crt1.o，当然也有使用更高number的系统，类似crt2.o什么的。一般来说，程序员接触到的程序入口都是main函数（有些使用更高级工具的程序员可能连main函数都看不到），但是实际上在main函数之前还有一段程序setup环境的过程，而且这段bootstrap的代码是所有的程序共用的，因此被整理成了crt*.o的文件，在链接的时候，和所有的具体程序相关的object文件link在一起，形成最后的image。如果不这样做，势必每一个程序员写程序都需要处理一些相同的内容，这不符合软件工程师不应该制作新轮子的原则。当然，虽然我们不制作新轮子，但是一定要理解轮子的机制。我们先反汇编看看crt1.o的内容：
+```cpp
+00000000 <start>:  
+0:    e59fc024     ldr    ip, pc, #36    ; 2c <.text+0x2c>  
+4:    e3a0b000     mov    fp, #0    ; 0x0 －－－－－－－－最外层函数，清除frame pointer  
+8:    e49d1004     ldr    r1, sp, #4 －－－－－－－－－－r1 = argc, sp=sp+4，sp指向了argv  
+c:    e1a0200d     mov    r2, sp －－－－－－－－－－－r2指向了argv  
+10:    e52d2004     str    r2, sp, #-4! －－－－－－－－这时候r2就是栈底，将stack end参数压入栈  
+14:    e52d0004     str    r0, sp, #-4! －－－－－－－将内核传递的r0参数压入_start的栈  
+18:    e59f0010     ldr    r0, pc, #16    ; 30 <.text+0x30> －－－r0保存了main函数指针  
+1c:    e59f3010     ldr    r3, pc, #16    ; 34 <.text+0x34> －－－r3保存了__libc_csu_init  
+20:    e52dc004     str    ip, sp, #-4! －－－－－－－将__libc_csu_init压入栈  
+24:    ebfffffe     bl    0 <libc_start_main> －－－－将控制权交给c lib  
+28:    ebfffffe     bl    0  
 
-> 00000000 <_start>:  
->    0:    e59fc024     ldr    ip, [pc, #36]    ; 2c <.text+0x2c>  
->    4:    e3a0b000     mov    fp, #0    ; 0x0 －－－－－－－－最外层函数，清除frame pointer  
->    8:    e49d1004     ldr    r1, [sp], #4 －－－－－－－－－－r1 = argc, sp=sp+4，sp指向了argv[]  
->    c:    e1a0200d     mov    r2, sp －－－－－－－－－－－r2指向了argv[]  
->   10:    e52d2004     str    r2, [sp, #-4]! －－－－－－－－这时候r2就是栈底，将stack end参数压入栈  
->   14:    e52d0004     str    r0, [sp, #-4]! －－－－－－－将内核传递的r0参数压入_start的栈  
->   18:    e59f0010     ldr    r0, [pc, #16]    ; 30 <.text+0x30> －－－r0保存了main函数指针  
->   1c:    e59f3010     ldr    r3, [pc, #16]    ; 34 <.text+0x34> －－－r3保存了__libc_csu_init  
->   20:    e52dc004     str    ip, [sp, #-4]! －－－－－－－将__libc_csu_init压入栈  
->   24:    ebfffffe     bl    0 <__libc_start_main> －－－－将控制权交给c lib  
->   28:    ebfffffe     bl    0  
-> 
-> **2C    .word __libc_csu_fini    注：原始的dump文件不是这样的，我稍加修改  
-> 30    .word main  
-> 34     .word __libc_csu_init**
-
+**2C    .word __libc_csu_fini    注：原始的dump文件不是这样的，我稍加修改  
+30    .word main  
+34     .word __libc_csu_init**
+```
 首先映入眼帘的就是_start函数，没有错，_start函数才是这个静态编译程序的入口，然后历经千山万水，最后会调用main函数。站在应用程序的大门口，进入一个新的世界之前，有一个问题很关键：我是如何来到这里的？或者说内核做了些什么事情才让cpu跳转到_start执行？在那一点上，CPU的寄存器为何？这时候该程序的用户栈的状态为何？……太多太多的问题，只有让内核代码来回答了。当我们在terminal中执行hello这个静态链接的可执行程序的时候，shell进程会首先fork一个进程，然后调用exec系统调用进入内核，将新建进程的映像替换成hello。对于elf文件，内核会进入load_elf_binary函数，而具体和该进程用户栈上内容相关的是create_elf_tables函数，具体代码我们就不过了，但是这时候的用户栈的状态如下：
 
 [![ustack](http://www.wowotech.net/content/uploadfile/201502/74c7c4972a568075ec6036f377e5bcd720150216070722.gif "ustack")](http://www.wowotech.net/content/uploadfile/201502/3a47b6f0c30041e9f67642b3cbf4e87320150216070618.gif)
@@ -102,49 +83,48 @@ libgcc库中多半是一些数学运算相关的函数，而这些函数在目�
 如果认为_start也是一个函数，那么它其实是一个特殊的函数，首先它是用户空间最外层的一个函数，因此需要将fp清零，在栈的回溯的过程中，当遇到fp等于0的时候，debugger就知道已经到了最外层的函数了。内核传递给_start函数的参数是通过某些寄存器传递的（例如X86平台，edx指向DT_FINI函数），对于ARM平台，规范规定通过r0来传递一个handler 函数，在atexit的时候执行该handler了，在3.14版本的内核中并没有这么做，这时候的r0等于NULL，具体参考ELF_PLAT_INIT这个内核宏定义。sp寄存器必须被内核正确的设定，并且在sp指向的用户栈上面保存argc、argv等数据。因此，内核转到userspace的关卡上，PC，SP，R0这三个寄存器被特别设定，其他的寄存器没有特别的规定。
 
 OK，了解这些内核知识后，看_start的反汇编代码就比较轻松了，代码注释已经提供了，这里不再赘述，其本质就是设定传递给__libc_start_main函数的参数，我们可以认为该函数的调用c代码如下：
-
-> int __libc_start_main( int (*main) (int, char **, char ** ),   －－－－通过r0传递  
->                                 int argc, char **argv,－－－－－－－－－－通过r1 r2传递  
->                                __typeof (main) init,－－－－－又一个函数指针，类型和main一样，用r3传递  
->                               void (*fini) (void),  
->                               void (*rtld_fini) (void),  
->                               void *stack_end )－－－－－－上面三个参数通过stack传递
-
+```cpp
+int libc_start_main( int (main) (int, char **, char ** ),   －－－－通过r0传递  
+int argc, char **argv,－－－－－－－－－－通过r1 r2传递  
+__typeof (main) init,－－－－－又一个函数指针，类型和main一样，用r3传递  
+void (*fini) (void),  
+void (*rtld_fini) (void),  
+void *stack_end )－－－－－－上面三个参数通过stack传递
+```
 在这个主题上，我不想再深入下去了，读者有兴趣的话可以自行反汇编其他的.o文件，每个都有自己特定的用途，但无论如何，进入main函数之前，内核、编译器和c库已经完美的准备好了一切。
-
-4、链接脚本
+## 4、链接脚本
 
 和compiler相比，linker的工作还是比较简单的。就是按照链接脚本进行各个.o文件的各个section的同类项合并，具体如何合并就要看link script file怎么规定了。相信有些同学会问：我编译hello world这样程序也没有使用链接脚本啊。虽然你可以直接使用简单的gcc命令来编译hello world程序，不过除了源代码之外，还有一个default的link script是幕后英雄。使用下面的命令可以看到这个link script：
 
 > arm-linux-ld --verbose
 
 链接脚本是一个很复杂的东西，你可以在linker的user manual中找到详细的解释，这里我们只给出一些基本概念性的东西，让大家有个了解就OK了：
-
-> OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")  
-> OUTPUT_ARCH(arm)  
-> ENTRY(_start)  
-> SEARCH_DIR("=/usr/local/lib"); SEARCH_DIR("=/lib"); SEARCH_DIR("=/usr/lib");
-
+```cpp
+OUTPUT_FORMAT("elf32-littlearm", "elf32-bigarm", "elf32-littlearm")
+OUTPUT_ARCH(arm)  
+ENTRY(start)  
+SEARCH_DIR("=/usr/local/lib"); SEARCH_DIR("=/lib"); SEARCH_DIR("=/usr/lib");
+```
 缺省链接脚本的开始有一些内容如上，OUTPUT_FORMAT定义了linker输出文件的格式。OUTPUT_FORMAT的语法是：OUTPUT_FORMAT（default, big, little），如果没有command line中的-EL或者-EB参数传递给linker，那么linker就选择default的格式，如果command line传入-EL参数，那么选择little，如果传入-EB，那么就选择big。在上面的链接命令行中没有传递-EL或者-EB参数，因此，linker输出的是default，也就是elf32-littlearm的输出文件格式。OUTPUT_ARCH指明了输出的文件是for哪一个平台的。ENTRY指明了程序入口点的，和我们上面分析的一样，_start就是程序的入口点，这个链接脚本命令和命令行中的-e参数含义是一样的。SEARCH_DIR命令就像它的名字说明的一样，当linker搜索lib的时候，可以在SEARCH_DIR定义的路径中寻找，这个链接脚本命令和命令行中的-L path参数含义是一样的。根据链接脚本的定义，实际上linker总是会在/usr/local/lib，/usr/lib和/lib目录下寻找库文件。很明显，从这里就可以看出GNU/linux系统对用户态的lib是有进行grouping的：那些重要的、关键的操作系统相关的lib被放到/lib目录下（例如c库）。一旦有一个usr的前缀，其重要性就比较低了，至少不是系统级别，应该是和普通应用程序相关的库。普通的应用程序也有两种，一种是大家（所有登录用户）都使用的，另外一种是特定用户使用的。因此，GNU/linux将那些和多个用户相关的library放入/usr/lib中。如果你自己编写了一个lib，最优雅的方式是放入到/usr/local/lib目录下，这样才不会打搅到别人。
 
 占据link script file大部分内容的是SECTIONS这个command，这个命令的作用就是告诉linker如何把输入的.o文件中的section映射到输出文件的section中，并且是如何和把这些section放到memory中的，我们摘取一个片段：
-
-> SECTIONS  
-> {  
->   PROVIDE (__executable_start = 0x00008000); . = 0x00008000 + SIZEOF_HEADERS;  
->   .interp         : { *(.interp) }  
->   .hash           : { *(.hash) }  
-> ……  
->   .text           :  
->   {  
->     *(.text .stub .text.* .gnu.linkonce.t.*)  
->     KEEP (*(.text.*personality*))  
->     *(.gnu.warning)  
->     *(.glue_7t) *(.glue_7) *(.vfp11_veneer)  
->   } =0  
->   ……  
-> }
-
+```cpp
+SECTIONS  
+{  
+PROVIDE (executable_start = 0x00008000); . = 0x00008000 + SIZEOF_HEADERS;  
+.interp         : { (.interp) }  
+.hash           : { *(.hash) }  
+……  
+.text           :  
+{  
+*(.text .stub .text. .gnu.linkonce.t.)  
+KEEP ((.text.personality))  
+(.gnu.warning)  
+*(.glue_7t) *(.glue_7) *(.vfp11_veneer)  
+} =0  
+……  
+}
+```
 在链接脚本里面可以定义符号，并且该符号被放入到了符号表中（注意：link script中定义的符号是global的），可以被c代码访问。因此，上面脚本中的__executable_start = 0x00008000其实就是在符号表中定义了一个符号。PROVIDE的意思是：如果.o文件中定义了同名的符号，那么该符号的定义将被取代，如果.o文件中没有定义该符号，那么就使用链接脚本中的定义。在c代码中访问链接脚本中定义的符号没有那么直观，我们给出一个例子：
 
 > #include

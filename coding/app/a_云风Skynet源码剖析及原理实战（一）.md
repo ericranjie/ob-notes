@@ -1,37 +1,19 @@
-
-
 深度Linux
-
  _2023年11月21日 21:27_ _湖南_
 
 Skynet 是一个基于C跟lua的开源服务端并发框架，这个框架是单进程多线程Actor模型。是一个轻量级的为在线游戏服务器打造的框架。
-
-![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
-
-**深度Linux**
-
-拥有15年项目开发经验及丰富教学经验，曾就职国内知名企业项目经理，部门负责人等职务。研究领域：Windows&Linux平台C/C++后端开发、Linux系统内核等技术。
-
-181篇原创内容
-
-公众号
-
 ## 一、skynet介绍
-
 ### 1.1简介
 
 这个系统是单进程多线程模型。每个服务都是严格的被动的消息驱动的，以一个统一的 callback 函数的形式交给框架。框架从消息队列里调度出接收的服务模块，找到 callback 函数入口，调用它。服务本身在没有被调度时，是不占用任何 CPU 的。
 
 skynet虽然支持集群，但是作者云风主张能用一个节点完成尽量用一个节点，因为多节点通信方面的开销太大，如果一共有 100 个 skynet 节点，在它们启动完毕后，会建立起 9900条通讯通道。
-
 ### 1.2特点
 
 Skynet框架做两个必要的保证：
 
 1. 一个服务的 callback 函数永远不会被并发。
-    
 2. 一个服务向另一个服务发送的消息的次序是严格保证的。
-    
 
 用多线程模型来实现它。底层有一个线程消息队列，消息由三部分构成：源地址、目的地址、以及数据块。框架启动固定的多条线程，每条工作线程不断从消息队列取到消息，调用服务的 callback 函数。
 
@@ -42,47 +24,38 @@ Skynet框架做两个必要的保证：
 做为核心功能，Skynet 仅解决一个问题：
 
 把一个符合规范的 C 模块，从动态库（so 文件）中启动起来，绑定一个永不重复（即使模块退出）的数字 id 做为其 handle 。模块被称为服务（Service），服务间可以自由发送消息。每个模块可以向 Skynet 框架注册一个 callback 函数，用来接收发给它的消息。每个服务都是被一个个消息包驱动，当没有包到来的时候，它们就会处于挂起状态，对 CPU 资源零消耗。如果需要自主逻辑，则可以利用 Skynet 系统提供的 timeout 消息，定期触发。
-
 ### 1.3Actor模型
 
 Actor模型内部的状态由它自己维护即它内部数据只能由它自己修改(通过消息传递来进行状态修改)，所以使用Actors模型进行并发编程可以很好地避免这些问题，Actor由状态(state)、行为(Behavior)和邮箱(mailBox)三部分组成：
 
 - 状态(state)：Actor中的状态指的是Actor对象的变量信息，状态由Actor自己管理，避免了并发环境下的锁和内存原子性等问题
-    
 - 行为(Behavior)：行为指定的是Actor中计算逻辑，通过Actor接收到消息来改变Actor的状态
-    
 - 邮箱(mailBox)：邮箱是Actor和Actor之间的通信桥梁，邮箱内部通过FIFO消息队列来存储发送方Actor消息，接受方Actor从邮箱队列中获取消息
-    
 
 Actor的基础就是消息传递，skynet中每个服务就是一个LUA虚拟机，就是一个Actor。
 
 Actor模型好处
 
 1. 事件模型驱动： Actor之间的通信是异步的，即使Actor在发送消息后也无需阻塞或者等待就能够处理其他事情。
-    
 2. 强隔离性： Actor中的方法不能由外部直接调用，所有的一切都通过消息传递进行的，从而避免了Actor之间的数据共享，想要观察到另一个Actor的状态变化只能通过消息传递进行询问。
-    
 3. 位置透明： 无论Actor地址是在本地还是在远程机上对于代码来说都是一样的。
-    
 4. 轻量性：Actor是非常轻量的计算单机，只需少量内存就能达到高并发。
-    
-
 ## 二、skynet原理
 
 ### 2.1消息队列
-
+![[Pasted image 20241007172635.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图摘自Actor模型解析，每个Actor都有一个专用的MailBox来接收消息，这也是Actor实现异步的基础。当一个Actor实例向另外一个Actor发消息的时候，并非直接调用Actor的方法，而是把消息传递到对应的MailBox里，就好像邮递员，并不是把邮件直接送到收信人手里，而是放进每家的邮箱，这样邮递员就可以快速的进行下一项工作。所以在Actor系统里，Actor发送一条消息是非常快的。
 
-```
+```c
 struct message_queue {    struct spinlock lock;    uint32_t handle;    int cap;    int head;    int tail;    int release;    int in_global;    int overload;    int overload_threshold;    struct skynet_message *queue;    struct message_queue *next;};struct global_queue {    struct message_queue *head;    struct message_queue *tail;    struct spinlock lock;};static struct global_queue *Q = NULL;
 ```
 
 struct spinlock是自旋锁，用来解决并发问题的。
 
 skynet也实现了Actor模型，每个服务都有一个专用的MailBox用来接收消息，这个队列即struct message_queue结构，skynet有两种消息队列，每个服务有一个刚刚谈到的被称为次级消息队列，skynet还有一个全局消息队列即static struct global_queue *Q = NULL;，头尾指针分别指向一个次级队列，在skynet启动时初始化全局队列。
-
+![[Pasted image 20241007172643.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 struct message_queue结构体种有一个struct skynet_message *queue这个就是每个服务的次级消息队列，是来自其他服务需要本服务处理的消息，这是一个数组实现的队列，在往队列push消息的时候会检查队列是否已满，满了会扩容一倍，跟vector有点类似。
@@ -217,7 +190,7 @@ $ sudo apt-get install build-essential libssl-dev libcurl4-gnutls-dev libexpat1-
 ```
 
 ### 3.2skynet代码目录结构
-
+![[Pasted image 20241007172721.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ```
@@ -293,13 +266,13 @@ $ cd examples$ ../skynet configtry open logger failed : ./cservice/logger.so: ca
 ```
 
 以上出现找不到logger.so的情况，其实不仅仅是这个模块找不到，所有的模块都找不到了，因为在config包含的路劲conf.path中，所有的模块路劲的引入全部依靠着相对路劲。一旦执行skynet程序的位置不一样了，相对路劲也会不一样。
-
+![[Pasted image 20241007172731.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (4)添加自己的LUA脚本路劲
 
 例如：添加my_workspace目录，则只需在luaservice值的基础上再添加一个`root.."my_workspace/？.lua;"`,注意：各个路劲通过一个`;` 隔开。
-
+![[Pasted image 20241007172737.png]]
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 把我们的刚才写的test.lua丢到my_workspace中
@@ -816,7 +789,6 @@ local skynet = require "skynet"function task()    skynet.error("task", coroutine
 ```
 testtimeout[:0100000a] LAUNCH snlua testtimeout[:0100000a] start thread: 0x7f525b16a048 false  #start函数也执行完，这个协程就空闲下来了[:0100000a] task thread: 0x7f525b16a128 false   #当前服务的协程池中只有两个协程，所以是交替使用[:0100000a] task thread: 0x7f525b16a048 false[:0100000a] task thread: 0x7f525b16a128 false[:0100000a] task thread: 0x7f525b16a048 false
 ```
-
 ### 7.7获取时间
 
 示例代码：testtime.lua

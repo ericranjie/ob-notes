@@ -1,12 +1,9 @@
-
 Linux内核那些事
-
  _2022年01月12日 13:05_
 
 数日之前，笔者参加某一技术会议之时，为人所安利了一款开源项目，演讲者对其性能颇为称道，称其乃基于近年在内核中炙手可热的 eBPF 技术。
 
 对这 eBPF 的名号，笔者略有些耳熟，会后遂一番搜索学习，发现 eBPF 果然源于早年间的成型于 BSD 之上的传统技术 BPF（Berkeley Packet Filter），但无论其性能还是功能已然都不是 BPF 可以比拟的了，慨叹长江后浪推前浪，前浪死在沙滩上之余，笔者也发现国内相关文献匮乏，导致 eBPF 尚不为大众所知，遂撰此文，记录近日所得，希冀可以为广大读者打开新世界的大门。
-
 ### 源头：一篇 1992 年的论文
 
 考虑到 BPF 的知名度，在介绍 eBPF 之前，笔者自觉还是有必要先来回答另一个问题：
@@ -22,26 +19,18 @@ Linux内核那些事
 诚然，无论 BSD 和 Berkeley 如何变换，其后的 Packet Filter 总是不变的，这两个单词也基本概括了 BPF 的两大核心功能：
 
 - 过滤Filter
-    
     ：根据外界输入的规则过滤报文；
-    
 - 复制Copy
-    
     ：将符合条件的报文由内核空间复制到用户空间；
     
-
 以 `tcpdump` 为例：熟悉网络监控network monitoring的读者大抵都知道 `tcpdump` 依赖于 pcap 库，`tcpdump` 中的诸多核心功能都经由后者实现，其整体工作流程如下图所示：
 ![[Pasted image 20240911194321.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 _图 1. Tcpdump 工作流程_
 
 由图 1 不难看出，位于内核之中的 BPF 模块是整个流程之中最核心的一环：它一方面接受 `tcpdump` 经由 libpcap 转码而来的滤包条件（Pseudo Machine Language），另一方面也将符合条件的报文复制到用户空间最终经由 libpcap 发送给 `tcpdump`。
 
 读到这里，估计有经验的读者已经能够在脑海里大致勾勒出一个 BPF 实现的大概了，图 2 引自文献 1，读者们可以管窥一下当时 BPF 的设计：
 ![[Pasted image 20240911194328.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 _图 2. BPF Overview_
 
 时至今日，传统 BPF 仍然遵循图 2 的路数：途经网卡驱动层的报文在上报给协议栈的同时会多出一路来传送给 BPF，再经后者过滤后最终拷贝给用户态的应用。除开本文提及的 `tcpdump`，当时的 RARP 协议也可以利用 BPF 工作（Linux 2.2 起，内核开始提供 RARP 功能，因此如今的 RARP 已经不再需要 BPF 了）。
@@ -65,8 +54,6 @@ bash-3.2$ sudo tcpdump -d -i lo tcp and dst port 7070(000) ldh [12](
 
 BPF 采用的报文过滤设计的全称是 CFG（Computation Flow Graph），顾名思义是将过滤器构筑于一套基于 if-else 的控制流flow graph之上，例如清单 1 中的 filter 就可以用图 3 来表示：
 ![[Pasted image 20240911194345.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 _图 3 基于 CFG 实现的 filter 范例_
 
 CFG 模型最大的优势是快，参考文献 1 中就比较了 CFG 模型和基于树型结构构建出的 CSPF 模型的优劣，得出了基于 CFG 模型需要的运算量更小的结论；但从另一个角度来说，基于伪代码的设计却也增加了系统的复杂性：一方面伪指令集已经足够让人眼花缭乱的了；另一方面为了执行伪代码，内核中还需要专门实现一个虚拟机pseudo-machine，这也在一定程度上提高了开发和维护的门槛。
@@ -92,7 +79,11 @@ BPF 是在 1997 年首次被引入 Linux 的，当时的内核版本尚为 2.1.7
 清单 2 BPF Sample
 
 ```c
-#include <……>// tcpdump -dd 生成出的伪代码块// instruction format:// opcode: 16bits; jt: 8bits; jf: 8bits; k: 32bitsstatic struct sock_filter code[] = {    { 0x28, 0, 0, 0x0000000c }, // (000) ldh [12]    { 0x15, 0, 4, 0x000086dd }, // (001) jeq #0x86dd jt 2 jf 6    { 0x30, 0, 0, 0x00000014 }, // (002) ldb [20]    { 0x15, 0, 11, 0x00000006 }, // (003) jeq #0x6 jt 4 jf 15    { 0x28, 0, 0, 0x00000038 }, // (004) ldh [56]    { 0x15, 8, 9, 0x00000438 }, // (005) jeq #0x438 jt 14 jf 15    { 0x15, 0, 8, 0x00000800 }, // (006) jeq #0x800 jt 7 jf 15    { 0x30, 0, 0, 0x00000017 }, // (007) ldb [23]    { 0x15, 0, 6, 0x00000006 }, // (008) jeq #0x6 jt 9 jf 15    { 0x28, 0, 0, 0x00000014 }, // (009) ldh [20]    { 0x45, 4, 0, 0x00001fff }, // (010) jset #0x1fff jt 15 jf 11    { 0xb1, 0, 0, 0x0000000e }, // (011) ldxb 4*([14]&0xf)    { 0x48, 0, 0, 0x00000010 }, // (012) ldh [x + 16]    { 0x15, 0, 1, 0x00000438 }, // (013) jeq #0x438 jt 14 jf 15    { 0x6, 0, 0, 0x00040000 }, // (014) ret #262144    { 0x6, 0, 0, 0x00000000 }, // (015) ret #0};int main(int argc, char **argv){    // ……    struct sock_fprog bpf = { sizeof(code)/sizeof(struct sock_filter), code };    // ……    // 1. 创建 raw socket    s = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));    // ……    // 2. 将 socket 绑定给指定的 ethernet dev    name = argv[1]; // ethernet dev 由 arg 1 传入    memset(&addr, 0, sizeof(addr));    addr.sll_ifindex = if_nametoindex(name);    // ……    if (bind(s, (struct sockaddr *)&addr, sizeof(addr))) {        // ……    }    // 3. 利用 SO_ATTACH_FILTER 将 bpf 代码块传入内核    if (setsockopt(s, SOL_SOCKET, SO_ATTACH_FILTER, &bpf, sizeof(bpf))) {        // ……    }    for (; ;) {        bytes = recv(s, buf, sizeof(buf), 0); // 4. 利用 recv()获取符合条件的报文        // ……        ip_header = (struct iphdr *)(buf + sizeof(struct ether_header));        inet_ntop(AF_INET, &ip_header->saddr, src_addr_str, sizeof(src_addr_str));        inet_ntop(AF_INET, &ip_header->daddr, dst_addr_str, sizeof(dst_addr_str));        printf("IPv%d proto=%d src=%s dst=%s\n",        ip_header->version, ip_header->protocol, src_addr_str, dst_addr_str);    }    return 0;}
+#include <……>
+// tcpdump -dd 生成出的伪代码块
+// instruction format:
+// opcode: 16bits; jt: 8bits; jf: 8bits; k: 32bitsstatic 
+struct sock_filter code[] = {    { 0x28, 0, 0, 0x0000000c }, // (000) ldh [12]    { 0x15, 0, 4, 0x000086dd }, // (001) jeq #0x86dd jt 2 jf 6    { 0x30, 0, 0, 0x00000014 }, // (002) ldb [20]    { 0x15, 0, 11, 0x00000006 }, // (003) jeq #0x6 jt 4 jf 15    { 0x28, 0, 0, 0x00000038 }, // (004) ldh [56]    { 0x15, 8, 9, 0x00000438 }, // (005) jeq #0x438 jt 14 jf 15    { 0x15, 0, 8, 0x00000800 }, // (006) jeq #0x800 jt 7 jf 15    { 0x30, 0, 0, 0x00000017 }, // (007) ldb [23]    { 0x15, 0, 6, 0x00000006 }, // (008) jeq #0x6 jt 9 jf 15    { 0x28, 0, 0, 0x00000014 }, // (009) ldh [20]    { 0x45, 4, 0, 0x00001fff }, // (010) jset #0x1fff jt 15 jf 11    { 0xb1, 0, 0, 0x0000000e }, // (011) ldxb 4*([14]&0xf)    { 0x48, 0, 0, 0x00000010 }, // (012) ldh [x + 16]    { 0x15, 0, 1, 0x00000438 }, // (013) jeq #0x438 jt 14 jf 15    { 0x6, 0, 0, 0x00040000 }, // (014) ret #262144    { 0x6, 0, 0, 0x00000000 }, // (015) ret #0};int main(int argc, char **argv){    // ……    struct sock_fprog bpf = { sizeof(code)/sizeof(struct sock_filter), code };    // ……    // 1. 创建 raw socket    s = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));    // ……    // 2. 将 socket 绑定给指定的 ethernet dev    name = argv[1]; // ethernet dev 由 arg 1 传入    memset(&addr, 0, sizeof(addr));    addr.sll_ifindex = if_nametoindex(name);    // ……    if (bind(s, (struct sockaddr *)&addr, sizeof(addr))) {        // ……    }    // 3. 利用 SO_ATTACH_FILTER 将 bpf 代码块传入内核    if (setsockopt(s, SOL_SOCKET, SO_ATTACH_FILTER, &bpf, sizeof(bpf))) {        // ……    }    for (; ;) {        bytes = recv(s, buf, sizeof(buf), 0); // 4. 利用 recv()获取符合条件的报文        // ……        ip_header = (struct iphdr *)(buf + sizeof(struct ether_header));        inet_ntop(AF_INET, &ip_header->saddr, src_addr_str, sizeof(src_addr_str));        inet_ntop(AF_INET, &ip_header->daddr, dst_addr_str, sizeof(dst_addr_str));        printf("IPv%d proto=%d src=%s dst=%s\n",        ip_header->version, ip_header->protocol, src_addr_str, dst_addr_str);    }    return 0;}
 ```
 
 由于主要是和过滤报文打交道，内核中（ 3.18 之前）的 BPF 的绝大部分实现都被放在了 net/core/filter.c 下，篇幅原因笔者就不对代码进行详述了，文件不长，600 来行（v2.6），比较浅显易懂，有兴趣的读者可以移步品评一下。值得留意的函数有两个，`sk_attach_filter()` 和 `sk_run_filter()`：前者将 filter 伪代码由用户空间复制进内核空间；后者则负责在报文到来时执行伪码解析。篇幅所限，清单 2 中笔者只列出了部分代码，代码分析也以注释为主。有兴趣的读者可以移步这里阅读完全版。

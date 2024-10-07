@@ -1,41 +1,12 @@
-
 Linux内核之旅
-
  _2022年05月24日 08:42_ _陕西_
-
 The following article is from 一口Linux Author 土豆居士
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6Y7VnVXfice2VtFnTr3IEibCiboib78PWNs5M2GeOz265umA/0)
-
-**一口Linux**.
-
-《从零开始学ARM》作者，一起学习嵌入式，Linux，网络，驱动，arm知识。
-
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664612370&idx=1&sn=dc149c919e87cf195c0a6ec4571bf25b&chksm=f04deff7c73a66e1de6bd32f7855207f05d79d1b856ca4b7b8ba157e4323b37d8369cb99aa1c&mpshare=1&scene=24&srcid=0524yoseblNSrDNfFH6AADxA&sharer_sharetime=1653405678227&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d03673498261f8eafe98815d657c26c5890bcda64467484f189a99820c1ffb6e5c085af1d2e7533325e12f1c69a15d4ea9165e9813ac0e406961875ac4c731e2c5516e525897b8483826330dfee7ded89955d0096da8c2fa92402802e02dfdd33987a73438815af6ba1ed7445b6ec20b037339d439a9ec658f&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQya%2F35iJbPs1LFAAgwUPOfRKEAgIE97dBBAEAAAAAAG97ATulCZkAAAAOpnltbLcz9gKNyK89dVj0cQ857sw7SpQ5QpWzrWN2JM4aiayEAJQfgvgM%2BAt1lwS5jb8ourkWybTBWyvQgrKbqPL2YJbMxis5QIJwJIwrlrgbpQ2MmyhNsrWofZl%2BEN4nnxyc8jDZp3sE0mBAfyh1dL6YGFBGL2BShLPitt0ljCOPURRQ8Q7PetXOVAuCXyjLzak7RmKVTmafjd%2BLgpybvn2xorNd%2F1%2B0GUQ3zZ92B6ygm%2Bvuk2xaQouxabdG3jkhHcxN46DNZeRVtC2B266Kd8kqtKUPKiE1CFU7NaHwR6CVt7f3G7Ytr77pPYAZ&acctmode=0&pass_ticket=XAzpOj0klOAkIjimV79wpkc3uVKqUI1fHwWALPmg34yvc6uWgc9lOU9KYq%2F1vUtU&wx_header=0#)
-
-  
-
-击上方“**一口Linux**”，选择“**置顶/星标公众号**”
-
-  
-
-# 
-
-干货福利，第一时间送达！
-
-# ![Image](https://mmbiz.qpic.cn/mmbiz/cZV2hRpuAPiaJQXWGyC9wrUzIicibgXayrgibTYarT3A1yzttbtaO0JlV21wMqroGYT3QtPq2C7HMYsvicSB2p7dTBg/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1 "动态黑色音符")
-
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/icRxcMBeJfc8Jn2zPPCsOyXwtxcrKpia3YpjtsDYnWroToLoz42wKuc94n4N8NuJEWTHc4aFQGXh20YjbuJZTmnw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 # Make简介：  
 
 - **工程管理器**，顾名思义，是指**管理较多的文件**
-    
 - **Make**工程管理器也就是个“**自动编译管理器**”，这里的“自动”是指它能够**根据文件时间戳自动发现更新过的文件而减少编译的工作量**，同时，它通过读入Makefile文件的内容来执行大量的编译工作
-    
 - **==Make将只编译改动的代码文件，而不用完全编译。==**
     
-
 会不会写makefile，从一个侧面说明了一个人是否具备完成大型工程的能力,makefile关系到了整个工程的编译规则。一个工程中的源文件不计数，其按类型、功能、模块分别放在若干个目录中，makefile定义了一系列的规则来指定，哪些文件需要先编译，哪些文件需要后编译，哪些文件需要重新编译，甚至于进行更复杂的功能操作，因为makefile就像一个Shell脚本一样，其中也可以执行操作系统的命令。makefile带来的好处就是——“自动化编译”，一旦写好，只需要一个make命令，整个工程完全自动编译，极大的提高了软件开发的效率
 
 # Makefile基本结构：
@@ -121,7 +92,6 @@ make工作时的执行步骤入下：（想来其它的make也是类似）
 >     
 
 1-5步为第一个阶段，6-7为第二个阶段。第一个阶段中，如果定义的变量被使用了，那么，make会把其展开在使用的位置。但make并不会完全马上展开，make使用的是拖延战术，如果变量出现在依赖关系的规则中，那么仅当这条依赖被决定要使用了，变量才会在其内部展开。
-
 ## 2.makefile文件中的依赖关系理解
 
 假设当前工程目录为object/，该目录下有6个文件，分别是：main.c、abc.c、xyz.c、abc.h、xyz.h和Makefile。其中main.c包含头文件abc.h和xyz.h，abc.c包含头文件abc.h，xyz.c包含头文件xyz.h，而abc.h又包含了xyz.h。它们的依赖关系如图。

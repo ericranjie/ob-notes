@@ -1,21 +1,14 @@
-# 
-
 土豆居士 一口Linux
-
  _2021年09月28日 11:42_
 
 设备树是一种描述硬件的数据结构，它起源于OpenFirmware（OF）。
 
 在Linux 2.6中， ARM架构的板极硬件细节过多地被硬编码在arch/arm/plat-xxx和arch/arm/mach-xxx中，采用设备树后，许多硬件的细节可以直接通过它传递给Linux，而不再需要在内核中进行大量的冗余编码。
-
 ## 1. linux设备树中DTS、 DTC和DTB的关系
 
 - (1) DTS：.dts文件是设备树的源文件。由于一个SoC可能对应多个设备，这些.dst文件可能包含很多共同的部分，共同的部分一般被提炼为一个 .dtsi 文件，这个文件相当于C语言的头文件。
-    
 - (2) DTC：DTC是将.dts编译为.dtb的工具，相当于gcc。
-    
 - (3) DTB：.dtb文件是 .dts 被 DTC 编译后的二进制格式的设备树文件，它可以被linux内核解析。
-    
 
 # 2. DTS语法
 
@@ -48,10 +41,8 @@ compatible 属性也叫做 “兼容性” 属性，这是非常重要的一个�
 `"manufacturer,model"   `
 
 - ① manufacturer : 表示厂商；
-    
 - ② model : 一般是模块对应的驱动名字。
     
-
 例如：
 
 `compatible = "fsl,mpc8641", "ns16550";   `

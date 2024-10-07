@@ -11,9 +11,11 @@
             "id": "e2d90085bd089a6c",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241007095514.png"
+                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241007095514.png",
+                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241007095514.png",
+                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241007095514.png"
+                "file": "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md"
               }
             }
           }
@@ -144,16 +146,29 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "coding/app/Apache 顶级项目 InLong“应龙” 正式毕业.md",
+    "coding/os/linux/BPF/b_eBPF 简史.md",
+    "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
+    "coding/os/linux/build/b_计算机科学基础知识（三）静态库和静态链接.md",
+    "coding/os/linux/build/b_计算机科学基础知识（四） 动态库和位置无关代码.md",
+    "README.md",
+    "coding/os/linux/build/d_Linux设备树语法规范.md",
+    "coding/app/b_n_万字超全 ElasticSearch 监控指南.md",
+    "coding/app/a_云风Skynet源码剖析及原理实战（一）.md",
+    "zx99-image/Pasted image 20241007172635.png",
+    "zx99-image/Pasted image 20241007172737.png",
+    "zx99-image/Pasted image 20241007172731.png",
+    "zx99-image/Pasted image 20241007172721.png",
+    "zx99-image/Pasted image 20241007172643.png",
+    "coding/app/SOTA技术概述.md",
+    "coding/app/c_Apache 顶级项目 InLong“应龙” 正式毕业.md",
+    "zx99-image/Pasted image 20241007095514.png",
     "coding/cpp/grammar/reflect/b_n_C++ 反射：全方位解读 Lura 库的前世今生！.md",
     "zx99-image/Pasted image 20241007104818.png",
     "zx99-image/Pasted image 20241007104804.png",
     "zx99-image/Pasted image 20241007104751.png",
     "zx99-image/Pasted image 20241007104741.png",
-    "zx99-image/Pasted image 20241007104731.png",
-    "zx99-image/Pasted image 20241007104520.png",
     "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
     "coding/cpp/grammar/k_n_使用 C++ 中的 final 关键字，到底能否提升性能？.md",
     "coding/cpp/grammar/i_C++20 新特性的小细节.md",
@@ -162,27 +177,14 @@
     "coding/cpp/grammar/i_解读C++即将迎来的重大更新（一）：C++20的四大新特性.md",
     "coding/algorithm/十五大经典算法研究.md",
     "learning",
-    "zx99-image/Pasted image 20241007095514.png",
     "coding/cpp/k_C++ 线程的使用.md",
     "coding/cpp/a_从新手到专业人士：探索 C++ STL 以获得终极性能.md",
     "interview/learn-quote.md",
     "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/memory/k_深入理解Linux内核页表映射分页机制原理.md",
-    "zx99-image/Pasted image 20241007092117.png",
     "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
     "interview/interview-resources.md",
-    "coding/os/linux/debug/ASAN/b_n_深入分析HWASAN检测内存错误原理.md",
-    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
-    "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md",
-    "README.md",
-    "coding/os/linux/memory/memory-manage/slub/b_n_SLUB DEBUG原理.md",
-    "coding/os/linux/memory/memory-manage/slub/k_图解slub.md",
-    "coding/os/linux/memory/memory-model/k_计算机科学基础知识（一）The Memory Hierarchy.md",
-    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
-    "zx99-image/Pasted image 20241006175104.png",
-    "zx99-image/Pasted image 20241006174502.png",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",
