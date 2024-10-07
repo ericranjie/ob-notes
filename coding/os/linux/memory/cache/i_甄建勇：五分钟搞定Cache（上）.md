@@ -1,25 +1,12 @@
-
 原创 甄建勇 Linux阅码场
-
  _2021年11月19日 07:03_
 
-  
-
 作者简介
-
 甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。感兴趣领域:经济学、心理学、哲学。
-
 本系列为甄建勇“五分钟系列”——用五分钟把计算机系统中一个关键的概念讲清楚，如果你也对计算机系统某些模块有独到的理解，欢迎赐稿“Linux阅码场”，投稿将获惊喜礼物一份，投稿请扫码加微信。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/Ass1lsY6byuNbKqNZWiaCgbfWUnTwDp9UqWCdBCpGOGDibHia6icygKomtAUdkaJCLwdOCaLzYYGANh3t56611ibichQ/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 关于cache，大概可以从三个方面进行阐述：内存到cache的映射方式，cache的写策略，cache的替换策略。 
-
-  
-
-**映射方式**
-
-  
+# **映射方式**
 
 内存到cache的映射方式，大致可以分为三种，分别是：直接映射（directmapped），全相连（fullyassociative），组相连（setassociative）。
 
@@ -30,8 +17,7 @@
  _图1      Cache的映射_
 
 (direct mapped：直接映射 ; fully associative：全相连 ;set associative：组相连)
-
-**（1）directmapped**
+## **（1）directmapped**
 
 对于directmapped（直接映射），为了便于数据查找，一般规定内存数据只能置于缓存的特定区域。对于直接匹配缓存，每一个内存块地址都可通过模运算对应到一个唯一缓存块上。注意这是一个多对一匹配：多个内存块地址须共享一个缓存区域。
 
@@ -40,8 +26,7 @@
 所以如果采用directmapped的话，core在访问cache时，根据TLB处理之后的物理地址，进行取模（%）运算，就可以直接确定其cache的位置，由于一个cacheline可能对应不同的内存地址（具有相同模运算结果的内存），然后将物理地址的tag部分与cache的tag部分进行一次比较，就可以确定是cache hit，还是cachemiss。
 
 directmapped的特点是，逻辑简单，延迟短（只进行一次比较），但命中率低。
-
-**（2）fullyassociative**
+## **（2）fullyassociative**
 
 对于fullyassociative（全相连），这种方式，内存中的数据块可以被放置到cache的任意区域。这种相联完全免去了索引的使用，而直接通过在整个缓存空间上匹配标签进行查找。 
 
@@ -50,8 +35,7 @@ directmapped的特点是，逻辑简单，延迟短（只进行一次比较）�
 所以如果采用fullyassociative的话，core在访问cache时，根据TLB处理之后的物理地址，要依次和所有的cacheline的tag进行比较。
 
 fullyassociative的特点是：控制复杂，查找造成的电路延迟最长，因此仅在特殊场合，如缓存极小时，才会使用，命中率较高。
-
-**（3）setassociative**
+## **（3）setassociative**
 
 set associative（组相连）是directmapped 和fully associative两种方式的一个折中。
 
@@ -71,9 +55,7 @@ setassociative是折中方案，所以其特点就是集directmapped 和fully as
 
 为了和下级存储（如内存）保持数据一致性，就必须把数据更新适时传播下去。这种传播通过回写来完成。
 
-**写策略**
-
-  
+# **写策略**
 
 一般有两种回写策略：写回（Writeback）和写通（Writethrough）。
 
@@ -93,11 +75,8 @@ setassociative是折中方案，所以其特点就是集directmapped 和fully as
 
 对于组相联缓存，当一个组的全部缓存块都被占满后，如果再次发生缓存失效，就必须选择一个缓存块来替换掉。存在多种策略决定哪个块被替换。
 
-  
+# *替换策略*
 
-****替换策略****
-
-  
 
 显然，最理想的替换块应当是距下一次被访问最晚的那个。这种理想策略无法真正实现，但它为设计其他策略提供了方向。
 
@@ -107,37 +86,9 @@ setassociative是折中方案，所以其特点就是集directmapped 和fully as
 
 此外，也可使用纯粹的随机替换法。测试表明完全随机替换的性能近似于LRU。
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
 未完待续
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
+---
 
 精彩回顾
 
@@ -148,28 +99,9 @@ setassociative是折中方案，所以其特点就是集directmapped 和fully as
 [甄建勇：五分钟搞定MMU](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680376&idx=1&sn=75fb4280dd0b141dd385b4421b958afd&chksm=810ff625b6787f33c75bcd900f0158d927c81fed0267c1b1aa0f8d8ec173e0fa9aef0bfc58cc&scene=21#wechat_redirect)  
 
   
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-**扫码加入社群**  
-
   
 
 更多精彩尽在"Linux阅码场"，扫描下方二维码关注
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-**别忘了分享、点赞或者在看哦~**
-
-  
-
-阅读 5524
-
-​
-
-喜欢此内容的人还喜欢
 
 写留言
 

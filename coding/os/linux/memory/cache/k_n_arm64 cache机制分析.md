@@ -1,24 +1,15 @@
-
 原创 LoyenWang LoyenWang
-
  _2022年04月09日 23:29_
-
 # 背景
 
 - `Read the fucking source code!`  --By 鲁迅
-    
 - `A picture is worth a thousand words.` --By 高尔基
-    
 
 说明：
 
 1. Kernel版本：4.14
-    
 2. ARM64处理器，Contex-A53，双核
-    
 3. 使用工具：Source Insight 3.5， Visio
-    
-
 # 1. 概述
 
 先来看一下经典的存储器层次结构图：
@@ -27,32 +18,24 @@
 
 
 - 不同存储器技术的访问时间差异很大，CPU和主存的速度差距在增大，如果直接从主存进行数据的load/store，CPU的大部分时间将会处在等待的状态；
-    
 - cache的作用就是来解决CPU与主存的速度不匹配问题；
-    
 
 以ARMv8的CPU架构为例：
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/OtawKxIaP3ibe3fE48wFnb4sG5icQcYYTJ1hdfRtHnL2fWYZvdpjIYQ3Xme31Zncso3YDI8zDJNeuZiaWANcGWOdA/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 - ARMv架构的CPU通常包含两级或多级cache；
-    
 - L1 cache为Core所独享的，通常包含Instruction cache和Data cache；
-    
 - L2 cache为同一个Cluster中的多个Core进行共享；
-    
 - L3 cache通常实现为外部的硬件模块，可以在Cluster之间进行共享，或者与其他IP进行共享；
-    
 
 接下来让我们对cache一探究竟。
-
 # 2. cache
 
 ## 2.1 cache结构
 
 先看一下cache的内部结构图：
 
-  
 
 - `cache line`：cache按行来组织，它是访问cache的最小单位，通常为16、32、64或128字节，`cache line`的大小通常在架构设计阶段确定；
     

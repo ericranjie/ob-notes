@@ -1,17 +1,3 @@
-# [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
-
-talk is cheap,  
-show me the code!
-
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
-
-# [人人都应该知道的CPU缓存运行效率](https://kfngxl.cn/index.php/archives/648/)
-
 2024-03-29 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(217) 评论(0)
 
 大家好，我是飞哥！
@@ -19,7 +5,6 @@ show me the code!
 提到CPU性能，大部分同学想到的都是CPU利用率，这个指标确实应该首先被关注。但是除了利用率之外，还有很容易被人忽视的指标，就是指令的运行效率。如果运行效率不高，那CPU利用率再忙也都是瞎忙，产出并不高。
 
 这就好比人，每天都是很忙，但其实每天的效率并不一样。有的时候一天干了很多事情，但有的时候只是瞎忙了一天，回头一看，啥也没干！
-
 ## 一、CPU 硬件运行效率
 
 那啥是CPU的运行效率呢？介绍这个之前我们得先来简单回顾下CPU的构成和工作原理。CPU在生产过程结束后，在硬件上就被光刻机刻成了各种各样的模块。

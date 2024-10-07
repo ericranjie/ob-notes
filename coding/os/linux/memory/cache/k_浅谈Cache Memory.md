@@ -1,26 +1,8 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2019-5-2 21:14 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 今天探究的主题是cache。我们围绕几个问题展开。为什么需要cache？如何判断一个数据在cache中是否命中？cache的种类有哪些，区别是什么？
 
 > [](https://zhuanlan.zhihu.com/p/102293437)我在知乎平台发起了一个[高速缓存专题](https://zhuanlan.zhihu.com/cpu-cache)，感兴趣的可以关注。
-
 ## 为什么需要cache memory
 
 在思考cache是什么之前我们首先先来思考第一个问题：我们的程序是如何运行起来的？我们应该知道程序是运行在 RAM之中，RAM 就是我们常说的DDR（例如 DDR3、DDR4等）。我们称之为main memory（主存）当我们需要运行一个进程的时候，首先会从Flash设备（例如，eMMC、UFS等）中将可执行程序load到main memory中，然后开始执行。在CPU内部存在一堆的通用寄存器（register）。如果CPU需要将一个变量（假设地址是A）加1，一般分为以下3个步骤：

@@ -1,28 +1,14 @@
-
 冰河 冰河技术
-
  _2022年01月07日 17:27_
 
 **大家好，我是冰河~~**
 
 很多小伙伴在学习并发编程中，总是觉得并发编程很难，学了很多遍也没有学会。即使感觉自己学会了，但是在项目中也不知道怎么使用，过段时间，又会把之前学过的知识忘记。后面，冰河会跟大家从根本上聊聊并发编程的知识。
 
-![](http://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwEsQmOPMjJS0EZKCJ66T4VwM2ia7E7Dxj8pWyco8fSSt6EeUOTeRHM64TE2MGkxHibrXYibUALgGLncA/300?wx_fmt=png&wxfrom=19)
-
-**冰河技术**
-
 分享各种编程语言、开发技术、分布式与微服务架构、分布式数据库、分布式事务、云原生、大数据与云计算技术和渗透技术。另外，还会分享各种面试题和面试技巧。
 
-673篇原创内容
-
-公众号
-
-点击上方卡片关注我
-
 今天，我们就深入聊聊关于CPU缓存一致性协议MESI的有关知识，希望能够为小伙伴们带来实质性的帮助。好了，不多说了，进入今天的正题。
-
 ## CPU高速缓存
-
 ### CPU为何要有高速缓存
 
 CPU在摩尔定律的指导下以每18个月翻一番的速度在发展，然而内存和硬盘的发展速度远远不及CPU。这就造成了高性能能的内存和硬盘价格及其昂贵。然而CPU的高度运算需要高速的数据。为了解决这个问题，CPU厂商在CPU中内置了少量的高速缓存以解决I\O速度和CPU运算速度之间的不匹配问题。
@@ -36,32 +22,23 @@ CPU在摩尔定律的指导下以每18个月翻一番的速度在发展，然而
 > **空间局部性（Spatial Locality）**：如果一个存储器的位置被引用，那么将来他附近的位置也会被引用。
 
 比如顺序执行的代码、连续创建的两个对象、数组等。
-
 ### 带有高速缓存的CPU执行计算的流程
 
 1. 程序以及数据被加载到主内存
-    
 2. 指令和数据被加载到CPU的高速缓存
-    
 3. CPU执行指令，把结果写到高速缓存
-    
 4. 高速缓存中的数据写回主内存
     
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYkqPP6iathJoDLCoicia2UrSf8Dxw3KUUYIzjtePWlbICfEp9eXN5EFHzLw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20241007190526.png]]
 ### 目前流行的多级缓存结构
 
 由于CPU的运算速度超越了1级缓存的数据I\O能力，CPU厂商又引入了多级的缓存结构。
 
 多级缓存结构
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYkibWSJoskicvsTtU6ibBmM0zKeQgq0Ma8O22lN7twzyS37tbqAXOeJsnlw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20241007190607.png]]
 ## 多核CPU多级缓存一致性协议MESI
 
 多核CPU的情况下有多个一级缓存，如何保证缓存内部数据的一致,不让系统数据混乱。这里就引出了一个一致性的协议MESI。
-
 ### MESI协议缓存状态
 
 MESI 是指4中状态的首字母。每个Cache line有4个状态，可用2个bit表示，它们分别是：
@@ -78,7 +55,6 @@ MESI 是指4中状态的首字母。每个Cache line有4个状态，可用2个bi
 **注意：****对于M和E状态而言总是精确的，他们在和该缓存行的真正状态是一致的，而S状态可能是非一致的**。如果一个缓存将处于S状态的缓存行作废了，而另一个缓存实际上可能已经独享了该缓存行，但是该缓存却不会将该缓存行升迁为E状态，这是因为其它缓存不会广播他们作废掉该缓存行的通知，同样由于缓存并没有保存该缓存行的copy的数量，因此（即使有这种通知）也没有办法确定自己是否已经独享了该缓存行。
 
 从上面的意义看来E状态是一种投机性的优化：如果一个CPU想修改一个处于S状态的缓存行，总线事务需要将所有该缓存行的copy变成invalid状态，而修改E状态的缓存不需要使用总线事务。
-
 ### MESI状态转换
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYk7THsbICK6APjU0nSChg0mtBNvCFwGVbLyvQepM1uaTLnmDkicJMI6Bw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
