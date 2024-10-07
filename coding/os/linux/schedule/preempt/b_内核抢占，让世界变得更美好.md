@@ -1,31 +1,14 @@
-# 
-
 一口Linux
-
  _2021年10月21日 11:50_
-
 The following article is from 老吴嵌入式 Author 吴伟东Jack
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4dUQtAwpFndQG5T1SLz8kAEfUphAiaYFeib14LFOKOH5lw/0)
-
-**老吴嵌入式**.
-
 《坐拥2娃的超级奶爸》《100 个适合嵌入式初学者的开源软件》作者《老吴嵌入式》公众号号主《篮球动作拆解》视频号号主《中国 A股荣誉股民》《终身学习践行者》
 
 ](https://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247498869&idx=1&sn=8b3175d2f34ac3d2741767e51f05e9cc&chksm=f96b8e81ce1c07974d31a6333a7fdd00f53e1114d63ee50d71a946e778db3be8c2b4be86ac65&mpshare=1&scene=24&srcid=1021aCufqtKRKRiybvOvRAB6&sharer_sharetime=1634823798662&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0fda3a29c1ec8073b0d2f0dd19c65e21de2ba6d3948f445bb0969025df9840980b44232402398e2ef3a523c966775ddef6c281ba6413d3cf5b230b7b495a0f8c6e5a650feaa385310c0ebeb9a70287d0db23c051799ca72b90789b281e4347dd0d806e972ec2cd5c38d91579095c7703a55fc174a1bce2c24&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_fc2c47bdbd29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQf59HHDNVB2IO%2FEt3%2FvLwvRKUAgIE97dBBAEAAAAAAKgICRknS1kAAAAOpnltbLcz9gKNyK89dVj0m%2FPwyXGGSzLag3%2FH2Df4J9kyur1nmjc%2Fi8DjnO7mFK4%2Ft93XBBI5%2BcqgrRMIHG%2Fo6EqUktPdOsTD3%2F0lNVeIyhA32eeg6w17sf2ErNiWIZ23s5a3FNlJb3%2BTprsSou4VlrKrenXxF0pjFBWmoF6c8bvRtCyLuMDSXzKrtnI01oQMS3QvUv3yIoJHy%2F3L%2BgdkiCrU0eDvio2cK0OvdoYx25Xdvr2UkpMFYr4o4qAlDqgDoTPg1RXSiniIieW8MnVDVJYqt%2BENSdsimScqteyJhfnsFL%2BnQWwoIGw6mnaPpkta61w17Xt%2FmQ%2Bm%2FYvKjA%3D%3D&acctmode=0&pass_ticket=gX41ie9JgJm3RfB9Ora8sRbtyoAg9cra9Z1zi3T2x9SQiDrQmcnWck26gZnGfmvs&wx_header=0#)
 
 大家好，我是老吴。
-
 今天要分享的是抢占相关的基础知识。
-
 本文以内核抢占为引子，概述一下 Linux 抢占的图景。
-
 我尽量避开细节问题和源码分析。
-
-  
-
 ## 什么是内核抢占？
 
 别急，咱们慢慢来。
@@ -50,16 +33,12 @@ The following article is from 老吴嵌入式 Author 吴伟东Jack
 
 很明显，现阶段，preemptive os 优于 cooperative os。所以 Linux 被设计成 preemptive。
 
-  
-
 **抢占的核心操作包括 2 个步骤**：
 
 1、从用户态陷入到内核态 (trap kernel)，3 个路径：
 
 > a. 系统调用，本质是 soft interrupt，通常就是一条硬件指令 (x86 的 int 0x80)。
-> 
 > b. 硬件中断，最典型的就是会周期性发生的 timer 中断，或者其他各种外设中断.
-> 
 > c. exception，例如 page fault、div 0。
 ![[Pasted image 20240906162125.png]]
 ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
@@ -68,8 +47,6 @@ The following article is from 老吴嵌入式 Author 吴伟东Jack
 
 2、陷入到内核态后，在合适的时机下，调用 sheduler 选出一个最重要的进程，如果被选中的不是当前正在运行的进程的话，就会执行 context switch 切换到新的进程。
 
-  
-
 **根据抢占时机点的不同，抢占分为 2 种类型**：
 
 1、user preemption
@@ -77,7 +54,6 @@ The following article is from 老吴嵌入式 Author 吴伟东Jack
 这里的 user 并不是指在 user-space 里进行抢占，而是指在返回 user-space 前进行抢占，具体的：
 
 > When returning to user-space from a system call
-> 
 > When returning to user-space from an interrupt handler
 
 即从 system call 和 interrupt handler 返回到 user-space 前进行抢占，这时仍然是在 kernel-space 里，抢占是需要非常高的权限的事情，user-space 没权利也不应该干这事。
@@ -108,8 +84,7 @@ Linux 2.6 之前是不支持内核抢占的。这意味着当处于用户空间�
 > 
 > If a task in the kernel blocks (which results in a call to schedule() )
 
-##   
-为什么要引入内核抢占？
+##  为什么要引入内核抢占？
 
 **根本原因**：
 

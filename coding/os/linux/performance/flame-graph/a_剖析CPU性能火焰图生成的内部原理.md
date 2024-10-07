@@ -1,17 +1,3 @@
-# [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
-
-talk is cheap,  
-show me the code!
-
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
-
-# [剖析CPU性能火焰图生成的内部原理](https://kfngxl.cn/index.php/archives/655/)
-
 2024-03-29 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(221) 评论(0)
 
 大家好，我是飞哥！
@@ -22,7 +8,6 @@ show me the code!
 在这张火焰图中，一个函数占据的宽度越宽，表明该函数消耗的 CPU 占比越高。但对于位于火焰图下方的函数来说，它们虽然开销比较大，但都是因为其子函数执行消耗的。所以一般都是看最上方的宽度较长的函数，这是导致整个系统 CPU 比较高的热点，把它优化掉可以提升程序运行性能。
 
 我们今天就来介绍下火焰图的是怎么做出来的，以及它的工作原理。
-
 ## 一、火焰图的使用
 
 为了更好地展示火焰图的原理，我专门写了一小段代码，
@@ -58,7 +43,7 @@ int main() {
 
 接下来我们使用 perf script 解析这个输出文件，并把输出结果传入到 FlameGraph/stackcollapse-perf.pl 脚本中来进一步解析，最后交由 FlameGraph/flamegraph.pl 来生成svg 格式的火焰图。具体命令可以一行来完成。
 
-```c
+```bash
 # perf script | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > out.svg
 ```
 

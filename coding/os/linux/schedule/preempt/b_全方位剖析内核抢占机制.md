@@ -1,6 +1,4 @@
-
 原创 summer OPPO内核工匠
-
  _2024年05月24日 17:30_ _广东_
 
 在当今数字时代，手机已成为人们日常生活中不可或缺，多任务处理和实时响应对于用户体验越来越重要，抢占(preemption)机制在提升系统性能和用户体验方面发挥了至关重要的作用。内核抢占机制使得系统能够有效地管理多任务处理，确保系统对用户操作的快速响应，并在资源紧张的情况下仍能保持稳定和流畅的运行。
@@ -9,14 +7,11 @@
 
 为了使内容组织更清晰，本文档将使用Linux6.1内核，按照以下结构展开：
 
-1.基本概念：首先讲解系统中的latency是如何产生的，为什么会产生
-
-2.内核抢占的实现机制：从latency的角度说明了为什么需要抢占，什么是抢占，内核的抢占模型是怎么样的，内核中抢占点的设置、抢占计数的机制，以及如何在内核代码中控制抢占
-
-3.Linux内核中的抢占实现：什么是内核抢占和实现方式，包括在什么情况下会发生抢占以及抢占的触发条件
+1. 基本概念：首先讲解系统中的latency是如何产生的，为什么会产生
+2. 内核抢占的实现机制：从latency的角度说明了为什么需要抢占，什么是抢占，内核的抢占模型是怎么样的，内核中抢占点的设置、抢占计数的机制，以及如何在内核代码中控制抢占
+3. Linux内核中的抢占实现：什么是内核抢占和实现方式，包括在什么情况下会发生抢占以及抢占的触发条件
 
 4.实例分析：通过实际案例中一个高优先级的线程长时间抢占不到资源，来看如何定位类似问题
-
 # **1. latency in linux**  
 
 内核抢占允许高优先级任务中断正在执行的低优先级任务，从而减少调度延迟，提高系统响应性，那么我们就需要知道对于Linux内核中有哪些因素会导致响应不及时。首先，我们来看看典型应用场景如下：![图片](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjNhtmSSUMJo4hat99prxyEEV6gIqAqGyGWXABHayY3Ehjib9pVLPAmo9icq1xhiaAtLagYACIibTiacceg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
@@ -28,48 +23,35 @@
 ![](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjNhtmSSUMJo4hat99prxyEEzxj6bbricl4uDKrILtCXfwlEEayg3cP8QKibnxDnUUeaicHb3DKib9dxWw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 这一次的内核调度延迟 = 中断延迟(interrupt latency) + 处理程序持续时间(handler duration) + 调度程序延迟(scheduler latency) + 调度程序持续时间(scheduler duration)，每一个过程都会影响这个高优先级任务的实时响应。
-
 ## **1.1 中断延迟**  
 ![[Pasted image 20240923210424.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在T0时刻，外设中断发生，从中断发生到linux内核响应这个中断，之间有一个延时，称为中断延时，中断延迟的来源主要有以下原因：
 
 1. 内核中大量使用了并发预防机制之一就是自旋锁，并且这个是一个common的接口供所有的模块使用，所以主要的来源就是中断在内核中被disable，如spinlock_irq()和spinlock_irq_irqsave()，此时当中断发生时候，内核处于关中断状态。    
-
 2. 中断控制器的调度延迟，现代的中断控制器支持中断优先级调度，当多个中断同时发生时，内核会通过比较中断的优先级来决定处理的顺序。较高优先级的中断会被优先处理，以保证对紧急事件的及时响应。因此，它可能会被高优先级中断
-
 3. 中断处理会切换模式，保存寄存器状态等，这个时间很短
-
 4. Shared Interrupt Line：当多个设备共享同一个中断时，中断控制器需要识别和区分不同的中断源，这个能有效地减少系统中断线的数量，节省硬件成本。然而，它也带来了一些潜在的问题，其中之一就是中断延迟的增加
-
-  
 ## **1.2 中断处理程序持续时间**  
 ![[Pasted image 20240923210430.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在T1时刻，CPU响应了这个中断，在Linux内核的中断处理分为上半部和下半部
 
 1. 上半部分，它在禁用中断的情况下运行，并且应该尽快完成
-
 2. 由上半部分调度的下半部分，在所有待处理的上半部分完成执行后开始，下半部分是开中断情况下执行，可能被其他中断打断
 
 如下图，在处理完中断A上部分后，其他外设中断发生，CPU转而处理其他中断，这样延迟处理中断A下半部，我们把开始响应中断到这个处理的时间称为中断处理延迟，其处理的整个过程如下图所示
 ![[Pasted image 20240923210439.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)    
 
 对于前面两个过程，我们在编写外设驱动的时候，要特别注意，里面设计大量的关中断和关抢占的过程，特别我们在一些自旋锁以及变体的接口，使用不当会导致响应不及时，例如中断响应不及时，高优先级任务迟迟得不到调度，给用户的直接感受就是卡顿。
-
 ## **1.3 调度延迟**  
 
 在T2时刻，中断处理完后，唤醒了进程。从唤醒进程到进程被调度器选中的这段延时称为调度延时。
 ![[Pasted image 20240923210445.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其产生调度延时的主要原因如下：
 
 - 调度器选中进程A的时间也是不确定的，可能就绪队列中有比进程A优先级更高的进程
-    
 
 对于这个，就需要了解抢占，尽快的通过抢占来完成任务的切换工作。对于Linux内核是一个支持抢占式操作系统，当一个任务运行在用户空间并被中断打断时，如果中断处理程序唤醒另外一个任务，我们从中断处理返回后可以立即调度该任务。对于不同内核支持不同的抢占方式，处理方式也会不同，这个后面会详细介绍，这里只是作为一个引子，目前存在以下情况会影响调度延迟    
 ![[Pasted image 20240923210450.png]]
@@ -77,15 +59,11 @@
 
 当中断发生时，linux内核正在自旋锁临界区里执行，这样，中断完成后，不能马上抢占调度，必须等待linux内核执行完自旋锁临界区才能抢占调度，这也会导致延迟的增加，并且很难被发现如下图所示
 ![[Pasted image 20240923210455.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-##   
 
 ## **1.4 调度持续时间**  
 
 在T3时刻，调度器选中了进程A，还需要进行上下文切换后才能执行进程A，上下文切换也是具有一定的延时性
 ![[Pasted image 20240923210501.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)    
 
 除了前面详细讲解的关键路径之外，Linux的其他非确定性机制也会影响实时任务的执行时间，例如linux是一个基于虚拟内存，由MMU提供，因此内存是按需分配的。每当应用程序首次访问代码和数据时，它都是按需加载的，这也会导致巨大的延时，同时C库服务和内核服务在设计的时候并未考虑实时约束。
 
@@ -102,11 +80,7 @@
 ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - 低优先级任务L和高优先级的任务H共享资源，在任务L获取资源后不久，任务H就开始运行。但是任务H必须等待任务L完成资源，因此它被挂起
-    
 - 在任务L完成资源之前，任务M准备好运行，抢占任务L，当任务M（可能还有其他中等优先级的任务）运行时，系统中的最高优先级任务H仍然处于挂起状态。
-    
-
-  
 
 # **2. 为什么需要内核抢占**  
 
@@ -117,14 +91,9 @@
 在不支持内核抢占模型中，抢占点比较少，对于内核抢占，如右图会在系统中添加很多抢占点，同时会导致执行时间会比左图多一点，可抢占会导致每隔一定时间去检查是否需要抢占，这样也会影响cache,pipeline，这样就会牺牲吞吐量。从上面图可以看出，操作系统演进过程中，不是新的就一定比旧的好，需要考量场景选择合适的方案。从这张图我们可以看出，内核抢占主要解决以下问题：
 
 - 提高系统响应实时性和用户体验：在不支持内核抢占式内核中，低优先级任务可能会长时间占用CPU，导致高优先级任务无法及时得到处理，主要解决的是latency问题。这种情况会显著影响系统的响应速度，特别是在实时应用中，可能导致严重的性能问题。对于手机场景中，当用户在使用应用程序时，内核抢占可以确保用户界面关键线程得到足够的CPU时间，避免界面卡顿和延迟。
-    
 - 避免优先级翻转：内核抢占结合优先级继承（Priority Inheritance）等机制，可以有效缓解优先级翻转问题。当低优先级任务持有高优先级任务需要的资源时，内核抢占机制可以提高低优先级任务的优先级，使其尽快释放资源，从而减少高优先级任务的等待时间。在Linux中，从2.6开始，rtmutex支持优先级继承，解决优先级翻转的问题。
-    
 
 所以需要内核抢占的根本原因就是系统在吞吐量和及时响应之间进行权衡的结果，对于Linux作为一个通用的操作系统，其最初设计就是为了throughput而非确定性时延而设计。但是越来越多的场景对及时响应的要求越来越高，让更高优先级的任务和关键的任务及时得到调度，特别对于我们手机这种交互式的场景中。
-
-  
-
 # **3. 抢占模型** 
 
 将抢占视为减少调度程序延迟的一种方法可能很有用，但减少延迟通常也会影响吞吐量，因此需要在完成大量工作（高吞吐量）和在任务准备好运行时立即调度任务（低延迟）之间保持平衡。Linux 内核支持多种抢占模型，以便您可以根据工作负载调整抢占行为。为了让用户根据自己的需求进行配置，Linux 提供了 3 种 Preemption Model：    

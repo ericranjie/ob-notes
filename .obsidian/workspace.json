@@ -11,9 +11,11 @@
             "id": "e2d90085bd089a6c",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241007190526.png"
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241007190526.png",
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241007190526.png",
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241007190526.png"
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md"
               }
             }
           }
@@ -144,8 +146,19 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
+    "coding/os/linux/schedule/b_深入理解 Linux 调度（GPU）虚拟化.md",
+    "coding/os/linux/schedule/lock/lock-free/b_如何利用CAS技术实现无锁队列.md",
+    "README.md",
+    "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
+    "zx99-image/Pasted image 20241007192403.png",
+    "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
+    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
+    "coding/os/linux/shell/i_使用 Linux 的 diff 和 patch 对文件进行协作.md",
+    "coding/os/linux/modules/i_谈一谈Linux写时拷贝(COW)的安全漏洞（1）.md",
+    "zx99-image/Pasted image 20241007190526.png",
     "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
     "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
     "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
@@ -154,7 +167,6 @@
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/cache/b_n_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
     "zx99-image/Pasted image 20241007190607.png",
-    "zx99-image/Pasted image 20241007190526.png",
     "coding/os/linux/memory/k_深入理解Linux内核页表映射分页机制原理.md",
     "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
@@ -167,21 +179,11 @@
     "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
     "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
     "coding/os/linux/BPF/b_eBPF 简史.md",
-    "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
-    "coding/os/linux/build/b_计算机科学基础知识（三）静态库和静态链接.md",
-    "coding/os/linux/build/b_计算机科学基础知识（四） 动态库和位置无关代码.md",
-    "README.md",
-    "coding/os/linux/build/d_Linux设备树语法规范.md",
-    "coding/app/b_n_万字超全 ElasticSearch 监控指南.md",
-    "coding/app/a_云风Skynet源码剖析及原理实战（一）.md",
     "zx99-image/Pasted image 20241007172635.png",
     "zx99-image/Pasted image 20241007172737.png",
     "zx99-image/Pasted image 20241007172731.png",
     "zx99-image/Pasted image 20241007172721.png",
     "zx99-image/Pasted image 20241007172643.png",
-    "coding/app/SOTA技术概述.md",
-    "coding/app/c_Apache 顶级项目 InLong“应龙” 正式毕业.md",
-    "zx99-image/Pasted image 20241007095514.png",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",

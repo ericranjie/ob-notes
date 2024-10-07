@@ -1,18 +1,7 @@
-# 
-
 CPP开发者
-
  _2021年10月01日 12:08_
-
 The following article is from 腾讯技术工程 Author jikesong
 
-[
-
-![](http://wx.qlogo.cn/mmhead/Iic9WLWEQMg2jTKicld7jhiagcz7jJxuYcpjicxAAiaVaNpdIiabCLIxOHIZFVsWH3cRNQjLF1TBznTJc/0)
-
-**腾讯技术工程**.
-
-腾讯技术官方号。腾讯技术创新、前沿领域发布解读平台。
 
 ](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651164873&idx=1&sn=a5da190031ea8ebe35359e8bacbfee9d&chksm=80644196b713c880266185caed05902b108f872ffc756f35b5b0133444623f97d94ebb087bb5&mpshare=1&scene=24&srcid=1001uLTXW1wtB4cvn4LqgJSh&sharer_sharetime=1633064163225&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d07ec8774a70d5063c7b2dc671230885689157d915ae34c1a23faf88c80b9fa911d4a0d6d9d86357b72efbf9e1acaaf2a85f1ff697f4ba2c11b5b8503784944c55b26e62aea668086cc6ece1f448e5793df2b36d4d51e7657ecdbb513456d4dd39db7d1d6715393b66eacc754433d9528eae6ca05d847e7c40&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_e829fd9228a9&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQdRtKCNamtVRKikbvAfo97xKUAgIE97dBBAEAAAAAAKs8LhGiAz0AAAAOpnltbLcz9gKNyK89dVj0xiUoeOdv1Dlx%2F6C90IJNAQD%2F84fXFqISgUfOxrvQD%2Bv%2Fggnsrev%2BORdgLBzY5VY66do4BL4Tl9aUoiOJnLu0jqEc%2BNuTO636LxNVHkcPFk57kJSUVEGkFLV8nrimmLcM8t9BnEtcjHaBxYK7OdA6y74YekrC8UCeCIomQf1gdPJwqXX9xqpRUlN%2BuFxDn1UbvfJ8j9qB5Sk4F0tKOgu%2FiL5giXBNUzyh1r%2FDBLJpanWD%2F2%2BvcCg7d7lwB2T47%2BkuunWKyqGNRmxgy%2FvO9SN7Yx8mrJZSO6haVYugChP4loqNZT1mEdZRF3ZqzAUKIA%3D%3D&acctmode=0&pass_ticket=Lti1HA6TBo9eKoRD1KfJ9G16pIgRm%2FU8YQfKhYdNo2EXQznZ5CpPuRP7xivrZTwr&wx_header=0#)
 
@@ -29,92 +18,57 @@ The following article is from 腾讯技术工程 Author jikesong
 ### 一、术语介绍
 
 **GPU —————** Graphics Processing Unit，显卡
-
 **CUDA ————** Compute Unified Device Architecture，英伟达 2006 年推出的计算 API
-
 **VT/VT-x/VT-d —** Intel Virtualization Technology。-x 表示 x86 CPU，-d 表示 Device。
-
 **SVM —————** AMD Secure Virtual Machine。AMD 的等价于 Intel VT-x 的技术。
-
 **EPT —————** Extended Page Table，Intel 的 CPU 虚拟化中的页表虚拟化硬件支持。
-
 **NPT —————** Nested Page Table，AMD 的等价于 Intel EPT 的技术。
-
 **SR-IOV ———** Single Root I/O Virtualization。PCI-SIG 2007 年推出的 PCIe 虚拟化技术。
-
 **PF —————** Physical Function，亦即物理卡
-
 **VF —————** Virtual Function，亦即 SR-IOV 的虚拟 PCIe 设备
-
 **MMIO ———** Memory Mapped I/O。设备上的寄存器或存储，CPU 以内存读写指令来访问。
-
 **CSR ————** Control & Status Register，设备上的用于控制、或反映状态的寄存器。CSR 通常以 MMIO 的方式访问。
-
 **UMD ————** User Mode Driver。GPU 的用户态驱动程序，例如 CUDA 的 UMD 是 libcuda.so
-
 **KMD ————** Kernel Mode Driver。GPU 的 PCIe 驱动，例如英伟达 GPU 的 KMD 是 nvidia.ko
-
 **GVA ————** Guest Virtual Address，VM 中的 CPU 虚拟地址
-
 **GPA ————** Guest Physical Address，VM 中的物理地址
-
 **HPA ————** Host Physical Address，Host 看到的物理地址
-
 **IOVA ————** I/O Virtual Address，设备发出去的 DMA 地址
-
 **PCIe TLP ——** PCIe Transaction Layer Packet
-
 **BDF ————** Bus/Device/Function，一个 PCIe/PCI 功能的 ID
-
 **MPT ————** Mediated Pass-Through，受控直通，一种设备虚拟化的实现方式
-
 **MDEV ———** Mediated Device，Linux 中的 MPT 实现
-
 **PRM ————** Programming Reference Manual，硬件的编程手册
-
 **MIG ————** Multi-Instance GPU，Ampere 架构高端 GPU 如 A100 支持的一种 hardware partition 方案
-
-  
-
 ### 二、GPU 虚拟化的历史和谱系
-
 #### 2.1 GPU 能做什么
 
 GPU 天然适合向量计算。常用场景及 API：
 ![[Pasted image 20240924114438.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)此外还有加解密、哈希等场景，例如近些年来的挖矿。渲染是 GPU 诞生之初的应用: GPU 的 G 就是 Graphics —— 图形。
+
+此外还有加解密、哈希等场景，例如近些年来的挖矿。渲染是 GPU 诞生之初的应用: GPU 的 G 就是 Graphics —— 图形。
 
 桌面、服务器级别的 GPU，长期以来仅有三家厂商:
 
 1. **英伟达**：GPU 的王者。主要研发力量在美国和印度。
-    
 2. **AMD/ATI**：ATI 于 2006 年被 AMD 收购。渲染稍逊英伟达，计算的差距更大。
-    
 3. **Intel**：长期只有集成显卡，近年来开始推独立显卡。
     
-
 2006 这一年，GPU 工业界发生了三件大事: ATI 被 AMD 收购；nVidia 黄仁勋提出了 CUDA 计算；Intel 宣布要研发独立显卡。
 
 日光之下并无新事。如同经常发生的，这些事有成功有失败: Intel 很快就放弃了它的独立显卡，直到 2018 才终于明白过来自己到底放弃了什么，开始决心生产独立显卡；AMD 整合 ATI 不太成功，整个公司差点被拖死，危急时公司股票跌到不足 2 美元；而当时不被看好的 CUDA，则在几年后取得了不可思议的成功。
 
 从 2012 年开始，人工智能领域的深度学习方法开始崛起，此时 CUDA 受到青睐，并很快统治了这个领域。
-
 #### 2.2 系统虚拟化和 OS 虚拟化
 
 系统虚拟化演化之路，起初是和 GPU 的演化完全正交的：
 
 - 1998 年，VMWare 公司成立，采用 Binary Translation 方式，实现了系统虚拟化。
-    
 - 2001 年，剑桥大学 Xen Source，提出了 PV 虚拟化(Para-Virtualization)，亦即 Guest-Host 的主动协作来实现虚拟化。
-    
 - 2005 年，Intel 提出了 VT，最初实现是安腾 CPU 上的 VT-i (VT for Itanium)，很快就有了 x86 上的 VT-x。
-    
 - 2007 年，Intel 提出了 VT-d (VT for Device)，亦即 x86 上的 IOMMU。
-    
 - 2008 年，Intel 提出了 EPT，支持了内存虚拟化。
-    
 - 2010 年，Linux 中的 PV Hypervisor lguest 的作者，Rusty Russell（他更有名的作品是 iptables/netfilter），提出了 VirtIO，一种 Guest-Host 的 PV 设备虚拟化方案。
-    
 
 应该可以说，在 PV 时代和 Binary Translation 时代，虚拟化是危险的。只有当 VT 在硬件层面解决了 CPU 的隔离、保证了安全性之后，公有云才成为可能。VT-x 于 2005 ～ 2006 年出现，亚马逊 AWS 于 2006 年就提出云计算，这是非常有远见的。
 
@@ -125,9 +79,7 @@ GPU 天然适合向量计算。常用场景及 API：
 严格来说，这种容器技术，和以 KVM 为代表的系统虚拟化，有着本质的区别。随着容器的流行，「虚拟化」这个术语，也被用来指称这种 OS 级别的容器技术。因此我们也从众，把它也算作虚拟化的一种 —— 只不过为了区分，称之为「OS 虚拟化」。
 
 这种 OS 虚拟化最初于 2005 年，由 Sun 公司在 Solaris 10 上实现，名为「Solaris Zone」。Linux 在 2007 ～ 2008 开始跟进，接下来有了 LXC 容器等；到了 2013 年，Docker 横空出世，彻底改变了软件分发的生态，成为事实上的标准。
-
 #### 2.3 GPU 虚拟化的谱系
-
 ##### 2.3.1 作为 PCIe 设备的 GPU
 
 不考虑嵌入式平台的话，那么，GPU 首先是一个 PCIe 设备。GPU 的虚拟化，还是要首先从 PCIe 设备虚拟化角度来考虑。
@@ -137,34 +89,22 @@ GPU 天然适合向量计算。常用场景及 API：
 2 种资源:
 
 - 配置空间
-    
 - MMIO
-    
 - (有的还有 PIO 和 Option ROM，此略)
-    
 
 2 种能力:
 
 - 中断能力
-    
 - DMA 能力
     
-
 一个典型的 GPU 设备的工作流程是:
 
 1. 应用层调用 GPU 支持的某个 API，如 OpenGL 或 CUDA
-    
 2. OpenGL 或 CUDA 库，通过 UMD (User Mode Driver)，提交 workload 到 KMD (Kernel Mode Driver)
-    
 3. KMD 写 CSR MMIO，把它提交给 GPU 硬件
-    
 4. GPU 硬件开始工作... 完成后，DMA 到内存，发出中断给 CPU
-    
 5. CPU 找到中断处理程序 —— KMD 此前向 OS Kernel 注册过的 —— 调用它
-    
 6. 中断处理程序找到是哪个 workload 被执行完毕了，...最终驱动唤醒相关的应用
-    
-
 ##### 2.3.2 PCIe 直通
 
 我们首先来到 GPU 虚拟化的最保守的实现: PCIe 设备直通。
@@ -176,77 +116,56 @@ VM 中，使用的是原生的 GPU 驱动。它向 VM 内核分配内存，把 G
 PCIe 协议，在事务层(Transaction Layer)，有多种 TLP，DMA 即是其中的一种: MRd/MWr。在这种 TLP 中，必须携带发起者的 Routing ID，而在 IOMMU 中，就根据这样的 Routing ID，可以使用不同的 IOMMU 页表进行翻译。
 
 很显然，PCIe 直通只能支持 1:1 的场景，无法满足 1:N 的需求。
-
 ##### 2.3.3 SR-IOV
 
 那么，业界对 1:N 的 PCIe 虚拟化是如何实现的呢？我们首先就会想到 SR-IOV。SR-IOV 是 PCI-SIG 在 2007 年推出的规范，目的就是 PCIe 设备的虚拟化。SR-IOV 的本质是什么？考虑我们说过的 2 种资源和 2 种能力，来看看一个 VF 有什么:
 
 - 配置空间是虚拟的（特权资源）
-    
 - MMIO 是物理的
-    
 - 中断和 DMA，因为 VF 有自己的 PCIe 协议层的标识（Routing ID，就是 BDF），从而拥有独立的地址空间。
     
-
 那么，什么设备适合实现 SR-IOV？其实无非是要满足两点:
 
 - 硬件资源要容易 partition
-    
 - 无状态（至少要接近无状态）
-    
 
 常见 PCIe 设备中，最适合 SR-IOV 的就是网卡了: 一或多对 TX/RX queue + 一或多个中断，结合上一个 Routing ID，就可以抽象为一个 VF。而且它是近乎无状态的。
 
 试考虑 NVMe 设备，它的资源也很容易 partition，但是它有存储数据，因此在实现 SR-IOV 方面，就会有更多的顾虑。
 
 回到 GPU 虚拟化：为什么 2007 年就出现 SR-IOV 规范、直到 2015 业界才出现第一个「表面上的」SRIOV-capable GPU【1】？这是因为，虽然 GPU 基本也是无状态的，但是它的硬件复杂度极高，远远超出 NIC、NVMe 这些，导致硬件资源的 partition 很难实现。
-
-**注释**
+# **注释**
 
 【1】 AMD S7150 GPU。腾讯云 GA2 机型使用。
 
 表面上它支持 SR-IOV，但事实上硬件只是做了 VF 在 PCIe 层的抽象。Host 上还需要一个 Virtualization-Aware 的 pGPU 驱动，负责 VF 的模拟和调度。
-
 ##### 2.3.4 API 转发
 
 因此，在业界长期缺乏 SRIOV-capable GPU、又有强烈的 1:N 需求的情形下，就有更 high-level 的方案出现了。我们首先回到 GPU 应用的场景:
 
 1. 渲染（OpenGL、DirectX，etc.）
-    
 2. 计算（CUDA，OpenCL）
-    
 3. 媒体编解码（VAAPI...)
-    
 
 业界就从这些 API 入手，在软件层面实现了「GPU 虚拟化」。以 AWS Elastic GPU 为例:
 
 - VM 中看不到真的或假的 GPU，但可以调用 OpenGL API 进行渲染
-    
 - 在 OpenGL API 层，软件捕捉到该调用，转发给 Host
-    
 - Host 请求 GPU 进行渲染
-    
 - Host 把渲染的结果，转发给 VM
-    
 
 API 层的 GPU 虚拟化是目前业界应用最广泛的 GPU 虚拟化方案。它的好处是:
 
 - **灵活**。1:N 的 N，想定为多少，软件可自行决定；哪个 VM 的优先级高，哪个 VM 的优先级低，同理。
-    
 - **不依赖于 GPU 硬件厂商**。微软、VMWare、Citrix、华为……都可以实现。这些 API 总归是公开的。
-    
 - **不限于系统虚拟化环境**。容器也好，普通的物理机也好，都可以 API 转发到远端。
-    
 
 缺点呢？
 
 - **复杂度极高**。同一功能有多套 API（渲染的 DirectX 和 OpenGL），同一套 API 还有不同版本（如 DirectX 9 和 DirectX 11），兼容性就复杂的要命。
-    
 - **功能不完整**。计算渲染媒体都支持的 API 转发方案，还没听说过。并且，编解码甚至还不存在业界公用的 API！【1】
-    
 
 **注释**
-
 【1】 Vulkan 的编解码支持，spec 刚刚添加，有望被所有 GPU 厂商支持。见下「未来展望」部分。
 
 ##### 2.3.5 MPT/MDEV/vGPU
@@ -254,48 +173,33 @@ API 层的 GPU 虚拟化是目前业界应用最广泛的 GPU 虚拟化方案。
 鉴于这些困难，业界就出现了 SR-IOV、API 转发之外的第三种方案。我们称之为 MPT（Mediated Pass-Through，受控的直通）。MPT 本质上是一种通用的 PCIe 设备虚拟化方案，甚至也可以用于 PCIe 之外的设备。它的基本思路是：
 
 - 敏感资源如配置空间，是虚拟的
-    
 - 关键资源如 MMIO（CSR 部分），是虚拟的，以便 trap-and-emulate
-    
 - 性能关键资源如 MMIO（GPU 显存、NVMe CMB 等），硬件 partition 后直接赋给 VM
-    
 - Host 上必须存在一个 Virtualization-Aware 的驱动程序，以负责模拟和调度，它实际上是 vGPU 的 device-model
-    
 
 这样，VM 中就能看到一个「看似」完整的 GPU PCIe 设备，它也可以 attach 原生的 GPU 驱动。以渲染为例，vGPU 的基本工作流程是:
 
 1. VM 中的 GPU 驱动，准备好一块内存，保存的是渲染 workload
-    
 2. VM 中的 GPU 驱动，把这块内存的物理地址(GPA)，写入到 MMIO CSR 中
-    
 3. Host/Hypervisor/驱动: 捕捉到这次的 MMIO CSR 写操作，拿到了 GPA
-    
 4. Host/Hypervisor/驱动: 把 GPA 转换成 HPA，并 pin 住相应的内存页
-    
 5. Host/Hypervisor/驱动: 把 HPA（而不是 GPA），写入到 pGPU 的真实的 MMIO CSR 中
-    
 6. pGPU 工作，完成这个渲染 workload，并发送中断给驱动
-    
 7. 驱动找到该中断对应哪个 workload —— 当初我是为哪个 vGPU 提交的这个 workload？—— 并注入一个虚拟的中断到相应的 VM 中
-    
 8. VM 中的 GPU 驱动，收到中断，知道该 workload 已完成、结果在内存中
-    
 
 这就是 nVidia GRID vGPU、Intel GVT-g（KVMGT、XenGT）的基本实现思路。一般认为 graphics stack 是 OS 中最复杂的，加上虚拟化之后复杂度更是暴增，任何地方出现一个编程错误，调试起来都是无比痛苦。但只要稳定下来，这种 MPT 方案，就能兼顾 1:N 灵活性、高性能、渲染计算媒体的功能完整性...是不是很完美？
 
 其实也不是。
 
 **该方案最大的缺陷，是必须有一个 pGPU 驱动，负责 vGPU 的模拟和调度工作。**逻辑上它相当于一个实现在内核态的 device-model。而且，由于 GPU 硬件通常并不公开其 PRM，所以事实上就只有 GPU 厂商才有能力提供这样的 Virtualization-Aware pGPU 驱动。使用了厂商提供的 MPT 方案，事实上就形成了对厂商的依赖。
-
 ##### 2.3.6 SR-IOV: revisited
 
 重新回到 GPU 的 SR-IOV。AMD 从 S7150 开始、英伟达从 Turing 架构开始，数据中心 GPU 都支持了 SR-IOV。但是 again，它不是 NIC 那样的 SR-IOV，它需要 Host 上存在一个 vGPU 的 device-model，来模拟从 VM 来的 VF 访问。
 
 所以事实上，到目前为止，GPU 的 SR-IOV 仅仅是封装了 PCIe TLP 层的 VF 路由标识、从而规避了 runtime 时的软件 DMA 翻译，除此之外，和基于 MDEV 的 MPT 方案并无本质的不同。
-
 ##### 2.3.7 谱系表
 ![[Pasted image 20240924114515.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在介绍完了上述的这些方案后，我们重新看下 CUDA 计算、OpenGL 渲染两种场景的软件栈，看看能发现什么:
 
