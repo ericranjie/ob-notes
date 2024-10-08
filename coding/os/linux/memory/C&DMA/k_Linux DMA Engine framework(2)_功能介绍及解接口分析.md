@@ -6,15 +6,12 @@
 如果一个软件模块比较复杂、晦涩，要么是设计者的功力不够，要么是需求使然。当然，我们不敢对Linux kernel的那些大神们有丝毫怀疑和不敬，只能从需求上下功夫了：难道Linux kernel中的driver对DMA的使用上，有一些超出了我们日常的认知范围？
 
 要回答这些问题并不难，将dmaengine framework为consumers提供的功能和API梳理一遍就可以了，这就是本文的目的。当然，也可以借助这个过程，加深对DMA的理解，以便在编写那些需要DMA传输的driver的时候，可以更游刃有余。
-
 ## 2. Slave-DMA API和Async TX API
 
 从方向上来说，DMA传输可以分为4类：memory到memory、memory到device、device到memory以及device到device。Linux kernel作为CPU的代理人，从它的视角看，外设都是slave，因此称这些有device参与的传输（MEM2DEV、DEV2MEM、DEV2DEV）为Slave-DMA传输。而另一种memory到memory的传输，被称为Async TX。
 
 为什么强调这种差别呢？因为Linux为了方便基于DMA的memcpy、memset等操作，在dma engine之上，封装了一层更为简洁的API（如下面图片1所示），这种API就是Async TX API（以async_开头，例如async_memcpy、async_memset、async_xor等）。
-
-[![dma_api](http://www.wowotech.net/content/uploadfile/201705/ed9181303abaaa537b1ac8416bd62ffa20170502144741.gif "dma_api")](http://www.wowotech.net/content/uploadfile/201705/82157c2e1311563d5ea661cec023c30a20170502144740.gif)
-
+![[Pasted image 20241008162151.png]]
 图片1 DMA Engine API示意图
 
 最后，因为memory到memory的DMA传输有了比较简洁的API，没必要直接使用dma engine提供的API，最后就导致dma engine所提供的API就特指为Slave-DMA API（把mem2mem剔除了）。
@@ -22,7 +19,6 @@
 本文主要介绍dma engine为consumers提供的功能和API，因此就不再涉及Async TX API了（具体可参考本站后续的文章。
 
 注1：Slave-DMA中的“slave”，指的是参与DMA传输的设备。而对应的，“master”就是指DMA controller自身。一定要明白“slave”的概念，才能更好的理解kernel dma engine中有关的术语和逻辑。
-
 ## 3. dma engine的使用步骤
 
 注2：本文大部分内容翻译自kernel document[1]，喜欢读英语的读者可以自行参考。
@@ -30,19 +26,14 @@
 对设备驱动的编写者来说，要基于dma engine提供的Slave-DMA API进行DMA传输的话，需要如下的操作步骤：
 
 > 1）申请一个DMA channel。
-> 
 > 2）根据设备（slave）的特性，配置DMA channel的参数。
-> 
 > 3）要进行DMA传输的时候，获取一个用于识别本次传输（transaction）的描述符（descriptor）。
-> 
 > 4）将本次传输（transaction）提交给dma engine并启动传输。
-> 
 > 5）等待传输（transaction）结束。
 > 
 > 然后，重复3~5即可。
 
 上面5个步骤，除了3有点不好理解外，其它的都比较直观易懂，具体可参考后面的介绍。
-
 #### 3.1 申请DMA channel
 
 任何consumer（文档[1]中称作client，也可称作slave driver，意思都差不多，不再特意区分）在开始DMA传输之前，都要申请一个DMA channel（有关DMA channel的概念，请参考[2]中的介绍）。
@@ -209,7 +200,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [API](http://www.wowotech.net/tag/API) [dma](http://www.wowotech.net/tag/dma) [engine](http://www.wowotech.net/tag/engine)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux的时钟](http://www.wowotech.net/timer_subsystem/clock-id-in-linux.html) | [系统休眠（System Suspend）和设备中断处理](http://www.wowotech.net/pm_subsystem/suspend-irq.html)»
 

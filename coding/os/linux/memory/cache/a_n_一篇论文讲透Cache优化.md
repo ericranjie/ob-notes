@@ -2,9 +2,6 @@
 首发于[分布式和存储的那些事](https://www.zhihu.com/column/distributed-storage)
 
 ![一篇论文讲透Cache优化](https://picx.zhimg.com/70/v2-8a4e110041f8c1667958caa2abb119bd_1440w.awebp?source=172ae18b&biz_tag=Post)
-# 一篇论文讲透Cache优化
-
-[![红星闪闪](https://picx.zhimg.com/v2-7e1fc938ae12f5dce67d46b570d99ded_l.jpg?source=172ae18b)](https://www.zhihu.com/people/hong-xing-shan-shan-17-75)
 
 [红星闪闪](https://www.zhihu.com/people/hong-xing-shan-shan-17-75)
 数据库资深工程师。在后台开发，高性能计算，分布式领域深耕。

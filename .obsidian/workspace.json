@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "7816db194f2e089a",
+        "id": "cd8c4776efd79c27",
         "type": "tabs",
         "children": [
           {
-            "id": "e2d90085bd089a6c",
+            "id": "15b363dfb2f468e9",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
+                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
+                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
+                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md"
+                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md"
               }
             }
           }
@@ -146,8 +146,20 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "15b363dfb2f468e9",
   "lastOpenFiles": [
+    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+    "coding/os/linux/memory/cache/a_n_深入理解CPU缓存：性能优化的关键.md",
+    "coding/os/linux/memory/cache/a_n_cache的58问，您能回答上来几个？.md",
+    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
+    "coding/cpp/k_C++ 线程的使用.md",
+    "coding/os/linux/memory/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "coding/os/linux/memory/C&DMA/k_应读者要求讲讲 DMA.md",
+    "README.md",
+    "zx99-image/Pasted image 20241008162409.png",
+    "zx99-image/Pasted image 20241008162332.png",
+    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
+    "zx99-image/Pasted image 20241008162151.png",
     "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
     "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
     "coding/os/linux/memory/C&DMA/i_Linux DMA Engine framework(1)_概述.md",
@@ -165,19 +177,10 @@
     "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
     "coding/os/linux/schedule/schedutil governor情景分析.md",
     "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
-    "README.md",
     "Pasted image 20241008161341.png",
     "zx99-image/Pasted image 20241008161241.png",
     "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
-    "coding/os/linux/schedule/i_Linux内核同步机制之（一）：原子操作.md",
-    "coding/os/linux/network/debug/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
     "zx99-image/Pasted image 20241008160654.png",
-    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
-    "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
-    "coding/os/linux/network/an_深入理解 Linux socket.md",
-    "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
-    "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
-    "coding/os/linux/network/i_比 netstat 好用？Linux 网络状态工具 ss 详解.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom/design-pattern",
@@ -186,9 +189,6 @@
     "zx99-image/Pasted image 20241008093858.png",
     "coding/os/linux/memory/page-folio",
     "zx99-image/Pasted image 20241008091330.png",
-    "zx99-image/Pasted image 20241008091516.png",
-    "zx99-image/Pasted image 20241008090821.png",
-    "zx99-image/Pasted image 20241007233004.png",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",

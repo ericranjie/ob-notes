@@ -1,65 +1,30 @@
-
-
 原创 baron Arm精选
-
  _2024年04月25日 07:46_ _上海_
-
-![](http://mmbiz.qpic.cn/sz_mmbiz_png/72OMRpZ5hV00GOqhBiag6YJIfArytJkI1xGDuAwB6cumchNVevDk9T1PvfhVdicTkFge7XpJy6mvTJT2YFYzGYnw/300?wx_fmt=png&wxfrom=19)
-
-**Arm精选**
-
-ARMv8/ARMv9架构、SOC架构、Trustzone/TEE安全、终端安全、SOC安全、ARM安全、ATF、OPTEE等
-
-591篇原创内容
-
-公众号
 
 ![](https://mmbiz.qpic.cn/sz_mmbiz_png/72OMRpZ5hV14msK9M9DHOr0VOP8yia0bzFOyT7Rp3BGpjFLkXXWGT1zxVmIsyXRpmDYbKR5OlnFElMyicjURQl0Q/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
 - 1、MMU关闭时cache的缓存策略是怎样的？
-    
 - 2、阐述一下mmu和cache有哪些关系，有哪些依赖
-    
 - 3、以下术语分别是什么含义：read allocation、write allocation、no-allocation、write-back、write-through、transient和Transient、outer shareable、inner shareable、shareablilty
-    
 - 4、Non-cacheable、device memory之间的区别是什么？
-    
 - 5、Non-cacheable、device GRE之间的区别是什么？
-    
 - 6、什么是伪共享？如何避免？
-    
 - 7、VIVT VIPT PIPT的区别？这是cache的硬件机制？还是软件的策略？
-    
 - 8、哪些cache是VIPT，哪些是PIPT，有没有VIVT？
-    
 - 9、VIPT是否也有同名、重名的问题？分别如何解决的？
-    
 - 10、L1、L2、L3分别都是多大？这是谁来配置的？配大了的优劣情况
-    
 - 11、全相联、直接相连、多路组相连的区别？优劣分别是什么？一般情况下，都是怎样用和设计的？
-    
 - 12、set、way、index、cache line、entry、cache tag、cache data的概念分别是什么？
-    
 - 13、cache　tag里都包括什么？
-    
 - 14、cache hit和cache hint的概念分别是什么？
-    
 - 15、inner、outer 的概念？POC POU IS的概念？
-    
 - 16、轮询替换、随机替换、LRU的概念？真实情况下是怎样的？L1/L2/L3分别采用的那种方式？
-    
 - 17、strongly、weakly、inclusive、exclusive的概念，真实情况下是怎样的？
-    
 - 18、PTW CACHE、PTE CACHE、TLB 之间的关系？
-    
 - 19、L1、L2、L3 cache的替换策略是怎样的？
-    
 - 20、什么类型的内存永远不会进L3 cache？
-    
 - 21、L3 cache一般都是多大？
-    
 - 22、L3 cache的组织形式一般是怎样的？
-    
 - 23、什么是cache partitioning？
     
 - 24、DSU、DSU-110、DSU-120有什么区别？
