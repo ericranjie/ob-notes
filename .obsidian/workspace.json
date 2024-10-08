@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
+                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
+                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
+                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md"
+                "file": "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md"
               }
             }
           }
@@ -146,8 +146,21 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "e2d90085bd089a6c",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
+    "coding/os/linux/memory/C&DMA/i_Linux DMA Engine framework(1)_概述.md",
+    "zx99-image/Pasted image 20241008161958.png",
+    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
+    "coding/os/linux/process/b_为什么新版内核将进程pid管理从bitmap替换成了radix-tree？.md",
+    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
+    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
+    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
+    "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
+    "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
+    "coding/os/linux/schedule/PELT/i_per-entity load tracking.md",
+    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
     "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
     "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
     "coding/os/linux/schedule/schedutil governor情景分析.md",
@@ -165,18 +178,6 @@
     "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
     "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
     "coding/os/linux/network/i_比 netstat 好用？Linux 网络状态工具 ss 详解.md",
-    "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
-    "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
-    "coding/os/linux/memory/C&DMA/应读者要求讲讲 DMA.md",
-    "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
-    "coding/os/linux/network/i_最后一天，继续卷！.md",
-    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
-    "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
-    "coding/os/linux/performance/t_性能优化的路有多远？.md",
-    "coding/os/linux/performance/pn_Linux问题分析与性能优化.md",
-    "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
-    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
-    "coding/os/linux/performance/bn_Linux系统性能优化：七个实战经验.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom/design-pattern",
@@ -188,7 +189,6 @@
     "zx99-image/Pasted image 20241008091516.png",
     "zx99-image/Pasted image 20241008090821.png",
     "zx99-image/Pasted image 20241007233004.png",
-    "zx99-image/Pasted image 20241007231324.png",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",

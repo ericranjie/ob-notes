@@ -7,9 +7,7 @@
 ## 2. DMA Engine硬件介绍
 
 DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问memory的意思。在计算机中，相比CPU，memory和外设的速度是非常慢的，因而在memory和memory（或者memory和设备）之间搬运数据，非常浪费CPU的时间，造成CPU无法及时处理一些实时事件。因此，工程师们就设计出来一种专门用来搬运数据的器件----DMA控制器，协助CPU进行数据搬运，如下图所示：
-
-[![dma](http://www.wowotech.net/content/uploadfile/201703/761a9244e7916bc8000a8f79dab9669a20170330140311.gif "dma")](http://www.wowotech.net/content/uploadfile/201703/ed79a6952349c83c0a1c9993fdc0fa3b20170330140311.gif)
-
+![[Pasted image 20241008161958.png]]
 图片1 DMA示意图
 
 思路很简单，因而大多数的DMA controller都有类似的设计原则，归纳如下[1]。
@@ -24,7 +22,6 @@ DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问
 > 很多时候，DMA channels是DMA controller为了方便，抽象出来的概念，让consumer以为独占了一个channel，实际上所有channel的DMA传输请求都会在DMA controller中进行仲裁，进而串行传输；
 > 
 > 因此，软件也可以基于controller提供的channel（我们称为“物理”channel），自行抽象更多的“逻辑”channel，软件会管理这些逻辑channel上的传输请求。实际上很多平台都这样做了，在DMA Engine framework中，不会区分这两种channel（本质上没区别）。
-
 #### 2.2 DMA request lines
 
 由图片1的介绍可知，DMA传输是由CPU发起的：CPU会告诉DMA控制器，帮忙将xxx地方的数据搬到xxx地方。CPU发完指令之后，就当甩手掌柜了。而DMA控制器，除了负责怎么搬之外，还要决定一件非常重要的事情（特别是有外部设备参与的数据传输）：
@@ -38,7 +35,6 @@ DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问
 最后总结：
 
 > DMA channel是Provider（提供传输服务），DMA request line是Consumer（消费传输服务）。在一个系统中DMA request line的数量通常比DMA channel的数量多，因为并不是每个request line在每一时刻都需要传输。
-
 #### 2.3 传输参数
 
 在最简单的DMA传输中，只需为DMA controller提供一个参数----transfer size，它就可以欢快的工作了：
@@ -59,7 +55,6 @@ DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问
 > memory是目的地的时候，先将源的数据传输到自己的buffer中，当累计一定量的数据之后，再一次性的写入memory。
 
 这种场景下，DMA控制器内部可缓存的数据量的大小，称作burst size----另一个参数。
-
 #### 2.4 scatter-gather
 
 我们在“[Linux MMC framework(2)_host controller driver](http://www.wowotech.net/comm/mmc_host_driver.html)”中已经提过scatter的概念，DMA传输时也有类似概念：
@@ -68,15 +63,12 @@ DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问
 > 
 > 对于这种非连续的传输，大多时候都是通过软件，将传输分成多个连续的小块（chunk）。但为了提高传输效率（特别是在图像、视频等场景中），有些DMA controller从硬件上支持了这种操作。  
 > 注2：具体怎么支持，和硬件实现有关，这里不再多说（只需要知道有这个事情即可，编写DMA controller驱动的时候，自然会知道怎么做）。
-
 ## 3. 总结
 
 本文简单的介绍了DMA传输有关的概念、术语，接下来将会通过下面两篇文章，介绍Linux DMA engine有关的实现细节：
 
 > Linux DMA Engine framework(2)_provider
-> 
 > Linux DMA Engine framework(3)_consumer
-
 ## 4. 参考文档
 
 [1] Documentation/dmaengine/provider.txt
@@ -85,7 +77,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [framework](http://www.wowotech.net/tag/framework) [dma](http://www.wowotech.net/tag/dma) [engine](http://www.wowotech.net/tag/engine)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [系统休眠（System Suspend）和设备中断处理](http://www.wowotech.net/pm_subsystem/suspend-irq.html) | [蓝牙协议分析(10)_BLE安全机制之LE Encryption](http://www.wowotech.net/bluetooth/le_encryption.html)»
 

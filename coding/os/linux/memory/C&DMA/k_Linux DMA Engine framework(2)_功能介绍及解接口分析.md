@@ -1,22 +1,4 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-5-2 22:47 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
-
 ## 1. 前言
 
 从我们的直观感受来说，DMA并不是一个复杂的东西，要做的事情也很单纯直白。因此Linux kernel对它的抽象和实现，也应该简洁、易懂才是。不过现实却不甚乐观（个人感觉），Linux kernel dmaengine framework的实现，真有点晦涩的感觉。为什么会这样呢？

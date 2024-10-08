@@ -3,7 +3,6 @@
 经通过上一篇文章《CFS调度器-基本原理》，我们可以了解到CFS调度器基本工作原理。本篇文章主要集中在Linux CFS调度器源码解析。
 
 > 注：文章代码分析基于Linux-4.18.0。
-
 ## 进程的创建
 
 进程的创建是通过do_fork()函数完成。新进程的诞生，我们调度核心层会通知调度类，调用特别的接口函数初始化新生儿。我们一路尾随do_fork()函数。do_fork()---->_do_fork()---->copy_process()---->sched_fork()。针对sched_fork()函数，删减部分代码如下：
@@ -26,7 +25,6 @@ const struct sched_class fair_sched_class = {	.next				= &idle_sched_class,	.enq
 task_fork_fair实现如下：
 
 ```c
- 
 static void task_fork_fair(struct task_struct *p){	struct cfs_rq *cfs_rq;	struct sched_entity *se = &p->se, *curr;	struct rq *rq = this_rq();	struct rq_flags rf; 	rq_lock(rq, &rf);	update_rq_clock(rq); 	cfs_rq = task_cfs_rq(current);	curr = cfs_rq->curr;                     /* 1 */	if (curr) {		update_curr(cfs_rq);                 /* 2 */		se->vruntime = curr->vruntime;       /* 3 */	}	place_entity(cfs_rq, se, 1);             /* 4 */ 	se->vruntime -= cfs_rq->min_vruntime;    /* 5 */	rq_unlock(rq, &rf);}
 ```
 
@@ -39,7 +37,6 @@ static void task_fork_fair(struct task_struct *p){	struct cfs_rq *cfs_rq;	struct
 下面就对update_curr()一探究竟。
 
 ```c
- 
 static void update_curr(struct cfs_rq *cfs_rq){	struct sched_entity *curr = cfs_rq->curr;	u64 now = rq_clock_task(rq_of(cfs_rq));	u64 delta_exec; 	if (unlikely(!curr))		return; 	delta_exec = now - curr->exec_start;                    /* 1 */	if (unlikely((s64)delta_exec <= 0))		return; 	curr->exec_start = now;	curr->sum_exec_runtime += delta_exec;	curr->vruntime += calc_delta_fair(delta_exec, curr);    /* 2 */	update_min_vruntime(cfs_rq);                            /* 3 */}
 ```
 
@@ -50,7 +47,6 @@ static void update_curr(struct cfs_rq *cfs_rq){	struct sched_entity *curr = cfs_
 我们就看看update_min_vruntime()是怎么更新min_vruntime的。
 
 ```c
- 
 static void update_min_vruntime(struct cfs_rq *cfs_rq){	struct sched_entity *curr = cfs_rq->curr;	struct rb_node *leftmost = rb_first_cached(&cfs_rq->tasks_timeline);	u64 vruntime = cfs_rq->min_vruntime; 	if (curr) {		if (curr->on_rq)			vruntime = curr->vruntime;		else			curr = NULL;	} 	if (leftmost) { /* non-empty tree */		struct sched_entity *se;		se = rb_entry(leftmost, struct sched_entity, run_node); 		if (!curr)			vruntime = se->vruntime;		else			vruntime = min_vruntime(vruntime, se->vruntime);	} 	/* ensure we never gain time by being placed backwards. */	cfs_rq->min_vruntime = max_vruntime(cfs_rq->min_vruntime, vruntime);}
 ```
 
@@ -65,27 +61,23 @@ static void update_min_vruntime(struct cfs_rq *cfs_rq){	struct sched_entity *cur
 我们继续place_entity()函数。
 
 ```c
- 
 static voidplace_entity(struct cfs_rq *cfs_rq, struct sched_entity *se, int initial){	u64 vruntime = cfs_rq->min_vruntime; 	/*	 * The 'current' period is already promised to the current tasks,	 * however the extra weight of the new task will slow them down a	 * little, place the new task so that it fits in the slot that	 * stays open at the end.	 */	if (initial && sched_feat(START_DEBIT))		vruntime += sched_vslice(cfs_rq, se);               /* 1 */ 	/* sleeps up to a single latency don't count. */	if (!initial) {		unsigned long thresh = sysctl_sched_latency; 		/*		 * Halve their sleep time's effect, to allow		 * for a gentler effect of sleepers:		 */		if (sched_feat(GENTLE_FAIR_SLEEPERS))			thresh >>= 1; 		vruntime -= thresh;                                 /* 2 */	} 	/* ensure we never gain time by being placed backwards. */	se->vruntime = max_vruntime(se->vruntime, vruntime);    /* 3 */}
 ```
 
 > 1. 如果是创建进程调用该函数的话，参数initial参数是1。因此这里是处理创建的进程，针对刚创建的进程会进行一定的惩罚，将虚拟时间加上一个值就是惩罚，毕竟虚拟时间越小越容易被调度执行。惩罚的时间由sched_vslice()计算。
 > 2. 这里主要是针对唤醒的进程，针对睡眠很久的的进程，我们总是期望它很快得到调度执行，毕竟人家睡了那么久。所以这里减去一定的虚拟时间作为补偿。
 > 3. 我们保证调度实体的虚拟时间不能倒退。为何呢？可以想一下，如果一个进程刚睡眠1ms，然后醒来后你却要奖励3ms（虚拟时间减去3ms），然后他竟然赚了2ms。作为调度器，我们不做亏本生意。你睡眠100ms，奖励你3ms，那就是没问题的。
-
 ### 新创建的进程惩罚的时间是多少
 
 有上面可知，惩罚的时间计算函数是sched_vslice()函数。
 
 ```c
- 
 static u64 sched_vslice(struct cfs_rq *cfs_rq, struct sched_entity *se){	return calc_delta_fair(sched_slice(cfs_rq, se), se);}
 ```
 
 calc_delta_fair()函数上面已经分析过，计算实际运行时间delta对应的虚拟时间。这里的delta是sched_slice()函数计算。
 
 ```c
- 
 static u64 sched_slice(struct cfs_rq *cfs_rq, struct sched_entity *se){	u64 slice = __sched_period(cfs_rq->nr_running + !se->on_rq);    /* 1 */ 	for_each_sched_entity(se) {                                     /* 2 */		struct load_weight *load;		struct load_weight lw; 		cfs_rq = cfs_rq_of(se);		load = &cfs_rq->load;                                       /* 3 */ 		if (unlikely(!se->on_rq)) {			lw = cfs_rq->load; 			update_load_add(&lw, se->load.weight);			load = &lw;		}		slice = __calc_delta(slice, se->load.weight, load);         /* 4 */	}	return slice;}
 ```
 
@@ -97,15 +89,14 @@ static u64 sched_slice(struct cfs_rq *cfs_rq, struct sched_entity *se){	u64 slic
 ## 新进程加入就绪队列
 
 经过do_fork()的大部分初始化工作完成之后，我们就可以唤醒新进程准别运行。也就是将新进程加入就绪队列准备调度。唤醒新进程的流程如下图。
-
+```cpp
 1. do_fork()--->_do_fork()--->wake_up_new_task()--->activate_task()--->enqueue_task()--->enqueue_task_fair()
 2.                                    |
 3.                                    +------------>check_preempt_curr()--->check_preempt_wakeup() 
-
+```
 wake_up_new_task()负责唤醒新创建的进程。简化一下函数如下。
 
 ```c
- 
 void wake_up_new_task(struct task_struct *p){	struct rq_flags rf;	struct rq *rq; 	p->state = TASK_RUNNING;#ifdef CONFIG_SMP	p->recent_used_cpu = task_cpu(p);	__set_task_cpu(p, select_task_rq(p, task_cpu(p), SD_BALANCE_FORK, 0));   /* 1 */#endif	rq = __task_rq_lock(p, &rf);	activate_task(rq, p, ENQUEUE_NOCLOCK);                                   /* 2 */	p->on_rq = TASK_ON_RQ_QUEUED;	check_preempt_curr(rq, p, WF_FORK);                                      /* 3 */}
 ```
 
