@@ -1,17 +1,6 @@
-
 一口Linux
-
  _2021年12月18日 11:38_
-
 以下文章来源于飞天小牛肉 ，作者小牛肉
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM49hOljJBBMfsYWyaz97icat4LTSBOIWibFE1xGB5AjTNibA/0)
-
-**飞天小牛肉**.
-
-InfoQ & 阿里云签约作者，分享原创技术干货和成长经验
 
 ](https://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247500770&idx=1&sn=f508978b102349a6e5d90f93e7720bd7&chksm=f96bb116ce1c3800d23549832f6d88221c375522593a6a1c1ad46168f07b6ec690b295102808&mpshare=1&scene=24&srcid=12185wVOSD6YYXImHWfKF8pC&sharer_sharetime=1639833523104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0c1c4ecc259988152f7710de743fcf40006a761b3a422b4351188a31d0fa061cddfde6cf57dde5de5c1dea4f06fc9567c51eaa4ca53815a246b9b39c106fe020d4cd87f34a92981e9b59ae419a33e3abcf78b782e53d79ef8a7a6721180d54b9edacc6529adb7129471a79447a5cd29d54f9f591e6e1ad63c&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQghJrWLvxiy0tPXz8ncZQxRLmAQIE97dBBAEAAAAAAKqfEkJpmOwAAAAOpnltbLcz9gKNyK89dVj0SnXqCN6DBADlugbujvafgdvk%2F2nCIXhJzhF0%2Be1mFPEQ1x%2FewAe%2BBlBbNYCKaimKj2Dh46X3lDlNuj%2FMzsCmtstWOkcJO0gfrYGOfIEcBHu%2FHtrExDSkG1BQVsFJE1El80t2qxM487nEMSzGUzM4tBEmgkzbLibNQOBlcIhu%2FofVA7x86Nzrj2oaPzzqWjkMXYop%2BzlqsZtjmO14TaMJ%2Bia4f5XOBvIZSksHsv4OvRnS88k5KYzdws5owa%2Fkw6V9&acctmode=0&pass_ticket=rEd9TIgn4OdPmPOBdXk2sf6UFFIrsfLZqRRO%2BjBWN2BHSkdpRAowX8Yt%2BlFTuQyR&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 

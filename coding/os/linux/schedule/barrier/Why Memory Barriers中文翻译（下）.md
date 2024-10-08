@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-1-5 18:09 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 在上一篇[why memory barriers](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html)文档中，由于各种原因，有几个章节没有翻译。其实所谓的各种原因总结出一句话就是还没有明白那些章节所要表达的内容。当然，对于一个真正的热爱钻研的linuxer，不理解的那些章节始终都是一块心病。终于，在一个月黑风高的夜晚，我发了一封邮件给perfbook的作者Paul，请其指点一二。果然是水平越高越平易近人，很快，大神回复了，给出了一些他的意见，大意就是不必纠结于具体的细节，始终focus在几个基本的规则上就OK了。受此鼓舞，我还是坚持把剩余章节翻译出来，于是形成了本文。

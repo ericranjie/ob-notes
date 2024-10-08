@@ -1,17 +1,3 @@
-# [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
-
-talk is cheap,  
-show me the code!
-
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
-
-# [协程究竟比线程牛在什么地方？](https://kfngxl.cn/index.php/archives/611/)
-
 2024-03-28 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(222) 评论(0)
 
 前文中中我们用实验的方式验证了Linux进程和线程的上下文切换开销，大约是3-5us之间。当运行在一般的计算机程序时，这个开销确实不算大。但是海量互联网服务端和一般的计算机程序相比，特点是：

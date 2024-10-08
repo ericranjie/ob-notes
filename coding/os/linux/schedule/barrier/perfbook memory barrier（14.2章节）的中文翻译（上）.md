@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-12-25 12:18 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 perfbook是一本值得反复阅读的好书，这一点是毋庸置疑的，不过你是选择阅读中文版本还是英文版本呢？当然，阅读中文版本相对要简单一些，毕竟是母语，而且最重要的是阅读速度快（注：perfbook已经有了中文版本的翻译，叫做《深入理解并行编程V2.0》，多谢谢宝友/鲁阳/陈渝的辛苦劳动），其实，每次遇到“快”的时候，我都本能的都要停下来再思考一下，我担心欲速则不达。知识的获取不可能是快的，就像看电影，当时的愉快的记忆不久就会被时间抹去。因此，最终我选择了阅读英文版（参考中文版本），并顺便将我阅读的部分翻译出来。与其说是翻译给大家看，不如说是翻译给自己看，让自己对memory barrier的理解更深入一些。

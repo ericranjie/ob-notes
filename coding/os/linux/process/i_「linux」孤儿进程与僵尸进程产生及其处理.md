@@ -1,18 +1,6 @@
-# 
-
 土豆居士 一口Linux
-
  _2021年12月10日 11:50_
 
-击上方“**一口Linux**”，选择“**星标公众号**”
-
-  
-
-# 
-
-干货福利，第一时间送达！
-
-# ![图片](https://mmbiz.qpic.cn/mmbiz/cZV2hRpuAPiaJQXWGyC9wrUzIicibgXayrgibTYarT3A1yzttbtaO0JlV21wMqroGYT3QtPq2C7HMYsvicSB2p7dTBg/640?wx_fmt=gif&wxfrom=13&tp=wxpic "动态黑色音符")
 
 在探讨这个问题之前，我们先来弄清什么是进程。
 
