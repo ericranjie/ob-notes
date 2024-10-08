@@ -111,12 +111,10 @@ Reset之后，CPU需要从RVBAR寄存器所显示的地址来重新启动。RVBA
 ![suspend-to-ram.png](https://schspa.tk/2020/07/10/assets/suspend-to-ram.png)  
 上面的流程着重描写了系统通过PSCI休眠时的调用流程，包括Linux系统从休眠状态唤醒之后的resume流程。  
 Linux唤醒时，运行的Linux内核的第一段指令是cpu_resume，之后再经过arm64 psci相关的一系列调用返回到psci_system_suspend_enter继续执行。
-
 ## Linux irq wakeup
 
 在Linux系统中，如果想要唤醒已经进入休眠状态中的cpu，就需要通过~enable_irq_wake~来设置开启唤醒功能[3](http://www.wowotech.net/admin/#fn.3)。  
 实际上，芯片支持的唤醒源个数是有限的，并不是每种中断都可以正常的唤醒系统。
-
 ### irq flags
 
 #### IRQCHIP_MASK_ON_SUSPEND
@@ -148,7 +146,6 @@ the flag in set_irq_wake_real() and return success when set.
 
 Signed-off-by: Santosh Shilimkar <santosh.shilimkar@ti.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>
-
 ### arm-gic
 
 在arm gic的实现中，既没有提供IRQCHIP_SKIP_SET_WAKE的flag，也没有实现set_irq_wake的实现。这是因为Linux内核认为gic不处理休眠唤醒的问题，这些应该由平台来基于stacked irqchip来实现。[4](http://www.wowotech.net/admin/#fn.4)  
