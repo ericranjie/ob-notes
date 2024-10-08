@@ -1,34 +1,13 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-5-18 21:56 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
-
 ## 1. 前言
 
 本文将从provider的角度，介绍怎样在linux kernel dmaengine的框架下，编写dma controller驱动。
-
 ## 2. dma controller驱动的软件框架
 
 设备驱动的本质是描述并抽象硬件，然后为consumer提供操作硬件的友好接口。dma controller驱动也不例外，它要做的事情无外乎是：
 
 > 1）抽象并控制DMA控制器。
-> 
 > 2）管理DMA channel（可以是物理channel，也可以是虚拟channel，具体可参考[1]中的介绍），并向client driver提供友好、易用的接口。
-> 
 > 3）以DMA channel为操作对象，响应client driver（consumer）的传输请求，并控制DMA controller，执行传输。
 
 当然，按照惯例，为了统一提供给consumer的API（参考[2]），并减少DMA controller driver的开发难度（从论述题变为填空题），dmaengine framework提供了一套controller driver的开发框架，主要思路是（参考图片1）：
@@ -38,15 +17,11 @@
 图片1 DMA驱动框架
 
 > 1）使用struct dma_device抽象DMA controller，controller driver只要填充该结构中必要的字段，就可以完成dma controller的驱动开发。
-> 
 > 2）使用struct dma_chan（图片1中的DCn）抽象物理的DMA channel（图片1中的CHn），物理channel和controller所能提供的通道数一一对应。
-> 
 > 3）基于物理的DMA channel，使用struct virt_dma_cha抽象出虚拟的dma channel（图片1中的VCx）。多个虚拟channel可以共享一个物理channel，并在这个物理channel上进行分时传输。
-> 
 > 4）基于这些数据结构，提供一些便于controller driver开发的API，供driver使用。
 
 上面三个数据结构的描述，可参考第3章的介绍。然后，我们会在第4章介绍相关的API、controller driver的开发思路和步骤以及dmaengine中和controller driver有关的重要流程。
-
 ## 3. 主要数据结构描述
 
 #### 3.1 struct dma_device
@@ -86,7 +61,6 @@
 > device_issue_pending，client driver调用dma_async_issue_pending启动传输的时候，会调用调用该回调函数。
 
 总结：dmaengine对dma controller的抽象和封装，只是薄薄的一层：仅封装出来一些回调函数，由dma controller driver实现，被client driver调用，dmaengine本身没有太多的操作逻辑。
-
 #### 3.2 struct dma_chan
 
 struct dma_chan用于抽象dma channel，其内容为：
@@ -106,7 +80,6 @@ struct dma_chan用于抽象dma channel，其内容为：
 > device_node，链表node，用于将该channel添加到dma_device的channel列表中。
 > 
 > router、route_data，TODO。
-
 #### 3.3 struct virt_dma_cha
 
 struct virt_dma_chan用于抽象一个虚拟的dma channel，多个虚拟channel可以共用一个物理channel，并由软件调度多个传输请求，将多个虚拟channel的传输串行地在物理channel上完成。该数据结构的定义如下：
@@ -120,7 +93,6 @@ struct virt_dma_chan用于抽象一个虚拟的dma channel，多个虚拟channel
 > task，一个tasklet，用于等待该虚拟channel上传输的完成（由于是虚拟channel，传输完成与否只能由软件判断）。
 > 
 > desc_allocated、desc_submitted、desc_issued、desc_completed，四个链表头，用于保存不同状态的虚拟channel描述符（struct virt_dma_desc，仅仅对struct dma_async_tx_descriptor[2]做了一个简单的封装）。
-
 ## 4. dmaengine向dma controller driver提供的API汇整
 
 damengine直接向dma controller driver提供的API并不多（大部分的逻辑交互都位于struct dma_device结构的回调函数中），主要包括：

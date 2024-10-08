@@ -1,43 +1,20 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-6-28 18:29 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-前言
+# 前言
 
 本文是近期学习CMA模块的一个学习笔记，方便日后遗忘的时候，回来查询以便迅速恢复上下文。
 
 学习的基本方法是这样的：一开始，我自己先提出了若干的问题，然后带着这些问题查看网上的资料，代码，最后整理形成这样以问题为导向的index，顺便也向笨叔叔致敬。笨叔叔写了一本书叫做《奔跑吧Linux内核》，采用了问答的方式描述了4.x Linux内核中的进程管理、内存管理，同步和中断子系统。7月将和大家见面，敬请期待。
 
 阅读本文最好手边有一份linux source code，我使用的是4.4.6版本。
-
-一、什么是CMA
+# 一、什么是CMA
 
 CMA，Contiguous Memory Allocator，是内存管理子系统中的一个模块，负责物理地址连续的内存分配。一般系统会在启动过程中，从整个memory中配置一段连续内存用于CMA，然后内核其他的模块可以通过CMA的接口API进行连续内存的分配。CMA的核心并不是设计精巧的算法来管理地址连续的内存块，实际上它的底层还是依赖内核伙伴系统这样的内存管理机制，或者说CMA是处于需要连续内存块的其他内核模块（例如DMA mapping framework）和内存管理模块之间的一个中间层模块，主要功能包括：
 
 1、解析DTS或者命令行中的参数，确定CMA内存的区域，这样的区域我们定义为CMA area。
-
 2、提供cma_alloc和cma_release两个接口函数用于分配和释放CMA pages
-
 3、记录和跟踪CMA area中各个pages的状态
-
 4、调用伙伴系统接口，进行真正的内存分配。
-
-二、内核中为何建立CMA模块？
+# 二、内核中为何建立CMA模块？
 
 Linux内核中已经提供了各种内存分配的接口，为何还有建立CMA这种连续内存分配的机制呢？
 
@@ -50,8 +27,7 @@ Linux内核中已经提供了各种内存分配的接口，为何还有建立CMA
 我们来一个实际的例子吧：我的手机，像素是1300W的，一个像素需要3B，那么拍摄一幅图片需要的内存大概是1300W x 3B ＝ 26MB。通过内存管理系统分配26M的内存，压力可是不小。当然，在系统启动之处，伙伴系统中的大块内存比较大，也许分配26M不算什么，但是随着系统的运行，内存不断的分配、释放，大块内存不断的裂解，再裂解，这时候，内存碎片化导致分配地址连续的大块内存变得不是那么的容易了，怎么办？作为驱动工程师，我们有两个选择：其一是在启动时分配用于视频采集的DMA buffer，另外一个方案是当实际使用camer设备的时候分配DMA buffer。前者的选择是可靠的，但它有一个缺点，即当照相机不使用时（大多数时间内camera其实都是空闲的），预留的那些DMA BUFFER的内存实际上是浪费了（特别在内存配置不大的系统上更是如此）。后一种选择不会浪费内存，但是不可靠，随着内存碎片化，大的、连续的内存分配变得越来越困难，一旦内存分配失败，camera功能就会缺失，估计用户不会答应。
 
 这就是驱动工程师面临的困境，为了解决这个问题，各个驱动各出奇招，但是都不能非常完美的解决问题。最终来自Michal Nazarewicz的CMA补丁将可以把各个驱动工程师的烦恼“一洗了之”。对于CMA 内存，当前驱动没有分配使用的时候，这些memory可以内核的被其他的模块使用（当然有一定的要求），而当驱动分配CMA内存后，那些被其他模块使用的内存需要吐出来，形成物理地址连续的大块内存，给具体的驱动来使用。
-
-三、CMA模块的蓝图是怎样的？
+# 三、CMA模块的蓝图是怎样的？
 
  [![cma](http://www.wowotech.net/content/uploadfile/201706/9602cb5181db7f560dfd5702c957c18220170628102932.gif "cma")](http://www.wowotech.net/content/uploadfile/201706/06d4c31f4030a8e984474d34258f4eab20170628102931.gif)
 
@@ -60,15 +36,15 @@ Linux内核中已经提供了各种内存分配的接口，为何还有建立CMA
 三、CMA模块如何管理和配置CMA area？
 
 在CMA模块中，struct cma数据结构用来抽象一个CMA area，具体定义如下：
-
-> struct cma {  
->     unsigned long   base_pfn;  
->     unsigned long   count;  
->     unsigned long   *bitmap;  
->     unsigned int order_per_bit; /* Order of pages represented by one bit */  
->     struct mutex    lock;  
-> };
-
+```cpp
+struct cma {  
+unsigned long   base_pfn;  
+unsigned long   count;  
+unsigned long   bitmap;  
+unsigned int order_per_bit; / Order of pages represented by one bit /  
+struct mutex    lock;  
+};
+```
 cma模块使用bitmap来管理其内存的分配，0表示free，1表示已经分配。具体内存管理的单位和struct cma中的order_per_bit成员相关，如果order_per_bit等于0，表示按照一个一个page来分配和释放，如果order_per_bit等于1，表示按照2个page组成的block来分配和释放，以此类推。struct cma中的bitmap成员就是管理该cma area内存的bit map。count成员说明了该cma area内存有多少个page。它和order_per_bit一起决定了bitmap指针指向内存的大小。base_pfn定义了该CMA area的起始page frame number，base_pfn和count一起定义了该CMA area在内存在的位置。
 
 我们前面说过了，CMA模块需要管理若干个CMA area，有gloal的，有per device的，代码如下：

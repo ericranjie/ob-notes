@@ -1,26 +1,11 @@
-
 宋远征、李佳伟 人人极客社区
-
  _2022年01月17日 23:28_
-
-![](http://mmbiz.qpic.cn/mmbiz_png/9sNwsXcN68pL55XIyzTrCHZTbIUdTibQcuzuCaYeGTXNMyn6ACmicUrpoDC0xZSap46XJ59sKysPg9Rg379f32cA/300?wx_fmt=png&wxfrom=19)
-
-**人人极客社区**
-
-工程师们自己的Linux底层技术社区，分享体系架构、内核、网络、安全和驱动。
-
-316篇原创内容
-
-公众号
 
 在终端多媒体业务中，CMA 内存的使用对业务功能和性能至关重要。本文将从入门开始，带你深入理解 CMA 的设计初衷和工作原理。
 
 （备注：在本文描述中，把 CMA 管理的内存区域称为 CMA 区域；把 CMA 的上层使用者称为 CMA 业务。）
+# **为什么需要CMA？**
 
-  
-**为什么需要CMA？**
-
-  
 CMA 全称是 Contiguous Memory Allocator（连续内存分配器）。顾名思义它是一种内存分配器，提供了分配、释放物理连续内存的功能。
 
 **你可能会有疑问：为什么需要 CMA？**
@@ -28,7 +13,6 @@ CMA 全称是 Contiguous Memory Allocator（连续内存分配器）。顾名思
 这个问题等价于两个子问题：
 
 第一，为什么业务需要物理地址连续的内存空间？
-
 第二，为什么 buddy 系统无法满足业务的此类连续内存需求？
 
 **对于第一个子问题：**

@@ -1,28 +1,9 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-3-30 22:01 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
-
 ## 1. 前言
 
 前面文章介绍“[Linux MMC framework](http://www.wowotech.net/tag/mmc)”的时候，涉及到了MMC数据传输，进而不可避免地遭遇了DMA(Direct Memory Access)。因而，择日不如撞日，就开几篇文章介绍Linux的DMA Engine framework吧。
 
 本文是DMA Engine framework分析文章的第一篇，主要介绍DMA controller的概念、术语（从硬件的角度，大部分翻译自kernel的document[1]）。之后，会分别从Provider（DMA controller驱动）和Consumer（其它驱动怎么使用DMA传输数据）两个角度，介绍Linux DMA engine有关的技术细节。
-
 ## 2. DMA Engine硬件介绍
 
 DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问memory的意思。在计算机中，相比CPU，memory和外设的速度是非常慢的，因而在memory和memory（或者memory和设备）之间搬运数据，非常浪费CPU的时间，造成CPU无法及时处理一些实时事件。因此，工程师们就设计出来一种专门用来搬运数据的器件----DMA控制器，协助CPU进行数据搬运，如下图所示：
@@ -34,7 +15,6 @@ DMA是Direct Memory Access的缩写，顾名思义，就是绕开CPU直接访问
 思路很简单，因而大多数的DMA controller都有类似的设计原则，归纳如下[1]。
 
 注1：得益于类似的设计原则，Linux kernel才有机会使用一套framework去抽象DMA engine有关的功能。
-
 #### 2.1 DMA channels
 
 一个DMA controller可以“同时”进行的DMA传输的个数是有限的，这称作DMA channels。当然，这里的channel，只是一个逻辑概念，因为：

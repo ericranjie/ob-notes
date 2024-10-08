@@ -1,29 +1,10 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2021-11-22 20:49 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-前言
+# 前言
 
 我们描述CFS任务负载均衡的系列文章一共三篇，第一篇是框架部分，第二篇描述了task placement和active upmigration两个典型的负载均衡场景。本文是第三篇，主要是分析各种负载均衡的触发和具体的均衡逻辑过程。
 
 本文出现的内核代码来自Linux5.10.61，为了减少篇幅，我们尽量删除不相关代码，如果有兴趣，读者可以配合代码阅读本文。
-
-一、几种负载均衡的概述
+## 一、几种负载均衡的概述
 
 整个Linux的负载均衡器有下面的几个类型：
 
@@ -36,10 +17,8 @@
 NOHZ load balance是指其他的cpu已经进入idle（错过new idle balance），本CPU任务太重，需要通过ipi将其他idle的CPUs唤醒来进行负载均衡。为什么叫NOHZ load balance呢？那是因为这个balancer只有在内核配置了NOHZ（即tickless mode）下才会生效。如果CPU进入idle之后仍然有周期性的tick，那么通过tick load balance就能完成负载均衡了，不需要IPI来唤醒idle的cpu。和周期性均衡一样，NOHZ idle load balance也是通过busy cpu上tick驱动的，如果需要kick idle load balancer，那么就会通过GIC发送一个ipi中断给选中的idle cpu，让它代表系统所有的idle cpu们进行负载均衡。NOHZ load balance具体均衡的方式和tick balance类似，也是自底向上，在整个sched domain hierarchy进行均衡的过程，不同的是NOHZ load balance会在多个CPU上执行这个均衡过程。
 
 New idle load balance比较好理解，就是在CPU上没有任务执行，马上要进入idle状态的时候，看看其他CPU是否需要帮忙，如果有需要便从busy cpu上拉任务，让整个系统的负载处于均衡状态。NOHZ load balance涉及系统中所有的idle cpu，但New idle load balance只是和即将进入idle的本CPU相关。
-
-二、周期性负载均衡
-
-1、触发
+# 二、周期性负载均衡
+## 1、触发
 
 当tick到来的时候，在scheduler_tick函数中会调用trigger_load_balance来触发周期性负载均衡，相关的代码如下：
 
@@ -51,13 +30,14 @@ New idle load balance比较好理解，就是在CPU上没有任务执行，马�
 
 另外，从上面的代码也可以看出，周期性均衡的触发是受控的，并非在每次tick中都会触发周期性均衡。在均衡过程中，我们会跟踪各个层级上sched domain的下次均衡时间点，并用rq->next_balance记录最近的均衡时间点，从而控制了周期性均衡的频次。Nohz idle balance也会控制均衡的触发次数，具体下一章节描述。
 
-2、均衡处理
+## 2、均衡处理
 
 SCHED_SOFTIRQ类型的软中断处理函数是run_rebalance_domains，代码逻辑如下：
 
-|   |
-|---|
-|if (nohz_idle_balance(this_rq, idle))------nohz idle balance<br><br>return;<br><br>update_blocked_averages(this_rq->cpu);<br><br>rebalance_domains(this_rq, idle);-----周期性均衡|
+if (nohz_idle_balance(this_rq, idle))------nohz idle balance
+return;
+update_blocked_averages(this_rq->cpu);
+rebalance_domains(this_rq, idle);-----周期性均衡
 
 nohz idle balance和periodic load balance都是通过SCHED_SOFTIRQ类型的软中断来完成，也就是说它们两个都是通过SCHED_SOFTIRQ注册的handler函数run_rebalance_domains来完成其功能的，这时候就有一个先后顺序的问题了，哪一个先执行？从上面的代码可见调度器优先处理nohz idle balance，毕竟nohz idle balance是一个全局的事情（代表系统所有idle cpu做均衡），而periodic load balance只是均衡自己的各阶sched domain。如果先执行this cpu的均衡，那么在执行rebalance_domains有可能拉取负载到this cpu，这会导致在执行nohz_idle_balance的时候会忽略其他idle cpu而直接退出（nohz idle balance要求选中的cpu是idle的）。如果成功进行了nohz idle balance，那么就没有必要进行周期性均衡了。
 

@@ -1,19 +1,10 @@
-
 Original Ham OPPO内核工匠
-
  _2023年01月06日 17:00_ _广东_
-
-  
 
 注：本文缩写说明
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjP7W0s65zd4aJAdJYNYnlGDnUHpbzoVicq4WFVVhAXYXEpRLkyXq17wTmPd9icqwR14icicricH6ooIXTA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
-
-  
-
-**一、CFS组调度简介**
+# **一、CFS组调度简介**
 
 **1.1. 存在的原因**
 

@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md"
+                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md"
               }
             }
           }
@@ -148,34 +148,34 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "README.md",
+    "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
+    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
+    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
+    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
+    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
+    "coding/os/linux/memory/C&DMA/Linux DMA Engine framework(1)_概述.md",
+    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
+    "coding/os/linux/memory/C&DMA/b_n_如何提升CMA利用率？.md",
+    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
+    "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
+    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
+    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
+    "coding/os/linux/memory/cache/b_n_这篇 CPU Cache，估计也没人看.md",
+    "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
+    "coding/os/linux/debug/i_钓鱼累了，写下断言怎么用.md",
+    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
     "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
     "coding/os/linux/memory/cache/a_cache的58问，您能回答上来几个？.md",
     "coding/os/linux/memory/cache/a_n_深入理解CPU缓存：性能优化的关键.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "README.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
     "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
     "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/os/linux/memory/memory-manage/slub/a_图解slub.md",
-    "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
-    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
-    "coding/os/linux/memory/memory-manage/a_n_五万字 深入理解Linux内存管理.md",
-    "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
-    "coding/os/linux/memory/memory-manage/b_n_图解 Linux内存背后的那些神秘往事.md",
-    "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
-    "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
-    "coding/os/linux/memory/reclaim/b_linux内存回收(一）---kswapd回收.md",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel内存管理的基本概念.md",
     "coding/os/linux/memory/reclaim",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
-    "coding/os/linux/memory/hardware/i_理解内存的Rank、位宽以及内存颗粒内部结构.md",
     "coding/os/linux/memory/hardware",
-    "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
-    "coding/os/linux/memory/memory-manage/i_KSM机制剖析 — Linux 内核中的内存去耦合.md",
-    "coding/os/linux/memory/memory-performance/k_n_zRAM内存压缩技术原理与应用.md",
-    "coding/os/linux/memory/memory-performance/i_n_图解 Linux内存性能优化核心思想.md",
-    "coding/os/linux/memory/MMU/d_n_MMU内存管理单元.md",
     "coding/cpp/idiom/design-pattern",
     "coding/cpp/idiom",
     "zx99-image/Pasted image 20241008093809.png",

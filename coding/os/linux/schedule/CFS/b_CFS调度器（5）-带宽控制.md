@@ -1,40 +1,20 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-12-22 15:07 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-## 前言
+# 前言
 
 什么是带宽控制？简而言之就是控制一个用户组在给定周期时间内可以消耗CPU的时间，如果在给定的周期内消耗CPU时间超额，就限制该用户组内任务调度，直到下一个周期。限制某个进程的最大CPU使用率是否真的有必要呢？如果一个系统中仅存在一个进程，限制该进程使用CPU使用率最大50%，当进程使用率达到50%的时候，就限制该进程运行，CPU进入idle状态。看起来好像没有任何意义。但是，有时候，这正是系统管理员可能想要做的事情。如果这些进程属于仅支付了一定CPU时间的客户或者需要提供严格资源的情况，则限制进程（或进程组）可能消耗的CPU时间的最大份额是很有必要的。毕竟付多少钱享受多少服务。本文章仅讨论SCHED_NORMAL进程的CPU带宽控制（CPU bandwidth control）。
 
 > 注：代码分析基于Linux 4.18.0。
-
-## 设计原理
+# 设计原理
 
 如果使用CPU bandwith control，需要配置CONFIG_FAIR_GROUP_SCHED和CONFIG_CFS_BANDWIDTH选项。该功能是限制一个组的最大使用CPU带宽。通过设置两个变量quota和period，period是指一段周期时间，quota是指在period周期时间内，一个组可以使用的CPU时间限额。当一个组的进程运行时间超过quota后，就会被限制运行，这个动作被称作throttle。直到下一个period周期开始，这个组会被重新调度，这个过程称作unthrottle。
 
 在多核系统中，一个用户组使用`task_group`描述，用户组中包含CPU数量的调度实体，以及调度实体对应的group cfs_rq。如何限制一个用户组中的进程呢？我们可以简单的将用户组管理的调度实体从对应的就绪队列上删除即可，然后标记调度实体对应的group cfs_rq的标志位。quota和period的值存储在`cfs_bandwidth`结构体中，该结构体嵌在`tasak_group`中，`cfs_bandwidth`结构体还包含runtime成员记录剩余限额时间。每当用户组中的进程运行一段时间时，对应的runtime时间也在减少。系统会启动一个高精度定时器，周期时间是period，在定时器时间到达后重置剩余限额时间runtime为quota，开始下一个轮时间跟踪。所有的用户组进程运行的时间累加在一起，保证总的运行时间小于quota。每个用户组会管理CPU个数的就绪队列group cfs_rq。每个group cfs_rq中也有限额时间，该限额时间是从全局用户组quota中申请。例如，周期period值100ms，限额quota值50ms，2个CPU系统。CPU0上group cfs_rq首先从全局限额时间中申请5ms时间（此实runtime值为45），然后运行进程。当5ms时间消耗完时，继续从全局时间限额quota中申请5ms（此实runtime值为40）。CPU1上的情况也同样如此，先以就绪队列cfs_rq的身份从quota中申请一个时间片，然后供进程运行消耗。当全局quota剩余时间不足以满足CPU0或者CPU1申请时，就需要throttle对应的cfs_rq。在定时器时间到达后，unthrottle所有已经throttle的cfs_rq。
 
 总结一下就是，`cfs_bandwidth`就像是一个全局时间池（时间池管理时间，类比内存池管理内存）。每个group cfs_rq如果想让其管理的红黑树上的调度实体调度，必须首先向全局时间池中申请固定的时间片，然后供其进程消耗。当时间片消耗完，继续从全局时间池中申请时间片。终有一刻，时间池中已经没有时间可供申请。此时就是throttle cfs_rq的大好时机。
-
-### 数据结构
+## 数据结构
 
 每个`task_group`都包含`cfs_bandwidth`结构体，主要记录和管理时间池的时间信息。
-
+```cpp
 1. struct cfs_bandwidth {
 2. #ifdef CONFIG_CFS_BANDWIDTH
 3. 	ktime_t				period;             /* 1 */
@@ -46,8 +26,7 @@
 9.     /* ... */
 10. #endif
 11. };
-
-  
+```
 
 > 1. 设定的定时器周期时间。
 > 2. 限额时间。
@@ -58,7 +37,6 @@
 CFS就绪队列使用`cfs_rq`结构体描述，和bandwidth相关成员如下：
 
 ```c
- 
 struct cfs_rq {#ifdef CONFIG_FAIR_GROUP_SCHED	struct rq *rq;	              /* 1 */	struct task_group *tg;        /* 2 */#ifdef CONFIG_CFS_BANDWIDTH	int runtime_enabled;          /* 3 */	u64 runtime_expires;	s64 runtime_remaining;        /* 4 */ 	u64 throttled_clock, throttled_clock_task;     /* 5 */	u64 throttled_clock_task_time;	int throttled, throttle_count;                 /* 6 */	struct list_head throttled_list;               /* 7 */#endif /* CONFIG_CFS_BANDWIDTH */#endif /* CONFIG_FAIR_GROUP_SCHED */};
 ```
 
@@ -69,11 +47,10 @@ struct cfs_rq {#ifdef CONFIG_FAIR_GROUP_SCHED	struct rq *rq;	              /* 1 
 > 5. 当cfs_rq被throttle的时候，方便统计被throttle的时间，需要记录throttle开始的时间。
 > 6. throttled：如果cfs_rq被throttle后，throttled变量置1，unthrottle的时候，throttled变量置0；throttle_count：由于task_group支持嵌套，当parent task_group的cfs_rq被throttle的时候，其chaild task_group对应的cfs_rq的throttle_count成员计数增加。
 > 7. 被throttle的cfs_rq挂入`cfs_bandwidth->throttled_cfs_rq`链表。
-
-### bandwidth贡献
+## bandwidth贡献
 
 周期性调度中会调用update_curr()函数更新当前正在运行进程的虚拟时间。该进程bandwidth贡献也在此时累计。从进程依附的cfs_rq的可用时间中减去进程运行的时间，如果时间不够，就从全局时间池中申请一定时间片。在update_curr()函数中调用account_cfs_rq_runtime()函数统计cfs_rq剩余可运行时间。
-
+```cpp
 1. static __always_inline
 2. void account_cfs_rq_runtime(struct cfs_rq *cfs_rq, u64 delta_exec)
 3. {
@@ -82,11 +59,10 @@ struct cfs_rq {#ifdef CONFIG_FAIR_GROUP_SCHED	struct rq *rq;	              /* 1 
 
 7. 	__account_cfs_rq_runtime(cfs_rq, delta_exec);
 8. } 
-
+```
   
-
 如果使能CFS bandwidth control功能，cfs_bandwidth_used()返回1，`cfs_rq->runtime_enabled`值为1。__account_cfs_rq_runtime()函数如下：
-
+```cpp
 1. static void __account_cfs_rq_runtime(struct cfs_rq *cfs_rq, u64 delta_exec)
 2. {
 3. 	/* dock delta_exec before expiring quota (as it could span periods) */
@@ -103,8 +79,7 @@ struct cfs_rq {#ifdef CONFIG_FAIR_GROUP_SCHED	struct rq *rq;	              /* 1 
 14. 	if (!assign_cfs_rq_runtime(cfs_rq) && likely(cfs_rq->curr))         /* 4 */
 15. 		resched_curr(rq_of(cfs_rq));                   /* 5 */
 16. } 
-
-  
+```
 
 > 1. 进程已经运行delta_exec时间，因此cfs_rq剩余可运行时间减少。
 > 2. 如果cfs_rq剩余运行时间还有，那么没必要向全局时间池申请时间片。
@@ -114,7 +89,6 @@ struct cfs_rq {#ifdef CONFIG_FAIR_GROUP_SCHED	struct rq *rq;	              /* 1 
 assign_cfs_rq_runtime()函数如下：
 
 ```c
- 
 static int assign_cfs_rq_runtime(struct cfs_rq *cfs_rq){	struct task_group *tg = cfs_rq->tg;	struct cfs_bandwidth *cfs_b = tg_cfs_bandwidth(tg);	u64 amount = 0, min_amount, expires;	int expires_seq; 	/* note: this is a positive sum as runtime_remaining <= 0 */	min_amount = sched_cfs_bandwidth_slice() - cfs_rq->runtime_remaining;    /* 1 */ 	raw_spin_lock(&cfs_b->lock);	if (cfs_b->quota == RUNTIME_INF)                          /* 2 */		amount = min_amount;	else {		start_cfs_bandwidth(cfs_b);                           /* 3 */ 		if (cfs_b->runtime > 0) {			amount = min(cfs_b->runtime, min_amount);			cfs_b->runtime -= amount;                         /* 4 */			cfs_b->idle = 0;		}	}	expires_seq = cfs_b->expires_seq;	expires = cfs_b->runtime_expires;	raw_spin_unlock(&cfs_b->lock); 	cfs_rq->runtime_remaining += amount;                      /* 5 */	/*	 * we may have advanced our local expiration to account for allowed	 * spread between our sched_clock and the one on which runtime was	 * issued.	 */	if (cfs_rq->expires_seq != expires_seq) {		cfs_rq->expires_seq = expires_seq;		cfs_rq->runtime_expires = expires;	} 	return cfs_rq->runtime_remaining > 0;                     /* 6 */}
 ```
 
@@ -124,20 +98,17 @@ static int assign_cfs_rq_runtime(struct cfs_rq *cfs_rq){	struct task_group *tg =
 > 4. 申请时间片成功，全局时间池剩余可用时间更新。
 > 5. cfs_rq剩余可用时间增加。
 > 6. 如果cfs_rq向全局时间池申请不到时间片，那么该函数返回0，否则返回1，代表申请时间片成功，不需要throttle。
-
-### 如何throttle cfs_rq
+## 如何throttle cfs_rq
 
 假设上述assign_cfs_rq_runtime()函数返回0，意味着申请时间失败。cfs_rq需要被throttle。函数返回后，会设置TIF_NEED_RESCHED flag，意味着调度即将开始。调度器核心层通过pick_next_task()函数挑选出下一个应该运行的进程。CFS调度器的pick_next_task接口函数是pick_next_task_fair()。CFS调度器挑选进程前会先put_prev_task()。在该函数中会调用接口函数put_prev_task_fair()，函数如下：
 
 ```c
- 
 static void put_prev_task_fair(struct rq *rq, struct task_struct *prev){	struct sched_entity *se = &prev->se;	struct cfs_rq *cfs_rq; 	for_each_sched_entity(se) {		cfs_rq = cfs_rq_of(se);		put_prev_entity(cfs_rq, se);	}}
 ```
 
 prev指向即将被调度出去的进程，我们会在put_prev_entity()函数中调用check_cfs_rq_runtime()检查`cfs_rq->runtime_remaining`的值是否小于0，如果小于0就需要被throttle。
 
 ```c
- 
 static bool check_cfs_rq_runtime(struct cfs_rq *cfs_rq){	if (!cfs_bandwidth_used())		return false; 	if (likely(!cfs_rq->runtime_enabled || cfs_rq->runtime_remaining > 0))    /* 1 */		return false; 	if (cfs_rq_throttled(cfs_rq))    /* 2 */		return true; 	throttle_cfs_rq(cfs_rq);         /* 3 */	return true;}
 ```
 
@@ -146,7 +117,7 @@ static bool check_cfs_rq_runtime(struct cfs_rq *cfs_rq){	if (!cfs_bandwidth_used
 > 3. throttle_cfs_rq()函数是真正throttle的操作，throttle核心函数。
 
 throttle_cfs_rq()函数如下：
-
+```cpp
 1. static void throttle_cfs_rq(struct cfs_rq *cfs_rq)
 2. {
 3. 	struct rq *rq = rq_of(cfs_rq);
@@ -189,9 +160,8 @@ throttle_cfs_rq()函数如下：
 40. 		start_cfs_bandwidth(cfs_b);
 41. 	raw_spin_unlock(&cfs_b->lock);
 42. } 
-
+```
   
-
 > 1. throttle对应的cfs_rq可以将对应的group se从其就绪队列的红黑树上删除，这样在pick_next_task的时候，顺着根cfs_rq的红黑树往下便利，就不会找到已经throttle的se，也就是没有机会运行。
 > 2. `task_group`可以父子关系嵌套。walk_tg_tree_from()函数功能是顺着cfs_rq->tg往下便利每一个child task_group，并且对每个task_group调用tg_throttle_down()函数。tg_throttle_down()负责增加`cfs_rq->throttle_count`计数。
 > 3. 从依附的cfs_rq的红黑树上删除。
@@ -203,20 +173,17 @@ throttle_cfs_rq()函数如下：
 tg_throttle_down()函数如下，主要是cfs_rq->throttle_count计数递增：
 
 ```c
- 
 static int tg_throttle_down(struct task_group *tg, void *data){	struct rq *rq = data;	struct cfs_rq *cfs_rq = tg->cfs_rq[cpu_of(rq)]; 	/* group is entering throttled state, stop time */	if (!cfs_rq->throttle_count)		cfs_rq->throttled_clock_task = rq_clock_task(rq);	cfs_rq->throttle_count++; 	return 0;}
 ```
 
 throttle cfs_rq时，数据结构示意图如下：
 
 [![throttle-cfs_rq.png](http://www.wowotech.net/content/uploadfile/201812/43d91545462538.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201812/43d91545462538.png)
-
 顺着被throttle cfs_rq依附的task_group的children链表，找到所有的task_group，并增加对应CPU的cfs_rq->throttle_count成员。
-
-### 如何unthrottle cfs_rq
+## 如何unthrottle cfs_rq
 
 unthrottle cfs_rq操作会在周期定时器定时时间到达之际进行。负责unthrottle cfs_rq操作的函数是unthrottle_cfs_rq()，该函数和throttle_cfs_rq()的操作相反。函数如下：
-
+```cpp
 1. void unthrottle_cfs_rq(struct cfs_rq *cfs_rq)
 2. {
 3. 	struct rq *rq = rq_of(cfs_rq);
@@ -260,9 +227,8 @@ unthrottle cfs_rq操作会在周期定时器定时时间到达之际进行。负
 41. 	if (rq->curr == rq->idle && rq->cfs.nr_running)
 42. 		resched_curr(rq);
 43. } 
-
+```
   
-
 > 1. unthrottle操作的做cfs_rq对应的调度实体，调度实体在parent cfs_rq上才有机会运行。
 > 2. throttled标志位清零。
 > 3. throttled_time记录cfs_rq被throttle的总时间，throttled_clock在throttle_cfs_rq()函数中记录开始throttle时刻。
@@ -272,7 +238,7 @@ unthrottle cfs_rq操作会在周期定时器定时时间到达之际进行。负
 > 7. 将调度实体入队，这里的for循环操作和throttle_cfs_rq()函数的dequeue操作对应。
 
 tg_unthrottle_up()函数如下：
-
+```cpp
 1. static int tg_unthrottle_up(struct task_group *tg, void *data)
 2. {
 3. 	struct rq *rq = data;
@@ -287,15 +253,13 @@ tg_unthrottle_up()函数如下：
 
 13. 	return 0;
 14. } 
-
-  
+```
 
 除了递减`cfs_rq->throttle_count`计数外，还计算了throttled_clock_task_time时间。和throttled_time不同的是，throttled_clock_task_time时间还包括由于parent cfs_rq被throttle的时间。虽然自己是unthrottle状态，但是parent cfs_rq是throttle状态，自己也是没办法运行的。所以throttled_clock_task_time统计的是`cfs_rq->throttle_count`从非零变成0经历的时间总和。
-
-### 周期更新quota
+## 周期更新quota
 
 带宽的限制是以`task_group`为单位，每一个`task_group`内嵌`cfs_bandwidth`结构体。周期性的更新quota利用的是高精度定时器，周期是period。`struct hrtimer period_timer`嵌在`cfs_bandwidth`结构体就是为了这个目的。定时器的初始化函数是init_cfs_bandwidth()。
-
+```cpp
 1. void init_cfs_bandwidth(struct cfs_bandwidth *cfs_b)
 2. {
 3. 	raw_spin_lock_init(&cfs_b->lock);
@@ -309,11 +273,10 @@ tg_unthrottle_up()函数如下：
 11. 	hrtimer_init(&cfs_b->slack_timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 12. 	cfs_b->slack_timer.function = sched_cfs_slack_timer;
 13. } 
-
-  
+```
 
 初始化两个hrtimer，分别是period_timer和slack_timer。period_timer的回调函数是sched_cfs_period_timer()。回调函数中刷新quota，并调用distribute_cfs_runtime()函数unthrottle cfs_rq。distribute_cfs_runtime()函数如下：
-
+```cpp
 1. static u64 distribute_cfs_runtime(struct cfs_bandwidth *cfs_b,
 2. 		u64 remaining, u64 expires)
 3. {
@@ -353,15 +316,14 @@ tg_unthrottle_up()函数如下：
 
 38. 	return starting_runtime - remaining;
 39. } 
-
-  
+```
 
 > 1. 循环便利所有已经throttle cfs_rq，函数参数remaining是全局时间池剩余可运行时间。
 > 2. remaining是全局时间池剩余时间，这里借给cfs_rq的时间是runtime。
 > 3. 如果从全局时间池借到的时间保证cfs_rq->runtime_remaining的值应该大于0，执行unthrottle操作。
 
 另外一个slack_timer的作用是什么呢？我们先思考另外一个问题，如果cfs_rq从全局时间池申请5ms时间片，该cfs_rq上只有一个进程，该进程运行0.5ms后就睡眠了，按照CFS的代码逻辑，整个cfs_rq对应的group se都会被dequeue。那么剩余的4.5ms是否应该归返给全局时间池呢？如果不归返，可能这个进程失眠很久，而其他CPU的cfs_rq很有可能申请不到5ms时间片（全局时间池时间剩余4ms）导致throttle，实际上可用时间是8.5ms。因此，我们针对这种情况会归返部分时间，可以用在其他CPU上消耗。这步处理的函数调用流程是dequeue_entity()->return_cfs_rq_runtime()->__return_cfs_rq_runtime()。
-
+```cpp
 1. static void __return_cfs_rq_runtime(struct cfs_rq *cfs_rq)
 2. {
 3. 	struct cfs_bandwidth *cfs_b = tg_cfs_bandwidth(cfs_rq->tg);
@@ -385,8 +347,7 @@ tg_unthrottle_up()函数如下：
 21. 	/* even if it's not valid for return we don't want to try again */
 22. 	cfs_rq->runtime_remaining -= slack_runtime;                          /* 4 */
 23. } 
-
-  
+```
 
 > 1. min_cfs_rq_runtime的值是1ms，我们选择至少保留min_cfs_rq_runtime时间给自己，剩下的时间归返全局时间池。全部归返的做法也是不明智的，有可能该cfs_rq上很快就会有进程运行。如果全部归返，进程运行的时候需要立刻去全局时间池申请，效率低。
 >     
@@ -400,7 +361,7 @@ tg_unthrottle_up()函数如下：
 >     
 
 slack_timer定时器的回调函数是sched_cfs_slack_timer()。sched_cfs_slack_timer()调用do_sched_cfs_slack_timer()处理主要逻辑。
-
+```cpp
 1. static void do_sched_cfs_slack_timer(struct cfs_bandwidth *cfs_b)
 2. {
 3. 	u64 runtime = 0, slice = sched_cfs_bandwidth_slice();
@@ -429,7 +390,7 @@ slack_timer定时器的回调函数是sched_cfs_slack_timer()。sched_cfs_slack_
 26. 		cfs_b->runtime -= min(runtime, cfs_b->runtime);
 27. 	raw_spin_unlock(&cfs_b->lock);
 28. } 
-
+```
   
 
 > 1. 检查period_timer定是时间是否即将到来，如果period_timer时间到了会刷新全局时间池。因此借助于period_timer即可unthrottle cfs_rq。如果，period_timer定是时间还有一段时间，那么此时此刻需要借助当前函数unthrottle cfs_rq。
