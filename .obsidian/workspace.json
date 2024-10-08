@@ -4,16 +4,16 @@
     "type": "split",
     "children": [
       {
-        "id": "cd8c4776efd79c27",
+        "id": "7816db194f2e089a",
         "type": "tabs",
         "children": [
           {
-            "id": "15b363dfb2f468e9",
+            "id": "e2d90085bd089a6c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
+                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
                 "mode": "source",
                 "source": false
               }
@@ -48,7 +48,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "无锁队列",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 368.5
+    "width": 359.50390243530273
   },
   "right": {
     "id": "0ed372e18b255e27",
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
+                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
+                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md"
+                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md"
               }
             }
           }
@@ -146,55 +146,55 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "15b363dfb2f468e9",
+  "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
-    "coding/os/linux/memory/cache/a_n_深入理解CPU缓存：性能优化的关键.md",
-    "coding/os/linux/memory/cache/a_n_cache的58问，您能回答上来几个？.md",
-    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
-    "coding/cpp/k_C++ 线程的使用.md",
-    "coding/os/linux/memory/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
-    "coding/os/linux/memory/C&DMA/k_应读者要求讲讲 DMA.md",
     "README.md",
-    "zx99-image/Pasted image 20241008162409.png",
-    "zx99-image/Pasted image 20241008162332.png",
-    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(2)_功能介绍及解接口分析.md",
-    "zx99-image/Pasted image 20241008162151.png",
-    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
-    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
-    "coding/os/linux/memory/C&DMA/i_Linux DMA Engine framework(1)_概述.md",
-    "zx99-image/Pasted image 20241008161958.png",
-    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
-    "coding/os/linux/process/b_为什么新版内核将进程pid管理从bitmap替换成了radix-tree？.md",
-    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
-    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
-    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
-    "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
-    "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
-    "coding/os/linux/schedule/PELT/i_per-entity load tracking.md",
-    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
-    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
-    "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
-    "coding/os/linux/schedule/schedutil governor情景分析.md",
+    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
+    "zx99-image/Pasted image 20241008183012.png",
+    "zx99-image/Pasted image 20241008183324.png",
+    "zx99-image/Pasted image 20241008183317.png",
+    "zx99-image/Pasted image 20241008183310.png",
+    "zx99-image/Pasted image 20241008183259.png",
+    "zx99-image/Pasted image 20241008183238.png",
+    "zx99-image/Pasted image 20241008183225.png",
+    "zx99-image/Pasted image 20241008183212.png",
+    "zx99-image/Pasted image 20241008183158.png",
+    "zx99-image/Pasted image 20241008183135.png",
+    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
+    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
+    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
+    "coding/os/linux/memory/cache/b_n_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+    "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+    "interview/大疆常见C++面试题，重点难点全方位解析.md",
     "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
-    "Pasted image 20241008161341.png",
-    "zx99-image/Pasted image 20241008161241.png",
-    "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
-    "zx99-image/Pasted image 20241008160654.png",
+    "coding/os/linux/schedule/a_n_Linux实时化与硬实时RTOS综述.md",
+    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
+    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
+    "coding/os/linux/network/debug/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
+    "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
+    "coding/os/linux/memory/userspace/k_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
+    "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
+    "coding/os/linux/memory/reclaim/b_linux内存回收(一）---kswapd回收.md",
     "coding/os/linux/memory/reclaim",
-    "coding/os/linux/memory/hardware",
-    "coding/cpp/idiom/design-pattern",
-    "coding/cpp/idiom",
-    "zx99-image/Pasted image 20241008093809.png",
-    "zx99-image/Pasted image 20241008093858.png",
+    "coding/os/linux/memory/page-folio/k_深入理解Linux内核页表映射分页机制原理.md",
+    "coding/os/linux/memory/page-folio/k_Linux下访问匿名页发生的神奇“化学反应”.md",
+    "coding/os/linux/memory/page-folio/k_Linux 内存管理窥探：页面回收 (LRU).md",
+    "coding/os/linux/memory/page-folio/i_页面回收的基本概念.md",
+    "coding/os/linux/memory/page-folio/i_深入理解Linux内核之脏页跟踪.md",
+    "coding/os/linux/memory/page-folio/i_文件系统和裸块设备的page cache问题.md",
     "coding/os/linux/memory/page-folio",
-    "zx99-image/Pasted image 20241008091330.png",
+    "coding/os/linux/memory/hardware",
+    "coding/cpp/idiom",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",
     "coding/cpp/grammar/Untitled",
     "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
+    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
   ]

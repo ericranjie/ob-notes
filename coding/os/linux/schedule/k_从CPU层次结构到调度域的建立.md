@@ -24,7 +24,7 @@
 我们以ARM64下CPU的初始化开始入手。ARM64平台下CPU的初始化需要读取DTS（Device Tree Source，设备树）文件。
 
 随意挑选arm64目录下一个处理器的dtsi文件的部分为例：
-
+```cpp
  cpus {  
  #address-cells = <1>;  
  #size-cells = <0>;  
@@ -53,13 +53,13 @@
  };  
     ......  
  };
-
+```
 以上是DTS文件中CPU定义的一个统一的格式。
-
-`start_kernel --> setup_arch --> smp_init_cpus`。
-
+```cpp
+start_kernel --> setup_arch --> smp_init_cpus
+```
 `smp_init_cpus`在系统启动的时候读取DTS文件中CPU信息，获得CPU数量，并调用`smp_cpu_setup`函数进行possible位图的设置。
-
+```cpp
  static int __init smp_cpu_setup(int cpu)  
  {  
  const struct cpu_operations *ops;  
@@ -75,9 +75,9 @@
    
  return 0;  
  }
-
+```
 这里先了解一下内核中存在的四种CPU的状态表示，分别是`possible`、`online`、`present`和`active`。
-
+```cpp
  typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;  
    
  #define DECLARE_BITMAP(name,bits) \  
@@ -91,9 +91,9 @@
  #define cpu_online_mask   ((const struct cpumask *)&__cpu_online_mask)  
  #define cpu_present_mask ((const struct cpumask *)&__cpu_present_mask)  
  #define cpu_active_mask   ((const struct cpumask *)&__cpu_active_mask)
-
+```
 可以从`smp_cpu_setup`函数看出，如果一个CPU编号对应的`struct cpu_operations`被建立成功，并且其对应的`init`函数没有执行失败，则将该CPU标记为possible。
-
+```cpp
  struct cpu_operations {  
  const char*name;  
  int(*cpu_init)(unsigned int);  
@@ -111,13 +111,10 @@
  int(*cpu_suspend)(unsigned long);  
  #endif  
  };
-
+```
 `cpu_init`：读取提出一个逻辑CPU的激活方法的必要数据；
-
 `cpu_prepare`：测试是否可以启动给定CPU；
-
 `cpu_boot`：启动CPU；
-
 `cpu_postboot`：启动CPU后必要的清理工作。
 
 除了上述的几个成员函数，可以看到其他成员函数是分别和CPU热插拔和CPUIDLE相关的电源操作，kernel抽象出了`struct cpu_operations`这个结构体，将启动、热插拔、空闲态接口统一起来，交给各个体系结构自己完成。
@@ -127,7 +124,7 @@
 接下来一直到`smp_prepare_cpus`函数，才到设置present位图的时候。
 
 以下是`smp_prepare_cpus`的部分代码：
-
+```cpp
  void __init smp_prepare_cpus(unsigned int max_cpus)  
  {  
  const struct cpu_operations *ops;  
@@ -156,11 +153,11 @@
  numa_store_cpu_info(cpu);  
  }  
  }
-
+```
 前面看到，possible位图的设置依赖于`cpu_operations`结构体的初始化以及是否读取到正确的CPU信息；那这里present位图的设置则依赖于`cpu_prepare`的执行结果，也就是检测对应CPU是否可以启动。
 
 `kernel_init_freezable --> smp_init --> bringup_nonboot_cpus`。
-
+```cpp
  void bringup_nonboot_cpus(unsigned int setup_max_cpus)  
  {  
  unsigned int cpu;  
@@ -172,11 +169,11 @@
  cpu_up(cpu, CPUHP_ONLINE);  
  }  
  }
-
+```
 `cpu_up --> _cpu_up --> cpuhp_up_callbacks --> cpuhp_invoke_callback --> bringup_cpu --> __cpu_up --> boot_secondary`
 
 `cpu_up`，这里可以这么简单的理解，最开始系统中只有一个CPU，当代码执行到这里的时候，开始启动其他的CPU，其他CPU的启动过程，首先是需要复制主CPU的0号线程（即空闲线程），然后去执行热插拔相关的回调函数，一直执行到`boot_secondary`，在这里最终会执行到`struct cpu_operations`中的回调函数`cpu_boot`。
-
+```cpp
  static int boot_secondary(unsigned int cpu, struct task_struct *idle)  
  {  
  const struct cpu_operations *ops = get_cpu_ops(cpu);  
@@ -186,7 +183,7 @@
    
  return -EOPNOTSUPP;  
  }
-
+```
 而通常在`struct cpu_operations`中的成员`cpu_boot`的执行中，会执行到`secondary_entry --> secondary_startup --> __secondary_switched --> secondary_start_kernel`。
 
 而在`secondary_start_kernel`中会调用`set_cpu_online`函数设置online位图。
@@ -194,7 +191,7 @@
 active这个位图的修改函数定义在CPU热插拔的回调函数数组中，也就是`struct cpuhp_step cpuhp_hp_states[]`中，该位图服务于调度器，在开启热插拔的情况下，调度器需要实时监控CPU热插拔的每个信息，因此需要该位图实时将某个CPU移除或添加。
 
 说完了四种位图，突然发现还没有说到CPU的层次结构在代码上的表示，CPU的层次结构使用一个结构体`struct cpu_topology`来表示。
-
+```cpp
  struct cpu_topology {  
  int thread_id;  
  int core_id;  
@@ -204,14 +201,15 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
  cpumask_t core_sibling;  
  cpumask_t llc_sibling;  
  };  
-   
+ 
  #ifdef CONFIG_GENERIC_ARCH_TOPOLOGY  
  extern struct cpu_topology cpu_topology[NR_CPUS];
-
+```
 其实，代码上CPU的层次结构的赋值代码与CPU启动的时间基本一致，主CPU的赋值是在`smp_prepare_cpus`函数中；其余CPU是在`secondary_start_kernel`函数中。
 
 直接来看`cpu_topology`结构体的赋值函数`store_cpu_topology`。在调用该函数之前，已经在`init_cpu_topology`函数中进行过`cpu_topology`数组的初始化了，其中`thread_id`、`core_id`、`package_id`和`llc_id`皆初始化为-1。
 
+```cpp
  void store_cpu_topology(unsigned int cpuid)  
  {  
  struct cpu_topology *cpuid_topo = &cpu_topology[cpuid];  
@@ -237,19 +235,19 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
  topology_populated:  
  update_siblings_masks(cpuid);  
  }
-
+```
 以arm64为例，`thread_id`应该是超线程情况下才有意义，这里不考虑。`core_id`等同于物理核心id，也就是逻辑核心id，二者一致，`package_id`指向了其所属的NUMA的Node号。`update_sibling_masks`则用于更新用于表示各个层级的兄弟关系。
 
 说了这么多，一直在说CPU的物理层次结构在代码上的表示，却还没有说到调度中CPU物理结构的参与。
 
 这里关注`kernel_init_freezable`函数有这样一段代码：
-
-     smp_init();  
- sched_init_smp();
-
+```cpp
+smp_init();  
+sched_init_smp();
+```
 前面已经了解到`smp_init`函数执行完成时，各个次CPU已经启动完成，此时进入`sched_init_smp`函数。
-
-`sched_init_smp --> sched_init_domains --> build_sched_domains`
+```cpp
+sched_init_smp --> sched_init_domains --> build_sched_domains
 
  static int  
  build_sched_domains(const struct cpumask *cpu_map, struct sched_domain_attr *attr)  
@@ -354,12 +352,11 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
    
  return ret;  
  }
-
+```
 首先，分析第1个核心函数`__visit_domain_allocation_hell`。
-
+```cpp
  static enum s_alloc  
- __visit_domain_allocation_hell(struct s_data *d, const struct cpumask *cpu_map)  
- {  
+ __visit_domain_allocation_hell(struct s_data *d, const struct cpumask *cpu_map) {  
  memset(d, 0, sizeof(*d));  
    
  if (__sdt_alloc(cpu_map))  
@@ -373,9 +370,9 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
    
  return sa_rootdomain;  
  }
-
+```
 首先进入`__sdt_alloc`函数。
-
+```cpp
  static int __sdt_alloc(const struct cpumask *cpu_map)  
  {  
  struct sched_domain_topology_level *tl;  
@@ -444,9 +441,9 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
    
  return 0;  
  }
-
+```
 在这个函数中我们接触到第一个比较关键的数据结构`struct sched_domain_topology_level`。
-
+```cpp
  struct sched_domain_topology_level {  
  sched_domain_mask_f mask;  
  sched_domain_flags_f sd_flags;  
@@ -482,7 +479,7 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
    
  sched_domain_topology = tl;  
  }
-
+```
 可以看到，`struct sched_domain_topology_level`使用一个数组`default_topology`给出，当然各个体系结构下也可以修改该数组。该数组一般按照CPU层次从低到高排列。
 
 `struct sched_domain_toplogy_level`的前两个成员`mask`和`flag`分别是两个函数，用于指定该CPU层次下的兄弟cpumask和flag标志位。而`struct sd_data`是该数据结构的核心，其成员将在后续完成赋值。
