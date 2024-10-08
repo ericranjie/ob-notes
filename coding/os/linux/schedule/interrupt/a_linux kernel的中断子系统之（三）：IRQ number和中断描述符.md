@@ -1,12 +1,9 @@
  作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-8-26 17:03 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
-
-一、前言
+# 一、前言
 
 本文主要围绕IRQ number和中断描述符（interrupt descriptor）这两个概念描述通用中断处理过程。第二章主要描述基本概念，包括什么是IRQ number，什么是中断描述符等。第三章描述中断描述符数据结构的各个成员。第四章描述了初始化中断描述符相关的接口API。第五章描述中断描述符相关的接口API。
-
-二、基本概念
-
-1、通用中断的代码处理示意图
+# 二、基本概念
+## 1、通用中断的代码处理示意图
 
 一个关于通用中断处理的示意图如下：
 
@@ -15,7 +12,6 @@
 在linux kernel中，对于每一个外设的IRQ都用struct irq_desc来描述，我们称之中断描述符（struct irq_desc）。linux kernel中会有一个数据结构保存了关于所有IRQ的中断描述符信息，我们称之中断描述符DB（上图中红色框图内）。当发生中断后，首先获取触发中断的HW interupt ID，然后通过irq domain翻译成IRQ nuber，然后通过IRQ number就可以获取对应的中断描述符。调用中断描述符中的highlevel irq-events handler来进行中断处理就OK了。而highlevel irq-events handler主要进行下面两个操作：
 
 （1）调用中断描述符的底层irq chip driver进行mask，ack等callback函数，进行interrupt flow control。
-
 （2）调用该中断描述符上的action list中的specific handler（我们用这个术语来区分具体中断handler和high level的handler）。这个步骤不一定会执行，这是和中断描述符的当前状态相关，实际上，interrupt flow control是软件（设定一些标志位，软件根据标志位进行处理）和硬件（mask或者unmask interrupt controller等）一起控制完成的。
 
 2、中断的打开和关闭

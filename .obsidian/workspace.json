@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md",
+                "file": "auxiliary/self-improvement/hair/hair-quote.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md",
+                "file": "auxiliary/self-improvement/hair/hair-quote.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md",
+                "file": "auxiliary/self-improvement/hair/hair-quote.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md"
+                "file": "auxiliary/self-improvement/hair/hair-quote.md"
               }
             }
           }
@@ -148,7 +148,9 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
     "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
+    "coding/os/linux/schedule/debug/p_n_关于numa loadbance的死锁分析.md",
     "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
     "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
     "coding/os/linux/schedule/interrupt/p_中断上下文中调度会怎样？.md",
@@ -172,8 +174,6 @@
     "coding/os/linux/schedule/lock/i_什么时候需要cpu_relax()锁.md",
     "coding/os/linux/schedule/d_load_balance函数代码详解.md",
     "coding/os/linux/schedule/d_n_多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "coding/os/linux/schedule/a_n_Linux实时化与硬实时RTOS综述.md",
-    "coding/os/linux/schedule/lock/RCU/b_RCU（2）- 使用方法.md",
     "zx99-image/Pasted image 20241008205719.png",
     "zx99-image/Pasted image 20241008190725.png",
     "Pasted image 20241008190450.png",
