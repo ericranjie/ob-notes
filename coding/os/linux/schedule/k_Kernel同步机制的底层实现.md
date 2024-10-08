@@ -7,7 +7,6 @@
 `ldr x0, &a   add x0,x0,#1   str x0,&a   `
 
 > 即
-> 
 > (1)从内存中读取a变量到X0寄存器
 > (2)X0寄存器加1
 > (3)将X0写入到内存a中
@@ -75,7 +74,9 @@ atomic_cmpxchg(v,old,new)
 > T3 : 进程3调用spin_lock，此时next=2, owner=0没有获得该锁，while(1)中调用wfe指令standby在那里，等待owner==next成立.
 > 
 > T4&T5 : 进程1调用spin_unlock，此时owner++，即owner=1，接着调用sev指令，让进程2和进程3退出standby状态，走while(1)流程，重新检查owner==next条件。此时进程2条件成立，进程3继续等待。进程2获得该锁，进程3继续等待。
+
 ### Linux Kernel中的SpinLock的实现
+
 ![[Pasted image 20240923215558.png]]
 
 ```c

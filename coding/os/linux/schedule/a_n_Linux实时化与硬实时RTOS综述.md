@@ -40,37 +40,21 @@
 **6. 典型案例**
 **6.1 Network and RTOS**
 **7. 下一代 HW-RTOS**
-## 1.背景介绍
+# 1.背景介绍
 
 在工业控制领域 实时(Real Time) 是一个核心要求。
 
-  
-
 - 实时系统的定义：实时系统是指计算的正确性不仅依赖于逻辑的正确性而且依赖于产生结果的时间，如果系统的时间限制不能得到满足，系统将会产生故障。在工业领域这种故障可能造成灾难性的结果。
-    
 - 实时操作系统：该操作系统有能力提供一个指定范围内的服务响应时间。
     
-      
-    
-
 一个 OS kernel 给程序员提供了一系列的服务，例如： multitasking、 interrupt management、 inter-task communication and signaling、 resource management、 time management、 memory partition management 等等。OS 的主要工作就是资源封装和调度，它提供对CPU、Memory、Storage、Network等资源的封装和调度。
 
-  
-
 对于 实时(Real Time) 这个课题来说，我们重点关注其中的 CPU 资源调度。
-
-  
-
-**1.1 OS 实时难题**
+## **1.1 OS 实时难题**
 
 - 1、CPU 调度模型
-    
-
-  
 
 在CPU资源调度方面，OS 主要提供一个多任务(multitasking)的运行环境，以方便应用的开发。在开发某个应用时首先把工作拆解成多个任务(Task/Thread)，每个任务都可以简化成一个简单的无限循环：
-
-  
 
 ```
 void MyTask (void) 

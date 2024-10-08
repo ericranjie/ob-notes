@@ -1,144 +1,84 @@
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2020-3-30 20:03 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
-
-一、前言
+# 一、前言
 
 本文以一个在centos7.6内核发生的crash,描述一下常见hardlock导致panic的解bug流程。
-
-二、故障现象
+# 二、故障现象
 
 机器出现复位，收集到了crash文件，从日志中显示为hardlock。
-
+```cpp
 KERNEL: /usr/lib/debug/lib/modules/3.10.0-957.27.2.el7.x86_64/vmlinux
-
 DUMPFILE: vmcore [PARTIAL DUMP]
-
 CPUS: 48
-
 DATE: Wed Dec 11 23:25:55 2019
-
 UPTIME: 80 days, 12:06:06-----------------------crash之前运行时间
-
 LOAD AVERAGE: 67.57, 65.21, 53.49-----------死之前load 较高
-
 TASKS: 3169
-
 NODENAME:
-
 RELEASE: 3.10.0-957.27.2.el7.x86_64
-
 VERSION: #1 SMP Mon Jul 29 17:46:05 UTC 2019
-
 MACHINE: x86_64 (2300 Mhz)
-
 MEMORY: 382.5 GB
-
 PANIC: "Kernel panic - not syncing: Hard LOCKUP"--------配置了hardlock_panic
-
 PID: 0
-
 COMMAND: "swapper/34"
-
 TASK: ffff9f1a36998000 (1 of 48) [THREAD_INFO: ffff9f1a36994000]
-
 CPU: 34
-
 STATE: TASK_RUNNING (PANIC)
-
 crash> bt
-
 PID: 0 TASK: ffff9f1a36998000 CPU: 34 COMMAND: "swapper/34"
-
 #0 [ffff9f487e0489f0] machine_kexec at ffffffffae063b34
-
 #1 [ffff9f487e048a50] __crash_kexec at ffffffffae11e242
-
 #2 [ffff9f487e048b20] panic at ffffffffae75d85b
-
 #3 [ffff9f487e048ba0] nmi_panic at ffffffffae09859f
-
 #4 [ffff9f487e048bb0] watchdog_overflow_callback at ffffffffae14a881
-
 #5 [ffff9f487e048bc8] __perf_event_overflow at ffffffffae1a26b7
-
 #6 [ffff9f487e048c00] perf_event_overflow at ffffffffae1abd24
-
 #7 [ffff9f487e048c10] intel_pmu_handle_irq at ffffffffae00a850
-
 #8 [ffff9f487e048e38] perf_event_nmi_handler at ffffffffae76d031
-
 #9 [ffff9f487e048e58] nmi_handle at ffffffffae76e91c
-
 #10 [ffff9f487e048eb0] do_nmi at ffffffffae76eb3d
-
 #11 [ffff9f487e048ef0] end_repeat_nmi at ffffffffae76dd89 [exception RIP: tg_unthrottle_up+24]
 
 RIP: ffffffffae0dc4d8 RSP: ffff9f487e043e08 RFLAGS: 00000046
-
 RAX: ffff9f4a6a078400 RBX: ffff9f787be9ab80 RCX: ffff9f4a03ea9530
-
 RDX: 0000000000000005 RSI: ffff9f787be9ab80 RDI: ffff9f4a03ea9400------task_group
-
 RBP: ffff9f487e043e08 R8: ffff9f782c78a100 R9: 0000000000000001
-
 R10: 0000000000004dcd R11: 0000000000000005 R12: ffff9f78790edc00
-
 R13: ffffffffae0dc4c0 R14: 0000000000000000 R15: ffff9f4a03ea9400
-
 ORIG_RAX: ffffffffffffffff CS: 0010 SS: 0000
 
 --- <NMI exception stack> ---
 
 #12 [ffff9f487e043e08] tg_unthrottle_up at ffffffffae0dc4d8
-
 #13 [ffff9f487e043e10] walk_tg_tree_from at ffffffffae0d3b20
-
 #14 [ffff9f487e043e60] unthrottle_cfs_rq at ffffffffae0e46e7
-
 #15 [ffff9f487e043e98] distribute_cfs_runtime at ffffffffae0e496a
-
 #16 [ffff9f487e043ee8] sched_cfs_period_timer at ffffffffae0e4b67
-
 #17 [ffff9f487e043f20] __hrtimer_run_queues at ffffffffae0c71e3
-
 #18 [ffff9f487e043f78] hrtimer_interrupt at ffffffffae0c776f
-
 #19 [ffff9f487e043fc0] local_apic_timer_interrupt at ffffffffae05a61b
-
 #20 [ffff9f487e043fd8] smp_apic_timer_interrupt at ffffffffae77b6e3
-
 #21 [ffff9f487e043ff0] apic_timer_interrupt at ffffffffae777df2
 
 --- <IRQ stack> ---
 
 #22 [ffff9f1a36997db8] apic_timer_interrupt at ffffffffae777df2 [exception RIP: cpuidle_enter_state+87]
-
 RIP: ffffffffae5b06c7 RSP: ffff9f1a36997e60 RFLAGS: 00000202
-
 RAX: 0018b604313aebda RBX: ffff9f1a36997e38 RCX: 0000000000000018
-
 RDX: 0000000225c17d03 RSI: ffff9f1a36997fd8 RDI: 0018b604313aebda
-
 RBP: ffff9f1a36997e88 R8: 0000000000005a0e R9: 0000000000000018
-
 R10: 0000000000004dcd R11: 0000000000000005 R12: ffffffffae7699bc
-
 R13: ffffffffae7699c8 R14: ffffffffae7699bc R15: ffffffffae7699c8
-
 ORIG_RAX: ffffffffffffff10 CS: 0010 SS: 0000
 
 #23 [ffff9f1a36997e90] cpuidle_idle_call at ffffffffae5b081e
-
 #24 [ffff9f1a36997ed0] arch_cpu_idle at ffffffffae0366de
-
 #25 [ffff9f1a36997ee0] cpu_startup_entry at ffffffffae0fd7ba
-
 #26 [ffff9f1a36997f28] start_secondary at ffffffffae0580d7
-
 #27 [ffff9f1a36997f50] start_cpu at ffffffffae0000d5
-
-三、分析过程
-
-1、可能存在问题的原因
+```
+# 三、分析过程
+## 1、可能存在问题的原因
 
 我们知道，hardlock一般有两种，一种是关中断时间过长，超过了阈值，系统通过NMI发送来
 
@@ -149,52 +89,37 @@ ORIG_RAX: ffffffffffffff10 CS: 0010 SS: 0000
 抢不到，比如只是代码bug导致运行时间过长，本文属于第二种情况。
 
 2、具体原因的分析
-
+```cpp
 /*
-
  * High resolution timer interrupt
-
  * Called with interrupts disabled
-
  */
-
 void hrtimer_interrupt(struct clock_event_device *dev)
-
+```
 既然是时间长，就要看一下这个阈值是多少：
-
+```cpp
 crash> p watchdog_thresh
-
 watchdog_thresh = $1 = 60
+```
 
 默认是10s，说明这个环境上有人因为hardlock的问题加大过这个阈值。
-
 反汇编对应的代码，分析如下：
 
+```cpp
 crash> task_group ffff9f4a03ea9400
-
 struct task_group {
-
 css = {
-
 cgroup = 0xffff9f4a57564000,
-
 crash> cgroup.sibling 0xffff9f4a57564000
-
 sibling = {
-
 next = 0xffff9f4a84df3c10,
-
 prev = 0xffff9f1b5b435a10
-
 }
-
 crash> list 0xffff9f4a84df3c10 |wc -l
-
 4460
+```
 
 说明该task_group有4459个兄弟，也就是同一等级的task_group 有这么多，4459比 4460少一个是因为要减去父cgroup的作为链表串接头的计数。
-
-  
 
 我们知道，cfs在支持组调度之后，每个task_group创建的两个定时器，一个是周期性定时器，也就是堆栈中的sched_cfs_period_timer ，
 
@@ -203,43 +128,27 @@ crash> list 0xffff9f4a84df3c10 |wc -l
 因为hrtimer是关中断运行的，所以需要解决堆栈中这个定时器为什么会运行这么长时间。
 
 经过分析代码，有两种可能，一种如下：
-
+```cpp
 static enum hrtimer_restart sched_cfs_period_timer(struct hrtimer *timer) {
-
     struct cfs_bandwidth *cfs_b =
-
         container_of(timer, struct cfs_bandwidth, period_timer);
-
     ktime_t now;
-
     int overrun;
-
     int idle = 0;
-
     raw_spin_lock(&cfs_b->lock);
-
     for (;;) {-----------一直循环
-
         now = hrtimer_cb_get_time(timer);//其实就是ktime_get，也就是当前时间
-
         overrun = hrtimer_forward(timer, now, cfs_b->period);
-
         if (!overrun)-------假设overrun一直非0则不退出
-
             break;
-
         idle = do_sched_cfs_period_timer(cfs_b, overrun);
-
     }
-
     raw_spin_unlock(&cfs_b->lock);
-
     return idle ? HRTIMER_NORESTART : HRTIMER_RESTART; }
-
+```
   
-
 这是一种可能，还有一种可能如下：
-
+```cpp
 static int do_sched_cfs_period_timer(struct cfs_bandwidth *cfs_b, int overrun)
 
 {。。。
@@ -259,113 +168,72 @@ static int do_sched_cfs_period_timer(struct cfs_bandwidth *cfs_b, int overrun)
                          runtime_expires);
 
         raw_spin_lock(&cfs_b->lock);
-
         cfs_b->distribute_running = 0;
-
         throttled = !list_empty(&cfs_b->throttled_cfs_rq);//判断当前是否被throttled
-
         cfs_b->runtime -= min(runtime, cfs_b->runtime);//防止变成负数
-
     }
-
 }
-
+```
 因为第二个循环受限于一种条件，也就是当前被限流的task_group不为空，同时还有时间没有分发完毕，同时没有在并发分发，否则则会break，
 
 我们先来分析第二种可能，先看看当前被限流的task_group链表是否为空，这个是串接在父task_group中的。
-
+```cpp
 crash> task_group.parent ffff9f4a03ea9400
-
 parent = 0xffff9f78790edc00
-
 crash> task_group.cfs_bandwidth.throttled_cfs_rq 0xffff9f78790edc00
-
 cfs_bandwidth.throttled_cfs_rq = {
-
 next = 0xffff9f782c78c900,
-
 prev = 0xffff9f48362bd900
-
 },
-
 crash> list 0xffff9f782c78c900 |wc -l
-
 46
-
+```
 除去链表头，说明还有45个task_group被限流，满足一个条件，那runtime呢？
-
+```cpp
 crash> task_group.cfs_bandwidth.runtime 0xffff9f78790edc00
-
 cfs_bandwidth.runtime = 0,
-
+```
 初步看起来好像不符合循环的条件，那有没有可能是前面一直循环，但是到crash的时候，这个值被修改为了0呢？
 
 那就需要查看一下调用 distribute_cfs_runtime 的时候的 runtime是多少，runtime是第二个参数，也就是rsi，我们需要获取栈中的数据，
-
+```cpp
 crash> dis -l distribute_cfs_runtime
-
 /usr/src/debug/kernel-3.10.0-957.27.2.el7/linux-3.10.0-957.27.2.el7.x86_64/kernel/sched/fair.c: 3487
-
 0xffffffffae0e4860 <distribute_cfs_runtime>: nopl 0x0(%rax,%rax,1) [FTRACE NOP]
-
 0xffffffffae0e4865 <distribute_cfs_runtime+5>: push %rbp
-
 0xffffffffae0e4866 <distribute_cfs_runtime+6>: mov %rsp,%rbp
-
 0xffffffffae0e4869 <distribute_cfs_runtime+9>: push %r15 0xffffffffae0e486b <distribute_cfs_runtime+11>: push %r14 0xffffffffae0e486d <distribute_cfs_runtime+13>: push %r13 0xffffffffae0e486f <distribute_cfs_runtime+15>: push %r12
-
 0xffffffffae0e4871 <distribute_cfs_runtime+17>: push %rbx
-
 0xffffffffae0e4872 <distribute_cfs_runtime+18>: sub $0x18,%rsp
-
 0xffffffffae0e4876 <distribute_cfs_runtime+22>: mov %rsi,-0x40(%rbp)----将初始剩余时间压栈，也就是栈中的000000003b9aca00,也就是十进制的 1000000000
-
 #15 [ffff9f487e043e98] distribute_cfs_runtime at ffffffffae0e496a
-
 ffff9f487e043ea0: 000000003b9aca00 ffff9f782c78a100 ----我们的rsi被压栈在此
-
 ffff9f487e043eb0: 51afefcdce629c68 ffff9f78790edd80
-
 ffff9f487e043ec0: ffff9f78790edd48 ffff9f78790ede40
-
 ffff9f487e043ed0: 0018a72ed3fa2963 0000000000000001
-
 ffff9f487e043ee0: ffff9f487e043f18 ffffffffae0e4b67
-
 #16 [ffff9f487e043ee8] sched_cfs_period_timer at ffffffffae0e4b67
-
 ffff9f487e043ef0: ffff9f78790edd80 ffff9f487e055960
-
 ffff9f487e043f00: ffff9f487e0559a0 ffffffffae0e4a90
-
 ffff9f487e043f10: ffff9f487e055a98 ffff9f487e043f70
-
 ffff9f487e043f20: ffffffffae0c71e3
 
-  
-
 crash> pd 0x000000003b9aca00
-
 $2 = 1000000000
+```
 
 而带宽设置的时候，参数如下：
 
+```cpp
 crash> cfs_bandwidth.distribute_running,runtime,period,quota
-
 crash> ffff9f78790edd48
-
 distribute_running = true
-
 runtime = 0
-
 period = {
-
 tv64 = 23148000
-
 }
-
 quota = 1000000000----------------每个period补充的时间，
-
+```
 所以说，能确定进入 distribute_cfs_runtime的时候，是第一次循环，因为rsi入参的值就是quota配置的值。也就是说，我们推断的第二种可能性被推翻了，因为假设是第二次循环且有限流，则不可能入参为1000000000。
 
 这样就说明不是 do_sched_cfs_period_timer 的while 循环导致了hardlock的检测，当然我们也不能排除一次while循环耗时很长的情况，而 do_sched_cfs_period_timer 的执行时间长短取决于 throttled_cfs_rq 链表的长短，目前crash的时候是有 45 个task_group 被限流，
@@ -383,43 +251,30 @@ hrtimer_forward 返回非0值，也就是出现了overrun。
 overrun就是当前时间减去timer->node.expires  为 cfs_b->period 的整数倍的次数，也就是相当于本来应该在 
 
 overrun就是当前时间减去timer->timer->node.expires  时刻回调的定时器没有及时执行
-
+```cpp
 period_timer = {
-
 node = {
-
 node = {
-
 __rb_parent_color = 18446637938508750208, rb_right = 0x0, rb_left = 0x0 }, expires = {
-
 tv64 = 6955566201684000
-
 }
-
 },
-
-3、复现
+```
+## 3、复现
 
 需要制造这样一种情况的条件就是：cfs_b→period比较小，另外待解除限流的进程足够多就行，好的，下面我们就模仿一下这种情况：通过复现，我们来验证一下猜测：
 
 第一步，创建一个耗cpu的进程
 
 # cat caq.c
-
+```cpp
 #include <stdio.h>
-
-int main(int argc,char* argv[])
-
-{
-
+int main(int argc,char* argv[]) {
 int i=0;
-
 while(1)
-
-i++;
-
+  i++;
 }
-
+```
 然后gcc -g -o caq.o caq.c
 
 这个caq.o下面会用到。

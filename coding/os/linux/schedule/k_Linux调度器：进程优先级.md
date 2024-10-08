@@ -60,15 +60,15 @@ return prio;
 ## 7、动态优先级
 
 task struct中的prio成员表示了该线程的动态优先级，也就是调度器在进行调度时候使用的那个优先级。动态优先级在运行时可以被修改，例如在处理优先级翻转问题的时候，系统可能会临时调升一个普通进程的优先级。一般设定动态优先级的代码是这样的：p->prio = effective_prio(p)，具体计算动态优先级的代码如下：
-
-> static int effective_prio(struct task_struct *p)  
-> {  
->     p->normal_prio = normal_prio(p);  
->     if (!rt_prio(p->prio))  
->         return p->normal_prio;  
->     return p->prio;  
-> }
-
+```cpp
+static int effective_prio(struct task_struct p)  
+{  
+p->normal_prio = normal_prio(p);  
+if (!rt_prio(p->prio))  
+return p->normal_prio;  
+return p->prio;  
+}
+```
 rt_prio是一个根据当前优先级来确定是否是实时进程的函数，包括两种情况，一种情况是该进程是实时进程，调度策略是SCHED_FIFO或者SCHED_RR。另外一种情况是人为的将该进程提升到RT priority的区域（例如在使用优先级继承的方法解决系统中优先级翻转问题的时候）。在这两种情况下，我们都不改变其动态优先级，即effective_prio返回当前动态优先级p->prio。其他情况，进程的动态优先级跟随归一化的优先级。
 # 三、典型数据流程分析
 ## 1、用户空间设定nice value
@@ -111,8 +111,7 @@ task_rq_unlock(rq, p, &flags);
 （3）最核心的代码就是p->static_prio = NICE_TO_PRIO(nice);这一句了，其他的都是side effect。比如说load weight。当cpu一刻不停的运算的时候，其load是100％，没有机会调度到idle进程休息一下。当系统中没有实时进程或者deadline进程的时候，所有的runnable的进程一起来瓜分cpu资源，以此不同的进程分享一个特定比例的cpu资源，我们称之load weight。不同的nice value对应不同的cpu load weight，因此，当更改nice value的时候，也必须通过set_load_weight来更新该进程的cpu load weight。除了load weight，该线程的动态优先级也需要更新，这是通过p->prio = effective_prio(p);来完成的。
 
 （4）delta 记录了新旧线程的动态优先级的差值，当调试了该线程的优先级（delta < 0），那么有可能产生一个调度点，因此，调用resched_curr，给当前正在运行的task做一个标记，以便在返回用户空间的时候进行调度。此外，如果修改当前running状态的task的动态优先级，那么调降（delta > 0）意味着该进程有可能需要让出cpu，因此也需要resched_curr标记当前running状态的task需要reschedule。
-
-2、进程缺省的调度策略和调度参数
+## 2、进程缺省的调度策略和调度参数
 
 我们先思考这样的一个问题：在用户空间设定调度策略和调度参数之前，一个线程的default scheduling policy是什么呢？这需要追溯到fork的时候（具体代码在sched_fork函数中），这个和task struct中sched_reset_on_fork设定相关。如果没有设定这个flag，那么说明在fork的时候，子进程跟随父进程的调度策略，如果设定了这个flag，则说明子进程的调度策略和调度参数不能继承自父进程，而是需要设定为default。代码片段如下：
 ```cpp
@@ -132,9 +131,7 @@ p->prio = p->normal_prio = normal_prio(p); －－－－－－－－－－－－�
 set_load_weight(p);   
 p->sched_reset_on_fork = 0;  
 }
-
 ……
-
 }
 ```
 （1）sched_fork只是fork过程中的一个片段，在fork一开始，dup_task_struct已经复制了一个和父进程完全一个的进程描述符（task struct），因此，如果没有步骤2中的重置，那么子进程是跟随父进程的调度策略和调度参数（各种优先级），当然，有时候为了解决PI问题而临时调升父进程的动态优先级，在fork的时候不宜传递到子进程中，因此这里重置了动态优先级。
@@ -144,8 +141,7 @@ p->sched_reset_on_fork = 0;
 （3）既然调度策略和静态优先级已经修改了，那么也需要更新动态优先级和归一化优先级。此外，load weight也需要更新。一旦子进程中恢复到了缺省的调度策略和优先级，那么sched_reset_on_fork这个flag已经完成了历史使命，可以clear掉了。
 
 OK，至此，我们了解了在fork过程中对调度策略和调度参数的处理，这里还是要追加一个问题：为何不一切继承父进程的调度策略和参数呢？为何要在fork的时候reset to default呢？在linux中，对于每一个进程，我们都会进行资源限制。例如对于那些实时进程，如果它持续消耗cpu资源而没有发起一次可以引起阻塞的系统调用，那么我们猜测这个realtime进程跑飞了，从而锁住了系统。对于这种情况，我们要进行干预，因此引入了RLIMIT_RTTIME这个per-process的资源限制项。但是，如果用户空间的realtime进程通过fork其实也可以绕开RLIMIT_RTTIME这个限制，从而肆意的攫取cpu资源。然而，机智的内核开发人员早已经看穿了这一切，为了防止实时进程“泄露”到其子进程中，sched_reset_on_fork这个flag被提出来。
-
-3、用户空间设定调度策略和调度参数
+## 3、用户空间设定调度策略和调度参数
 
 通过sched_setparam接口函数可以修改rt priority的调度参数，而通过sched_setscheduler功能会更强一些，不但可以设定rt priority，还可以设定调度策略。而sched_setattr是一个集大成之接口，可以设定一个线程的调度策略以及该调度策略下的调度参数。当然，对于内核，这些接口都通过__sched_setscheduler这个内核函数来完成对指定线程调度策略和调度参数的修改。
 
@@ -154,8 +150,7 @@ __sched_setscheduler分成两个部分，首先进行安全性检查和参数检
 我们先看看安全性检查。如果用户空间可以自由的修改调度策略和调度优先级，那么世界就乱套了，每个进程可能都想把自己的调度策略和优先级提升上去，从而获取足够的CPU 资源。因此用户空间设定调度策略和调度参数要遵守一定的规则：如果没有CAP_SYS_NICE的能力，那么基本上该线程能被允许的操作只是降级而已。例如从SCHED_FIFO修改成SCHED_NORMAL，异或不修改scheduling policy，而是降低静态优先级（nice value）或者实时优先级（scheduling priority）。这里例外的是SCHED_DEADLINE的设定，按理说如果进程本身的调度策略就是SCHED_DEADLINE，那么应该允许“优先级”降低的操作（这里用优先级不是那么合适，其实就是减小run time，或者加大period，这样可以放松对cpu资源的获取），但是目前的4.4.6内核不允许（也许以后版本的内核会允许）。此外，如果没有CAP_SYS_NICE的能力，那么设定调度策略和调度参数的操作只能是限于属于同一个登录用户的线程。如果拥有CAP_SYS_NICE的能力，那么就没有那么多限制了，可以从普通进程提升成实时进程（修改policy），也可以提升静态优先级或者实时优先级。
 
 具体的修改比较简单，是通过__setscheduler_params函数完成，其实也就是是根据sched_attr中的参数设定到task struct相关成员中，大家可以自行阅读代码进行理解。
-
-参考文档：
+# 参考文档：
 
 1、linux下的各种man page
 2、linux 4.4.6内核源代码

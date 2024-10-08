@@ -1,18 +1,9 @@
-
-
 Linux开发架构之路
-
  _2024年03月27日 20:06_ _湖南_
-
-## 
-
-一、提出问题
+# 一、提出问题
 
 在日常的软件开发中，多线程是不可避免的，使用多线程中的一大问题就是线程对锁的不合理使用造成的死锁，死锁一旦发生，将导致多线程程序响应时间长，吞吐量下降甚至宕机崩溃，那么如何检测出一个多线程程序中是否存在死锁呢？在提出解决方案之前，先对死锁产生的原因以及产生的现象做一个分析。最后在用有向环来检测多线程中是否存在死锁的问题。
-
-## 
-
-二、死锁存在的条件
+## 二、死锁存在的条件
 
 所谓死锁，是指多个进程在运行过程中因争夺资源而造成的一种僵局，当进程处于这种僵持状态时，若无外力作用，它们都将无法再向前推进。
 
@@ -20,19 +11,13 @@ Linux开发架构之路
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0xZslZTn668Q7iaMZSibJMLMIjBF3SuRhzzBicqwXSMSqug5WVcl4yjSG1nVq3GsFAickJneNiaMN13jWA/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
-  
-
 在来看看4个线程线程的情况，线程A想获取线程B的锁，线程B想获取线程C的锁，线程C想获取线程D的锁，线程D想获取线程A 的锁，在线程之间构建了一个资源获取环。
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0xZslZTn668Q7iaMZSibJMLMIiceLNQor88A8qMqregtZhBicgT0bqiaGtUSdTnQWU6UxfMIm1rP6Gw64w/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
-  
-
 注意：后面的例子都是以4个线程的例子来说明的。
 
-## 
-
-三、死锁的产生原因
+## 三、死锁的产生原因
 
 （1）竞争资源
 
@@ -51,28 +36,16 @@ Linux开发架构之路
 若P1保持了资源R1,P2保持了资源R2，系统处于不安全状态，因为这两个进程再向前推进，便可能发生死锁。
 
 例如，当P1运行到P1：Request（R2）时，将因R2已被P2占用而阻塞；当P2运行到P2：Request（R1）时，也将因R1已被P1占用而阻塞，于是发生进程死锁。
-
-## 
-
-四、死锁必要条件
+# 四、死锁必要条件
 
 1.互斥条件：进程要求对所分配的资源进行排它性控制，即在一段时间内某资源仅为一进程所占用。
-
 2.请求和保持条件：当进程因请求资源而阻塞时，对已获得的资源保持不放。
-
 3.不剥夺条件：进程已获得的资源在未使用完之前，不能剥夺，只能在使用完时由自己释放。
-
 4.环路等待条件：在发生死锁时，必然存在一个进程–资源的环形链。
-
-## 
-
-五、死锁问题分析
+# 五、死锁问题分析
 
 从死锁存在的条件的图中2个线程右边的图和4个线程使用锁（互斥资源）图的来看，发生死锁之后，就构成了线程之间的一个有向环形图，因此，我们很自然的想到，死锁的问题就转换为有向环（图）问题，只要线程之间存在环形链，那么就产生了死锁问题。产生死锁的测试代码见源代码部分。
-
-## 
-
-六、环形链（死锁）的检测
+# 六、环形链（死锁）的检测
 
 如果对检测死锁问题就是对有向环的检测有一个了解之后，那么如果当死锁时肯定是一个有向环。那么我们如何构造这个有向环并且检测出这个有向环图呢？
 
@@ -97,56 +70,46 @@ b.该锁之前被其他线程lock过，但是后来被该线程unlock了，这�
 （3）释放锁之后：查询锁id的下标，然后将其锁id和线程id设置为0（清除步骤二建立的对应关系）。
 
 具体细节会在代码里提现。
-
-需要C/C++ Linux服务器架构师学习资料加qun579733396获取（资料包括C/C++，Linux，golang技术，Nginx，ZeroMQ，MySQL，Redis，fastdfs，MongoDB，ZK，流媒体，CDN，P2P，K8S，Docker，TCP/IP，协程，DPDK，ffmpeg等），免费分享
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-## 
-
-七、Hook
+# 七、Hook
 
 前面说过造成死锁的原因是因为当前线程只知道自己lock的锁，而通过环形链检测的3步骤之后，就知道了目前哪些锁当前正在被哪些线程lock了，哪些锁没有被lock。从而使问题得以解决。
 
 既然在每次加锁之前和解锁之后都要完成这些操作，是不是可以考虑到将这3个操作融入到加锁和解锁的函数API中，但是就常规情况而言，C语言没有C++类的函数重写功能，但是对于早期编译器而言，C的语法是支持自定义和系统API一样的函数名(虽然我们可以定义的函数和系统函数重名而不报错，那么我们又如何使用系统的API呢？)，这时候我们可以自定义pthread_mutex_lock()接口-和系统api同名，但是在调用系统api加锁之前需要进行”加锁之前的操作”以及在加锁之后的”加锁之后”操作，同时定义pthread_mutex_unlock()接口需要实现解锁操作和”释放锁之后”的操作。这样用户依然可以像调用系统API一样，去进行加锁和解锁操作。然而比较新的编译器会将这种视为”重定义”的错误。然而Hook帮我们实现了这个问题，关于hook的原理这里不做分析，有兴趣的朋友可以自行百度，Hook的原理就是使用函数指针的思想，找到我们想要指向的系统API的入口，然后在某个时候进行调用即可，Hook是使用系统的dlsym API接口来实现的，下面是使用实例。
-
+```cpp
 typedef int (*pthread_mutex_lock_t)(pthread_mutex_t *mutex);  
 pthread_mutex_lock_t pthread_mutex_lock_f;  
 typedef int (*pthread_mutex_unlock_t)(pthread_mutex_t *mutex);  
 pthread_mutex_unlock_t pthread_mutex_unlock_f;  
-  
+
 //在函数入口处进行初始化  
 static int init_hook() {   
    //锁住系统函数 pthread_mutex_lock  
    pthread_mutex_lock_f = dlsym(RTLD_NEXT, "pthread_mutex_lock");  
    pthread_mutex_unlock_f = dlsym(RTLD_NEXT, "pthread_mutex_unlock");  
-}  
+}
+
 int pthread_mutex_lock(pthread_mutex_t *mutex) {  
     pthread_t selfid = pthread_self(); //  
     lock_before(selfid, (uint64)mutex);//加锁前操作  
     pthread_mutex_lock_f(mutex);//调用系统的pthread_mutex_lock  
     lock_after(selfid, (uint64)mutex);//加锁后操作  
-}  
+}
+
 int pthread_mutex_unlock(pthread_mutex_t *mutex) {  
     pthread_t selfid = pthread_self();  
     pthread_mutex_unlock_f(mutex);//调用系统的pthread_mutex_unlock  
     unlock_after(selfid, (uint64)mutex);//解锁后操作  
 }
+```
 
 以上代码就是使用hook的例子，在函数入口处调用init_hook().，init_hook()里面为什么会hook()系统的函数，而不是自定义的函数，这个在这篇博客中”hook function注意事项”处说明：hook介绍,然后就可以像你平时使用pthread_mutex_lock和pthread_mutex_unlock使用这2个函数了。
 
 如果对函数指针熟悉，上面的代码很容易明白上面意思。其中lock_before、lock_after、unlock_after就是前面说的环检测的3步骤，后面源代码部分有实现过程。
-
-## 
-
-八、死锁中涉及图的结构分析
+# 八、死锁中涉及图的结构分析
 
 关于图的基本概念、遍历等在本文中就不细说了，这里结合源代码来对其进行说明。
-
-### 
-
-结点数据信息
-
+## 结点数据信息
+```cpp
 enum Type {PROCESS, RESOURCE};//进程，资源  
 //结点数据  
 struct source_type {  
@@ -156,21 +119,18 @@ struct source_type {
     //当前 mutex id 正在被线程lock的标志（我可能理解的有问题）  
     int degress;  
 };
-
+```
 图由顶点（结点）和边组成，在死锁中结点代表了线程和锁的对应关系，包括线程id，mutex_id等。
-
-### 
-
-图的邻接表表示
+## 图的邻接表表示
 
 图的邻接表所有结点使用数组表示，而结点的边是使用链表来表示。
-
-//结点  
+```cpp
+// 结点  
 struct vertex {  
     struct source_type s;  
     struct vertex *next;//结点与结点之间的边的链表表示  
 };  
-//图-邻接表表示  
+// 图-邻接表表示  
 struct task_graph {  
     struct vertex list[MAX];//结点列表  
     int num;//结点数量  
@@ -179,16 +139,11 @@ struct task_graph {
     int lockidx;//锁 id下标  
     pthread_mutex_t mutex;  
 };
-
-### 
-
-深度遍历（DFS）
+```
+## 深度遍历（DFS）
 
 从某结点开始遍历，从该节点某边进行遍历，一直遍历到最后一个结点，然后返回继续遍历该节点的其他边。对每个结点都进行递归操作。
-
-### 
-
-有向环的检测
+## 有向环的检测
 
 在深度遍历（DFS）遍历的过程中，如果发现某个结点的访问标志已经为1，那么就存在环了。
 
