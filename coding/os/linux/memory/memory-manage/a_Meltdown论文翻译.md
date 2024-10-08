@@ -1,29 +1,10 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-1-19 20:18 分类：[基础学科](http://www.wowotech.net/sort/basic_subject)
-
-摘要（Abstract）
+# 摘要（Abstract）
 
 The security of computer systems fundamentally relies on memory isolation, e.g., kernel address ranges are marked as non-accessible and are protected from user access. In this paper, we present Meltdown. Meltdown exploits side effects of out-of-order execution on modern processors to read arbitrary kernel-memory locations including personal data and passwords. Out-of-order execution is an indispensable performance feature and present in a wide range of modern processors. The attack is independent of the operating system, and it does not rely on any software vulnerabilities. Meltdown breaks all security assumptions given by address space isolation as well as paravirtualized environments and, thus, every security mechanism building upon this foundation. On affected systems, Meltdown enables an adversary to read memory of other processes or virtual machines in the cloud without any permissions or privileges, affecting millions of customers and virtually every user of a personal computer. We show that the KAISER defense mechanism for KASLR [8] has the important (but inadvertent) side effect of impeding Meltdown. We stress that KAISER must be deployed immediately to prevent large-scale exploitation of this severe information leakage.
 
 内存隔离是计算机系统安全的基础，例如：内核空间的地址段往往是标记为受保护的，用户态程序读写内核地址则会触发异常，从而阻止其访问。在这篇文章中，我们会详细描述这个叫Meltdown的硬件漏洞。Meltdown是利用了现代处理器上乱序执行（out-of-order execution）的副作用（side effect），使得用户态程序也可以读出内核空间的数据，包括个人私有数据和密码。由于可以提高性能，现代处理器广泛采用了乱序执行特性。利用Meltdown进行攻击的方法和操作系统无关，也不依赖于软件的漏洞。地址空间隔离带来的安全保证被Meltdown给无情的打碎了（半虚拟化环境也是如此），因此，所有基于地址空间隔离的安全机制都不再安全了。在受影响的系统中，Meltdown可以让一个攻击者读取其他进程的数据，或者读取云服务器中其他虚拟机的数据，而不需要相应的权限。这份文档也说明了KAISER（本意是解决KASLR不能解决的问题）可以防止Meltdown攻击。因此，我们强烈建议必须立即部署KAISER，以防止大规模、严重的信息泄漏。
-
-一、简介（Introduction）
+# 一、简介（Introduction）
 
 One of the central security features of today’s operating systems is memory isolation. Operating systems ensure that user applications cannot access each other’s memories and prevent user applications from reading or writing kernel memory. This isolation is a cornerstone of our computing environments and allows running multiple applications on personal devices or executing processes of multiple users on a single machine in the cloud.
 
@@ -66,7 +47,6 @@ Meltdown is distinct from the Spectre Attacks [19] in several ways, notably that
 Contributions. The contributions of this work are:
 
 1. We describe out-of-order execution as a new, extremely powerful, software-based side channel.
-
 2. We show how out-of-order execution can be combined with a microarchitectural covert channel to
 
 transfer the data from an elusive state to a receiver on the outside.
@@ -90,14 +70,12 @@ and on public cloud machines.
 Outline. The remainder of this paper is structured as follows: In Section 2, we describe the fundamental problem which is introduced with out-of-order execution. In Section 3, we provide a toy example illustrating the side channel Meltdown exploits. In Section 4, we describe the building blocks of the full Meltdown attack. In Section 5, we present the Meltdown attack. In Section 6, we evaluate the performance of the Meltdown attack on several different systems. In Section 7, we discuss the effects of the software-based KAISER countermeasure and propose solutions in hardware. In Section 8, we discuss related work and conclude our work in Section 9.
 
 本文概述：本文的其余部分的结构如下：在第2节中，我们描述了乱序执行带来的基本问题，在第3节中，我们提供了一个简单的示例来说明Meltdown利用的侧信道。在第4节中，我们描述了Meltdown攻击的方块结构图。在第5节中，我们展示如何进行Meltdown攻击。在第6节中，我们评估了几种不同系统上的meltdown攻击的性能。在第7节中，我们讨论了针对meltdown的软硬件对策。软件解决方案主要是KAISER机制，此外，我们也提出了硬件解决方案的建议。在第8节中，我们将讨论相关工作，并在第9节给出我们的结论。
-
-二、背景介绍（Background）
+# 二、背景介绍（Background）
 
 In this section, we provide background on out-of-order execution, address translation, and cache attacks.
 
 这一小节，我们将描述乱序执行、地址翻译和缓存攻击的一些基本背景知识。
-
-1、乱序执行（Out-of-order execution）
+## 1、乱序执行（Out-of-order execution）
 
 Out-of-order execution is an optimization technique that allows to maximize the utilization of all execution units of a CPU core as exhaustive as possible. Instead of processing instructions strictly in the sequential program order, the CPU executes them as soon as all required resources are available. While the execution unit of the current operation is occupied, other execution units can run ahead. Hence, instructions can be run in parallel as long as their results follow the architectural definition.
 

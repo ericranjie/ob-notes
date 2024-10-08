@@ -1,17 +1,7 @@
- 
 CPP开发者
-
  _2022年05月12日 11:50_ _浙江_
-
 The following article is from 高性能架构探索 Author 雨乐
 
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5l59Jsg6JicJQAuib8Sc0WPkC0P6LaJzVntCQerzf7bcPg/0)
-
-**高性能架构探索**.
-
-专注于分享干货，硬货，欢迎关注😄
 
 ](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651170981&idx=1&sn=61be27deb019126bb32fd6d8da71d44a&chksm=806479fab713f0ec2c47394610dc0e91e7fd51d01b473566f10d9adfa3dda9a8a48bfa5d15ae&mpshare=1&scene=24&srcid=0512SAyJ9OJxGdXLQ7YCVAjs&sharer_sharetime=1652338318591&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0587970c94857179744e0205b2a8b610acadc576e8a17dd598be9fe9bdf2324916f995c39d585c306ab622680f4f0df9f3d46433d2db46cd37539ed4c65502e372c9bd6c8aec76ce508dff7e3f9933aaaeffa3741106b262cd0246c9323c2379fda1143ceed5438f481258103507a6c05b6c0d1f72092c79a&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_e829fd9228a9&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQ02wLcyO%2B3%2Fj%2FRmT%2B6lGfRxKUAgIE97dBBAEAAAAAAARMFt%2FXnXcAAAAOpnltbLcz9gKNyK89dVj0pIZOhCMoj51%2Fbd2zR%2B2Kka0Vvs8Q3HWgtAdfntSTklobIVWavD5FvwsFLIyXLX5RiiAXfLqamW7P1MqDIr0gV9immhm%2Bf5VIsLyGDmUqvuyhA9jGid0Fg%2B0BvxCtdIxhsmNDr1AFeY7sBI2hmy3QjVaCGaJISbwynacz75cdE8hyS9zAoF3Y%2F4pPoUpYOtM7kZN0s9BmUuw%2B1m8yI%2Bn0SdJxnJXvIHLNzdz2wZ%2FPd73sqyVyKmVdMUGpufqQqqgx8jsiivv5cwfp44aaLDveX%2Fw%2BeU507rV6pkoYRWCg%2BjbIm3YoGVrFJZIuZRNd%2Fg%3D%3D&acctmode=0&pass_ticket=q6POhk3Bct7s1ht4Sq%2BwmceZMpwDuNxcMqFo88t1VUhRzhjl%2F%2BnXe83K0Ts2j52V&wx_header=0#)
 
@@ -20,7 +10,6 @@ The following article is from 高性能架构探索 Author 雨乐
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhRXIkKJ7KWooq2f0YibyXX9AAGq6Vqp50R6onibERQV75sBiaIyuI8LEOUVNWQicQLJs99FOuVcVHTdw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 看了下面所有的回答，要么是没有回答到点上，要么是回答不够深入，所以，借助本文，深入讲解C/C++内存管理。
-
 ## 1 写在前面
 
 源码分析本身就很枯燥乏味，尤其是要将其写成通俗易懂的文章，更是难上加难。
@@ -29,11 +18,9 @@ The following article is from 高性能架构探索 Author 雨乐
 
 接下来的内容，干货满满，对于你我都是一次收获的过程。主要从内存布局、glibc内存管理、malloc实现以及free实现几个点来带你领略glibc内存管理精髓。最后，针对项目中的问题，指出了解决方案。大纲内容如下：
 ![[Pasted image 20240914160557.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 
 主要内容
-
-  
 
 ## 2 背景
 
@@ -50,16 +37,11 @@ The following article is from 高性能架构探索 Author 雨乐
 问题缩小到glibc的内存管理方面，把下面几个问题弄清楚，才能解决SeedService进程消失的问题：
 
 - glibc 在什么情况下不会将内存归还给操作系统？
-    
 - glibc 的内存管理方式有哪些约束?适合什么样的内存分配场景？
-    
 - 我们的系统中的内存管理方式是与glibc 的内存管理的约束相悖的？
-    
 - glibc 是如何管理内存的？
-    
 
 带着上面这些问题，大概用了将近一个月的时间分析了glibc运行时库的内存管理代码，今天将当时的笔记整理了出来，希望能够对大家有用。
-
 ## 3 基础
 
 Linux 系统在装载 elf 格式的程序文件时，会调用 loader 把可执行文件中的各个段依次载入到从某一地址开始的空间中。

@@ -1,8 +1,5 @@
-
 Original songsong001 Linux内核那些事
-
  _2022年09月27日 13:05_ _广东_
-
 ## splice 原理重温
 
 在《[splice使用](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466923&idx=1&sn=acf2fb71a960f3831f9b98657b39d4ce&scene=21#wechat_redirect)》一文中介绍了 `splice` 的原理和使用，现在我们来分析一下 `splice` 的代码实现。
@@ -17,18 +14,13 @@ Original songsong001 Linux内核那些事
 
 我们在《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》一文中介绍过，管道有个 `环形缓冲区`，这个 `环形缓冲区` 需要绑定真实的物理内存页。而 splice 就是将管道的 `环形缓冲区` 绑定到文件的 `页缓存`，如下图所示：
 ![[Pasted image 20240914164257.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 通过将文件页缓存绑定到管道的环形缓冲区后，就可以通过管道的读端读取文件页缓存的数据。
-
 ## splice 代码实现
 
 在《[splice使用](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466923&idx=1&sn=acf2fb71a960f3831f9b98657b39d4ce&scene=21#wechat_redirect)》一文中介绍过 `splice` 的使用过程，要将文件内容发送到客户端连接的步骤如下：
 
 1. 首先，使用 `splice()` 系统调用将文件的内容与管道绑定。
-    
 2. 然后，使用 `splice()` 系统调用将管道的数据拷贝到客户端连接 socket。
-    
 
 我们先来看看 `splice()` 系统调用的实现，代码如下：
 
@@ -45,12 +37,9 @@ static longdo_splice(struct file *in, loff_t *off_in,           
 如上面代码所示，`do_splice()` 函数分两种情况处理，如下：
 
 1. 如果输入端是一个管道，则调用 `do_splice_from()` 函数进行处理。
-    
 2. 如果输出端是一个管道，则调用 `do_splice_to()` 函数进行处理。
-    
 
 下面我们分别来说明这两种情况的处理过程。
-
 ### 1. 输入端是一个管道
 
 如果输入端是一个管道（也就是说从管道拷贝数据到输出端句柄），那么将会调用 `do_splice_from()` 函数进行处理，`do_splice_from()` 函数的实现如下：
@@ -76,16 +65,13 @@ ssize_t__splice_from_pipe(struct pipe_inode_info *pipe, struct splice_desc 
 对 `__splice_from_pipe()` 函数进行简化后，逻辑就很简单。主要过程如下：
 
 1. 获取管道环形缓冲区（管道的实现可以参考《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》一文）。
-    
 2. 调用 `pipe_to_file()` 函数把管道环形缓冲区的数据拷贝到输出端的文件中。
-    
 
 所以，输入端是一个管道的调用链如下：
 
 ```c
 sys_splice()└→ do_splice()   └→ do_splice_from()      └→ generic_file_splice_write()         └→ __splice_from_pipe()            └→ pipe_to_file()
 ```
-
 ### 2. 输出端是一个管道
 
 如果输出端是一个管道（也就是说将输入端与管道绑定），那么将会调用 `do_splice_to()` 函数进行处理，`do_splice_to()` 函数的实现如下：
@@ -109,13 +95,9 @@ while (spd.nr_pages < nr_pages) {        page = find_get_page(mapp
 `__generic_file_splice_read()` 函数的代码比较长，为了更易于分析，所以对其进行了精简。从精简后的代码可以看出，`__generic_file_splice_read()` 函数主要完成 4 个步骤：
 
 1. 查找要绑定的页缓存是否已经存在（已经从硬盘同步到页缓存）。
-    
 2. 如果还有没有同步到内核的页缓存，那么申请新的页缓存。
-    
 3. 如果页缓存与硬盘的数据不一致，那么先从硬盘同步到页缓存。
-    
 4. 调用 `splice_to_pipe()` 函数将页缓存与管道绑定。
-    
 
 所以最终会调用 `splice_to_pipe()` 函数将页缓存与管道绑定，我们来看看 `splice_to_pipe()` 函数的实现：
 
@@ -130,25 +112,8 @@ ssize_tsplice_to_pipe(struct pipe_inode_info *pipe, struct splice_pipe_desc�
 ```c
 sys_splice()└→ do_splice()   └→ do_splice_to()      └→ generic_file_splice_read()         └→ __generic_file_splice_read()            └→ splice_to_pipe()
 ```
-
 ## 总结
 
 本文主要介绍了 `splice` 的原理与实现，`splice` 是 `零拷贝技术` 的一种实现。希望通过本文，能够让读者对 `零拷贝技术` 有更深入的理解。
 
 当然本文也忽略了很多实现的细节，所以在阅读的过程中遇到某些细节不理解的时候，可以直接阅读源代码来解疑。
-
-  
-
-![](https://mmbiz.qlogo.cn/mmbiz_jpg/3L4ic10JiaFticmDSGL5JOIwYJsxLuKSN4gibA34IIsKqkiaXzqKjLUzuLUpBPbZqLlK8sogSpvicicxNf6Ibwn4SMLXg/0?wx_fmt=jpeg)
-
-songsong001
-
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466990&idx=1&sn=ab735f1c926d35f885f6835ebe6f5f90&chksm=87663b8bb011b29dc32fdbe41b843369cf8acf705f4ab1d018f4cb4d983ed1733f414c18d3fa&mpshare=1&scene=24&srcid=0927wmtqLYzz2UM6EVcMj7iw&sharer_sharetime=1664269948114&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0028f86d5c7c6feb69ca7add83264fca5e0460404ff9b6109fbc5c2eba4a53215010a3dc2e4eb133866d684b4b066b77f323264fa761fb473b3cc6754efc9842c0951760bc0cc3b1b114787d25f631dd861696db1c0e3445093d8cd77ea56b1b1826d43a2011db3e295caffb388471e3fdf113c4715aeb022&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_d1ab94bf8efc&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQHYqu7Ktss3a5vFpi9ai6VBKUAgIE97dBBAEAAAAAAIjIOZ0UEmIAAAAOpnltbLcz9gKNyK89dVj0EFWRvfWKjfXz3%2BtwMJMtbqOw0ntJ5jnq2UNmTTuKm1tqjEP1jaiWpgCxJNWhbO8tPZh6l%2Fc5PtnpugOdAEN0PNzpCzIvA%2FR%2BTWHClTM2iStMa054OkgJsv8f4P6ZIr3rAq%2BIvCVFxC0ysW6axNY%2F9NQxKdtURpmSgTZS6DNkwFrX9iMljPus26FF4OuDTptFKtsvRVU7zQibGLvxKRmrNxVydFoZ%2FsimKk2YsmY32x4P%2FGxqM4hmEvGT0CJcIh5g6Xqivety3QR51jBVKUxV4fj9lci077%2B%2FaOv0YCWz7UUpkcYCYoi5HrXUj74MPg%3D%3D&acctmode=0&pass_ticket=znvIAeeZjMBGpG5ZUs7vIifC1Lenmh3zj%2BoQFNFFyBfrf00L9r88Thq4QD9HgYAm&wx_header=0)Like the Author
-
-1 like(s)
-
-![](http://wx.qlogo.cn/mmopen/PiajxSqBRaEItd7xO3jwnrNId670almsxlS8JQJK6Izs83ibztSVJ62WAaEianL1fqJF2TTE3zB8ksyialmKnkp4qQ/64)
-
-Reads 2129
-
-​

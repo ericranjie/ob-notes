@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
+                "file": "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
+                "file": "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
+                "file": "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md"
+                "file": "coding/os/linux/debug/b_《Load高故障分析》学习笔记.md"
               }
             }
           }
@@ -148,14 +148,20 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/memory/userspace/k_一文读懂零拷贝技术｜splice原理与实现.md",
+    "coding/os/linux/memory/userspace/k_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
+    "README.md",
+    "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
+    "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
+    "coding/os/linux/memory/memory-manage/i_图文详解 Linux 分页机制！.md",
+    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
+    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
     "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "coding/os/linux/memory/memory-manage/k_Linux Kernel：内存分页机制核心原理.md",
     "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
-    "README.md",
     "zx99-image/Pasted image 20241007233004.png",
     "coding/os/linux/memory/memory-manage/i_文件系统和裸块设备的page cache问题.md",
-    "coding/os/linux/memory/memory-manage/i_图文详解 Linux 分页机制！.md",
     "coding/os/linux/memory/memory-manage/i_深入理解Linux内核之脏页跟踪.md",
     "coding/os/linux/memory/MMU/p_甄建勇：五分钟搞定MMU.md",
     "zx99-image/Pasted image 20241007231324.png",
@@ -174,15 +180,9 @@
     "Pasted image 20241007225825.png",
     "zx99-image/Pasted image 20241007225643.png",
     "coding/os/linux/debug/b_n_案例分析 - 内存泄露的排查方法.md",
-    "coding/os/linux/debug/trace/b_Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧.md",
     "zx99-image/Pasted image 20241007224037.png",
-    "coding/os/linux/debug/GDB/b_自己动手写一个GDB 设置断点（原理篇）.md",
-    "coding/os/linux/debug/b_Linux内核调试的方式以及工具集锦.md",
     "zx99-image/Pasted image 20241007224451.png",
     "zx99-image/Pasted image 20241007224127.png",
-    "coding/os/linux/debug/a_n_大厂干掉 OOM 的套路，不过如此.md",
-    "coding/cpp/template/b_C++模板总结.md",
-    "coding/cpp/template/a_n_四万字长文，这是我见过最好的模板元编程文章！.md",
     "zx99-image/Pasted image 20241007192403.png",
     "learning",
     "coding/app/nginx",

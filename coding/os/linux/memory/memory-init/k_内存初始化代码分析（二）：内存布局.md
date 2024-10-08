@@ -2,56 +2,51 @@
 # 一、前言
 
 同样的，本文是[内存初始化](http://www.wowotech.net/memory_management/mm-init-1.html)文章的一份补充文档，希望能够通过这样的一份文档，细致的展示在初始化阶段，Linux 4.4.6内核如何从device tree中提取信息，完成内存布局的任务。具体的cpu体系结构选择的是ARM64。
-
-二、memory type region的构建
+# 二、memory type region的构建
 
 memory type是一个memblock模块（内核初始化阶段的内存管理模块）的术语，memblock将内存块分成两种类型：一种是memory type，另外一种是reserved type，分别用数组来管理系统中的两种类型的memory region。本小节描述的是系统如何在初始化阶段构建memory type的数组。
-
-1、扫描device tree
+## 1、扫描device tree
 
 在完成fdt内存区域的地址映射之后（fixmap_remap_fdt），内核会对fdt进行扫描，以便完成memory type数组的构建。具体代码位于setup_machine_fdt--->early_init_dt_scan--->early_init_dt_scan_nodes中：
-
-> void __init early_init_dt_scan_nodes(void)  
-> {  
->     of_scan_flat_dt(early_init_dt_scan_chosen, boot_command_line); －－－－－－（1）  
->     of_scan_flat_dt(early_init_dt_scan_root, NULL);   
->     of_scan_flat_dt(early_init_dt_scan_memory, NULL);－－－－－－－－－－－－－（2）  
-> }
-
+```cpp
+void init early_init_dt_scan_nodes(void) {  
+of_scan_flat_dt(early_init_dt_scan_chosen, boot_command_line); // －－－－－－（1）  
+of_scan_flat_dt(early_init_dt_scan_root, NULL);   
+of_scan_flat_dt(early_init_dt_scan_memory, NULL); // －－－－－－－－－－－－－（2）  
+}
+```
 （1）of_scan_flat_dt函数是用来scan整个device tree，针对每一个node调用callback函数，因此，这里实际上是针对设备树中的每一个节点调用early_init_dt_scan_chosen函数。之所以这么做是因为device tree blob刚刚完成地址映射，还没有展开，我们只能使用这种比较笨的办法。这句代码主要是寻址chosen node，并解析，将相关数据放入到boot_command_line。
 
 （2）概念同上，不过是针对memory node进行scan。
+## 2、传统的命令行参数解析
+```cpp
+int init early_init_dt_scan_chosen(unsigned long node, const char uname, int depth, void *data) {  
+int l;  
+const char *p;
 
-2、传统的命令行参数解析
+if (depth != 1 || !data ||  
+(strcmp(uname, "chosen") != 0 && strcmp(uname, "chosen@0") != 0))  
+return 0; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）
 
-> int __init early_init_dt_scan_chosen(unsigned long node, const char *uname, int depth, void *data)  
-> {  
->     int l;  
->     const char *p;
-> 
->     if (depth != 1 || !data ||  
->         (strcmp(uname, "chosen") != 0 && strcmp(uname, "chosen@0") != 0))  
->         return 0; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）
-> 
->     early_init_dt_check_for_initrd(node); －－－－－－－－－－－－－－－－－－－－（2）
-> 
->     /* Retrieve command line */  
->     p = of_get_flat_dt_prop(node, "bootargs", &l);  
->     if (p != NULL && l > 0)  
->         strlcpy(data, p, min((int)l, COMMAND_LINE_SIZE)); －－－－－－－－－－－－（3）
-> 
->   
-> #ifdef CONFIG_CMDLINE  
-> #ifndef CONFIG_CMDLINE_FORCE  
->     if (!((char *)data)[0])  
-> #endif  
->         strlcpy(data, CONFIG_CMDLINE, COMMAND_LINE_SIZE);  
-> #endif /* CONFIG_CMDLINE */ －－－－－－－－－－－－－－－－－－－－－－－（4）
-> 
->   
->     return 1;  
-> }
+early_init_dt_check_for_initrd(node); －－－－－－－－－－－－－－－－－－－－（2）
 
+/ Retrieve command line /  
+p = of_get_flat_dt_prop(node, "bootargs", &l);  
+if (p != NULL && l > 0)  
+strlcpy(data, p, min((int)l, COMMAND_LINE_SIZE)); －－－－－－－－－－－－（3）
+
+
+ifdef CONFIG_CMDLINE  
+ifndef CONFIG_CMDLINE_FORCE  
+if (!((char *)data)0)  
+endif  
+strlcpy(data, CONFIG_CMDLINE, COMMAND_LINE_SIZE);  
+endif / CONFIG_CMDLINE / －－－－－－－－－－－－－－－－－－－－－－－（4）
+
+
+return 1;  
+}
+```
 （1）上面我们说过，early_init_dt_scan_chosen会为device tree中的每一个node而调用一次，因此，为了效率，不是chosen node的节点我们必须赶紧闪人。由于chosen node是root node的子节点，因此其depth必须是1。这里depth不是1的节点，节点名字不是"chosen"或者[chosen@0](mailto:chosen@0)和我们毫无关系，立刻返回。
 
 （2）解析chosen node中的initrd的信息
@@ -59,40 +54,39 @@ memory type是一个memblock模块（内核初始化阶段的内存管理模块�
 （3）解析chosen node中的bootargs（命令行参数）并将其copy到boot_command_line。
 
 （4）一般而言，内核有可能会定义一个default command line string（CONFIG_CMDLINE），如果bootloader没有通过device tree传递命令行参数过来，那么可以考虑使用default参数。如果系统定义了CONFIG_CMDLINE_FORCE，那么系统强制使用缺省命令行参数，bootloader传递过来的是无效的。
+## 3、memory node解析
+```cpp
+int init early_init_dt_scan_memory(unsigned long node, const char uname, int depth, void *data)  
+{  
+const char *type = of_get_flat_dt_prop(node, "device_type", NULL);  
+const __be32 *reg, *endp;  
+int l;   
+if (type == NULL) {  
+if (!IS_ENABLED(CONFIG_PPC32) || depth != 1 || strcmp(uname, "memory@0") != 0)  
+return 0;  
+} else if (strcmp(type, "memory") != 0)  
+return 0; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）
 
-3、memory node解析
+reg = of_get_flat_dt_prop(node, "linux,usable-memory", &l);  
+if (reg == NULL)  
+reg = of_get_flat_dt_prop(node, "reg", &l);－－－－－－－－－－－－－－－（2）  
+if (reg == NULL)  
+return 0;
 
-> int __init early_init_dt_scan_memory(unsigned long node, const char *uname, int depth, void *data)  
-> {  
->     const char *type = of_get_flat_dt_prop(node, "device_type", NULL);  
->     const __be32 *reg, *endp;  
->     int l;   
->     if (type == NULL) {  
->         if (!IS_ENABLED(CONFIG_PPC32) || depth != 1 || strcmp(uname, "memory@0") != 0)  
->             return 0;  
->     } else if (strcmp(type, "memory") != 0)  
->         return 0; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）
-> 
->     reg = of_get_flat_dt_prop(node, "linux,usable-memory", &l);  
->     if (reg == NULL)  
->         reg = of_get_flat_dt_prop(node, "reg", &l);－－－－－－－－－－－－－－－（2）  
->     if (reg == NULL)  
->         return 0;
-> 
->     endp = reg + (l / sizeof(__be32)); －－－－－－－－－－－－－－－－－－－－（3）
-> 
->     while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {  
->         u64 base, size;
-> 
->         base = dt_mem_next_cell(dt_root_addr_cells, ®);  
->         size = dt_mem_next_cell(dt_root_size_cells, ®); －－－－－－－－－－（4）
-> 
->         early_init_dt_add_memory_arch(base, size);－－－－－－－－－－－－－－（5）  
->     }
-> 
->     return 0;  
-> }
+endp = reg + (l / sizeof(__be32)); －－－－－－－－－－－－－－－－－－－－（3）
 
+while ((endp - reg) >= (dt_root_addr_cells + dt_root_size_cells)) {  
+u64 base, size;
+
+base = dt_mem_next_cell(dt_root_addr_cells, ®);  
+size = dt_mem_next_cell(dt_root_size_cells, ®); －－－－－－－－－－（4）
+
+early_init_dt_add_memory_arch(base, size);－－－－－－－－－－－－－－（5）  
+}
+
+return 0;  
+}
+```
 （1）如果该memory node是root node的子节点的话，那么它一定是有device_type属性并且其值是字符串”memory”。不是的话就可以返回了。不过node没有定义device_type属性怎么办？大部分的平台都可以直接返回了，除了PPC32，对于这个平台，如果memory node是更深层次的节点的话，那么它是没有device_type属性的，这时候可以根据node name来判断。当然，目标都是一致的，不是自己关注的node就赶紧闪人。
 
 （2）该memory node的物理地址信息保存在"linux,usable-memory"或者"reg"属性中（reg是我们常用的）
@@ -104,49 +98,47 @@ memory type是一个memblock模块（内核初始化阶段的内存管理模块�
 注：dt_root_addr_cells和dt_root_size_cells这两个参数的解析在early_init_dt_scan_root中完成。
 
 （5）针对该memory mode中的每一个memory region，调用early_init_dt_add_memory_arch向系统注册memory type的内存区域（实际上是通过memblock_add完成的）。
-
-4、解析memory相关的early option
+## 4、解析memory相关的early option
 
 setup_arch--->parse_early_param函数中会对early options解析解析，这会导致下面代码的执行：
+```cpp
+static int init early_mem(char p)  
+{
 
-> static int __init early_mem(char *p)  
-> {
-> 
->     memory_limit = memparse(p, &p) & PAGE_MASK;
-> 
->     return 0;  
-> }  
-> early_param("mem", early_mem);
+memory_limit = memparse(p, &p) & PAGE_MASK;
 
+return 0;  
+}  
+early_param("mem", early_mem);
+```
 在过去，没有device tree的时代，mem这个命令行参数传递了memory bank的信息，内核根据这个信息来创建系统内存的初始布局。在ARM64中，由于强制使用device tree，因此mem这个启动参数失去了本来的意义，现在它只是定义了memory的上限（最大的系统内存地址），可以限制DTS传递过来的内存参数。
-
-三、reserved type region的构建
+# 三、reserved type region的构建
 
 保留内存的定义主要在fixmap_remap_fdt和arm64_memblock_init函数中进行，我们会按照代码顺序逐一进行各种各样reserved type的memory region的构建。
 
 1、保留fdt占用的内存，代码如下：
+```cpp
+void init fixmap_remap_fdt(phys_addr_t dt_phys)  
+{……
 
-> void *__init fixmap_remap_fdt(phys_addr_t dt_phys)  
-> {……
-> 
->     memblock_reserve(dt_phys, size);
-> 
-> ……}
+memblock_reserve(dt_phys, size);
 
+……}
+```
 fixmap_remap_fdt主要是为fdt建立地址映射，在该函数的最后，顺便就调用memblock_reserve保留了该段内存。
 
 2、保留内核和initrd占用的内容，代码如下：
-
-> void __init arm64_memblock_init(void)  
-> {  
->     memblock_enforce_memory_limit(memory_limit); －－－－－－－－－－－－－－－－（1）  
->     memblock_reserve(__pa(_text), _end - _text);－－－－－－－－－－－－－－－－－－（2）  
-> #ifdef CONFIG_BLK_DEV_INITRD  
->     if (initrd_start)  
->         memblock_reserve(__virt_to_phys(initrd_start), initrd_end - initrd_start);－－－－－－（3）  
-> #endif  
-> ……}
-
+```cpp
+void init arm64_memblock_init(void)  
+{  
+memblock_enforce_memory_limit(memory_limit); －－－－－－－－－－－－－－－－（1）  
+memblock_reserve(__pa(text), _end - _text);－－－－－－－－－－－－－－－－－－（2）  
+ifdef CONFIG_BLK_DEV_INITRD  
+if (initrd_start)  
+memblock_reserve(__virt_to_phys(initrd_start), initrd_end - initrd_start);－－－－－－（3）  
+endif  
+……}
+```
 （1）我们前面解析了DTS的memory节点，已经向系统加入了不少的memory type的region，当然reserved memory block也会有一些，例如DTB对应的memory就是reserved。memory_limit可以对这些DTS的设定给出上限，memblock_enforce_memory_limit函数会根据这个上限，修改各个memory region的base和size，此外还将大于memory_limit的memory block（包括memory type和reserved type）从列表中删掉。
 
 （2）reserve内核代码、数据区等（_text到_end那一段，具体的内容可以参考内核链接脚本）
