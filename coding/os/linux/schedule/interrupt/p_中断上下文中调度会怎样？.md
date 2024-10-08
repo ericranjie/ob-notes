@@ -1,14 +1,11 @@
  作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-3-20 19:08 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-一、前言
+# 一、前言
 
 每一个Linux驱动工程师都知道这样一个准则：在中断上下文中不能睡眠。但是为什么interrupt context中不能调用导致睡眠的kernel API呢？如果驱动这么做会导致什么样的后果呢？这就是本文探讨的主题。为了理解这个主题，我们设计了一些非常简单的驱动程序和用户空间的程序，实际做实验观察实验效果，最后给出了结果和分析。
 
 BTW，本文的实验在X86 64bit ＋ 标准4.4内核上完成。
-
-二、测试程序
-
-1、cst驱动模块
+# 二、测试程序
+## 1、cst驱动模块
 
 我们首先准备一个能够在中断上下文中睡眠的驱动程序，在这里我称之Context schedule test module（后文简称cst模块）。这个驱动程序类似潜伏在内核中的“捣蛋鬼”，每隔1秒随机命中一个进程，然后引发调度。首先准备一个Makefile，代码如下：
 

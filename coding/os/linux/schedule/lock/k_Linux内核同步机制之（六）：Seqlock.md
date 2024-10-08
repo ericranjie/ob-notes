@@ -8,40 +8,30 @@
 seqlock这种锁机制是倾向writer thread，也就是说，除非有其他的writer thread进入了临界区，否则它会长驱直入，无论有多少的reader thread都不能阻挡writer的脚步。writer thread这么霸道，reader肿么办？对于seqlock，reader这一侧需要进行数据访问的过程中检测是否有并发的writer thread操作，如果检测到并发的writer，那么重新read。通过不断的retry，直到reader thread在临界区的时候，没有任何的writer thread插入即可。这样的设计对reader而言不是很公平，特别是如果writer thread负荷比较重的时候，reader thread可能会retry多次，从而导致reader thread这一侧性能的下降。
 
 总结一下seqlock的特点：临界区只允许一个writer thread进入，在没有writer thread的情况下，reader thread可以随意进入，也就是说reader不会阻挡reader。在临界区只有有reader thread的情况下，writer thread可以立刻执行，不会等待。
-
-2、writer thread的操作
+## 2、writer thread的操作
 
 对于writer thread，获取seqlock操作如下：
 
 （1）获取锁（例如spin lock），该锁确保临界区只有一个writer进入。
-
 （2）sequence counter加一
 
 释放seqlock操作如下：
 
 （1）释放锁，允许其他writer thread进入临界区。
-
 （2）sequence counter加一（注意：不是减一哦，sequence counter是一个不断累加的counter）
 
 由上面的操作可知，如果临界区没有任何的writer thread，那么sequence counter是偶数（sequence counter初始化为0），如果临界区有一个writer thread（当然，也只能有一个），那么sequence counter是奇数。
-
-3、reader thread的操作如下：
+## 3、reader thread的操作如下：
 
 （1）获取sequence counter的值，如果是偶数，可以进入临界区，如果是奇数，那么等待writer离开临界区（sequence counter变成偶数）。进入临界区时候的sequence counter的值我们称之old sequence counter。
-
 （2）进入临界区，读取数据
-
 （3）获取sequence counter的值，如果等于old sequence counter，说明一切OK，否则回到step（1）
-
-4、适用场景。一般而言，seqlock适用于：
+## 4、适用场景。一般而言，seqlock适用于：
 
 （1）read操作比较频繁
-
 （2）write操作较少，但是性能要求高，不希望被reader thread阻挡（之所以要求write操作较少主要是考虑read side的性能）
-
 （3）数据类型比较简单，但是数据的访问又无法利用原子操作来保护。我们举一个简单的例子来描述：假设需要保护的数据是一个链表，header--->A node--->B node--->C node--->null。reader thread遍历链表的过程中，将B node的指针赋给了临时变量x，这时候，中断发生了，reader thread被preempt（注意，对于seqlock，reader并没有禁止抢占）。这样在其他cpu上执行的writer thread有充足的时间释放B node的memory（注意：reader thread中的临时变量x还指向这段内存）。当read thread恢复执行，并通过x这个指针进行内存访问（例如试图通过next找到C node），悲剧发生了……
-
-三、API示例
+# 三、API示例
 
 在kernel中，jiffies_64保存了从系统启动以来的tick数目，对该数据的访问（以及其他jiffies相关数据）需要持有jiffies_lock这个seq lock。
 
