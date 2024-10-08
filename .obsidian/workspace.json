@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
+                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
+                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
+                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md"
+                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md"
               }
             }
           }
@@ -149,6 +149,9 @@
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
     "README.md",
+    "coding/os/linux/schedule/Linux调度器：进程优先级.md",
+    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
+    "coding/os/linux/schedule/schedutil governor情景分析.md",
     "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
     "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
     "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
@@ -171,9 +174,6 @@
     "coding/os/linux/memory/cache/a_n_深入理解CPU缓存：性能优化的关键.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
-    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
-    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom/design-pattern",

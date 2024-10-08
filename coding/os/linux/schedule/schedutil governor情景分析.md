@@ -1,31 +1,11 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-4-26 6:29 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-前言
+# 前言
 
 这是一篇分析schedutil governor（后文称之sugov）代码逻辑的文章。通过详细的代码级别的分析，希望能够帮助读者理解sugov的代码精妙之处。本文主要分四个章节：第一章简单重复了sugov相关的软件结构和基本算法，让读者对整个sugov在系统所处的位置和基本的逻辑控制有所了解。第二章对sugov使用的数据结构给出了详细的解释。第三章对sugov和cpufreq core的基本数据流和控制流进行分析。第四章描述了sugov本身的调频逻辑。
 
 本文出现的内核代码来自Linux5.10.61，为了减少篇幅，我们会引用缩减版本的代码（仅包含主要逻辑），如果有兴趣，读者可以配合原始代码阅读本文。
-
-一、Sugov概述
-
-1、sugov相关软件模块
+# 一、Sugov概述
+## 1、sugov相关软件模块
 
 Sugov在整个调频软件的位置如下所示：
 
@@ -36,8 +16,7 @@ Sugov作为一种内核调频策略模块，它主要是根据当前CPU的利用
 为了适配各种场景，sugov还提供了可调参数，用户空间可以检测当前的场景，并根据不同的场景设定不同的参数，以便满足用户性能/功耗的需求。
 
 Sugov选定target frequency之后，需要通过cpufreq core（cpufreq framework）、cpufreq driver，cpu调频硬件完成频率的调整。cpufreq core是一个硬件无关的调频框架，集中管理了cpufreq governor、cpufreq driver、cpufreq device对象，同时提供了简单方便使用的接口API，让工程师很轻松的就能完成特定governor或者driver的撰写。
-
-2、Sugov的基本算法描述
+## 2、Sugov的基本算法描述
 
 Sugov的基本算法如下：
 
@@ -46,9 +25,7 @@ Sugov的基本算法如下：
 和基于采样的governor不同的是sugov是基于调度器调度事件的。每当发生调度事件的时候，负载跟踪模块会及时更新各个level的调度实体和cfs_rq的平均调度负载（sched_avg），直到顶层cfs rq（即CPU的平均调度负载） 。每当CPU利用率发生变化的时候，调度器都会调用cpufreq_update_util通知sugov，由sugov判断是否需要进行调频操作。基于采样的governor是governor定期去采样负载信息，而sugov是调度事件（进程切换、入队、出队、tick等）驱动调频的，因此调频会更及时。具体驱动调频的时机包括：
 
 （1）实时线程（rt或者deadline）的入队出队
-
 （2）Cpu上的cfs util发生变化
-
 （3）处于Iowait的任务被唤醒
 
 调度事件的发生还是非常密集的，特别是在重载的情况下，很多任务可能执行若干个us就切换出去了。如果每次都计算CPU util看看是否需要调整频率，那么本身sugov就给系统带来较重的负荷，因此并非每次调频时机都会真正执行调频检查，sugov设置了一个最小调频间隔，小于这个间隔的调频请求会被过滤掉。当然，这个最小调频间隔规定也不是永远强制执行，在特定情况下（例如cpufreq core修改了sugov可以动态调整的范围的时候），调频间隔判断可以略过。
@@ -64,10 +41,8 @@ Sugov的基本算法如下：
 next_freq = C * max_freq * util / max
 
 其中C = 1.25，表示CPU需要调整的next freq需要提供1.25倍的算力，这样CPU在next freq上运行当前的任务还有20%的算力余量。这里计算出来的next_freq未必是最终设定的频率，因为底层硬件支持的调频是一系列的档位频率，因此，还需要底层硬件驱动进一步根据next_freq来选择一个它支持的频率，最后设定下去。
-
-二、sugov使用的数据结构
-
-1、struct sugov_tunables
+# 二、sugov使用的数据结构
+## 1、struct sugov_tunables
 
 这个数据结构用来描述sugov的可调参数：
 

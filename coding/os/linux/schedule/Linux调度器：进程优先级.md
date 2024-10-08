@@ -1,29 +1,9 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
-作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-3-14 18:46 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-一、前言
+ 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-3-14 18:46 分类：[进程管理](http://www.wowotech.net/sort/process_management)
+# 一、前言
 
 本文主要描述的是进程优先级这个概念。从用户空间来看，进程优先级就是nice value和scheduling priority，对应到内核，有静态优先级、realtime优先级、归一化优先级和动态优先级等概念，我们希望能在第二章将这些相关的概念描述清楚。为了加深理解，在第三章我们给出了几个典型数据流过程的分析。
-
-二、overview
-
-1、蓝图
+# 二、overview
+## 1、蓝图
 
 [![priority](http://www.wowotech.net/content/uploadfile/201703/771adb345f01f5f2f7f816f57fae9e1e20170314104605.gif "priority")](http://www.wowotech.net/content/uploadfile/201703/578560e4870564b7532a4dc1f087150520170314104603.gif)
 
@@ -34,16 +14,16 @@
 3、内核中的实现
 
 内核中，task struct中有若干和进程优先级有个的成员，如下：
-
-> struct task_struct {  
-> ......  
->     int prio, static_prio, normal_prio;  
->     unsigned int rt_priority;  
-> ......  
->     unsigned int policy;  
-> ......  
-> }
-
+```cpp
+struct task_struct {  
+......  
+int prio, static_prio, normal_prio;  
+unsigned int rt_priority;  
+......  
+unsigned int policy;  
+......  
+}
+```
 policy成员记录了该线程的调度策略，而其他的成员表示了各种类型的优先级，下面的小节我们会一一描述。
 
 4、静态优先级
