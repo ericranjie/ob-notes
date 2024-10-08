@@ -485,7 +485,7 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
 `struct sched_domain_toplogy_level`的前两个成员`mask`和`flag`分别是两个函数，用于指定该CPU层次下的兄弟cpumask和flag标志位。而`struct sd_data`是该数据结构的核心，其成员将在后续完成赋值。
 
 这里简单看下物理核心层的`mask`成员`cpu_coregroup_mask`。
-
+```cpp
  const struct cpumask *cpu_coregroup_mask(int cpu)  
  {  
  const cpumask_t *core_mask = cpumask_of_node(cpu_to_node(cpu));  
@@ -502,20 +502,20 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
    
  return core_mask;  
  }
-
+```
 可以看到，本质上是利用`cpu_topology`数组来获得`core_sibling`的值，到这里就和物理层级联系起来了。
-
+```cpp
  struct sd_data {  
  struct sched_domain *__percpu *sd;  
  struct sched_domain_shared *__percpu *sds;  
  struct sched_group *__percpu *sg;  
  struct sched_group_capacity *__percpu *sgc;  
  };
-
+```
 分析`__sdt_alloc`，可以看到为每个层次的`struct sched_domain_topology_level`的`sd_data`分配percpu的`sched_domain`、`sched_domain_shared`、`sched_group`和`sched_group_capacity`。这样每个CPU可以通过`default_topology`数组轻易找到自己的`sched_domain`等数据。
 
 接下来，继续分析`build_sched_domains`的第2个核心函数`build_sched_domain`，该函数在每个CPU的每个层次上都要去调用一次。
-
+```cpp
  static struct sched_domain *build_sched_domain(struct sched_domain_topology_level *tl,  
  const struct cpumask *cpu_map, struct sched_domain_attr *attr,  
  struct sched_domain *child, int dflags, int cpu)  
@@ -545,9 +545,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
    
  return sd;  
  }
-
+```
 其中`sd_init`函数完成对应`sched_domain_topology_level`对应层次的`sched_domain`的一些数据的填充以及`sd_data`中mask和flag的修改。
-
+```cpp
  static struct sched_domain *  
  sd_init(struct sched_domain_topology_level *tl,  
  const struct cpumask *cpu_map,  
@@ -655,13 +655,13 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
    
  return sd;  
  }
-
+```
 这里可以看到，`sched_domain`中的成员往往是与调度中负载均衡操作相关的一些字段，例如`min_interval`是最小的load balance间隔，`max_interval`是最大的load balance间隔等等。
 
 这里应该注意，`sched_domain`的父子关系，高层级的`sched_domain`是低层级的`sched_domain`的parent，低层级的`sched_domain`是高层级的child。`sched_domain`的`span`为自己该层级的兄弟CPU以及下面几个层级的兄弟CPU的并集。
 
 创建完`sched_domain`之后，开始从CPU开始由低到高依次建立`sched_group`，这就是第3个核心函数，`build_sched_groups`。
-
+```cpp
  static int  
  build_sched_groups(struct sched_domain *sd, int cpu)  
  {  
@@ -697,9 +697,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
    
  return 0;  
  }
-
+```
 `build_sched_groups`函数的核心是`get_group`函数。
-
+```cpp
  static struct sched_group *get_group(int cpu, struct sd_data *sdd)  
  {  
  struct sched_domain *sd = *per_cpu_ptr(sdd->sd, cpu);  
@@ -736,7 +736,7 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
    
  return sg;  
  }
-
+```
 可以从`get_group`函数看出来，如果是最底层的`sched_domain`，即不存在`child`，那么`get_group`中建立的`sched_group`是该CPU独有的。而如果是非最底层的`sched_domain`，那么`get_group`中建立的`sched_group`是其`child`的`span`成员共享的。这里注意，`sched_group_capacity`和`sched_group`两位一体，表示该调度组的计算能力。
 
 到这里，调度域和调度组的关系基本可以理清楚。在CPU层次结构上，CPU在每个层次都有一个调度域，该CPU在高层次的调度域与该CPU在低层次的调度域互成父子关系。
@@ -748,7 +748,5 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
 `rq_attach_root`中有这样的一行代码：`rq->rd = rd;`。至此，从`rq --> root_domain --> sched_domain`的关系已经建立完成。
 
   
-
-阅读 2870
-
+---
 ​

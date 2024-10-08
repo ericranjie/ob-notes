@@ -8,8 +8,7 @@
 ## 1、sugov相关软件模块
 
 Sugov在整个调频软件的位置如下所示：
-
-![](http://www.wowotech.net/content/uploadfile/202204/64be1650926074.png)
+![[Pasted image 20241008184145.png]]
 
 Sugov作为一种内核调频策略模块，它主要是根据当前CPU的利用率进行调频。因此，sugov会注册一个callback函数（sugov_update_shared/sugov_update_single）到调度器负载跟踪模块，当CPU util发生变化的时候就会调用该callback函数，检查一下当前CPU频率是否和当前的CPU util匹配，如果不匹配，那么就进行提频或者降频。
 

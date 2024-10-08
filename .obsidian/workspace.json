@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+                "file": "README.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+                "file": "README.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+                "file": "README.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md"
+                "file": "README.md"
               }
             }
           }
@@ -148,8 +148,10 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "README.md",
+    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
+    "zx99-image/Pasted image 20241008184145.png",
     "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+    "README.md",
     "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
     "zx99-image/Pasted image 20241008183012.png",
     "zx99-image/Pasted image 20241008183324.png",
@@ -160,7 +162,6 @@
     "zx99-image/Pasted image 20241008183225.png",
     "zx99-image/Pasted image 20241008183212.png",
     "zx99-image/Pasted image 20241008183158.png",
-    "zx99-image/Pasted image 20241008183135.png",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
     "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
@@ -184,7 +185,6 @@
     "coding/os/linux/memory/page-folio/k_Linux 内存管理窥探：页面回收 (LRU).md",
     "coding/os/linux/memory/page-folio/i_页面回收的基本概念.md",
     "coding/os/linux/memory/page-folio/i_深入理解Linux内核之脏页跟踪.md",
-    "coding/os/linux/memory/page-folio/i_文件系统和裸块设备的page cache问题.md",
     "coding/os/linux/memory/page-folio",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom",

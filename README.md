@@ -14,6 +14,8 @@ f_ : finished 已读
 
 n_: need-complete
 
+o_: outer 超纲文章（目前来说）
+
 t_: trash 垃圾桶 待废弃文章（可能已经过时）
 
 i_: **information** 信息等级文章（DIKW模型）
