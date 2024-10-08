@@ -12,8 +12,7 @@
 ### 1、问题描述
 
 模拟高并发的场景，会出现批量的 TIME_WAIT 的 TCP 连接：
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/QFzRdz9libEYvO4icXe2ZG6mhMq8STawnibst4SYuN0YauGDoEVbibmWica0oOqrTdF1PQbtuyS04DgSgqmUsibCF3FQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241008160654.png]]
 
 短时间后，所有的 TIME_WAIT 全都消失，被回收，端口包括服务，均正常。即，在高并发的场景下，TIME_WAIT 连接存在，属于正常现象。
 

@@ -5,13 +5,11 @@
 # 二、overview
 ## 1、蓝图
 
-[![priority](http://www.wowotech.net/content/uploadfile/201703/771adb345f01f5f2f7f816f57fae9e1e20170314104605.gif "priority")](http://www.wowotech.net/content/uploadfile/201703/578560e4870564b7532a4dc1f087150520170314104603.gif)
-
-2、用户空间的视角
+![[Pasted image 20241008161241.png]]
+## 2、用户空间的视角
 
 在用户空间，进程优先级有两种含义：nice value和scheduling priority。对于普通进程而言，进程优先级就是nice value，从-20（优先级最高）～19（优先级最低），通过修改nice value可以改变普通进程获取cpu资源的比例。随着实时需求的提出，进程又被赋予了另外一种属性scheduling priority，而这些进程被称为实时进程。实时进程的优先级的范围可以通过sched_get_priority_min和sched_get_priority_max，对于linux而言，实时进程的scheduling priority的范围是1（优先级最低）～99（优先级最高）。当然，普通进程也有scheduling priority，被设定为0。
-
-3、内核中的实现
+## 3、内核中的实现
 
 内核中，task struct中有若干和进程优先级有个的成员，如下：
 ```cpp
@@ -25,49 +23,41 @@ unsigned int policy;
 }
 ```
 policy成员记录了该线程的调度策略，而其他的成员表示了各种类型的优先级，下面的小节我们会一一描述。
-
-4、静态优先级
+## 4、静态优先级
 
 task struct中的static_prio成员。我们称之静态优先级，其特点如下：
 
 （1）值越小，进程优先级越高
-
 （2）0 – 99用于real-time processes（没有实际的意义），100 – 139用于普通进程
-
 （3）缺省值是 120
-
 （4）用户空间可以通过nice()或者setpriority对该值进行修改。通过getpriority可以获取该值。
-
 （5）新创建的进程会继承父进程的static priority。
 
 静态优先级是所有相关优先级的计算的起点，要么继承自父进程，要么用户空间自行设定。一旦修改了静态优先级，那么normal priority和动态优先级都需要重新计算。
-
-5、实时优先级
+## 5、实时优先级
 
 task struct中的rt_priority成员表示该线程的实时优先级，也就是从用户空间的视角来看的scheduling priority。0是普通进程，1～99是实时进程，99的优先级最高。
-
-6、归一化优先级
+## 6、归一化优先级
 
 task struct中的normal_prio成员。我们称之归一化优先级（normalized priority），它是根据静态优先级、scheduling priority和调度策略来计算得到，代码如下：
+```cpp
+static inline int normal_prio(struct task_struct p)  
+{  
+int prio;
 
-> static inline int normal_prio(struct task_struct *p)  
-> {  
->     int prio;
-> 
->     if (task_has_dl_policy(p))  
->         prio = MAX_DL_PRIO-1;  
->     else if (task_has_rt_policy(p))  
->         prio = MAX_RT_PRIO-1 - p->rt_priority;  
->     else  
->         prio = __normal_prio(p);  
->     return prio;  
-> }
-
+if (task_has_dl_policy(p))  
+prio = MAX_DL_PRIO-1;  
+else if (task_has_rt_policy(p))  
+prio = MAX_RT_PRIO-1 - p->rt_priority;  
+else  
+prio = normal_prio(p);  
+return prio;  
+}
+```
 这里我们先聊聊归一化（Normalization）这个看起来稍微有点晦涩的术语。如果你做过音视频定点算法的优化，应该对这个词不陌生。不同的定点数据有不同的表示，有Q31的，有Q15，这些数据的小数点的位置不同，无法进行比较、加减等操作，因此需要归一化，全部转换成某个特定的数据格式（其实就是确定小数点的位置）。在数学上，1米和1mm在进行操作的时候也需要归一化，全部转换成同一个量纲就OK了。对于这里的优先级，调度器需要综合考虑各种因素，例如调度策略，nice value、scheduling priority等，把这些factor全部考虑进来，归一化成一个数轴上的number，以此来表示其优先级，这就是normalized priority。对于一个线程，其normalized priority的number越小，其优先级越大。
 
 调度策略是deadline的进程比RT进程和normal进程的优先级还要高，因此它的归一化优先级是负数：-1。如果采用实时调度策略，那么该线程的normalized priority和rt_priority相关。task struct中的rt_priority成员是用户空间视角的实时优先级（scheduling priority），MAX_RT_PRIO-1是99，MAX_RT_PRIO-1 - p->rt_priority则翻转了实时进程的scheduling priority，最高优先级是0，最低是98。顺便说一句，normalized priority是99的情况是没有意义的。对于普通进程，normalized priority就是其静态优先级。
-
-7、动态优先级
+## 7、动态优先级
 
 task struct中的prio成员表示了该线程的动态优先级，也就是调度器在进行调度时候使用的那个优先级。动态优先级在运行时可以被修改，例如在处理优先级翻转问题的时候，系统可能会临时调升一个普通进程的优先级。一般设定动态优先级的代码是这样的：p->prio = effective_prio(p)，具体计算动态优先级的代码如下：
 

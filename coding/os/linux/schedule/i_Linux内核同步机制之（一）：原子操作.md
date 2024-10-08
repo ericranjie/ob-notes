@@ -1,13 +1,10 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-10-10 17:56 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
-
-一、源由
+# 一、源由
 
 我们的程序逻辑经常遇到这样的操作序列：
 
 1、读一个位于memory中的变量的值到寄存器中
-
 2、修改该变量的值（也就是修改寄存器中的值）
-
 3、将寄存器中的数值写回memory中的变量值
 
 如果这个操作序列是串行化的操作（在一个thread中串行执行），那么一切OK，然而，世界总是不能如你所愿。在多CPU体系结构中，运行在两个CPU上的两个内核控制路径同时并行执行上面操作序列，有可能发生下面的场景：
@@ -36,15 +33,14 @@
 |写操作||
 
 系统调用的控制路径上，完成读操作后，硬件触发中断，开始执行中断handler。这种场景下，中断handler控制路径的写回的操作被系统调用控制路径上的写回覆盖了，结果也是错误的。
-
-二、对策
+# 二、对策
 
 对于那些有多个内核控制路径进行read-modify-write的变量，内核提供了一个特殊的类型atomic_t，具体定义如下：
-
-> typedef struct {  
->     int counter;  
-> } atomic_t;
-
+```cpp
+typedef struct {  
+int counter;  
+} atomic_t;
+```
 从上面的定义来看，atomic_t实际上就是一个int类型的counter，不过定义这样特殊的类型atomic_t是有其思考的：内核定义了若干atomic_xxx的接口API函数，这些函数只会接收atomic_t类型的参数。这样可以确保atomic_xxx的接口函数只会操作atomic_t类型的数据。同样的，如果你定义了atomic_t类型的变量（你期望用atomic_xxx的接口API函数操作它），这些变量也不会被那些普通的、非原子变量操作的API函数接受。
 
 具体的接口API函数整理如下：
@@ -70,47 +66,47 @@
 三、ARM中的实现
 
 我们以atomic_add为例，描述linux kernel中原子操作的具体代码实现细节：
+```cpp
+if LINUX_ARM_ARCH >= 6 －－－－－－－－－－－－－－－－－－－－－－（1）  
+static inline void atomic_add(int i, atomic_t v)  
+{  
+unsigned long tmp;  
+int result;
 
-> #if __LINUX_ARM_ARCH__ >= 6 －－－－－－－－－－－－－－－－－－－－－－（1）  
-> static inline void atomic_add(int i, atomic_t *v)  
-> {  
->     unsigned long tmp;  
->     int result;
-> 
->     prefetchw(&v->counter); －－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->     __asm__ __volatile__("@ atomic_add\n" －－－－－－－－－－－－－－－－－－（3）  
-> "1:    ldrex    %0, [%3]\n" －－－－－－－－－－－－－－－－－－－－－－－－－－（4）  
-> "    add    %0, %0, %4\n" －－－－－－－－－－－－－－－－－－－－－－－－－－（5）  
-> "    strex    %1, %0, [%3]\n" －－－－－－－－－－－－－－－－－－－－－－－－－（6）  
-> "    teq    %1, #0\n" －－－－－－－－－－－－－－－－－－－－－－－－－－－－－（7）  
-> "    bne    1b"  
->     : "=&r" (result), "=&r" (tmp), "+Qo" (v->counter) －－－对应％0，％1，％2  
->     : "r" (&v->counter), "Ir" (i) －－－－－－－－－－－－－对应％3，％4  
->     : "cc");  
-> }
-> 
-> #else
-> 
-> #ifdef CONFIG_SMP  
-> #error SMP not supported on pre-ARMv6 CPUs  
-> #endif
-> 
-> static inline int atomic_add_return(int i, atomic_t *v)  
-> {  
->     unsigned long flags;  
->     int val;
-> 
->     raw_local_irq_save(flags);  
->     val = v->counter;  
->     v->counter = val += i;  
->     raw_local_irq_restore(flags);
-> 
->     return val;  
-> }  
-> #define atomic_add(i, v)    (void) atomic_add_return(i, v)
-> 
-> #endif
+prefetchw(&v->counter); －－－－－－－－－－－－－－－－－－－－－－－－－（2）  
+asm volatile("@ atomic_add\n" －－－－－－－－－－－－－－－－－－（3）  
+"1:    ldrex    %0, %3\n" －－－－－－－－－－－－－－－－－－－－－－－－－－（4）  
+"    add    %0, %0, %4\n" －－－－－－－－－－－－－－－－－－－－－－－－－－（5）  
+"    strex    %1, %0, %3\n" －－－－－－－－－－－－－－－－－－－－－－－－－（6）  
+"    teq    %1, #0\n" －－－－－－－－－－－－－－－－－－－－－－－－－－－－－（7）  
+"    bne    1b"  
+: "=&r" (result), "=&r" (tmp), "+Qo" (v->counter) －－－对应％0，％1，％2  
+: "r" (&v->counter), "Ir" (i) －－－－－－－－－－－－－对应％3，％4  
+: "cc");  
+}
 
+else
+
+ifdef CONFIG_SMP  
+error SMP not supported on pre-ARMv6 CPUs  
+endif
+
+static inline int atomic_add_return(int i, atomic_t *v)  
+{  
+unsigned long flags;  
+int val;
+
+raw_local_irq_save(flags);  
+val = v->counter;  
+v->counter = val += i;  
+raw_local_irq_restore(flags);
+
+return val;  
+}  
+define atomic_add(i, v)    (void) atomic_add_return(i, v)
+
+endif
+```
 （1）ARMv6之前的CPU并不支持SMP，之后的ARM架构都是支持SMP的（例如我们熟悉的ARMv7-A）。因此，对于ARM处理，其原子操作分成了两个阵营，一个是支持SMP的ARMv6之后的CPU，另外一个就是ARMv6之前的，只有单核架构的CPU。对于UP，原子操作就是通过关闭CPU中断来完成的。
 
 （2）这里的代码和preloading cache相关。在strex指令之前将要操作的memory内容加载到cache中可以显著提高性能。

@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
+                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
+                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
+                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md"
+                "file": "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md"
               }
             }
           }
@@ -148,6 +148,24 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
+    "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
+    "coding/os/linux/schedule/schedutil governor情景分析.md",
+    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
+    "README.md",
+    "Pasted image 20241008161341.png",
+    "zx99-image/Pasted image 20241008161241.png",
+    "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
+    "coding/os/linux/schedule/i_Linux内核同步机制之（一）：原子操作.md",
+    "coding/os/linux/network/debug/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+    "zx99-image/Pasted image 20241008160654.png",
+    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
+    "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
+    "coding/os/linux/network/an_深入理解 Linux socket.md",
+    "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
+    "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
+    "coding/os/linux/network/i_比 netstat 好用？Linux 网络状态工具 ss 详解.md",
+    "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
     "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
     "coding/os/linux/memory/C&DMA/应读者要求讲讲 DMA.md",
     "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
@@ -159,21 +177,6 @@
     "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
     "coding/os/linux/performance/bn_Linux系统性能优化：七个实战经验.md",
-    "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md",
-    "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
-    "coding/os/linux/process/coroutine/i_协程究竟比线程牛在什么地方？.md",
-    "coding/os/linux/process/k_一文看懂 fork 系统调用.md",
-    "coding/os/linux/process/k_进程管理和终端驱动：基本概念.md",
-    "coding/os/linux/process/i_Shopee 送命题：进程切换为什么比线程切换慢.md",
-    "coding/os/linux/process/i_Linux进程冻结技术.md",
-    "coding/os/linux/process/i_计算机科学基础知识之（六）理解栈帧.md",
-    "coding/os/linux/process/i_「linux」孤儿进程与僵尸进程产生及其处理.md",
-    "coding/os/linux/process/d_Process Creation（一）.md",
-    "coding/os/linux/process/d_Process Creation（二）.md",
-    "coding/os/linux/process/d_Linux系统如何标识进程？.md",
-    "coding/os/linux/process/b_为什么新版内核将进程pid管理从bitmap替换成了radix-tree？.md",
-    "coding/os/linux/schedule/barrier/Why Memory Barriers中文翻译（下）.md",
-    "coding/os/linux/schedule/barrier/Why Memory Barriers？中文翻译（上）.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom/design-pattern",
@@ -186,9 +189,6 @@
     "zx99-image/Pasted image 20241008090821.png",
     "zx99-image/Pasted image 20241007233004.png",
     "zx99-image/Pasted image 20241007231324.png",
-    "zx99-image/Pasted image 20241007231459.png",
-    "zx99-image/Pasted image 20241007231350.png",
-    "Pasted image 20241007225825.png",
     "learning",
     "coding/app/nginx",
     "auxiliary/self-improvement/Chrisma/Untitled",

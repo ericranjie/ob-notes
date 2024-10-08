@@ -2,13 +2,6 @@ CPP开发者
  _2021年11月30日 11:55_
 以下文章来源于后端研究所 ，作者程序员大白啊
 
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7Lhjgjq6G9fRPYpJaHf91EX8kJWRaYlzWic5enxibYmiacg/0)
-
-**后端研究所**.
-
-专注后端开发，记录所思所得。
-
 ](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651167793&idx=1&sn=f44c8c206391dfbe61f4e19a1f249ab9&chksm=80644d6eb713c478d23a4b166903c9dd33ed6dfadc0d73b783b1b24eb638c0c0346161d287c7&mpshare=1&scene=24&srcid=1130WVTkjj3Q7Io2HcrokrPg&sharer_sharetime=1638264435514&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03d2c27bf9ee4cde7dd404e045fe6bb8c0488f18856387e4046d5e8e40a8cae76e4b8bc7e114763262a1deab08438b962a042dc04126903dd0a6a1576ae592a4f1fae0bd67ac74e1efda2d4e997aee81f0681ca67e5d05c2dfb29c5384470282e6c447513d8b3a37601b2638b4b5caf56dad839b9c29a7f10&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQnoe8gNQH1VphtPNrFcTxZRLmAQIE97dBBAEAAAAAABHhFtctiS4AAAAOpnltbLcz9gKNyK89dVj02R%2FJTCiCjngjb3g6DI2TGNNj9dFQ9slXNQSPOP4aVlHvJKFG6tA%2BWEZp4FitD7mr5VmHphCQvVLly5xOqhUn87YgncHYcxDawxg1%2BsgWGVhg8mr%2B%2BHLqZhk8ZiZeWP6lK7JHrHz%2FMupgAowtNN4ync274X0RHBwY2VaEQigEDQC5Wr8Q4Kp3cCJDgu7fIrh8mHiyPayMVO0ktm5lIXZHiKsPR4qSPyLzeGDZ5PUxEK8BGyL19S6CNK2VGRn%2BMcSt&acctmode=0&pass_ticket=ZY3IJbcGJD4QRKmq848HB%2FXmhuJpTiAGjRyP0e75kASdb%2FDV4Gs5D5w3qaZHUsGo&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 ## 1. 开场白
@@ -55,7 +48,6 @@ Dan Kegel这篇文章阅读难度并不大，大白建议从事服务端开发�
 
 开源大神们基于epoll/kqueue等开发了诸如libevent/libuv等网络库，从而大幅提高了高并发网络的开发效率，对于C/C++程序员来说并不陌生。
 ![[Pasted image 20240923220928.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里简单提一下针对下一个10年的展望和挑战：**C10M问题**。
 
@@ -77,7 +69,6 @@ Errata Security的CEO Robert Graham在Shmoocon 2013大会上的演讲，大佬�
 
 前面提到的C10K和C10M问题都是围绕着提升服务器并发能力展开的，但是难免要问：**服务器最大的并发上限是多少**？
 ![[Pasted image 20240923220949.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 3.1 五元组
 

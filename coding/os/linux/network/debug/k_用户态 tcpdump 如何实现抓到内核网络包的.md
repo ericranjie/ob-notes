@@ -1,4 +1,3 @@
-
 CPP开发者
  _2021年10月13日 11:57_
 The following article is from 开发内功修炼 Author 张彦飞allen
@@ -15,57 +14,57 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 - 让你自己写一个抓包程序的话该如何下手？
 
 借助这几个问题，我们来展开今天的探索之旅！
-
 ## 一、网络包接收过程
 
 在[图解Linux网络包接收过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666548640&idx=1&sn=7e6dcbbcd569ad4f3c20e915b78b3bac&chksm=80dc890bb7ab001d4cd880c773b3e7b3b9ee4d7d9d4fac0ebbeaa6d247c70084d8cde829bcf2&scene=21#wechat_redirect)一文中我们详细介绍了网络包是如何从网卡到达用户进程中的。这个过程我们可以简单用如下这个图来表示。
 ![[Pasted image 20241003161545.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 找到 tcpdump 抓包点  
 
 我们在网络设备层的代码里找到了 tcpdump 的抓包入口。在 __netif_receive_skb_core 这个函数里会遍历 ptype_all 上的协议。还记得上文中我们提到 tcpdump 在 ptype_all 上注册了虚拟协议。这时就能执行的到了。来看函数：
-
-`//file: net/core/dev.c   static int __netif_receive_skb_core(struct sk_buff *skb, bool pfmemalloc)   {       ......       //遍历 ptype_all （tcpdump 在这里挂了虚拟协议）       list_for_each_entry_rcu(ptype, &ptype_all, list) {           if (!ptype->dev || ptype->dev == skb->dev) {               if (pt_prev)                   ret = deliver_skb(skb, pt_prev, orig_dev);               pt_prev = ptype;           }       }   }   `
-
+```cpp
+//file: net/core/dev.c
+static int __netif_receive_skb_core(struct sk_buff *skb, bool pfmemalloc)   {       ......       //遍历 ptype_all （tcpdump 在这里挂了虚拟协议）       
+list_for_each_entry_rcu(ptype, &ptype_all, list) {           if (!ptype->dev || ptype->dev == skb->dev) {               if (pt_prev)                   ret = deliver_skb(skb, pt_prev, orig_dev);               pt_prev = ptype;           }       }   }   
+```
 在上面函数中遍历 ptype_all，并使用 deliver_skb 来调用协议中的回调函数。
-
-`//file: net/core/dev.c    static inline int deliver_skb(...)   {    return pt_prev->func(skb, skb->dev, pt_prev, orig_dev);   }   `
-
+```cpp
+//file: net/core/dev.c
+static inline int deliver_skb(...)   {    return pt_prev->func(skb, skb->dev, pt_prev, orig_dev);   }   
+```
 对于 tcpdump 来说，就会进入 packet_rcv 了（后面我们再说为啥是进入这个函数）。这个函数在 net/packet/af_packet.c 文件中。
-
-`//file: net/packet/af_packet.c   static int packet_rcv(struct sk_buff *skb, ...)   {    __skb_queue_tail(&sk->sk_receive_queue, skb);    ......   }   `
-
+```cpp
+//file: net/packet/af_packet.c   
+static int packet_rcv(struct sk_buff *skb, ...)   {    __skb_queue_tail(&sk->sk_receive_queue, skb);    ......   }   
+```
 可见 packet_rcv 把收到的 skb 放到了当前 packet socket 的接收队列里了。这样后面调用 recvfrom 的时候就可以获取到所抓到的包！！
-
 ### 再找 netfilter 过滤点
 
 为了解释我们开篇中提到的问题，这里我们再稍微到协议层中多看一些。在 ip_rcv 中我们找到了一个 netfilter 相关的执行逻辑。
-
-`//file: net/ipv4/ip_input.c   int ip_rcv(...)   {    ......    return NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING, skb, dev, NULL,            ip_rcv_finish);   }   `
-
+```cpp
+//file: net/ipv4/ip_input.c
+int ip_rcv(...)   {    ......    return NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_ROUTING, skb, dev, NULL,            ip_rcv_finish);   }   
+```
 如果你用 NF_HOOK 作为关键词来搜索，还能搜到不少 netfilter 的过滤点。不过所有的过滤点都是位于 IP 协议层的。
 
 在接收包的过程中，数据包是先经过网络设备层然后才到协议层的。
 ![[Pasted image 20241003161556.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么我们开篇中的一个问题就有了答案了。假如我们设置了 netfilter 规则，在接收包的过程中，工作在网络设备层的 tcpdump 先开始工作。还没等 netfilter 过滤，tcpdump 就抓到包了！  
 
 **所以，在接收包的过程中，netfilter 过滤并不会影响 tcpdump 的抓包！**
-
 ## 二、网络包发送过程
 
 我们接着再来看网络包发送过程。在[25 张图，一万字，拆解 Linux 网络包发送过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666554809&idx=1&sn=31381caf815f6b0dc266b6dc432959da&chksm=80dca112b7ab2804efc8a99772fc17a1217f791a988c5087a703b10c4bf3d27fee55abfbcd85&scene=21#wechat_redirect)一文中，我们详细描述过网络包的发送过程。发送过程可以汇总成简单的一张图。
 ![[Pasted image 20241003161602.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 ### 找到 netfilter 过滤点  
 
 在发送的过程中，同样是在 IP 层进入各种 netfilter 规则的过滤。
-
-`//file: net/ipv4/ip_output.c     int ip_local_out(struct sk_buff *skb)   {    //执行 netfilter 过滤    err = __ip_local_out(skb);   }      int __ip_local_out(struct sk_buff *skb)   {    ......    return nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT, skb, NULL,            skb_dst(skb)->dev, dst_output);   }   `
-
+```cpp
+//file: net/ipv4/ip_output.c
+int ip_local_out(struct sk_buff *skb)   {    //执行 netfilter 过滤    
+err = __ip_local_out(skb);   }      int __ip_local_out(struct sk_buff *skb)   {    ......    return nf_hook(NFPROTO_IPV4, NF_INET_LOCAL_OUT, skb, NULL,            skb_dst(skb)->dev, dst_output);   }   
+```
 在这个文件中，还能看到若干处 netfilter 过滤逻辑。
 
 ### 找到 tcpdump 抓包点

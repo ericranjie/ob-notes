@@ -12,9 +12,8 @@
 然后进行mii的一些初始化fec_enet_mii_init(pdev);
 
 主要是对struct mii_bus这里的成员进行初始化
-
   
-
+```cpp
 1. /*
 2.  * The Bus class for PHYs.  Devices which provide access to
 3.  * PHYs should register using this structure
@@ -78,17 +77,11 @@
 
 21. 	for (i = 0; i < PHY_MAX_ADDR; i++)
 22. 		fep->mii_bus->irq[i] = PHY_POLL;
-
+```
   
-
-  
-
 并且会做注册mdiobus的工作
 
-  
-
-  
-
+```cpp
 1. 	node = of_get_child_by_name(pdev->dev.of_node, "mdio");
 2. 	if (node) {
 3. 		err = of_mdiobus_register(fep->mii_bus, node);
@@ -96,13 +89,11 @@
 5. 	} else {
 6. 		err = mdiobus_register(fep->mii_bus);
 7. 	}
-
-  
+```
 
 因为我们系统是使用device tree，因此会执行of_mdiobus_register
-
   
-
+```cpp
 1. /**
 2.  * of_mdiobus_register - Register mii_bus and create PHYs from the device tree
 3.  * @mdio: pointer to mii_bus structure
@@ -175,13 +166,11 @@
 70. 	return 0;
 71. }
 72. EXPORT_SYMBOL(of_mdiobus_register);
-
+```
   
-
 进行midobus_register
 
-  
-
+```cpp
 1. 	/* Register the MDIO bus */
 2. 	rc = mdiobus_register(mdio);
 3. 	if (rc)
@@ -199,17 +188,11 @@
 15. 		if (rc)
 16. 			continue;
 17. 	}
-
-  
-
-  
+```
 
 由于设备树代码是这样的：
 
-  
-
-  
-
+```cpp
 1. 	mdio {
 2. 		#address-cells = <1>;
 3. 		#size-cells = <0>;
@@ -219,11 +202,10 @@
 7. 			reg = <0>;
 8. 		};
 9. 	};
-
+```
 如下路径：drivers/of/of_mdio.c
 
-  
-
+```cpp
 1. static int of_mdiobus_register_phy(struct mii_bus *mdio, struct device_node *child,
 2. 				   u32 addr)
 3. {
@@ -271,11 +253,11 @@
 
 46. 	return 0;
 47. }
-
+```
 因此我们是走get_phy_device这个函数：
 
 所以我说内核代码写的好，就是注释和函数名基本就是意思了，获取phy device，
-
+```cpp
 1. /**
 2.  * get_phy_device - reads the specified PHY device and returns its @phy_device
 3.  *		    struct
@@ -303,7 +285,9 @@
 25. 	return phy_device_create(bus, addr, phy_id, is_c45, &c45_ids);
 26. }
 27. EXPORT_SYMBOL(get_phy_device);
+```
 
+```cpp
 1. /**
 2.  * get_phy_id - reads the specified addr for its ID.
 3.  * @bus: the target MII bus
@@ -344,31 +328,26 @@
 
 39. 	return 0;
 40. }
-
+```
 最关键的函数就是它，也就是本文的核心，这里是从寄存器中通过mdiobus的read方法来从phy中获取phy id，但是这里并没有获取到phy_id ，这寄存器都是以太网的通用寄存器
 
-  
-
+```cpp
 #define MII_PHYSID1 0x02 /* PHYS ID 1                   */  
 #define MII_PHYSID2 0x03 /* PHYS ID 2                   */
-
+```
   
-
 既然没有从寄存器中获取到phy_id，因此phy_device_create也不会在mii bus数据结构中创建phy_device，
 
 那么应用层在进行socket的时候，回调了open函数 fec_enet_open，这个函数中的fec_enet_mii_probe就不会从of_phy_connect中获取到phy_device，因此就会出现-19的错误。那么获取不到phy_id的根本原因就是因为reset的时序没满足datasheet的要求，具体原因分析请见之前第一篇以太网分析的《标题2 原因分析》
-
 ## 1.2 Realtek phy的内核配置
 
 那这是获取不到phy id的过程，那么正常的获取phy id的流程又是怎样的呢？
 
 我们可以看到这样的log：
 
-  
-
+```cpp
 fec 2188000.ethernet eth0: Freescale FEC PHY driver [RTL8201F Fast Ethernet] (mii_bus:phy_addr=2188000.ethernet:00, irq=-1)
-
-  
+```
 
 那这里又是怎样匹配的呢？
 
@@ -389,12 +368,9 @@ make kernel_menuconfig中我们需要选中realtek这款phy
 
 [![图像 11.jpg](http://www.wowotech.net/content/uploadfile/202001/thum-4bae1578380351.jpg "点击查看原图")](http://www.wowotech.net/content/uploadfile/202001/4bae1578380351.jpg)
 
-  
-
 代码路径：drivers/net/phy/realtek.c
 
-  
-
+```cpp
 1. static struct phy_driver realtek_drvs[] = {
 2. 	{
 3. 		.phy_id         = 0x00008201,
@@ -456,15 +432,11 @@ make kernel_menuconfig中我们需要选中realtek这款phy
 59. 	{ 0x001cc915, 0x001fffff },
 60. 	{ }
 61. };
-
+```
 phy_id                = 0x001cc816我们需要把这个phy id填入
 
 module_phy_driver(realtek_drvs);
-
-  
-
-  
-
+```cpp
 1. /**
 2.  * module_phy_driver() - Helper macro for registering PHY drivers
 3.  * @__phy_drivers: array of PHY drivers to register
@@ -487,17 +459,11 @@ module_phy_driver(realtek_drvs);
 
 21. #define module_phy_driver(__phy_drivers)				\
 22. 	phy_module_driver(__phy_drivers, ARRAY_SIZE(__phy_drivers))
-
+```
   
-
-  
-
 这里会将这个phy_drvier注册进去
-
   
-
-  
-
+```cpp
 1. /**
 2.  * phy_probe - probe and init a PHY device
 3.  * @dev: device to probe and init
@@ -514,17 +480,11 @@ module_phy_driver(realtek_drvs);
 14. 	int err = 0;
 
 16. 	phydev->drv = phydrv;
-
-  
-
-  
+```
 
 然后在这里把phy_device与phy_drvier关联了起来，再由phy_driver_register注册
 
-  
-
-  
-
+```cpp
 1. int phy_drivers_register(struct phy_driver *new_driver, int n)
 2. {
 3. 	int i, ret = 0;
@@ -540,21 +500,14 @@ module_phy_driver(realtek_drvs);
 13. 	return ret;
 14. }
 15. EXPORT_SYMBOL(phy_drivers_register);
-
+```
   
-
-  
-
 Freescale的以太网控制器驱动fec_main.c中
-
+```cpp
 static int fec_enet_mii_probe(struct net_device *ndev)
-
-  
+```
 
 [![图像 12.jpg](http://www.wowotech.net/content/uploadfile/202001/11101578380721.jpg "点击查看原图")](http://www.wowotech.net/content/uploadfile/202001/11101578380721.jpg)
-
-  
-
 ## 1.3 以太网流程总图
 
 最后汇总一个图给大家：
