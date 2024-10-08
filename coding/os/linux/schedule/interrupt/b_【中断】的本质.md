@@ -1,18 +1,6 @@
-# 
-
 Linux云计算网络
-
  _2021年10月25日 08:13_
-
 以下文章来源于IOT物联网小镇 ，作者道哥
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4Ity70WLCicqljHPMcjBJicfmKibafuotbvsRqaZIic6N5dQ/0)
-
-**IOT物联网小镇**.
-
-深入的思考 + 直白的文字 + 实用的项目经验，这是我能为您提供的、最基本的知识服务！
 
 ](https://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&mpshare=1&scene=24&srcid=1025peMJiUpm4aKVPsLvw1Zn&sharer_sharetime=1635124512104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04bb4eb637ddf607b3f3973caff47f9e57980acde5c001b070729666898ffb01d5f76551b6a95ec17053ab6340bab531c5eeb9b906f26aa6d90c4d762c252e3a0b90e887c437bf278688d4d81ce27756f9b217aad492ab0073a93a5cc8fc73a152234fd3fdef5736e615b2607de46cc63275cbca893629594&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQhc%2BeS6SshNikRXyWPYNVNBLmAQIE97dBBAEAAAAAAEbHL71HiEUAAAAOpnltbLcz9gKNyK89dVj00M2etG%2Bpo5B0ubHnyhcWPD7ZS8ONZ1eK2%2B0AD0NAhI0c%2BRMZUOysodHehBQylawPN5DfXFo7cbWNYRhmF4vvkkoDd5ggzAMtVhIV32lQrV4KSqfCcAp5yA%2Fzv54VqpWZuYCglwE9mSfwic2P0jTjsCgBQG5nPfbsHFS%2B%2F2fVGkjigd2TDU%2F3v84g0z4Ol7BtMs6Mv0J9YmIZ9sLpeRtG5Y4vIfUyeyPDLZVdXdPgC49%2B3FQpPd4IMlyqyyl%2Bv52d&acctmode=0&pass_ticket=nI3fD44N03%2F076Ut5RH0dB6vWUwI3QJ7W38UCvR2PbFN4F%2BqtJgd0bIfpnIN4qRu&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 

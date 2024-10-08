@@ -1,97 +1,72 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-8-17 19:41 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
-
-一、前言
+# 一、前言
 
 本文主要讲述下面两部分的内容：
 
 1、将work挂入workqueue的处理过程
-
 2、如何处理挂入workqueue的work
-
-二、用户将一个work挂入workqueue
-
-1、queue_work_on函数
+# 二、用户将一个work挂入workqueue
+## 1、queue_work_on函数
 
 使用workqueue机制的模块可以调用queue_work_on（有其他变种的接口，这里略过，其实思路是一致的）将一个定义好的work挂入workqueue，具体代码如下：
+```cpp
+bool queue_work_on(int cpu, struct workqueue_struct wq, struct work_struct *work)  
+{  
+……
 
-> bool queue_work_on(int cpu, struct workqueue_struct *wq, struct work_struct *work)  
-> {  
->     ……
-> 
->     if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work))) {  
->         __queue_work(cpu, wq, work);－－－挂入work list并通知worker thread pool来处理  
->         ret = true;  
->     }
-> 
->     ……  
-> }
+if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work))) {  
+queue_work(cpu, wq, work);－－－挂入work list并通知worker thread pool来处理  
+ret = true;  
+}
 
+……  
+}
+```
 work_struct的data member中的WORK_STRUCT_PENDING_BIT这个bit标识了该work是处于pending状态还是正在处理中，pending状态的work只会挂入一次。大部分的逻辑都是在__queue_work函数中，下面的小节都是描述该函数的执行过程。
-
-2、__WQ_DRAINING的解释
+## 2、__WQ_DRAINING的解释
 
 __queue_work函数一开始会校验__WQ_DRAINING这个flag，如下：
-
-> if (unlikely(wq->flags & __WQ_DRAINING) && WARN_ON_ONCE(!is_chained_work(wq)))  
->         return;
-
+```cpp
+if (unlikely(wq->flags & WQ_DRAINING) && WARN_ON_ONCE(!is_chained_work(wq)))  
+return;
+```
 __WQ_DRAINING这个flag表示该workqueue正在进行draining的操作，这多半是发送在销毁workqueue的时候，既然要销毁，那么挂入该workqueue的所有的work都要处理完毕，才允许它消亡。当想要将一个workqueue中所有的work都清空的时候，如果还有work挂入怎么办？一般而言，这时候当然是不允许新的work挂入了，毕竟现在的目标是清空workqueue中的work。但是有一种特例（通过is_chained_work判定），也就是正在清空的work（隶属于该workqueue）又触发了一个queue work的操作（也就是所谓chained work），这时候该work允许挂入。
+## 3、选择pool workqueue
+```cpp
+if (req_cpu == WORK_CPU_UNBOUND)  
+cpu = raw_smp_processor_id();
 
-3、选择pool workqueue
-
-> if (req_cpu == WORK_CPU_UNBOUND)  
->         cpu = raw_smp_processor_id();
-> 
-> if (!(wq->flags & WQ_UNBOUND))  
->         pwq = per_cpu_ptr(wq->cpu_pwqs, cpu);  
->     else  
->         pwq = unbound_pwq_by_node(wq, cpu_to_node(cpu));
-
+if (!(wq->flags & WQ_UNBOUND))  
+pwq = per_cpu_ptr(wq->cpu_pwqs, cpu);  
+else  
+pwq = unbound_pwq_by_node(wq, cpu_to_node(cpu));
+```
 WORK_CPU_UNBOUND表示并不指定cpu，这时候，选择当前代码运行的那个cpu了。一旦确定了cpu了，对于非unbound的workqueue，当然使用per cpu的pool workqueue。如果是unbound的workqueue，那么要根据numa node id来选择。cpu_to_node可以从cpu id获取node id。需要注意的是：这里选择的pool wq只是备选的，可能用也可能不用，它有可能会被替换掉，具体参考下一节描述。
-
-4、选择worker thread pool
+## 4、选择worker thread pool
 
 与其说挂入workqueue，不如说挂入worker thread pool，因为毕竟是线程池来处理具体的work。pool_workqueue有一个相关联的worker thread pool（struct pool_workqueue的pool成员），因此看起来选择了pool wq也就选定了worker pool了，但是，不是当前选定的那个pool wq对应的worker pool就适合该work，因为有时候该work可能正在其他的worker thread上执行中，在这种情况下，为了确保work的callback function不会重入，该work最好还是挂在那个worker thread pool上，具体代码如下：
+```cpp
+last_pool = get_work_pool(work);  
+if (last_pool && last_pool != pwq->pool) {  
+struct worker worker;
 
-> last_pool = get_work_pool(work);  
->     if (last_pool && last_pool != pwq->pool) {  
->         struct worker *worker;
-> 
->         spin_lock(&last_pool->lock);
-> 
->         worker = find_worker_executing_work(last_pool, work);
-> 
->         if (worker && worker->current_pwq->wq == wq) {  
->             pwq = worker->current_pwq;  
->         } else {  
->             /* meh... not running there, queue here */  
->             spin_unlock(&last_pool->lock);  
->             spin_lock(&pwq->pool->lock);  
->         }  
->     } else {  
->         spin_lock(&pwq->pool->lock);  
->     }
+spin_lock(&last_pool->lock);
 
+worker = find_worker_executing_work(last_pool, work);
+
+if (worker && worker->current_pwq->wq == wq) {  
+pwq = worker->current_pwq;  
+} else {  
+/ meh... not running there, queue here /  
+spin_unlock(&last_pool->lock);  
+spin_lock(&pwq->pool->lock);  
+}  
+} else {  
+spin_lock(&pwq->pool->lock);  
+}
+```
 last_pool记录了上一次该work是被哪一个worker pool处理的，如果last_pool就是pool wq对应的worker pool，那么皆大欢喜，否则只能使用last pool了。使用last pool的例子比较复杂一些，因为这时候需要根据last worker pool找到对应的pool workqueue。find_worker_executing_work函数可以找到具体哪一个worker线程正在处理该work，如果没有找到，那么还是使用第3节中选定的pool wq吧，否则，选择该worker线程当前的那个pool workqueue（其实也就是选定了线程池）。
-
-5、选择work挂入的队列
+## 5、选择work挂入的队列
 
 队列有两个，一个是被推迟执行的队列（pwq->delayed_works），一个是线程池要处理的队列（pwq->pool->worklist），如果挂入线程池要处理的队列，也就意味着该work进入active状态，线程池会立刻启动处理流程，如果挂入推迟执行的队列，那么该work还是pending状态：
 

@@ -1,95 +1,45 @@
-# 
-
 原创 伟林 Linux阅码场
-
  _2022年02月17日 08:00_
-
-伟林，中年码农，从事过电信、手机、安全、芯片等行业，目前依旧从事Linux方向开发工作，个人爱好Linux相关知识分享，个人微博CSDN pwl999，欢迎大家关注！  
-
-![](https://res.wx.qq.com/op_res/NN_GToMiIjsXzgPzF9-74ZzwR3cA9-fv3o9eWo8f5gQWqx71CmGlY8kFxuIxZaG0TB1bFeMCmh1DGN_pWMRg0A)
-
-**帐号已迁移**
-
-2篇原创内容
-
-公众号
-
-文章目录
+伟林，中年码农，从事过电信、手机、安全、芯片等行业，目前依旧从事Linux方向开发工作，个人爱好Linux相关知识分享，个人微博CSDN pwl999，欢迎大家关注！ 
+#  文章目录
 
 **1. 背景介绍**
-
 **1.1 OS 实时难题**
-
 **1.2 Linux 实时补丁**
-
 **1.3 Xenomai + Linux 双内核**
-
 **1.4 HW-RTOS**
-
 **1.5 More**
-
 **2. 优化点1：API**
-
 **2.1 原理介绍**
-
 2.1.1 Software API Execution time
-
 2.1.2 Software Influence of Queue Handling
-
 2.1.3 HW-RTOS API Execution time
-
 2.1.4 HW-RTOS Influence of Queue Handling
-
 **2.2 具体实现**
-
 **2.3 性能测试**
-
 **3. 优化点2：Tick offloading**
-
 **3.1 原理介绍**
-
 3.1.1 Software Tick
-
 3.1.2 HW-RTOS Tick
-
 **4. 优化点3：Hardware ISR (HW ISR)**
-
 **4.1 原理介绍**
-
 4.1.1 Software ISR
-
 4.1.2 Software ISR handed over to Task
-
 4.1.3 HW-RTOS ISR handed over to Task
-
 4.1.4 Non-OS managed Interrupt & Direct Interrupt Service
-
 **4.2 具体实现**
-
 **4.3 性能测试**
-
 **4.4 相关应用**
-
 4.4.1 Multiple interrupts using HW ISR
-
 4.4.2 Cyclic activation task
-
 4.4.3 Using cyclic activation task for network synchronization
-
 **5. 优化点4：Task Management**
-
 **5.1 原理介绍**
-
 5.1.1 HW-RTOS Scheduler
-
 5.1.1 HW-RTOS Context Switch
-
 **6. 典型案例**
-
 **6.1 Network and RTOS**
-
 **7. 下一代 HW-RTOS**
-
 ## 1.背景介绍
 
 在工业控制领域 实时(Real Time) 是一个核心要求。

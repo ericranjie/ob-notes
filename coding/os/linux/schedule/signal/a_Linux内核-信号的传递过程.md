@@ -1,47 +1,24 @@
-
-
 Linux内核之旅
-
  _2024年03月06日 21:16_ _陕西_
-
 以下文章来源于嵌入式ARM和Linux ，作者tupeloshen
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5WqcicNJs89QudCgkSngFcNBTicjNXiaWNib1w8TTdZ4brow/0)
-
-**嵌入式ARM和Linux**.
-
-专注于ARM体系架构，基于ARM的嵌入式开发，Linux内核及其驱动开发。记录自己学习过程中的点点滴滴！！！
 
 ](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664616933&idx=1&sn=58a93ef3c3f4a9e9bed672aa23db9d6a&chksm=f04dfe00c73a77162159d967b799523e1aba0616ffdad62fd2cbb8df2fda2ede1c00f9f3264e&mpshare=1&scene=24&srcid=0306nVHnxgFrHWAsxOzGWTmH&sharer_shareinfo=a19214a4ec6776ba98e9ed0f9c94e34e&sharer_shareinfo_first=a19214a4ec6776ba98e9ed0f9c94e34e&key=daf9bdc5abc4e8d0da554e703da0700cb379cdc101464c07876e71407485bd58dad5698a6db3d5ca16ad9b801a3c2f6fb821621b985f48d222cd3c34fd7cf51cf1f9b9ef428f3f3b45a1f1fc4706676c1553b84f93f546d8d6c4905ca68470cd0aa5c02c7a958aa7e39bdaaba1e0074e065a621a13192aa7167547e7d22e3fef&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQl4kzuQbYJjI4879aJL7x8RLmAQIE97dBBAEAAAAAAEraNpI9rkcAAAAOpnltbLcz9gKNyK89dVj0KBGboHjEbwOT5AIRUAL56oiogmbFLahPd%2FpHvsO%2BxhnKAPPWkFX78FgWb1bxUIBr4MHkePE%2BmLQBCIc9MEezYB7%2Fdc0foQjSdKIoZ7oTCCCokviGZU2B9f30Rzxvi6hYRz%2BLg%2Fu9coGzkn9quoc21DDhzlbOywU7BFr6R%2FPo9lZtVQthbzs4GctJ9F7byhWjVUVUQW9PKMMtbpmE7dM2DJV23ZGM4C8urWpOfqjjDxj%2FHXF2JDEfc3RtyDN2AVAg&acctmode=0&pass_ticket=vLWo0ZwNrZKlXT3BYW5AhZd%2FAT4S7VjNtt0fHItUGsihAiAag8O0Mwpc1DL2VeNr&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
-  
 
 - 1 执行信号的默认动作
-    
 - 2 捕获信号
-    
 - 3 系统调用的重新执行
-    
 - 4 x86_64架构-do_signal()
-    
-
-  
 
 前面我们已经介绍了内核注意到信号的到来，调用相关函数更新进程描述符以便进程接收处理信号。但是，如果目标进程此时没有运行，内核则推迟传递信号。现在，我们看看内核如何处理进程挂起的信号。
 
 正如第4章的`从中断和异常返回`一节中提到的，内核允许在进程返回到用户态执行之前，检查进程的`TIF_SIGPENDING`标志。因此，内核每次完成中断或异常的处理后，都会检查挂起信号是否存在。为了处理非阻塞的挂起信号，内核调用`do_signal()`函数，其接受2个参数：
 
 - `regs`
-    
     `current`当前进程的用户态寄存器内容在内核栈中保存位置的地址。
-    
 - `oldset`
-    
     用来保存阻塞信号位掩码数组的变量地址。
     
-
 对`do_signal()`的描述，主要集中在信号传递的通用机制；真实的代码中涵盖了许多细节，比如处理竞态条件和其它特殊情况（如`冻结系统`、`生成核心转储`、`停止和杀死整个线程组`等等。我们将忽略这些细节。
 
 如前所述，`do_signal()`函数通常只在`CPU`打算返回到用户态时才会被调用。所以，如果中断处理程序里调用`do_signal()`，函数直接返回：
@@ -69,7 +46,6 @@ Linux内核之旅
 `if (ka->sa.sa_handler == SIG_IGN)       continue;   `
 
 接下来的两节，我们将描述如何执行默认动作和信号处理程序。
-
 ## 1 执行信号的默认动作
 
 如果`ka->sa.sa_handler`等于`SIG_DFL`，`do_signal()`执行信号的默认动作。唯一的例外是，当接收进程是`init`时，这种情况下，信号会被抛弃：
@@ -89,7 +65,6 @@ Linux内核之旅
 `do_signal_stop()`检查当前进程是否是线程组中第一个被停止的进程。如果是，它负责停止所有进程：本质上，该函数将信号描述符中的`group_stop_count`字段设置为正值，并唤醒线程组中的每个进程。然后，每个进程依次查看此字段以识别正在进行的`组停止`，将其状态更改为`TASK_STOPPED`，并调用`schedule()`重新调度进程。`do_signal_stop()`函数还向线程组`leader`的父进程发送`SIGCHLD`信号，除非父进程设置了`SIGCHLD`的`SA_NOCLDSTOP`标志。
 
 默认动作为`dump`的信号会在进程的工作目录中创建核心转储文件：该文件列出了进程地址空间和寄存器的完整内容。`do_signal()`创建核心转储文件之后，会杀死线程组。其余`18`个信号的默认动作是`terminate`，就是杀死进程。为此，调用`do_group_exit()`，执行一个优雅的`group exit`处理程序（可以参考第3章的`进程终止`一节）
-
 ## 2 捕获信号
 
 如果信号指定了处理程序，则`do_signal()`执行该程序。通过调用`invoking handle_signal()`
@@ -104,36 +79,26 @@ Linux内核之旅
 
 下图`11-2`说明了捕获信号的函数执行流程。假设非阻塞信号被发送给进程。中断或异常发生时，进程切换到内核态。在即将返回到用户态之前，内核调用`do_signal()`函数，依次处理信号（`handle_signal()`）并配置用户态栈（`setup_frame()`或`setup_rt_frame()`）。进程切换到用户态后，开始执行信号处理程序，因为该处理程序的地址被强制加载到了`PC`程序计数器中。当信号程序终止后，调用`setup_frame()`或`setup_rt_frame()`将返回代码加载到用户态栈中。这段返回代码会调用`sigreturn()`和`rt_sigreturn()`系统调用；相应的服务例程会将正常程序的硬件上下文内容拷贝到内核态栈并将用户态栈恢复到其原始状态（`restore_sigcontext()`）。当系统调用终止时，正常程序继续其执行。
 ![[Pasted image 20240924152400.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 图`11-2` 捕获一个信号
 
 现在，让我们看一下其执行细节：
-
 #### 2.1 Setting up the frame
 
 为了正确设置进程的用户态栈，`handle_signal()`函数既可以调用`setup_frame()`（对于那些不需要`siginfo_t`的信号），也可以调用`setup_rt_frame()`（对于那些确定需要`siginfo_t`的信号）。具体调用哪个函数，依赖于信号的`sigaction`表中`sa_flags`字段的`SA_SIGINFO`标志。
 
 接下来，我们看一下`setup_frame()`函数的具体实现：（`Linux`内核版本是`v2.6.11`，文件位置：`arch/x86_64/kernel/signal.c`）
-
-`/* 这些符号的定义在vsyscall内存页中，查看vsyscall-sigreturn.S文件*/   extern void __user __kernel_sigreturn;   extern void __user __kernel_rt_sigreturn;      static void setup_frame(int sig, struct k_sigaction *ka,               sigset_t *set, struct pt_regs * regs)   {       void __user *restorer;       struct sigframe __user *frame;       int err = 0;       int usig;          frame = get_sigframe(ka, regs, sizeof(*frame));          if (!access_ok(VERIFY_WRITE, frame, sizeof(*frame)))           goto give_sigsegv;          usig = current_thread_info()->exec_domain           && current_thread_info()->exec_domain->signal_invmap           && sig < 32           ? current_thread_info()->exec_domain->signal_invmap[sig]           : sig;          err = __put_user(usig, &frame->sig);       if (err)           goto give_sigsegv;          err = setup_sigcontext(&frame->sc, &frame->fpstate, regs, set->sig[0]);       if (err)           goto give_sigsegv;          if (_NSIG_WORDS > 1) {           err = __copy_to_user(&frame->extramask, &set->sig[1],                         sizeof(frame->extramask));           if (err)               goto give_sigsegv;       }          restorer = &__kernel_sigreturn;       if (ka->sa.sa_flags & SA_RESTORER)           restorer = ka->sa.sa_restorer;          /* Set up to return from userspace.  */       err |= __put_user(restorer, &frame->pretcode);               /*        * This is popl %eax ; movl $,%eax ; int $0x80        *        * WE DO NOT USE IT ANY MORE! It's only left here for historical        * reasons and because gdb uses it as a signature to notice        * signal handler stack frames.        */       err |= __put_user(0xb858, (short __user *)(frame->retcode+0));       err |= __put_user(__NR_sigreturn, (int __user *)(frame->retcode+2));       err |= __put_user(0x80cd, (short __user *)(frame->retcode+6));          if (err)           goto give_sigsegv;          /* 为信号处理程序配置寄存器 */       regs->esp = (unsigned long) frame;       regs->eip = (unsigned long) ka->sa.sa_handler;       regs->eax = (unsigned long) sig;       regs->edx = (unsigned long) 0;       regs->ecx = (unsigned long) 0;          /* 恢复用户态的段寄存器 */       set_fs(USER_DS);       regs->xds = __USER_DS;       regs->xes = __USER_DS;       regs->xss = __USER_DS;       regs->xcs = __USER_CS;          /* 在进入信号处理程序时清除TF标志，但通知正在单步跟踪的跟踪器，        * 跟踪器也可能希望在信号处理程序内部进行单步执行        */       regs->eflags &= ~TF_MASK;       if (test_thread_flag(TIF_SINGLESTEP))           ptrace_notify(SIGTRAP);       // ...省略，打印调试信息，然后返回。      give_sigsegv:       force_sigsegv(sig, current);   }   `
-
+```cpp
+/* 这些符号的定义在vsyscall内存页中，查看vsyscall-sigreturn.S文件*/   extern void __user __kernel_sigreturn;   extern void __user __kernel_rt_sigreturn;      static void setup_frame(int sig, struct k_sigaction *ka,               sigset_t *set, struct pt_regs * regs)   {       void __user *restorer;       struct sigframe __user *frame;       int err = 0;       int usig;          frame = get_sigframe(ka, regs, sizeof(*frame));          if (!access_ok(VERIFY_WRITE, frame, sizeof(*frame)))           goto give_sigsegv;          usig = current_thread_info()->exec_domain           && current_thread_info()->exec_domain->signal_invmap           && sig < 32           ? current_thread_info()->exec_domain->signal_invmap[sig]           : sig;          err = __put_user(usig, &frame->sig);       if (err)           goto give_sigsegv;          err = setup_sigcontext(&frame->sc, &frame->fpstate, regs, set->sig[0]);       if (err)           goto give_sigsegv;          if (_NSIG_WORDS > 1) {           err = __copy_to_user(&frame->extramask, &set->sig[1],                         sizeof(frame->extramask));           if (err)               goto give_sigsegv;       }          restorer = &__kernel_sigreturn;       if (ka->sa.sa_flags & SA_RESTORER)           restorer = ka->sa.sa_restorer;          /* Set up to return from userspace.  */       err |= __put_user(restorer, &frame->pretcode);               /*        * This is popl %eax ; movl $,%eax ; int $0x80        *        * WE DO NOT USE IT ANY MORE! It's only left here for historical        * reasons and because gdb uses it as a signature to notice        * signal handler stack frames.        */       err |= __put_user(0xb858, (short __user *)(frame->retcode+0));       err |= __put_user(__NR_sigreturn, (int __user *)(frame->retcode+2));       err |= __put_user(0x80cd, (short __user *)(frame->retcode+6));          if (err)           goto give_sigsegv;          /* 为信号处理程序配置寄存器 */       regs->esp = (unsigned long) frame;       regs->eip = (unsigned long) ka->sa.sa_handler;       regs->eax = (unsigned long) sig;       regs->edx = (unsigned long) 0;       regs->ecx = (unsigned long) 0;          /* 恢复用户态的段寄存器 */       set_fs(USER_DS);       regs->xds = __USER_DS;       regs->xes = __USER_DS;       regs->xss = __USER_DS;       regs->xcs = __USER_CS;          /* 在进入信号处理程序时清除TF标志，但通知正在单步跟踪的跟踪器，        * 跟踪器也可能希望在信号处理程序内部进行单步执行        */       regs->eflags &= ~TF_MASK;       if (test_thread_flag(TIF_SINGLESTEP))           ptrace_notify(SIGTRAP);       // ...省略，打印调试信息，然后返回。      give_sigsegv:       force_sigsegv(sig, current);   }   
+```
 `setup_frame()`接收4个参数，如下所示：
 
 - `sig`
-    
     信号
-    
 - `ka`
-    
     信号的`k_sigaction`表地址
-    
 - `oldset`
-    
     阻塞信号的位掩码组地址
-    
 - `regs`
-    
     用户态寄存器内容在内核栈的保存位置
     
 

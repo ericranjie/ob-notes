@@ -1,18 +1,7 @@
-# 
-
 Linux阅码场
-
  _2022年03月08日 08:02_
-
 以下文章来源于内核工匠 ，作者Cheetah
 
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6RLUCnKO3ibq4vBV8CTFqV5ibnt5e1aeIn8ZRoxrtproqA/0)
-
-**内核工匠**.
-
-分享Linux内核相关黑科技、技术文章、技术资讯和精选教程
 
 ](https://mp.weixin.qq.com/s?__biz=Mzg2OTc0ODAzMw==&mid=2247502883&idx=1&sn=2828205841efab5458e52cd7ee6413f4&source=41&key=daf9bdc5abc4e8d09fb278ac985aadd68b95ecc78120e4e3445542e374f859ffe8b7922606a458cc79aa138803ed105b8a09721cb04c7a431a9477ce346c540f0a9319c43f20908897377934de4ff6aae4a9f8e5a381020e7a8f3703566751d7368ee2126670872697b98bfdb39c07d5fa741335f34aa8079936bd4eff3b01ee&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ2WNaILvTpkt6r5SSwcmZgxLmAQIE97dBBAEAAAAAAB8LCJ0PxPgAAAAOpnltbLcz9gKNyK89dVj0Oqc6s1ErWGDCv3jaYRMplefJw6e7q2dmvmVPtNqpRmVXZWDOI7lphNU7qRn9e6fVSOO8I7T3LDDiEfctVSOaZbBiBoSrpCn3PUi0s%2BIKCjaAwvbgJ3f8tL%2F6J4EkkTLzq6dGINDs1AtLbhd69LdKjogQZspFRWf3PuR3NACXC7tt95v4efmJfc6IMAy6zm2kQGAKVxLgL0%2FEs%2Frnp%2BRwF9m0EOYVeXSGNp5g05kGWtriibA7Y8JGpMeFH33uCw72&acctmode=0&pass_ticket=KoIcDWU9jRKc526Py0cFHu7wL41BoRO8IevQDbsFCtUOAuKTGiIIw7LaHTxdYpxD&wx_header=1#)
 

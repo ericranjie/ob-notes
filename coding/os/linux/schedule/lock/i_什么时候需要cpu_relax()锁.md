@@ -1,16 +1,5 @@
-# 
-
 宋宝华 Linux内核之旅
-
  _2021年09月27日 11:32_
-
-![](https://res.wx.qq.com/op_res/NN_GToMiIjsXzgPzF9-74ZzwR3cA9-fv3o9eWo8f5gQWqx71CmGlY8kFxuIxZaG0TB1bFeMCmh1DGN_pWMRg0A)
-
-**帐号已迁移**
-
-2篇原创内容
-
-公众号
 
 一个最典型的要使用pu_relax()锁的场景是忙等待（也就是死循环等一个事情的发生），在内核里面有大量的代码，比如等寄存器状态：  
 

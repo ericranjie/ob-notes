@@ -1,32 +1,11 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-4-7 7:09 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-前言
+# 前言
 
 Linux是一个通用操作系统的内核，她的目标是星辰大海，上到网络服务器，下至嵌入式设备都能运行良好。做一款好的linux进程调度器是一项非常具有挑战性的任务，因为设计约束太多了：
 
 ---它必须是公平的
-
 ---快速响应
-
 ---系统的throughput要高
-
 ---功耗要小
 
 3.8版本之前的内核CFS调度器在计算CPU load的时候采用的是跟踪每个运行队列上的负载（per-rq load tracking）。这种粗略的负载跟踪算法显然无法为调度算法提供足够的支撑。为了完美的满足上面的所有需求，Linux调度器在3.8版中引入了PELT（Per-entity load tracking）算法。本文将为您分析PELT的设计概念和具体的实现。
@@ -44,10 +23,8 @@ Linux是一个通用操作系统的内核，她的目标是星辰大海，上到
 跟踪任务的utility主要是为任务寻找合适算力的CPU。例如在手机平台上4个大核+4个小核的结构。一个任务本身逻辑复杂，需要有很长的执行时间，也就是说其utility比较大，那么需要将其安排到算力和任务utility匹配的CPU上，例如大核CPU上。PELT算法也会跟踪CPU上的utility，根据CPU utility选择提升或者降低该CPU的频率。CPU load和Task load主要用于负载均衡算法，即让系统中的每一个CPU承担和它的算力匹配的任务负载。
 
 3.8版本之前的内核CFS调度器在负载跟踪算法上比较粗糙，采用的是跟踪每个运行队列上的负载（per-rq load tracking）。它并没有跟踪每一个任务的负载和利用率，只是关注整体CPU的负载。对于per-rq的负载跟踪方法，调度器可以了解到每个运行队列对整个系统负载的贡献。这样的统计信息可以帮助调度器平衡runqueue上的负载，但从整个系统的角度看，我们并不知道当前CPU上的负载来自哪些任务，每个任务施加多少负载，当前CPU的算力是否支撑runqueue上的所有任务，是否需要提频或者迁核来解决当前CPU上负载。因此，为了更好的进行负载均衡和CPU算力调整，调度器需要PELT算法来指引方向。
-
-二、PELT算法的基本原理
-
-1、定义
+# 二、PELT算法的基本原理
+## 1、定义
 
 内核用struct sched_avg来抽象一个se或者cfs rq的平均调度负载：
 
@@ -61,8 +38,7 @@ Linux是一个通用操作系统的内核，她的目标是星辰大海，上到
 |util_est|任务阻塞后，其负载会不断衰减。如果一个重载任务阻塞太长时间，那么根据标准PELT算法计算出来的负载会非常的小，当该任务被唤醒重新参与调度的时候，由于负载较小会让调度器做出错误的判断。因此引入了这个成员，记录阻塞之前的load avg信息。|
 
 从这个数据结构可以看出，平均调度负载实际上包括了平均负载load_avg、平均运行负载runnable_load_avg和平均利用率util_avg。为了简单，后文省略“平均”二字，称这些术语为负载、运行负载和利用率。
-
-2、基本公式
+## 2、基本公式
 
 通过上一章，我们了解到PELT算法把负载跟踪算法从per rq推进到per-entity的层次，从而让调度器有了做更精细控制的前提。这里per-entity中的“entity”指的是调度实体（scheduling entity），其实就是一个进程或者control group中的一组进程。为了做到Per-entity的负载跟踪，时间被分成了1024us的序列，在每一个1024us的周期中，一个entity对系统负载的贡献可以根据该实体处于runnable状态（正在CPU上运行或者等待cpu调度运行）的时间进行计算。任务在1024us的周期窗口内的负载其实就是瞬时负载。如果在该周期内，runnable的时间是t，那么该任务的瞬时负载应该和（t/1024）有正比的关系。类似的概念，任务的瞬时利用率应该通过1024us的周期窗口内的执行时间（不包括runqueue上的等待时间）比率来计算。
 
@@ -101,8 +77,7 @@ Li表示在周期pi中的瞬时负载，对于过去的负载我们在计算的�
 （3）最近时间点的负荷值拥有最大的权重1，随着时间的推移，权重指数衰减
 
 使用这样序列的好处是计算简单，我们不需要使用数组来记录过去的负荷贡献，只要把上次的总负荷的贡献值乘以y再加上新的L0负荷值就OK了。utility和runnable load的计算也是类似的，不再赘述。
-
-3、关于时间
+## 3、关于时间
 
 在上面的公式中，有很多关于时间的部分参与到了运算中，本小节将对PELT算法中的时间进行详细说明。PELT算法中的时间都是来自几个rq clock，如下：
 

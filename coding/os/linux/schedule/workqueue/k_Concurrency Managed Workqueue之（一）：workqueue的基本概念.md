@@ -1,23 +1,5 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-7-15 18:47 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
-
-一、前言
+# 一、前言
 
 workqueue是一个驱动工程师常用的工具，在旧的内核中（指2.6.36之前的内核版本）workqueue代码比较简单（大概800行），在2.6.36内核版本中引入了CMWQ（Concurrency Managed Workqueue），workqueue.c的代码膨胀到5000多行，为了深入的理解CMWQ，单单一份文档很难将其描述的清楚，因此CMWQ作为一个主题将会产生一系列的文档，本文是这一系列文档中的第一篇，主要是基于2.6.23内核的代码实现来讲述workqueue的一些基本概念（之所以选择较低版本的内核，主要是因为代码简单，适合理解基本概念）。
 

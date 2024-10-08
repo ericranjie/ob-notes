@@ -80,42 +80,40 @@ task struct中的prio成员表示了该线程的动态优先级，也就是调�
 > }
 
 rt_prio是一个根据当前优先级来确定是否是实时进程的函数，包括两种情况，一种情况是该进程是实时进程，调度策略是SCHED_FIFO或者SCHED_RR。另外一种情况是人为的将该进程提升到RT priority的区域（例如在使用优先级继承的方法解决系统中优先级翻转问题的时候）。在这两种情况下，我们都不改变其动态优先级，即effective_prio返回当前动态优先级p->prio。其他情况，进程的动态优先级跟随归一化的优先级。
-
-三、典型数据流程分析
-
-1、用户空间设定nice value
+# 三、典型数据流程分析
+## 1、用户空间设定nice value
 
 用户空间设定nice value的操作，在内核中主要是set_user_nice函数实现的，无论是sys_nice或者sys_setpriority，在参数检查和权限检查之后都会调用set_user_nice函数，完成具体的设定。代码如下：
+```cpp
+void set_user_nice(struct task_struct p, long nice)  
+{  
+int old_prio, delta, queued;  
+unsigned long flags;  
+struct rq *rq;   
+rq = task_rq_lock(p, &flags);  
+if (task_has_dl_policy(p) || task_has_rt_policy(p)) {－－－－－－－－－－－（1）  
+p->static_prio = NICE_TO_PRIO(nice);  
+goto out_unlock;  
+}  
+queued = task_on_rq_queued(p);－－－－－－－－－－－－－－－－－－－（2）  
+if (queued)  
+dequeue_task(rq, p, DEQUEUE_SAVE);
 
-> void set_user_nice(struct task_struct *p, long nice)  
-> {  
->     int old_prio, delta, queued;  
->     unsigned long flags;  
->     struct rq *rq;   
->     rq = task_rq_lock(p, &flags);  
->     if (task_has_dl_policy(p) || task_has_rt_policy(p)) {－－－－－－－－－－－（1）  
->         p->static_prio = NICE_TO_PRIO(nice);  
->         goto out_unlock;  
->     }  
->     queued = task_on_rq_queued(p);－－－－－－－－－－－－－－－－－－－（2）  
->     if (queued)  
->         dequeue_task(rq, p, DEQUEUE_SAVE);
-> 
->     p->static_prio = NICE_TO_PRIO(nice);－－－－－－－－－－－－－－－－（3）  
->     set_load_weight(p);  
->     old_prio = p->prio;  
->     p->prio = effective_prio(p);  
->     delta = p->prio - old_prio;
-> 
->     if (queued) {  
->         enqueue_task(rq, p, ENQUEUE_RESTORE);－－－－－－－－－－－－（2）  
->         if (delta < 0 || (delta > 0 && task_running(rq, p)))－－－－－－－－－－－－（4）  
->             resched_curr(rq);  
->     }  
-> out_unlock:  
->     task_rq_unlock(rq, p, &flags);  
-> }
+p->static_prio = NICE_TO_PRIO(nice);－－－－－－－－－－－－－－－－（3）  
+set_load_weight(p);  
+old_prio = p->prio;  
+p->prio = effective_prio(p);  
+delta = p->prio - old_prio;
 
+if (queued) {  
+enqueue_task(rq, p, ENQUEUE_RESTORE);－－－－－－－－－－－－（2）  
+if (delta < 0 || (delta > 0 && task_running(rq, p)))－－－－－－－－－－－－（4）  
+resched_curr(rq);  
+}  
+out_unlock:  
+task_rq_unlock(rq, p, &flags);  
+}
+```
 （1）如果是实时进程或者deadline类型的进程，那么nice value其实是没有什么实际意义的，不过我们还是设定其静态优先级，当然，这样的设定其实不会起到什么作用的，也不会实际改变调度器行为，因此直接返回，没有dequeue和enqueue的动作。
 
 （2）在step中已经处理了调度策略是RT类和DEADLINE类的进程，因此，执行到这里，只可能是普通进程了，使用CFS算法。如果该task在run queue上（queued 等于true），那么由于我们修改了nice value，调度器需要重新审视当前runqueue中的task。因此，我们需要将该task从rq中摘下，在重新计算优先级之后，再次插入该runqueue对应的runable task的红黑树中。
@@ -127,29 +125,28 @@ rt_prio是一个根据当前优先级来确定是否是实时进程的函数，�
 2、进程缺省的调度策略和调度参数
 
 我们先思考这样的一个问题：在用户空间设定调度策略和调度参数之前，一个线程的default scheduling policy是什么呢？这需要追溯到fork的时候（具体代码在sched_fork函数中），这个和task struct中sched_reset_on_fork设定相关。如果没有设定这个flag，那么说明在fork的时候，子进程跟随父进程的调度策略，如果设定了这个flag，则说明子进程的调度策略和调度参数不能继承自父进程，而是需要设定为default。代码片段如下：
+```cpp
+int sched_fork(unsigned long clone_flags, struct task_struct p)  
+{
+……  
+p->prio = current->normal_prio; －－－－－－－－－－－－－－－－－－－（1）  
+if (unlikely(p->sched_reset_on_fork)) {  
+if (task_has_dl_policy(p) || task_has_rt_policy(p)) {－－－－－－－－－－（2）  
+p->policy = SCHED_NORMAL;  
+p->static_prio = NICE_TO_PRIO(0);  
+p->rt_priority = 0;  
+} else if (PRIO_TO_NICE(p->static_prio) < 0)  
+p->static_prio = NICE_TO_PRIO(0);
 
-> int sched_fork(unsigned long clone_flags, struct task_struct *p)  
-> {
-> 
-> ……  
->     p->prio = current->normal_prio; －－－－－－－－－－－－－－－－－－－（1）  
->     if (unlikely(p->sched_reset_on_fork)) {  
->         if (task_has_dl_policy(p) || task_has_rt_policy(p)) {－－－－－－－－－－（2）  
->             p->policy = SCHED_NORMAL;  
->             p->static_prio = NICE_TO_PRIO(0);  
->             p->rt_priority = 0;  
->         } else if (PRIO_TO_NICE(p->static_prio) < 0)  
->             p->static_prio = NICE_TO_PRIO(0);
-> 
->         p->prio = p->normal_prio = __normal_prio(p); －－－－－－－－－－－－（3）  
->         set_load_weight(p);   
->         p->sched_reset_on_fork = 0;  
->     }
-> 
-> ……
-> 
-> }
+p->prio = p->normal_prio = normal_prio(p); －－－－－－－－－－－－（3）  
+set_load_weight(p);   
+p->sched_reset_on_fork = 0;  
+}
 
+……
+
+}
+```
 （1）sched_fork只是fork过程中的一个片段，在fork一开始，dup_task_struct已经复制了一个和父进程完全一个的进程描述符（task struct），因此，如果没有步骤2中的重置，那么子进程是跟随父进程的调度策略和调度参数（各种优先级），当然，有时候为了解决PI问题而临时调升父进程的动态优先级，在fork的时候不宜传递到子进程中，因此这里重置了动态优先级。
 
 （2）缺省的调度策略是SCHED_NORMAL，静态优先级等于120（也就是说nice value等于0），rt priority等于0（普通进程）。不管父进程如何，即便是deadline的进程，其fork的子进程也需要恢复到缺省参数。
@@ -171,14 +168,13 @@ __sched_setscheduler分成两个部分，首先进行安全性检查和参数检
 参考文档：
 
 1、linux下的各种man page
-
 2、linux 4.4.6内核源代码
 
 _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [进程优先级](http://www.wowotech.net/tag/%E8%BF%9B%E7%A8%8B%E4%BC%98%E5%85%88%E7%BA%A7)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [中断上下文中调度会怎样？](http://www.wowotech.net/process_management/schedule-in-interrupt.html) | [玩转BLE(3)_使用微信蓝牙精简协议伪造记步数据](http://www.wowotech.net/bluetooth/weixin_ble_1.html)»
 

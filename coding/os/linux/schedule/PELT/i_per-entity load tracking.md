@@ -1,32 +1,11 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-8-18 10:27 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-一、为何需要per-entity load tracking？
+# 一、为何需要per-entity load tracking？
 
 对于Linux内核而言，做一款好的进程调度器是一项非常具有挑战性的任务，主要原因是在进行CPU资源分配的时候必须满足如下的需求：
 
 1、它必须是公平的
-
 2、快速响应
-
 3、系统的throughput要高
-
 4、功耗要小
 
 其实你仔细分析上面的需求，这些目标其实是相互冲突的，但是用户在提需求的时候就是这么任性，他们期望所有的需求都满足，而且不管系统中的负荷情况如何。因此，纵观Linux内核调度器这些年的发展，各种调度器算法在内核中来来去去，这也就不足为奇了。当然，2007年，2.6.23版本引入“完全公平调度器”（CFS）之后，调度器相对变得稳定一些。最近一个最重大的变化是在3.8版中合并的Per-entity load tracking。
@@ -46,9 +25,7 @@ _L = L0 + L1*y + L2*y2 + L3*y3 + ..._
 其中y是衰减因子。通过上面的公式可以看出：
 
 （1）    调度实体对系统负荷的贡献值是一个序列之和组成
-
 （2）    最近的负荷值拥有最大的权重
-
 （3）    过去的负荷也会被累计，但是是以递减的方式来影响负载计算。
 
 使用这样序列的好处是计算简单，我们不需要使用数组来记录过去的负荷贡献，只要把上次的总负荷的贡献值乘以_y_再加上新的L0负荷值就OK了。
@@ -60,8 +37,7 @@ _L = L0 + L1*y + L2*y2 + L3*y3 + ..._
 当然，内核可以选择记录所有进入阻塞状态的进程，像往常一样衰减它们的负载贡献，并将其增加到总负载中。但这么做是非常耗费资源的。所以，相反，3.8版本的调度器在每个cfs_rq（每个control group都有自己的cfs rq）数据结构中，维护一个“blocked load”的成员，这个成员记录了所有阻塞状态进程对系统负荷的贡献。当一个进程阻塞了，它的负载会从总的运行负载值（runnable load）中减去并添加到总的阻塞负载值（blocked load）中。该负载可以以相同的方式衰减（即每个周期乘以y）。当阻塞的进程再次转换成运行态时，其负载值（适当进行衰减）则转移到运行负荷上来。因此，跟踪blocked load只是需要在进程状态转换过程中有一点计算量，调度器并不需要由于跟踪阻塞负载而遍历一个进入阻塞状态进程的链表。
 
 另外一个比较繁琐的地方是对节流进程（throttled processes）负载的计算。所谓节流进程是指那些在“CFS带宽控制器”（ [CFS bandwidth controller](https://lwn.net/Articles/428230/)）下控制运行的进程。当这些进程用完了本周期内的CPU时间，即使它们仍然在运行状态，即使CPU空闲，调度器并不会把CPU资源分配给它们。因此节流进程不会对系统造成负荷。正因为如此，当进程处于被节流状态的时候，它们对系统负荷的贡献值不应该按照runnable进程计算。在等待下一个周期到来之前，throttled processes不能获取cpu资源，因此它们的负荷贡献值会衰减。
-
-**三、**per-entity load tracking有什么好处？
+# **三、per-entity load tracking有什么好处？
 
 有了Per-entity负载跟踪机制，在没有增加调度器开销的情况下，调度器现在对每个进程和“调度进程组”对系统负载的贡献有了更清晰的认识。有了更精细的统计数据（指per entity负载值）通常是好的，但人们可能会怀疑这些信息是否真的对调度器有用。
 

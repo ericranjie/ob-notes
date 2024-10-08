@@ -1,31 +1,11 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-1-27 18:31 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
-
-一、前言
+# 一、前言
 
 无论你愿意或者不愿意，linux kernel的版本总是不断的向前推进，做为一个热衷于专研内核的工程师，最大的痛苦莫过于此：当你熟悉了一个版本的内核之后，内核已经推进到一个新的版本，你曾经熟悉的内容可能会变得陌生（这里主要说的是该模块的内部实现，实际上，内核中的每一个子系统都是会尽量保持接口API的不变）。怎么应对这种变化呢？一方面，具体的实现可能千差万别，但是基本的概念是一样的，无论哪一个版本的内核，总是能够理解一个内核子系统的基本概念和运作机理。另外一方面，不同版本之间的实现不同往往是有原因的，新版本中具体实现的不同往往是针对旧版本的问题而改进的，如果你能够理清不同版本之间的差异以及背后的原因，那么你其实也在不断的加深对计算机系统的理解（不断的迭代是一个不错的学习linux内核的方法）。
 
 因此，在进入具体的Linux2.6.11版本内核RCU实现之前，我们首先描述why，也就是说为何修改RCU算法实现？旧内核有哪里不足，新的内核优点是什么？随后需要描述的是如何改进，最后，我们描述的是Linux2.6.11版本内核RCU模块的具体实现。
-
-二、 Linux2.5.43版本的可扩展性（scalability）问题
-
-1、原理
+# 二、 Linux2.5.43版本的可扩展性（scalability）问题
+## 1、原理
 
 我们现在研究的并行运算系统大多是基于共享内存的：也就是说系统中有若干个CPU core，共享一个memory space。在这种情况下，各个CPU Core对memory space中的某个固定的变量数据的访问就很值得思考一下了。一个简单的例子：假设程序中有一个全局变量A，每个CPU core都运行一个线程对A进行访问。如果大家都是读，那么没有什么问题，除了第一个CPU core用于cache miss需要从main memory加载之外，其他的CPU core的第一次读操作都可以从通过snoop的操作，从其他cache中获取A的值，并将自己的A变量对应的cacheline设置成shared状态。之后，各个CPU core无论如何的发起多次read操作，都可以从自己的local cache中获取A值，因此，整个系统的性能非常好。
 
@@ -36,83 +16,82 @@
 2、Linux2.5.43版本的全局变量和访问分析
 
 现在，我们先一起review一下Linux2.5.43版本的全局变量（percpu的那些全局变量不考虑）：
+```cpp
+struct rcu_ctrlblk rcu_ctrlblk =  
+{ .mutex = SPIN_LOCK_UNLOCKED, .curbatch = 1,  .maxbatch = 1, .rcu_cpu_mask = 0 };
 
-> struct rcu_ctrlblk rcu_ctrlblk =  
->     { .mutex = SPIN_LOCK_UNLOCKED, .curbatch = 1,  .maxbatch = 1, .rcu_cpu_mask = 0 };
-> 
-> struct rcu_ctrlblk {  
->     spinlock_t    mutex;  
->     long        curbatch;   
->     long        maxbatch;  
->     unsigned long    rcu_cpu_mask;  
-> };
-
+struct rcu_ctrlblk {  
+spinlock_t    mutex;  
+long        curbatch;   
+long        maxbatch;  
+unsigned long    rcu_cpu_mask;  
+};
+```
 对于rcu_ctrlblk数据结构中，rcu_cpu_mask成员修改异常频繁，每个CPU都会在自己经历Quiescent state之后，修改该变量。curbatch和maxbatch仅仅是在一次Grace period才修改，特别是如果cpu core增多，curbatch和maxbatch访问频率不变，但是rcu_cpu_mask成员的写操作呈线性增长。因此，如果RCU算法经常读rcu_cpu_mask，那么其读性能一定是非常的差。
 
 下面，我们再一起过一下Linux2.5.43版本对对rcu_cpu_mask的访问情况。
 
 （1）rcu_pending函数对rcu_cpu_mask的访问情况，代码如下：
-
-> static inline int rcu_pending(int cpu)  
-> {  
->     if ((……忽略其他检查  
->         test_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask))  
->         return 1;  
->     else  
->         return 0;  
-> }
-
+```cpp
+static inline int rcu_pending(int cpu)  
+{  
+if ((……忽略其他检查  
+test_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask))  
+return 1;  
+else  
+return 0;  
+}
+```
 在各个CPU的tick handler中，需要调用rcu_pending来检测是否进行后续RCU相关的操作（检查Quiescent state，调用callback什么的）。为什么做这个检查呢？逻辑思考是这样的：如果该CPU以及报告了Quiescent state，那么其rcu_cpu_mask必定被修改成0，因此，通过该bit可以知道其是否上报了Quiescent state，如果已经上报，那么后续的RCU相关的操作在该CPU上不需要进行（这时候，就需要等最后一个上报Quiescent state的CPU启动一次新的Grace Period检查过程之后，该CPU才有事情要做）。你知道的，CPU的资源有限，我们得省着点用，能少执行点代码就少执行点代码。
 
 （2）rcu_check_quiescent_state函数对rcu_cpu_mask的访问情况，代码如下：
+```cpp
+static void rcu_check_quiescent_state(void)  
+{  
+int cpu = smp_processor_id();
 
-> static void rcu_check_quiescent_state(void)  
-> {  
->     int cpu = smp_processor_id();
-> 
->     if (!test_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask)) {－－－－－－－－－A   
->         return;  
->     }
-> 
-> ……
-> 
->     spin_lock(&rcu_ctrlblk.mutex);  
->     if (!test_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask)) {－－－－－－－－－B   
->         spin_unlock(&rcu_ctrlblk.mutex);  
->         return;  
->     }  
->     clear_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask);－－－－－－－－－－－C   
->     RCU_last_qsctr(cpu) = RCU_QSCTR_INVALID;  
->     if (rcu_ctrlblk.rcu_cpu_mask != 0) {－－－－－－－－－－－－－－－D  
->         spin_unlock(&rcu_ctrlblk.mutex);  
->         return;  
->     }  
->     rcu_ctrlblk.curbatch++;  
->     rcu_start_batch(rcu_ctrlblk.maxbatch);－－－－－－－－－－－－－E  
->     spin_unlock(&rcu_ctrlblk.mutex);  
-> }
+if (!test_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask)) {－－－－－－－－－A   
+return;  
+}
 
+……
+
+spin_lock(&rcu_ctrlblk.mutex);  
+if (!test_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask)) {－－－－－－－－－B   
+spin_unlock(&rcu_ctrlblk.mutex);  
+return;  
+}  
+clear_bit(cpu, &rcu_ctrlblk.rcu_cpu_mask);－－－－－－－－－－－C   
+RCU_last_qsctr(cpu) = RCU_QSCTR_INVALID;  
+if (rcu_ctrlblk.rcu_cpu_mask != 0) {－－－－－－－－－－－－－－－D  
+spin_unlock(&rcu_ctrlblk.mutex);  
+return;  
+}  
+rcu_ctrlblk.curbatch++;  
+rcu_start_batch(rcu_ctrlblk.maxbatch);－－－－－－－－－－－－－E  
+spin_unlock(&rcu_ctrlblk.mutex);  
+}
+```
 在A点的访问，其思路和上一节描述的类似，也是本着解约CPU的MIPS的角度而增加的逻辑判断。B点的访问有必要吗？我没有看出有任何的必要。C和D的访问是必要的，在发现本CPU至少经历一次Quiescent state之后，当然要clear对应的cpu bit。如果rcu_cpu_mask等于0，当然要启动一个新的Grace period的检查过程（处理一批新的callback请求），这对应上面E处的代码。
 
 （3）rcu_start_batch函数对rcu_cpu_mask的访问情况，代码如下：
-
-> static void rcu_start_batch(long newbatch)  
-> {  
->     if (rcu_batch_before(rcu_ctrlblk.maxbatch, newbatch)) {  
->         rcu_ctrlblk.maxbatch = newbatch;  
->     }  
->     if (rcu_batch_before(rcu_ctrlblk.maxbatch, rcu_ctrlblk.curbatch) ||  
->         (rcu_ctrlblk.rcu_cpu_mask != 0)) {－－－－－－－－需要吗？  
->         return;  
->     }  
->     rcu_ctrlblk.rcu_cpu_mask = cpu_online_map;－－－重置CPU BITMASK，必须的  
-> }
-
+```cpp
+static void rcu_start_batch(long newbatch)  
+{  
+if (rcu_batch_before(rcu_ctrlblk.maxbatch, newbatch)) {  
+rcu_ctrlblk.maxbatch = newbatch;  
+}  
+if (rcu_batch_before(rcu_ctrlblk.maxbatch, rcu_ctrlblk.curbatch) ||  
+(rcu_ctrlblk.rcu_cpu_mask != 0)) {－－－－－－－－需要吗？  
+return;  
+}  
+rcu_ctrlblk.rcu_cpu_mask = cpu_online_map;－－－重置CPU BITMASK，必须的  
+}
+```
 如果rcu_start_batch只是在rcu_check_quiescent_state函数（5）处被调用，那么rcu_start_batch函数中对rcu_cpu_mask的非零检查是没有必要的。不过，在rcu_process_callbacks函数，各个CPU在第一次从nextlist链表摘下请求挂入curlist链表中的时候，也会调用该函数。
 
 从上面的描述可以得出结论：Linux2.5.43版本对rcu_cpu_mask的读操作过于频繁，会导致cache line trashing，影响性能。
-
-三、Linux2.5.43版本的其他问题
+# 三、Linux2.5.43版本的其他问题
 
 1、实时性问题
 

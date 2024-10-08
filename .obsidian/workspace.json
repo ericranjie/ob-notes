@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md",
+                "file": "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md",
+                "file": "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md",
+                "file": "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/Linux调度器：进程优先级.md"
+                "file": "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md"
               }
             }
           }
@@ -148,32 +148,32 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "README.md",
-    "coding/os/linux/schedule/Linux调度器：进程优先级.md",
-    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
-    "coding/os/linux/schedule/schedutil governor情景分析.md",
     "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
-    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
-    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
-    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
-    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
-    "coding/os/linux/memory/C&DMA/Linux DMA Engine framework(1)_概述.md",
-    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
-    "coding/os/linux/memory/C&DMA/b_n_如何提升CMA利用率？.md",
-    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
-    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
-    "coding/os/linux/memory/cache/k_浅谈Cache Memory.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
-    "coding/os/linux/memory/cache/b_n_这篇 CPU Cache，估计也没人看.md",
-    "coding/os/linux/debug/i_Linux kernel debug技巧----开启DEBUG选项.md",
-    "coding/os/linux/debug/i_钓鱼累了，写下断言怎么用.md",
-    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
-    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
-    "coding/os/linux/memory/cache/a_cache的58问，您能回答上来几个？.md",
-    "coding/os/linux/memory/cache/a_n_深入理解CPU缓存：性能优化的关键.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
+    "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
+    "coding/os/linux/schedule/CFS/d_CFS任务放置代码详解.md",
+    "coding/os/linux/schedule/CFS/k_CFS调度器（3）-组调度.md",
+    "coding/os/linux/schedule/CFS/k_CFS调度器（6）-总结.md",
+    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（概述）.md",
+    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（任务放置）.md",
+    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
+    "coding/os/linux/schedule/deadline/k_deadline调度器之（一）：原理.md",
+    "coding/os/linux/schedule/deadline/d_Deadline调度器之（二）：细节和使用方法.md",
+    "coding/os/linux/schedule/debug/p_关于numa loadbance的死锁分析.md",
+    "coding/os/linux/schedule/interrupt/p_中断上下文中调度会怎样？.md",
+    "coding/os/linux/schedule/interrupt/k_Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
+    "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
+    "coding/os/linux/schedule/interrupt/i_linux kernel的中断子系统之（九）：tasklet.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel中断子系统之（五）：驱动申请中断API.md",
+    "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
+    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（八）：softirq.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（二）：IRQ Domain介绍.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（六）：ARM中断处理过程.md",
+    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（七）：GIC代码分析.md",
+    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（四）：High level irq event handler.md",
+    "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
+    "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
+    "coding/os/linux/schedule/lock/lock-free/b_如何利用CAS技术实现无锁队列.md",
+    "coding/os/linux/schedule/lock/mutex/d_Linux内核同步机制之（八）：mutex.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom/design-pattern",

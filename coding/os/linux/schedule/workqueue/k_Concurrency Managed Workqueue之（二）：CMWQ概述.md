@@ -1,23 +1,5 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-7-31 12:29 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
-
-一、前言
+# 一、前言
 
 一种新的机制出现的原因往往是为了解决实际的问题，虽然linux kernel中已经提供了workqueue的机制，那么为何还要引入cmwq呢？也就是说：旧的workqueue机制存在什么样的问题？在新的cmwq又是如何解决这些问题的呢？它接口是如何呈现的呢（驱动工程师最关心这个了）？如何兼容旧的驱动呢？本文希望可以解开这些谜题。
 

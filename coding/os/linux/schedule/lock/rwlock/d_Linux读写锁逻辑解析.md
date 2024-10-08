@@ -1,29 +1,10 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## Linux读写锁逻辑解析
-
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2023-5-29 20:57 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
-
-一、Linux为何会引入读写锁？
+# 一、Linux为何会引入读写锁？
 
 除了mutex，在linux内核中，还有一个经常用到的睡眠锁就是rw semaphore（后文简称为rwsem），它到底和mutex有什么不同呢？为何会有rw semaphore？无他，仅仅是为了增加内核的并发，从而增加性能而已。Mutex严格的限制只有一个thread可以进入临界区，但是实际应用中，有些场景对共享资源的访问可以严格区分读和写的，并且是读多写少，这时候，其实多个读的thread同时进入临界区是OK的，使用mutex则限制一个线程进入临界区，从而导致性能的下降。
 
 本文会描述linux5.15.81中读写锁的数据结构和逻辑过程。
-
-二、如何抽象读写锁的数据结构？
+# 二、如何抽象读写锁的数据结构？
 
 下图可以抽象rwsem相关的数据结构：
 
@@ -32,7 +13,6 @@
 一个rwsem对象需要记录两种数据：
 
 1、读写锁的状态信息
-
 2、和该读写锁相关的任务信息
 
 我们先看看读写锁的状态。读写锁状态字需要分别记录读锁和写锁的状态：由于多个reader可以同时处于临界区，所以对于reader-owned的场景，读锁状态变成了一个counter，来记录临界区内reader的数量，counter等于0表示读锁为空锁状态。对于writer，其行为和互斥锁一致，因此其写锁状态和mutex一样，仍然使用一个bit表示。
@@ -42,7 +22,6 @@
 如果持锁失败，无法进入临界区，我们有两种选择：
 
 1、乐观自旋
-
 2、挂入等待队列
 
 两种选择各有优点和缺点，总结如下：
@@ -75,7 +54,7 @@
 |unsigned long timeout|在队列中等待超时时间，目前设置为4ms|
 |bool handoff_set|如果该任务等待对象的handoff_set等于true，那么说明该对象就是该读写锁的第一顺位继承人，在唤醒之后可以乐观自旋去持锁|
 
-三、Rwsem外部接口API为何？
+# 三、Rwsem外部接口API为何？
 
 Rwsem模块的外部接口API如下：
 
@@ -104,7 +83,7 @@ Rwsem模块的外部接口API如下：
 |rwsem_is_locked|该rwsem是否处于locked的状态|
 |rwsem_is_contended|该rwsem是否处于被竞争的状态（等待队列至少有一个waiter）|
 
-四、尝试获取读锁
+# 四、尝试获取读锁
 
 和down_read不一样，down_read_trylock只是尝试获取读锁，如果成功，那么自然是好的，直接返回1，如果失败，也不会阻塞，只是返回0就可以了。代码主逻辑在__down_read_trylock函数中，如下：
 
@@ -125,8 +104,7 @@ B、如果快速获取空锁不成功，这时候tmp已经赋值（等于sem->co
 |RWSEM_FLAG_READFAIL|有太多的reader在临界区，应该是异常状态|
 
 如果判断可以进入读临界区（临界区仅有reader并且没有writer等待的场景），那么重新进入循环，如果sem->count保持不变，那么可以持锁成功，给进入临界区的reader数目加一，并设置owner task和reader持锁标记（non-spinnable比特保持不变）。如果这期间有其他线程插入修改了count值，那么需要再次判断是否能持读锁，重复上面的循环。如果判断不可以进入临界区，退出循环，持锁失败。
-
-五、获取读锁
+# 五、获取读锁
 
 Reader获取读锁的代码主要在__down_read_common函数中，如下：
 

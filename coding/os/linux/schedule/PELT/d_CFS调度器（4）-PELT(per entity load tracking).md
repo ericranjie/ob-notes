@@ -1,48 +1,25 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-12-2 15:40 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
 ## 为什么需要PELT？
 
 为了让调度器更加的聪明，我们总是希望系统满足最大吞吐量同时又最大限度的降低功耗。虽然可能有些矛盾，但是现实总是这样。PELT算法是Linux 3.8合入的，那么在此之前，我们存在什么问题才引入PELT算法呢？在Linux 3.8之前，CFS以每个运行队列（runqueue，简称rq）为基础跟踪负载。但是这种方法，我们无法确定当前负载的来源。同时，即使工作负载相对稳定的情况下，在rq级别跟踪负载，其值也会产生很大变化。为了解决以上的问题，PELT算法会跟踪每个调度实体（per-scheduling entity）的负载情况。
 
 > 注：代码分析基于Linux 4.18.0。
-
 ## 如何进行PELT
 
 具体原理的东西可以参考这篇文章[《per-entity load tracking》](http://www.wowotech.net/process_management/PELT.html)。我就无耻的从这篇文章中摘录一段话吧。为了做到Per-entity的负载跟踪，时间（物理时间，不是虚拟时间）被分成了1024us的序列，在每一个1024us的周期中，一个entity对系统负载的贡献可以根据该实体处于runnable状态（正在CPU上运行或者等待cpu调度运行）的时间进行计算。如果在该周期内，runnable的时间是x，那么对系统负载的贡献就是（x/1024）。当然，一个实体在一个计算周期内的负载可能会超过1024us，这是因为我们会累积在过去周期中的负载，当然，对于过去的负载我们在计算的时候需要乘一个衰减因子。如果我们让Li表示在周期pi中该调度实体的对系统负载贡献，那么一个调度实体对系统负荷的总贡献可以表示为：
 
 1. L = L0 + L1 * y + L2 * y2 + L3 * y3 + ... + Ln * yn
-
 - y32 = 0.5, y = 0.97857206
 
 初次看到以上公式，不知道你是否在想这都是什么玩意！举个例子，如何计算一个se的负载贡献。如果有一个task，从第一次加入rq后开始一直运行4096us后一直睡眠，那么在1023us、2047us、3071us、4095us、5119us、6143us、7167us和8191us时间的每一个时刻负载贡献分别是多少呢？
 
 ```c
- 
 1023us: L0 = 10232047us: L1 = 1023 + 1024 * y                                                 = 1023 + (L0 + 1) * y = 20253071us: L2 = 1023 + 1024 * y + 1024 * y2                                     = 1023 + (L1 + 1) * y = 30054095us: L3 = 1023 + 1024 * y + 1024 * y2 + 1024 * y3                         = 1023 + (L2 + 1) * y = 39635119us: L4 = 0    + 1024 * y + 1024 * y2 + 1024 * y3 + 1024 * y4             =    0 + (L3 + 1) * y = 38776143us: L5 = 0    +    0     + 1024 * y2 + 1024 * y3 + 1024 * y4 + 1024 * y5 =    0 + L4 * y = 37927167us: L6 = 0    + L5 * y = L4 * y2 = 37098191us: L7 = 0    + L6 * y = L5 * y2 = L4 * y3 = 3627
 ```
 
 经过以上的举例，我们不难发现一个规律，计算当前时间的负载只需要上个周期负载贡献总和乘以衰减系数y，并加上当前时间点的负载即可。
 
 从上面的计算公式我们也可以看出，经常需要计算val*yn的值，因此内核提供decay_load()函数用于计算第n个周期的衰减值。为了避免浮点数运算，采用移位和乘法运算提高计算速度。decay_load(val, n) = val*yn*232>>32。我们将yn*232的值提前计算出来保存在数组runnable_avg_yN_inv中。
-
-  
 
 1. runnable_avg_yN_inv[n] = yn*232, n > 0 && n < 32
 

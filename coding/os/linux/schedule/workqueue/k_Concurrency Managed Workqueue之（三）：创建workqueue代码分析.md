@@ -1,27 +1,8 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-8-6 18:22 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
-
-一、前言
+# 一、前言
 
 本文主要以__alloc_workqueue_key函数为主线，描述CMWQ中的创建一个workqueue实例的代码过程。
-
-二、WQ_POWER_EFFICIENT的处理
+# 二、WQ_POWER_EFFICIENT的处理
 
 __alloc_workqueue_key函数的一开始有如下的代码：
 

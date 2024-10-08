@@ -1,29 +1,9 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-9-9 11:55 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
-
-一、前言
+# 一、前言
 
 普通的spin lock对待reader和writer是一视同仁，RW spin lock给reader赋予了更高的优先级，那么有没有让writer优先的锁的机制呢？答案就是seqlock。本文主要描述linux kernel 4.0中的seqlock的机制，首先是seqlock的工作原理，如果想浅尝辄止，那么了解了概念性的东东就OK了，也就是第二章了，当然，我还是推荐普通的驱动工程师了解seqlock的API，第三章给出了一个简单的例子，了解了这些，在驱动中（或者在其他内核模块）使用seqlock就可以易如反掌了。细节是魔鬼，概念性的东西需要天才的思考，不是说就代码实现的细节就无足轻重，如果想进入seqlock的内心世界，推荐阅读第四章seqlock的代码实现，这一章和cpu体系结构相关的内容我们选择了ARM64（呵呵～～要跟上时代的步伐）。最后一章是参考资料，如果觉得本文描述不清楚，可以参考这些经典文献，在无数不眠之夜，她们给我心灵的慰籍，也愿能够给读者带来快乐。
-
-二、工作原理
-
-1、overview
+# 二、工作原理
+## 1、overview
 
 seqlock这种锁机制是倾向writer thread，也就是说，除非有其他的writer thread进入了临界区，否则它会长驱直入，无论有多少的reader thread都不能阻挡writer的脚步。writer thread这么霸道，reader肿么办？对于seqlock，reader这一侧需要进行数据访问的过程中检测是否有并发的writer thread操作，如果检测到并发的writer，那么重新read。通过不断的retry，直到reader thread在临界区的时候，没有任何的writer thread插入即可。这样的设计对reader而言不是很公平，特别是如果writer thread负荷比较重的时候，reader thread可能会retry多次，从而导致reader thread这一侧性能的下降。
 
