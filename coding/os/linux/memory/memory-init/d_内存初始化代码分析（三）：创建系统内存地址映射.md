@@ -1,5 +1,4 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-11-24 12:08 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
 # 一、前言
 
 经过[内存初始化代码分析（一）](http://www.wowotech.net/memory_management/__create_page_tables_code_analysis.html)和[内存初始化代码分析（二）](http://www.wowotech.net/memory_management/memory-layout.html)的过渡，我们终于来到了内存初始化的核心部分：paging_init。当然本文不能全部解析完该函数（那需要的篇幅太长了），我们只关注创建系统内存地址映射这部分代码实现，也就是解析paging_init中的map_mem函数。

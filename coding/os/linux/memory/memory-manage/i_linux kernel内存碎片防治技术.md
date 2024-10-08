@@ -1,74 +1,44 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-11-2 10:24 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 Linux kernel组织管理物理内存的方式是buddy system（伙伴系统），而物理内存碎片正式buddy system的弱点之一，为了预防以及解决碎片问题，kernel采取了一些实用技术，这里将对这些技术进行总结归纳。
-
-**1** **低内存时整合碎片**
+# **1** **低内存时整合碎片**
 
 从buddy申请内存页，如果找不到合适的页，则会进行两步调整内存的工作，compact和reclaim。前者是为了整合碎片，以得到更大的连续内存；后者是回收不一定必须占用内存的缓冲内存。这里重点了解comact，整个流程大致如下：
-
+```cpp
 __alloc_pages_nodemask
-
     -> __alloc_pages_slowpath
-
         -> __alloc_pages_direct_compact
-
             -> try_to_compact_pages
-
                 -> compact_zone_order
-
                     -> compact_zone
-
                         -> isolate_migratepages
-
                         -> migrate_pages
-
                         -> release_freepages
-
+```
 并不是所有申请不到内存的场景都会compact，首先要满足order大于0，并且gfp_mask携带__GFP_FS和__GFP_IO；另外，需要zone的剩余内存情况满足一定条件，kernel称之为“碎片指数”（fragmentation index），这个值在0~1000之间，默认碎片指数大于500时才能进行compact，可以通过proc文件extfrag_threshold来调整这个默认值。fragmentation index通过fragmentation_index函数来计算：
-
   
-
-1.         /*
+```cpp
+1.  /*
 2. 	 * Index is between 0 and 1000
 3. 	 *
 4. 	 * 0 => allocation would fail due to lack of memory
 5. 	 * 1000 => allocation would fail due to fragmentation
 6. 	 */
 7. 	return 1000 - div_u64( (1000+(div_u64(info->free_pages * 1000ULL, requested))), info->free_blocks_total)
-
+```
 在整合内存碎片的过程中，碎片页只会在本zone的内部移动，将位于zone低地址的页尽量移到zone的末端。申请新的页面位置通过compaction_alloc函数实现。
 
 移动过程又分为同步和异步，内存申请失败后第一次compact将会使用异步，后续reclaim之后将会使用同步。同步过程只移动当面未被使用的页，异步过程将遍历并等待所有MOVABLE的页使用完成后进行移动。
-
-**2** **按可移动性组织页**
+# **2** **按可移动性组织页**
 
 按照可移动性将内存页分为以下三个类型：
 
 UNMOVABLE：在内存中位置固定，不能随意移动。kernel分配的内存基本属于这个类型；
-
 RECLAIMABLE：不能移动，但可以删除回收。例如文件映射内存；
-
 MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 
 申请内存时，根据可移动性，首先在指定类型的空闲页中申请内存，每个zone的空闲内存组织方式如下：
-
+```cpp
 1. struct zone {
 2. ......
 3. struct free_area    free_area[MAX_ORDER];
@@ -79,11 +49,11 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 8. 	struct list_head	free_list[MIGRATE_TYPES];
 9. 	unsigned long		nr_free;
 10. };
-
+```
 当在指定类型的free_area申请不到内存时，可以从备用类型挪用，挪用之后的内存就会释放到新指定的类型列表中，kernel把这个过程称为“盗用”。
 
 备用类型优先级列表如下定义：
-
+```cpp
 1. static int fallbacks[MIGRATE_TYPES][4] = {
 2. 	[MIGRATE_UNMOVABLE]   = { MIGRATE_RECLAIMABLE, MIGRATE_MOVABLE,     MIGRATE_RESERVE },
 3. 	[MIGRATE_RECLAIMABLE] = { MIGRATE_UNMOVABLE,   MIGRATE_MOVABLE,     MIGRATE_RESERVE },
@@ -98,11 +68,10 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 12. 	[MIGRATE_ISOLATE]     = { MIGRATE_RESERVE }, /* Never used */
 13. #endif
 14. };
-
-  
+```
 
 值得注意的是并不是所有场景都适合按可移动性组织页，当内存大小不足以分配到各种类型时，就不适合启用可移动性。有个全局变量来表示是否启用，在内存初始化时设置：
-
+```cpp
 1. void __ref build_all_zonelists(pg_data_t *pgdat, struct zone *zone)
 2. {
 3. ......
@@ -112,13 +81,12 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 7. 		page_group_by_mobility_disabled = 0;
 8. ......
 9. }
-
+```
 如果page_group_by_mobility_disabled，则所有内存都是不可移动的。
 
 其中有个参数决定了每个内存区域至少拥有的页，pageblock_nr_pages，它的定义如下：
 
-  
-
+```cpp
 #define pageblock_order HUGETLB_PAGE_ORDER
 
 1. #else /* CONFIG_HUGETLB_PAGE */
@@ -126,9 +94,9 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 3. #define pageblock_order		(MAX_ORDER-1)
 4. #endif /* CONFIG_HUGETLB_PAGE */
 5. #define pageblock_nr_pages	(1UL << pageblock_order)
-
+```
 在系统初始化期间，所有页都被标记为MOVABLE：
-
+```cpp
 1. void __meminit memmap_init_zone(unsigned long size, int nid, unsigned long zone,
 2. 		unsigned long start_pfn, enum memmap_context context)
 3. {
@@ -139,9 +107,9 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 8. 			set_pageblock_migratetype(page, MIGRATE_MOVABLE);
 9. ......
 10. }
-
+```
 其它可移动性类型的页都是后来产生的，也就是前面说的“盗取”。在这种情况发生时，通常会“盗取”fallback中更高优先级、更大块连续的页，从而避免小碎片的产生。
-
+```cpp
 1. /* Remove an element from the buddy allocator from the fallback list */
 2. static inline struct page *
 3. __rmqueue_fallback(struct zone *zone, int order, int start_migratetype)
@@ -154,13 +122,12 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 10. 			migratetype = fallbacks[start_migratetype][i];
 11. ......
 12. }
-
+```
 可以通过/proc/pageteypeinfo查看当前系统各种类型的页分布。
-
-**3** **虚拟可移动内存域**
+# **3** **虚拟可移动内存域**
 
 在依据可移动性组织页的技术之前，还有一个方法已经合入kernel，那就是虚拟内存域：ZONE_MOVABLE。基本思想很简单：把内存分为两部分，可移动的和不可移动的。
-
+```cpp
 1. enum zone_type {
 2. #ifdef CONFIG_ZONE_DMA
 3. 	ZONE_DMA,
@@ -175,9 +142,8 @@ MOVABLE：可以随意移动，用户空间的内存基本属于这个类型。
 12. 	ZONE_MOVABLE,
 13. 	__MAX_NR_ZONES
 14. };
-
+```
   
-
 ZONE_MOVABLE的启用需要指定kernel参数kernelcore或者movablecore，kernelcore用来指定不可移动的内存数量，movablecore指定可移动的内存大小，如果两个都指定，取不可移动内存数量较大的一个。如果都不指定，则不启动。
 
 与其它内存域不同的是ZONE_MOVABLE不关联任何物理内存范围，该域的内存取自高端内存域或者普通内存域。
@@ -194,7 +160,7 @@ kernelcore_node = required_kernelcore / usable_nodes;
 
 标签: [内存碎片](http://www.wowotech.net/tag/%E5%86%85%E5%AD%98%E7%A2%8E%E7%89%87)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [實作 spinlock on raspberry pi 2](http://www.wowotech.net/231.html) | [ARM64的启动过程之（五）：UEFI](http://www.wowotech.net/armv8a_arch/UEFI.html)»
 

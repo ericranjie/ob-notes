@@ -1,37 +1,17 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-5-18 12:09 分类：[ARMv8A Arch](http://www.wowotech.net/sort/armv8a_arch)
-
-一、前言
+# 一、前言
 
 从阅读ARMv8手册的第一天起，我就饱受memory order、memory barrier、coherent、consistency等概念的残害，各种痛苦，各种迷茫，各种试图放弃，各种欲罢不能……，现在，终于收拾心情，再次出发，希望这次能把近期关于ARMv8上的memory model相关的知识点整理出来，让自己更清楚一些，也顺便希望能够和大家一起探讨。
 
 本文主要关注shared-memory system，其他的系统不在本文的考虑范围。
-
-二、什么是memory model？
+# 二、什么是memory model？
 
 想要理解ARMv8的memory model，首先需要知道什么是memory model，或者说memory consistency model。
 
 当cpu从memory中的某个位置发起一次读操作的时候，该操作的返回值应该是什么样子的呢？对于程序员，直觉就是当然返回上次写入的数值了。不过，怎么定义“上次”呢？对于单核的执行环境，“上次”比较容易定义，从program order中可以轻易的得出上一次对该地址的写入操作。对于share-memory的多核环境而言，如何定义“上次”呢？那么多Hardware Thread在并发执行程序（每个cpu core上都有自己的指令流，都有自己的program order），想找出“上次”还不是一个显而易见的事情啊（当从两个不同CPU core上发起了对同一个memory location的访问，谁先谁后是无法通过program order来定义的）。为了搞清楚这个问题，我们必须要引入memory consistency model这个概念。所谓memory consistency model，其实就是就是定义系统中对内存访问需要遵守的规则（本质上就是read操作返回什么样的值），了解了这些规则，软件和硬件才能和谐工作，软件工程师才能写出逻辑正确的程序。
 
 memory consistency model的规则影响了一大票人：使用高级语言的程序员、写编译器的软件工程师、CPU设计人员。做为一个程序员，一个有情怀的c程序员，我期望的memory model符合c语言的基本逻辑，内存操作是按照c程序中的program order进行的，而且是有序的进行，符合c程序的逻辑推导的，一言以蔽之，程序员当然希望能够编程简单，不要考虑什么memory order啊，memory barrier什么的。不过，从系统设计人员的角度看呢，需要找到一个各方面都OK的memory model。你看，系统设计人员就是高瞻远瞩啊，可以从多方面考虑，在性能和编程易用性方面平衡。
-
-三、什么是sequential consistency？
+# 三、什么是sequential consistency？
 
 我们从ARMv8的手册中知道它的memory consistency model是属于Relaxed Memory Consistency Models，这里的“Relaxed”是针对sequential consistency而言的，因此我们先解释什么是sequential consistency，定义如下：
 
@@ -72,22 +52,18 @@ memory consistency model的规则影响了一大票人：使用高级语言的�
 （1）在单核上，程序中的数据依赖和控制依赖必须保证，即有依赖关系的内存操作必须保证操作顺序，不能out of order。
 
 （2）对同一地址的memory location的写入操作必须是串行化的。如果系统中有cache，那么需要cache coherence protocol来保证这一点。
-
-五、参考文献
+# 五、参考文献
 
 1、Computer Architecture, A Quantitative Approach 5th
-
 2、Shared Memory Consistency Models: A  Tutorial
-
 3、Memory Consistency Models for Shared-Memory Multiprocessors
-
 4、ARMv8 ARM
 
 原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http://www.wowotech.net/)。
 
 标签: [Model](http://www.wowotech.net/tag/Model) [ARMv8](http://www.wowotech.net/tag/ARMv8) [sequential](http://www.wowotech.net/tag/sequential) [consistency](http://www.wowotech.net/tag/consistency) [relaxed](http://www.wowotech.net/tag/relaxed)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [玩转BLE(2)_使用bluepy扫描BLE的广播数据](http://www.wowotech.net/bluetooth/bluepy_scan.html) | [ARMv8之Atomicity](http://www.wowotech.net/armv8a_arch/atomicity.html)»
 

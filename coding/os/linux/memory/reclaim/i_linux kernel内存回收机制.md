@@ -1,25 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-11-12 20:37 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 无论计算机上有多少内存都是不够的，因而linux kernel需要回收一些很少使用的内存页面来保证系统持续有内存使用。页面回收的方式有页回写、页交换和页丢弃三种方式：如果一个很少使用的页的后备存储器是一个块设备（例如文件映射），则可以将内存直接同步到块设备，腾出的页面可以被重用；如果页面没有后备存储器，则可以交换到特定swap分区，再次被访问时再交换回内存；如果页面的后备存储器是一个文件，但文件内容在内存不能被修改（例如可执行文件），那么在当前不需要的情况下可直接丢弃。
-
-**1** **回收的时机**
+# **1** **回收的时机**
 
 ![](http://www.wowotech.net/content/uploadfile/201511/4a471447331961.png)
 
@@ -32,23 +14,16 @@ LRU(Least Recently Used)，近期最少使用链表，是按照近期的使用�
 #define lru_to_page(_head) (list_entry((_head)->prev, struct page, lru))
 
 每个zone有5个LRU链表用以存放各种最近使用状态的页面。
-
+```cpp
 enum lru_list {
-
          LRU_INACTIVE_ANON = LRU_BASE,
-
          LRU_ACTIVE_ANON = LRU_BASE + LRU_ACTIVE,
-
          LRU_INACTIVE_FILE = LRU_BASE + LRU_FILE,
-
          LRU_ACTIVE_FILE = LRU_BASE + LRU_FILE + LRU_ACTIVE,
-
          LRU_UNEVICTABLE,
-
          NR_LRU_LISTS
-
 };
-
+```
 其中INACTIVE_ANON、ACTIVE_ANON、INACTIVE_FILE、ACTIVE_FILE 4个链表中的页面是可以回收的。ANON代表匿名映射，没有后备存储器；FILE代表文件映射。
 
 页面回收时，会优先回收INACTIVE的页面，只有当INACTIVE页面很少时，才会考虑回收ACTIVE页面。
@@ -62,13 +37,9 @@ enum lru_list {
 基本上有以下步骤：
 
 （1）如果页是活动的，设置PG_active位，并保存在ACTIVE LRU链表；反之在INACTIVE；
-
 （2）每次访问页时，设置PG_referenced位，负责该工作的是mark_page_accessed函数；
-
 （3）PG_referenced以及由逆向映射提供的信息用来确定页面活动程度，每次清除该位时，都会检测页面活动程度，page_referenced函数实现了该行为；
-
 （4）再次进入mark_page_accessed。如果发现PG_referenced已被置位，意味着page_referenced没有执行检查，因而对于mark_page_accessed的调用比page_referenced更频繁，这意味着页面经常被访问。如果该页位于INACTIVE链表，将其移动到ACTIVE，此外还会设置PG_active标志位，清除PG_referenced；
-
 （5）反向的转移也是有可能的，在页面活动程度减少时，可能连续调用两次page_referenced而中间没有mark_page_accessed。
 
 如果对内存页的访问是稳定的，那么对page_referenced和mark_page_accessed的调用在本质上是均衡的，因而页面保持在当前LRU链表。这种方案同时确保了内存页不会再ACTIVE与INACTIVE链表间快速跳跃。
@@ -106,10 +77,9 @@ cache_reap用来回收slab中的空闲对象，如果空闲对象可以还原成
 **5** **参考文献**
 
 (1)《understanding the linux kernel》
-
 (2)《professional linux kernel architecture》
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [进化论、人工智能和外星人](http://www.wowotech.net/tech_discuss/toe_ai_et.html) | [linux cpufreq framework(5)_ARM big Little driver](http://www.wowotech.net/pm_subsystem/arm_big_little_driver.html)»
 

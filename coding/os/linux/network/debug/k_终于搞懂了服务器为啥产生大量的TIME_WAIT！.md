@@ -1,4 +1,3 @@
-
 运维派
  _2021年10月14日 21:50_
 
@@ -34,7 +33,6 @@ Nginx 作为反向代理时，大量的短链接，可能导致 Nginx 上的 TCP
 `// 统计：各种连接的数量      $ netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'      ESTABLISHED 1154      TIME_WAIT 1645   `
 
 **Tips：TCP 本地端口数量，上限为 65535（6.5w），这是因为 TCP 头部使用 16 bit，存储「端口号」，因此约束上限为 65535。**
-
 ### 2、问题分析
 
 大量的 TIME_WAIT 状态 TCP 连接存在，其本质原因是什么？
@@ -48,10 +46,7 @@ Nginx 作为反向代理时，大量的短链接，可能导致 Nginx 上的 TCP
 TIME_WAIT 状态：
 
 - 1.TCP 连接中，主动关闭连接的一方出现的状态；（收到 FIN 命令，进入 TIME_WAIT 状态，并返回 ACK 命令）
-    
 - 2.保持 2 个 MSL 时间，即，4 分钟；（MSL 为 2 分钟）
-    
-
 ### 3、解决办法
 
 解决上述 time_wait 状态大量存在，导致新连接创建失败的问题，一般解决办法：
@@ -65,33 +60,22 @@ TIME_WAIT 状态：
 **1.time_wait 状态的影响：**
 
 - TCP 连接中，「主动发起关闭连接」的一端，会进入 time_wait 状态
-    
 - time_wait 状态，默认会持续 2 MSL（报文的最大生存时间），一般是 2x2 mins
-    
 - time_wait 状态下，TCP 连接占用的端口，无法被再次使用
-    
 - TCP 端口数量，上限是 6.5w（65535，16 bit）
-    
 - 大量 time_wait 状态存在，会导致新建 TCP 连接会出错，address already in use : connect 异常
-    
 
 **2.现实场景：**
 
 - 服务器端，一般设置：不允许「主动关闭连接」
-    
 - 但 HTTP 请求中，http 头部 connection 参数，可能设置为 close，则，服务端处理完请求会主动关闭 TCP 连接
-    
 - 现在浏览器中， HTTP 请求 connection 参数，一般都设置为 keep-alive
-    
 - Nginx 反向代理场景中，可能出现大量短链接，服务器端，可能存在
-    
 
 **3.解决办法：**
 
 - 服务器端允许 time_wait 状态的 socket 被重用
-    
 - 缩减 time_wait 时间，设置为 1 MSL（即，2 mins）
-    
 
 **4、附录 - 底层原理**
 

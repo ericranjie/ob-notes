@@ -1,30 +1,11 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-## 
-
 作者：[heaven](http://www.wowotech.net/author/532) 发布于：2022-2-11 1:34 分类：[ARMv8A Arch](http://www.wowotech.net/sort/armv8a_arch)
-
 [Zhang Binghua](https://tinylab.org/arm-wfe/#author-footer "点击联系作者") 创作于 2020/05/19
-
 有发表于泰晓科技，原文见：
-
 [https://tinylab.org/arm-wfe/](https://tinylab.org/arm-wfe/)
-
 ## 1 背景简介
 
 今天我想分享一个跟多核锁原理相关的东西，由于我搞 arm 居多，所以目前只研究了 arm 架构下的 WFE 指令，分享出来，如果有表述不精准或者错误的地方还请大家指出，非常感谢。研究这个原因也是只是想搞清楚所以然和来龙去脉，以后写代码可以更游刃有余。
-
+```cpp
 1. static inline void arch_spin_lock(arch_spinlock_t *lock)
 2. {
 3. 	unsigned long tmp;
@@ -46,13 +27,12 @@
 19. 	}
 20. 	smp_mb();
 21. }
-
+```
 我印象之前的 kernel 是没有这个 wfe 这个函数的，当 cpu0 获取到锁后，如果 cpu1 再想获取锁，此时会被 lock 住，然后进入死等的状态，那么 wfe 这个指令的作用是会让 cpu 进入 low power standby，这样可以降低功耗，本来发生竞态时其他的 cpu 都要等待这个锁释放才能运行，有了这个指令，相当于是“因祸得福”了，还可以降低功耗，当然这是有条件的，后面追溯并研究了一下 wfe 这个指令的作用。
-
 ## 3 spinlock 与 WFE、SEV、WFI
 
 首先 `spin_lock` 函数，搞内核的大家都知道，那么我把 linux-stable 的代码黏贴出来如下：
-
+```cpp
 1. static __always_inline void spin_lock(spinlock_t *lock)
 2. {
 3. 	raw_spin_lock(&lock->rlock);
@@ -110,9 +90,9 @@
 55. 	}
 56. 	smp_mb();
 57. }
-
+```
 对于 arm32：
-
+```cpp
 1. #if __LINUX_ARM_ARCH__ >= 7 || \
 2. 	(__LINUX_ARM_ARCH__ == 6 && defined(CONFIG_CPU_32v6K))
 3. #define sev()	__asm__ __volatile__ ("sev" : : : "memory")
@@ -121,9 +101,9 @@
 6. #else
 7. #define wfe()	do { } while (0)
 8. #endif
-
+```
 对于 arm64：
-
+```cpp
 1. #define sev()		asm volatile("sev" : : : "memory")
 2. #define wfe()		asm volatile("wfe" : : : "memory")
 3. #define wfi()		asm volatile("wfi" : : : "memory")
@@ -149,11 +129,11 @@
 23. #else
 24. #define __ALT_SMP_ASM(smp, up)	up
 25. #endif
-
+```
 以上我们可以看出，在 lock 的时候使用 WFE，在 unlock 的时候使用 SEV，这个必须要成对使用，原因我下面会说。
 
 对于内核版本 Linux 3.0.56：
-
+```cpp
 1. static inline void arch_spin_lock(arch_spinlock_t *lock)
 2. {
 3. 	unsigned long tmp;
@@ -169,9 +149,9 @@
 13. 	: "cc");
 14. 	smp_mb();
 15. }
-
+```
 对于 Linux 2.6.18：
-
+```cpp
 1. define _raw_spin_lock(lock)     __raw_spin_lock(&(lock)->raw_lock)
 2. static inline void __raw_spin_lock(raw_spinlock_t *lock)
 3. {
@@ -187,9 +167,8 @@
 13.     : "cc");
 14.     smp_mb();
 15. }
-
+```
 以上大家可以看出，最早期的 kernel 版本是没有 wfe 这条指令的，后面的版本才有。
-
 ## 4 WFE、SEV 与 WFI 的作用与工作原理
 
 那这条指令的作用是什么呢？我们可以上 arm 官网去查看这条指令的描述：[ARM Software development tools  
@@ -265,7 +244,7 @@ SEV 指令可以产生事件信号，发送给全部的 cpu，让他们唤醒。
 > In an implementation that includes the Virtualization Extensions, if HCR.TWE is set to 1, execution of a WFE instruction in a Non-secure mode other than Hyp mode generates a Hyp Trap exception if, ignoring the value of the HCR.TWE bit, conditions permit the processor to suspend execution. For more information see Trapping use of the WFI and WFE instructions on page B1-1249.
 
 接下来上 WFE 这条指令的伪代码流程：
-
+```cpp
 1. Assembler syntax
 2. WFE{<c>}{<q>}
 3. where:
@@ -285,7 +264,7 @@ SEV 指令可以产生事件信号，发送给全部的 cpu，让他们唤醒。
 17.             WaitForEvent();
 18. Exceptions
 19. Hyp Trap.
-
+```
 看了上面这段 WFE 的伪代码，一目了然，首先判断 `ConditionPassed()`，这些函数大家可以在 arm 手册中查看其详细含义，如果 `EventResigerted()` 函数为真，也就是这个 1 bit 的寄存器为真，那么就清除此 bit，然后退出返回，不会让 cpu 进入 low power state；
 
 如果不是异常处理，`TakeHypTrapException()`，那么就 `WaitForEvent()`，等待唤醒事件到来，到来了，就唤醒当前 cpu。
@@ -297,7 +276,7 @@ SEV 指令可以产生事件信号，发送给全部的 cpu，让他们唤醒。
 当然，irq，fiq 等很多中断都可以让 WFE 休眠的 cpu 唤醒，那么这样做还有什么意义呢？比如说时钟中断是一直产生的，那么 cpu 很快就醒了啊，都不用等到发 SEV，那么既然是用 `spin_lock`，也可以在中断上半部使用，也可以在进程上下文，既然是自旋锁，就意味着保护的这段代码是要足够精简，不希望被其他东西打断，那么如果你保护的这部分代码非常长，这时候整个系统响应很可能会变慢，因为如果这时候有人也要使用这个锁的话，那么是否保护的这段代码设计上是有问题的。因此用 `spin_lock` 保护的函数尽可能要短，如果长的话可能需要换其他锁，或者考虑下是否真的要这么长的保护措施。
 
 `TakeHypTrapException()`，是进入异常处理
-
+```cpp
 1. Pseudocode description of taking the Hyp Trap exception
 2. The TakeHypTrapException() pseudocode procedure describes how the processor takes the exception:
 3. // TakeHypTrapException()
@@ -313,7 +292,7 @@ SEV 指令可以产生事件信号，发送给全部的 cpu，让他们唤醒。
 13.     EnterHypMode(new_spsr_value, preferred_exceptn_return, 20);
 14. Additional pseudocode functions for exception handling on page B1-1221 defines the EnterHypMode() pseudocode
 15. procedure.
-
+```
 ClearEventRegister()
 
 Clear the Event Register of the current processor 清除Event Register的bit
@@ -351,7 +330,7 @@ Wait until WFE instruction completes
 > As shown in the list of wake-up events, an implementation can include IMPLEMENTATION DEFINED hardware mechanisms to generate wake-up events.
 
 接下来我们看下 WFI 的伪代码：
-
+```cpp
 1. Assembler syntax
 2. WFI{<c>}{<q>}
 3. where:
@@ -368,7 +347,7 @@ Wait until WFE instruction completes
 14.         WaitForInterrupt();
 15. Exceptions
 16. Hyp Trap.
-
+```
 相关解释：
 
 > WFI  
@@ -379,7 +358,6 @@ Wait until WFE instruction completes
 以上我们可以看出，WFI 并没有去判断 event register，因此看伪代码可以很直观的看出 WFI 与 WFE 的区别。
 
 以上是我个人的理解，如果有表述不精准或者不准确的地方还请大家指出，欢迎交流。
-
 ## 5 参考资料
 
 - [ARM 架构下 spinlock 原理 (代码解读)](https://blog.csdn.net/adaptiver/article/details/72389453)
@@ -389,7 +367,7 @@ Wait until WFE instruction completes
 
 标签: [ARM](http://www.wowotech.net/tag/ARM) [wfe](http://www.wowotech.net/tag/wfe) [wfi](http://www.wowotech.net/tag/wfi)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [load_balance函数代码详解](http://www.wowotech.net/process_management/load_balance_function.html) | [CFS任务放置代码详解](http://www.wowotech.net/process_management/task_placement_detail.html)»
 

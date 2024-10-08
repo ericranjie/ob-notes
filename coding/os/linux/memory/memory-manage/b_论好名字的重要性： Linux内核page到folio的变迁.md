@@ -132,73 +132,44 @@ void lock_page(struct page *page);
 
 如果你还没看明白呢，也许把folio和page并排列会更明白：
 ![[Pasted image 20240927115859.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 说白了，就是同名成员在同样offset位置的简单数学游戏。这样，类似前面的folio的private的访问，就可以直接是：
 ![[Pasted image 20240927115904.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-**三、破局**
-
-  
+# **三、破局**
 
 由此，我们搞清楚了folio并不是什么新生事物，而是一个有着集合概念的，数据结构与page对等的东西 。这样我们至少破除了folio的神秘感。
-
-  
 
 我们看看内核里面关于folio的注释：
 
 _A folio is a physically, virtually and logically contiguous set of bytes.  It is a power-of-two in size, and it is aligned to that same power-of-two.  It is at least as large as %PAGE_SIZE.  If it is in the page cache, it is at a file offset which is a multiple of that  power-of-two.  It may be mapped into userspace at an address which is  at an arbitrary page offset, but its kernel virtual address is aligned  to its size._
 
-  
-
 其实folio就是物理连续、虚拟连续的2^n次的PAGE_SIZE的一些bytes的集合，当然这个n也是允许是0的。这个时候，有的童鞋就跳出来，为什么单页的集合也可以叫folio？你问这个问题是伤了广大单身群众的心，难道单身自己一个人过就不叫一个家庭了吗？家庭成员数量是一，侬晓得伐？
-
-  
 
 **folio有一点是确定的，它必然不会是一个tail page。**从而避免了前面的xxx、yyy的语义混乱（也就是Linux社区说的page结构体 的mess）。
 
-  
-
 理解理念之后，在实践环节，其实就比较简单了。Folio的开发，分了好多个阶段完成，而第一个阶段的git pull request，就有90个patch：
 ![[Pasted image 20240927115913.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 简单地看到这个数字，可能就有的童鞋直接从入门到放弃了。但是，实际点进去看，真的都是非常简单的替换游戏。比如我们随机点开看一个mm: Add folio_pfn()  【1】这个是求folio的pfn的，它究竟是个什么样子呢？不要太简单好吧：
 ![[Pasted image 20240927115920.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 所以，理解folio，最本质的是理解什么时候用folio，把该用folio的，当成folio用，破除心中的迷雾。
 
 在Linux的层面，至少但是不限于如下这些应该是一个集合：
 
-  
-
 1.加入lruvec进行内存回收管理的应该是一个集合，它或者是compound page或者就是一个普通的单页“集合”。在内核透明大页THP的场景下，其实THP都是以整体加入lruvec的，将lruvec的相关参数改为folio，可以适应更广泛的情况：THP和非THP进入lruvec。比如，著名的shrink_page_list()函数，现在就叫shrink_folio_list()，从lruvec里面拿到的，也是folio:
 ![[Pasted image 20240927115927.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 2.refcount计数、lock等的应该是一个集合
 
 比如：
 ![[Pasted image 20240927115936.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 哪怕你传的是folio中的某一个page，我lock的还是一个集合：
 ![[Pasted image 20240927115941.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3.mem_cgroup等的记账charge应该是一个集合；
 ![[Pasted image 20240927115947.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 4.wait writeback、bit等应该是一个集合，比如：
 
@@ -206,7 +177,6 @@ folio_wait_bit(struct folio *folio, int bit_nr);
 
 void folio_wait_writeback(struct folio *folio);
 ![[Pasted image 20240927115953.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 5.与address_space绑定的Page cache的查找、插入、删除等操作应该是一个集合，因为page cache也是可以是THP的。相关代码比如：
 ![[Pasted image 20240927120000.png]]

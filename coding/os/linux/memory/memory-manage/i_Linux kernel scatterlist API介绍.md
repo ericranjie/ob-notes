@@ -1,22 +1,4 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-10-13 22:20 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
 ## 1. 前言
 
 我们在那些需要和用户空间交互大量数据的子系统（例如MMC[1]、Video、Audio等）中，经常看到scatterlist的影子。对我们这些“非英语母语”的人来说，初见这个词汇，脑袋瞬间就蒙圈了。scatter可翻译成“散开、分散”，list是“列表”的意思，因而scatterlist可翻译为“散列表”。“散列表”又是什么？太抽象了！
@@ -24,7 +6,6 @@
 之所以抽象，是因为这个词省略了主语----物理内存（Physical memory），加上后，就好理解了多了，既：物理内存的散列表。再通俗一些，就是把一些分散的物理内存，以列表的形式组织起来。那么，也许你会问，有什么用处呢？
 
 当然有用，具体可参考本文后续的介绍。
-
 ## 2. scatterlist产生的背景
 
 我没有去考究scatterlist API是在哪个kernel版本中引入的（年代太久远了），凭猜测，我觉得应该和MMU有关。因为在引入MMU之后，linux系统中的软件将不得不面对一个困扰（下文将以图片1中所示的系统架构为例进行说明）：
@@ -50,7 +31,6 @@
 [![cpu_view_memory](http://www.wowotech.net/content/uploadfile/201710/2392578dfe2c1f39048ea5ee8e7eb0c820171013142033.gif "cpu_view_memory")](http://www.wowotech.net/content/uploadfile/201710/a159a36c35bcec7617fd7684f92024fe20171013142033.gif)
 
 图片2 cpu_view_memory
-
 ## 3. scatterlist API介绍
 
 #### 3.1 struct scatterlist
@@ -91,7 +71,6 @@ scatterlist数组中到底有多少有效内存块呢？这不是一个很直观
 > 1）如果scatterlist数组中某个scatterlist的page_link的bit0为1，表示该scatterlist不是一个有效的内存块，而是一个chain（铰链），指向另一个scatterlist数组。通过这种机制，可以将不同的scatterlist数组链在一起，因为scatterlist也称作chain scatterlist。
 > 
 > 2）如果scatterlist数组中某个scatterlist的page_link的bit1为1，表示该scatterlist是scatterlist数组中最后一个有效内存块（后面的就忽略不计了）。
-
 #### 3.3 API介绍
 
 理解了scatterlist的含义之后，再去看“include/linux/scatterlist.h”中的API，就容易多了，例如（简单介绍一下，不再详细分析）：
@@ -139,7 +118,7 @@ scatterlist数组中到底有多少有效内存块呢？这不是一个很直观
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [scatterlist](http://www.wowotech.net/tag/scatterlist) [sg_table](http://www.wowotech.net/tag/sg_table)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux kernel内存管理的基本概念](http://www.wowotech.net/memory_management/concept.html) | [X-026-KERNEL-Linux gpio driver的移植之gpio range](http://www.wowotech.net/x_project/kernel_gpio_driver_porting_2.html)»
 

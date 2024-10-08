@@ -1,25 +1,10 @@
-# 
-
 Original 往事敬秋风 深度Linux
-
  _2024年09月26日 08:22_ _湖南_
 
-![Image](https://mmbiz.qpic.cn/mmbiz_gif/dkX7hzLPUR3kfOnwCpNNqvibHNhqFhoich3oNicAscCD5kq6uEcR6NxrB3M1s3br9FNyp8tic0ZRlTFIrKhWxb9Q9Q/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1)CPU作为计算机的核心部件，其缓存结构犹如一座高效的数据桥梁，在提升计算机性能方面发挥着关键作用。而原子操作，则以其独特的不可分割性，为程序的正确性和稳定性提供了坚实的保障。
-
-![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
-
-**深度Linux**
-
-曾就职国内知名企业项目经理，部门负责人等职务。研究领域：Windows&Linux平台C/C++后端开发、嵌入式、Linux系统内核等。
-
-206篇原创内容
-
-公众号
+CPU作为计算机的核心部件，其缓存结构犹如一座高效的数据桥梁，在提升计算机性能方面发挥着关键作用。而原子操作，则以其独特的不可分割性，为程序的正确性和稳定性提供了坚实的保障。
 
 在接下来的时间里，我们将逐步揭开 CPU 缓存结构的神秘面纱，深入了解其工作原理和设计理念。同时，我们也将一同探寻原子操作的奥秘，明白它在多线程编程等场景中的重要意义。让我们共同开启这场充满智慧与挑战的科技之旅。
-
 ## 一、初识CPU缓存
-
 ### 1.1多级缓存体系
 
 现代 CPU 为了弥合处理器与主内存之间巨大的速度差异，引入了多级缓存体系。

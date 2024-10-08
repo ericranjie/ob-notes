@@ -1,44 +1,30 @@
-
 CSDN Linux内核之旅
-
  _2024年04月15日 14:20_ _陕西_
 
 本文对 Linux 内核目前热点项目 Large Folios 的社区与产品现状进行剖析，并预测未来趋势。文中讲述的技术内容，来自 Google、OPPO、ARM、Nivida、Samsung、华为、alibaba 等多家公司的社区与产品贡献。
 
-  
-
 作者 | Barry Song，Yu Zhao     责编 | 梦依丹  
-
 出品 | CSDN（ID：CSDNnews）
 
 在 Linux 内核中，一个 folio 可以只包含 1 个 page，也可以包含多个 page。当一个 folio 包含多个 page 的时候，我们称它为一个 large folio，在中文社区，我们一般称呼其为大页。采用 large folio 可潜在带来诸多好处，比如：
 
 1. TLB miss 减小，比如许多硬件都支持 PMD 映射，可以直接把 2MB 做成一个 large folio，只占用一个 TLB entry；部分硬件支持 contiguous PTE 映射，比如 ARM64 可以让 16 个连续的 page 通过 CONT-PTE 只占一个 TLB entry。
-
 2. page fault 次数减小，比如 do_anonymous_page() 在某个 PTE 的 page fault 后，直接申请一个 large folio 并映射一个 CONT-PTE 的话，则剩下的 15 个 PTE 不再发生 page fault。
-
 3. 降低 LRU 的规模和内存 reclamation 的成本，以 large folio 为单位进行回收，整个 large folio 在 folio_referenced() 等的反向映射成本低于多个 small folio 单独进行 rmap 的成本；try_to_unmap_one() 理论上也如此。
-
 4. 潜在的以更大粒度在 zRAM/zsmalloc 进行压缩/解压的机会，从而降低压缩/解压的 CPU 利用率、提高压缩率。比如 64KiB 的 large folio 整体压缩，比分成 16个4KiB 的 small folio 来进行压缩，有明显优势。
 
 在 Linux 内核的整个内存管理中，large folios 将与 small folios（只有一个page）混合存在。比如在 LRU 链表上，挂在上面的 folio 既可能是 large，也可能是 small；一个进程的某个 VMA 里面的内存，可由 large folios 和 small folios 混合组成；文件的 pagecache 上，不同的 offset 上面对应的可能是 small folios 也可能是 large folios。
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHApozNs2phAzj4ib8ejpFE47d08OPu6jibvDWuyAMfW9GcPMuUnDOt7VA/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/Pn4Sm0RsAujX5kS5KQ6BaBUsy1RqR06QuwjkSP1G6wEJHaJCLTONqlcQexqRgJcIICxofIOJs6B6tWBfibb7now/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1&tp=wxpic)
-
-**文件页 large folios**
+# 1 **文件页 large folios**
 
 Linux 社区在文件页方面，发展出多个文件系统支持 large folio。这类文件系统会通过 mapping_set_large_folios()告诉 page cache 这层，它支持 large folio：
 
 1. afs
-    
 2. bcachefs
-    
 3. erofs非压缩文件
-    
 4. xfs
-    
 
 而 pagecache 这层，则会关注到这一情况，在 mapping_large_folio_support() 为真的情况下，允许申请 large folios 来填充 pagecache 的 xarray：
 

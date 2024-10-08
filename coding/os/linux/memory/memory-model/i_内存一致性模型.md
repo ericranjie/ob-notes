@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[passerby](http://www.wowotech.net/author/257) 发布于：2019-3-24 14:22 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
          早期的CPU是通过提高主频来提升CPU的性能，但是随着频率“红利”越来越困难的情况下，厂商开始用多核来提高CPU的计算能力。多核是指一个CPU里有多个核心，在同一时间一个CPU能够同时运行多个线程，通过这样提高CPU的并发能力。
@@ -22,19 +5,13 @@
 内存一致性模型（memory consistency model）就是用来描述多线程对共享存储器的访问行为，在不同的内存一致性模型里，多线程对共享存储器的访问行为有非常大的差别。这些差别会严重影响程序的执行逻辑，甚至会造成软件逻辑问题。在后面的介绍中，我们将分析不同的一致性模型里，多线程的内存访问乱序问题。
 
          目前有多种内存一致性模型：
-
          顺序存储模型（sequential consistency model）
-
          完全存储定序（total store order）
-
          部分存储定序（part store order）
-
          宽松存储模型（relax memory order）
-
          在后面我们会分析这几个一致性模型的特性
 
 在分析之前，我们先定义一个基本的内存模型，以这个内存模型为基础进行分析
-
  ![](http://www.wowotech.net/content/uploadfile/201903/3b101553410032.png)
 
 上图是现代CPU的基本内存模型，CPU内部有多级缓存来提高CPU的load/store访问速度（因为对于CPU而言，主存的访问速度太慢了，上百个时钟周期的内存访问延迟会极大的降低CPU的使用效率，所以CPU内部往往使用多级缓存来提升内存访问效率。）

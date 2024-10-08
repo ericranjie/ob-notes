@@ -7,7 +7,7 @@ s_: **super** 等级 极品好文 or **specific** 深度细节好文
 
 a_: **alpha** 等级 深度好文 or **analyze** 深度分析好文
 b_: **beta** 等级 好文
-c_: 一般文章 or comment等级文章
+c_: 一般文章 or comment等级文章 or common-sense 常识文章
 
 d_: **detail** & **deeper** 细节 深度文章 or  **data** 数据文章（DIKW模型）
 f_ : finished 已读

@@ -95,11 +95,9 @@ Linux内存管理的整体模式是虚拟内存管理(分页内存管理)，并�
 有些书上会说用户空间是分页的，内核是不分页的，这是对英语paging的错误翻译，paging在这里不是分页的意思，而是换页的意思。分页是指整个分页机制，换页是内存回收中的操作，两者的含义是完全不同的。
 
 现在我们对Linux内存管理体系已经有了宏观上的了解，下面我们就来对每个模块进行具体地分析。  
-
 # 二、物理内存区划
 
 内核对物理内存进行了三级区划。为什么要进行三级区划，具体怎么划分的呢？这个不是软件随意决定的，而是和硬件因素有关。下面我们来看一下每一层级划分的原因，以及软件上是如果描述的。  
-
 ## 2.1 物理内存节点
 
 我国的省为什么要按照现在的这个形状来划分呢，主要是依据山川地形还有民俗风情等历史原因。那么物理内存划分为节点的原因是什么呢？这就要从UMA、NUMA说起了。我们用三个图来看一下。
@@ -189,187 +187,156 @@ PAGE_SHIFT的值在大部分平台上都是等于12，2的12次方幂正好就�
 系统有一个页面描述符的数组，用来描述系统中的所有页帧。这个数组是在系统启动时创建的，然后有一个全局的指针变量会指向这个数组。这个变量的名字在平坦内存中叫做mem_map，是全分配的，在稀疏内存中叫做vmemmap，内存空洞对应的页表描述符是不被映射的。学过C语言的人都知道指针与数组之间的关系，指针之间的减法以及指针与整数之间的加法与数组下标的关系。因此我们可以把页面描述符指针和页帧号相互转换。
 
 我们来看一下页面描述符数组指针的定义和指针与页帧号之间的转换操作。linux-src/mm/memory.c
-
-`#ifndef CONFIG_NUMA   struct page *mem_map;   EXPORT_SYMBOL(mem_map);   #endif   `
-
+```cpp
+#ifndef CONFIG_NUMA   struct page *mem_map;   EXPORT_SYMBOL(mem_map);   #endif   
+```
 linux-src/arch/x86/include/asm/pgtable_64.h
-
-`#define vmemmap ((struct page *)VMEMMAP_START)   `
-
+```cpp
+#define vmemmap ((struct page *)VMEMMAP_START)   
+```
 linux-src/arch/x86/include/asm/pgtable_64_types.h
-
-`#ifdef CONFIG_DYNAMIC_MEMORY_LAYOUT   # define VMEMMAP_START  vmemmap_base   #else   # define VMEMMAP_START  __VMEMMAP_BASE_L4   #endif /* CONFIG_DYNAMIC_MEMORY_LAYOUT */   `
-
+```cpp
+`#ifdef CONFIG_DYNAMIC_MEMORY_LAYOUT   # define VMEMMAP_START  vmemmap_base   #else   # define VMEMMAP_START  __VMEMMAP_BASE_L4   #endif /* CONFIG_DYNAMIC_MEMORY_LAYOUT */   
+```
 linux-src/include/asm-generic/memory_model.h
-
-`#if defined(CONFIG_FLATMEM)      #ifndef ARCH_PFN_OFFSET   #define ARCH_PFN_OFFSET  (0UL)   #endif      #define __pfn_to_page(pfn) (mem_map + ((pfn) - ARCH_PFN_OFFSET))   #define __page_to_pfn(page) ((unsigned long)((page) - mem_map) + \        ARCH_PFN_OFFSET)      #elif defined(CONFIG_SPARSEMEM_VMEMMAP)      /* memmap is virtually contiguous.  */   #define __pfn_to_page(pfn) (vmemmap + (pfn))   #define __page_to_pfn(page) (unsigned long)((page) - vmemmap)      #elif defined(CONFIG_SPARSEMEM)   /*    * Note: section's mem_map is encoded to reflect its start_pfn.    * section[i].section_mem_map == mem_map's address - start_pfn;    */   #define __page_to_pfn(pg)     \   ({ const struct page *__pg = (pg);    \    int __sec = page_to_section(__pg);   \    (unsigned long)(__pg - __section_mem_map_addr(__nr_to_section(__sec))); \   })      #define __pfn_to_page(pfn)    \   ({ unsigned long __pfn = (pfn);   \    struct mem_section *__sec = __pfn_to_section(__pfn); \    __section_mem_map_addr(__sec) + __pfn;  \   })   #endif /* CONFIG_FLATMEM/SPARSEMEM */      /*    * Convert a physical address to a Page Frame Number and back    */   #define __phys_to_pfn(paddr) PHYS_PFN(paddr)   #define __pfn_to_phys(pfn) PFN_PHYS(pfn)      #define page_to_pfn __page_to_pfn   #define pfn_to_page __pfn_to_page   `
-
-  
-
+```cpp
+`#if defined(CONFIG_FLATMEM)      #ifndef ARCH_PFN_OFFSET   #define ARCH_PFN_OFFSET  (0UL)   #endif      #define __pfn_to_page(pfn) (mem_map + ((pfn) - ARCH_PFN_OFFSET))   #define __page_to_pfn(page) ((unsigned long)((page) - mem_map) + \        ARCH_PFN_OFFSET)      #elif defined(CONFIG_SPARSEMEM_VMEMMAP)      /* memmap is virtually contiguous.  */   #define __pfn_to_page(pfn) (vmemmap + (pfn))   #define __page_to_pfn(page) (unsigned long)((page) - vmemmap)      #elif defined(CONFIG_SPARSEMEM)   /*    * Note: section's mem_map is encoded to reflect its start_pfn.    * section[i].section_mem_map == mem_map's address - start_pfn;    */   #define __page_to_pfn(pg)     \   ({ const struct page *__pg = (pg);    \    int __sec = page_to_section(__pg);   \    (unsigned long)(__pg - __section_mem_map_addr(__nr_to_section(__sec))); \   })      #define __pfn_to_page(pfn)    \   ({ unsigned long __pfn = (pfn);   \    struct mem_section *__sec = __pfn_to_section(__pfn); \    __section_mem_map_addr(__sec) + __pfn;  \   })   #endif /* CONFIG_FLATMEM/SPARSEMEM */      /*    * Convert a physical address to a Page Frame Number and back    */   #define __phys_to_pfn(paddr) PHYS_PFN(paddr)   #define __pfn_to_phys(pfn) PFN_PHYS(pfn)      #define page_to_pfn __page_to_pfn   #define pfn_to_page __pfn_to_page 
+```
 ## 2.5 三级区划关系
 
 我们对物理内存的三级区划有了简单的了解，下面我们再对它们之间的关系进行更进一步地分析。虽然在节点描述符中包含了所有的区域类型，但是除了第一个节点能包含所有的区域类型之外，其它的节点并不能包含所有的区域类型，因为有些区域类型(DMA、DMA32)必须从物理内存的起点开始。Normal、HighMem和Movable是可以出现在所有的节点上的。页面编号(pfn)是从物理内存的起点开始编号，不是每个节点或者区域重新编号的。所有区域的范围都必须是整数倍个页面，不能出现半个页面。节点描述符不仅记录自己所包含的区域，还会记录自己的起始页帧号和跨越页帧数量，区域描述符也会记录自己的起始页帧号和跨越页帧数量。
 
 下面我们来画个图看一下节点与页面之间的关系以及x86上具体的区分划分情况。
 ![[Pasted image 20240927100451.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
 # 三、物理内存分配
 
 当我们把物理内存区划弄明白之后，再来学习物理内存分配就比较容易了。物理内存分配最底层的是页帧分配。页帧分配的分配单元是区域，分配粒度是页面。如何进行页帧分配呢？Linux采取的算法叫做伙伴系统(buddy system)。只有伙伴系统还不行，因为伙伴系统进行的是大粒度的分配，我们还需要批发与零售，于是便有了slab allocator和kmalloc。这几种内存分配方法分配的都是线性映射的内存，当系统连续内存不足的时候，Linux还提供了vmalloc用来分配非线性映射的内存。下面我们画图来看一下它们之间的关系。
 ![[Pasted image 20240927100500.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)Buddy System既是直接的内存分配接口，也是所有其它内存分配器的底层分配器。Slab建立在Buddy的基础之上，Kmalloc又建立在Slab的基础之上。Vmalloc和CMA也是建立在Buddy的基础之上。Linux采取的这种内存分配体系提供了丰富灵活的内存接口，还能同时减少外部碎片和内部碎片。  
 
+Buddy System既是直接的内存分配接口，也是所有其它内存分配器的底层分配器。Slab建立在Buddy的基础之上，Kmalloc又建立在Slab的基础之上。Vmalloc和CMA也是建立在Buddy的基础之上。Linux采取的这种内存分配体系提供了丰富灵活的内存接口，还能同时减少外部碎片和内部碎片。  
 ## 3.1 Buddy System
 
 伙伴系统的基本管理单位是区域，最小分配粒度是页面。因为伙伴系统是建立在物理内存的三级区划上的，所以最小分配粒度是页面，不能比页面再小了。基本管理单位是区域，是因为每个区域的内存都有特殊的用途或者用法，不能随便混用，所以不能用节点作为基本管理单位。伙伴系统并不是直接管理一个个页帧的，而是把页帧组成页块(pageblock)来管理，页块是由连续的2^n^个页帧组成，n叫做这个页块的阶，n的范围是0到10。而且2^n^个页帧还有对齐的要求，首页帧的页帧号(pfn)必须能除尽2^n^，比如3阶页块的首页帧(pfn)必须除以8(2^3^)能除尽，10阶页块的首页帧必须除以1024(2^10^)能除尽。0阶页块只包含一个页帧，任意一个页帧都可以构成一个0阶页块，而且符合对齐要求，因为任何整数除以1(2^0^)都能除尽。  
-
 ### 3.1.1 伙伴系统的内存来源
 
 伙伴系统管理的内存并不是全部的物理内存，而是内核在完成初步的初始化之后的未使用内存。内核在刚启动的时候有一个简单的早期内存管理器，它会记录系统的所有物理内存以及在它之前就被占用的内存，并为内核提供早期的内存分配服务。当内核的基础初始化完成之后，它就会把所有剩余可用的物理内存交给伙伴系统来管理，然后自己就退出历史舞台了。早期内存管理器会首先尝试把页帧以10阶页块的方式加入伙伴系统，不够10阶的以9阶页块的方式加入伙伴系统，以此类推，直到以0阶页块的方式把所有可用页帧都加入到伙伴系统。显而易见，内核刚启动的时候高阶页块比较多，低阶页块比较少。早期内存管理器以前是bootmem，后来是bootmem和memblock共存，可以通过config选择使用哪一个，现在是只有memblock了，bootmem已经被移出了内核。  
-
 ### 3.1.2 伙伴系统的管理数据结构
 
 伙伴系统的管理数据定义在区域描述符中，是结构体free_area的数组，数组大小是11，因为从0到10有11个数。free_area的定义如下所示：linux-src/include/linux/mmzone.h
-
-`struct free_area {    struct list_head free_list[MIGRATE_TYPES];    unsigned long  nr_free;   };      enum migratetype {    MIGRATE_UNMOVABLE,    MIGRATE_MOVABLE,    MIGRATE_RECLAIMABLE,    MIGRATE_PCPTYPES, /* the number of types on the pcp lists */    MIGRATE_HIGHATOMIC = MIGRATE_PCPTYPES,   #ifdef CONFIG_CMA    /*     * MIGRATE_CMA migration type is designed to mimic the way     * ZONE_MOVABLE works.  Only movable pages can be allocated     * from MIGRATE_CMA pageblocks and page allocator never     * implicitly change migration type of MIGRATE_CMA pageblock.     *     * The way to use it is to change migratetype of a range of     * pageblocks to MIGRATE_CMA which can be done by     * __free_pageblock_cma() function.  What is important though     * is that a range of pageblocks must be aligned to     * MAX_ORDER_NR_PAGES should biggest page be bigger than     * a single pageblock.     */    MIGRATE_CMA,   #endif   #ifdef CONFIG_MEMORY_ISOLATION    MIGRATE_ISOLATE, /* can't allocate from here */   #endif    MIGRATE_TYPES   };   `
-
+```cpp
+struct free_area {    struct list_head free_list[MIGRATE_TYPES];    unsigned long  nr_free;   };      enum migratetype {    MIGRATE_UNMOVABLE,    MIGRATE_MOVABLE,    MIGRATE_RECLAIMABLE,    MIGRATE_PCPTYPES, /* the number of types on the pcp lists */    MIGRATE_HIGHATOMIC = MIGRATE_PCPTYPES,   #ifdef CONFIG_CMA    /*     * MIGRATE_CMA migration type is designed to mimic the way     * ZONE_MOVABLE works.  Only movable pages can be allocated     * from MIGRATE_CMA pageblocks and page allocator never     * implicitly change migration type of MIGRATE_CMA pageblock.     *     * The way to use it is to change migratetype of a range of     * pageblocks to MIGRATE_CMA which can be done by     * __free_pageblock_cma() function.  What is important though     * is that a range of pageblocks must be aligned to     * MAX_ORDER_NR_PAGES should biggest page be bigger than     * a single pageblock.     */    MIGRATE_CMA,   #endif   #ifdef CONFIG_MEMORY_ISOLATION    MIGRATE_ISOLATE, /* can't allocate from here */   #endif    MIGRATE_TYPES   };   
+```
 可以看到free_area的定义非常简单，就是由MIGRATE_TYPES个链表组成，链表连接的是同一个阶的迁移类型相同的页帧。迁移类型是内核为了减少内存碎片而提出的技术，不同区域的页块有不同的默认迁移类型，比如DMA、NORMAL默认都是不可迁移(MIGRATE_UNMOVABLE)的页块,HIGHMEM、MOVABLE区域默认都是可迁移(MIGRATE_UNMOVABLE)的页块。我们申请的内存有时候是不可移动的内存，比如内核线性映射的内存，有时候是可以移动的内存，比如用户空间缺页异常分配的内存。我们把不同迁移类型的内存分开进行分配，在进行内存碎片整理的时候就比较方便，不会出现一片可移动内存中夹着一个不可移动的内存(这种情况就很碍事)。如果要分配的迁移类型的内存不足时就需要从其它的迁移类型中进行盗页了。内核定义了每种迁移类型的后备类型，如下所示：linux-src/mm/page_alloc.c
-
-`/*    * This array describes the order lists are fallen back to when    * the free lists for the desirable migrate type are depleted    */   static int fallbacks[MIGRATE_TYPES][3] = {    [MIGRATE_UNMOVABLE]   = { MIGRATE_RECLAIMABLE, MIGRATE_MOVABLE,   MIGRATE_TYPES },    [MIGRATE_MOVABLE]     = { MIGRATE_RECLAIMABLE, MIGRATE_UNMOVABLE, MIGRATE_TYPES },    [MIGRATE_RECLAIMABLE] = { MIGRATE_UNMOVABLE,   MIGRATE_MOVABLE,   MIGRATE_TYPES },   #ifdef CONFIG_CMA    [MIGRATE_CMA]         = { MIGRATE_TYPES }, /* Never used */   #endif   #ifdef CONFIG_MEMORY_ISOLATION    [MIGRATE_ISOLATE]     = { MIGRATE_TYPES }, /* Never used */   #endif   };   `
-
+```cpp
+/*    * This array describes the order lists are fallen back to when    * the free lists for the desirable migrate type are depleted    */   static int fallbacks[MIGRATE_TYPES][3] = {    [MIGRATE_UNMOVABLE]   = { MIGRATE_RECLAIMABLE, MIGRATE_MOVABLE,   MIGRATE_TYPES },    [MIGRATE_MOVABLE]     = { MIGRATE_RECLAIMABLE, MIGRATE_UNMOVABLE, MIGRATE_TYPES },    [MIGRATE_RECLAIMABLE] = { MIGRATE_UNMOVABLE,   MIGRATE_MOVABLE,   MIGRATE_TYPES },   #ifdef CONFIG_CMA    [MIGRATE_CMA]         = { MIGRATE_TYPES }, /* Never used */   #endif   #ifdef CONFIG_MEMORY_ISOLATION    [MIGRATE_ISOLATE]     = { MIGRATE_TYPES }, /* Never used */   #endif   };   
+```
 一种迁移类型的页块被盗页之后，它的迁移类型就改变了，所以一个页块的迁移类型是会改变的，有可能变来变去。当物理内存比较少时，这种变来变去就会特别频繁，这样迁移类型带来的好处就得不偿失了。因此内核定义了一个变量page_group_by_mobility_disabled，当物理内存比较少时就禁用迁移类型。
 
 伙伴系统管理页块的方式可以用下图来表示：
 ![[Pasted image 20240927100515.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
 ### 3.1.3 伙伴系统的算法逻辑
 
 伙伴系统对外提供的接口只能分配某一阶的页块，并不能随意分配若干个页帧。当分配n阶页块时，伙伴系统会优先查找n阶页块的链表，如果不为空的话就拿出来一个分配。如果为空的就去找n+1阶页块的链表，如果不为空的话，就拿出来一个，并分成两个n阶页块，其中一个加入n阶页块的链表中，另一个分配出去。如果n+1阶页块链表也是空的话，就去找n+2阶页块的链表，如果不为空的话，就拿出来一个，然后分成两个n+1阶的页块，其中一个加入到n+1阶的链表中去，剩下的一个再分成两个n阶页块，其中一个放入n阶页块的链表中去，另一个分配出去。如果n+2阶页块的链表也是空的，那就去找n+3阶页块的链表，重复此逻辑，直到找到10阶页块的链表。如果10阶页块的链表也是空的话，那就去找后备迁移类型的页块去分配，此时从最高阶的页块链表往低阶页块的链表开始查找，直到查到为止。如果后备页块也分配不到内存，那么就会进行内存回收，这是下一章的内容。
 
 用户用完内存还给伙伴系统的时候，并不是直接还给其对应的n阶页块的链表就行了，而是会先进行合并。比如你申请了一个0阶页块，用完了之后要归还，我们假设其页帧号是5，来推演一下其归还过程。如果此时发现4号页帧也是free的，则4和5会合并成一个1阶页块，首页帧号是4。如果4号页帧不是free的，则5号页帧直接还给0阶页块链表中去。如果6号页帧free呢，会不会和5号页帧合并？不会，因为不满足页帧号对齐要求。如果5和6合并，将会成为一个1阶页块，1阶页块要求其首页帧的页号必须除以2(2^1^)能除尽，而5除以2除不尽，所以5和6不能合并。而4和5合并之后，4除以2(2^1^)是能除尽的。4和5合并成一个1阶页块之后还要查看是否能继续合并，如果此时有一个1阶页块是free的，由6和7组成的，此时它们就会合并成一个2阶页块，包含4、5、6、7共4个页帧，而且符合对齐要求，4除以4(2^2^)是能除尽的。如果此时有一个1阶页块是free的，由2和3组成的，那么就不能合并，因为合并后的首页帧是2，2除以4(2^2^)是除不尽的。继续此流程，如果合并后的n阶页块的前面或者后面还有free的同阶页块，而且也符合对齐要求，就会继续合并，直到无法合并或者已经到达了10阶页块，才会停止合并，然后把其插入到对应的页块链表中去。  
-
 ### 3.1.4 伙伴系统的接口
 
 下面我们来看一下伙伴系统的接口。伙伴系统提供了两类接口，一类是返回页表描述符的，一类是返回虚拟内存地址的。linux-src/include/linux/gfp.h
-
-`struct page *alloc_pages(gfp_t gfp, unsigned int order);   #define alloc_page(gfp_mask) alloc_pages(gfp_mask, 0)   struct page *alloc_pages_node(int nid, gfp_t gfp_mask,unsigned int order);   void __free_pages(struct page *page, unsigned int order);   #define __free_page(page) __free_pages((page), 0)   `
-
+```cpp
+struct page *alloc_pages(gfp_t gfp, unsigned int order);   #define alloc_page(gfp_mask) alloc_pages(gfp_mask, 0)   struct page *alloc_pages_node(int nid, gfp_t gfp_mask,unsigned int order);   void __free_pages(struct page *page, unsigned int order);   #define __free_page(page) __free_pages((page), 0)   
+```
 释放的接口很简单，只需要一个页表描述符指针加一个阶数。分配的接口中，有的会指定nodeid，就从那个节点中分配内存。不指定nodeid的接口，如果是在UMA中，那就从唯一的节点中分配内存，如果是NUMA，会按照一定的策略选择在哪个节点中分配内存。最复杂的参数是gfp，gfp是标记参数，可以分为两类标记，一类是指定分配区域的，一类是指定分配行为的，下面我们来看一下。linux-src/include/linux/gfp.h
-
+```cpp
 `#define ___GFP_DMA  0x01u   #define ___GFP_HIGHMEM  0x02u   #define ___GFP_DMA32  0x04u   #define ___GFP_MOVABLE  0x08u   #define ___GFP_RECLAIMABLE 0x10u   #define ___GFP_HIGH  0x20u   #define ___GFP_IO  0x40u   #define ___GFP_FS  0x80u   #define ___GFP_ZERO  0x100u   #define ___GFP_ATOMIC  0x200u   #define ___GFP_DIRECT_RECLAIM 0x400u   #define ___GFP_KSWAPD_RECLAIM 0x800u   #define ___GFP_WRITE  0x1000u   #define ___GFP_NOWARN  0x2000u   #define ___GFP_RETRY_MAYFAIL 0x4000u   #define ___GFP_NOFAIL  0x8000u   #define ___GFP_NORETRY  0x10000u   #define ___GFP_MEMALLOC  0x20000u   #define ___GFP_COMP  0x40000u   #define ___GFP_NOMEMALLOC 0x80000u   #define ___GFP_HARDWALL  0x100000u   #define ___GFP_THISNODE  0x200000u   #define ___GFP_ACCOUNT  0x400000u   #define ___GFP_ZEROTAGS  0x800000u   #define ___GFP_SKIP_KASAN_POISON 0x1000000u   #ifdef CONFIG_LOCKDEP   #define ___GFP_NOLOCKDEP 0x2000000u   #else   #define ___GFP_NOLOCKDEP 0   #endif   `
-
+```
 其中前4个是指定分配区域的，内核里一共定义了6类区域，为啥只有4个指示符呢？因为ZONE_DEVICE有特殊用途，不在一般的内存分配管理中，当不指定区域类型时默认就是ZONE_NORMAL，所以4个就够了。是不是指定了哪个区域就只能在哪个区域分配内存呢，不是的。每个区域都有后备区域，当其内存不足时，会从其后备区域中分配内存。后备区域是在节点描述符中定义，我们来看一下：linux-src/include/linux/mmzone.h
-
-`typedef struct pglist_data {    struct zonelist node_zonelists[MAX_ZONELISTS];   } pg_data_t;      enum {    ZONELIST_FALLBACK, /* zonelist with fallback */   #ifdef CONFIG_NUMA    /*     * The NUMA zonelists are doubled because we need zonelists that     * restrict the allocations to a single node for __GFP_THISNODE.     */    ZONELIST_NOFALLBACK, /* zonelist without fallback (__GFP_THISNODE) */   #endif    MAX_ZONELISTS   };      struct zonelist {    struct zoneref _zonerefs[MAX_ZONES_PER_ZONELIST + 1];   };      struct zoneref {    struct zone *zone; /* Pointer to actual zone */    int zone_idx;  /* zone_idx(zoneref->zone) */   };   `
-
+```cpp
+typedef struct pglist_data {    struct zonelist node_zonelists[MAX_ZONELISTS];   } pg_data_t;      enum {    ZONELIST_FALLBACK, /* zonelist with fallback */   #ifdef CONFIG_NUMA    /*     * The NUMA zonelists are doubled because we need zonelists that     * restrict the allocations to a single node for __GFP_THISNODE.     */    ZONELIST_NOFALLBACK, /* zonelist without fallback (__GFP_THISNODE) */   #endif    MAX_ZONELISTS   };      struct zonelist {    struct zoneref _zonerefs[MAX_ZONES_PER_ZONELIST + 1];   };      struct zoneref {    struct zone *zone; /* Pointer to actual zone */    int zone_idx;  /* zone_idx(zoneref->zone) */   };   
+```
 在UMA上，后备区域只有一个链表，就是本节点内的后备区域，在NUMA中后备区域有两个链表，包括本节点内的后备区域和其它节点的后备区域。这些后备区域是在内核启动时初始化的。对于本节点的后备区域，是按照区域类型的id排列的，高id的排在前面，低id的排在后面，后面的是前面的后备，前面的区域内存不足时可以从后面的区域里分配内存，反过来则不行。比如MOVABLE区域的内存不足时可以从NORMAL区域来分配，NORMAL区域的内存不足时可以从DMA区域来分配，反过来则不行。对于其它节点的后备区域，除了会符合前面的规则之外，还会考虑后备区域是按照节点优先的顺序来排列还是按照区域类型优先的顺序来排列。
 
 下面我们再来看一下分配行为的flag都是什么含义。
 
 __GFP_HIGH：调用者的优先级很高，要尽量满足分配请求。
-
 __GFP_ATOMIC：调用者处在原子场景中，分配过程不能回收页或者睡眠，一般是中断处理程序会用。
-
 __GFP_IO：可以进行磁盘IO操作。
-
 __GFP_FS：可以进行文件系统的操作。
-
 __GFP_KSWAPD_RECLAIM：当内存不足时允许异步回收。
-
 __GFP_RECLAIM：当内存不足时允许同步回收和异步回收。
-
 __GFP_REPEAT：允许重试，重试多次以后还是没有内存就返回失败。
-
 __GFP_NOFAIL：不能失败，必须无限次重试。
-
 __GFP_NORETRY：不要重试，当直接回收和内存规整之后还是分配不到内存的话就返回失败。
-
 __GFP_ZERO：把要分配的页清零。
 
 还有一些其它的flag就不再一一进行介绍了。
 
 如果我们每次分配内存都把这些flag一一进行组合，那就太麻烦了，所以系统为我们定义了一些常用的组合，如下所示：linux-src/include/linux/gfp.h
-
+```cpp
 `#define GFP_ATOMIC (__GFP_HIGH|__GFP_ATOMIC|__GFP_KSWAPD_RECLAIM)   #define GFP_KERNEL (__GFP_RECLAIM | __GFP_IO | __GFP_FS)   #define GFP_NOIO (__GFP_RECLAIM)   #define GFP_NOFS (__GFP_RECLAIM | __GFP_IO)   #define GFP_USER (__GFP_RECLAIM | __GFP_IO | __GFP_FS | __GFP_HARDWALL)   #define GFP_DMA  __GFP_DMA   #define GFP_DMA32 __GFP_DMA32   #define GFP_HIGHUSER (GFP_USER | __GFP_HIGHMEM)   #define GFP_HIGHUSER_MOVABLE (GFP_HIGHUSER | __GFP_MOVABLE | __GFP_SKIP_KASAN_POISON)   `
-
+```
 中断中分配内存一般用GFP_ATOMIC，内核自己使用的内存一般用GFP_KERNEL，为用户空间分配内存一般用GFP_HIGHUSER_MOVABLE。
 
 我们再来看一下直接返回虚拟内存的接口函数。linux-src/include/linux/gfp.h
-
+```cpp
 `unsigned long __get_free_pages(gfp_t gfp_mask, unsigned int order);   #define __get_free_page(gfp_mask)  __get_free_pages((gfp_mask), 0)   #define __get_dma_pages(gfp_mask, order) __get_free_pages((gfp_mask) | GFP_DMA, (order))   unsigned long get_zeroed_page(gfp_t gfp_mask);   void free_pages(unsigned long addr, unsigned int order);   #define free_page(addr) free_pages((addr), 0)   `
-
+```
 此接口不能分配HIGHMEM中的内存，因为HIGHMEM中的内存不是直接映射到内核空间中去的。除此之外这个接口和前面的没有区别，其参数函数也跟前面的一样，就不再赘述了。  
-
 ### 3.1.5 伙伴系统的实现
 
 下面我们再来看一下伙伴系统的分配算法。linux-src/mm/page_alloc.c
-
-`/*    * This is the 'heart' of the zoned buddy allocator.    */   struct page *__alloc_pages(gfp_t gfp, unsigned int order, int preferred_nid,          nodemask_t *nodemask)   {    struct page *page;        /* First allocation attempt */    page = get_page_from_freelist(alloc_gfp, order, alloc_flags, &ac);    if (likely(page))     goto out;       page = __alloc_pages_slowpath(alloc_gfp, order, &ac);      out:    return page;   }   `
-
+```cpp
+/*    * This is the 'heart' of the zoned buddy allocator.    */   struct page *__alloc_pages(gfp_t gfp, unsigned int order, int preferred_nid,          nodemask_t *nodemask)   {    struct page *page;        /* First allocation attempt */    page = get_page_from_freelist(alloc_gfp, order, alloc_flags, &ac);    if (likely(page))     goto out;       page = __alloc_pages_slowpath(alloc_gfp, order, &ac);      out:    return page;   }   
+```
 伙伴系统的所有分配接口最终都会使用__alloc_pages这个函数来进行分配。对这个函数进行删减之后，其逻辑也比较简单清晰，先使用函数get_page_from_freelist直接从free_area中进行分配，如果分配不到就使用函数 __alloc_pages_slowpath进行内存回收。内存回收的内容在下一章里面讲。  
-
 ## 3.2 Slab Allocator
 
 伙伴系统的最小分配粒度是页面，但是内核中有很多大量的同一类型结构体的分配请求，比如说进程的结构体task_struct，如果使用伙伴系统来分配显然不合适，如果自己分配一个页面，然后可以分割成多个task_struct，显然也很麻烦，于是内核中给我们提供了slab分配机制来满足这种需求。Slab的基本思想很简单，就是自己先从伙伴系统中分配一些页面，然后把这些页面切割成一个个同样大小的基本块，用户就可以从slab中申请分配一个同样大小的内存块了。如果slab中的内存不够用了，它会再向伙伴系统进行申请。不同的slab其基本块的大小并不相同，内核的每个模块都要为自己的特定需求分配特定的slab，然后再从这个slab中分配内存。
 
 刚开始的时候内核中就只有一个slab，其接口和实现都叫slab。但是后来内核中又出现了两个slab实现，slob和slub。slob是针对嵌入式系统进行优化的，slub是针对内存比较多的系统进行优化的，它们的接口还是slab。由于现在的计算机内存普遍都比较大，连手机的的内存都6G、8G起步了，所以现在除了嵌入式系统之外，内核默认使用的都是slub。下面我们画个图看一下它们的关系。
 ![[Pasted image 20240927100534.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)可以看到Slab在不同的语境下有不同的含义，有时候指的是整个Slab机制，有时候指的是Slab接口，有时候指的是Slab实现。如果我们在讨论问题的时候遇到了歧义，可以加上汉语后缀以明确语义。  
 
+可以看到Slab在不同的语境下有不同的含义，有时候指的是整个Slab机制，有时候指的是Slab接口，有时候指的是Slab实现。如果我们在讨论问题的时候遇到了歧义，可以加上汉语后缀以明确语义。  
 ### 3.2.1 Slab接口
 
 下面我们来看一下slab的接口：linux-src/include/linux/slab.h
-
-`struct kmem_cache *kmem_cache_create(const char *name, unsigned int size,      unsigned int align, slab_flags_t flags,      void (*ctor)(void *));   void kmem_cache_destroy(struct kmem_cache *);   void *kmem_cache_alloc(struct kmem_cache *, gfp_t flags);   void kmem_cache_free(struct kmem_cache *, void *);   `
-
+```cpp
+struct kmem_cache *kmem_cache_create(const char *name, unsigned int size,      unsigned int align, slab_flags_t flags,      void (*ctor)(void *));   void kmem_cache_destroy(struct kmem_cache *);   void *kmem_cache_alloc(struct kmem_cache *, gfp_t flags);   void kmem_cache_free(struct kmem_cache *, void *);   
+```
 我们在使用slab时首先要创建slab，创建slab用的是接口kmem_cache_create，其中最重要的参数是size，它是基本块的大小，一般我们都会传递sizeof某个结构体。创建完slab之后，我们用kmem_cache_alloc从slab中分配内存，第一个参数指定哪个是从哪个slab中分配，第二个参数gfp指定如果slab的内存不足了如何从伙伴系统中去分配内存，gfp的函数和前面伙伴系统中讲的相同，此处就不再赘述了，函数返回的是一个指针，其指向的内存大小就是slab在创建时指定的基本块的大小。当我们用完一块内存时，就要用kmem_cache_free把它还给slab，第一个参数指定是哪个slab，第二个参数是我们要返回的内存。如果我们想要释放整个slab的话，就使用接口kmem_cache_destroy。  
-
 ### 3.2.2 Slab实现
 
 暂略  
-
 ### 3.2.3 Slob实现
 
 暂略  
-
 ### 3.2.4 Slub实现
 
 暂略  
-
 ## 3.3 Kmalloc
 
 内存中还有一些偶发的零碎的内存分配需求，一个模块如果仅仅为了分配一次5字节的内存，就去创建一个slab，那显然不划算。为此内核创建了一个统一的零碎内存分配器kmalloc，用户可以直接请求kmalloc分配若干个字节的内存。Kmalloc底层用的还是slab机制，kmalloc在启动的时候会预先创建一些不同大小的slab，用户请求分配任意大小的内存，kmalloc都会去大小刚刚满足的slab中去分配内存。
 
 下面我们来看一下kmalloc的接口：linux-src/include/linux/slab.h
-
-`void *kmalloc(size_t size, gfp_t flags);   void kfree(const void *);   `
-
+```cpp
+void *kmalloc(size_t size, gfp_t flags);   void kfree(const void *);   
+```
 可以看到kmalloc的接口很简单，使用接口kmalloc就可以分配内存，第一个参数是你要分配的内存大小，第二个参数和伙伴系统的参数是一样的，这里就不再赘述了，返回值是一个内存指针，用这个指针就可以访问分配到的内存了。内存使用完了之后用kfree进行释放，参数是刚才分配到的内存指针。
 
 我们以slub实现为例讲一下kmalloc的逻辑。Kmalloc中会定义一个全局的slab指针的二维数组，第一维下标代表的是kmalloc的类型，默认有四种类型，分别有DMA和NORMAL，这两个代表的是gfp中的区域，还有两个是CGROUP和RECLAIM，CGROUP代表的是在memcg中分配内存，RECLAIM代表的是可回收内存。第二维下标代表的是基本块大小的2的对数，不过下标0、1、2是例外，有特殊含义。在系统初始化的时候，会初始化这个数组，创建每一个slab，下标0除外，下标1对应的slab的基本块大小是96，下标2对应的slab的基本块的大小是192。在用kmalloc分配内存的时候，会先处理特殊情况，当size是0的时候直接返回空指针，当size大于8k的时候会则直接使用伙伴系统进行分配。然后先根据gfp参数选择kmalloc的类型，再根据size的大小选择index。如果2^n-1^+1 < size <= 2^n^，则index等于n，但是有特殊情况，当 64 < size <= 96时，index等于1，当 128 < size <= 192时，index等于2。Type和index都确定好之后，就找到了具体的slab了，就可以从这个slab中分配内存了。  
-
 ## 3.4 Vmalloc
 
 暂略  
-
 ## 3.5 CMA
 
 暂略  
-
 # 四、物理内存回收
 
 内存作为系统最宝贵的资源，总是不够用的。当内存不足的时候就要对内存进行回收了。内存回收按照回收时机可以分为同步回收和异步回收，同步回收是指在分配内存的时候发现无法分配到内存就进行回收，异步回收是指有专门的线程定期进行检测，如果发现内存不足就进行回收。内存回收的类型有两种，一是内存规整，也就是内存碎片整理，它不会增加可用内存的总量，但是会增加连续可用内存的量，二是页帧回收，它会把物理页帧的内容写入到外存中去，然后解除其与虚拟内存的映射，这样可用物理内存的量就增加了。内存回收的时机和类型是正交关系，同步回收中会使用内存规整和页帧回收，异步回收中也会使用内存规整和页帧回收。在异步回收中，内存规整有单独的线程kcompactd，此类线程一个node一个，线程名是[kcompactd/nodeid]，页帧回收也有单独的线程kswapd，此类线程也是一个node一个，线程名是[kswapd/nodeid]。在同步回收中，还有一个大杀器，那就是OOM Killer，OOM是内存耗尽的意思，当内存耗尽，其它所有的内存回收方法也回收不到内存的时候，就会使用这个大杀器。下面我们画个图来看一下：
 ![[Pasted image 20240927100555.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
 ## 4.1 内存规整
 
 系统运行的时间长了，内存一会儿分配一会儿释放，慢慢地可用内存就会变得很碎片化不连续。虽然总的可用内存还不少，但是却无法分配大块连续内存，此时就需要进行内存规整了。内存规整是以区域为基本单位，找到可用移动的页帧，把它们都移到同一端，然后连续可用内存的量就增大了。其逻辑如下图所示：
 ![[Pasted image 20240927100606.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
 ## 4.2 页帧回收
 
 内存规整只是增加了连续内存的量，但是可用内存的量并没有增加，当可用内存量不足的时候就要进行页帧回收。对于内核来说，其虚拟内存和物理内存的映射关系是不能解除的，所以必须同时回收物理内存和虚拟内存。对此采取的办法是让内核的每个模块都注册shrinker，当内存紧张时通过shrinker的回调函数通知每个模块尽量释放自己暂时用不到的内存。对于用户空间，其虚拟内存和物理内存的映射关系是可以解除的，我们可以先把其物理内存上的内容保存到外存上去，然后再解除映射关系，这样其物理内存就被回收了，就可以拿做它用了。如果程序后来又用到了这段内存，程序访问其虚拟内存的时候就会发生缺页异常，在缺页异常里再给它分配物理内存，并把其内容从外存中加载建立，这样程序还是能正常运行的。进程的内存页可以分为两种类型：一种是文件页，其内容来源于文件，如程序的代码区、数据区；一种是匿名页，没有内容来源，由内核直接为其分配内存，如进程的堆和栈。对于文件页，有两种情况：一种情况是文件页是clean的，也就是和外存中的内容是一样的，此时我们可以直接丢弃文件页，后面用到时再从外存中加载进来；另一种情况是文件页是dirty的，也就是其经历过修改，和外存中的内容不同，此时要先把文件页的内容写入到外存中，然后才能回收其内存。对于匿名页，由于其没有文件做后备，没办法对其进行回收。此时就需要swap作为匿名页的后备存储了，有了swap之后，匿名页也可以进行回收了。Swap是外存中的一片空间，可以是一个分区，也可以是文件，具体原理请看下一节。
@@ -377,19 +344,17 @@ __GFP_ZERO：把要分配的页清零。
 页帧回收时如何选择回收哪些文件页、匿名页，不回收哪些文件页、匿名页呢，以及文件页和匿名页各回收多少比例呢？内核把所有的文件页放到两个链表上，活跃文件页和不活跃文件页，回收的时候只会回收不活跃文件页。内核把所有的匿名页也放到两个链表上，活跃匿名页和不活跃匿名页，回收的时候只会回收不活跃匿名页。有一个参数/proc/sys/vm/swappiness控制着匿名页和文件页之间的回收比例。
 
 在回收文件页和匿名页的时候是需要把它们的虚拟内存映射给解除掉的。由于一个物理页帧可能会同时映射到多个虚拟内存上，包括映射到多个进程或者同一个进程的不同地址上，所以我们需要找到一个物理页帧所映射的所有虚拟内存。如何找到物理内存所映射的虚拟内存呢，这个过程就叫做反向映射(rmap)。之所以叫反向映射是因为正常的映射都是从虚拟内存映射到物理内存。  
-
 ## 4.3 交换区
 
 暂略  
-
 ## 4.4 OOM Killer
 
 如果用尽了上述所说的各种办法还是无法回收到足够的物理内存，那就只能使出杀手锏了，OOM Killer，通过杀死进程来回收内存。其触发点在linux-src/mm/page_alloc.c:__alloc_pages_may_oom，当使用各种方法都回收不到内存时会调用out_of_memory函数。
 
 下面我们来看一下out_of_memory函数的实现(经过高度删减)：linux-src/mm/oom_kill.c:out_of_memory
-
-`bool out_of_memory(struct oom_control *oc)   {       select_bad_process(oc);       oom_kill_process(oc, "Out of memory");   }   `
-
+```cpp
+bool out_of_memory(struct oom_control *oc)   {       select_bad_process(oc);       oom_kill_process(oc, "Out of memory");   }   
+```
 out_of_memory函数的代码逻辑还是非常简单清晰的，总共有两步，1.先选择一个要杀死的进程，2.杀死它。oom_kill_process函数的目的很简单，但是实现过程也有点复杂，这里就不展开分析了，大家可以自行去看一下代码。我们重点分析一下select_bad_process函数的逻辑，select_bad_process主要是依靠oom_score来进行进程选择的。我们先来看一下和oom_score有关的三个文件。
 
 /proc//oom_score 系统计算出来的oom_score值，只读文件，取值范围0 –- 1000，0代表never kill，1000代表aways kill，值越大，进程被选中的概率越大。
@@ -399,25 +364,23 @@ out_of_memory函数的代码逻辑还是非常简单清晰的，总共有两步�
 /proc//oom_adj 旧的接口文件，为兼容而保留，root可读写，取值范围 -16 — 15，会被线性映射到oom_score_adj，特殊值 -17代表 OOM_DISABLE。大家尽量不要再用此接口。
 
 下面我们来分析一下select_bad_process函数的实现：
-
-`static void select_bad_process(struct oom_control *oc)   {    oc->chosen_points = LONG_MIN;    struct task_struct *p;       rcu_read_lock();    for_each_process(p)     if (oom_evaluate_task(p, oc))      break;    rcu_read_unlock();   }   `
-
+```cpp
+static void select_bad_process(struct oom_control *oc)   {    oc->chosen_points = LONG_MIN;    struct task_struct *p;       rcu_read_lock();    for_each_process(p)     if (oom_evaluate_task(p, oc))      break;    rcu_read_unlock();   }   
+```
 函数首先把chosen_points初始化为最小的Long值，这个值是用来比较所有的oom_score值，最后谁的值最大就选中哪个进程。然后函数已经遍历所有进程，计算其oom_score，并更新chosen_points和被选中的task，有点类似于选择排序。我们继续看oom_evaluate_task函数是如何评估每个进程的函数。
-
-`static int oom_evaluate_task(struct task_struct *task, void *arg)   {    struct oom_control *oc = arg;    long points;    if (oom_unkillable_task(task))     goto next;    /* p may not have freeable memory in nodemask */    if (!is_memcg_oom(oc) && !oom_cpuset_eligible(task, oc))     goto next;    if (oom_task_origin(task)) {     points = LONG_MAX;     goto select;    }    points = oom_badness(task, oc->totalpages);    if (points == LONG_MIN || points < oc->chosen_points)     goto next;   select:    if (oc->chosen)     put_task_struct(oc->chosen);    get_task_struct(task);    oc->chosen = task;    oc->chosen_points = points;   next:    return 0;   abort:    if (oc->chosen)     put_task_struct(oc->chosen);    oc->chosen = (void *)-1UL;    return 1;   }   `
-
+```cpp
+static int oom_evaluate_task(struct task_struct *task, void *arg)   {    struct oom_control *oc = arg;    long points;    if (oom_unkillable_task(task))     goto next;    /* p may not have freeable memory in nodemask */    if (!is_memcg_oom(oc) && !oom_cpuset_eligible(task, oc))     goto next;    if (oom_task_origin(task)) {     points = LONG_MAX;     goto select;    }    points = oom_badness(task, oc->totalpages);    if (points == LONG_MIN || points < oc->chosen_points)     goto next;   select:    if (oc->chosen)     put_task_struct(oc->chosen);    get_task_struct(task);    oc->chosen = task;    oc->chosen_points = points;   next:    return 0;   abort:    if (oc->chosen)     put_task_struct(oc->chosen);    oc->chosen = (void *)-1UL;    return 1;   }   
+```
 此函数首先会跳过所有不适合kill的进程，如init进程、内核线程、OOM_DISABLE进程等。然后通过select_bad_process算出此进程的得分points 也就是oom_score，并和上一次的胜出进程进行比较，如果小的会话就会goto next 返回，如果大的话就会更新oc->chosen 的task 和 chosen_points 也就是目前最高的oom_score。那么 oom_badness是如何计算的呢？
-
-`long oom_badness(struct task_struct *p, unsigned long totalpages)   {    long points;    long adj;    if (oom_unkillable_task(p))     return LONG_MIN;    p = find_lock_task_mm(p);    if (!p)     return LONG_MIN;    adj = (long)p->signal->oom_score_adj;    if (adj == OOM_SCORE_ADJ_MIN ||      test_bit(MMF_OOM_SKIP, &p->mm->flags) ||      in_vfork(p)) {     task_unlock(p);     return LONG_MIN;    }    points = get_mm_rss(p->mm) + get_mm_counter(p->mm, MM_SWAPENTS) +     mm_pgtables_bytes(p->mm) / PAGE_SIZE;    task_unlock(p);    adj *= totalpages / 1000;    points += adj;    return points;   }   `
-
+```cpp
+long oom_badness(struct task_struct *p, unsigned long totalpages)   {    long points;    long adj;    if (oom_unkillable_task(p))     return LONG_MIN;    p = find_lock_task_mm(p);    if (!p)     return LONG_MIN;    adj = (long)p->signal->oom_score_adj;    if (adj == OOM_SCORE_ADJ_MIN ||      test_bit(MMF_OOM_SKIP, &p->mm->flags) ||      in_vfork(p)) {     task_unlock(p);     return LONG_MIN;    }    points = get_mm_rss(p->mm) + get_mm_counter(p->mm, MM_SWAPENTS) +     mm_pgtables_bytes(p->mm) / PAGE_SIZE;    task_unlock(p);    adj *= totalpages / 1000;    points += adj;    return points;   }   
+```
 oom_badness首先把unkiller的进程也就是init进程内核线程直接返回 LONG_MIN，这样它们就不会被选中而杀死了，这里看好像和前面的检测冗余了，但是实际上这个函数还被/proc//oom_score的show函数调用用来显示数值，所以还是有必要的，这里也说明了一点，oom_score的值是不保留的，每次都是即时计算。然后又把oom_score_adj为-1000的进程直接也返回LONG_MIN，这样用户空间专门设置的进程就不会被kill了。最后就是计算oom_score了，计算方法比较简单，就是此进程使用的RSS驻留内存、页表、swap之和越大，也就是此进程所用的总内存越大，oom_score的值就越大，逻辑简单直接，谁用的物理内存最多就杀谁，这样就能够回收更多的物理内存，而且使用内存最多的进程很可能是内存泄漏了，所以此算法虽然很简单，但是也很合理。
 
 可能很多人会觉得这里讲的不对，和自己在网上的看到的逻辑不一样，那是因为网上有很多讲oom_score算法的文章都是基于2.6版本的内核讲的，那个算法比较复杂，会考虑进程的nice值，nice值小的，oom_score会相应地降低，也会考虑进程的运行时间，运行时间越长，oom_score值也会相应地降低，因为当时认为进程运行的时间长消耗内存多是合理的。但是这个算法会让那些缓慢内存泄漏的进程逃脱制裁。因此后来这个算法就改成现在这样的了，只考虑谁用的内存多就杀谁，简洁高效。  
-
 # 五、物理内存压缩
 
 暂略  
-
 ## 5.1 ZRAM
 
   
@@ -428,14 +391,10 @@ oom_badness首先把unkiller的进程也就是init进程内核线程直接返回
 
 ## 5.3 ZCache
 
-  
-
 # 六、虚拟内存映射
 
 开启分页内存机制之后，CPU访问一切内存都要通过虚拟内存地址访问，CPU把虚拟内存地址发送给MMU，MMU把虚拟内存地址转换为物理内存地址，然后再用物理内存地址通过MC(内存控制器)访问内存。MMU里面有两个部件，TLB和PTW。TLB可以意译地址转换缓存器，它是缓存虚拟地址解析结果的地方。PTW可以意译为虚拟地址解析器，它负责解析页表，把虚拟地址转换为物理地址，然后再送去MC进行访问。同时其转换结果也会被送去TLB进行缓存，下次再访问相同虚拟地址的时候就不用再去解析了，可以直接用缓存的结果。
 ![[Pasted image 20240927100628.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
 ## 6.1 页表
 
 虚拟地址映射的基本单位是页面不是字节，一个虚拟内存的页面会被映射到一个物理页帧上。MMU把虚拟地址转换为物理地址的方法是通过查找页表。一个页表的大小也是一个页面，4K大小，页表的内容可以看做是页表项的数组，一个页表项是一个物理地址，指向一个物理页帧，在32位系统上，物理地址是32位也就是4个字节，所以一个页表有4K/4=1024项，每一项指向一个物理页帧，大小是4K，所以一个页表可以表达4M的虚拟内存,要想表达4G的虚拟内存空间，需要有1024个页表才行，每个页表4K，一共需要4M的物理内存。4M的物理内存看起来好像不大，但是每个进程都需要有4M的物理内存做页表，如果有100个进程，那就需要有400M物理内存，这就太浪费物理内存了，而且大部分时候，一个进程的大部分虚拟内存空间并没有使用。为此我们可以采取两级页表的方法来进行虚拟内存映射。在多级页表体系中，最后一级页表还叫页表，其它的页表叫做页目录，但是我们有时候也会都叫做页表。对于两级页表体系，一级页表还是一个页面，4K大小，每个页表项还是4个字节，一共有1024项，一级页表的页表项是二级页表的物理地址，指向二级页表，二级页表的内容和前面一样。一级页表只有一个，4K，有1024项，指向1024个二级页表，一个一级页表项也就是一个二级页表可以表达4M虚拟内存，一级页表总共能表达4G虚拟内存，此时所有页表占用的物理内存是4M加4K。看起来使用二级页表好像还多用了4K内存，但是在大多数情况下，很多二级页表都用不上，所以不用分配内存。如果一个进程只用了8M物理内存，那么它只需要一个一级页表和两个二级页表就行了，一级页表中只需要使用两项指向两个二级页表，两个二级页表填充满，就可以表达8M虚拟内存映射了，此时总共用了3个页表，12K物理内存，页表的内存占用大大减少了。所以在32位系统上，采取的是两级页表的方式，每级的一个页表都是1024项，32位虚拟地址正好可以分成三份，10、10、12，第一个10位可以用于在一级页表中寻址，第二个10位在二级页表中寻址，最后12位可以表达一个页面中任何一个字节。
@@ -447,49 +406,38 @@ Linux内核最多支持五级页表，在五级页表体系中，每一级页表
 页表项是下一级页表或者最终页帧的物理地址，页表也是一个页帧，页帧的地址都是4K对齐的，所以页表项中的物理地址的最后12位一定都是0，既然都是0，那么就没必要表示出来了，我们就可以把这12位拿来做其它用途了。下面我们来看一下x86的页表项格式。
 ![[Pasted image 20240927100642.png]]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这是32位的页表项格式，其中12-31位是物理地址。
+这是32位的页表项格式，其中12-31位是物理地址。
 
 P，此页表项是否有效，1代表有效，0代表无效，为0时其它字段无意义。
-
 R/W，0代表只读，1代表可读写。
-
 U/S，0代表内核页表，1代表用户页面。
-
 PWT，Page-level write-through
-
 PCD，Page-level cache disable
 
 A，Accessed; indicates whether software has accessed the page
-
 D，Dirty; indicates whether software has written to the  page
-
 PAT，If the PAT is supported, indirectly determines the memory type used to access the page
-
 G，Global; determines whether the translation is global
 
 64位系统的页表项格式和这个是一样的，只不过是物理地址扩展到了硬件支持的最高物理地址位数。  
-
 ## 6.2 MMU
 
 MMU是通过遍历页表把虚拟地址转换为物理地址的。其过程如下所示：
 ![[Pasted image 20240927100657.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)CR3是CPU的寄存器，存放的是PGD的物理地址。MMU首先通过CR3获取PGD的物理地址，然后以虚拟地址的31-22位为index，在PGD中找到相应的页表项，先检测页表项的P是否存在，R/W是否有读写权限，U/S是否有访问权限，如果检测都通过了，则进入下一步，如果没通过则触发缺页异常。关于中断与异常的基本原理请参看《深入理解Linux中断机制》。如果检测通过了，页表项的31-12位代表PTE的物理地址，取虚拟地址中的21-12位作为index，在PTE中找到对应的页表项，也是先各种检测，如果没通过则触发缺页异常。如果通过了，则31-12位代表最终页帧的物理地址，然后把虚拟地址的11-0位作为页内偏移加上去，就找到了虚拟地址对应的物理地址了，然后送到MC进行访问。64位系统的逻辑和32位是相似的，只不过是多了几级页表而已，就不再赘述了。
+CR3是CPU的寄存器，存放的是PGD的物理地址。MMU首先通过CR3获取PGD的物理地址，然后以虚拟地址的31-22位为index，在PGD中找到相应的页表项，先检测页表项的P是否存在，R/W是否有读写权限，U/S是否有访问权限，如果检测都通过了，则进入下一步，如果没通过则触发缺页异常。关于中断与异常的基本原理请参看《深入理解Linux中断机制》。如果检测通过了，页表项的31-12位代表PTE的物理地址，取虚拟地址中的21-12位作为index，在PTE中找到对应的页表项，也是先各种检测，如果没通过则触发缺页异常。如果通过了，则31-12位代表最终页帧的物理地址，然后把虚拟地址的11-0位作为页内偏移加上去，就找到了虚拟地址对应的物理地址了，然后送到MC进行访问。64位系统的逻辑和32位是相似的，只不过是多了几级页表而已，就不再赘述了。
 
 一个进程的所有页表通过页表项的指向构成了一个页表树，页表树的根节点是PGD，根指针是CR3。页表树中所有的地址都是物理地址，MMU在遍历页表树时使用物理地址可以直接访问内存。一个页表只有加入了某个页表树才有意义，孤立的页表是没有意义的。每个进程都有一个页表树，切换进程就会切换页表树，切换页表树的方法是给CR3赋值，让其指向当前进程的页表树的根节点也就是PGD。进程的虚拟内存空间分为两部分，内核空间和用户空间，所有进程的内核空间都是共享的，所以所有进程的页表树根节点的内核子树都相同。
 ![[Pasted image 20240927100708.png]]
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
 ## 6.3 缺页异常
 
 MMU在解析虚拟内存时如果发现了读写错误或者权限错误或者页表项无效，就会触发缺页异常让内核来处理。下面我们来看一下x86的缺页异常处理的过程。linux-src/arch/x86/mm/fault.c
-
-`DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)   {    unsigned long address = read_cr2();    irqentry_state_t state;       prefetchw(&current->mm->mmap_lock);       if (kvm_handle_async_pf(regs, (u32)address))     return;       state = irqentry_enter(regs);       instrumentation_begin();    handle_page_fault(regs, error_code, address);    instrumentation_end();       irqentry_exit(regs, state);   }      static __always_inline void   handle_page_fault(struct pt_regs *regs, unsigned long error_code,            unsigned long address)   {    trace_page_fault_entries(regs, error_code, address);       if (unlikely(kmmio_fault(regs, address)))     return;       /* Was the fault on kernel-controlled part of the address space? */    if (unlikely(fault_in_kernel_space(address))) {     do_kern_addr_fault(regs, error_code, address);    } else {     do_user_addr_fault(regs, error_code, address);     /*      * User address page fault handling might have reenabled      * interrupts. Fixing up all potential exit points of      * do_user_addr_fault() and its leaf functions is just not      * doable w/o creating an unholy mess or turning the code      * upside down.      */     local_irq_disable();    }   }      static void   do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,        unsigned long address)   {    WARN_ON_ONCE(hw_error_code & X86_PF_PK);      #ifdef CONFIG_X86_32    if (!(hw_error_code & (X86_PF_RSVD | X86_PF_USER | X86_PF_PROT))) {     if (vmalloc_fault(address) >= 0)      return;    }   #endif       if (is_f00f_bug(regs, hw_error_code, address))     return;       /* Was the fault spurious, caused by lazy TLB invalidation? */    if (spurious_kernel_fault(hw_error_code, address))     return;       /* kprobes don't want to hook the spurious faults: */    if (WARN_ON_ONCE(kprobe_page_fault(regs, X86_TRAP_PF)))     return;       bad_area_nosemaphore(regs, hw_error_code, address);   }      static inline   void do_user_addr_fault(struct pt_regs *regs,      unsigned long error_code,      unsigned long address)   {    struct vm_area_struct *vma;    struct task_struct *tsk;    struct mm_struct *mm;    vm_fault_t fault;    unsigned int flags = FAULT_FLAG_DEFAULT;       tsk = current;    mm = tsk->mm;       if (unlikely((error_code & (X86_PF_USER | X86_PF_INSTR)) == X86_PF_INSTR)) {     /*      * Whoops, this is kernel mode code trying to execute from      * user memory.  Unless this is AMD erratum #93, which      * corrupts RIP such that it looks like a user address,      * this is unrecoverable.  Don't even try to look up the      * VMA or look for extable entries.      */     if (is_errata93(regs, address))      return;        page_fault_oops(regs, error_code, address);     return;    }       /* kprobes don't want to hook the spurious faults: */    if (WARN_ON_ONCE(kprobe_page_fault(regs, X86_TRAP_PF)))     return;       /*     * Reserved bits are never expected to be set on     * entries in the user portion of the page tables.     */    if (unlikely(error_code & X86_PF_RSVD))     pgtable_bad(regs, error_code, address);       /*     * If SMAP is on, check for invalid kernel (supervisor) access to user     * pages in the user address space.  The odd case here is WRUSS,     * which, according to the preliminary documentation, does not respect     * SMAP and will have the USER bit set so, in all cases, SMAP     * enforcement appears to be consistent with the USER bit.     */    if (unlikely(cpu_feature_enabled(X86_FEATURE_SMAP) &&          !(error_code & X86_PF_USER) &&          !(regs->flags & X86_EFLAGS_AC))) {     /*      * No extable entry here.  This was a kernel access to an      * invalid pointer.  get_kernel_nofault() will not get here.      */     page_fault_oops(regs, error_code, address);     return;    }       /*     * If we're in an interrupt, have no user context or are running     * in a region with pagefaults disabled then we must not take the fault     */    if (unlikely(faulthandler_disabled() || !mm)) {     bad_area_nosemaphore(regs, error_code, address);     return;    }       /*     * It's safe to allow irq's after cr2 has been saved and the     * vmalloc fault has been handled.     *     * User-mode registers count as a user access even for any     * potential system fault or CPU buglet:     */    if (user_mode(regs)) {     local_irq_enable();     flags |= FAULT_FLAG_USER;    } else {     if (regs->flags & X86_EFLAGS_IF)      local_irq_enable();    }       perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, address);       if (error_code & X86_PF_WRITE)     flags |= FAULT_FLAG_WRITE;    if (error_code & X86_PF_INSTR)     flags |= FAULT_FLAG_INSTRUCTION;      #ifdef CONFIG_X86_64    /*     * Faults in the vsyscall page might need emulation.  The     * vsyscall page is at a high address (>PAGE_OFFSET), but is     * considered to be part of the user address space.     *     * The vsyscall page does not have a "real" VMA, so do this     * emulation before we go searching for VMAs.     *     * PKRU never rejects instruction fetches, so we don't need     * to consider the PF_PK bit.     */    if (is_vsyscall_vaddr(address)) {     if (emulate_vsyscall(error_code, regs, address))      return;    }   #endif       /*     * Kernel-mode access to the user address space should only occur     * on well-defined single instructions listed in the exception     * tables.  But, an erroneous kernel fault occurring outside one of     * those areas which also holds mmap_lock might deadlock attempting     * to validate the fault against the address space.     *     * Only do the expensive exception table search when we might be at     * risk of a deadlock.  This happens if we     * 1. Failed to acquire mmap_lock, and     * 2. The access did not originate in userspace.     */    if (unlikely(!mmap_read_trylock(mm))) {     if (!user_mode(regs) && !search_exception_tables(regs->ip)) {      /*       * Fault from code in kernel from       * which we do not expect faults.       */      bad_area_nosemaphore(regs, error_code, address);      return;     }   retry:     mmap_read_lock(mm);    } else {     /*      * The above down_read_trylock() might have succeeded in      * which case we'll have missed the might_sleep() from      * down_read():      */     might_sleep();    }       vma = find_vma(mm, address);    if (unlikely(!vma)) {     bad_area(regs, error_code, address);     return;    }    if (likely(vma->vm_start <= address))     goto good_area;    if (unlikely(!(vma->vm_flags & VM_GROWSDOWN))) {     bad_area(regs, error_code, address);     return;    }    if (unlikely(expand_stack(vma, address))) {     bad_area(regs, error_code, address);     return;    }       /*     * Ok, we have a good vm_area for this memory access, so     * we can handle it..     */   good_area:    if (unlikely(access_error(error_code, vma))) {     bad_area_access_error(regs, error_code, address, vma);     return;    }       /*     * If for any reason at all we couldn't handle the fault,     * make sure we exit gracefully rather than endlessly redo     * the fault.  Since we never set FAULT_FLAG_RETRY_NOWAIT, if     * we get VM_FAULT_RETRY back, the mmap_lock has been unlocked.     *     * Note that handle_userfault() may also release and reacquire mmap_lock     * (and not return with VM_FAULT_RETRY), when returning to userland to     * repeat the page fault later with a VM_FAULT_NOPAGE retval     * (potentially after handling any pending signal during the return to     * userland). The return to userland is identified whenever     * FAULT_FLAG_USER|FAULT_FLAG_KILLABLE are both set in flags.     */    fault = handle_mm_fault(vma, address, flags, regs);       if (fault_signal_pending(fault, regs)) {     /*      * Quick path to respond to signals.  The core mm code      * has unlocked the mm for us if we get here.      */     if (!user_mode(regs))      kernelmode_fixup_or_oops(regs, error_code, address,          SIGBUS, BUS_ADRERR,          ARCH_DEFAULT_PKEY);     return;    }       /*     * If we need to retry the mmap_lock has already been released,     * and if there is a fatal signal pending there is no guarantee     * that we made any progress. Handle this case first.     */    if (unlikely((fault & VM_FAULT_RETRY) &&          (flags & FAULT_FLAG_ALLOW_RETRY))) {     flags |= FAULT_FLAG_TRIED;     goto retry;    }       mmap_read_unlock(mm);    if (likely(!(fault & VM_FAULT_ERROR)))     return;       if (fatal_signal_pending(current) && !user_mode(regs)) {     kernelmode_fixup_or_oops(regs, error_code, address,         0, 0, ARCH_DEFAULT_PKEY);     return;    }       if (fault & VM_FAULT_OOM) {     /* Kernel mode? Handle exceptions or die: */     if (!user_mode(regs)) {      kernelmode_fixup_or_oops(regs, error_code, address,          SIGSEGV, SEGV_MAPERR,          ARCH_DEFAULT_PKEY);      return;     }        /*      * We ran out of memory, call the OOM killer, and return the      * userspace (which will retry the fault, or kill us if we got      * oom-killed):      */     pagefault_out_of_memory();    } else {     if (fault & (VM_FAULT_SIGBUS|VM_FAULT_HWPOISON|           VM_FAULT_HWPOISON_LARGE))      do_sigbus(regs, error_code, address, fault);     else if (fault & VM_FAULT_SIGSEGV)      bad_area_nosemaphore(regs, error_code, address);     else      BUG();    }   }   `
-
+```cpp
+DEFINE_IDTENTRY_RAW_ERRORCODE(exc_page_fault)   {    unsigned long address = read_cr2();    irqentry_state_t state;       prefetchw(&current->mm->mmap_lock);       if (kvm_handle_async_pf(regs, (u32)address))     return;       state = irqentry_enter(regs);       instrumentation_begin();    handle_page_fault(regs, error_code, address);    instrumentation_end();       irqentry_exit(regs, state);   }      static __always_inline void   handle_page_fault(struct pt_regs *regs, unsigned long error_code,            unsigned long address)   {    trace_page_fault_entries(regs, error_code, address);       if (unlikely(kmmio_fault(regs, address)))     return;       /* Was the fault on kernel-controlled part of the address space? */    if (unlikely(fault_in_kernel_space(address))) {     do_kern_addr_fault(regs, error_code, address);    } else {     do_user_addr_fault(regs, error_code, address);     /*      * User address page fault handling might have reenabled      * interrupts. Fixing up all potential exit points of      * do_user_addr_fault() and its leaf functions is just not      * doable w/o creating an unholy mess or turning the code      * upside down.      */     local_irq_disable();    }   }      static void   do_kern_addr_fault(struct pt_regs *regs, unsigned long hw_error_code,        unsigned long address)   {    WARN_ON_ONCE(hw_error_code & X86_PF_PK);      #ifdef CONFIG_X86_32    if (!(hw_error_code & (X86_PF_RSVD | X86_PF_USER | X86_PF_PROT))) {     if (vmalloc_fault(address) >= 0)      return;    }   #endif       if (is_f00f_bug(regs, hw_error_code, address))     return;       /* Was the fault spurious, caused by lazy TLB invalidation? */    if (spurious_kernel_fault(hw_error_code, address))     return;       /* kprobes don't want to hook the spurious faults: */    if (WARN_ON_ONCE(kprobe_page_fault(regs, X86_TRAP_PF)))     return;       bad_area_nosemaphore(regs, hw_error_code, address);   }      static inline   void do_user_addr_fault(struct pt_regs *regs,      unsigned long error_code,      unsigned long address)   {    struct vm_area_struct *vma;    struct task_struct *tsk;    struct mm_struct *mm;    vm_fault_t fault;    unsigned int flags = FAULT_FLAG_DEFAULT;       tsk = current;    mm = tsk->mm;       if (unlikely((error_code & (X86_PF_USER | X86_PF_INSTR)) == X86_PF_INSTR)) {     /*      * Whoops, this is kernel mode code trying to execute from      * user memory.  Unless this is AMD erratum #93, which      * corrupts RIP such that it looks like a user address,      * this is unrecoverable.  Don't even try to look up the      * VMA or look for extable entries.      */     if (is_errata93(regs, address))      return;        page_fault_oops(regs, error_code, address);     return;    }       /* kprobes don't want to hook the spurious faults: */    if (WARN_ON_ONCE(kprobe_page_fault(regs, X86_TRAP_PF)))     return;       /*     * Reserved bits are never expected to be set on     * entries in the user portion of the page tables.     */    if (unlikely(error_code & X86_PF_RSVD))     pgtable_bad(regs, error_code, address);       /*     * If SMAP is on, check for invalid kernel (supervisor) access to user     * pages in the user address space.  The odd case here is WRUSS,     * which, according to the preliminary documentation, does not respect     * SMAP and will have the USER bit set so, in all cases, SMAP     * enforcement appears to be consistent with the USER bit.     */    if (unlikely(cpu_feature_enabled(X86_FEATURE_SMAP) &&          !(error_code & X86_PF_USER) &&          !(regs->flags & X86_EFLAGS_AC))) {     /*      * No extable entry here.  This was a kernel access to an      * invalid pointer.  get_kernel_nofault() will not get here.      */     page_fault_oops(regs, error_code, address);     return;    }       /*     * If we're in an interrupt, have no user context or are running     * in a region with pagefaults disabled then we must not take the fault     */    if (unlikely(faulthandler_disabled() || !mm)) {     bad_area_nosemaphore(regs, error_code, address);     return;    }       /*     * It's safe to allow irq's after cr2 has been saved and the     * vmalloc fault has been handled.     *     * User-mode registers count as a user access even for any     * potential system fault or CPU buglet:     */    if (user_mode(regs)) {     local_irq_enable();     flags |= FAULT_FLAG_USER;    } else {     if (regs->flags & X86_EFLAGS_IF)      local_irq_enable();    }       perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, address);       if (error_code & X86_PF_WRITE)     flags |= FAULT_FLAG_WRITE;    if (error_code & X86_PF_INSTR)     flags |= FAULT_FLAG_INSTRUCTION;      #ifdef CONFIG_X86_64    /*     * Faults in the vsyscall page might need emulation.  The     * vsyscall page is at a high address (>PAGE_OFFSET), but is     * considered to be part of the user address space.     *     * The vsyscall page does not have a "real" VMA, so do this     * emulation before we go searching for VMAs.     *     * PKRU never rejects instruction fetches, so we don't need     * to consider the PF_PK bit.     */    if (is_vsyscall_vaddr(address)) {     if (emulate_vsyscall(error_code, regs, address))      return;    }   #endif       /*     * Kernel-mode access to the user address space should only occur     * on well-defined single instructions listed in the exception     * tables.  But, an erroneous kernel fault occurring outside one of     * those areas which also holds mmap_lock might deadlock attempting     * to validate the fault against the address space.     *     * Only do the expensive exception table search when we might be at     * risk of a deadlock.  This happens if we     * 1. Failed to acquire mmap_lock, and     * 2. The access did not originate in userspace.     */    if (unlikely(!mmap_read_trylock(mm))) {     if (!user_mode(regs) && !search_exception_tables(regs->ip)) {      /*       * Fault from code in kernel from       * which we do not expect faults.       */      bad_area_nosemaphore(regs, error_code, address);      return;     }   retry:     mmap_read_lock(mm);    } else {     /*      * The above down_read_trylock() might have succeeded in      * which case we'll have missed the might_sleep() from      * down_read():      */     might_sleep();    }       vma = find_vma(mm, address);    if (unlikely(!vma)) {     bad_area(regs, error_code, address);     return;    }    if (likely(vma->vm_start <= address))     goto good_area;    if (unlikely(!(vma->vm_flags & VM_GROWSDOWN))) {     bad_area(regs, error_code, address);     return;    }    if (unlikely(expand_stack(vma, address))) {     bad_area(regs, error_code, address);     return;    }       /*     * Ok, we have a good vm_area for this memory access, so     * we can handle it..     */   good_area:    if (unlikely(access_error(error_code, vma))) {     bad_area_access_error(regs, error_code, address, vma);     return;    }       /*     * If for any reason at all we couldn't handle the fault,     * make sure we exit gracefully rather than endlessly redo     * the fault.  Since we never set FAULT_FLAG_RETRY_NOWAIT, if     * we get VM_FAULT_RETRY back, the mmap_lock has been unlocked.     *     * Note that handle_userfault() may also release and reacquire mmap_lock     * (and not return with VM_FAULT_RETRY), when returning to userland to     * repeat the page fault later with a VM_FAULT_NOPAGE retval     * (potentially after handling any pending signal during the return to     * userland). The return to userland is identified whenever     * FAULT_FLAG_USER|FAULT_FLAG_KILLABLE are both set in flags.     */    fault = handle_mm_fault(vma, address, flags, regs);       if (fault_signal_pending(fault, regs)) {     /*      * Quick path to respond to signals.  The core mm code      * has unlocked the mm for us if we get here.      */     if (!user_mode(regs))      kernelmode_fixup_or_oops(regs, error_code, address,          SIGBUS, BUS_ADRERR,          ARCH_DEFAULT_PKEY);     return;    }       /*     * If we need to retry the mmap_lock has already been released,     * and if there is a fatal signal pending there is no guarantee     * that we made any progress. Handle this case first.     */    if (unlikely((fault & VM_FAULT_RETRY) &&          (flags & FAULT_FLAG_ALLOW_RETRY))) {     flags |= FAULT_FLAG_TRIED;     goto retry;    }       mmap_read_unlock(mm);    if (likely(!(fault & VM_FAULT_ERROR)))     return;       if (fatal_signal_pending(current) && !user_mode(regs)) {     kernelmode_fixup_or_oops(regs, error_code, address,         0, 0, ARCH_DEFAULT_PKEY);     return;    }       if (fault & VM_FAULT_OOM) {     /* Kernel mode? Handle exceptions or die: */     if (!user_mode(regs)) {      kernelmode_fixup_or_oops(regs, error_code, address,          SIGSEGV, SEGV_MAPERR,          ARCH_DEFAULT_PKEY);      return;     }        /*      * We ran out of memory, call the OOM killer, and return the      * userspace (which will retry the fault, or kill us if we got      * oom-killed):      */     pagefault_out_of_memory();    } else {     if (fault & (VM_FAULT_SIGBUS|VM_FAULT_HWPOISON|           VM_FAULT_HWPOISON_LARGE))      do_sigbus(regs, error_code, address, fault);     else if (fault & VM_FAULT_SIGSEGV)      bad_area_nosemaphore(regs, error_code, address);     else      BUG();    }   }   
+```
 缺页异常首先从CR2寄存器中读取发生异常的虚拟内存地址。然后根据此地址是在内核空间还是在用户空间，分别调用do_kern_addr_fault和do_user_addr_fault来处理。使用vmalloc时会出现内核空间的缺页异常。用户空间地址的缺页异常在做完各种检测处理之后会调用所有架构都通用的函数handle_mm_fault来处理。下面我们来看一下这个函数是怎么处理的。linux-src/mm/memory.c
-
-`vm_fault_t handle_mm_fault(struct vm_area_struct *vma, unsigned long address,         unsigned int flags, struct pt_regs *regs)   {    vm_fault_t ret;       __set_current_state(TASK_RUNNING);       if (!arch_vma_access_permitted(vma, flags & FAULT_FLAG_WRITE,            flags & FAULT_FLAG_INSTRUCTION,            flags & FAULT_FLAG_REMOTE))     return VM_FAULT_SIGSEGV;       if (flags & FAULT_FLAG_USER)     mem_cgroup_enter_user_fault();       if (unlikely(is_vm_hugetlb_page(vma)))     ret = hugetlb_fault(vma->vm_mm, vma, address, flags);    else     ret = __handle_mm_fault(vma, address, flags);       return ret;   }      static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,     unsigned long address, unsigned int flags)   {    struct vm_fault vmf = {     .vma = vma,     .address = address & PAGE_MASK,     .flags = flags,     .pgoff = linear_page_index(vma, address),     .gfp_mask = __get_fault_gfp_mask(vma),    };    unsigned int dirty = flags & FAULT_FLAG_WRITE;    struct mm_struct *mm = vma->vm_mm;    pgd_t *pgd;    p4d_t *p4d;    vm_fault_t ret;       pgd = pgd_offset(mm, address);    p4d = p4d_alloc(mm, pgd, address);    if (!p4d)     return VM_FAULT_OOM;       vmf.pud = pud_alloc(mm, p4d, address);       return handle_pte_fault(&vmf);   }      static vm_fault_t handle_pte_fault(struct vm_fault *vmf)   {    pte_t entry;       if (!vmf->pte) {     if (vma_is_anonymous(vmf->vma))      return do_anonymous_page(vmf);     else      return do_fault(vmf);    }       if (!pte_present(vmf->orig_pte))     return do_swap_page(vmf);       if (pte_protnone(vmf->orig_pte) && vma_is_accessible(vmf->vma))     return do_numa_page(vmf);       vmf->ptl = pte_lockptr(vmf->vma->vm_mm, vmf->pmd);    spin_lock(vmf->ptl);    entry = vmf->orig_pte;    if (unlikely(!pte_same(*vmf->pte, entry))) {     update_mmu_tlb(vmf->vma, vmf->address, vmf->pte);     goto unlock;    }    if (vmf->flags & FAULT_FLAG_WRITE) {     if (!pte_write(entry))      return do_wp_page(vmf);     entry = pte_mkdirty(entry);    }    entry = pte_mkyoung(entry);    if (ptep_set_access_flags(vmf->vma, vmf->address, vmf->pte, entry,       vmf->flags & FAULT_FLAG_WRITE)) {     update_mmu_cache(vmf->vma, vmf->address, vmf->pte);    } else {     if (vmf->flags & FAULT_FLAG_TRIED)      goto unlock;     if (vmf->flags & FAULT_FLAG_WRITE)      flush_tlb_fix_spurious_fault(vmf->vma, vmf->address);    }   unlock:    pte_unmap_unlock(vmf->pte, vmf->ptl);    return 0;   }      static vm_fault_t do_fault(struct vm_fault *vmf)   {    struct vm_area_struct *vma = vmf->vma;    struct mm_struct *vm_mm = vma->vm_mm;    vm_fault_t ret;       if (!vma->vm_ops->fault) {     if (unlikely(!pmd_present(*vmf->pmd)))      ret = VM_FAULT_SIGBUS;     else {      vmf->pte = pte_offset_map_lock(vmf->vma->vm_mm,                vmf->pmd,                vmf->address,                &vmf->ptl);      if (unlikely(pte_none(*vmf->pte)))       ret = VM_FAULT_SIGBUS;      else       ret = VM_FAULT_NOPAGE;         pte_unmap_unlock(vmf->pte, vmf->ptl);     }    } else if (!(vmf->flags & FAULT_FLAG_WRITE))     ret = do_read_fault(vmf);    else if (!(vma->vm_flags & VM_SHARED))     ret = do_cow_fault(vmf);    else     ret = do_shared_fault(vmf);       if (vmf->prealloc_pte) {     pte_free(vm_mm, vmf->prealloc_pte);     vmf->prealloc_pte = NULL;    }    return ret;   }   `
-
+```cpp
+vm_fault_t handle_mm_fault(struct vm_area_struct *vma, unsigned long address,         unsigned int flags, struct pt_regs *regs)   {    vm_fault_t ret;       __set_current_state(TASK_RUNNING);       if (!arch_vma_access_permitted(vma, flags & FAULT_FLAG_WRITE,            flags & FAULT_FLAG_INSTRUCTION,            flags & FAULT_FLAG_REMOTE))     return VM_FAULT_SIGSEGV;       if (flags & FAULT_FLAG_USER)     mem_cgroup_enter_user_fault();       if (unlikely(is_vm_hugetlb_page(vma)))     ret = hugetlb_fault(vma->vm_mm, vma, address, flags);    else     ret = __handle_mm_fault(vma, address, flags);       return ret;   }      static vm_fault_t __handle_mm_fault(struct vm_area_struct *vma,     unsigned long address, unsigned int flags)   {    struct vm_fault vmf = {     .vma = vma,     .address = address & PAGE_MASK,     .flags = flags,     .pgoff = linear_page_index(vma, address),     .gfp_mask = __get_fault_gfp_mask(vma),    };    unsigned int dirty = flags & FAULT_FLAG_WRITE;    struct mm_struct *mm = vma->vm_mm;    pgd_t *pgd;    p4d_t *p4d;    vm_fault_t ret;       pgd = pgd_offset(mm, address);    p4d = p4d_alloc(mm, pgd, address);    if (!p4d)     return VM_FAULT_OOM;       vmf.pud = pud_alloc(mm, p4d, address);       return handle_pte_fault(&vmf);   }      static vm_fault_t handle_pte_fault(struct vm_fault *vmf)   {    pte_t entry;       if (!vmf->pte) {     if (vma_is_anonymous(vmf->vma))      return do_anonymous_page(vmf);     else      return do_fault(vmf);    }       if (!pte_present(vmf->orig_pte))     return do_swap_page(vmf);       if (pte_protnone(vmf->orig_pte) && vma_is_accessible(vmf->vma))     return do_numa_page(vmf);       vmf->ptl = pte_lockptr(vmf->vma->vm_mm, vmf->pmd);    spin_lock(vmf->ptl);    entry = vmf->orig_pte;    if (unlikely(!pte_same(*vmf->pte, entry))) {     update_mmu_tlb(vmf->vma, vmf->address, vmf->pte);     goto unlock;    }    if (vmf->flags & FAULT_FLAG_WRITE) {     if (!pte_write(entry))      return do_wp_page(vmf);     entry = pte_mkdirty(entry);    }    entry = pte_mkyoung(entry);    if (ptep_set_access_flags(vmf->vma, vmf->address, vmf->pte, entry,       vmf->flags & FAULT_FLAG_WRITE)) {     update_mmu_cache(vmf->vma, vmf->address, vmf->pte);    } else {     if (vmf->flags & FAULT_FLAG_TRIED)      goto unlock;     if (vmf->flags & FAULT_FLAG_WRITE)      flush_tlb_fix_spurious_fault(vmf->vma, vmf->address);    }   unlock:    pte_unmap_unlock(vmf->pte, vmf->ptl);    return 0;   }      static vm_fault_t do_fault(struct vm_fault *vmf)   {    struct vm_area_struct *vma = vmf->vma;    struct mm_struct *vm_mm = vma->vm_mm;    vm_fault_t ret;       if (!vma->vm_ops->fault) {     if (unlikely(!pmd_present(*vmf->pmd)))      ret = VM_FAULT_SIGBUS;     else {      vmf->pte = pte_offset_map_lock(vmf->vma->vm_mm,                vmf->pmd,                vmf->address,                &vmf->ptl);      if (unlikely(pte_none(*vmf->pte)))       ret = VM_FAULT_SIGBUS;      else       ret = VM_FAULT_NOPAGE;         pte_unmap_unlock(vmf->pte, vmf->ptl);     }    } else if (!(vmf->flags & FAULT_FLAG_WRITE))     ret = do_read_fault(vmf);    else if (!(vma->vm_flags & VM_SHARED))     ret = do_cow_fault(vmf);    else     ret = do_shared_fault(vmf);       if (vmf->prealloc_pte) {     pte_free(vm_mm, vmf->prealloc_pte);     vmf->prealloc_pte = NULL;    }    return ret;   }   
+```
 可以看到handle_mm_fault最终会调用handle_pte_fault进行处理。在handle_pte_fault中，会根据缺页的内存的类型进行相应的处理。  
 
 # 七、虚拟内存空间

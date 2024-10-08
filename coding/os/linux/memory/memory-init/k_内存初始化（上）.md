@@ -82,20 +82,17 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 我们知道，在内核编译的时候，在BSS段之后分配了几个page用于swapper进程地址空间（内核空间）的映射，当然，由于kernel image不需要mapping那么多的地址，因此swapper进程translation table的最后一个level中的entry不会全部的填充完毕。换句话说：swapper进程页表可以支持远远大于kernel image mapping那一段的地址区域，实际上，它可以支持的地址段的size是SWAPPER_INIT_MAP_SIZE。为（PAGE_OFFSET，PAGE_OFFSET＋SWAPPER_INIT_MAP_SIZE）这段虚拟内存创建地址映射，mapping到（PHYS_OFFSET，PHYS_OFFSET＋SWAPPER_INIT_MAP_SIZE）这段物理内存的时候，调用create_mapping不会发生内存分配，因为所有的页表都已经存在了，不需要动态分配。
 
 一旦完成了（PHYS_OFFSET，PHYS_OFFSET＋SWAPPER_INIT_MAP_SIZE）这段物理内存的地址映射，这时候，终于可以自由使用memblock_alloc进行内存分配了，当然，要进行限制，确保分配的内存位于（PHYS_OFFSET，PHYS_OFFSET＋SWAPPER_INIT_MAP_SIZE）这段物理内存中。完成所有memory type类型的memory region的地址映射之后，可以解除限制，任意分配memory了。而这时候，所有memory type的地址区域（上上图中绿色block）都已经可见，而这些宝贵的内存资源就是内存管理模块需要管理的对象。具体代码请参考paging_init--->map_mem函数的实现。
-
-八、结束语
+# 八、结束语
 
 目前为止，所有为内存管理做的准备工作已经完成：收集了整个内存布局的信息，memblock模块中已经保存了所有需要管理memory region的信息，同时，系统也为所有的内存（reserved除外）创建了地址映射。虽然整个内存管理系统没有ready，但是通过memblock模块已经可以在随后的初始化过程中进行动态内存的分配。 有了这些基础，随后就是真正的内存管理系统的初始化了，我们下回分解。
-
-参考文献：
+# 参考文献：
 
 1、Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
-
 2、linux4.4.6内核代码
 
 标签: [初始化](http://www.wowotech.net/tag/%E5%88%9D%E5%A7%8B%E5%8C%96) [内存管理](http://www.wowotech.net/tag/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux TTY framework(3)_从应用的角度看TTY设备](http://www.wowotech.net/tty_framework/application_view.html) | [X-013-UBOOT-使能autoboot功能](http://www.wowotech.net/x_project/uboot_autoboot.html)»
 

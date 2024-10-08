@@ -1,31 +1,16 @@
-
 Linux内核之旅
-
  _2021年11月12日 15:33_
-
 The following article is from 内核工匠 Author Stephen Fang
 
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6RLUCnKO3ibq4vBV8CTFqV5ibnt5e1aeIn8ZRoxrtproqA/0)
-
-**内核工匠**.
-
-分享Linux内核相关黑科技、技术文章、技术资讯和精选教程
 
 ](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664610401&idx=1&sn=90101e53ea57a7cea9486c5faf1d4086&chksm=f04d9784c73a1e92109b84d794ebc36d811be3bddd5cee93d5ceddda95bb2c82e132cfa02cb6&mpshare=1&scene=24&srcid=1112Y0MVVt2FmflHBL9mFfE5&sharer_sharetime=1636704742364&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03ce983d15cb959cc1cd389623acfee5e75cc0cfc90f80c259b86ef227ed1459b478cb0c6e226ab3ec498195345fe2e4387d61edcf9f2ecbddcba3f89e1859a843265d5405abd024cf43f94160b9cb08d324b6700594178ded52cba38830d14a6c499bfca254701e292b9e1a957d637a1ca010becd6609385&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQZW1rcYQKYzEYBtTbv9PtaBKUAgIE97dBBAEAAAAAAE1DCj5VWSIAAAAOpnltbLcz9gKNyK89dVj0aER9T6jytG%2BncKWncrnyaB%2FpYBK72OGEEfh3eMHbC7QWlQNMQkp7Y4XqwKTWkMuBXl6Fw5ptfHnpTMMD%2F6y2ocxG4ENrlyWtGmEnrSkWV%2BQdB7W7Vd8c4hfGZQvwrVSYLo9NpEoJeXbAUdCUBPgsgh4kWNlz8paQVWJDKqxlSI0QyUl9ZnlUvrEZOIBAo9%2BEFO2Z30ODIzPHKCH2zZGAQDzXPOk07k8SGKWJhNF395z4ReqNXikFeOfgRQ76Wo%2FvbRstXsNMnqjMLcO%2FqpVAZfBgqfiQMZGdTH4QDBm2XL7%2FbjAyF11RBHmpJG6GzA%3D%3D&acctmode=0&pass_ticket=BYSpaxEC6TUmYfPAUirDQs5AbssVRvdKp1ApHrku%2F%2Bz6INFA3czlX2i9Bc4Zk3G5&wx_header=0#)
 
-  
-
-**一、引言**
+# **一、引言**
 
 作为一名基民(韭菜)，对于“做时间的朋友”这一金句一定耳熟能详（深恶痛绝）。各大知名基金经理教育我们，想做好投资，需要跟时间“做朋友”，对于认准的基金要坚定的长期持有。先不论在投资方面这句话是否适用，但它在linux开发领域却有一定的道理。作为一名linux内核开发者，如果想要了解一段程序执行的是否高效，一个很关键的指标就是它占用了cpu多长时间。“做时间的朋友”，了解linux系统中形形色色的cpu时间，是linux系统工程师需要掌握的重要技能之一，接下来我们就来简单的聊一聊这些linux时间守护者们。
-
-  
-
-**二、各司其职****的时间****守护者们**
+# **二、各司其职**的时间守护者们
 
 **1. 总揽全局的老大哥cputime**
-
-  
 
 通过读取/proc/stat，我们可以看到cpu使用时间的分类显示:
 

@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-12-21 18:51 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 Linux的物理内存管理采用了以页为单位的buddy system（伙伴系统），但是很多情况下，内核仅仅需要一个较小的对象空间，而且这些小块的空间对于不同对象又是变化的、不可预测的，所以需要一种类似用户空间堆内存的管理机制(malloc/free)。然而内核对对象的管理又有一定的特殊性，有些对象的访问非常频繁，需要采用缓冲机制；对象的组织需要考虑硬件cache的影响；需要考虑多处理器以及NUMA架构的影响。90年代初期，在Solaris 2.4操作系统中，采用了一种称为“slab”（原意是大块的混凝土）的缓冲区分配和管理方法，在相当程度上满足了内核的特殊需求。
@@ -22,13 +5,9 @@ Linux的物理内存管理采用了以页为单位的buddy system（伙伴系统
 多年以来，SLAB成为linux kernel对象缓冲区管理的主流算法，甚至长时间没有人愿意去修改，因为它实在是非常复杂，而且在大多数情况下，它的工作完成的相当不错。但是，随着大规模多处理器系统和 NUMA系统的广泛应用，SLAB 分配器逐渐暴露出自身的严重不足：
 
 1). 缓存队列管理复杂；
-
 2). 管理数据存储开销大；
-
 3). 对NUMA支持复杂；
-
 4). 调试调优困难；
-
 5). 摒弃了效果不太明显的slab着色机制；
 
 针对这些SLAB不足，内核开发人员Christoph Lameter在Linux内核2.6.22版本中引入一种新的解决方案：SLUB分配器。SLUB分配器特点是简化设计理念，同时保留SLAB分配器的基本思想：每个缓冲区由多个小的slab 组成，每个 slab 包含固定数目的对象。SLUB分配器简化kmem_cache，slab等相关的管理数据结构，摒弃了SLAB 分配器中众多的队列概念，并针对多处理器、NUMA系统进行优化，从而提高了性能和可扩展性并降低了内存的浪费。为了保证内核其它模块能够无缝迁移到SLUB分配器，SLUB还保留了原有SLAB分配器所有的接口API函数。
@@ -36,17 +15,14 @@ Linux的物理内存管理采用了以页为单位的buddy system（伙伴系统
 （注：本文源码分析基于linux-4.1.x）
 
 整体数据结构关系如下图所示：
-
-![](http://www.wowotech.net/content/uploadfile/201512/4a471450695161.png)
-
-**1 SLUB****分配器的初始化**
+![[Pasted image 20241008093809.png]]
+# **1 SLUB****分配器的初始化**
 
 SLUB初始化有两个重要的工作：第一，创建用于申请struct kmem_cache和struct kmem_cache_node的kmem_cache；第二，创建用于常规kmalloc的kmem_cache。
-
-**1.1** **申请kmem_cache****的kmem_cache**
+## **1.1** **申请kmem_cache****的kmem_cache**
 
 第一个工作涉及到一个“先有鸡还是先有蛋”的问题，因为创建kmem_cache需要从kmem_cache的缓冲区申请，而这时候还没有创建kmem_cache的缓冲区。kernel的解决办法是先用两个静态变量boot_kmem_cache和boot_kmem_cache_node来保存struct kmem_cach和struct kmem_cache_node缓冲区管理数据，以两个静态变量为基础申请大小为struct kmem_cache和struct kmem_cache_node对象大小的slub缓冲区，随后再从这些缓冲区中分别申请两个kmem_cache，然后把boot_kmem_cache和boot_kmem_cache_node中的内容拷贝到新申请的对象中，从而完成了struct kmem_cache和struct kmem_cache_node管理结构的bootstrap（自引导）。
-
+```cpp
 1. void __init kmem_cache_init(void)
 2. {
 3. 	//声明静态变量，存储临时kmem_cache管理结构
@@ -71,11 +47,11 @@ SLUB初始化有两个重要的工作：第一，创建用于申请struct kmem_c
 22. 	kmem_cache_node = bootstrap(&boot_kmem_cache_node);
 23. •••
 24. }
-
-**1.2** **创建kmalloc****常规缓存**
+```
+## **1.2** **创建kmalloc常规缓存**
 
 原则上系统会为每个2次幂大小的内存块申请一个缓存，但是内存块过小时，会产生很多碎片浪费，所以系统为96B和192B也各自创建了一个缓存。于是利用了一个size_index数组来帮助确定小于192B的内存块使用哪个缓存
-
+```cpp
 1. void __init create_kmalloc_caches(unsigned long flags)
 2. {
 3. •••
@@ -103,24 +79,20 @@ SLUB初始化有两个重要的工作：第一，创建用于申请struct kmem_c
 25. 	}
 26. •••
 27. }
-
-**2** **缓存的创建与销毁**
-
-**2.1** **缓存的创建**
+```
+# **2** **缓存的创建与销毁**
+## **2.1** **缓存的创建**
 
 创建缓存通过接口kmem_cache_create进行，在创建新的缓存以前，尝试找到可以合并的缓存，合并条件包括对对象大小以及缓存属性的判断，如果可以合并则直接返回已存在的kmem_cache，并创建一个kobj链接指向同一个节点。
 
 创建新的缓存主要是申请管理结构暂用的空间，并初始化，这些管理结构包括kmem_cache、kmem_cache_nodes、kmem_cache_cpu。同时在sysfs创建kobject节点。最后把kmem_cache加入到全局cahce链表slab_caches中。
-
-![](http://www.wowotech.net/content/uploadfile/201512/fb5c1450695161.png)
-
-**2.2** **缓存的销毁**
+![[Pasted image 20241008093858.png]]
+## **2.2** **缓存的销毁**
 
 销毁过程比创建过程简单的多，主要工作是释放partial队列所有page，释放kmem_cache_cpu，释放每个node的kmem_cache_node，最后释放kmem_cache本身。
 
 ![](http://www.wowotech.net/content/uploadfile/201512/10fb1450695162.png)
-
-**3** **申请对象**
+# **3** **申请对象**
 
 对象是SLUB分配器中可分配的内存单元，与SLAB相比，SLUB对象的组织非常简洁，申请过程更加高效。SLUB没有任何管理区结构来管理对象，而是将对象之间的关联嵌入在对象本身的内存中，因为申请者并不关心对象在分配之前内存的内容是什么。而且各个SLUB之间的关联，也利用page自身结构进行处理。
 
@@ -141,7 +113,6 @@ cpu_slab的freelist则保存着当前第一个空闲对象的地址。
 deactivate_slab主要进行两步工作：
 
 第一步，将cpu_slab的freelist全部释放回page->freelist；
-
 第二部，根据page(slab)的状态进行不同操作，如果该slab有部分空闲对象，则将page移到kmem_cache_node的partial队列；如果该slab全部空闲，则直接释放该slab；如果该slab全部占用，而且开启了CONFIG_SLUB_DEBUG编译选项，则将page移到full队列。
 
 page的状态也从frozen改变为unfrozen。（frozen代表slab在cpu_slub，unfroze代表在partial队列或者full队列）。
@@ -153,7 +124,7 @@ page的状态也从frozen改变为unfrozen。（frozen代表slab在cpu_slub，un
 创建新slab其实就是申请对应order的内存页，用来放足够数量的对象。值得注意的是其中order以及对象数量的确定，这两者又是相互影响的。order和object数量同时存放在kmem_cache成员kmem_cache_order_objects中，低16位用于存放object数量，高位存放order。order与object数量的关系非常简单：((PAGE_SIZE << order) - reserved) / size。
 
 下面重点看calculate_order这个函数
-
+```cpp
 1. static inline int calculate_order(int size, int reserved)
 2. {
 3. •••
@@ -191,24 +162,21 @@ page的状态也从frozen改变为unfrozen。（frozen代表slab在cpu_slub，un
 35. 		return order;
 36. 	return -ENOSYS;
 37. }
-
-**4** **释放对象**
+```
+# **4** **释放对象**
 
 从上面申请对象的流程也可以看出，释放的object有几个去处：
 
 1）cpu本地缓存slab，也就是cpu_slab；
-
 2）放回object所在的page（也就是slab）中；另外要处理所在的slab：
-
 2.1）如果放回之后，slab完全为空，则直接销毁该slab；
-
 2.2）如果放回之前，slab为满，则判断slab是否已被冻结；如果已冻结，则不需要做其他事；如果未冻结，则将其冻结，放入cpu_slab的partial队列；如果cpu_slab partial队列过多，则将队列中所有slab一次性解冻到各自node的partial队列中。
 
 值得注意的是cpu partial队列的功能是个可选项，依赖于内核选项CONFIG_SLUB_CPU_PARTIAL，如果没有开启，则不使用cpu partial队列，直接使用各个node的partial队列。
 
 标签: [slub](http://www.wowotech.net/tag/slub) [slab](http://www.wowotech.net/tag/slab)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [perfbook memory barrier（14.2章节）的中文翻译（上）](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html) | [Linux graphic subsytem(1)_概述](http://www.wowotech.net/graphic_subsystem/graphic_subsystem_overview.html)»
 

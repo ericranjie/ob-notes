@@ -1,4 +1,3 @@
-
 一口Linux
  _2021年11月16日 11:50_
 The following article is from Linux内核那些事 Author songsong001
@@ -13,10 +12,6 @@ The following article is from Linux内核那些事 Author songsong001
 
 但某些场景下，不同进程间需要相互通信，比如：`进程A` 负责处理用户的请求，而 `进程B` 负责保存处理后的数据。那么当 `进程A` 处理完请求后，就需要把处理后的数据提交给 `进程B` 进行存储。此时，`进程A` 就需要与 `进程B` 进行通信。如下图所示：
 ![[Pasted image 20241003191920.png]]
-
-
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于不同进程间是相互隔离的，所以必须借助内核来作为桥梁来进行相互通信，内核相当于岛屿之间的轮船，如下图所示：
 ![[Pasted image 20241003191858.png]]
@@ -37,7 +32,6 @@ The following article is from Linux内核那些事 Author songsong001
 
 其原理如下图所示：
 ![[Pasted image 20241003192019.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 由于管道分为读端和写端，所以需要两个文件描述符来管理管道：`fd[0]` 为读端，`fd[1]` 为写端。
 
@@ -64,27 +58,21 @@ int main(){    int ret = -1;    int fd[2];  // 用于管理管�
 ```c
 [root@localhost pipe]# ./pipeparent read 11 bytes data: hello world
 ```
-
 ## 二、管道的实现
 
 每个进程的用户空间都是独立的，但内核空间却是共用的。所以，进程间通信必须由内核提供服务。前面介绍了 `管道(pipe)` 的使用，接下来将会介绍管道在内核中的实现方式。
 
 > 本文使用 Linux-2.6.23 内核作为分析对象。
-
 ### 1. 环形缓冲区（Ring Buffer）
 
 在内核中，`管道` 使用了环形缓冲区来存储数据。环形缓冲区的原理是：把一个缓冲区当成是首尾相连的环，其中通过读指针和写指针来记录读操作和写操作位置。如下图所示：
 ![[Pasted image 20241003192052.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 在 Linux 内核中，使用了 16 个内存页作为环形缓冲区，所以这个环形缓冲区的大小为 64KB（16 * 4KB）。
 
 当向管道写数据时，从写指针指向的位置开始写入，并且将写指针向前移动。而从管道读取数据时，从读指针开始读入，并且将读指针向前移动。当对没有数据可读的管道进行读操作，将会阻塞当前进程。而对没有空闲空间的管道进行写操作，也会阻塞当前进程。
 
 > 注意：可以将管道文件描述符设置为非阻塞，这样对管道进行读写操作时，就不会阻塞当前进程。
-
 ### 2. 管道对象
 
 在 Linux 内核中，管道使用 `pipe_inode_info` 对象来进行管理。我们先来看看 `pipe_inode_info` 对象的定义，如下所示：
@@ -96,22 +84,14 @@ struct pipe_inode_info {    wait_queue_head_t wait;    unsigned int�
 下面介绍一下 `pipe_inode_info` 对象各个字段的作用：
 
 - `wait`：等待队列，用于存储正在等待管道可读或者可写的进程。
-    
 - `bufs`：环形缓冲区，由 16 个 `pipe_buffer` 对象组成，每个 `pipe_buffer` 对象拥有一个内存页 ，后面会介绍。
-    
 - `nrbufs`：表示未读数据已经占用了环形缓冲区的多少个内存页。
-    
 - `curbuf`：表示当前正在读取环形缓冲区的哪个内存页中的数据。
-    
 - `readers`：表示正在读取管道的进程数。
-    
 - `writers`：表示正在写入管道的进程数。
-    
 - `waiting_writers`：表示等待管道可写的进程数。
-    
 - `inode`：与管道关联的 `inode` 对象。
     
-
 由于环形缓冲区是由 16 个 `pipe_buffer` 对象组成，所以下面我们来看看 `pipe_buffer` 对象的定义：
 
 ```c
@@ -121,37 +101,29 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
 下面介绍一下 `pipe_buffer` 对象各个字段的作用：
 
 - `page`：指向 `pipe_buffer` 对象占用的内存页。
-    
 - `offset`：如果进程正在读取当前内存页的数据，那么 `offset` 指向正在读取当前内存页的偏移量。
-    
 - `len`：表示当前内存页拥有未读数据的长度。
-    
 
 下图展示了 `pipe_inode_info` 对象与 `pipe_buffer` 对象的关系：
 ![[Pasted image 20241003192110.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 管道的环形缓冲区实现方式与经典的环形缓冲区实现方式有点区别，经典的环形缓冲区一般先申请一块地址连续的内存块，然后通过读指针与写指针来对读操作与写操作进行定位。
 
 但为了减少对内存的使用，内核不会在创建管道时就申请 64K 的内存块，而是在进程向管道写入数据时，按需来申请内存。
 
 那么当进程从管道读取数据时，内核怎么处理呢？下面我们来看看管道读操作的实现方式。
-
 ### 3. 读操作
 
 从 `经典的环形缓冲区` 中读取数据时，首先通过读指针来定位到读取数据的起始地址，然后判断环形缓冲区中是否有数据可读，如果有就从环形缓冲区中读取数据到用户空间的缓冲区中。如下图所示：
 ![[Pasted image 20241003192116.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 而 `管道的环形缓冲区` 与 `经典的环形缓冲区` 实现稍有不同，`管道的环形缓冲区` 其读指针是由 `pipe_inode_info` 对象的 `curbuf` 字段与 `pipe_buffer` 对象的 `offset` 字段组合而成：
 
 - `pipe_inode_info` 对象的 `curbuf` 字段表示读操作要从 `bufs` 数组的哪个 `pipe_buffer` 中读取数据。
-    
 - `pipe_buffer` 对象的 `offset` 字段表示读操作要从内存页的哪个位置开始读取数据。
     
 读取数据的过程如下图所示：
 ![[Pasted image 20241003192124.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从缓冲区中读取到 n 个字节的数据后，会相应移动读指针 n 个字节的位置（也就是增加 `pipe_buffer` 对象的 `offset` 字段），并且减少 n 个字节的可读数据长度（也就是减少 `pipe_buffer` 对象的 `len` 字段）。
 
@@ -166,27 +138,18 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 上面代码总结来说分为以下步骤：
 
 - 通过文件 `inode` 对象来获取到管道的 `pipe_inode_info` 对象。
-    
 - 通过 `pipe_inode_info` 对象的 `nrbufs` 字段获取管道未读数据占有多少个内存页。
-    
 - 通过 `pipe_inode_info` 对象的 `curbuf` 字段获取读操作应该从环形缓冲区的哪个内存页处读取数据。
-    
 - 通过 `pipe_buffer` 对象的 `offset` 字段获取真正的读指针， 并且从管道中读取数据到用户缓冲区。
-    
 - 如果当前内存页的数据已经被读取完毕，那么移动 `pipe_inode_info` 对象的 `curbuf` 指针，并且减少其 `nrbufs` 字段的值。
-    
 - 如果读取到用户期望的数据长度，退出循环。
     
-
 ### 4. 写操作
 
 分析完管道读操作的实现后，接下来，我们分析一下管道写操作的实现。
 
 `经典的环形缓冲区` 写入数据时，首先通过写指针进行定位要写入的内存地址，然后判断环形缓冲区的空间是否足够，足够就把数据写入到环形缓冲区中。如下图所示：
 ![[Pasted image 20241003192144.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 但 `管道的环形缓冲区` 并没有保存 `写指针`，而是通过 `读指针` 计算出来。那么怎么通过读指针计算出写指针呢？
 
@@ -198,7 +161,6 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 
 如上图所示，向管道写入数据时：
 ![[Pasted image 20241003192150.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - 首先通过 `pipe_inode_info` 的 `curbuf` 字段和 `nrbufs` 字段来定位到，应该向哪个 `pipe_buffer` 写入数据。
 - 然后再通过 `pipe_buffer` 对象的 `offset` 字段和 `len` 字段来定位到，应该写入到内存页的哪个位置。
@@ -212,28 +174,21 @@ static ssize_tpipe_write(struct kiocb *iocb, const struct iovec *_iov, u
 上面代码有点长，但是逻辑却很简单，主要进行如下操作：
 
 - 如果上次写操作写入的 `pipe_buffer` 还有空闲的空间，那么就将数据写入到此 `pipe_buffer` 中，并且增加其 `len` 字段的值。
-    
 - 如果上次写操作写入的 `pipe_buffer` 没有足够的空闲空间，那么就新申请一个内存页，并且把数据保存到新的内存页中，并且增加 `pipe_inode_info` 的 `nrbufs` 字段的值。
-    
 - 如果写入的数据已经全部写入成功，那么就退出写操作。
-    
 ## 三、思考一下
 
 管道读写操作的实现已经分析完毕，现在我们来思考一下以下问题。
-
 ### 1. 为什么父子进程可以通过管道来通信？
 
 这是因为父子进程通过 `pipe` 系统调用打开的管道，在内核空间中指向同一个管道对象（`pipe_inode_info`）。所以父子进程共享着同一个管道对象，那么就可以通过这个共享的管道对象进行通信。
-
 ### 2. 为什么内核要使用 16 个内存页进行数据存储？
 
 这是为了减少内存使用。
 
 因为使用 `pipe` 系统调用打开管道时，并没有立刻申请内存页，而是当有进程向管道写入数据时，才会按需申请内存页。当内存页的数据被读取完后，内核会将此内存页回收，来减少管道对内存的使用。
 
-![](http://mmbiz.qpic.cn/mmbiz_png/ciab8jTiab9J6dgBc9aqzhEyz7LkUJ812dSOibgAHcHicR8zE8PyD3bvkyicjTSGfFsF1racDTDviayU3Mbcra30sacw/300?wx_fmt=png&wxfrom=19)
-
-**Linux内核那些事**
+---
 
 以简单的方式介绍 Linux 内核的原理，以通俗的语言分析 Linux 内核的实现。如果你没有接触过 Linux 内核，那么就关注我们的公众号吧，我们将以图解的方式让内核更亲民...
 

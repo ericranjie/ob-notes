@@ -1,17 +1,3 @@
-# [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
-
-talk is cheap,  
-show me the code!
-
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
-
-# [理解内存的Rank、位宽以及内存颗粒内部结构](https://kfngxl.cn/index.php/archives/798/)
-
 2024-05-13 [内存篇](https://kfngxl.cn/index.php/category/memory/) 阅读(437) 评论(0)
 
 大家好，我是飞哥！
@@ -95,6 +81,8 @@ CPU 的内存控制器能够对同一个 rank 的 chip 进行读写操作。通�
 至于每个 Chip 内存颗粒中有多少个二维矩阵元素，为了支持 Burst IO，也为了节约地址线数量。一般每个二维矩阵元素中存储的数据要比位宽更大一些。
 
 ---
+
+
 
 更多干货内容，详见：  
 Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  

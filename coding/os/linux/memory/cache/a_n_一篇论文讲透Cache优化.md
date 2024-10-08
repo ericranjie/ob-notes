@@ -1,46 +1,26 @@
-![](https://zhuanlan.zhihu.com/p/608663298)
-
-[](https://www.zhihu.com/)
 
 首发于[分布式和存储的那些事](https://www.zhihu.com/column/distributed-storage)
 
-写文章
-
-![点击打开planet-frontier的主页](https://picx.zhimg.com/v2-abed1a8c04700ba7d72b45195223e0ff_l.jpg?source=32738c0c&needBackground=1)
-
 ![一篇论文讲透Cache优化](https://picx.zhimg.com/70/v2-8a4e110041f8c1667958caa2abb119bd_1440w.awebp?source=172ae18b&biz_tag=Post)
-
 # 一篇论文讲透Cache优化
 
 [![红星闪闪](https://picx.zhimg.com/v2-7e1fc938ae12f5dce67d46b570d99ded_l.jpg?source=172ae18b)](https://www.zhihu.com/people/hong-xing-shan-shan-17-75)
 
 [红星闪闪](https://www.zhihu.com/people/hong-xing-shan-shan-17-75)
-
 数据库资深工程师。在后台开发，高性能计算，分布式领域深耕。
-
-已关注
-
 韦易笑 等 1353 人赞同了该文章
 
 《What Every Programmer Should Know About Memory》是Ulrich Drepper大佬的一篇神作，洋洋洒洒100多页，基本上涵盖了当时（2007年）关于访存原理和优化的所有问题。即使今天的CPU又有了进一步的发展，但是依然没有跳出这篇文章的探讨范围。只要是讨论访存优化的文章，基本上都会引用这篇论文。
 
 这篇文章也是常读常新的，不同出发点和不同阶段的同学看这篇文章都会有自己的收获。刚入职的时候读了一遍，初窥门径，最近团队的论文分享又读了一遍，有了进一步的理解，这里简单梳理了一下这篇文章自己感兴趣的知识点，初步解答了访存的基本原理，访存面临的主要问题[和解法](https://zhida.zhihu.com/search?q=%E5%92%8C%E8%A7%A3%E6%B3%95&zhida_source=entity&is_preview=1)，希望对大家有所帮助。更重要的是，希望能激起大家阅读这篇论文的兴趣。
-
 ## 一 原理
-
 ## 1.1 Cache架构
-
-  
 
 ![](https://pica.zhimg.com/80/v2-db76f92d9a8a56c74d1f64ef1f90e764_1440w.jpg)
 
-  
 
-  
 
 ![](https://pic2.zhimg.com/80/v2-9771fed8a54f17697f91b4dc9f7ad713_1440w.webp)
-
-  
 
 - 浅灰色代表一个Processor，代表一个CPU的物理封装，通过总线和内存相连。
 - 深灰色代表一个物理Core：

@@ -1,16 +1,6 @@
-# 
-
 Original zgrxmm linux源码阅读
-
  _2024年09月11日 00:03_ _浙江_
-
-  
-
-**1**
-
-  
-
-简介
+# **1* * 简介
 
 在现代 C++ 编程中，标准模板库（STL）中的头文件提供了大量高效且灵活的算法，极大地简化了数据处理任务。从简单的元素比较到复杂的集合操作，这些算法覆盖了广泛的应用场景。
 
@@ -19,14 +9,7 @@ Original zgrxmm linux源码阅读
 此外，我们还将探讨 std::reverse 和 std::reverse_copy 如何用于就地或创建反转元素顺序的副本。
 
 最后，我们将介绍 std::merge, std::inplace_merge, std::set_union, std::set_intersection, std::set_difference, 和 std::set_symmetric_difference，这些算法在合并、排序以及执行集合操作时极为有用。通过理解和应用这些算法，开发者可以编写出更为简洁、高效且易于维护的代码。
-
-  
-
-**2**
-
-  
-
-合并算法
+# **2** 合并算法
 
 在 C++ 标准库中，提供了多种算法用于合并、排序以及集合操作。以下是对 std::merge, std::inplace_merge, std::set_union, std::set_intersection, std::set_difference, 和 std::set_symmetric_difference 的详细介绍及示例代码。
 

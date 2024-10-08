@@ -1,34 +1,15 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-4-29 20:35 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
 ## 引言
 
 fixmap是一段固定地址映射。kernel预留一段虚拟地址空间。因此虚拟地址是在编译的时候确定。fixmap可以用来做什么？kernel启动初期，由于此时的kernel已经运行在虚拟地址上。因此我们访问具体的物理地址是不行的，必须建立虚拟地址和物理地址的映射，然后通过虚拟地址访问才可以。例如：dtb中包含bootloader传递过来的内存信息，我们需要解析dtb，但是我们得到的是dtb的物理地址。因此访问之前必须创建映射，创建映射又需要内存。但是由于所有的内存管理子系统还没有ready。因此我们不能使用ioremap接口创建映射。为此kernel提出fixmap的解决方案。
 
 > 注：文章代码分析基于linux-4.15，架构基于aarch64（ARM64）。
-
 ## fixmap空间分配
 
 fixmap虚拟地址空间又被平均分成两个部分permanent fixed addresses和temporary fixed addresses。permanent fixed addresses是永久映射，temporary fixed addresses是临时映射。永久映射是指在建立的映射关系在kernel阶段不会改变，仅供特定模块一直使用。临时映射就是模块使用前创建映射，使用后解除映射。
 
 fixmap区域又被继续细分，分配给不同模块使用。kernel中定义枚举类型作为index，根据index可以计算该模拟在fixmap区域的虚拟地址。
-
+```cpp
 1. enum fixed_addresses {
 2. 	FIX_HOLE,
 3. #define FIX_FDT_SIZE		(MAX_FDT_SIZE + SZ_2M)
@@ -50,22 +31,21 @@ fixmap区域又被继续细分，分配给不同模块使用。kernel中定义�
 19. };
 20. #define FIXADDR_SIZE	(__end_of_permanent_fixed_addresses << PAGE_SHIFT)
 21. #define FIXADDR_START	(FIXADDR_TOP - FIXADDR_SIZE) 
-
+```
 > 1. FIX_FDT映射设备树使用。在ARM64架构，大小是4M。
 > 2. early console使用，大小1页。1页虚拟地址空间完全够了，毕竟串口操作相关寄存器没有几个。
 > 3. early_ioremap()接口使用，这部分属于动态映射。大小是7 × 256KB。
 
 fixmap区域是地址空间范围从FIXADDR_START到FIXADDR_TOP结束。FIXADDR_SIZE是permanent fixed addresses区域的大小。我对这个地方很奇怪，为什么不包括temporary fixed addresses区域的大小呢？如果你知道可以告诉我。fixmap区域可以想象成一块内存以页为单位被平均分成__end_of_permanent_fixed_addresses块。而这些枚举值就是这块内存的index。因此虚拟地址可以根据index进行计算。计算方法如下。
-
+```cpp
 1. #define __fix_to_virt(x)	(FIXADDR_TOP - ((x) << PAGE_SHIFT))
 2. #define __virt_to_fix(x)	((FIXADDR_TOP - ((x) & PAGE_MASK)) >> PAGE_SHIFT) 
-
+```
 FIX_FDT是给dtb创建映射的区域。例如需要得到FDT的虚拟地址，即可以利用__fix_to_virt(FIX_FDT)得到虚拟地址。之所以FIX_FDT放在枚举的最前面，是因为我们针对dtb映射采用section mapping要求虚拟地址2M对齐。FIXADDR_TOP地址本身是2M对齐的，因此FIXADDR_TOP - (FIX_FDT << PAGE_SHIFT)可以很容易2M对齐。
-
 ## fixmap初始化
 
 fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PUD/PMD页表。early_fixmap_init实现如下（简化部分代码逻辑）。
-
+```cpp
 1. static pte_t bm_pte[PTRS_PER_PTE] __page_aligned_bss;               /* 1 */
 2. static pmd_t bm_pmd[PTRS_PER_PMD] __page_aligned_bss __maybe_unused;/* 1 */
 3. static pud_t bm_pud[PTRS_PER_PUD] __page_aligned_bss __maybe_unused;/* 1 */
@@ -94,17 +74,16 @@ fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PU
 26. 		WARN_ON(1);
 27. 	}
 28. } 
-
+```
 > 1. 静态定义数组作为页表（PUD/PMD/PTE）使用。PGD页表使用swapper_pg_dir。
 > 2. 以FIXADDR_START为虚拟地址，建立页表映射关系。假设计算FDT的虚拟地址为addr = __fix_to_virt(FIX_FDT)，必然addr是2M对齐的一个地址。由上面的分析可知，FIXADDR_START的值位于[addr - 2M, addr]之间。因此访问[addr - 2M, addr]之间的虚拟地址不需要再建立PUD/PMD页表项。只需要设置PTE页表对应的页表项即可。
 > 3. [FIX_BTMAP_BEGIN, FIX_BTMAP_END]区域给动态映射使用，保证该区域正好位于[addr - 2M, addr]之间，必须检查动态映射区域小于2M。定义的PTE页表数组其实是给动态映射使用的。当我们需要访问物理地址A，从[addr - 2M, addr]区域找到一个合适的虚拟地址B，填充B地址对应的PTE页表项即可访问。这也是early_ioremap的实现原理。
 
 经过early_fixmap_init函数的探究，我们也可以得到一个结论：为了以page为单位进行映射，必须保证FIX_FDT和__end_of_fixed_addresses之间的虚拟地址空间必须小于2M。如果有超过2M的部分就要使用section mapping（因为只有一个PTE页表），以2M为单位映射。
-
 ## early ioremap初始化
 
 如果你希望kernel启动早期使用ioremap操作，其实是不行的。我们必须借助early ioremap接口。early ioremap是基于fixmap实现。初始化在early_ioremap_init完成。简化部分代码如下。
-
+```cpp
 1. static void __iomem *prev_map[FIX_BTMAPS_SLOTS] __initdata;
 2. static unsigned long prev_size[FIX_BTMAPS_SLOTS] __initdata;
 3. static unsigned long slot_virt[FIX_BTMAPS_SLOTS] __initdata;
@@ -121,13 +100,12 @@ fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PU
 14. {
 15. 	early_ioremap_setup();
 16. } 
-
+```
 > early ioremap利用slot管理映射，最多支持FIX_BTMAPS_SLOTS个映射，每个映射最大支持映射256KB。slot_virt数组存储每个slot的虚拟地址首地址。prev_map数组用来记录已经分配出去的虚拟地址，数组值为0代表没有分配。prev_size记录映射的size。
-
 ## 创建FDT映射
 
 创建FDT映射的函数是__fixmap_remap_fdt，实现如下。
-
+```cpp
 1. void *__init __fixmap_remap_fdt(phys_addr_t dt_phys,
 2. 		int *size, pgprot_t prot)
 3. {
@@ -153,14 +131,15 @@ fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PU
 
 24. 	return dt_virt;
 25. } 
-
+```
 > 1. 根据__fix_to_virt计算fdt虚拟地址。
 > 2. 虚拟地址必须2M对齐。主要是为了section mapping。
 > 3. 在early_fixmap_init函数中，已经建立了PUD/PMD页表。为了让映射过程不用分配额外的PMD页表内存，这里必须保证FDT所在的虚拟地址范围落在early_fixmap_init函数建立的PMD页表范围内。
 > 4. 创建页表。这里映射2M空间。
 > 5. 如果dtb文件结尾地址超过上一个建立映射的地址范围，就必须紧接着再映射2M空间。
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+
+---
 
 « [KASLR](http://www.wowotech.net/memory_management/441.html) | [文件系统和裸块设备的page cache问题](http://www.wowotech.net/filesystem/439.html)»
 

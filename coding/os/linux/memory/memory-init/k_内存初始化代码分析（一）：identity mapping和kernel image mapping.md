@@ -1,77 +1,55 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-11-10 19:07 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
-
-一、前言
+# 一、前言
 
 本文没有什么框架性的东西，就是按照__create_page_tables代码的执行路径走读一遍，记录在初始化阶段，内核是如何创建内核运行需要的页表过程。想要了解一些概述性的、框架性的东西可以参考[内存初始化](http://www.wowotech.net/memory_management/mm-init-1.html)文档。
 
 本文的代码来自ARM64，内核版本是4.4.6，此外，阅读本文最好熟悉ARMv8中翻译表描述符的格式。
-
-二、create_table_entry
+# 二、create_table_entry
 
 这个宏定义主要是用来创建一个中间level的translation table中的描述符。如果用linux的术语，就是创建PGD、PUD或者PMD的描述符。如果用ARM64术语，就是创建L0、L1或者L2的描述符。具体创建哪一个level的Translation table descriptor是由tbl参数指定的，tbl指向了该translation table的内存。virt参数给出了要创建地址映射的那个虚拟地址，shift参数以及ptrs参数是和具体在哪一个entry中写入描述符有关。我们知道，在定位页表描述的时候，我们需要截取虚拟地址中的一部分做为offset（index）来定位描述符，实际上，虚拟地址右移shift，然后截取ptrs大小的bit field就可以得到entry index了。tmp1和tmp2是临时变量。create_table_entry的代码如下：
-
-> .macro    create_table_entry, tbl, virt, shift, ptrs, tmp1, tmp2  
-> lsr    \tmp1, \virt, #\shift  
-> and    \tmp1, \tmp1, #\ptrs - 1    // table index－－－－－－－－－－－－－－－－－－－（1）  
-> add    \tmp2, \tbl, #PAGE_SIZE－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
-> orr    \tmp2, \tmp2, #PMD_TYPE_TABLE－－－－－－－－－－－－－－－－－－－－－（3）  
-> str    \tmp2, [\tbl, \tmp1, lsl #3]－－－－－－－－－－－－－－－－－－－－－－－－－－（4）  
-> add    \tbl, \tbl, #PAGE_SIZE－－－－－－－－－－－－－－－－－－－－－－－－－－－（5）  
-> .endm
-
+```cpp
+.macro    create_table_entry, tbl, virt, shift, ptrs, tmp1, tmp2  
+lsr    \tmp1, \virt, \shift  
+and    \tmp1, \tmp1, \ptrs - 1    // table index－－－－－－－－－－－－－－－－－－－（1）  
+add    \tmp2, \tbl, PAGE_SIZE－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
+orr    \tmp2, \tmp2, PMD_TYPE_TABLE－－－－－－－－－－－－－－－－－－－－－（3）  
+str    \tmp2, \tbl, \tmp1, lsl #3－－－－－－－－－－－－－－－－－－－－－－－－－－（4）  
+add    \tbl, \tbl, PAGE_SIZE－－－－－－－－－－－－－－－－－－－－－－－－－－－（5）  
+.endm
+```
 （1）tmp1中保存virt地址对应在Translation table中的entry index。
-
 （2）初始阶段的页表页表定义在链接脚本中，如下：
+```cpp
+BSS_SECTION(0, 0, 0)
 
-> BSS_SECTION(0, 0, 0)
-> 
-> . = ALIGN(PAGE_SIZE);  
-> idmap_pg_dir = .;  
-> . += IDMAP_DIR_SIZE;  
-> swapper_pg_dir = .;  
-> . += SWAPPER_DIR_SIZE;
-
+. = ALIGN(PAGE_SIZE);  
+idmap_pg_dir = .;  
+. += IDMAP_DIR_SIZE;  
+swapper_pg_dir = .;  
+. += SWAPPER_DIR_SIZE;
+```
 初始阶段的页表（PGD/PUD/PMD/PTE）都是排列在一起的，每一个占用一个page。也就是说，如果create_table_entry当前操作的是PGD，那么tmp2这时候保存了下一个level的页表，也就是PUD了。
 
 （3）这一步是合成描述符的数值。光有下一级translation table的地址不行，还要告知该描述符是否有效（bit 0），该描述符的类型是哪一种类型（bit 1）。对于中间level的页表，该描述符不可能是block entry，只能是table type的描述符，因此该描述符的最低两位是0b11。
-
-> #define PMD_TYPE_TABLE        (_AT(pmdval_t, 3) << 0)
-
+```cpp
+#define PMD_TYPE_TABLE        (_AT(pmdval_t, 3) << 0)
+```
 （4）这是最关键的一步，将描述符写入页表中。之所以有“lsl #3”操作，是因为一个描述符占据8个Byte。
-
 （5）将translation table的地址移到next level，以便进行下一步设定。
-
-三、create_pgd_entry
+# 三、create_pgd_entry
 
 从字面上看，create_pgd_entry似乎是用来在PGD中创建一个描述符，但是，实际上该函数不仅仅创建PGD中的描述符，如果需要下一级的translation table，例如PUD、PMD，也需要同时建立，最终的要求是能够完成所有中间level的translation table的建立（其实每个table中都是只建立了一个描述符），仅仅留下PTE，由其他代码来完成。该函数需要四个参数：tbl是pgd translation table的地址，具体要创建哪一个地址的描述符由virt指定，tmp1和tmp2是临时变量，create_pgd_entry具体代码如下：
-
->     .macro    create_pgd_entry, tbl, virt, tmp1, tmp2  
->     create_table_entry \tbl, \virt, PGDIR_SHIFT, PTRS_PER_PGD, \tmp1, \tmp2－－－－－－－（1）  
-> #if SWAPPER_PGTABLE_LEVELS > 3－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->     create_table_entry \tbl, \virt, PUD_SHIFT, PTRS_PER_PUD, \tmp1, \tmp2－－－－－－－－（3）  
-> #endif  
-> #if SWAPPER_PGTABLE_LEVELS > 2－－－－－－－－－－－－－－－－－－－－－－－－（4）  
->     create_table_entry \tbl, \virt, SWAPPER_TABLE_SHIFT, PTRS_PER_PTE, \tmp1, \tmp2  
-> #endif  
->     .endm
-
+```cpp
+.macro    create_pgd_entry, tbl, virt, tmp1, tmp2  
+create_table_entry \tbl, \virt, PGDIR_SHIFT, PTRS_PER_PGD, \tmp1, \tmp2－－－－－－－（1）  
+if SWAPPER_PGTABLE_LEVELS > 3－－－－－－－－－－－－－－－－－－－－－－－－（2）  
+create_table_entry \tbl, \virt, PUD_SHIFT, PTRS_PER_PUD, \tmp1, \tmp2－－－－－－－－（3）  
+endif  
+if SWAPPER_PGTABLE_LEVELS > 2－－－－－－－－－－－－－－－－－－－－－－－－（4）  
+create_table_entry \tbl, \virt, SWAPPER_TABLE_SHIFT, PTRS_PER_PTE, \tmp1, \tmp2  
+endif  
+.endm
+```
 （1）create_table_entry 在上一节已经描述了，这里通过调用该函数在PGD中为虚拟地址virt创建一个table type的描述符。
 
 （2）SWAPPER_PGTABLE_LEVELS这个宏定义和ARM64_SWAPPER_USES_SECTION_MAPS相关，而这个宏在蜗窝已经[有一篇文章](http://www.wowotech.net/linux_kenrel/create_page_tables.html)描述，这里就不说了。SWAPPER_PGTABLE_LEVELS其实定义了swapper进程地址空间的页表的级数，可能3，也可能是2，具体中间的Translation table有多少个level是和配置相关的，如果是section mapping，那么中间level包括PGD和PUD就OK了，PMD是最后一个level。如果是page mapping，那么需要PGD、PUD和PMD这三个中间level，PTE是最后一个level。当然，如果整个page level是3或者2的时候，也有可能不存在PUD或者PMD这个level。
@@ -87,49 +65,48 @@
 例子2：当虚拟地址是48个bit，16k page size（不能采用section mapping），这时候page level等于4，映射关系是PGD（L0）--->PUD（L1）--->PMD（L2）--->Page table（L3）--->page。在create_pgd_entry函数中将创建PGD、PUD和PMD这三个中间level。
 
 例子3：当虚拟地址是39个bit，4k page size，这时候page level等于3，映射关系是PGD（L1）--->PMD（L2）--->Page table（L3）--->page。由于是4k page，因此采用section mapping，映射关系是PGD（L1）--->PMD（L2）--->section。在create_pgd_entry函数中将创建PGD这一个中间level。
-
-四、create_block_map
+# 四、create_block_map
 
 create_block_map的名字起得不错，该函数就是在tbl指定的Translation table中建立block descriptor以便完成address mapping。具体mapping的内容是将start 到 end这一段VA mapping到phys开始的PA上去，代码如下：
+```cpp
+.macro    create_block_map, tbl, flags, phys, start, end  
+lsr    \phys, \phys, SWAPPER_BLOCK_SHIFT  
+lsr    \start, \start, SWAPPER_BLOCK_SHIFT  
+and    \start, \start, PTRS_PER_PTE - 1    // table index  
+orr    \phys, \flags, \phys, lsl SWAPPER_BLOCK_SHIFT    // table entry  
+lsr    \end, \end, SWAPPER_BLOCK_SHIFT  
+and    \end, \end, PTRS_PER_PTE - 1        // table end index  
+9999:    str    \phys, \tbl, \start, lsl #3        // store the entry  
+add    \start, \start, #1            // next entry  
+add    \phys, \phys, SWAPPER_BLOCK_SIZE        // next block  
+cmp    \start, \end  
+b.ls    9999b  
+.endm
+```
+# 五、__create_page_tables
 
->     .macro    create_block_map, tbl, flags, phys, start, end  
->     lsr    \phys, \phys, #SWAPPER_BLOCK_SHIFT  
->     lsr    \start, \start, #SWAPPER_BLOCK_SHIFT  
->     and    \start, \start, #PTRS_PER_PTE - 1    // table index  
->     orr    \phys, \flags, \phys, lsl #SWAPPER_BLOCK_SHIFT    // table entry  
->     lsr    \end, \end, #SWAPPER_BLOCK_SHIFT  
->     and    \end, \end, #PTRS_PER_PTE - 1        // table end index  
-> 9999:    str    \phys, [\tbl, \start, lsl #3]        // store the entry  
->     add    \start, \start, #1            // next entry  
->     add    \phys, \phys, #SWAPPER_BLOCK_SIZE        // next block  
->     cmp    \start, \end  
->     b.ls    9999b  
->     .endm
+## 1、准备阶段
+```cpp
+create_page_tables:  
+adrp    x25, idmap_pg_dir－－－－－－－－－－－－－－－－－－－－－－－－（1）  
+adrp    x26, swapper_pg_dir  
+mov    x27, lr
 
-五、__create_page_tables
+mov    x0, x25－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
+add    x1, x26, SWAPPER_DIR_SIZE  
+bl    __inval_cache_range
 
-1、准备阶段
+mov    x0, x25－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）  
+add    x6, x26, SWAPPER_DIR_SIZE  
+1:    stp    xzr, xzr, x0, #16  
+stp    xzr, xzr, x0, #16  
+stp    xzr, xzr, x0, #16  
+stp    xzr, xzr, x0, #16  
+cmp    x0, x6  
+b.lo    1b
 
-> __create_page_tables:  
->     adrp    x25, idmap_pg_dir－－－－－－－－－－－－－－－－－－－－－－－－（1）  
->     adrp    x26, swapper_pg_dir  
->     mov    x27, lr
-> 
->     mov    x0, x25－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->     add    x1, x26, #SWAPPER_DIR_SIZE  
->     bl    __inval_cache_range
-> 
->     mov    x0, x25－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）  
->     add    x6, x26, #SWAPPER_DIR_SIZE  
-> 1:    stp    xzr, xzr, [x0], #16  
->     stp    xzr, xzr, [x0], #16  
->     stp    xzr, xzr, [x0], #16  
->     stp    xzr, xzr, [x0], #16  
->     cmp    x0, x6  
->     b.lo    1b
-> 
->     ldr    x7, =SWAPPER_MM_MMUFLAGS－－－－－－－－－－－－－－－－－（4）
-
+ldr    x7, =SWAPPER_MM_MMUFLAGS－－－－－－－－－－－－－－－－－（4）
+```
 （1）取idmap_pg_dir这个符号的物理地址，保存到x25。取swapper_pg_dir这个符号的物理地址，保存到x26。这段代码没有什么特别要说明的，除了adrp这条指令。adrp是计算指定的符号地址到run time PC值的相对偏移（不过，这个offset没有那么精确，是以4K为单位，或者说，低12个bit是0）。在指令编码的时候，立即数（也就是 offset）占据21个bit，此外，由于偏移计算是按照4K进行的，因此最后计算出来的符号地址必须要在该指令的－4G和4G之间。由于执行该指令的 时候，还没有打开MMU，因此通过adrp获取的都是物理地址，当然该物理地址的低12个bit是全零的。此外，由于在链接脚本中 idmap_pg_dir和swapper_pg_dir是page size aligned，因此使用adrp指令也是OK的。
 
 （2）这段代码是要进行invalid cache的操作了，具体要操作的范围就是identity mapping和kernel image mapping所对应的页表区域，起始地址是idmap_pg_dir，结束地址是swapper_pg_dir＋SWAPPER_DIR_SIZE。
@@ -139,18 +116,18 @@ create_block_map的名字起得不错，该函数就是在tbl指定的Translatio
 （3）将idmap和swapper页表内容设定为0是有意义的。实际上这些translation table中的大部分entry都是没有使用的，PGD和PUD都是只有一个entry是有用的，而PMD中有效的entry数目是和mapping的地 址size有关。将页表内容清零也就是意味着将页表中所有的描述符设定为invalid（描述符的bit 0指示是否有效，等于0表示无效描述符）。
 
 （4）要创建mapping除了需要VA和PA，还需要memory attribute的参数，这个参数定义如下：
-
-> #if ARM64_SWAPPER_USES_SECTION_MAPS  
-> #define SWAPPER_MM_MMUFLAGS    (PMD_ATTRINDX(MT_NORMAL) | SWAPPER_PMD_FLAGS)  
-> #else  
-> #define SWAPPER_MM_MMUFLAGS    (PTE_ATTRINDX(MT_NORMAL) | SWAPPER_PTE_FLAGS)  
-> #endif
-
+```cpp
+if ARM64_SWAPPER_USES_SECTION_MAPS  
+define SWAPPER_MM_MMUFLAGS    (PMD_ATTRINDX(MT_NORMAL) | SWAPPER_PMD_FLAGS)  
+else  
+define SWAPPER_MM_MMUFLAGS    (PTE_ATTRINDX(MT_NORMAL) | SWAPPER_PTE_FLAGS)  
+endif
+```
 为了理解这些定义，需要理解block type和page type的描述符的格式，大家自行对照ARMv8文档，这里就不贴图了。SWAPPER_MM_MMUFLAGS这个flag其实定义了要映射地址的memory attribut。对于kernel image这一段内存，当然是普通内存，因此其中的MT_NORMAL就是表示后续的地址映射都是为normal memory而创建的。其他的flag定义如下：
-
-> #define SWAPPER_PTE_FLAGS    (PTE_TYPE_PAGE | PTE_AF | PTE_SHARED)  
-> #define SWAPPER_PMD_FLAGS    (PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S)
-
+```cpp
+define SWAPPER_PTE_FLAGS    (PTE_TYPE_PAGE | PTE_AF | PTE_SHARED)  
+define SWAPPER_PMD_FLAGS    (PMD_TYPE_SECT | PMD_SECT_AF | PMD_SECT_S)
+```
 PMD_SECT_AF（PTE_AF）中的AF是access flag的缩写，这个bit用来表示该entry是否第一次使用（当程序访问对应的page或者section的时候，就会使用该entry，如果从来没有被访问过，那么其值等于0，否者等于1）。该bit主要被操作系统用来跟踪一个page是否被使用过（最近是否被访问），当该page首次被创建的时候，AF等于0，当代码第一次访问该page的时候，会产生MMU fault，这时候，异常处理函数应该设定AF等于1，从而阻止下一次访问该page的时候产生MMU Fault。在这里，kernel image对应的page，其描述符的AF bit都设定为1，表示该page当前状态是actived（最近被访问），因为只有用户空间进程的page才会根据AF bit来确定哪些page被swap out，而kernel image对应的page是always actived的。
 
 PMD_SECT_S（PTE_SHARED）对应shareable attribute bits，这个两个bits定义了该page的shareable attribute。那么是shareable attribute呢？shareable attribute定义了memory location被多个系统中的bus master共享的属性。具体定义如下：
@@ -167,39 +144,39 @@ PMD_SECT_S（PTE_SHARED）对应shareable attribute bits，这个两个bits定�
 
 memory attribute中其他的flag都没有显式指定，也就是说它们的值都是0，我们可以简单过一下。AP的值是0，表示该page对kernel mode（EL1）是read/write的，对于userspace（EL0），是不允许访问的。nG bit是0，表示该地址翻译是全局的，不是process-specific的，这也合理，内核page的映射当然是全局的了。
 
-2、建立identity mapping
+## 2、建立identity mapping
+```cpp
+mov    x0, x25                －－－－－－－－－－－－－－－－－－－－－－－－－（1）  
+adrp    x3, idmap_text_start        －－－－－－－－－－－－－－－－－－－－（2）
 
->     mov    x0, x25                －－－－－－－－－－－－－－－－－－－－－－－－－（1）  
->     adrp    x3, __idmap_text_start        －－－－－－－－－－－－－－－－－－－－（2）
-> 
-> #ifndef CONFIG_ARM64_VA_BITS_48－－－－－－－－－－－－－－－－－－－－－（3）  
-> #define EXTRA_SHIFT    (PGDIR_SHIFT + PAGE_SHIFT - 3)－－－－－－－－－－－（4）  
-> #define EXTRA_PTRS    (1 << (48 - EXTRA_SHIFT)) －－－－－－－－－－－－－－－（5）
-> 
->   
-> #if VA_BITS != EXTRA_SHIFT－－－－－－－－－－－－－－－－－－－－－－－－－（6）  
-> #error "Mismatch between VA_BITS and page size/number of translation levels"  
-> #endif
-> 
->     adrp    x5, __idmap_text_end－－－－－－－－－－－－－－－－－－－－－－－－－（7）  
->     clz    x5, x5  
->     cmp    x5, TCR_T0SZ(VA_BITS)    －－－－－－－－－－－－－－－－－－－－－－（8）  
->     b.ge    1f
-> 
->     adr_l    x6, idmap_t0sz－－－－－－－－－－－－－－－－－－－－－－－－－－－（9）  
->     str    x5, [x6]  
->     dmb    sy  
->     dc    ivac, x6
-> 
->     create_table_entry x0, x3, EXTRA_SHIFT, EXTRA_PTRS, x5, x6－－－－－－－－（10）  
-> 1:  
-> #endif
-> 
->     create_pgd_entry x0, x3, x5, x6－－－－－－－－－－－－－－－－－－－－－－－（11）  
->     mov    x5, x3                // __pa(__idmap_text_start)  
->     adr_l    x6, __idmap_text_end        // __pa(__idmap_text_end)  
->     create_block_map x0, x7, x3, x5, x6－－－－－－－－－－－－－－－－－－－－－（12）
+ifndef CONFIG_ARM64_VA_BITS_48－－－－－－－－－－－－－－－－－－－－－（3）  
+define EXTRA_SHIFT    (PGDIR_SHIFT + PAGE_SHIFT - 3)－－－－－－－－－－－（4）  
+define EXTRA_PTRS    (1 << (48 - EXTRA_SHIFT)) －－－－－－－－－－－－－－－（5）
 
+
+if VA_BITS != EXTRA_SHIFT－－－－－－－－－－－－－－－－－－－－－－－－－（6）  
+error "Mismatch between VA_BITS and page size/number of translation levels"  
+endif
+
+adrp    x5, __idmap_text_end－－－－－－－－－－－－－－－－－－－－－－－－－（7）  
+clz    x5, x5  
+cmp    x5, TCR_T0SZ(VA_BITS)    －－－－－－－－－－－－－－－－－－－－－－（8）  
+b.ge    1f
+
+adr_l    x6, idmap_t0sz－－－－－－－－－－－－－－－－－－－－－－－－－－－（9）  
+str    x5, x6  
+dmb    sy  
+dc    ivac, x6
+
+create_table_entry x0, x3, EXTRA_SHIFT, EXTRA_PTRS, x5, x6－－－－－－－－（10）  
+1:  
+endif
+
+create_pgd_entry x0, x3, x5, x6－－－－－－－－－－－－－－－－－－－－－－－（11）  
+mov    x5, x3                // __pa(__idmap_text_start)  
+adr_l    x6, __idmap_text_end        // __pa(__idmap_text_end)  
+create_block_map x0, x7, x3, x5, x6－－－－－－－－－－－－－－－－－－－－－（12）
+```
 （1）x0保存了idmap_pg_dir变量的物理地址，也就是identity mapping的PGD。
 
 （2）x3保存了__idmap_text_start的物理地址，对于identity mapping而言，x3也保存了虚拟地址，因为虚拟地址是等于物理地址的。
@@ -235,52 +212,43 @@ EXTRA_PTRS：增加了一个level的Translation table，我们需要确定这个
 （12）创建最后一个level translation table的entry。该entry可能是page descriptor，也可能是block descriptor，具体传递的参数如下：
 
 x0：指向最后一个level的translation table
-
 x7：要创建映射的memory attribute
-
 x3：物理地址
-
 x5：虚拟地址的起始地址（其实和x3一样）
-
 x6：虚拟地址的结束地址
 
-3、创建kernel direct mapping
+## 3、创建kernel direct mapping
+```cpp
+mov    x0, x26                －－－－－－－－－－－－－－－－－－－－－－－－（1）  
+mov    x5, PAGE_OFFSET－－－－－－－－－－－－－－－－－－－－－－－（2）  
+create_pgd_entry x0, x5, x3, x6－－－－－－－－－－－－－－－－－－－－－（3）  
+ldr    x6, =KERNEL_END            // va(KERNEL_END)  
+mov    x3, x24                // phys offset  
+create_block_map x0, x7, x3, x5, x6 －－－－－－－－－－－－－－－－－－－（4）
 
-> mov    x0, x26                －－－－－－－－－－－－－－－－－－－－－－－－（1）  
-> mov    x5, #PAGE_OFFSET－－－－－－－－－－－－－－－－－－－－－－－（2）  
-> create_pgd_entry x0, x5, x3, x6－－－－－－－－－－－－－－－－－－－－－（3）  
-> ldr    x6, =KERNEL_END            // __va(KERNEL_END)  
-> mov    x3, x24                // phys offset  
-> create_block_map x0, x7, x3, x5, x6 －－－－－－－－－－－－－－－－－－－（4）
-> 
->   
-> mov    x0, x25  
-> add    x1, x26, #SWAPPER_DIR_SIZE  
-> dmb    sy  
-> bl    __inval_cache_range
-> 
-> mov    lr, x27  
-> ret
 
+mov    x0, x25  
+add    x1, x26, SWAPPER_DIR_SIZE  
+dmb    sy  
+bl    __inval_cache_range
+
+mov    lr, x27  
+ret
+```
 （1）swapper_pg_dir其实就是swapper进程（pid等于0的那个，其实就是idle进程）的地址空间，这时候，x0指向了内核地址空间的PGD的基地址。
-
 （2）PAGE_OFFSET是kernel image的首地址，对于48bit的VA而言，该地址是0xffff8000-00000000
-
 （3）创建PAGE_OFFSET（即kernel image首地址，虚拟地址）对应中间level的table描述符。
-
 （4）创建PAGE_OFFSET～KERNEL_END之间地址映射的最后一个level的描述符。
-
-参考文献：
+# 参考文献：
 
 1、ARMv8技术手册
-
 2、Linux 4.4.6内核源代码
 
 _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [__create_page_tables](http://www.wowotech.net/tag/__create_page_tables)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [X-016-KERNEL-串口驱动开发之驱动框架](http://www.wowotech.net/x_project/serial_driver_porting_1.html) | [蓝牙协议分析(8)_BLE安全机制之白名单](http://www.wowotech.net/bluetooth/ble_white_list.html)»
 
