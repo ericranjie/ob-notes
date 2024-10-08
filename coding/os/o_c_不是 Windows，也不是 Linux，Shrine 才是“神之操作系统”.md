@@ -1,10 +1,5 @@
-# 
-
 Original 邀你一起成为开源贡献者 Linux中国
-
  _2021年09月28日 16:24_
-
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/W9DqKgFsc68OWQAoVPcez3QfahTK250iciaM1RUYCCzPa6TBbIhweucCJYPOR07sht37ScRbNy0NBetiaCTJgjOjw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 **导读：**你能说你使用过由“神”设计的操作系统吗？今天，我想向你介绍 Shrine（圣殿）。　 　 　 　 　 　
 

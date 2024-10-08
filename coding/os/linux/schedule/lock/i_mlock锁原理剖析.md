@@ -15,7 +15,7 @@ mlock处理路径中，会将VM_LOCKED标志加入到vma->vm_flags中（由于�
 
 handle_mm_fault函数是内核通用的缺页异常处理例程，如vma是匿名映射的则分配物理页面然后建立页表映射关系，vma是文件映射则会从磁盘读取对应的文件页（如果page cache没有对应页面时）到内存的page cache,然后建立虚拟页面建立页表映射关系。
 # **二、内存回收处理
-## **1. 扫描活跃的lru链表**
+## 1. 扫描活跃的lru链表**
 
 内存回收扫描活跃的lru链表时，对于设定了VM_LOCKED的vma处理链路如下：
   ![[Pasted image 20240906121015.png]]

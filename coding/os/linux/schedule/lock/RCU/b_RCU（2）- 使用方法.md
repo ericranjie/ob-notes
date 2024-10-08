@@ -1,27 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[沙漠之狐](http://www.wowotech.net/author/535) 发布于：2019-5-24 19:36 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
- 
-
 作者简介：余华兵，在网络通信行业工作十多年，负责IPv4协议栈、IPv6协议栈和Linux内核。在工作中看着2.6版本的专业书籍维护3.x和4.x版本的Linux内核，感觉不方便，于是自己分析4.x版本的Linux内核整理出一本书，书名叫《Linux内核深度解析》，2019年5月出版，希望对同行有帮助。
-
-1．经典RCU
+# 1．经典RCU
 
 如果不关心使用的RCU是不可抢占RCU还是可抢占RCU，应该使用经典RCU的编程接口。最初的经典RCU是不可抢占RCU，后来实现了可抢占RCU，经典RCU的意思发生了变化：如果内核编译了可抢占RCU，那么经典RCU的编程接口被实现为可抢占RCU，否则被实现为不可抢占RCU。
 
@@ -32,77 +12,52 @@
 写者可以使用下面4个函数。
 
 （1）使用函数synchronize_rcu()等待宽限期结束，即所有读者退出读端临界区，然后写者执行下一步操作。这个函数可能睡眠。
-
 （2）使用函数synchronize_rcu_expedited()等待宽限期结束。和函数synchronize_rcu()的区别是：该函数会向其他处理器发送处理器间中断（Inter-Processor Interrupt，IPI）请求，强制宽限期快速结束。我们把强制快速结束的宽限期称为加速宽限期（expedited grace period），把没有强制快速结束的宽限期称为正常宽限期（normal grace period）。
-
 （3）使用函数call_rcu()注册延后执行的回调函数，把回调函数添加到RCU回调函数链表中，立即返回，不会阻塞。函数原型如下：
 
+```cpp
 void call_rcu(struct rcu_head *head, rcu_callback_t func);
-
 struct callback_head {
-
      struct callback_head *next;
-
      void (*func)(struct callback_head *head);
-
 } __attribute__((aligned(sizeof(void *))));
 
 #define rcu_head callback_head
-
 typedef void (*rcu_callback_t)(struct rcu_head *head);
+```
 
 （4）使用函数rcu_barrier()等待使用call_rcu注册的所有回调函数执行完。这个函数可能睡眠。
 
 现在举例说明使用方法，假设链表节点和头节点如下：
-
+```cpp
 typedef struct {
-
     struct list_head link;
-
     struct rcu_head rcu;
-
     int key;
-
     int val;
-
 } test_entry;
 
 struct list_head test_head;
-
+```
 成员“struct rcu_head rcu”：调用函数call_rcu把回调函数添加到RCU回调函数链表的时候需要使用。
 
 读者访问链表的方法如下：
-
-int test_read(int key, int *val_ptr)
-
-{
-
+```cpp
+int test_read(int key, int *val_ptr) {
      test_entry *entry;
-
      int found = 0;
-
      **rcu****_read****_lock();**
-
      **list****_for****_each****_entry****_rcu(entry,** **&test****_head,** **link)** **{**
-
            if (entry->key == key) {
-
                 *val_ptr = entry->val;
-
                 found = 1;
-
                 break;
-
            }
-
      }
-
      **rcu****_read****_unlock();**
-
      return found;
-
 }
-
+```
 如果只有一个写者，写者不需要使用锁，添加、更新和删除3种操作的实现方法如下。
 
 （1）写者添加一个节点到链表尾部。

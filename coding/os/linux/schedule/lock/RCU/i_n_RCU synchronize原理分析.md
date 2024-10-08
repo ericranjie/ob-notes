@@ -1,34 +1,13 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-10-27 19:10 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
     RCU（Read-Copy Update）是Linux内核比较成熟的新型读写锁，具有较高的读写并发性能，常常用在需要互斥的性能关键路径。在kernel中，rcu有tiny rcu和tree rcu两种实现，tiny rcu更加简洁，通常用在小型嵌入式系统中，tree rcu则被广泛使用在了server, desktop以及android系统中。本文将以tree rcu为分析对象。
-
-  
-
-**1** **如何度过宽限期**
+# **1** **如何度过宽限期**
 
     RCU的核心理念是读者访问的同时，写者可以更新访问对象的副本，但写者需要等待所有读者完成访问之后，才能删除老对象。这个过程实现的关键和难点就在于如何判断所有的读者已经完成访问。通常把写者开始更新，到所有读者完成访问这段时间叫做宽限期（Grace Period）。内核中实现宽限期等待的函数是synchronize_rcu。
-
-**1.1** **读者锁的标记**
+## **1.1** **读者锁的标记**
 
          在普通的TREE RCU实现中，rcu_read_lock和rcu_read_unlock的实现非常简单，分别是关闭抢占和打开抢占：
-
+```cpp
 1. static inline void __rcu_read_lock(void)
 2. {
 3. 	preempt_disable();
@@ -38,13 +17,13 @@
 7. {
 8. 	preempt_enable();
 9. }
-
+```
+    
     这时是否度过宽限期的判断就比较简单：每个CPU都经过一次抢占。因为发生抢占，就说明不在rcu_read_lock和rcu_read_unlock之间，必然已经完成访问或者还未开始访问。
-
-**1.2** **每个CPU****度过quiescnet state**
+## **1.2** **每个CPU****度过quiescnet state**
 
     接下来我们看每个CPU上报完成抢占的过程。kernel把这个完成抢占的状态称为quiescent state。每个CPU在时钟中断的处理函数中，都会判断当前CPU是否度过quiescent state。
-
+```cpp
 1. void update_process_times(int user_tick)
 2. {
 3. ......
@@ -69,15 +48,15 @@
 22. 		invoke_rcu_core();
 23. ......
 24. }
+```
 
    这里补充一个细节说明，Tree RCU有多个类型的RCU State，用于不同的RCU场景，包括rcu_sched_state、rcu_bh_state和rcu_preempt_state。不同的场景使用不同的RCU API，度过宽限期的方式就有所区别。例如上面代码中的rcu_sched_qs和rcu_bh_qs，就是为了标记不同的state度过quiescent state。普通的RCU例如内核线程、系统调用等场景，使用rcu_read_lock或者rcu_read_lock_sched，他们的实现是一样的；软中断上下文则可以使用rcu_read_lock_bh，使得宽限期更快度过。
 
     细分这些场景是为了提高RCU的效率。rcu_preempt_state将在下文进行说明。
-
-**1.3** **汇报宽限期度过**
+## **1.3** **汇报宽限期度过**
 
          每个CPU度过quiescent state之后，需要向上汇报直至所有CPU完成quiescent state，从而标识宽限期的完成，这个汇报过程在软中断RCU_SOFTIRQ中完成。软中断的唤醒则是在上述的时钟中断中进行。
-
+```cpp
 update_process_times
 
     -> rcu_check_callbacks
@@ -95,7 +74,7 @@ rcu_process_callbacks
             -> rcu_report_qs_rdp
 
                 -> rcu_report_qs_rnp
-
+```
 其中rcu_report_qs_rnp是从叶子节点向根节点的遍历过程，同一个节点的子节点都通过quiescent state后，该节点也设置为通过。
 
 ![](http://www.wowotech.net/content/uploadfile/201510/c31d1445945201.png)

@@ -1,23 +1,4 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[沙漠之狐](http://www.wowotech.net/author/535) 发布于：2019-5-24 19:30 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
-
- 
 
 作者简介：余华兵，在网络通信行业工作十多年，负责IPv4协议栈、IPv6协议栈和Linux内核。在工作中看着2.6版本的专业书籍维护3.x和4.x版本的Linux内核，感觉不方便，于是自己分析4.x版本的Linux内核整理出一本书，书名叫《Linux内核深度解析》，2019年5月出版，希望对同行有帮助。
 
@@ -30,7 +11,6 @@ RCU的优点是读者没有任何同步开销：不需要获取任何锁，不�
 RCU的第一个版本称为经典RCU，在内核版本2.5.43中引入，目前内核支持3种RCU。
 
 （1）不可抢占RCU（RCU-sched）。不允许进程在读端临界区被其他进程抢占。最初的经典RCU是不可抢占RCU，后来引入了可抢占RCU，所以内核版本2.6.12为不可抢占RCU设计了一套专用编程接口。
-
 （2）加速版不可抢占RCU（RCU-bh，bh是“bottom half”的缩写，下半部），在内核版本2.6.9中引入，是针对不可抢占RCU的改进，在软中断很多的情况下可以缩短宽限期。
 
 内核的网络栈在软中断里面处理报文，如果攻击者疯狂地发送报文攻击设备，导致被攻击设备的处理器大部分时间执行软中断，宽限期会变得很长，大量延后执行的销毁操作没有被执行，可能导致内存耗尽。
@@ -42,12 +22,11 @@ RCU的第一个版本称为经典RCU，在内核版本2.5.43中引入，目前�
 RCU根据数据结构可以分为以下两种。
 
 （1）树型RCU（tree RCU）：也称为基于树的分层RCU（Tree-based hierarchical RCU），为拥有几百个或几千个处理器的大型系统设计。配置宏是CONFIG_TREE_RCU。
-
 （2）微型RCU（tiny RCU）：为不需要实时响应的单处理器系统设计。配置宏是CONFIG_ TINY_RCU。
 
 标签: [无锁编程](http://www.wowotech.net/tag/%E6%97%A0%E9%94%81%E7%BC%96%E7%A8%8B)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [RCU（2）- 使用方法](http://www.wowotech.net/kernel_synchronization/462.html) | [Linux内核的自旋锁](http://www.wowotech.net/kernel_synchronization/460.html)»
 

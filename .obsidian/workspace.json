@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/coding-quote.md",
+                "file": "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/coding-quote.md",
+                "file": "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/coding-quote.md",
+                "file": "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/coding-quote.md"
+                "file": "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md"
               }
             }
           }
@@ -150,21 +150,32 @@
   "lastOpenFiles": [
     "coding/os/linux/schedule/lock/i_mlock锁原理剖析.md",
     "coding/os/linux/schedule/lock/i_什么时候需要cpu_relax()锁.md",
+    "coding/os/linux/schedule/d_load_balance函数代码详解.md",
     "coding/os/linux/schedule/d_n_多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "README.md",
-    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
     "coding/os/linux/schedule/b_n_一例centos7.6内核hardlock的解析.md",
     "coding/os/linux/schedule/a_n_Linux实时化与硬实时RTOS综述.md",
+    "coding/os/linux/schedule/lock/RCU/b_RCU（2）- 使用方法.md",
+    "README.md",
+    "coding/os/linux/schedule/lock/RCU/i_RCU（1）- 概述.md",
+    "coding/os/linux/schedule/lock/RCU/k_Linux2.6.23 ：sleepable RCU的实现.md",
+    "coding/os/linux/schedule/lock/RCU/i_n_RCU synchronize原理分析.md",
+    "coding/os/linux/schedule/lock/RCU/i_Linux内核同步机制之（七）：RCU基础.md",
+    "zx99-image/Pasted image 20241008205719.png",
+    "coding/os/linux/schedule/lock/mutex/d_futex基础问答.md",
+    "coding/os/linux/schedule/lock/RCU/d_Linux2.6.11版本：classic RCU的实现.md",
+    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
+    "coding/os/o_c_不是 Windows，也不是 Linux，Shrine 才是“神之操作系统”.md",
+    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
+    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/shell/i_使用 logrotate 命令轮转和归档日志 Linux 中国.md",
+    "coding/coding-quote.md",
+    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
     "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
     "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
-    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
-    "coding/os/linux/schedule/lock/mutex/d_futex基础问答.md",
     "zx99-image/Pasted image 20241008190725.png",
     "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
     "Pasted image 20241008190450.png",
     "zx99-image/Pasted image 20241008185413.png",
-    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
     "zx99-image/Pasted image 20241008184145.png",
     "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
     "zx99-image/Pasted image 20241008183012.png",
@@ -172,18 +183,7 @@
     "zx99-image/Pasted image 20241008183317.png",
     "zx99-image/Pasted image 20241008183310.png",
     "zx99-image/Pasted image 20241008183259.png",
-    "zx99-image/Pasted image 20241008183238.png",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
-    "coding/os/linux/memory/cache/b_n_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
-    "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
-    "interview/大疆常见C++面试题，重点难点全方位解析.md",
-    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
-    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
-    "coding/os/linux/network/debug/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
-    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/page-folio",
     "coding/os/linux/memory/hardware",

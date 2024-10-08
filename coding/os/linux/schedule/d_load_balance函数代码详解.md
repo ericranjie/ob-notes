@@ -1,20 +1,16 @@
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-2-16 7:29 分类：[进程管理](http://www.wowotech.net/sort/process_management)
-
-前言
+# 前言
 
 我们描述CFS任务负载均衡的系列文章一共三篇，第一篇是框架部分，第二篇描述了task placement和active upmigration两个典型的负载均衡场景，第三篇是负载均衡的情景分析，包括tick balance、nohz idle balance和new idle balance。在负载均衡情景分析文档最后，我们给出了结论：tick balancing、nohz idle balancing、new idle balancing都是万法归宗，汇聚到load_balance函数来完成具体的负载均衡工作。本文就是第三篇负载均衡情景分析的附加篇，重点给大家展示load_balance函数的精妙。
 
 本文出现的内核代码来自Linux5.10.61，为了减少篇幅，我们对引用的代码进行了删减（例如去掉了NUMA的代码，毕竟手机平台上我们暂时不关注这个特性），如果有兴趣，读者可以配合完整的源代码代码阅读本文。
-
-一、概述
+# 一、概述
 
 本文主要分成三个部分，第一个部分就是本章，简单的描述了本文的结构和阅读前提条件。第二章是对load_balance函数设计的数据结构进行描述。这一章不需要阅读，只是在有需要的时候可以查阅几个主要数据结构的各个成员的具体功能。随后的若干个章节是以load_balance函数为主线，对各个逻辑过程进行逐行分析。
 
 需要强调的是本文不是独立成文的，很多负载均衡的基础知识（例如sched domain、sched group，什么是负载、运行负载、利用率utility，什么是均衡......）在CFS任务负载均衡系列文章的第一篇已经描述，如果没有阅读过，强烈建议提前阅读。如果已经具体负载均衡的基础概念，那么希望本文能够给你带来研读代码的快乐。
-
-二、load_balance函数使用的数据结构
-
-1、struct lb_env
+# 二、load_balance函数使用的数据结构
+## 1、struct lb_env
 
 在负载均衡的时候，通过 lb_env数据结构来表示本次负载均衡的上下文：
 
@@ -36,7 +32,7 @@
 | enum migration_type migration_type   | 为了达到sched domain负载均衡的目标，本次迁移的类型为何？有四种迁移类型：<br><br>migrate_load---迁移一定量的负载<br><br>migrate_util----迁移一定量的utility<br><br>migrate_task---迁移一定数量的任务<br><br>migrate_misfit---迁移misfit task                   |
 | struct list_head tasks               | 需要进行迁移的任务链表                                                                                                                                                                                            |
 
-2、struct sd_lb_stats
+## 2、struct sd_lb_stats
 
 在负载均衡的时候，通过sd_lb_stats数据结构来表示sched domain的负载统计信息：
 
@@ -70,7 +66,7 @@
 |group_type|该group在负载均衡时候所处的状态，下面代码分析过程中会详细解析各种状态。|
 |group_misfit_task_load|该组内至少有一个cpu上有misfit task，这里记录了该组所有CPU中，misfit task load最大的值。|
 
-4、struct sched_group_capacity
+## 4、struct sched_group_capacity
 
 数据结构sched_group_capacity用来描述sched group的算力信息：
 
@@ -85,7 +81,7 @@
 | int imbalance              | 该group中是否有由于affinity原因产生的不均衡问题                      |
 | unsigned long cpumask[]    | Balance mask                                        |
 
-三、load_balance函数整体逻辑
+# 三、load_balance函数整体逻辑
 
 从本章开始我们进行代码分析，这一章是load_balance函数的整体逻辑，后面的章节都是对本章中的一些细节内容进行补充。load_balance函数实在是太长了，我们分段解读。第一段的逻辑如下：
 
@@ -109,9 +105,9 @@ B、初始化本次负载均衡的上下文信息。具体可以参考对struct 
 
 初始化完第一轮均衡的上下文，下面就看看具体的均衡操作为何。第二段的逻辑如下：
 
-|   |
-|---|
-|cpumask_and(cpus, sched_domain_span(sd), cpu_active_mask);-------A<br><br>redo:<br><br>if (!should_we_balance(&env)) {<br><br>    *continue_balancing = 0;<br><br>    goto out_balanced;-------------------B<br><br>}<br><br>group = find_busiest_group(&env);<br><br>if (!group) {<br><br>    goto out_balanced;------------------C<br><br>}<br><br>busiest = find_busiest_queue(&env, group);<br><br>if (!busiest) {<br><br>    goto out_balanced;-----------------D<br><br>}|
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| cpumask_and(cpus, sched_domain_span(sd), cpu_active_mask);-------A<br><br>redo:<br><br>if (!should_we_balance(&env)) {<br><br>    *continue_balancing = 0;<br><br>    goto out_balanced;-------------------B<br><br>}<br><br>group = find_busiest_group(&env);<br><br>if (!group) {<br><br>    goto out_balanced;------------------C<br><br>}<br><br>busiest = find_busiest_queue(&env, group);<br><br>if (!busiest) {<br><br>    goto out_balanced;-----------------D<br><br>} |
 
 A、确定本轮负载均衡涉及的cpu，因为是第一轮均衡，所以所有的sched domain中的cpu都参与均衡（cpu_active_mask用来剔除无法参与均衡的CPU）。后续如果发现一些异常状况（例如由于affinity原因无法完成任务迁移），那么会清除选定的busiest cpu，跳转到redo进行全新一轮的均衡。
 

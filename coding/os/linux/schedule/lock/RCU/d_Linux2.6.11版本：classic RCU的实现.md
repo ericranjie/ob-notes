@@ -12,8 +12,7 @@
 如果有写的操作会怎样呢？事情就不那么美妙了，写操作不能直接施加到shared状态的cache，必须invalidate其他CPU的local cache中A变量对应的cacheline，才能发起写的动作。因此，一次写操作，由于invalidate其他的local cache中的内容，结果会立刻重创其他所有CPU上的read操作的性能。特别是当CPU core数据增加的时候，共享变量的读写性能瓶颈也会逐步的显现出来。
 
 对策是什么呢？主要有两种方法，一种是改成percpu变量。另外一种方法是减少对全局变量的访问。
-
-2、Linux2.5.43版本的全局变量和访问分析
+## 2、Linux2.5.43版本的全局变量和访问分析
 
 现在，我们先一起review一下Linux2.5.43版本的全局变量（percpu的那些全局变量不考虑）：
 ```cpp
@@ -21,10 +20,10 @@ struct rcu_ctrlblk rcu_ctrlblk =
 { .mutex = SPIN_LOCK_UNLOCKED, .curbatch = 1,  .maxbatch = 1, .rcu_cpu_mask = 0 };
 
 struct rcu_ctrlblk {  
-spinlock_t    mutex;  
-long        curbatch;   
-long        maxbatch;  
-unsigned long    rcu_cpu_mask;  
+  spinlock_t    mutex;  
+  long        curbatch;   
+  long        maxbatch;  
+  unsigned long    rcu_cpu_mask;  
 };
 ```
 对于rcu_ctrlblk数据结构中，rcu_cpu_mask成员修改异常频繁，每个CPU都会在自己经历Quiescent state之后，修改该变量。curbatch和maxbatch仅仅是在一次Grace period才修改，特别是如果cpu core增多，curbatch和maxbatch访问频率不变，但是rcu_cpu_mask成员的写操作呈线性增长。因此，如果RCU算法经常读rcu_cpu_mask，那么其读性能一定是非常的差。
@@ -92,8 +91,7 @@ rcu_ctrlblk.rcu_cpu_mask = cpu_online_map;－－－重置CPU BITMASK，必须的
 
 从上面的描述可以得出结论：Linux2.5.43版本对rcu_cpu_mask的读操作过于频繁，会导致cache line trashing，影响性能。
 # 三、Linux2.5.43版本的其他问题
-
-1、实时性问题
+## 1、实时性问题
 
 （1）原理。我们知道，对于linux kernel而言，中断上下文（包括softirq context，当然tasklet context是softirq context的一种）优先级总是高过进程优先级，也就是说，完成了中断上下文的执行，才会启动进程调度。RCU callback函数是在tasklet context中执行，本质上属于中断上下文，因此，一旦一个批次的Grace period过去，那么这个批次的callback函数会在中断上下文（bottom half）中被一一执行。
 

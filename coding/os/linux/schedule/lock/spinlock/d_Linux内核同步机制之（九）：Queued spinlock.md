@@ -1,32 +1,13 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-6-29 6:33 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
-
-前言
+# 前言
 
 本站之前已经有了一篇关于[spinlock](http://www.wowotech.net/kernel_synchronization/spinlock.html)的文档，在之前的文章中有对自旋锁进行简单的介绍，同时给出了API汇整和应用场景。不过该文章中的自旋锁描述是基于比较老的内核版本，那时候的自旋锁还是ticket base锁，而目前最新内核中的自旋锁已经进化成queued spinlock，因此需要一篇新的自旋锁文档来跟上时代。此外，本文将不再描述基本的API和应用场景，主要的篇幅将集中在具体的自旋锁实现上。顺便说一句，同时准备一份linux5.10源码是打开本文的正确方式。
 
 由于自旋锁可以在各种上下文中使用，因此本文中的thread是执行线索的意思，表示进程上下文、hardirq上下文、softirq上下文等多种执行线索，而不是调度器中线程的意思。
-
-一、简介
+# 一、简介
 
 Spinlock是linux内核中常用的一种互斥锁机制，和mutex不同，当无法持锁进入临界区的时候，当前执行线索不会阻塞，而是不断的自旋等待该锁释放。正因为如此，自旋锁也是可以用在中断上下文的。也正是因为自旋，临界区的代码要求尽量的精简，否则在高竞争场景下会浪费宝贵的CPU资源。
-
-1、代码结构
+## 1、代码结构
 
 我们整理spinlock的代码结构如下：
 
@@ -37,8 +18,7 @@ Spinlock是linux内核中常用的一种互斥锁机制，和mutex不同，当�
 中间一层是区分SMP和UP的，在SMP和UP上，自旋锁的实现是不一样的。对于UP，自旋没有意义，因此spinlock的上锁和放锁操作退化为preempt disable和enable。SMP平台上，除了抢占操作之外还有正常自旋锁的逻辑，具体如何实现自旋锁逻辑是和底层的CPU architecture相关的，后面我们会详细描述。
 
 最底层的代码是体系结构相关的代码，ARM64上，目前采用是qspinlock。和体系结构无关的Qspinlock代码抽象在qspinlock.c文件中，也就是本文重点要描述的内容。
-
-2、接口API
+## 2、接口API
 
 一个示例性的接口API流程如下（左边是UP，右边是SMP）：
 
@@ -57,16 +37,14 @@ Spinlock是linux内核中常用的一种互斥锁机制，和mutex不同，当�
 ![](http://www.wowotech.net/content/uploadfile/202206/33591656456202.png)
 
 如果thread4当前持锁，同一个cluster中的cpu7上的thread7和另外一个cluster中的thread0都在自旋等待锁的释放。当thread4释放锁的时候，由于cpu7和cpu4的拓扑距离更近，thread7会有更高概率可以抢到自旋锁，从而产生了不公平现象。为了解决这个问题，内核工程师又开发了ticket base的自旋锁，但是这种自旋锁在持锁失败的时候会对自旋锁状态数据next成员进行++操作，当CPU数据巨大并且竞争激烈的时候，自旋锁状态数据对应的cacheline会在不同cpu上跳来跳去，从而对性能产生影响，为了解决这个问题，qspinlock产生了，下面的文章会集中在qspinlock的原理和实现上。
-
-二、Qspinlock的数据结构
-
-1、Qspinlock
+# 二、Qspinlock的数据结构
+## 1、Qspinlock
 
 struct qspinlock定义如下（little endian）：
 
-|   |
-|---|
-|typedef struct qspinlock {<br><br>    union {<br><br>        atomic_t val;<br><br>        struct {<br><br>            u8 locked;------0 unlocked， 1 locked<br><br>            u8 pending;--------有thread（非队列中）自旋等待locked状态<br><br>        };<br><br>        struct {<br><br>            u16 locked_pending;-------mcs锁队列的head node等待该域变成0<br><br>            u16 tail;--------在自旋等待队列中（mcs锁队列）<br><br>        };<br><br>    };<br><br>} arch_spinlock_t;|
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| typedef struct qspinlock {<br><br>    union {<br><br>        atomic_t val;<br><br>        struct {<br><br>            u8 locked;------0 unlocked， 1 locked<br> <br>            u8 pending;--------有thread（非队列中）自旋等待locked状态<br><br>        };<br><br>        struct {<br><br>            u16 locked_pending;-------mcs锁队列的head node等待该域变成0<br><br>            u16 tail;--------在自旋等待队列中（mcs锁队列）<br><br>        };<br><br>    };<br><br>} arch_spinlock_t; |
 
 Qspinlock的数据结构一共4个byte，不同的场景下，为了操作方便，我们可以从不同的视角来看这四个字节，示意图如下：
 
