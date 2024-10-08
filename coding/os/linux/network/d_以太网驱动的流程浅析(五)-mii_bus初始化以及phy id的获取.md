@@ -1,20 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
 作者：[heaven](http://www.wowotech.net/author/532) 发布于：2020-1-7 14:42 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 我们继续沿着上一篇的以太网思路来继续分析，目的是为了学习以太网这块从应用层到底层的整块加载和匹配流程。  
@@ -22,13 +5,8 @@
 如下是本人调试过程中的一点经验分享，以太网驱动架构毕竟涉及的东西太多，如下仅仅是针对加载流程和围绕这个问题产生的分析过程和驱动加载流程部分，并不涉及以太网协议层的数据流程分析。
 
 【硬件环境】         Imx6ul
-
 【Linux kernel版本】   Linux4.1.15
-
 【以太网phy】        Realtek8201f
-
-  
-
 ## 1.1 mii_bus初始化以及phy id的获取
 
 然后进行mii的一些初始化fec_enet_mii_init(pdev);

@@ -1,59 +1,28 @@
-# 
 Linux爱好者
-
  _2021年12月30日 11:53_
-
-↓推荐关注↓  
-
-![](http://mmbiz.qpic.cn/mmbiz_png/DSU8cv1j3ibStMRcibJLd4TkNlt53KNZj0A2IicORH4REC4ics87icsx703M5giby2wuofz3dicMsHVcXDMXTM6t6VBQw/300?wx_fmt=png&wxfrom=19)
-
-**开源前哨**
-
-点击获取10万+ star的开发资源库。 日常分享热门、有趣和实用的开源项目～
-
-167篇原创内容
-
-公众号
-![[Pasted image 20240923185622.png]]
-、![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
 > 来源：云原生实验室  
-> 
 > https://arthurchiao.art/blog/intro-to-io-uring-zh/
 
 今天分享一篇Linux异步IO编程框架文章，对比IO复用的epoll框架，到底性能提高多少？让我们看一看。  
 
 ## 译者序
 
-  
-
-  
-
  本文组合翻译了以下两篇文章的干货部分，作为 `io_uring` 相关的入门参考：
 
 - How io_uring and eBPF Will Revolutionize Programming in Linux[1], ScyllaDB, 2020
-    
 - An Introduction to the io_uring Asynchronous I/O Framework[2], Oracle, 2020
-    
 
 `io_uring` 是 2019 年  **==Linux 5.1==** 内核首次引入的高性能**==异步 I/O 框架==**，能显着加速 I/O 密集型应用的性能。但如果你的应用 **==已经在使用==** 传统 Linux AIO 了， **==并且使用方式恰当==**， 那 `io_uring`  **==并不会带来太大的性能提升==** —— 根据原文测试（以及我们 自己的复现），即便打开高级特性，也只有 5%。除非你真的需要这 5% 的额外性能，否则==切换==成 `io_uring`  **==代价可能也挺大==**，因为要==重写应用==来适配 `io_uring`（或者让依赖的平台或框架去适配，总之需要改代码）。
 
 既然性能跟传统 AIO 差不多，那为什么还称 `io_uring` 为革命性技术呢？
 
 1. 它首先和最大的贡献在于：**==统一了 Linux 异步 I/O 框架==**，
-    
 
 - Linux AIO  **==只支持 direct I/O==** 模式的 **==存储文件==**（storage file），而且主要用在 **==数据库这一细分领域==**；
-    
 - `io_uring` 支持存储文件和网络文件（network sockets），也支持更多的异步系统调用 （`accept/openat/stat/...`），而非仅限于 `read/write` 系统调用。
-    
-
 3. 在 **==设计上是真正的异步 I/O==**，作为对比，Linux AIO 虽然也 是异步的，但仍然可能会阻塞，某些情况下的行为也无法预测；
     
     似乎之前 Windows 在这块反而是领先的，更多参考：
-    
 
 - 浅析开源项目之 io_uring[3]，“分布式存储”专栏，知乎
     

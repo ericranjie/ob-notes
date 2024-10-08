@@ -1,18 +1,6 @@
-# 
-
 Linux内核之旅
-
  _2021年12月16日 11:23_
-
 以下文章来源于人人都是极客 ，作者布道师Peter
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4OTSB4zfwr5HJ5plpabZhz6p0bMbicicnAGn9Hwicp01JVw/0)
-
-**人人都是极客**.
-
-工程师们自己的Linux底层技术社区，分享体系架构、内核、网络、安全和驱动。
 
 ](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664610434&idx=1&sn=09d7a98e2f2d516b34e63360c4aa4bef&chksm=f04d9767c73a1e719dc31a655c94f05bbb71b49602c2b2571f3a6ccf56b674a787eee2ba530a&mpshare=1&scene=24&srcid=1216jZOEyqkU1nezybfDxBjg&sharer_sharetime=1639629314330&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0f4c579bba0b76d984c703a6390d0dd8e85cc81282dd66afdd6d32223cd5186fa9f969997b6454fa199b67c3e040dc22bb8306e817833944f7f3d21f3278dd95a358d4240737f61c10503757b44d61a9ec779936d958cc81ea3caf74a8aaeff819ea2e2732473839d896001f0a15ea37e3d591afd85554827&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQJ0hA9GsVV92BXW%2Ff%2FnzioRLmAQIE97dBBAEAAAAAAKocGfCEgu0AAAAOpnltbLcz9gKNyK89dVj0ovYZHqRDoHm3YpzMCvO7bWM5ASDXqArQtwvrD%2FaupYk3k8Cundw6BI3GqoJgQzCF%2Fwbf8X8VOAWfsN8%2FGGM1SZUD%2F%2Bg1DdsPz1SCCkOCJrJ7GI3zkFid7cnTwAX1pKPtU44L2lQ8%2BVhDnglycuZje8rPhzv8ZEVFPJH%2BZXzEs5ueOVq5vXxkayciar5%2FooO38WUGiGFNuNhpNsd0UjCZumstxB7f64CbYzlZH3WvGqnRxzoqsxHk6APV9Hlwui6N&acctmode=0&pass_ticket=r%2BDaQHDn21KexAH13NTMXpn32N07XYqqlwzW1EPDErMs%2FNOmupU%2BKfAzM9dpKikv&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
@@ -35,12 +23,8 @@ DMA 控制器可以同时进行的传输个数是有限的，每一个传输都�
 ### 传输参数
 
 - transfer size
-    
 - transfer width
-    
 - burst size
-    
-
 ### scatter gather
 
 我们知道，一般情况下 DMA 传输只能处理在物理上连续的 buffer。但在有些场景下，我们需要将一些非连续的 buffer 拷贝到一个连续 buffer 中，这样的操作称作 scatter gather。

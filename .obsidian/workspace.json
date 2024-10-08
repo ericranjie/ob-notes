@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md",
+                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md",
+                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md",
+                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md"
+                "file": "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md"
               }
             }
           }
@@ -148,6 +148,18 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
+    "coding/os/linux/memory/C&DMA/应读者要求讲讲 DMA.md",
+    "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
+    "coding/os/linux/network/i_最后一天，继续卷！.md",
+    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
+    "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
+    "coding/os/linux/performance/t_性能优化的路有多远？.md",
+    "coding/os/linux/performance/pn_Linux问题分析与性能优化.md",
+    "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
+    "coding/os/linux/performance/bn_Linux系统性能优化：七个实战经验.md",
+    "coding/os/linux/performance/bn_系统性能分析从入门到进阶.md",
     "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
     "coding/os/linux/process/coroutine/i_协程究竟比线程牛在什么地方？.md",
     "coding/os/linux/process/k_一文看懂 fork 系统调用.md",
@@ -162,18 +174,6 @@
     "coding/os/linux/process/b_为什么新版内核将进程pid管理从bitmap替换成了radix-tree？.md",
     "coding/os/linux/schedule/barrier/Why Memory Barriers中文翻译（下）.md",
     "coding/os/linux/schedule/barrier/Why Memory Barriers？中文翻译（上）.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
-    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）的中文翻译（上）.md",
-    "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
-    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
-    "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
-    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/schedule/i_Linux内核同步机制之（一）：原子操作.md",
-    "coding/os/linux/schedule/i_Linux内核同步机制之（二）：Per-CPU变量.md",
-    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
-    "coding/os/linux/schedule/i_甄建勇：五分钟搞定计算机体系结构（上）.md",
-    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom/design-pattern",

@@ -1,18 +1,6 @@
-# 
-
 Linux云计算网络
-
  _2021年09月09日 08:13_
-
 The following article is from 赐我白日梦 Author 赐我白日梦
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM74hYTZZLibbBGwnB25vS6psdqauiatysAcnKJLc7Ayg1RQ/0)
-
-**赐我白日梦**.
-
-熊厂🐻程序员，赐我白日梦的笔记
 
 ](https://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496357&idx=1&sn=561cb194d70bd4f693445c34fdf8b5c2&chksm=ea77c61ddd004f0b35fe9d665da61e19805212da0c995480ddbc2016bfb9a918039b2a9ca3a0&mpshare=1&scene=24&srcid=0909MmqSkBeTIqd1BRM6mkYz&sharer_sharetime=1631147611819&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03ab310529d0689a0e875ecb3473de37d0966f561e62c40aa5970f6e5e3e8589597d0042c6e0efbd1192610e15494bd634e093fd272b63eaf3b5e06eca857032c0a6d4bfce98e1afe21519bc40fbdaa07fc6e891ea1ba6c8846fc3afdbcf8ee9929cf860115f43a1b59f93b6caf3691c554102f7d57a242d8&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_5c352b88aa29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQLbZ1ZrWiEfvSMaQmK3La9xKUAgIE97dBBAEAAAAAAKErMtksEV8AAAAOpnltbLcz9gKNyK89dVj0jWBYF0s8qUI2jfcxjljsHapAYqAwTMy%2FX7qI4on%2FlJwr766sHBk31N0aD5OI0jYOBaJgXSTC6S7Oo7rTIj098W8QdX5do%2FTCgP8koOr8Aa9HFo%2FQcZgkpVXr0Nys6p1Y3n4XU6G4plk6GjjVuPFVysbyNUuDckS%2BVnCEGac6POf8HPR1tYB8mICoen%2F6UseVePYJO496GAemALHmrJYn7nYNlkx6AIZhBbTqixo8aDu277dX2jA%2Becd7gJrALiL1I5pkeZMcmz6PFOOmy4JWbfgLB%2BBe52QUUvFRmFNskjvMJHzIJANmrHyj9frw3Q%3D%3D&acctmode=0&pass_ticket=I18it5ABTV08CuyImy%2BjeOSwwsV%2FqF6iCoQHwwp5g9RGyFVvsA7TKHy7jX5aWDHu&wx_header=0#)
 

@@ -1,13 +1,6 @@
-
-
 Linux云计算网络
-
  _2024年04月01日 08:14_ _广东_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/1TDxR6xkRSEplO6BjCUUzQ0dGo5KhZ6d3HYZCTGyWqauM0BLWKKtSOicg4czIvKTLbXB6frzdf5x9PY8jzbicZkg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
 来源公众号：twt社区IT社区  
-
 原文链接：https://mp.weixin.qq.com/s/Rey0gSnnj-zoAEwE6J-Gjw
 
 Linux系统的性能是指操作系统完成任务的有效性、稳定性和响应速度。Linux系统管理员可能经常会遇到系统不稳定、响应速度慢等问题，例如在Linux上搭建了一个web服务，经常出现网页无法打开、打开速度慢等现象，而遇到这些问题，就有人会抱怨Linux系统不好，其实这些都是表面现象。
@@ -18,7 +11,7 @@ Linux系统的性能是指操作系统完成任务的有效性、稳定性和响
 
 例如，主机CPU使用率过高报警，登录Linux上去top完之后，却不知道怎么进一步定位，到底是系统CPU资源太少，还是应用程序导致的问题？这些Linux性能问题一直困扰着我们，哪怕工作多年的资深工程师也不例外。
 
-# 本文根据社区探讨，整理出**企业Linux系统性能优化的7个实战经验**，来自社区专家和会员分享，希望对大家有所帮助。
+本文根据社区探讨，整理出**企业Linux系统性能优化的7个实战经验**，来自社区专家和会员分享，希望对大家有所帮助。
 
 ## **1、影响Linux系统性能的因素一般有哪些？**
 
