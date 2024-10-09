@@ -1,20 +1,18 @@
-
-
 原创 晓泰 泰晓科技
 
- _2024年03月15日 20:27_ _广东_
+_2024年03月15日 20:27_ _广东_
 
-> Corrector: TinyCorrect v0.2-rc2 - [spaces]  
-> Author:    Yuan Tan tanyuan@tinylab.org  
-> Date:      20230730  
-> Revisor:   Falcon falcon@tinylab.org  
-> Project:   RISC-V Linux 内核剖析  
-> Proposal:  通过编译器解决因链接过程 KEEP 操作引起的 Section GC 失败问题  
+> Corrector: TinyCorrect v0.2-rc2 - \[spaces\]\
+> Author:    Yuan Tan tanyuan@tinylab.org\
+> Date:      20230730\
+> Revisor:   Falcon falcon@tinylab.org\
+> Project:   RISC-V Linux 内核剖析\
+> Proposal:  通过编译器解决因链接过程 KEEP 操作引起的 Section GC 失败问题\
 > Sponsor:   PLCT Lab, ISCAS
 
 本周继续连载 Section Gc 系列文章，记得收藏分享+关注，合集：https://tinylab.org/riscv-linux
 
-**学习 RISC-V Linux，就用泰晓社区自研 RISC-V 实验盘 和 RISC-V 实验箱  
+**学习 RISC-V Linux，就用泰晓社区自研 RISC-V 实验盘 和 RISC-V 实验箱\
 （https://tinylab.org/tiny-riscv-box）！**
 
 # 解决 Linux 内核 Section GC 失败问题 - Part 1
@@ -24,15 +22,14 @@
 本文为 解决 Linux 内核 Section GC 失败问题 系列文章的一部分。
 
 - Section GC 分析 - Part 1 原理简介
-    
+
 - Section GC 分析 - Part 2  gold 源码解析
-    
+
 - Section GC 分析 - Part 3 引用建立过程
-    
+
 - 解决 Linux 内核 Section GC 失败问题 - Part 1
-    
+
 - 解决 Linux 内核 Section GC 失败问题 - Part 2
-    
 
 前面几篇文章介绍了 Section GC 的使用方法和原理，现在我们来研究 Linux 内核中的 Section GC 失败问题。
 
@@ -61,13 +58,12 @@
 在编译一个 C 语言程序的时候，编译器进行一下几个步骤：
 
 1. 预处理（Preprocessing）阶段：展开 C 语言中的宏和 include
-    
-2. 编译（Compilation）阶段：cc1 先将 C 语言转换成编译器 IR(Intermediate Representation)，在 IR 阶段对程序进行各种优化，然后根据目标架构的汇编语法规则，转换成目标架构汇编
-    
-3. 汇编（Assembly）阶段：汇编器将汇编代码翻译成机器代码，生成目标文件。目标文件是二进制文件，其中包含特定平台上的机器指令，但还没有链接到最终的可执行文件中。
-    
-4. 链接（Linking）阶段：链接器将编译生成的目标文件与所需的库文件进行链接，解析符号引用，并创建最终的可执行文件。在这个阶段，所有的函数和变量引用都被解析为内存地址，生成一个完整的可执行文件。
-    
+
+1. 编译（Compilation）阶段：cc1 先将 C 语言转换成编译器 IR(Intermediate Representation)，在 IR 阶段对程序进行各种优化，然后根据目标架构的汇编语法规则，转换成目标架构汇编
+
+1. 汇编（Assembly）阶段：汇编器将汇编代码翻译成机器代码，生成目标文件。目标文件是二进制文件，其中包含特定平台上的机器指令，但还没有链接到最终的可执行文件中。
+
+1. 链接（Linking）阶段：链接器将编译生成的目标文件与所需的库文件进行链接，解析符号引用，并创建最终的可执行文件。在这个阶段，所有的函数和变量引用都被解析为内存地址，生成一个完整的可执行文件。
 
 最终的 ELF 可执行文件分为不同的 section，如代码节 `.text`、数据节 `.data`。编译阶段就已经划分好了这些节。
 
@@ -112,9 +108,8 @@
 上一小节提到的强制保留方法会造成一些问题，可以分两种情况讨论。
 
 1. `.pushsection` 产生的节不应该被保留仍被保留。 有一函数 `section_pusher()` 使用了 `.pushsection pushed_section` 来增加 `pushed_section` 节的数据。如果 `section_pusher()` 因为被 GC 删除，那么他创建的 `pushed_section` 自然不应该被其他地方使用到，但 `pushed_section` 仍然被强制保留。
-    
-2. `.pushsection` 中引用了 `section_pusher()`，造成所属权反转，`section_pusher()` 也被强制保留。
-    
+
+1. `.pushsection` 中引用了 `section_pusher()`，造成所属权反转，`section_pusher()` 也被强制保留。
 
 下面是情况 2 的一个例子：
 
@@ -128,7 +123,7 @@
 
 这里 `pushed_section` 引用了 `section_pusher()`，让 `section_pusher()` 成为了 `pushed_section` 的子节，形成了错误的依赖关系。不仅 `pushed_section` 会被强制保留，`section_pusher()` 也会被强制保留。
 
-## __ex_table 介绍
+## \_\_ex_table 介绍
 
 `__ex_table` 是一种用于处理异常的数据结构，异常表项是这样定义的：
 
@@ -144,7 +139,7 @@
 
 `// arch/riscv/include/asm/asm-extable.h:14      #define __ASM_EXTABLE_RAW(insn, fixup, type, data) \    ".pushsection __ex_table, \"a\"\n"  \    ".balign 4\n"    \    ".long  ((" insn ") - .)\n"  \    ".long  ((" fixup ") - .)\n"  \    ".short  (" type ")\n"   \    ".short  (" data ")\n"   \    ".popsection\n"   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ownership_reverses.png
 
@@ -159,38 +154,35 @@ ownership_reverses.png
 ## 参考资料
 
 - Section GC 分析 —— 原理简介
-    
+
 - Section GC 分析 —— gold 源码解析
-    
+
 - Section GC 分析 —— 引用建立过程
-    
+
 - 吴章金：通过操作 Section 为 Linux ELF 程序新增数据）
-    
+
 - Section (Using as)
-    
+
 - Linux 异常表 - 在于思考
-    
+
 - Linux 内核的异常修复原理 - 摩斯电码
-    
+
 - Linux 内核缺页异常
-    
+
 - Porting TinyLinux to RISC-V
-    
 
----
+______________________________________________________________________
 
-**首发地址**：https://tinylab.org/section-gc-no-more-keep-part1  
+**首发地址**：https://tinylab.org/section-gc-no-more-keep-part1\
 **技术服务**：https://tinylab.org/ruma.tech
 
 左下角 **阅读原文** 可访问外链。都看到这里了，就随手在看+分享一下吧 ;-)
-
-  
 
 ![](https://mmbiz.qlogo.cn/mmbiz_png/1tEsbMpHLZI1QWGqkrkKGqDOOicX6ptkaFYaVfDXR4XTic5lafHBFKib1ly1TdKkwb01S9WTUQlQQ5lBdgY6riaedg/0?wx_fmt=png)
 
 晓泰
 
- ～一份支持，一份动力～ 
+～一份支持，一份动力～
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzA5NDQzODQ3MQ==&mid=2648193207&idx=1&sn=4f7c89f10056a9685b2e50a83d5b6a6d&chksm=88620d9fbf1584899c4ba9e3d7a1c688cbbf920125aa8818268317d2b4743a433a6a59889035&mpshare=1&scene=24&srcid=0315hDiMP9Am9AAP2M9DrF1Q&sharer_shareinfo=2d38c8eb09eb0cb794fe32e248ca9f00&sharer_shareinfo_first=2d38c8eb09eb0cb794fe32e248ca9f00&key=daf9bdc5abc4e8d0ef99f4b14c2fa631e71f67c4ba89474d158ad558190bc7392a164c7c4d0abdf50eae3051317b3a8cf536e1671d5bb4e7de242476e8988056a6fe1e3fe57e74745cea00080c554b77b91e6844c20ed0765736cc84998b5a51a7945b00dbfece4d6f4af3ec00b72cdc2f820cf2c02814a605fa2c2ebe8fa2b5&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQHBKwCTv3%2BBD52EuSdWit9BLmAQIE97dBBAEAAAAAAIYMGSrDr5MAAAAOpnltbLcz9gKNyK89dVj02teNdS6q9GdpJzDp9WZdXOKeabP42QjPZWJJpYbiH%2Fmd2THhMD%2F3WkdYLAuYnGoM0s4E5F0LwviKaKf66U7dExulZSLK%2BJOekO8Bm12z0fw%2F4HIRxhHRofxNQhQyngqpRWYtRcCJemZYUv5nucDXvJW3NvcRRRwr7AdsUXWcabN2rgBzEf558nfV5%2FgxF1TvtlY2zIA2F1i7DIlenfN04hchq4QGD7qIzOSzWKrjfEuH6nxHeCdNtzOqgNXodUov&acctmode=0&pass_ticket=oEvywLLfiBgSlq2yYi0nL6PqjwpmdVMvc6%2F5sAPslOuZ37vr1K9vNcMWj4XA9qdl&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 

@@ -1,7 +1,6 @@
-
 Linux内核之旅
 
- _2021年11月22日 10:06_
+_2021年11月22日 10:06_
 
 The following article is from Linux内核那些事 Author songsong001
 
@@ -11,7 +10,7 @@ The following article is from Linux内核那些事 Author songsong001
 
 以简单的方式介绍 Linux 内核的原理，以通俗的语言分析 Linux 内核的实现。如果你没有接触过 Linux 内核，那么就关注我们的公众号吧，我们将以图解的方式让内核更亲民...
 
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664610409&idx=1&sn=1b1286cd09af9ae9c756095b5bf5383b&chksm=f04d978cc73a1e9a3eabc2df8314c387c50ecf0d172a1a209bbb808b9e257ba101bacac20867&mpshare=1&scene=24&srcid=1122RHeLGq11aTjQ0iE8QcaY&sharer_sharetime=1637556053589&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b2ced0d725e2182388a12c7cba6fadf7e7c0e734dcd7bcf2fd8826f981c987cb7ff847e4fda5fd90f6606914c6d037a895471c22550cd00ab0e643a7354ba2d0c246c31027eedb4e850f6cb64618ae058ae5285437f0d344011cf342ca462e0dbd260ba709eaff1072a937fb75272e20d89791d82a238aa0&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQx472DC6Ytwq4RfmrcEfnshKUAgIE97dBBAEAAAAAAHv9Kj%2BUOHQAAAAOpnltbLcz9gKNyK89dVj0Ul%2Be5%2FspClOjhbNVLJ99Ni3NlidIFH65HIIOAR49knpXTXZFFjLz54XVzyygSnza%2B1buddol8106tZt%2BvHFJmermx0DvhVJCK%2BhTZoeTZaJOWrCGn3ddC1Krqa6WY4fCBYgi74d0FHo%2B7iDJHQ3to7MMFUTXLFs9J5VS9LlnGOyAQAZf%2FgAYWRJGQ2HTT%2Fte9siR1AJY1HBg5g4XP51O5TbXtzGIC98KMvSiHc3TWJgqSKMdYfeAWoadlr6gWwVV2RFXlc%2B7l57M%2Fv%2FIrXIuhEQxZfgLE0VdvdyRT1oNL3wM8xRNdu66pcVARg8WrQ%3D%3D&acctmode=0&pass_ticket=iqTeYdR4%2FGi4Ljg98i819Wd7cCx6MoKiwNk4QjTI3o1i3qM%2FgEsjjWDtW1BQx8K6&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664610409&idx=1&sn=1b1286cd09af9ae9c756095b5bf5383b&chksm=f04d978cc73a1e9a3eabc2df8314c387c50ecf0d172a1a209bbb808b9e257ba101bacac20867&mpshare=1&scene=24&srcid=1122RHeLGq11aTjQ0iE8QcaY&sharer_sharetime=1637556053589&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b2ced0d725e2182388a12c7cba6fadf7e7c0e734dcd7bcf2fd8826f981c987cb7ff847e4fda5fd90f6606914c6d037a895471c22550cd00ab0e643a7354ba2d0c246c31027eedb4e850f6cb64618ae058ae5285437f0d344011cf342ca462e0dbd260ba709eaff1072a937fb75272e20d89791d82a238aa0&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQx472DC6Ytwq4RfmrcEfnshKUAgIE97dBBAEAAAAAAHv9Kj%2BUOHQAAAAOpnltbLcz9gKNyK89dVj0Ul%2Be5%2FspClOjhbNVLJ99Ni3NlidIFH65HIIOAR49knpXTXZFFjLz54XVzyygSnza%2B1buddol8106tZt%2BvHFJmermx0DvhVJCK%2BhTZoeTZaJOWrCGn3ddC1Krqa6WY4fCBYgi74d0FHo%2B7iDJHQ3to7MMFUTXLFs9J5VS9LlnGOyAQAZf%2FgAYWRJGQ2HTT%2Fte9siR1AJY1HBg5g4XP51O5TbXtzGIC98KMvSiHc3TWJgqSKMdYfeAWoadlr6gWwVV2RFXlc%2B7l57M%2Fv%2FIrXIuhEQxZfgLE0VdvdyRT1oNL3wM8xRNdu66pcVARg8WrQ%3D%3D&acctmode=0&pass_ticket=iqTeYdR4%2FGi4Ljg98i819Wd7cCx6MoKiwNk4QjTI3o1i3qM%2FgEsjjWDtW1BQx8K6&wx_header=0#)
 
 在程序出现bug的时候，最好的解决办法就是通过 `GDB` 调试程序，然后找到程序出现问题的地方。比如程序出现 `段错误`（内存地址不合法）时，就可以通过 `GDB` 找到程序哪里访问了不合法的内存地址而导致的。
 
@@ -28,13 +27,12 @@ long ptrace(enum __ptrace_request request,  pid_t pid, void *addr,  vo
 下面解释一下 `ptrace()` 各个参数的作用：
 
 - `request`：指定调试的指令，指令的类型很多，如：`PTRACE_TRACEME`、`PTRACE_PEEKUSER`、`PTRACE_CONT`、`PTRACE_GETREGS`等等，下面会介绍不同指令的作用。
-    
+
 - `pid`：进程的ID（这个不用解释了）。
-    
+
 - `addr`：进程的某个地址空间，可以通过这个参数对进程的某个地址进行读或写操作。
-    
+
 - `data`：根据不同的指令，有不同的用途，下面会介绍。
-    
 
 `ptrace()` 系统调用详细的介绍可以参考以下链接：https://man7.org/linux/man-pages/man2/ptrace.2.html
 
@@ -65,35 +63,33 @@ Register: rdi[0], rsi[0], rdx[0], rax[0], orig_rax[59]ptrace  ptrace.c
 下面解释一下上面程序的执行流程：
 
 1. 主进程调用 `fork()` 系统调用创建一个子进程。
-    
-2. 子进程调用 `ptrace(PTRACE_TRACEME,...)` 把自己设置为被追踪状态，并且调用 `execl()` 执行 `/bin/ls` 程序。
-    
-3. 被设置为追踪（TRACE）状态的子进程执行 `execl()` 的程序后，会向父进程发送 `SIGCHLD` 信号，并且暂停自身的执行。
-    
-4. 父进程通过调用 `wait()` 接收子进程发送过来的信号，并且开始追踪子进程。
-    
-5. 父进程通过调用 `ptrace(PTRACE_GETREGS, child, ...)` 来获取到子进程各个寄存器的值，并且打印寄存器的值。
-    
-6. 父进程通过调用 `ptrace(PTRACE_CONT, child, ...)` 让子进程继续执行下去。
-    
+
+1. 子进程调用 `ptrace(PTRACE_TRACEME,...)` 把自己设置为被追踪状态，并且调用 `execl()` 执行 `/bin/ls` 程序。
+
+1. 被设置为追踪（TRACE）状态的子进程执行 `execl()` 的程序后，会向父进程发送 `SIGCHLD` 信号，并且暂停自身的执行。
+
+1. 父进程通过调用 `wait()` 接收子进程发送过来的信号，并且开始追踪子进程。
+
+1. 父进程通过调用 `ptrace(PTRACE_GETREGS, child, ...)` 来获取到子进程各个寄存器的值，并且打印寄存器的值。
+
+1. 父进程通过调用 `ptrace(PTRACE_CONT, child, ...)` 让子进程继续执行下去。
 
 从上面的例子可以知道，通过向 `ptrace()` 函数的 `request` 参数传入不同的值时，就有不同的效果。比如传入 `PTRACE_TRACEME` 就可以让进程进入被追踪状态，而传入 `PTRACE_GETREGS` 时，就可以获取被追踪的子进程各个寄存器的值等。
 
 本来我想使用 `ptrace` 实现一个简单的调试工具，但在网上找到了一位 Google 的大神 `Eli Bendersky` 写了类似的系列文章，所以我就不再重复工作了，在这里贴一下文章的链接：
 
 - https://eli.thegreenplace.net/2011/01/23/how-debuggers-work-part-1/
-    
+
 - https://eli.thegreenplace.net/2011/01/27/how-debuggers-work-part-2-breakpoints
-    
+
 - https://eli.thegreenplace.net/2011/02/07/how-debuggers-work-part-3-debugging-information
-    
 
 但由于 `Eli Bendersky` 大神的文章只是介绍使用 `ptrace` 实现一个简单的进程调试工具，而没有介绍 `ptrace` 的原理和实现，所以这里为了填补这个空缺，下面就详细介绍一下 `ptrace` 的原理与实现。
 
 ## ptrace实现原理
 
 > 本文使用的 Linux 2.4.16 版本的内核
-> 
+>
 > 看懂本文需要的基础：进程调度，内存管理和信号处理相关知识。
 
 调用 `ptrace()` 系统函数时会触发调用内核的 `sys_ptrace()` 函数，由于不同的 CPU 架构有着不同的调试方式，所以 Linux 为每种不同的 CPU 架构实现了不同的 `sys_ptrace()` 函数，而本文主要介绍的是 `X86 CPU` 的调试方式，所以 `sys_ptrace()` 函数所在文件是 `linux-2.4.16/arch/i386/kernel/ptrace.c`。
@@ -124,9 +120,8 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 当要调试一个进程时，需要使进程进入被追踪模式，怎么使进程进入被追踪模式呢？有两个方法：
 
 - 被调试的进程调用 `ptrace(PTRACE_TRACEME, ...)` 来使自己进入被追踪模式。
-    
+
 - 调试进程（如GDB）调用 `ptrace(PTRACE_ATTACH, pid, ...)` 来使指定的进程进入被追踪模式。
-    
 
 第一种方式是进程自己主动进入被追踪模式，而第二种是进程被动进入被追踪模式。
 
@@ -157,15 +152,14 @@ int do_signal(struct pt_regs *regs, sigset_t *oldset) {    for (;;) 
 上面的代码主要做了3件事：
 
 1. 如果当前进程被标记为 PTRACE 状态，那么就使自己进入停止运行状态。
-    
-2. 发送 SIGCHLD 信号给父进程。
-    
-3. 让出 CPU 的执行权限，使 CPU 执行其他进程。
-    
+
+1. 发送 SIGCHLD 信号给父进程。
+
+1. 让出 CPU 的执行权限，使 CPU 执行其他进程。
 
 执行以上过程后，被追踪进程便进入了调试模式，过程如下图：
-![[Pasted image 20240928175013.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928175013.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 traceme
 
@@ -192,8 +186,8 @@ struct mm_struct {    ...    pgd_t *pgd; /* 页目录指针 */  
 ```
 
 而 `access_process_vm()` 函数就是通过进程的页目录来找到 `addr` 虚拟内存地址映射的物理内存地址，然后把此物理内存地址处的数据复制到 `data` 变量中。如下图所示：
-![[Pasted image 20240928175023.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928175023.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 memory_map
 
@@ -212,8 +206,8 @@ asmlinkage int sys_ptrace(long request, long pid, long addr, long data)
 要把被调试的进程设置为单步调试模式，英特尔的 X86 CPU 提供了一个硬件的机制，就是通过把 `eflags` 寄存器的 `Trap Flag` 设置为1即可。
 
 当把 `eflags` 寄存器的 `Trap Flag` 设置为1后，CPU 每执行一条指令便会产生一个异常，然后会触发 Linux 的异常处理，Linux 便会发送一个 `SIGTRAP` 信号给被调试的进程。`eflags` 寄存器的各个标志如下图：
-![[Pasted image 20240928175032.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928175032.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 eflags-register
 
@@ -228,13 +222,12 @@ tmp = get_stack_long(child, EFL_OFFSET) | TRAP_FLAG;put_stack_long(child, 
 而 `get_stack_long(proccess, offset)` 函数用于获取进程栈 `offset` 处的值，而 `EFL_OFFSET` 偏移量就是 `eflags` 寄存器的值。所以上面两行代码的意思就是：
 
 1. 获取进程的 `eflags` 寄存器的值，并且设置 `Trap Flag` 标志。
-    
-2. 把新的值设置到进程的 `eflags` 寄存器中。
-    
+
+1. 把新的值设置到进程的 `eflags` 寄存器中。
 
 设置完 `eflags` 寄存器的值后，就调用 `wake_up_process()` 函数把被调试的进程唤醒，让其进入运行状态。单步调试过程如下图：
-![[Pasted image 20240928175040.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928175040.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 single-trace
 
@@ -246,8 +239,6 @@ single-trace
 
 由于 `ptrace()` 的功能十分强大，所以本文只能抛砖引玉，没能对其所有功能进行分析。另外断点功能并不是通过 `ptrace()` 函数实现的，而是通过 `int3` 指令来实现的，在 `Eli Bendersky` 大神的文章有介绍。而对于 `ptrace()` 的所有功能，只能读者自己慢慢看代码来体会了。
 
-  
-
 Reads 4950
 
 ​
@@ -257,21 +248,20 @@ Comment
 **留言 2**
 
 - 元自然
-    
-    2021年11月22日
-    
-    Like
-    
-    这个能调试linux 内核吗
-    
-    Linux内核之旅
-    
-    Author2021年11月25日
-    
-    Like
-    
-    不行，内核要kgdb
-    
+
+  2021年11月22日
+
+  Like
+
+  这个能调试linux 内核吗
+
+  Linux内核之旅
+
+  Author2021年11月25日
+
+  Like
+
+  不行，内核要kgdb
 
 已无更多数据
 
@@ -290,20 +280,19 @@ Comment
 **留言 2**
 
 - 元自然
-    
-    2021年11月22日
-    
-    Like
-    
-    这个能调试linux 内核吗
-    
-    Linux内核之旅
-    
-    Author2021年11月25日
-    
-    Like
-    
-    不行，内核要kgdb
-    
+
+  2021年11月22日
+
+  Like
+
+  这个能调试linux 内核吗
+
+  Linux内核之旅
+
+  Author2021年11月25日
+
+  Like
+
+  不行，内核要kgdb
 
 已无更多数据

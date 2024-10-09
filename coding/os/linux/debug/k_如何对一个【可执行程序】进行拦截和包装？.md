@@ -5,10 +5,8 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 ![Image](https://mmbiz.qpic.cn/mmbiz_gif/WC13ibsIvG3Y8MTyd4ia2QsjDhz1XzpjgOxWRlefNadnEbZvYFK9nVKjbjgTDZPibD2CTpglrCicGpyvBeZlSJtJRQ/640?wx_fmt=gif&tp=webp&wxfrom=5&wx_lazy=1)
 
 > 作  者：道哥，10+年嵌入式开发老兵，专注于：C/C++、嵌入式、Linux。
-> 
+>
 > 关注下方公众号，回复【书籍】，获取 Linux、嵌入式领域经典书籍；回复【PDF】，获取所有原创文章( PDF 格式)。
-
-  
 
 别人的经验，我们的阶梯！
 
@@ -19,11 +17,10 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 文中一共讨论了`3`种方法，来实现对【函数】进行拦截：
 
 > 1. 在编译阶段插桩;
->     
-> 2. 在链接阶段插桩;
->     
-> 3. 在执行阶段插桩;
->     
+>
+> 1. 在链接阶段插桩;
+>
+> 1. 在执行阶段插桩;
 
 昨天一个网友提了另外一个问题：如何对一个可执行程序进行拦截？
 
@@ -32,7 +29,7 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 `Ubuntu 18.04`操作系统中，重启指令`/sbin/reboot`是一个软链接，链接到可执行程序`/bin/systemctl`，那么是否可以在执行`systemctl`之前，做一些其它的事情(例如：保持一些应用程序的状态数据)？
 
 > Ubuntn18.04 中使用 systemd 来管理系统的所有 Service;
-> 
+>
 > 除了 reboot 指令，还有其它几个指令也是软链接到 /bin/systemctl;
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/WC13ibsIvG3Y8MTyd4ia2QsjDhz1XzpjgORELibZEdm1TOiaDnyNib054FBg4V0UWO0w8MaU0QmicUXNz0HQ6f7XYe2g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
@@ -41,7 +38,7 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 
 既然上面这`6`个命令都链接到`systemctl`，那么当`systemctl`被执行的时候，它是如何知道它是被哪一个命令调用的呢？
 
-看一下源码就知道了：通过参数 argv[0] 来获得的。
+看一下源码就知道了：通过参数 argv\[0\] 来获得的。
 
 我们知道，`main`函数通过`argc`和`argv[]`来获取所有的参数，如下：
 
@@ -119,11 +116,7 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/WC13ibsIvG3Y8MTyd4ia2QsjDhz1XzpjgOibrOeZvqsNvfYfGzDGiaItOtN6oiaiaGGvTlalibr94h3VFOwxCzV6PXjibA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 ------ End ------
-
-  
 
 以上就是今天分享的内容，感谢您的阅读！
 
@@ -131,9 +124,7 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 
 如果转载本文，文末务必注明：“转自微信公众号：IOT物联网小镇”。
 
-  
-
-推荐阅读  
+推荐阅读
 
 [【1】C语言指针-从底层原理到花式技巧，用图文和代码讲解透彻](https://mp.weixin.qq.com/s?__biz=MzA3MzAwODYyNQ==&mid=2247484230&idx=1&sn=da68a36ddeb0dcab1b4ed685130ccf2e&scene=21#wechat_redirect)
 
@@ -147,15 +138,9 @@ Original 道哥 IOT物联网小镇  _2022年06月17日 07:55_ _江苏_
 
 [【6】Linux中对【库函数】的调用进行跟踪的3种【插桩】技巧](https://mp.weixin.qq.com/s?__biz=MzA3MzAwODYyNQ==&mid=2247487152&idx=1&sn=e5cf23a6de4995ba32058423f4edbb2f&scene=21#wechat_redirect)
 
-  
-
 ![Image](https://mmbiz.qpic.cn/mmbiz/WC13ibsIvG3Y8MTyd4ia2QsjDhz1XzpjgO2pHiblXVOpibDojdhad1hKASFouuT2W0uyYPict30mGNeWEz8uooicygJA/640?wx_fmt=bmp&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 星标公众号，第一时间看文章！
-
-  
-
-  
 
 ​
 

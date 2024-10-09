@@ -1,7 +1,6 @@
-
 原创 CFC4N 榫卯江湖
 
- _2022年06月08日 19:20_ _上海_
+_2022年06月08日 19:20_ _上海_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/IjnZ9ic9bGHtPAahMhI15bGncsAjvibibT4qJvib0WPicxVibWLIAd7eEzIhzp4SFicCRL1r1YcAQJwjv75LvDicAkSH8A/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -13,7 +12,7 @@
 
 在云原生领域中，Cilium是容器管理上最著名的网络编排、可观察性、网络安全的开源软件。基于革命性技术eBPF实现，并用XDP、TC等功能实现了L3、L4层的防火墙、负载均衡软件，具备优秀的网络安全处理能力，但在运行时安全上，Cilium一直是缺失的。
 
-2022年5月，在欧洲举行的KubeCon技术峰会期间，Cilium的母公司Isovalent发布了云原生运行时防护系统Tetragon[1]，填补这一空缺。
+2022年5月，在欧洲举行的KubeCon技术峰会期间，Cilium的母公司Isovalent发布了云原生运行时防护系统Tetragon\[1\]，填补这一空缺。
 
 Tetragon的面世，意味着与falco、tracee、KubeArmor、datadog-agent等几款产品正面竞争，eBPF运行时防护领域愈加内卷。
 
@@ -29,13 +28,13 @@ Tetragon的面世，意味着与falco、tracee、KubeArmor、datadog-agent等几
 
 # Tetragon介绍
 
-摘自Tetragon官方仓库[2]的产品介绍。
+摘自Tetragon官方仓库\[2\]的产品介绍。
 
 ### eBPF实时性
 
 Tetragon 是一个运行时安全实时和可观察性工具。它直接在内核中对事件做相应动作，比如执行过滤、阻止，无需再将事件发送到用户空间处理。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于可观察性用例，直接在内核中应用过滤器会大大减少观察开销。避免昂贵的上下文切换，尤其是对于高频事件，例如发送、读取或写入操作，减少了大量的内存、CPU等资源。
 
@@ -57,46 +56,45 @@ Tetragon 通过eBPF钩子感知Linux Kernel状态，并将状态与Kubernetes用
 
 以上是Tetragon官方的介绍，提到具备`阻断`能力，并在技术峰会上，展示了相关阻断的截图，有必要了解一下其实现原理。
 
-tetragon的运行原理会在下篇详细介绍，本篇主要讲实时阻断原理。本文分析的代码版本为首次发布的tag v0.8.0[3] ，commit ID：75e49ab。
+tetragon的运行原理会在下篇详细介绍，本篇主要讲实时阻断原理。本文分析的代码版本为首次发布的tag v0.8.0\[3\] ，commit ID：75e49ab。
 
 ## 业界常见方式
 
 `LKM的内核模块`、`LD_PRELOAD`的动态链接库修改、基于LSM的`selinux`、`seccomp`技术等都是常见做内核态/用户态运行时阻断的技术方案，而缺点就比较明显，系统稳定性、规则灵活性、变更周期等问题比较突出。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当然，也有使用内核模块方式。方法是把eBPF特性，封装在内核模块里，再安装到老版本的内核上，这样，就可以覆盖更多内核版本了。但backport新特性的做法在社区里很不推荐，维护成本特别高，需要比较大的内核研发团队与深厚的技术功底。。
 
 云原生生态中，CNCF的项目Falco具备内核模块与eBPF探针两套驱动引擎，提供数据收集能力。同类产品Tracee也是，还基于LSM接口，实现了一定的防御阻断能力，同时支持使用者自定义语法配置文件，进行检测、判断、阻断规则的修改快速更新，以达到更好的防御能力。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-作为云原生领域的容器管理软件领头羊，Cilium也会落后，但Linux Security Module[4]钩子（以下简称LSM）需要Linux Kernel 5.7以上版本，而业界多数内核版本都不会这么新。Cilium有没有使用LSM类HOOK进行阻断呢？我们一起来看一下。
+作为云原生领域的容器管理软件领头羊，Cilium也会落后，但Linux Security Module\[4\]钩子（以下简称LSM）需要Linux Kernel 5.7以上版本，而业界多数内核版本都不会这么新。Cilium有没有使用LSM类HOOK进行阻断呢？我们一起来看一下。
 
 ## 配置文件
 
 前面提到，Tetragon灵活性更高，可以读取配置文件规则，应用到内核态。以代码仓库的`crds/examples/open_kill.yaml`为例，语法规则分为如下几部分
 
 1. kprobe函数名
-    
-2. 函数原型参数
-    
-3. 进程过滤配置
-    
-4. 参数过滤配置
-    
-5. 执行动作
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 函数原型参数
+
+1. 进程过滤配置
+
+1. 参数过滤配置
+
+1. 执行动作
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中，`matchActions`字段为匹配后的执行动作，比如这里的`Sigkill`
 
- `- call: "__x64_sys_write"       syscall: true       args:       - index: 0         type: "fd"       - index: 1         type: "char_buf"         sizeArgIndex: 3       - index: 2         type: "size_t"       selectors:       - matchPIDs:         - operator: NotIn           followForks: true           isNamespacePID: true           values:           - 0           - 1         matchArgs:         - index: 0           operator: "Prefix"           values:           - "/etc/passwd"         matchActions:         - action: Sigkill`
+`- call: "__x64_sys_write"       syscall: true       args:       - index: 0         type: "fd"       - index: 1         type: "char_buf"         sizeArgIndex: 3       - index: 2         type: "size_t"       selectors:       - matchPIDs:         - operator: NotIn           followForks: true           isNamespacePID: true           values:           - 0           - 1         matchArgs:         - index: 0           operator: "Prefix"           values:           - "/etc/passwd"         matchActions:         - action: Sigkill`
 
 yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`TracingPolicySpec`结构体中，包含`KProbeSpec`和`TracepointSpec`， 对应`json:"kprobes"`和`json:"tracepoints"`两个json的结构。
 
-``type TracingPolicySpec struct {    // +kubebuilder:validation:Optional    // A list of kprobe specs.    KProbes []KProbeSpec `json:"kprobes"`    // +kubebuilder:validation:Optional    // A list of tracepoint specs.    Tracepoints []TracepointSpec `json:"tracepoints"`   }   ``
+`` type TracingPolicySpec struct {    // +kubebuilder:validation:Optional    // A list of kprobe specs.    KProbes []KProbeSpec `json:"kprobes"`    // +kubebuilder:validation:Optional    // A list of tracepoint specs.    Tracepoints []TracepointSpec `json:"tracepoints"`   }    ``
 
 同时，Tetragon还支持远程下发配置，配置结构与yaml结构是一样的。这里相比传统的内核模块等技术方案，灵活性更高。
 
@@ -109,19 +107,18 @@ yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`Tra
 在项目中，抽象出一些概念：
 
 1. Tetragon由多个Sensors传感器构成
-    
-2. Sensor由多个Programs和Maps构成
-    
-3. 每个Program对应eBPF代码的HOOK函数
-    
-4. 每个Map是相应Program的bpf的数据交互map
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. Sensor由多个Programs和Maps构成
+
+1. 每个Program对应eBPF代码的HOOK函数
+
+1. 每个Map是相应Program的bpf的数据交互map
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 `// Program reprents a BPF program.   type Program struct {    // Name is the name of the BPF object file.    Name string    // Attach is the attachment point, e.g. the kernel function.    Attach string    // Label is the program section name to load from program.    Label string    // PinPath is the pinned path to this program. Note this is a relative path    // based on the BPF directory FGS is running under.    PinPath string       // RetProbe indicates whether a kprobe is a kretprobe.    RetProbe bool    // ErrorFatal indicates whether a program must load and fatal otherwise.    // Most program will set this to true. For example, kernel functions hooks    // may change across verions so different names are attempted, hence    // avoiding fataling when the first attempt fails.    ErrorFatal bool       // Needs override bpf program    Override bool       // Type is the type of BPF program. For example, tc, skb, tracepoint,    // etc.    Type      string    LoadState State       // TraceFD is needed because tracepoints are added different than kprobes    // for example. The FD is to keep a reference to the tracepoint program in    // order to delete it. TODO: This can be moved into loaderData for    // tracepoints.    TraceFD int       // LoaderData represents per-type specific fields.    LoaderData interface{}       // unloader for the program. nil if not loaded.    unloader unloader.Unloader   }      ExecveV53 = program.Builder(       "bpf_execve_event_v53.o",       "sched/sched_process_exec",       "tracepoint/sys_execve",       "event_execve",       "execve",   )   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### Sensors传感器加载
 
@@ -130,9 +127,8 @@ yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`Tra
 `pkg/sensors/tracing`包下由两个文件对传感器进行默认注册，分别是`generictracepoint.go`与`generickprobe.go`，写入如下两个Sensors到`registeredTracingSensors`中。
 
 1. observerKprobeSensor ，kprobe类型HOOK
-    
-2. observerTracepointSensor， tracepoint类型HOOK
-    
+
+1. observerTracepointSensor， tracepoint类型HOOK
 
 同时，还会注册自定义eBPF probe加载器到`registeredProbeLoad`中。
 
@@ -155,27 +151,26 @@ yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`Tra
 解析过程如下：
 
 1. 验证配置文件中配置依赖，比如Sigkill需要内核大于5.3
-    
-2. 解析匹配参数（进程名、namespace、路径、五元组等）写入BTF对象
-    
-3. 解析ReturnArg 返回值参数，写入到BTF对象
-    
-4. 过滤保留参数，写入BTF对象
-    
-5. 解析Filters逻辑，写入BTF对象
-    
-6. 解析Binary名字到内核数据结构体
-    
-7. 将属性写入BTF指针，以便加载
-    
-8. 判断action是否为SIGKILL，并写入BTF对象
-    
-9. 设定这个kprobe所需的ebpf字节码文件信息
-    
-10. 利用如上信息，填充到prog的结构体中。
-    
-11. 在prog结构体中，label字段的值都是**kprobe/generic_kprobe**
-    
+
+1. 解析匹配参数（进程名、namespace、路径、五元组等）写入BTF对象
+
+1. 解析ReturnArg 返回值参数，写入到BTF对象
+
+1. 过滤保留参数，写入BTF对象
+
+1. 解析Filters逻辑，写入BTF对象
+
+1. 解析Binary名字到内核数据结构体
+
+1. 将属性写入BTF指针，以便加载
+
+1. 判断action是否为SIGKILL，并写入BTF对象
+
+1. 设定这个kprobe所需的ebpf字节码文件信息
+
+1. 利用如上信息，填充到prog的结构体中。
+
+1. 在prog结构体中，label字段的值都是**kprobe/generic_kprobe**
 
 解析完成后，返回一个新的`sensor`，并添加到`Sensors传感器`数组中。
 
@@ -204,17 +199,16 @@ yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`Tra
 在对每个eBPF program进行加载时，会判断HOOK的类型，针对`tracepoint`特殊判断处理。这里还是以`Kprobe`为例。代码调用`loadInstance`函数，逻辑中判断是否存在自定义的`加载器`：
 
 1. 若有，则调用`s.LoadProbe`加载；
-    
-2. 若没有，则调用`loader.LoadKprobeProgram`加载;
-    
+
+1. 若没有，则调用`loader.LoadKprobeProgram`加载;
 
 `// pkg/sensors/load.go#Line=297   if s, ok := registeredProbeLoad[load.Type]; ok {      logger.GetLogger().WithField("Program", load.Name).WithField("Type", load.Type).Infof("Load probe")      return s.LoadProbe(LoadProbeArgs{       BPFDir:    bpfDir,       MapDir:    mapDir,       CiliumDir: ciliumDir,       Load:      load,       Version:   version,       Verbose:   verbose,      })     }     return loader.LoadKprobeProgram(      version, verbose,      btfObj,      load.Name,      load.Attach,      load.Label,      filepath.Join(bpfDir, load.PinPath),      mapDir,      load.RetProbe)   `
 
 同样，以前面提到的`observerKprobeSensor`类型传感器，已经注册自己的Probe加载器，那么会走`s.LoadProbe()`逻辑，之后，调用`loadGenericKprobeSensor()` -> `loadGenericKprobe()`进行加载。
 
-这里的**load.Name**、**load.Attach**、**load.Label**的值，来自前面的yaml配置文件读取部分，值分别为**bpf_generic_kprobe_v53.o**、 **__x64_sys_write** 、 **kprobe/generic_kprobe**，也就是说，不管是哪个kprobe函数，都会被挂载到**kprobe/generic_kprobe**上，都被`generic_kprobe_event()`这个eBPF 函数处理，起到统一管理的网关作用。
+这里的**load.Name**、**load.Attach**、**load.Label**的值，来自前面的yaml配置文件读取部分，值分别为**bpf_generic_kprobe_v53.o**、 **\_\_x64_sys_write** 、 **kprobe/generic_kprobe**，也就是说，不管是哪个kprobe函数，都会被挂载到**kprobe/generic_kprobe**上，都被`generic_kprobe_event()`这个eBPF 函数处理，起到统一管理的网关作用。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **kprobe/generic_kprobe**对应的eBPF代码在`bpf/process/bpf_generic_kprobe.c`文件里，我们在后面内核空间代码详细分析。
 
@@ -232,7 +226,7 @@ yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`Tra
 
 格式构成为
 
-> filter := [length][matchPIDs][matchBinaries][matchArgs][matchNamespaces][matchCapabilities][matchNamespaceChanges][matchCapabilityChanges]
+> filter := \[length\]\[matchPIDs\]\[matchBinaries\]\[matchArgs\]\[matchNamespaces\]\[matchCapabilities\]\[matchNamespaceChanges\]\[matchCapabilityChanges\]
 
 这些数据，也是在内核空间eBPF逻辑中，实现参数匹配，动作响应的判断依据。
 
@@ -246,7 +240,7 @@ yaml配置文件的解析在`pkg/k8s/apis/cilium.io/v1alpha1/types.go`中的`Tra
 
 之后，再调用CGO的C函数`generic_loader_args()`进行BPF SYSCALL调用，加载eBPF程序，挂载到对应`kprobe`函数上。之后，再写入eBPF Maps。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### eBPF Maps创建写入
 
@@ -255,11 +249,10 @@ Tetragon使用eBPF Maps进行用户空间与内核空间的配置数据交互，
 还是以`open_kill.yaml`为例，涉及了两类`eBPF Map`：
 
 1. 特征匹配规则，也就是配置的内容，比如需要保护的文件路径、IP黑名单等，称之为filters规则
-    
-2. 路由分发规则，也就是tetragon程序内部，用于eBPF HOOK的函数网关处理各类参数的自用规则，用尾调用Tail Call类型的map实现。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 路由分发规则，也就是tetragon程序内部，用于eBPF HOOK的函数网关处理各类参数的自用规则，用尾调用Tail Call类型的map实现。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### filters规则Map
 
@@ -292,35 +285,34 @@ Tetragon使用eBPF Maps进行用户空间与内核空间的配置数据交互，
 一共11个函数，都在`bpf/process/bpf_generic_kprobe.c`文件里，分别是：
 
 1. kprobe/0 对应 generic_kprobe_process_event0
-    
-2. kprobe/1 对应 generic_kprobe_process_event1
-    
-3. kprobe/2 对应 generic_kprobe_process_event2
-    
-4. kprobe/3 对应 generic_kprobe_process_event3
-    
-5. kprobe/4 对应 generic_kprobe_process_event4
-    
-6. kprobe/5 对应 generic_kprobe_process_filter
-    
-7. kprobe/6 对应 generic_kprobe_filter_arg1
-    
-8. kprobe/7 对应 generic_kprobe_filter_arg2
-    
-9. kprobe/8 对应 generic_kprobe_filter_arg3
-    
-10. kprobe/9 对应 generic_kprobe_filter_arg4
-    
-11. kprobe/10 对应 generic_kprobe_filter_arg5
-    
+
+1. kprobe/1 对应 generic_kprobe_process_event1
+
+1. kprobe/2 对应 generic_kprobe_process_event2
+
+1. kprobe/3 对应 generic_kprobe_process_event3
+
+1. kprobe/4 对应 generic_kprobe_process_event4
+
+1. kprobe/5 对应 generic_kprobe_process_filter
+
+1. kprobe/6 对应 generic_kprobe_filter_arg1
+
+1. kprobe/7 对应 generic_kprobe_filter_arg2
+
+1. kprobe/8 对应 generic_kprobe_filter_arg3
+
+1. kprobe/9 对应 generic_kprobe_filter_arg4
+
+1. kprobe/10 对应 generic_kprobe_filter_arg5
 
 至此，涉及**eBPF阻断**功能的用户空间逻辑全部完成。
 
 ## 内核空间
 
-在内核空间，入口函数为用户空间HOOK的kprobe点 **"kprobe/generic_kprobe"** ，对应 **generic_kprobe_event()** 函数。这函数内部只有一个 **generic_kprobe_start_process_filter()**的调用。
+在内核空间，入口函数为用户空间HOOK的kprobe点 **"kprobe/generic_kprobe"** ，对应 **generic_kprobe_event()** 函数。这函数内部只有一个 \*\*generic_kprobe_start_process_filter()\*\*的调用。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 统一网关触发
 
@@ -345,22 +337,20 @@ Tetragon使用eBPF Maps进行用户空间与内核空间的配置数据交互，
 **PFILTER_ACCEPT 逐个进入5类进程event事件判断**
 
 1. generic_process_event0()
-    
-2. generic_process_event1()
-    
-3. generic_process_event2()
-    
-4. generic_process_event3()
-    
-5. generic_process_event4()
-    
-6. generic_kprobe_filter_arg1()
-    
+
+1. generic_process_event1()
+
+1. generic_process_event2()
+
+1. generic_process_event3()
+
+1. generic_process_event4()
+
+1. generic_kprobe_filter_arg1()
 
 **PFILTER_CONTINUE直接进入参数判断**
 
 1. generic_kprobe_filter_arg1()
-    
 
 **OTHER 其他情况**
 
@@ -380,45 +370,43 @@ Tetragon使用eBPF Maps进行用户空间与内核空间的配置数据交互，
 
 当找到`filter`配置后，则读取配置中相应的`action`参数类型，开始进行相应动作分类判断，执行相关流程逻辑，这块都是在`__do_action()`函数中完成的。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 `actions = (struct selector_action *)&f[actoff];      postit = do_actions(e, actions, override_tasks);   `
 
 `action`动作的类型有下面几种
 
 1. ACTION_POST = 0,
-    
-2. ACTION_FOLLOWFD = 1,
-    
-3. ACTION_SIGKILL = 2,
-    
-4. ACTION_UNFOLLOWFD = 3,
-    
-5. ACTION_OVERRIDE = 4,
-    
+
+1. ACTION_FOLLOWFD = 1,
+
+1. ACTION_SIGKILL = 2,
+
+1. ACTION_UNFOLLOWFD = 3,
+
+1. ACTION_OVERRIDE = 4,
 
 每个`action`动作类型都有相应的处理逻辑，本文重点是阻断的实现，那么只需要关注`ACTION_SIGKILL`类型。
 
 `static inline __attribute__((always_inline)) long   __do_action(long i, struct msg_generic_kprobe *e,        struct selector_action *actions, struct bpf_map_def *override_tasks)   {    int action = actions->act[i];        switch (action) {    case ACTION_UNFOLLOWFD:    case ACTION_FOLLOWFD:       // ...     break;    case ACTION_SIGKILL:     if (bpf_core_enum_value(tetragon_args, sigkill))      send_signal(FGS_SIGKILL);     break;    case ACTION_OVERRIDE:         default:     break;    }    if (!err) {     e->action = action;     return ++i;    }    return -1;   }   `
 
-可以看到，针对类型，是调用了`send_signal()`函数进行下发`FGS_SIGKILL`指令给当前进程，完整阻断动作。`send_signal()`函数是ebpf的内置函数，在Kernel 5.3版本[5]里增加。
+可以看到，针对类型，是调用了`send_signal()`函数进行下发`FGS_SIGKILL`指令给当前进程，完整阻断动作。`send_signal()`函数是ebpf的内置函数，在Kernel 5.3版本\[5\]里增加。
 
-**阻断演示视频**可以到CNCF (Cloud Native Computing Foundation)的油管观看：Real Time Security - eBPF for Preventing attacks - Liz Rice, Isovalent[6]
+**阻断演示视频**可以到CNCF (Cloud Native Computing Foundation)的油管观看：Real Time Security - eBPF for Preventing attacks - Liz Rice, Isovalent\[6\]
 
 **LSM HOOK比较**`LSM类HOOK`是在Kernel 5.7以后才添加。阻断功能的实现，Tetragon选择`send_signal()`的方式，有着兼容更多内核版本的优势。并且其kprobe的HOOK点上，可以实现网关式通用处理，通过配置方式，更灵活地变更HOOK点，避免更新eBPF字节码的方式。
 
 1. 更灵活
-    
-2. 网关式
-    
-3. 内核版本覆盖多
-    
+
+1. 网关式
+
+1. 内核版本覆盖多
 
 # 总结
 
 Tetragon是一个实时识别阻断的运行时防护系统。具备网关式统一处理抓手，可以覆盖更多内核版本，通过配置文件方式灵活变更HOOK点。在eBPF技术支持下，还具备热挂载，系统稳定性高，程序可靠性高等特点。是主机运行时防护系统HIDS的最佳学习项目。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 笔者水平有限，若有错误，欢迎指出，谢谢。
 
@@ -430,28 +418,25 @@ Tetragon是一个实时识别阻断的运行时防护系统。具备网关式统
 
 2022年5月，云原生安全公司Isovalent的CTO宣布开源了其内部开发了多年的基于eBPF安全监控和阻断的方案：Tetragon。称可以防御容器逃逸的Linux内核漏洞。
 
-安全研究人员Felix Wilhelm的质疑，在Tetragone: A Lesson in Security Fundamentals[7]认为可以轻易绕过，并用CVE-2021-22555[8]漏洞修改版演示。
+安全研究人员Felix Wilhelm的质疑，在Tetragone: A Lesson in Security Fundamentals\[7\]认为可以轻易绕过，并用CVE-2021-22555\[8\]漏洞修改版演示。
 
 这篇文章从标题上都充满了各种嘲讽，`Tetragon`单词加了`e`，大概是`gone`的谐音吧。`grsecurity`是linux 内核安全经验非常深厚的大厂，对这个领域比较精通。但`Tetragon`的优势并不是内核底层安全能力。
 
-赛博堡垒（HardenedVault）也撰写一篇文章，云原生安全Tetragon案例之安全产品自防护[9] 认为该产品必定失败。
+赛博堡垒（HardenedVault）也撰写一篇文章，云原生安全Tetragon案例之安全产品自防护\[9\] 认为该产品必定失败。
 
 > 随着云原生的流行，Linux内核安全成为了一个无法绕开的问题，某个容器被攻陷后可以向Linux内核发起攻击，一旦成功则整个主机都会被攻击者控制，如果你不想你的产品耗资上百万美金后攻击者两个小时就攻陷的话，那应该认真的考虑是否应该从一开始就建立正确的威胁模型。另外，eBPF机制更适合实现审计监控类的安全方案而非防护阻断类，VED的eBPF版本也仅仅是为审计而设计，剩下的事情你应该让SIEM和SOC团队去做，在安全流程上我们也应该遵循KISS（Keep it simple, stupid！）原则，不是吗？
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 我的看法
 
 针对漏洞利用的方法（注：不是漏洞）的防御机制通常会针对三个阶段：
 
 1. Pre-exploitation（前漏洞利用阶段）
-    
-2. Exploitation（漏洞利用阶段）
-    
-3. Post-exploitation（后漏洞利用阶段）
-    
+
+1. Exploitation（漏洞利用阶段）
+
+1. Post-exploitation（后漏洞利用阶段）
 
 Tetragon的阻断功能是在`Exploitation漏洞利用阶段`生效的，因为是可以直接阻断，让此次漏洞攻击失败。其次，认可几位安全人员的关于`Tetragon`适用场景说法，更适合阻断用户空间的内核逃逸漏洞。
 
@@ -475,49 +460,47 @@ Tetragon的阻断功能是在`Exploitation漏洞利用阶段`生效的，因为�
 
 ### 参考资料
 
-[1]
+\[1\]
 
 云原生运行时防护系统Tetragon: _https://isovalent.com/blog/post/2022-05-16-tetragon/_
 
-[2]
+\[2\]
 
 Tetragon官方仓库: _https://github.com/cilium/tetragon_
 
-[3]
+\[3\]
 
 tag v0.8.0: _https://github.com/cilium/tetragon/releases/tag/v0.8.0_
 
-[4]
+\[4\]
 
 Linux Security Module: _https://www.kernel.org/doc/html/v4.19/admin-guide/LSM/index.html_
 
-[5]
+\[5\]
 
 Kernel 5.3版本: _https://github.com/torvalds/linux/blob/v5.3/include/uapi/linux/bpf.h#L2703_
 
-[6]
+\[6\]
 
 Real Time Security - eBPF for Preventing attacks - Liz Rice, Isovalent: _https://www.youtube.com/watch?v=Xs3MBK17kCk_
 
-[7]
+\[7\]
 
 Tetragone: A Lesson in Security Fundamentals: _https://grsecurity.net/tetragone_a_lesson_in_security_fundamentals_
 
-[8]
+\[8\]
 
 CVE-2021-22555: _https://github.com/google/security-research/blob/master/pocs/linux/cve-2021-22555/exploit.c_
 
-[9]
+\[9\]
 
 云原生安全Tetragon案例之安全产品自防护: _https://hardenedvault.net/zh-cn/blog/2022-05-25-vspp/_
-
-  
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/gKCOPCVblibIKcAWZw9pxfEavItcEibgw8hibGVRuWba0Fxech04gllHb9QCOrb3ghEYljpsBlTMpf25zPPsBKWrQ/0?wx_fmt=jpeg)
 
 CFC4N
 
- 原创不易 
+原创不易
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzUyMDM0OTY5NA==&mid=2247484028&idx=1&sn=e8aa2abf212984d22b9571a8e0dbd2ae&chksm=f9eaf0edce9d79fbd29c9eb907f719ba89434147b75c10d3bc4b81de6be2de86f5a4fe2162e9&mpshare=1&scene=24&srcid=0608ZnTniBwHH562BKvDDW4i&sharer_sharetime=1654695333918&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0d21707672fe1b5bdcb6e08b691e4ac99847f31a1c8d60f418b33416c3a3445b7e059a6d24623e93c561d00319e47013a76d1f989dad6f669dacb1c7e246ec5c14d84813ffd489d9c3546593a2419c41c217ddc5c002e743c59d50da5d8b98f6ba93343b68755df7ef38fa1ee80420a224c22bdf3b68e0c65&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQq%2BteUAj6%2FbPgdebCeWUjDhLmAQIE97dBBAEAAAAAAG7xCiOFDvoAAAAOpnltbLcz9gKNyK89dVj0CfueA0%2Fd7OIin%2BGBnkdlGcmzKQNnjEA77fiCDvpiELfzXCO%2FBaFqSxPlWc0CLba9ewwb9xNWVumfexbVb6iKl4Sb5KcFqov0CwjFBaj%2FBtjIsKZcAFjM6tVhobDjS8XLOTC2fAuyIg2Y1TvNWOVwU7MCIf47leIjgKefiRnymbz1yYhZwNxQl7af3twkWqZ3CV4FetCGZ6iqlMtvYnYsq0TxVhm1C3HGKlXGwBGLS9enBUbvKWNE3SkCRiPMiKFF&acctmode=0&pass_ticket=H4DpfLS6zerdx96BdaYZnj7KQK0JXg%2FNfvozL3h1R%2BtOLHhdoHHtG%2FRcmdaaHRRO&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 

@@ -69,7 +69,7 @@ stack size              (kbytes, -s) 10240
 
 协程由于是在用户态来完成上下文切换的，所以切换耗时只有区区100ns多一些，比进程切换要高30倍。单个协程需要的栈内存也足够小，只需要2KB。所以，近几年来协程大火，在互联网后端的高并发场景里大放光彩。
 
-无论是空间还是时间性能都比进程（线程）好这么多，那么Linus为啥不把它在操作系统里实现了多好？ 
+无论是空间还是时间性能都比进程（线程）好这么多，那么Linus为啥不把它在操作系统里实现了多好？
 
 实际上协程并不是一个新玩意，在上个世纪60年代的时候就已经有人提出了。操作系统的一个主要设计目标是实时性，对优先级比较高的进程是会抢占当前占用CPU的进程。但是协程无法实现这一点，还得依赖于使用CPU的一方主动释放，与操作系统的实现目的不相吻合。协程的高效是以牺牲了可抢占性为代价的。
 
@@ -77,8 +77,8 @@ stack size              (kbytes, -s) 10240
 
 写在最后，由于我的这些知识在公众号里文章比较分散，很多人似乎没有理解到我对知识组织的体系结构。而且图文也不像视频那样理解起来更直接。所以我在知识星球上规划了视频系列课程，包括**硬件原理、内存管理、进程管理、文件系统、网络管理、Golang语言、容器原理、性能观测、性能优化九大部分大约 120 节内容**，每周更新。加入方式参见[我要开始搞知识星球啦](https://mp.weixin.qq.com/s/_8ux274sY-As__Xwoqmewg)、[如何才能高效地学习技术,我投“融汇贯通”一票](https://mp.weixin.qq.com/s/z82z9jqnt08gBLYGxLHY2g)
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [协程究竟比线程牛在什么地方？](https://kfngxl.cn/index.php/archives/611/)
@@ -123,5 +123,5 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36929次
     - 本站运营：0年168天18小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。

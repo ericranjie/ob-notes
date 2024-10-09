@@ -2,8 +2,7 @@
 *2024 年 03 月 06 日 08:19* *广东*
 以下文章来源于腾讯云开发者  ，作者张江涛
 
-
-](https://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562914&idx=1&sn=2d323c1eed2fd3e5870a7f15dea44237&chksm=8139b9bab64e30acbe7cee5c0ba0b5ce18c3cd1499dc53d5d92b2dcf9adb1dbe4659cbfee26b&mpshare=1&scene=24&srcid=0306PiwJ26g4tBzAalAFqZ3C&sharer_shareinfo=12b20ed0c86342c3e2541fe4823fbd9b&sharer_shareinfo_first=12b20ed0c86342c3e2541fe4823fbd9b&key=daf9bdc5abc4e8d0224d824ab0f15e3fe410b4d7ad060a071367539e786f45f213cc374130ca13ee3645bbc5e1469163e4d6e60971cec8ab9ae9eb653f8c0e1a6f3f9625f3c9d2a1e8a79815e0373154b4c4158af0f79fee5357f402f03ab9a812c45c54dc6769c604b0a1ea2612dabf310fc4edb4a28f8aacc9d6abcb0b2e26&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQcbYWwaW0aIYiLCIkcPbPExLmAQIE97dBBAEAAAAAAO%2FIK48bZFIAAAAOpnltbLcz9gKNyK89dVj0hUCzBaTe0RzHf3USdNpazxIS3qoTMtLAGuYjKtx%2BmiOim1C4m3MBXnc8er7D7dLCwVfm6S0rjaRvA48%2FlLTiUaqMB4to2mRtM2h8qw%2FKuPjRVIUlwal%2FDEh8e1Keb%2BcNO12shKQNqK6OD4mnclWBBzDwRJnb%2FAvKjRT4oqnYzcqGixKxaz3Ug6sTY20zzLU6qqBKURf%2B38SbA6LU%2FNNLcviGwr4FrQzJgLg5Ph1lP89EFX6EjAll3QWOYcL6fger&acctmode=0&pass_ticket=Q4VrPmg%2Fpqw9wgGdCLcn2FDa14aPpxoHJknq4dLU3QR2Md8oqXvll3GAiqHVa1vN&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzAwMDU1MTE1OQ==&mid=2653562914&idx=1&sn=2d323c1eed2fd3e5870a7f15dea44237&chksm=8139b9bab64e30acbe7cee5c0ba0b5ce18c3cd1499dc53d5d92b2dcf9adb1dbe4659cbfee26b&mpshare=1&scene=24&srcid=0306PiwJ26g4tBzAalAFqZ3C&sharer_shareinfo=12b20ed0c86342c3e2541fe4823fbd9b&sharer_shareinfo_first=12b20ed0c86342c3e2541fe4823fbd9b&key=daf9bdc5abc4e8d0224d824ab0f15e3fe410b4d7ad060a071367539e786f45f213cc374130ca13ee3645bbc5e1469163e4d6e60971cec8ab9ae9eb653f8c0e1a6f3f9625f3c9d2a1e8a79815e0373154b4c4158af0f79fee5357f402f03ab9a812c45c54dc6769c604b0a1ea2612dabf310fc4edb4a28f8aacc9d6abcb0b2e26&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQcbYWwaW0aIYiLCIkcPbPExLmAQIE97dBBAEAAAAAAO%2FIK48bZFIAAAAOpnltbLcz9gKNyK89dVj0hUCzBaTe0RzHf3USdNpazxIS3qoTMtLAGuYjKtx%2BmiOim1C4m3MBXnc8er7D7dLCwVfm6S0rjaRvA48%2FlLTiUaqMB4to2mRtM2h8qw%2FKuPjRVIUlwal%2FDEh8e1Keb%2BcNO12shKQNqK6OD4mnclWBBzDwRJnb%2FAvKjRT4oqnYzcqGixKxaz3Ug6sTY20zzLU6qqBKURf%2B38SbA6LU%2FNNLcviGwr4FrQzJgLg5Ph1lP89EFX6EjAll3QWOYcL6fger&acctmode=0&pass_ticket=Q4VrPmg%2Fpqw9wgGdCLcn2FDa14aPpxoHJknq4dLU3QR2Md8oqXvll3GAiqHVa1vN&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 性能优化是降本增效路上必不可少的手段之一，在合适的时机采用合理的手段进行性能优化，一方面可以实现系统性能提升的目标，另一方面也可以借机对腐化的代码进行清理。在程序员的面试环节中，性能优化的问题也几乎是必考题。
 
@@ -35,7 +34,7 @@ TEST(ParamHitDestructorPerf, test) {    vector<ParamHit> hits;    vector
 
 性能对比结果：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到使用 C++的 Class 相比于 ProtoBuf 可以提升 3 倍的性能。
 
@@ -51,7 +50,7 @@ A：其实是不一定的，由于数组具有较高的缓存局部性，可提�
 
 这里给出一个常见操作耗时的数据（2020 年）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 下面也给出一个项目中的使用 Cache Friendly 优化的例子：
 
@@ -75,7 +74,7 @@ TEST(HitContext, test) {    const int keycnt = 264;    std::vector<st
 
 性能对比结果：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 # 03
 
@@ -85,7 +84,7 @@ TEST(HitContext, test) {    const int keycnt = 264;    std::vector<st
 
 |                                                                                                                                                                                                                                                                                               |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **内存碎片：**频繁分配和释放不同大小的对象，可能导致内存碎片，降低内存的使用效率。<br><br>**Cache 不友好：**而且 STL 的普通内存分配器分散了对象的内存地址，降低了数据的缓存命中率。<br><br>**并发差：**STL 的默认内存分配器可能使用全局锁，相当于给加了一把大锁，在多线程环境下性能表现很差。 |
+| \*\*内存碎片：\*\*频繁分配和释放不同大小的对象，可能导致内存碎片，降低内存的使用效率。<br><br>\*\*Cache 不友好：\*\*而且 STL 的普通内存分配器分散了对象的内存地址，降低了数据的缓存命中率。<br><br>\*\*并发差：\*\*STL 的默认内存分配器可能使用全局锁，相当于给加了一把大锁，在多线程环境下性能表现很差。 |
 
 目前在我们的代码中加 jemalloc 还是很方便的，就是在所编译的 target 中加下依赖就好了，比如：
 
@@ -95,7 +94,7 @@ cc_library(name = "mmexpt_dye_api",srcs = ["mmexpt_dye_api.cc",],hdrs = ["mmexp
 
 使用 jemalloc 与不使用 jemalloc 前后性能对比（这里的测试场景是在 loadbusiness 的时候，具体涉及到了一些业务代码）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以发现使用 jemalloc 可以提升 20%多的性能，还是优化了很大的，很小的开发成本（只需要加一个编译依赖）带来不错的收益。
 
@@ -143,7 +142,7 @@ struct DyeHitInfo {    int expt_id, group_id;    uint64_t bucket_src
 
 优化前后性能对比：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 所以其实针对某些特殊场景做一些定制化的开发成本也没有很高，但是带来的收益却是巨大的。
 
@@ -175,11 +174,14 @@ https://github.com/brendangregg/FlameGraph （生成火焰图的工具）
 
 **参考阅读：**
 
-- [Spring 七种事务传播性介绍](http://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562834&idx=1&sn=496e41b1ba83de558971bf1505d5ed0e&chksm=8139b64ab64e3f5ce8f4c138213453b5b538fba79ea8396866c57e24952fa69b63a375198903&scene=21#wechat_redirect)  
+- [Spring 七种事务传播性介绍](http://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562834&idx=1&sn=496e41b1ba83de558971bf1505d5ed0e&chksm=8139b64ab64e3f5ce8f4c138213453b5b538fba79ea8396866c57e24952fa69b63a375198903&scene=21#wechat_redirect)
 
 - [Sora：技术细节推测与原理解读，行业影响与成功关键](http://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562841&idx=1&sn=6c0a359b29872272cc6cea41884e6764&chksm=8139b641b64e3f573c1da8a8e05d94454630b922e8f98a86da4ad071e931327b528a2b9e8486&scene=21#wechat_redirect)
+
 - [万字长文：一文详解单元测试干了什么](http://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562876&idx=1&sn=00b9fbfb2132b79790ac822717634295&chksm=8139b664b64e3f7244a925a049989fdfcb2edb4d349b9d567ae6db00473872d165c9aeff9be9&scene=21#wechat_redirect)
+
 - [vivo 在离线混部探索与实践](http://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562905&idx=1&sn=505028bbb802e6d7c5432c0dbd3c7f50&chksm=8139b981b64e3097f9a8a65ce9a6d4b5abadb29ae28271bf8d54c19f23a6ec96db2df1b588fe&scene=21#wechat_redirect)
+
 - [千万级高性能长连接 Go 服务架构实践](http://mp.weixin.qq.com/s?__biz=MzAwMDU1MTE1OQ==&mid=2653562694&idx=1&sn=9b111722c3d3edb14f32f7178a22590e&chksm=8139b6deb64e3fc8e0cdc6584c31caddf67a4689910088b8e8d7d3e94fcf28a66db46761db7a&scene=21#wechat_redirect)
 
 本文由高可用架构转载。技术原创及架构实践文章，欢迎通过公众号菜单「联系我们」进行投稿

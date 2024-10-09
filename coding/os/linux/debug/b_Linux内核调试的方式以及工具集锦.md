@@ -1,21 +1,23 @@
 CHENG Jian Linux内核之旅
- _2023年01月05日 09:43_ _河南_
+_2023年01月05日 09:43_ _河南_
 原文作者：CHENG Jian
 原文链接：https://kernel.blog.csdn.net/article/details/68948080
 
 本作品采用知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议进行许可, 转载请注明出处, 谢谢合作
 
 因本人技术水平和知识面有限, 内容如有纰漏或者需要修正的地方, 欢迎大家指正, 也欢迎大家提供一些其他好的调试工具以供收录, 鄙人在此谢谢啦
+
 # 1 内核调试以及工具总结
 
 内核总是那么捉摸不透, 内核也会犯错, 但是调试却不能像用户空间程序那样, 为此内核开发者为我们提供了一系列的工具和系统来支持内核的调试.
 
 内核的调试, 其本质是内核空间与用户空间的数据交换, 内核开发者们提供了多样的形式来完成这一功能.
-![[Pasted image 20241007224451.png]]
+!\[\[Pasted image 20241007224451.png\]\]
+
 # 2 用户空间与内核空间数据交换的文件系统
 
 内核中有三个常用的伪文件系统: procfs, debugfs和sysfs.
-![[Pasted image 20240928190647.png]]
+!\[\[Pasted image 20240928190647.png\]\]
 
 它们都用于Linux内核和用户空间的数据交换, 但是适用的场景有所差异：
 
@@ -29,13 +31,15 @@ CHENG Jian Linux内核之旅
 在 Linux 下用户空间与内核空间数据交换的方式, 第 2 部分: procfs、seq_file、debugfs和relayfs：http://www.ibm.com/developerworks/cn/linux/l-kerns-usrs2/
 
 Linux 文件系统：procfs, sysfs, debugfs 用法简介：http://www.tinylab.org/show-the-usage-of-procfs-sysfs-debugfs/
+
 ## 2.1 procfs文件系统
 
 - `ProcFs` 介绍
-`procfs` 是比较老的一种用户态与内核态的数据交换方式, 内核的很多数据都是通过这种方式出口给用户的, 内核的很多参数也是通过这种方式来让用户方便设置的. 除了 `sysctl` 出口到 `/proc` 下的参数, `procfs` 提供的大部分内核参数是只读的. 实际上, 很多应用严重地依赖于procfs, 因此它几乎是必不可少的组件. 前面部分的几个例子实际上已经使用它来出口内核数据, 但是并没有讲解如何使用, 本节将讲解如何使用`procfs`.
+  `procfs` 是比较老的一种用户态与内核态的数据交换方式, 内核的很多数据都是通过这种方式出口给用户的, 内核的很多参数也是通过这种方式来让用户方便设置的. 除了 `sysctl` 出口到 `/proc` 下的参数, `procfs` 提供的大部分内核参数是只读的. 实际上, 很多应用严重地依赖于procfs, 因此它几乎是必不可少的组件. 前面部分的几个例子实际上已经使用它来出口内核数据, 但是并没有讲解如何使用, 本节将讲解如何使用`procfs`.
 
 - 参考资料：
-    用户空间与内核空间数据交换的方式(2)——procfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011141.html
+  用户空间与内核空间数据交换的方式(2)——procfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011141.html
+
 ## 2.2 sysfs文件系统
 
 内核子系统或设备驱动可以直接编译到内核, 也可以编译成模块, 编译到内核, 使用前一节介绍的方法通过内核启动参数来向它们传递参数, 如果编译成模块, 则可以通过命令行在插入模块时传递参数, 或者在运行时, 通过 `sysfs` 来设置或读取模块数据.
@@ -52,6 +56,7 @@ mount -t sysfs sysfs /sysfs
 **相关资料链接：**
 
 用户空间与内核空间数据交换的方式(6)——模块参数与sysfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011470.html
+
 ## 2.3 debugfs文件系统
 
 内核开发者经常需要向用户空间应用输出一些调试信息, 在稳定的系统中可能根本不需要这些调试信息, 但是在开发过程中, 为了搞清楚内核的行为, 调试信息非常必要, printk可能是用的最多的, 但它并不是最好的, 调试信息只是在开发中用于调试, 而 `printk` 将一直输出, 因此开发完毕后需要清除不必要的 `printk` 语句, 另外如果开发者希望用户空间应用能够改变内核行为时, `printk` 就无法实现.
@@ -68,7 +73,7 @@ mount -t sysfs sysfs /sysfs
 
 **相关资料链接：**
 
-用户空间与内核空间数据交换的方式(1)——debugfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011124.html  
+用户空间与内核空间数据交换的方式(1)——debugfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011124.html
 
 Linux内核里的DebugFS：http://www.cnblogs.com/wwang/archive/2011/01/17/1937609.html
 
@@ -89,6 +94,7 @@ Linux 文件系统：procfs, sysfs, debugfs 用法简介：http://www.tinylab.or
 用户空间与内核空间数据交换的方式(1)——debugfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011124.html
 
 Linux 运用debugfs调试方法：http://www.xuebuyuan.com/1023006.html
+
 ## 2.4 relayfs文件系统
 
 `relayfs` 是一个快速的转发(`relay`)数据的文件系统, 它以其功能而得名. 它为那些需要从内核空间转发大量数据到用户空间的工具和应用提供了快速有效的转发机制.
@@ -98,7 +104,7 @@ Linux 运用debugfs调试方法：http://www.xuebuyuan.com/1023006.html
 `relayfs` 的用户空间`API` :
 
 `relayfs` 实现了四个标准的文件 `I/O` 函数, `open、mmap、poll和close`
-![[Pasted image 20240928190738.png]]
+!\[\[Pasted image 20240928190738.png\]\]
 
 注意 : 用户态应用在使用上述 API 时必须保证已经挂载了 relayfs 文件系统, 但内核在创建和使用 channel时不需要relayfs 已经挂载. 下面命令将把 relayfs 文件系统挂载到 /mnt/relay.
 
@@ -107,6 +113,7 @@ Linux 运用debugfs调试方法：http://www.xuebuyuan.com/1023006.html
 用户空间与内核空间数据交换的方式(4)——relayfs：http://www.cnblogs.com/hoys/archive/2011/04/10/2011270.html
 
 Relay：一种内核到用户空间的高效数据传输技术：https://www.ibm.com/developerworks/cn/linux/l-cn-relay/
+
 ## 2.5 seq_file
 
 一般地, 内核通过在 `procfs` 文件系统下建立文件来向用户空间提供输出信息, 用户空间可以通过任何文本阅读应用查看该文件信息, 但是 `procfs` 有一个缺陷, 如果输出内容大于1个内存页, 需要多次读,因此处理起来很难, 另外, 如果输出太大, 速度比较慢, 有时会出现一些意想不到的情况, `Alexander Viro` 实现了一套新的功能, 使得内核输出大文件信息更容易, 该功能出现在 `2.4.15`(包括 `2.4.15`)以后的所有 `2.4` 内核以及 `2.6` 内核中, 尤其是在 `2.6` 内核中，已经大量地使用了该功能
@@ -124,18 +131,21 @@ seq_file源码分析：http://www.cppblog.com/csjiaxin/articles/136681.html
 用序列文件(seq_file)接口导出常用数据结构：http://blog.chinaunix.net/uid-317451-id-92670.html
 
 seq_file机制：http://blog.csdn.net/a8039974/article/details/24052619
+
 # 3 printk
 
 在内核调试技术之中, 最简单的就是 `printk` 的使用了, 它的用法和C语言应用程序中的 `printf` 使用类似, 在应用程序中依靠的是 `stdio.h` 中的库, 而在 `linux` 内核中没有这个库, 所以在 `linux` 内核中,实现了自己的一套库函数, `printk` 就是标准的输出函数
 
-**相关资料链接：**  
+**相关资料链接：**
 
 linux内核调试技术之printk：http://www.cnblogs.com/veryStrong/p/6218383.html
 
 调整内核printk的打印级别：http://blog.csdn.net/tonywgx/article/details/17504001
 
 linux设备驱动学习笔记–内核调试方法之printk：http://blog.csdn.net/itsenlin/article/details/43205983
+
 # 4 ftrace && trace-cmd
+
 ## 4.1 trace && ftrace
 
 `Linux`当前版本中, 功能最强大的调试、跟踪手段. 其最基本的功能是提供了动态和静态探测点, 用于探测内核中指定位置上的相关信息.
@@ -151,7 +161,7 @@ linux设备驱动学习笔记–内核调试方法之printk：http://blog.csdn.n
 `framework`, 采用 `plugin` 的方式支持开发人员添加更多种类的 `trace` 功能.
 
 `Ftrace` 由 `RedHat` 的 `Steve Rostedt` 负责维护. 到 `2.6.30` 为止, 已经支持的 `tracer` 包括 :
-![[Pasted image 20240928190754.png]]
+!\[\[Pasted image 20240928190754.png\]\]
 
 这里还没有列出所有的 `tracer`, `ftrace` 是目前非常活跃的开发领域, 新的 `tracer` 将不断被加入内核。
 
@@ -167,7 +177,7 @@ ftrace 简介：https://www.ibm.com/developerworks/cn/linux/l-cn-ftrace/
 
 ftrace的使用：http://blog.csdn.net/cybertan/article/details/8258394
 
-[转]Linux内核跟踪之trace框架分析：http://blog.chinaunix.net/uid-24063584-id-2642103.html
+\[转\]Linux内核跟踪之trace框架分析：http://blog.chinaunix.net/uid-24063584-id-2642103.html
 
 Linux trace使用入门：http://blog.csdn.net/jscese/article/details/46415531
 
@@ -190,7 +200,9 @@ sudo trace-cmd reord subsystem:tracing   #  解析结果
 trace-cmd: A front-end for Ftrace：https://lwn.net/Articles/410200/
 
 其本质就是对`/sys/kernel/debug/tracing/events` 下各个模块进行操作, 收集数据并解析
+
 # 5 Kprobe && systemtap
+
 ## 5.1 内核kprobe机制
 
 `kprobe` 是 `linux` 内核的一个重要特性, 是一个轻量级的内核调试工具, 同时它又是其他一些更高级的内核调试工具(比如 `perf` 和 `systemtap`)的 “基础设施”, 4.0版本的内核中, 强大的 `eBPF` 特性也寄生于 `kprobe` 之上, 所以 `kprobe` 在内核中的地位就可见一斑了.
@@ -246,11 +258,13 @@ SystemTap Beginner：http://blog.csdn.net/kafeiflynn/article/details/6429976
 Ubuntu Kernel Debuginfo：http://ddebs.ubuntu.com/pool/main/l/linux
 
 Linux 下的一个全新的性能测量和调式诊断工具 Systemtap, 第 3 部分: Systemtap：https://www.ibm.com/developerworks/cn/linux/l-cn-systemtap3/
+
 # 6 kgdb && kgtp
+
 ## 6.1 kgdb
 
 - KDB 和 KGDB 合并, 并进入内核
-    
+
 `KGDB` 是大名鼎鼎的内核调试工具, 他是由 `KDB` 和 `KGDB` 项目合并而来.
 
 `kdb` 是一个Linux系统的内核调试器, 它是由SGI公司开发的遵循GPL许可证的开放源码调试工具. `kdb` 嵌入在`Linux` 内核中. 为内核&&驱动程序员提供调试手段. 它适合于调试内核空间的程序代码. 譬如进行设备驱动程序调试. 内核模块的调试等.
@@ -268,11 +282,12 @@ Linux 下的一个全新的性能测量和调式诊断工具 Systemtap, 第 3 �
 `kdb`跟 `kgdb` 合并之后, 也可以使用 `kgdb` 的`IO` 驱动(比如键盘), 但是同时也 `kdb`也丧失了一些功能.合并之后的`kdb`不在支持汇编级的源码调试. 因此它现在也是平台独立的.
 
 1. kdump和kexec已经被移除。
-2. 从/proc/meninfo中获取的信息比以前少了。
-3. bt命令现在使用的是内核的backtracer，而不是kdb原来使用的反汇编。
-4. 合并之后的kdb不在具有原来的反汇编（id命令）
-    
+1. 从/proc/meninfo中获取的信息比以前少了。
+1. bt命令现在使用的是内核的backtracer，而不是kdb原来使用的反汇编。
+1. 合并之后的kdb不在具有原来的反汇编（id命令）
+
 总结一下 : `kdb` 和 `kgdb` 合并之后，系统中对这两种调试方式几乎没有了明显的界限，比如通过串口进行远程访问的时候，可以使用 `kgdb` 命令, 也可以使用 `kdb` 命令（使用gdb monitor实现）
+
 ## 6.2 KGTP
 
 `KGTP` 是一个 实时 轻量级 `Linux` 调试器 和 跟踪器. 使用 `KGTP`
@@ -283,8 +298,8 @@ Linux 下的一个全新的性能测量和调式诊断工具 Systemtap, 第 3 �
 
 即使板子上没有 `GDB` 而且其没有可用的远程接口, `KGTP` 也可以用离线调试的功能调试内核（见http://code.google.com/p/kgtp/wiki/HOWTOCN#/sys/kernel/debug/gtpframe和离线调试）。
 
-KGTP支持 X86-32 ， X86-64 ， MIPS 和 ARM 。  
-KGTP在Linux内核 2.6.18到upstream 上都被测试过。  
+KGTP支持 X86-32 ， X86-64 ， MIPS 和 ARM 。\
+KGTP在Linux内核 2.6.18到upstream 上都被测试过。\
 而且还可以用在 Android 上(见 http://code.google.com/p/kgtp/wiki/HowToUseKGTPinAndroid)
 
 **相关资料链接：**
@@ -294,9 +309,10 @@ github-KGTP：https://github.com/teawater/kgtp
 KGTP内核调试使用：http://blog.csdn.net/djinglan/article/details/15335653
 
 KGTP中增加对GDB命令“set trace-buffer-size”的支持 - Week 5：http://blog.csdn.net/calmdownba/article/details/38659317
+
 # 7 perf
 
-`Perf` 是用来进行软件性能分析的工具。  
+`Perf` 是用来进行软件性能分析的工具。\
 通过它, 应用程序可以利用 `PMU`, `tracepoint` 和内核中的特殊计数器来进行性能统计. 它不但可以分析指定应用程序的性能问题 (`per thread`). 也可以用来分析内核的性能问题, 当然也可以同时分析应用代码和内核，从而全面理解应用程序中的性能瓶颈.
 
 最初的时候, 它叫做 `Performance counter`, 在 `2.6.31` 中第一次亮相. 此后他成为内核开发最为活跃的一个领域. 在 `2.6.32` 中它正式改名为 `Performance Event`, 因为 `perf` 已不再仅仅作为 `PMU` 的抽象, 而是能够处理所有的性能相关的事件.
@@ -324,11 +340,13 @@ Perf使用教程：http://blog.chinaunix.net/uid-10540984-id-3854969.html
 linux下的内核测试工具——perf使用简介：http://blog.csdn.net/trochiluses/article/details/10261339
 
 perf 移植：http://www.cnblogs.com/helloworldtoyou/p/5585152.html
+
 # 8 其他Tracer工具
+
 ## 8.1 LTTng
 
 `LTTng` 是一个 `Linux` 平台开源的跟踪工具, 是一套软件组件, 可允许跟踪 `Linux` 内核和用户程序, 并控制跟踪会话(开始/停止跟踪、启动/停止事件 等等). 这些组件被绑定如下三个包 :
-![[Pasted image 20240928190832.png]]
+!\[\[Pasted image 20240928190832.png\]\]
 
 **相关资料链接：**
 
@@ -337,18 +355,23 @@ Linux 平台开源的跟踪工具：LTTng：http://www.open-open.com/lib/view/op
 用 lttng 跟踪内核：http://blog.csdn.net/xsckernel/article/details/17794551
 
 LTTng and LTTng project：http://blog.csdn.net/ganggexiongqi/article/details/6664331
+
 ## 8.2 eBPF
 
 extended Berkeley Packet Filter（eBPF）是一个可以在事件上运行程序的高效内核虚拟机（JIT）。它可能最终会提供 ftrace 和 perf_events 的内核编程，并强化其他的 tracer。这是 Alexei Starovoitov 目前正在开发的，还没有完全集成，但是从4.1开始已经对一些优秀的工具有足够的内核支持了，如块设备I/O的延迟热图。可参考其主要作者 Alexei Starovoitov 的BPF slides和eBPF samples。
+
 ## 8.3 Ktap
 
 ktap 在过去是一款前景很好的 tracer，它使用内核中的 lua 虚拟机处理，在没有调试信息的情况下在嵌入式设备上运行的很好。它分为几个步骤，并在有一段时间似乎超过了 Linux 上所有的追踪器。然后 eBPF 开始进行内核集成，而 ktap 的集成在它可以使用 eBPF 替代它自己的虚拟机后才开始。因为 eBPF 仍将持续集成几个月，ktap 开发者要继续等上一段时间。我希??今年晚些时候它能重新开发。
+
 ## 8.4 dtrace4linux
 
 dtrace4linux 主要是 Paul Fox 一个人在业余时间完成的，它是 Sun DTrace 的 Linux 版本。它引入瞩目，还有一些 provider 可以运行，但是从某种程度上来说还不完整，更多的是一种实验性的工具（不安全）。我认为，顾忌到许可问题，人们会小心翼翼的为 dtrace4linux 贡献代码：由于当年 Sun 开源DTrace 使用的是 CDDL 协议，而 dtrace4linux 也不大可能最终进入 Linux kernel。Paul 的方法很可能会使其成为一个 add-on。我很乐意看到 Linux 平台上的 DTrace 和这个项目的完成，我认为当我加入 Netflix 后将会花些时间来协助完成这个项目。然而，我还是要继续使用内置的 tracers，如 ftrace 和 perf_events。
+
 ## 8.5 OL DTrace
 
 Oracle Linux DTrace为了将 DTrace 引入 Linux，特别是 Oracle Linux，做出了很大的努力。这些年来发布的多个版本表明了它的稳定进展。开发者们以一种对这个项目的前景看好的态度谈论着改进 DTrace 测试套件。很多有用的 provider 已经完成了，如：syscall, profile, sdt, proc, sched 以及USDT。我很期待 fbt（function boundary tracing, 用于内核动态跟踪）的完成，它是 Linux 内核上非常棒的 provider。OL DTrace 最终的成功将取决于人们对运行 Oracle Linux（为技术支持付费）有多大兴趣，另一方面取决于它是否完全开源：它的内核元件是开源的，而我没有看到它的用户级别代码。
+
 ## 8.6 sysdig
 
 sysdig是一个使用类tcpdump语法来操作系统事件的新tracer，它使用lua提交进程。它很优秀，它见证了系统跟踪领域的变革。它的局限性在于它只在当前进行系统调用，在提交进行时将所有事件转储为用户级别。你可以使用系统调用做很多事情，然而我还是很希望它能支持跟踪点、kprobe和uprobe。我还期待它能支持eBPF做内核摘要。目前，sysdig开发者正在增加容器支持。留意这些内容。

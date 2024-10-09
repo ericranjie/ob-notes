@@ -1,8 +1,8 @@
 一口Linux
- _2021年12月18日 11:38_
+_2021年12月18日 11:38_
 以下文章来源于飞天小牛肉 ，作者小牛肉
 
-](https://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247500770&idx=1&sn=f508978b102349a6e5d90f93e7720bd7&chksm=f96bb116ce1c3800d23549832f6d88221c375522593a6a1c1ad46168f07b6ec690b295102808&mpshare=1&scene=24&srcid=12185wVOSD6YYXImHWfKF8pC&sharer_sharetime=1639833523104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0c1c4ecc259988152f7710de743fcf40006a761b3a422b4351188a31d0fa061cddfde6cf57dde5de5c1dea4f06fc9567c51eaa4ca53815a246b9b39c106fe020d4cd87f34a92981e9b59ae419a33e3abcf78b782e53d79ef8a7a6721180d54b9edacc6529adb7129471a79447a5cd29d54f9f591e6e1ad63c&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQghJrWLvxiy0tPXz8ncZQxRLmAQIE97dBBAEAAAAAAKqfEkJpmOwAAAAOpnltbLcz9gKNyK89dVj0SnXqCN6DBADlugbujvafgdvk%2F2nCIXhJzhF0%2Be1mFPEQ1x%2FewAe%2BBlBbNYCKaimKj2Dh46X3lDlNuj%2FMzsCmtstWOkcJO0gfrYGOfIEcBHu%2FHtrExDSkG1BQVsFJE1El80t2qxM487nEMSzGUzM4tBEmgkzbLibNQOBlcIhu%2FofVA7x86Nzrj2oaPzzqWjkMXYop%2BzlqsZtjmO14TaMJ%2Bia4f5XOBvIZSksHsv4OvRnS88k5KYzdws5owa%2Fkw6V9&acctmode=0&pass_ticket=rEd9TIgn4OdPmPOBdXk2sf6UFFIrsfLZqRRO%2BjBWN2BHSkdpRAowX8Yt%2BlFTuQyR&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzUxMjEyNDgyNw==&mid=2247500770&idx=1&sn=f508978b102349a6e5d90f93e7720bd7&chksm=f96bb116ce1c3800d23549832f6d88221c375522593a6a1c1ad46168f07b6ec690b295102808&mpshare=1&scene=24&srcid=12185wVOSD6YYXImHWfKF8pC&sharer_sharetime=1639833523104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0c1c4ecc259988152f7710de743fcf40006a761b3a422b4351188a31d0fa061cddfde6cf57dde5de5c1dea4f06fc9567c51eaa4ca53815a246b9b39c106fe020d4cd87f34a92981e9b59ae419a33e3abcf78b782e53d79ef8a7a6721180d54b9edacc6529adb7129471a79447a5cd29d54f9f591e6e1ad63c&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQghJrWLvxiy0tPXz8ncZQxRLmAQIE97dBBAEAAAAAAKqfEkJpmOwAAAAOpnltbLcz9gKNyK89dVj0SnXqCN6DBADlugbujvafgdvk%2F2nCIXhJzhF0%2Be1mFPEQ1x%2FewAe%2BBlBbNYCKaimKj2Dh46X3lDlNuj%2FMzsCmtstWOkcJO0gfrYGOfIEcBHu%2FHtrExDSkG1BQVsFJE1El80t2qxM487nEMSzGUzM4tBEmgkzbLibNQOBlcIhu%2FofVA7x86Nzrj2oaPzzqWjkMXYop%2BzlqsZtjmO14TaMJ%2Bia4f5XOBvIZSksHsv4OvRnS88k5KYzdws5owa%2Fkw6V9&acctmode=0&pass_ticket=rEd9TIgn4OdPmPOBdXk2sf6UFFIrsfLZqRRO%2BjBWN2BHSkdpRAowX8Yt%2BlFTuQyR&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 这个问题挺有区分度的，我也是昨天整理面经才看见的这道题。
 
@@ -14,7 +14,7 @@
 
 在进入文题之前，我想有必要解释下虚拟地址（逻辑地址）和物理地址的区别
 
-下面这段 C 代码摘录自《操作系统导论 -  [美] 雷姆兹·H.阿帕希杜塞尔》，依次打印出 main 函数的地址，由 malloc（类似于 Java 中的 new 操作）返回的堆空间分配的值，以及栈上一个整数的地址：
+下面这段 C 代码摘录自《操作系统导论 -  \[美\] 雷姆兹·H.阿帕希杜塞尔》，依次打印出 main 函数的地址，由 malloc（类似于 Java 中的 new 操作）返回的堆空间分配的值，以及栈上一个整数的地址：
 
 ![](https://mmbiz.qpic.cn/mmbiz_png/PocakShgoGELnicBoj8poS9or2DUBdPEFcGuibAok1eyNatVm7IZxTUvZCagQCAxvuUp4wpibU6jzOoFfNuBDKr3A/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -89,14 +89,14 @@ OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个
 页表是一个十分重要的数据结构！
 
 操作系统为每个进程建立了一张页表。一个进程对应一张页表，进程的每个页面对应一个页表项，每个页表项由页号和块号（页框号）组成，记录着进程页面和实际存放的内存块之间的映射关系。
-![[Pasted image 20240922200948.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240922200948.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从数学角度来说，页表是一个函数，它的参数是虚拟页号，结果是物理页框号。
 
 至此，上述这一套 CPU 生成虚拟地址并进行地址翻译的流程就是**虚拟寻址**（virtual addressing）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 进程切换为什么比线程切换慢？
 
@@ -106,13 +106,11 @@ OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个
 
 So，Tell me，进程切换会涉及什么的切换？
 
-  
-
 是的，**进程切换会涉及到虚拟地址空间的切换，而这正是导致进程切换比线程切换慢的原因所在**！
 
 很多小伙伴可能都云里雾里，啊，是这样吗，怎么回事
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 想一下，上面是不是说过，虚拟地址转换为物理地址需要两个东西：CPU 上的 MMU 和内存中的页表
 
@@ -132,71 +130,57 @@ TLB 中存放的就是那些会被反复读取的页表项。换句话说，TLB 
 
 > 简单理解，TLB 就相当于一个缓存
 
-  
-
 现在再回到问题，不知道各位小伙伴有没有一点思路了。
 
 由于进程切换会涉及到虚拟地址空间的切换，这就导致内存中的页表也需要进行切换，一个进程对应一个页表是不假，但是 CPU 中的 TLB 只有一个啊，这就尴尬了，页表切换后这个 TLB 就失效了。这样，TLB 在一段时间内肯定是无法被命中的，操作系统就必须去访问内存，那么虚拟地址转换为物理地址就会变慢，表现出来的就是程序运行会变慢。
 
 而线程切换呢，由于不涉及虚拟地址空间的切换，也就不存在这个问题了。
 
----
+______________________________________________________________________
 
 最后放上这道题的背诵版：
 
 > 🥸 **面试官**：进程切换为什么比线程切换要慢呢？
-> 
+>
 > 😎 **小牛肉**：额，关于这个问题，需要从虚拟地址和物理地址说起
-> 
+>
 > 物理地址就是真实的地址嘛，这种寻址方式很容易破坏操作系统，而且使得操作系统中同时运行两个或以上的程序几乎是不可能的（此处可以举个例子，第一个程序给物理内存地址赋值 10，第二个程序也同样给这个地址赋值为 100，那么第二个程序的赋值会覆盖掉第一个程序所赋的值，这会造成两个程序同时崩溃）。
-> 
+>
 > 当然，也不是完全不可能，有一种方式可以实现比较粗糙的并发
-> 
+>
 > 就是说，我们将空闲的进程存储在磁盘上，这样当它们不运行时就不会占用内存，当进程需要运行的时候再从磁盘上转到内存上来，不过很显然这种方式比较浪费时间。
-> 
+>
 > 于是，我们考虑，把所有进程对应的内存一直留在物理内存中，给每个进程分别划分各自的区域，这样，发生上下文切换的时候就切换到特定的区域
-> 
+>
 > 那问题还是很明显的，就是仍然没法避免破坏操作系统，因为各个进程之间可以随意读取、写入内容。
-> 
->   
-> 
+>
 > 所以，我们需要一种机制对每个进程使用的地址进行保护，因此操作系统创造了一个新的内存模型，那就是虚拟地址空间
-> 
+>
 > 就是说，每个进程都拥有一个自己的虚拟地址空间，并且独立于其他进程的地址空间，然后每个进程包含的栈、堆、代码段这些都会从这个地址空间中被分配一个地址，这个地址就被称为虚拟地址。底层指令写入的地址也是虚拟地址。
-> 
+>
 > 有了虚拟地址空间后，CPU 就可以通过虚拟地址转换成物理地址这样一个过程，来间接访问物理内存了。
-> 
+>
 > 地址转换需要两个东西，一个是 CPU 上的内存管理单元 MMU，另一个是内存中的页表，页表中存的虚拟地址到物理地址的映射
-> 
+>
 > 但是呢，每次访问内存，都需要进行虚拟地址到物理地址的转换，对吧，这样的话，页表就会被频繁地访问，而页表又是存在于内存中的。所以说，访问页表（内存）次数太多导致其成为了操作系统地一个性能瓶颈。
-> 
+>
 > 于是，引入了转换检测缓冲区 TLB，也就是快表，其实就是一个缓存，把经常访问到的内存地址映射存在 TLB 中，因为 TLB 是在 CPU 的 MMU 中的嘛，所以访问起来非常快。
-> 
->   
-> 
+>
 > 然后，正是因为 TLB 这个东西，导致了进程切换比线程切换慢。
-> 
+>
 > 由于进程切换会涉及到虚拟地址空间的切换，这就导致内存中的页表也需要进行切换，一个进程对应一个页表是不假，但是 CPU 中的 TLB 只有一个，页表切换后这个 TLB 就失效了。这样，TLB 在一段时间内肯定是无法被命中的，操作系统就必须去访问内存，那么虚拟地址转换为物理地址就会变慢，表现出来的就是程序运行会变慢。
-> 
+>
 > 而线程切换呢，由于不涉及虚拟地址空间的切换，所以也就不存在这个问题了。
 
 end
 
-  
-
-  
-
-**一口Linux** 
-
-  
+**一口Linux**
 
 **关注，回复【****1024****】海量Linux资料赠送**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
-**精彩文章合集**  
+**精彩文章合集**
 
 文章推荐
 
@@ -216,11 +200,7 @@ end
 
 ☞【干货】[Linux嵌入式所有知识点-思维导图](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247497822&idx=1&sn=1e2aed9294f95ae43b1ad057c2262980&chksm=f96b8aaace1c03bc2c9b0c3a94c023062f15e9ccdea20cd76fd38967b8f2eaad4dfd28e1ca3d&scene=21#wechat_redirect)
 
-  
-
 点击“**阅读原文**”查看更多分享，欢迎**点分享、收藏、点赞、在看**
-
-  
 
 阅读原文
 
@@ -233,45 +213,44 @@ end
 **留言 5**
 
 - chao
-    
-    2021年12月22日
-    
-    赞
-    
-    请教一个问题 上面有些两个进程对应的虚拟地址空间不一样 因此对应的物理地址就不一样？ 这个不一定吧？
-    
+
+  2021年12月22日
+
+  赞
+
+  请教一个问题 上面有些两个进程对应的虚拟地址空间不一样 因此对应的物理地址就不一样？ 这个不一定吧？
+
 - weixue
-    
-    2021年12月19日
-    
-    赞
-    
-    linux中虽然线程是LWP，但是设计成共用一个页表项就不存在命不中的情况了。省去切换成本。这也是为什么LWP之间能共享地址的原因。
-    
-    一口Linux
-    
-    作者2021年12月19日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月19日
+
+  赞
+
+  linux中虽然线程是LWP，但是设计成共用一个页表项就不存在命不中的情况了。省去切换成本。这也是为什么LWP之间能共享地址的原因。
+
+  一口Linux
+
+  作者2021年12月19日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - echoOo
-    
-    2021年12月18日
-    
-    赞
-    
-    Linux下线程切换就是进程切换，效率一样![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月18日
+
+  赞
+
+  Linux下线程切换就是进程切换，效率一样![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 贝加尔湖畔的微风
-    
-    2021年12月18日
-    
-    赞
-    
-    linux内核里面不是只有内核线程的概念吗？而且所谓应用进程不是也只是当前进程的主线程吗？
-    
+
+  2021年12月18日
+
+  赞
+
+  linux内核里面不是只有内核线程的概念吗？而且所谓应用进程不是也只是当前进程的主线程吗？
 
 已无更多数据
 
@@ -290,44 +269,43 @@ end
 **留言 5**
 
 - chao
-    
-    2021年12月22日
-    
-    赞
-    
-    请教一个问题 上面有些两个进程对应的虚拟地址空间不一样 因此对应的物理地址就不一样？ 这个不一定吧？
-    
+
+  2021年12月22日
+
+  赞
+
+  请教一个问题 上面有些两个进程对应的虚拟地址空间不一样 因此对应的物理地址就不一样？ 这个不一定吧？
+
 - weixue
-    
-    2021年12月19日
-    
-    赞
-    
-    linux中虽然线程是LWP，但是设计成共用一个页表项就不存在命不中的情况了。省去切换成本。这也是为什么LWP之间能共享地址的原因。
-    
-    一口Linux
-    
-    作者2021年12月19日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月19日
+
+  赞
+
+  linux中虽然线程是LWP，但是设计成共用一个页表项就不存在命不中的情况了。省去切换成本。这也是为什么LWP之间能共享地址的原因。
+
+  一口Linux
+
+  作者2021年12月19日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - echoOo
-    
-    2021年12月18日
-    
-    赞
-    
-    Linux下线程切换就是进程切换，效率一样![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月18日
+
+  赞
+
+  Linux下线程切换就是进程切换，效率一样![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 贝加尔湖畔的微风
-    
-    2021年12月18日
-    
-    赞
-    
-    linux内核里面不是只有内核线程的概念吗？而且所谓应用进程不是也只是当前进程的主线程吗？
-    
+
+  2021年12月18日
+
+  赞
+
+  linux内核里面不是只有内核线程的概念吗？而且所谓应用进程不是也只是当前进程的主线程吗？
 
 已无更多数据

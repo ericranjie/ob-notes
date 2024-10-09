@@ -1,17 +1,14 @@
-
-
 Original Gracker Android Performance  _2022年06月30日 08:00_ _四川_
 
 本文是 Systrace 线程 CPU 运行状态分析技巧系列的第三篇，本文主要讲了使用 Systrace 分析 CPU 状态时遇到的 **Sleep** 与 **Uninterruptible Sleep** 状态的原因排查方法与优化方法，这两个状态导致性能变差概率非常高，而且排查起来也比较费劲，网上也没有系统化的文档。
 
-本系列的目的是通过 Systrace 这个工具，从另外一个角度来看待 Android 系统整体的运行，同时也从另外一个角度来对 Framework 进行学习。也许你看了很多讲 Framework 的文章，但是总是记不住代码，或者不清楚其运行的流程，也许从 Systrace 这个图形化的角度，你可以理解的更深入一些。Systrace 基础和实战系列大家可以在 Systrace 基础知识 - Systrace 预备知识[1] 或者 博客文章目录[2] 这里看到完整的目录
+本系列的目的是通过 Systrace 这个工具，从另外一个角度来看待 Android 系统整体的运行，同时也从另外一个角度来对 Framework 进行学习。也许你看了很多讲 Framework 的文章，但是总是记不住代码，或者不清楚其运行的流程，也许从 Systrace 这个图形化的角度，你可以理解的更深入一些。Systrace 基础和实战系列大家可以在 Systrace 基础知识 - Systrace 预备知识\[1\] 或者 博客文章目录\[2\] 这里看到完整的目录
 
-1. [Systrace 线程 CPU 运行状态分析技巧 - Runnable 篇](http://mp.weixin.qq.com/s?__biz=MzIwNTQxMjM5MA==&mid=2247485497&idx=1&sn=1f76cd615518322ba214ee41c1cd99b7&chksm=97300970a0478066a46867085c92251c42c91199b532de574773a78b409d528c7359ddcef053&scene=21#wechat_redirect)[3]
-    
-2. [Systrace 线程 CPU 运行状态分析技巧 - Running 篇](http://mp.weixin.qq.com/s?__biz=MzIwNTQxMjM5MA==&mid=2247485698&idx=1&sn=54bad9edbde9f2ee137d2719cc31943b&chksm=9730084ba047815d655a4602eac17ddaeae104cdd4cb9afb82fc8edfd8829338223f04c4f2fd&scene=21#wechat_redirect)[4]
-    
-3. Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇[5]
-    
+1. [Systrace 线程 CPU 运行状态分析技巧 - Runnable 篇](http://mp.weixin.qq.com/s?__biz=MzIwNTQxMjM5MA==&mid=2247485497&idx=1&sn=1f76cd615518322ba214ee41c1cd99b7&chksm=97300970a0478066a46867085c92251c42c91199b532de574773a78b409d528c7359ddcef053&scene=21#wechat_redirect)\[3\]
+
+1. [Systrace 线程 CPU 运行状态分析技巧 - Running 篇](http://mp.weixin.qq.com/s?__biz=MzIwNTQxMjM5MA==&mid=2247485698&idx=1&sn=54bad9edbde9f2ee137d2719cc31943b&chksm=9730084ba047815d655a4602eac17ddaeae104cdd4cb9afb82fc8edfd8829338223f04c4f2fd&scene=21#wechat_redirect)\[4\]
+
+1. Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇\[5\]
 
 # TASK_INTERUPTIBLE vs TASK_UNINTERRUPTIBLE
 
@@ -20,11 +17,10 @@ Original Gracker Android Performance  _2022年06月30日 08:00_ _四川_
 在 Linux 中的 Sleep 状态可以细分为 3 个状态：
 
 - **TASK_INTERUPTIBLE** → 可中断
-    
+
 - **TASK_UNINTERRUPTIBLE** → 不可中断
-    
+
 - **TASK_KILLABLE** → 等同于 TASK_WAKEKILL | TASK_UNINTERRUPTIBLE
-    
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/HjA9ygCONWmMD0pDHlibbTfYYicfWKgCKMAWr7oPYic8AMVNXWVXoTqhbS8Makictgk5wicds8stv1YnGdORTbkrQpw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -48,7 +44,7 @@ Android 中的 Looper、Java/Native 锁等待都属于 TAKS_INTERRUPTIBLE，因�
 
 Linux 处理硬件调度的时候也会临时关闭中断控制器、调度的时候会临时关闭抢占功能，本质上为了 `防止程序流程进入不可控的状态`。这类状态本身执行时间非常短，但系统出异常、运行压力较大的时候可能会影响到性能。
 
-https://elixir.bootlin.com/linux/latest/ident/TASK_UNINTERRUPTIBLE[6]
+https://elixir.bootlin.com/linux/latest/ident/TASK_UNINTERRUPTIBLE\[6\]
 
 可以看到内核中使用此状态的情况，典型的有 Swap 读数据、信号量机制、mutex 锁、内存慢路径回收等场景。
 
@@ -57,9 +53,8 @@ https://elixir.bootlin.com/linux/latest/ident/TASK_UNINTERRUPTIBLE[6]
 首先要认识到 TASK_INTERUPTIBLE、TASK_UNINTERRUPTIBLE 状态的出现是正常的，但是如果这些这些状态的累计占比达到了一定程度，就要引起注意了。特别是在关键操作路径上这类状态的占比较多的时候，需要排查原因之后做相应的优化。分析问题以及做优化的时候需要牢牢把握两个关键点，它类似于内功心法一样:
 
 1. **原因的排查方法**
-    
-2. **优化方法论**
-    
+
+1. **优化方法论**
 
 你需要知道是什么原因导致了这次睡眠，是主动的还是被动的？如果是主动的，通过走读代码调查是否是正常的逻辑。如果是被动的，故事的源头是什么？这需要你对系统有足够多的认识，以及分析问题的经验，你需要经常看案例以增强自己的知识。
 
@@ -70,22 +65,24 @@ https://elixir.bootlin.com/linux/latest/ident/TASK_UNINTERRUPTIBLE[6]
 本文没办法列举完所有状态的原因，因此只能列举最为常见的类型，以及典型的实际案例。更重要的是，你需要掌握诊断方法，并结合源代码来定位问题。
 
 ## Trace 中的可视化效果
-![[Pasted image 20240928120519.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240928120519.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Pefetto 中支持显示的状态
-![[Pasted image 20240928120526.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928120526.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Systrace 支持显示的状态
 
 # Sleep 状态分析
-![[Pasted image 20240928120533.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240928120533.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 1: UIThread 等待 RenderThread
-![[Pasted image 20240928120542.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928120542.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 2: Binder 调用等待
 
@@ -95,37 +92,35 @@ Systrace 支持显示的状态
 
 Sleep 最常见的有图 1（UIThread 与 RenderThread 同步）的情况与图 2（Binder 调用）的情况。Sleep 状态一般是由程序主动等待某个事件的发生而造成的，比如锁等待，因此它有个比较明确的唤醒源。比如图 1，UIThread 等待的是 RenderThread，你可以通过阅读代码来了解这种多线程之间的交互关系。虽然最直接，但是对开发者的要求非常高，因为这需要你熟读图形栈的代码。这可不是一般的难度，是追求的目标，但不具备普适性。
 
-更简单的方法是通过所谓的 `wakeup from tid: ***` 来调查线程之间的交互关系。从前面的 Runnable 文章[7] 中讲过，任何线程进入 Running 之前会先进入到 Runnable 状态，由此再转换成 Running。从 Sleep 状态切换到 Running，必然也要经过 Runnable。
+更简单的方法是通过所谓的 `wakeup from tid: ***` 来调查线程之间的交互关系。从前面的 Runnable 文章\[7\] 中讲过，任何线程进入 Running 之前会先进入到 Runnable 状态，由此再转换成 Running。从 Sleep 状态切换到 Running，必然也要经过 Runnable。
 
 进入到 Runnable 有两种方式，一种是 Running 中的程序被抢占了，暂时进入到 Runnable。还有一种是由另外一个线程将此线程（处于 Sleep 的线程）变成了 Runnable。
 
 我们在调查 Sleep 唤醒线程关系的时候，应用到的原理是第二种情况。在 Systrace 中这种是被 `wakeup from tid: ***` 信息所呈现。线程被抢占之后变成 Runnable，在 Systrace 中是被 `Running Instead` 呈现。
-![[Pasted image 20240928120610.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928120610.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 需要特别注意的是 `wakeupfrom` 这个有时候不准，原因是跟具体的 tracepoint 类型有关。分析的时候要注意甄别，不要一味地相信这个数据是对的。
 
 ### 其他方法
 
 1. Simpleperf 还原代码执行流
-    
-2. 在 Systrace 寻找时间点对齐的事件
-    
 
-方法 1 适合用来看程序到底在执行什么操作进入到这种状态，是 IO 还是锁等待？球里连载 Simpleperf 工具的使用方法，其中「Simpleperf 分析篇 (1): 使用 Firefox Profiler 可视分析 Simpleperf 数据[8]」介绍了可以按时间顺序看函数调用的可视化方法。其他使用也会陆续更新，直接搜关键字即可。
+1. 在 Systrace 寻找时间点对齐的事件
+
+方法 1 适合用来看程序到底在执行什么操作进入到这种状态，是 IO 还是锁等待？球里连载 Simpleperf 工具的使用方法，其中「Simpleperf 分析篇 (1): 使用 Firefox Profiler 可视分析 Simpleperf 数据\[8\]」介绍了可以按时间顺序看函数调用的可视化方法。其他使用也会陆续更新，直接搜关键字即可。
 
 方法 2 是个比较笨的方法，但有时候也可以通过它找到蛛丝马迹，不过缺点是错误率比较高。
 
 ## 耗时过长的常见原因
 
 - **Binder 操作** → 通过打开 Binder 对应的 trace，可方便地观察到调用到远端的 Binder 执行线程。如果 Binder 耗时长，要分析远端的 Binder 执行情况，是否是锁竞争？得不到 CPU 时间片？要具体问题具体分析
-    
-- **Java\futex 锁竞争等待** → 最常见也是最容易引起性能问题，当负载较高时候特别容易出现，特别是在 SystemServer 进程中。这是 Binder 多线程并行化或抢占公共资源导致的弊端。
-    
+
+- **Java\\futex 锁竞争等待** → 最常见也是最容易引起性能问题，当负载较高时候特别容易出现，特别是在 SystemServer 进程中。这是 Binder 多线程并行化或抢占公共资源导致的弊端。
+
 - **主动等待** → 线程主动进入 Sleep 状态，等待其它线程的唤醒，比如等待信号量的释放。优化建议：需要看代码逻辑分析等待是否合理，不合理就要优化掉。
-    
+
 - **等待 GPU 执行完毕** → 等 GPU 任务执行完毕，Trace 中可以看到等 GPU fence 时间。常见的原因有渲染任务过重、 GPU 能力弱、GPU 频率低等。优化建议：提升 GPU 频率、降低渲染任务复杂度，比如精简 Shader、降低渲染分辨率、降低 Texture 画质等。
-    
 
 # UninterruptibleSleep 状态分析
 
@@ -134,9 +129,8 @@ Sleep 最常见的有图 1（UIThread 与 RenderThread 同步）的情况与图 
 本质上 UninterruptibleSleep 也是一种 Sleep，因此分析 Sleep 状态时用到的方法也是通用的。不过此状态有两个特殊点与 Sleep 不同，因此在此特别说明。
 
 1. **UninterruptibleSleep 分为 IOWait 与 Non-IOWait**
-    
-2. **UninterruptibleSleep 有 Block reason**
-    
+
+1. **UninterruptibleSleep 有 Block reason**
 
 ### UninterruptibleSleep 分为 IOWait 与 Non-IOWait
 
@@ -159,8 +153,8 @@ sched_blocked_reason: pid=30235 iowait=0 caller=get_user_pages_fast+0x34/0x70
 ```
 
 这句话被 Systrace 可视化的效果为:
-![[Pasted image 20240928120629.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928120629.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 主线程中有一段 Uninterruptible Sleep 状态，它的 BlockReason 是 `get_user_pages_fast`。它是一个 Linux 内核中函数的名字，代表着是线程是被它切换到了 UninterruptibleSleep 状态。为了查看具体的原因，需要查看这个函数的具体实现。
 
@@ -169,8 +163,8 @@ sched_blocked_reason: pid=30235 iowait=0 caller=get_user_pages_fast+0x34/0x70
 ```
 
 从函数解释上可以看到，函数首先是通过无锁的方式 pin 应用侧的 pages，如果失败的时候不得不尝试持锁后走慢速执行路径。此时，无法持锁的时候那就要等待了，直到先前持锁的人释放锁。那之前被谁持有了呢？这时候可以利用之前介绍的 Sleep 诊断方法，如下图。
-![[Pasted image 20240928120704.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928120704.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 UninterruptibleSleep 状态相比 Sleep 有点复杂，因为它涉及到 Linux 内部的实现。可能是内核本身的机制有问题，也有可能是应用层使用不对，因此要联合上层的行为综合诊断才行。毕竟内核也不是万能的，它也有自己的能力边界，当应用层的使用超过其边界的时候，就会出现影响性能的现象。
 
@@ -179,26 +173,24 @@ UninterruptibleSleep 状态相比 Sleep 有点复杂，因为它涉及到 Linux 
 ### 1. **主动 IO 操作**
 
 - 程序进行频繁、大量的读或者写 IO 操作，这是最常见的情况。
-    
+
 - 多个应用同时下发 IO 操作，导致器件的压力较大。同时执行的程序多的时候 IO 负载高的可能性也大。
-    
+
 - 器件本身的 IO 性能较差，可通过 IO Benchmark 来进行排查。常见的原因有磁盘碎片化、器件老化、剩余空间较少（越是低端机越明显）、读放大、写放大等等。
-    
+
 - 文件系统特性，比如有些文件系统的内部操作会表现为 IO 等待。
-    
+
 - 开启 Swap 机制的内核下，数据从 Swap 中读取。
-    
 
 **优化方法**
 
 - 调优 Readahead 机制
-    
+
 - 指定文件到 PageCache，即 PinFile 机制
-    
+
 - 调整 PageCache 回收策略
-    
+
 - 调优清理垃圾文件策略
-    
 
 ### 2. 低内存导致的 IO 变多
 
@@ -209,24 +201,22 @@ UninterruptibleSleep 状态相比 Sleep 有点复杂，因为它涉及到 Linux 
 **优化方法**
 
 - 关键路径上减少 IO 操作
-    
+
 - 通过 Readahead 机制读数据
-    
+
 - 将热点数据尽量聚集在一起，使被 Readahead 机制命中的概率高
-    
+
 - 最后一个老生常谈的，减少大量的内存分配、内存浪费等操作
-    
 
 系统中的内存是被各个进程所共用。当 app 只考虑自己，肆无忌惮的使用计算资源，必然会影响到其他程序。这时候系统还是会回来压制你，到头来亏损的还是自己。不过能想到这一步的开发者比较少，也不现实。明文化的执行系统约定，可能是个终极解决方案。
 
 ## Non-IOWait 常见原因
 
 - **低内存导致等待** → 低内存的时候要回收其他程序或者缓存上的内存。
-    
+
 - **Binder 等待** → 有大量 Binder 操作的时候出现概率较高。
-    
+
 - **各种各样的内核锁，不胜枚举**。结合「诊断方法」来分析。
-    
 
 ## 系统调度与 UninterruptibleSleep 耦合的问题
 
@@ -254,12 +244,14 @@ UninterruptibleSleep 状态相比 Sleep 有点复杂，因为它涉及到 Linux 
 |D|W|
 
 ## 案例: 从 Swap 读取数据时的等待
-![[Pasted image 20240928120718.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240928120718.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 案例: 同进程的多个线程进行 mmap
-![[Pasted image 20240928120724.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240928120724.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 共享同一个 mm_struct 的线程同时执行 mmap() 系统调用进行 vma 分配时发生锁竞争。
 
@@ -271,35 +263,35 @@ unsigned long vm_mmap_pgoff(struct file *file, unsigned long addr,  uns
 
 ### 参考资料
 
-[1]
+\[1\]
 
 Systrace 基础知识 - Systrace 预备知识: _https://www.androidperformance.com/2019/07/23/Android-Systrace-Pre/_
 
-[2]
+\[2\]
 
 博客文章目录: _https://www.androidperformance.com/2019/12/01/BlogMap/_
 
-[3]
+\[3\]
 
 Systrace 线程 CPU 运行状态分析技巧 - Runnable 篇: _https://www.androidperformance.com/2022/01/21/android-systrace-cpu-state-runnable/_
 
-[4]
+\[4\]
 
 Systrace 线程 CPU 运行状态分析技巧 - Running 篇: _https://www.androidperformance.com/2022/03/13/android-systrace-cpu-state-running/_
 
-[5]
+\[5\]
 
 Systrace 线程 CPU 运行状态分析技巧 - Sleep 和 Uninterruptible Sleep 篇: _https://www.androidperformance.com/2022/03/13/android-systrace-cpu-state-sleep/_
 
-[6]
+\[6\]
 
 https://elixir.bootlin.com/linux/latest/ident/TASK_UNINTERRUPTIBLE: _https://elixir.bootlin.com/linux/latest/ident/TASK_UNINTERRUPTIBLE_
 
-[7]
+\[7\]
 
 Runnable 文章: _https://articles.zsxq.com/id_wzkkiwop5pgm.html_
 
-[8]
+\[8\]
 
 Simpleperf 分析篇 (1): 使用 Firefox Profiler 可视分析 Simpleperf 数据: _https://articles.zsxq.com/id_xc0a7uwmsf3z.html_
 

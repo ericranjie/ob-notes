@@ -1,11 +1,8 @@
-
 腾讯技术工程
 
- _2023年05月23日 18:00_ _广东_
+_2023年05月23日 18:00_ _广东_
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1)
-
-  
 
 作者：beck
 
@@ -18,8 +15,6 @@
 这个过程很折磨人，没有任何眉目时，令人茶不思饭不想。找到问题问题后，如打鸡血般兴奋，自己也会陶醉般飘飘然。真正受过折磨的人，才能体会到修改问题的滋味一二。
 
 开发的程序大致要经过一下两个阶段，最终才可以上线发布。
-
-  
 
 ### **功能开发阶段**
 
@@ -37,11 +32,7 @@
 
 开发阶段的总结两个关键字：TDD + 迭代。需要详情的同学自行 baidu,google。
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### **功能调试阶段**
 
@@ -115,15 +106,9 @@
 
 coding 数载，偶有所得，记录于此，望各位有所得！
 
-  
-
-  
-
 腾讯程序员
 
 ，赞798
-
-  
 
 ![](http://mmbiz.qpic.cn/sz_mmbiz_png/j3gficicyOvauPPfL7J2AVERiaoMJy9NBIwbJE2ZRJX7FZ2Dx7IibtTwdlqYSqTZTCsXkDS2jvNF8wWJKcibxXtOHng/300?wx_fmt=png&wxfrom=19)
 
@@ -134,8 +119,6 @@ coding 数载，偶有所得，记录于此，望各位有所得！
 494篇原创内容
 
 公众号
-
-  
 
 Reads 8248
 

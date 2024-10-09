@@ -1,7 +1,6 @@
-
 helight Linux内核之旅
 
- _2021年12月05日 09:22_
+_2021年12月05日 09:22_
 
 ##### **“** 一个互联网技术玩家，爱聊技术的家伙。在工作和学习中不断思考，把这些思考总结出来，并分享，和大家一起交流进步。**”**
 
@@ -43,9 +42,9 @@ socket 缓冲区的结构体由多个字段，来标识不同的网络层。从 
 
 在裸机速度下的 eBPF 和 XDP 包处理流程
 
-在网络协议栈中的 XDP 的钩子 
+在网络协议栈中的 XDP 的钩子
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 具体上来看在软中断任务中调度顺序执行的 iptables 规则，会在 IP 协议层中去匹配指定的 IP 地址，以决定是否丢弃这个数据包。和 iptables 不一样的是 XDP 会直接操作一个从 DMA 后端环形缓冲区中拿的原始的以太帧包，所以丢弃逻辑可以很早的执行，这样就节省了内核时间，避免了会导致协议栈执行导致的延时。
 
@@ -131,8 +130,6 @@ XDP 在 Linux 内核中慢慢以高速包处理标准出现。通过这篇博文
 
 基于 eBPF 的 Linux 可观测性：http://www.helight.info/blog/2020/linux-kernel-observability-ebpf/
 
-  
-
 大家可以关注本文原文公众号
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/KcMSvcdxzvUSSfIcYHWaOYdV3aribUUcQoqKf9ACc3gywnf5pA4z0UaA6rHzFULR6tqwa8dP5OiaU0vo1z0YB21A/300?wx_fmt=png&wxfrom=19)
@@ -145,8 +142,6 @@ H5，小程序和网络系统化工程研发研究
 
 公众号
 
-  
-
 阅读 2675
 
 ​
@@ -156,21 +151,20 @@ H5，小程序和网络系统化工程研发研究
 **留言 2**
 
 - 董Lucky
-    
-    2021年12月5日
-    
-    赞2
-    
-    文章开头说的“XDP是一种特殊的ebpf程序”，其实就是正常的ebpf程序。哪有什么特殊之分，本身ebpf程序就有十几种程序类型，xdp是其中一种而已。
-    
-    Linux内核之旅
-    
-    作者2021年12月5日
-    
-    赞
-    
-    是的，意思一样
-    
+
+  2021年12月5日
+
+  赞2
+
+  文章开头说的“XDP是一种特殊的ebpf程序”，其实就是正常的ebpf程序。哪有什么特殊之分，本身ebpf程序就有十几种程序类型，xdp是其中一种而已。
+
+  Linux内核之旅
+
+  作者2021年12月5日
+
+  赞
+
+  是的，意思一样
 
 已无更多数据
 
@@ -189,20 +183,19 @@ Linux内核之旅
 **留言 2**
 
 - 董Lucky
-    
-    2021年12月5日
-    
-    赞2
-    
-    文章开头说的“XDP是一种特殊的ebpf程序”，其实就是正常的ebpf程序。哪有什么特殊之分，本身ebpf程序就有十几种程序类型，xdp是其中一种而已。
-    
-    Linux内核之旅
-    
-    作者2021年12月5日
-    
-    赞
-    
-    是的，意思一样
-    
+
+  2021年12月5日
+
+  赞2
+
+  文章开头说的“XDP是一种特殊的ebpf程序”，其实就是正常的ebpf程序。哪有什么特殊之分，本身ebpf程序就有十几种程序类型，xdp是其中一种而已。
+
+  Linux内核之旅
+
+  作者2021年12月5日
+
+  赞
+
+  是的，意思一样
 
 已无更多数据

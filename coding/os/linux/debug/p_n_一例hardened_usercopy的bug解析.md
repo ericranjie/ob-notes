@@ -1,10 +1,13 @@
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2020-3-30 20:54 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
+
 # 一、前言
 
 本文以一个在centos7.6内核发生的BUGON,描述一下常见BUGON导致panic的解bug流程。目前这个bug在centos7.6最新版本未合入，需要升级到centos7.7的3.10.0-1062.13.1.el7以上版本才能解决。文中涉及到iscsi模块，xfs模块，内核协议栈收发包，slab(slub)等内存结构信息。本文对内核初学者分析和理解常见的内核问题有一定的帮助。
+
 # 二、故障现象
 
 机器出现复位，收集到了crash文件，从日志中显示为BUGON。
+
 ```cpp
 [85774.558604] usercopy: kernel memory exposure attempt detected from ffff9cba0bf75400 (kmalloc-512) (1024 bytes)
 [85774.559261] ------------[ cut here ]------------
@@ -44,6 +47,7 @@
 [85774.585495] RIP  [<ffffffff9803f557>] __check_object_size+0x87/0x250
 [85774.586135]  RSP <ffff9cb124227b98>
 ```
+
 # 三、分析过程
 
 1、可能存在问题的原因
@@ -51,6 +55,7 @@
 我们知道，在使能了CONFIG_HARDENED_USERCOPY的情况下，如果往用户态拷贝或者用户态往内核拷贝的话，会对访问的数据区进行检查，这里不展开，感兴趣的同学可以参照一下《[https://lwn.net/Articles/695991/](https://lwn.net/Articles/695991/)》来理解这种配置引入的背景。
 
 首先，我们来看一下对应BUGON的地方：
+
 ```cpp
      61 static void report_usercopy(const void *ptr, unsigned long len,
      62                             bool to_user, const char *type)
@@ -66,13 +71,15 @@
      **72         BUG();----这行出现**
      73 }
 ```
+
 从上面代码可以看出，我们报错日志的红色字体的第一行，就是pr_emerg打印出来的。在本案例中，有几个关键字需要特别关注：
 
-[85774.558604] usercopy: kernel memory **exposure** attempt detected **from ffff9cba0bf75400** (**kmalloc-512)** (**1024 bytes**)
+\[85774.558604\] usercopy: kernel memory **exposure** attempt detected **from ffff9cba0bf75400** (**kmalloc-512)** (**1024 bytes**)
 
 意思是，我们试图从ffff9cba0bf75400 拷贝到用户态，那么出现bugon，要么是地址问题，要么是长度问题，我们下面就要判断出，到底是地址问题还是长度问题。
 
 回到我们的堆栈，堆栈表示tgtd 进程在收tcp的网络包。
+
 ```cpp
 [85774.577880]  [<ffffffff9818dd9d>] memcpy_toiovec+0x4d/0xb0
 [85774.578531]  [<ffffffff9842c858>] skb_copy_datagram_iovec+0x128/0x280
@@ -85,8 +92,10 @@
 [85774.582934]  [<ffffffff9804342f>] SyS_read+0x7f/0xf0
 [85774.583543]  [<ffffffff98576ddb>] system_call_fastpath+0x22/0x27
 ```
+
 我们知道，收包的时候，我们从sock对象的sk_receive_queue中把存放数据的skb取出来，然后拷贝其中的数据到用户态。skb_copy_datagram_iovec的skb参数是压栈的，所以在堆栈中取出的skb如下：
-```cpp
+
+````cpp
 **crash> sk_buff.len ffff9cb0e3b388f8**
   **len = 1024**
 crash> sk_buff.data_len  ffff9cb0e3b388f8
@@ -98,17 +107,21 @@ crash> sk_buff.head  ffff9cb0e3b388f8
   head = 0xffff9cbf9c679400 ""
 crash> sk_buff.end  ffff9cb0e3b388f8 -x
   end = 0x2c0
-```
+````
+
 所以，sk_buff这个结构在线性区之后，还有skb_shared_info 结构：
+
 ```cpp
 crash> px  0xffff9cbf9c679400 + 0x2c0
 $5 = 0xffff9cbf9c6796c0
 crash> skb_shared_info 0xffff9cbf9c6796c0
 struct skb_shared_info {
 ```
-  nr_frags = 1 '\001', ----只有一个frag,这个值确定了从skb_frag_t的拷贝次数
+
+nr_frags = 1 '\\001', ----只有一个frag,这个值确定了从skb_frag_t的拷贝次数
 
 查看对应的page：
+
 ```cpp
 crash> skb_shared_info.frags 0xffff9cbf9c6796c0
   frags = {{
@@ -119,9 +132,11 @@ crash> skb_shared_info.frags 0xffff9cbf9c6796c0
       size = 1024
 }, {
 ```
+
 。。。。。。。数组其他部分省略。。。。。。
 
 好的，下面我们结合bug报错的地址来看一下对应page的使用：
+
 ```cpp
 crash> kmem ffff9cba0bf75400 ---报错的地址
 CACHE            NAME                 OBJSIZE  ALLOCATED     TOTAL  SLABS  SSIZE
@@ -133,24 +148,30 @@ ffff9ca27fc07600 kmalloc-512              512     242454    
       PAGE         PHYSICAL      MAPPING       INDEX CNT FLAGS
 **fffff597a42fdd40** 190bf75000                0        0  **0** 6fffff00008000 tail
 ```
+
 可以看到，关联的page指针确实和我们skb中保存数据的page指针能对应上的。
 
 一开始，当我看到page的引用计数为0还愣住了一下，以为是个踩内存的问题，然后我看到tail标志，想起来这个页是一个复合页，所以这个非head的page没有slab的标记，同时引用计数为0就是合理的了，因为它的slab标志和引用计数都是放在head页面里的，到这一步，说明地址不是非法访问，**只是长度问题**。
 
-0xffff9cba0bf75400 对应的是一个kmalloc-512 的slab，在未开启slab（slub）的debug的情况下，对应的size应该是512字节，而（1024 bytes），就是我们本次需要访问的长度，对于hardened usercopy的检查来说，是越界了，也就是在 copy_to_user-->check_heap_object-->__check_heap_object中返回了kmem_cache的name，那么确定是因为访问长度问题。
+0xffff9cba0bf75400 对应的是一个kmalloc-512 的slab，在未开启slab（slub）的debug的情况下，对应的size应该是512字节，而（1024 bytes），就是我们本次需要访问的长度，对于hardened usercopy的检查来说，是越界了，也就是在 copy_to_user-->check_heap_object-->\_\_check_heap_object中返回了kmem_cache的name，那么确定是因为访问长度问题。
 
 接下来，我们需要解决的疑问是，为什么会访问一个512字节的object的时候，长度却是1024字节。
 
 我们知道，如果从普通网卡收包，在skb分配的时候，除了线性区部分的内存，frag部分的内存应该都是按页分配的，哪怕修改过标准内核，这个page都应该是一个整页，而不应该是一个512字节的slab，所以要么这个数据被踩了，要么就是这个page不是从普通网卡收包而来，而是类似lo口的这种内部循环，不过，在收包到tcp的阶段，skb对应的dev指针已经被置为NULL了，我们无法通过这个指针来辨别对应的入向dev，所以我尝试从socket本身入手，看看这个是一个什么样的socket，
+
 ```cpp
 crash> sk_buff.sk ffff9cb0e3b388f8
   sk = 0xffff9cc1242a8000---------skb对应的sock指针
 ```
+
 使用net -s查看，可以看到详细的端口信息如下：
+
 ```cpp
 66 ffff9cc11d941e00 ffff9cc1242a8000 INET:STREAM  127.0.0.1-3260 127.0.0.1-41654
 ```
+
 可以看到，由于我们的socket是侦听在127的环回地址，端口为3260，所以这个page，还真是发送方传来的Page，而不是我们自己收包的时候申请的page。我们先查看一下对应512字节部分的数据是什么数据：
+
 ```cpp
 crash> rd ffff9cba0bf75400 8
 ffff9cba0bf75400:  0100000046474158 0000e80301000000   XAGF............
@@ -158,12 +179,15 @@ ffff9cba0bf75410:  0200000001000000 0100000000000000   ................
 ffff9cba0bf75420:  0000000001000000 0300000000000000   ................
 ffff9cba0bf75430:  fc62a00304000000 00000000f0ceba02   ......b.........
 ```
+
 看起来像是一个xfs的agf的block，由于对xfs也不是很熟悉，看代码只是怀疑有点像，
+
 ```cpp
 #define XFS_AGF_MAGIC   0x58414746  /* 'XAGF' */
 #define XFS_AGI_MAGIC   0x58414749  /* 'XAGI' */
 #define XFS_AGFL_MAGIC  0x5841464c  /* 'XAFL' */
 ```
+
 然后开始有目的地在社区搜索相关xfs关键字，以及 usercopy 关键字相关的patch，一开始搜到下面这个：
 
 https://bugs.centos.org/view.php?id=15859#bugnotes
@@ -171,6 +195,7 @@ https://bugs.centos.org/view.php?id=15859#bugnotes
 出错的行号都一样，但我们目前内核已经合入ceph这个补丁，所以应该不是这个问题。再次陷入迷茫。。。
 
 然后在搜索的过程中，另外一名同学报了一个类似问题上来，也是同样的堆栈，同样的进程，于是我开始尝试了解tgtd对应的组件，原来它就是iscsi的target端的组件，那么xfs用它来传送AGF的元数据就能够说得通了，换句话说，ceph和iscsi的地位在这种场景下是类似的。这个时候开始搜索iscsi相关的补丁，找到了对应的补丁如下：
+
 ```cpp
 commit 08b11eaccfcf86a3bac6755625d933ac15ccc27a
 Author: Vasily Averin <vvs@virtuozzo.com>
@@ -190,44 +215,47 @@ Date:   Thu Feb 21 18:23:17 2019 +0300
     Acked-by: Chris Leech <cleech@redhat.com>
     Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
 ```
+
 原来，这个1024的长度，是tcp_sendpage将用户前后两次调用的时候，做了一个检查，如果发送的是同一个page，并且偏移能够衔接上，也就是skb_can_coalesce 函数的实现逻辑，则会将对应的发送合并，然后长度进行叠加，也就是说我们的1024长度，是两个xfs的512字节的slab叠加而成，所以既不是地址有问题，也不是长度有问题，而是叠加之后的page在开启hardened_usercopy=on的机器上报错而已。
 
 **但是，敲黑板，同学们请注意，它的改动是如下实现的：**
+
 ```cpp
 -       if (page_count(sg_page(sg)) >= 1 && !recv)
 +       if (!recv && page_count(sg_page(sg)) >= 1 && !PageSlab(sg_page(sg)))
 ```
+
 这个改动**表面上看**是无法解决组合页的问题，只能解决单页的情况。因为compound的page需要取它的head来判断slab标志，就像本案例中遇到的情况那样，真正的改动应该是下面那样：
 
--       if (page_count(sg_page(sg)) >= 1 && !recv)
+- if (page_count(sg_page(sg)) >= 1 && !recv)
 
-+       if (!recv && page_count(sg_page(sg)) >= 1    && !PageSlab(compound_head(sg_page(sg))))
+* if (!recv && page_count(sg_page(sg)) >= 1    && !PageSlab(compound_head(sg_page(sg))))
 
 于是，我尝试给负责这块的社区大神来提交一个如上的补丁，不过Ilya Dryomov 很快回复如下：
 
-> >AFAICT compound pages should already be taken into account, because PageSlab is defined as:
+> > AFAICT compound pages should already be taken into account, because PageSlab is defined as:
 
 > >
 
-> >  __PAGEFLAG(Slab, slab, PF_NO_TAIL)
+> > \_\_PAGEFLAG(Slab, slab, PF_NO_TAIL)
 
 > >
 
-> >  #define __PAGEFLAG(uname, lname, policy)                       \
+> > #define \_\_PAGEFLAG(uname, lname, policy)                       \\
 
-> >      TESTPAGEFLAG(uname, lname, policy)                         \
+> > TESTPAGEFLAG(uname, lname, policy)                         \\
 
-> >      __SETPAGEFLAG(uname, lname, policy)                        \
+> > \_\_SETPAGEFLAG(uname, lname, policy)                        \\
 
-> >      __CLEARPAGEFLAG(uname, lname, policy)
+> > \_\_CLEARPAGEFLAG(uname, lname, policy)
 
 > >
 
-> >  #define TESTPAGEFLAG(uname, lname, policy)                     \
+> > #define TESTPAGEFLAG(uname, lname, policy)                     \\
 
-> >  static __always_inline int Page##uname(struct page *page)      \
+> > static \_\_always_inline int Page##uname(struct page \*page)      \\
 
-> >      { return test_bit(PG_##lname, &policy(page, 0)->flags); }
+> > { return test_bit(PG\_##lname, &policy(page, 0)->flags); }
 
 > >
 
@@ -235,11 +263,11 @@ Date:   Thu Feb 21 18:23:17 2019 +0300
 
 >
 
-> >  #define PF_NO_TAIL(page, enforce) ({                        \
+> > #define PF_NO_TAIL(page, enforce) ({                        \\
 
-> >      VM_BUG_ON_PGFLAGS(enforce && PageTail(page), page);     \
+> > VM_BUG_ON_PGFLAGS(enforce && PageTail(page), page);     \\
 
-> >      PF_POISONED_CHECK(compound_head(page)); })
+> > PF_POISONED_CHECK(compound_head(page)); })
 
 >
 
@@ -251,21 +279,21 @@ Date:   Thu Feb 21 18:23:17 2019 +0300
 
 从补丁来说，这个补丁是从libceph那边关联到xfs也有类似的问题，不过分析的过程还是很有趣的，如果使用iscsi同时底层文件系统又是xfs的，需要注意反向合入了，或者如果嫌麻烦的话，升级到centos7.7内核也可以。这个故障动作最小的情况下怎么解决呢，由于iscsi的lib是一个linux模块形式，可以将对应的代码合入，替换线上的模块即可。由于 hardened_usercopy 开启是会影响服务器性能的，所以在grub中设置 hardened_usercopy=off 也是一种解决办法，但是这时候需要复位机器生效了，并且对于越界拷贝的情况就无法提前暴露了，2016年linux内核引入hardened_usercopy功能之后，帮助很多模块定位了很多问题。详细研究了一下最开始遇到这个问题的时候，社区提交补丁的交流历史记录，发现一开始有人想在发包合并的地方进行判断，也就是如下改动：
 
-> @@ -3089,7 +3089,7 @@ static inline bool skb_can_coalesce(struct sk_buff *skb, int i,
+> @@ -3089,7 +3089,7 @@ static inline bool skb_can_coalesce(struct sk_buff \*skb, int i,
 
->   if (i) {
+> if (i) {
 
->   const struct skb_frag_struct *frag = &skb_shinfo(skb)->frags[i - 1];
+> const struct skb_frag_struct \*frag = &skb_shinfo(skb)->frags\[i - 1\];
 
->  
+>
 
 > - return page == skb_frag_page(frag) &&
 
-> + return page == skb_frag_page(frag) && !PageSlab(page) &&
+> - return page == skb_frag_page(frag) && !PageSlab(page) &&
 
->          off == frag->page_offset + skb_frag_size(frag);
+> off == frag->page_offset + skb_frag_size(frag);
 
->   }
+> }
 
 但是David 大神很敏锐地判断出，这种改法有问题，他的原文回复是：
 
@@ -277,7 +305,7 @@ since a page fragment can be shared (the page refcount needs to be manipulated, 
 
 being aware of this)
 
-**Please fix the callers.****---------最关键的一句**
+**Please fix the callers.\*\*\*\*---------最关键的一句**
 
 是的啊，这样改动应该是最合理的，将问题掐死在源头。具体可以参考[https://www.spinics.net/lists/netdev/msg552971.html](https://www.spinics.net/lists/netdev/msg552971.html)
 
@@ -291,19 +319,19 @@ index 2079145a3b7c..cf9572f4fc0f 100644
 
 +++ b/net/ipv4/tcp.c
 
-@@ -996,6 +996,7 @@ ssize_t do_tcp_sendpages(struct sock *sk, struct page *page, int offset,
+@@ -996,6 +996,7 @@ ssize_t do_tcp_sendpages(struct sock \*sk, struct page \*page, int offset,
 
-  goto wait_for_memory;
+goto wait_for_memory;
 
-  if (can_coalesce) {
+if (can_coalesce) {
 
-+ WARN_ON_ONCE(PageSlab(page));
+- WARN_ON_ONCE(PageSlab(page));
 
-  skb_frag_size_add(&skb_shinfo(skb)->frags[i - 1], copy);
+skb_frag_size_add(&skb_shinfo(skb)->frags\[i - 1\], copy);
 
-  } else {
+} else {
 
-  get_page(page);
+get_page(page);
 
 不过这个不死心的改动最终并没能合入到基线中去，具体可参考：
 
@@ -315,65 +343,65 @@ index 2079145a3b7c..cf9572f4fc0f 100644
 
 **评论：**
 
-**nswcfd@cu**  
+**nswcfd@cu**\
 2021-05-10 14:28
 
-又重新学习了一遍，过了一年差不多都忘干净啦 :(  
-  
+又重新学习了一遍，过了一年差不多都忘干净啦 :(
+
 您的文章介绍的很清晰，前因后果讲的很清楚，再次点赞
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8236)
 
-**[爱芭虎](http://www.aibahu.com/)**  
+**[爱芭虎](http://www.aibahu.com/)**\
 2020-10-28 21:28
 
 分析的很详细，很用心的文章了。
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8131)
 
-**[安庆](http://www.wowotech.net/)**  
+**[安庆](http://www.wowotech.net/)**\
 2021-05-08 14:31
 
 @爱芭虎：才看到，谢谢
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8229)
 
-**[太仓招聘网](http://https//www.tczpw.com)**  
+**[太仓招聘网](http://https//www.tczpw.com)**\
 2020-05-30 10:54
 
 很详细！花了很多时间看完
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8004)
 
-**[安庆](http://www.wowotech.net/)**  
+**[安庆](http://www.wowotech.net/)**\
 2021-05-08 14:32
 
 @太仓招聘网：嗯，篇幅比较长。
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8230)
 
-**[安庆](http://www.wowotech.net/)**  
+**[安庆](http://www.wowotech.net/)**\
 2021-05-08 14:32
 
 @太仓招聘网：嗯，篇幅比较长。
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8231)
 
-**[安庆](http://www.wowotech.net/)**  
+**[安庆](http://www.wowotech.net/)**\
 2021-05-08 14:32
 
 @太仓招聘网：嗯，篇幅比较长。
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-8232)
 
-**nswcfd@cu**  
+**nswcfd@cu**\
 2020-04-02 10:30
 
 非常好的分析！
 
 [回复](http://www.wowotech.net/linux_kenrel/480.html#comment-7935)
 
-**[安庆](http://www.wowotech.net/)**  
+**[安庆](http://www.wowotech.net/)**\
 2021-05-08 14:32
 
 @nswcfd@cu：嗯，篇幅比较长。
@@ -382,152 +410,155 @@ index 2079145a3b7c..cf9572f4fc0f 100644
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [Linux CPU core的电源管理(1)_概述](http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html)
-    - [CFS调度器（5）-带宽控制](http://www.wowotech.net/process_management/451.html)
-    - [RCU（2）- 使用方法](http://www.wowotech.net/kernel_synchronization/462.html)
-    - [ARM64的启动过程之（一）：内核第一个脚印](http://www.wowotech.net/armv8a_arch/arm64_initialize_1.html)
-    - [Linux TTY framework(4)_TTY driver](http://www.wowotech.net/tty_framework/tty_driver.html)
+
+  - [Linux CPU core的电源管理(1)\_概述](http://www.wowotech.net/pm_subsystem/cpu_core_pm_overview.html)
+  - [CFS调度器（5）-带宽控制](http://www.wowotech.net/process_management/451.html)
+  - [RCU（2）- 使用方法](http://www.wowotech.net/kernel_synchronization/462.html)
+  - [ARM64的启动过程之（一）：内核第一个脚印](http://www.wowotech.net/armv8a_arch/arm64_initialize_1.html)
+  - [Linux TTY framework(4)\_TTY driver](http://www.wowotech.net/tty_framework/tty_driver.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

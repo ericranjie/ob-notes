@@ -1,9 +1,9 @@
 Linux阅码场
- _2021年11月25日 07:03_
+_2021年11月25日 07:03_
 
 以下文章来源于OpenAnolis龙蜥 ，作者闻茂泉、李靖轩
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4bZCboj0qz7G2rqBCKMh4iblVGkMN9XKUxiaECBVF6nj1g/0)
 
@@ -11,14 +11,14 @@ Linux阅码场
 
 龙蜥社区（OpenAnolis）是立足中国面向国际的 Linux 服务器操作系统开源根社区及创新平台。
 
-](https://mp.weixin.qq.com/s?__biz=Mzg2OTc0ODAzMw==&mid=2247502803&idx=1&sn=709db7f06081af73177c2d2993f03fd2&source=41&key=daf9bdc5abc4e8d05fb4e1ce7572f25187a4bdf98413b11d17b7d296f7c0a8ead604c6279a5fdc68478baa7056dee6a816daa68b46e5cdc4e37745850ad62e5357353015561bc164d341f170d52442b4b02c0bb549c68cd7a48b61bce09700aaac63756dce0f6e0cf64664b4acb121f6bafbbd8632110d1fefe34c04c6975f96&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQtCZB%2F0EQCYtZ7uiQ0Ev0BhLmAQIE97dBBAEAAAAAAP3vDB3ExKUAAAAOpnltbLcz9gKNyK89dVj04ViatOwdSkycmFBjVcmREhqJCODXY7lk1RZ2l107J018vWUj9hem%2FgMFch4ofXHzNgUtYIuCgi%2Bhf%2BPG2SSkuh%2BeWlFKYt0V0WSLdujTDX0fepp7tDCLIlVrCXOSEAJ%2BwnxhfSgokYFjPrs3%2Bfiw2%2Faq6L47gRHiytmXavHH19yxs6bLtVnQtjBugG1L6XyKGjtEAi9b%2BbsHwH7643c9GVv7q0g7mcd34cE0Ev%2FGudYavSkKhGgKZkUJKroyzqQ%2F&acctmode=0&pass_ticket=tH4V4QcsOMmoMNwUPvizh7Af8SbvIXUpGf3p4CXyc4Fsi2qaI4b1YcA%2Bpfv8%2B5TK&wx_header=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247502803&idx=1&sn=709db7f06081af73177c2d2993f03fd2&source=41&key=daf9bdc5abc4e8d05fb4e1ce7572f25187a4bdf98413b11d17b7d296f7c0a8ead604c6279a5fdc68478baa7056dee6a816daa68b46e5cdc4e37745850ad62e5357353015561bc164d341f170d52442b4b02c0bb549c68cd7a48b61bce09700aaac63756dce0f6e0cf64664b4acb121f6bafbbd8632110d1fefe34c04c6975f96&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQtCZB%2F0EQCYtZ7uiQ0Ev0BhLmAQIE97dBBAEAAAAAAP3vDB3ExKUAAAAOpnltbLcz9gKNyK89dVj04ViatOwdSkycmFBjVcmREhqJCODXY7lk1RZ2l107J018vWUj9hem%2FgMFch4ofXHzNgUtYIuCgi%2Bhf%2BPG2SSkuh%2BeWlFKYt0V0WSLdujTDX0fepp7tDCLIlVrCXOSEAJ%2BwnxhfSgokYFjPrs3%2Bfiw2%2Faq6L47gRHiytmXavHH19yxs6bLtVnQtjBugG1L6XyKGjtEAi9b%2BbsHwH7643c9GVv7q0g7mcd34cE0Ev%2FGudYavSkKhGgKZkUJKroyzqQ%2F&acctmode=0&pass_ticket=tH4V4QcsOMmoMNwUPvizh7Af8SbvIXUpGf3p4CXyc4Fsi2qaI4b1YcA%2Bpfv8%2B5TK&wx_header=1#)
 
 **跟踪诊断技术 SIG 致力于为操作系统生态提供系统性，工具化，并以数据为支撑的发现、跟踪和诊断问题的能力。**
 
-**SIG目标：为龙蜥社区（OpenAnolis****）开源操作系统，提供一个全栈覆盖内核与核心组件的跟踪和诊断工具，增强龙蜥社区（OpenAnolis）全栈的可观察性和可靠性。**
+**SIG目标：为龙蜥社区（OpenAnolis**\*\*）开源操作系统，提供一个全栈覆盖内核与核心组件的跟踪和诊断工具，增强龙蜥社区（OpenAnolis）全栈的可观察性和可靠性。\*\*
 
-**作者广成（闻茂泉）、无牙（李靖轩）分别是龙蜥社区**跟踪诊断技术 SIG** 核心成员。  
-**
+**作者广成（闻茂泉）、无牙（李靖轩）分别是龙蜥社区**跟踪诊断技术 SIG\*\* 核心成员。\
+\*\*
 
 欢迎更多开发者加入跟踪诊断技术SIG：
 
@@ -28,7 +28,7 @@ Linux阅码场
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/xHicTWic3y1DskJOic8Wjfg87ib4ZtSljR5oF5hzgfqNVM5wus6BUic16kmrib746FgMNf6ZEKMs3TRJMVPLibbX7dXyg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-### **前言**  
+### **前言**
 
 ssar 是阿里自研并贡献至龙蜥社区的一款系统性能监控工具。该工具系统开销很小，已经在公司部分业务规模化部署，**且持续稳定运行 1 年以上。**
 
@@ -84,7 +84,7 @@ $ ssar proc -p $(pidof sresar) -i 1 --cpu
 
 ### **二、跟踪单进程的CPU和内存波动详情**
 
-通过上面的方法，发掘出了影响整机指标波动的进程，还可以进一步通过 proc 子命令更进一步追踪特定进程的 CPU 和内存变化情况。其中左尖括号（<）表示 2021-08-09T11:39:00 时刻该 sresar 进程还没有启动，右尖括号（>）表示 2021-08-09T11:47:00 时刻该 sresar 进程已经结束。
+通过上面的方法，发掘出了影响整机指标波动的进程，还可以进一步通过 proc 子命令更进一步追踪特定进程的 CPU 和内存变化情况。其中左尖括号（\<）表示 2021-08-09T11:39:00 时刻该 sresar 进程还没有启动，右尖括号（>）表示 2021-08-09T11:47:00 时刻该 sresar 进程已经结束。
 
 ```c
 $ ssar proc -p $(pidof sresar)  -i1 -o collect_datetime,rss,min_flt,cmd
@@ -145,7 +145,7 @@ page_fault
 
 ### **五、诊断整机高阶内存不足情况**
 
-系统内存不足相关的问题，一直是日常运维中最常见的问题之一。有时候我们会从系统日志中看到类似这样的日志信息“page allocction failure: order:4”，这是 free 内存不足，并且伴随内存碎片化，内核空间申请不到高阶内存的表现。         
+系统内存不足相关的问题，一直是日常运维中最常见的问题之一。有时候我们会从系统日志中看到类似这样的日志信息“page allocction failure: order:4”，这是 free 内存不足，并且伴随内存碎片化，内核空间申请不到高阶内存的表现。
 
 定位这类问题需先对整机内存不足程度做一个诊断，anonpages 指标是匿名页，memfree 指标是整机 free 内存， pgsteal_kswapd 指标是每秒异步内存回收数量，pgsteal_direct 是每秒直接内存回收数量。
 
@@ -326,11 +326,11 @@ $ ./ssar -i 1s -f +10 -o
 
 对于多行或者多列指标含义相近的情况，也可以参考如下 2 个用法。
 
-`$ ssar -o 'metric=d:cfile=stat:line=2:column=2-``11:alias=cpu0_{column};' # cpu0第2到11列数据` `$ ssar -o 'metric=d|cfile=stat|line=2-``17|column=5|alias=idle_{line};'   # cpu0到15的idle`
+``` $ ssar -o 'metric=d:cfile=stat:line=2:column=2-``11:alias=cpu0_{column};' # cpu0第2到11列数据 ``` ``` $ ssar -o 'metric=d|cfile=stat|line=2-``17|column=5|alias=idle_{line};'   # cpu0到15的idle ```
 
 ssar 还支持指标不是整数的情况，支持实数和字符串形式的指标，参考如下用法。
 
-`$ ssar -o 'metric=c:cfile=loadavg:line=1:column=1:dtype=float:alias=load1'``# load1实型数据``$ ssar -o 'metric=c|cfile=loadavg|line=1|column=4|dtype=string|alias=rp'``# rp字符串信息`
+``` $ ssar -o 'metric=c:cfile=loadavg:line=1:column=1:dtype=float:alias=load1'``# load1实型数据``$ ssar -o 'metric=c|cfile=loadavg|line=1|column=4|dtype=string|alias=rp'``# rp字符串信息 ```
 
 如果只想采集这个驱动指标文件mydev，ssar还提供了2个配置参数load5s_flag 和 proc_flag 来关闭load和进程级指标采集。节省不必要的磁盘存储空间开销。
 
@@ -374,19 +374,19 @@ Time             count irq CPU name                 count irq CPU name
 
 如果需要获取实时数据，可将上面命令增加-l选项即可。
 
-`$ tsar2 --cpu -I cpu,cpu0,cpu1,cpu2,cpu3,cpu4,cpu5,cpu6,cpu7 -s sirq -i 1 -l``$ tsar2 irqtop -i 1 -C 5 -l`
+``` $ tsar2 --cpu -I cpu,cpu0,cpu1,cpu2,cpu3,cpu4,cpu5,cpu6,cpu7 -s sirq -i 1 -l``$ tsar2 irqtop -i 1 -C 5 -l ```
 
 ### **十、支持灵活的数据输出和解析**
 
 ssar 不仅数据指标非常丰富，而且输出格式上也非常易于使用和解析。ssar 的所有数据输出，都支持支持 json 格式输出，便于 python 等高级语言的解析。使用方法就是在命令上增加一个 --api 选项。
 
-`$ ssar -r 5 -o user,system,memfree,anonpages --api``[{"anonpages":"280824","collect_datetime":"2021-09-10T12:00:00","memfree":"181753024","system":"-","user":"-"},{"anonpages":"280812","collect_datetime":"2021-09-10T12:05:00","memfree":"181752704","system":"2.35","user":"1.22"}]`
+``` $ ssar -r 5 -o user,system,memfree,anonpages --api``[{"anonpages":"280824","collect_datetime":"2021-09-10T12:00:00","memfree":"181753024","system":"-","user":"-"},{"anonpages":"280812","collect_datetime":"2021-09-10T12:05:00","memfree":"181752704","system":"2.35","user":"1.22"}] ```
 
 对于 shell 等脚本解析，ssar 也提供了便利，-H 选项可以隐藏掉各种 header 信息。
 
-`$ ssar -r 5 -o user,system,memfree,anonpages -H``2021-09-10T12:00:00          -          -  81754836     280296` `2021-09-10T12:05:00       1.29       2.57  81756712     280228`
+``` $ ssar -r 5 -o user,system,memfree,anonpages -H``2021-09-10T12:00:00          -          -  81754836     280296 ``` `2021-09-10T12:05:00       1.29       2.57  81756712     280228`
 
-对于数据项中出现的各种“-”、“*”和“<”等符号信息，提供-P 选项参数隐藏输出，可以让上层调用脚本减少处理异常数据的工作。
+对于数据项中出现的各种“-”、“\*”和“\<”等符号信息，提供-P 选项参数隐藏输出，可以让上层调用脚本减少处理异常数据的工作。
 
 ```c
 $ ssar -r 5 -o user,system,memfree,anonpages -H -P
@@ -398,13 +398,13 @@ $ ssar -r 5 -o user,system,memfree,anonpages -H -P
 
 _**https://codeup.openanolis.cn/codeup/tracing_diagnosis/ssar.git**_
 
-—— 完 ——  
+—— 完 ——
 
 **关于龙蜥社区SIG**
 
 SIG是开放的，并争取让交付成果成为社区发行的一部分，由组内核心成员主导治理，可通过邮件列表和组内的成员进行交流。龙蜥社区SIG目前已超20个，包括跟踪诊断技术SIG、商密软件栈、高性能存储技术SIG、Java语言与虚拟机SIG、Cloud Kernel、OceanBase SIG等。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **SIG网址：https://openanolis.cn/sig**
 

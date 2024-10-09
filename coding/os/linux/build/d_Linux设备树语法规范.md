@@ -1,9 +1,10 @@
 土豆居士 一口Linux
- _2021年09月28日 11:42_
+_2021年09月28日 11:42_
 
 设备树是一种描述硬件的数据结构，它起源于OpenFirmware（OF）。
 
 在Linux 2.6中， ARM架构的板极硬件细节过多地被硬编码在arch/arm/plat-xxx和arch/arm/mach-xxx中，采用设备树后，许多硬件的细节可以直接通过它传递给Linux，而不再需要在内核中进行大量的冗余编码。
+
 ## 1. linux设备树中DTS、 DTC和DTB的关系
 
 - (1) DTS：.dts文件是设备树的源文件。由于一个SoC可能对应多个设备，这些.dst文件可能包含很多共同的部分，共同的部分一般被提炼为一个 .dtsi 文件，这个文件相当于C语言的头文件。
@@ -26,9 +27,9 @@
 
 `node-name@unit-address   `
 
-**node-name：**是设备节点的名称，为ASCII字符串，节点名字应该能够清晰的描述出节点的功能，比如“uart1”就表示这个节点是UART1外设；**unit-address：**一般表示设备的地址或寄存器首地址，如果某个节点没有地址或者寄存器的话 “unit-address” 可以不要；注：根节点没有node-name 或者 unit-address，它被定义为 /。
+\*\*node-name：\*\*是设备节点的名称，为ASCII字符串，节点名字应该能够清晰的描述出节点的功能，比如“uart1”就表示这个节点是UART1外设；\*\*unit-address：\*\*一般表示设备的地址或寄存器首地址，如果某个节点没有地址或者寄存器的话 “unit-address” 可以不要；注：根节点没有node-name 或者 unit-address，它被定义为 /。
 
-设备节点的例子如下图：![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+设备节点的例子如下图：!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在上图中：**cpu 和 ethernet依靠不同的unit-address 分辨不同的CPU；可见，node-name相同的情况下，可以通过不同的unit-address定义不同的设备节点。**
 
@@ -42,7 +43,7 @@ compatible 属性也叫做 “兼容性” 属性，这是非常重要的一个�
 
 - ① manufacturer : 表示厂商；
 - ② model : 一般是模块对应的驱动名字。
-    
+
 例如：
 
 `compatible = "fsl,mpc8641", "ns16550";   `
@@ -96,22 +97,21 @@ reg 属性的值一般是 (address， length) 对，reg 属性一般用于描述
 
 `reg = <0x3000 0x20 0xFE00 0x100>;   `
 
-> 注：上述对应#address-cells = <1>; #size-cells = <1>;。
+> 注：上述对应#address-cells = \<1>; #size-cells = \<1>;。
 
 ### 2.2.1.7 ranges 属性
 
 ranges属性值可以为空或者按照 (child-bus-address,parent-bus-address,length) 格式编写的数字矩阵， ranges 是一个地址映射/转换表， ranges 属性每个项目由子地址、父地址和地址空间长度这三部分组成：
 
 - child-bus-address：子总线地址空间的物理地址，由父节点的 #address-cells 确定此物理地址所占用的字长。
-    
+
 - parent-bus-address：父总线地址空间的物理地址，同样由父节点的 #address-cells 确定此物理地址所占用的字长。
-    
+
 - length：子地址空间的长度，由父节点的 #size-cells 确定此地址长度所占用的字长。
-    
 
 `soc {       compatible = "simple-bus";       #address-cells = <1>;       #size-cells = <1>;       ranges = <0x0 0xe0000000 0x00100000>;       serial {           device_type = "serial";           compatible = "ns16550";           reg = <0x4600 0x100>;           clock-frequency = <0>;           interrupts = <0xA 0x8>;           interrupt-parent = <&ipic>;           };   };   `
 
-节点 soc 定义的 ranges 属性，值为 <0x0 0xe0000000 0x00100000>，此属性值指定了一个 1024KB(0x00100000) 的地址范围，子地址空间的物理起始地址为 0x0，父地址空间的物理起始地址为 0xe0000000。
+节点 soc 定义的 ranges 属性，值为 \<0x0 0xe0000000 0x00100000>，此属性值指定了一个 1024KB(0x00100000) 的地址范围，子地址空间的物理起始地址为 0x0，父地址空间的物理起始地址为 0xe0000000。
 
 serial 是串口设备节点，
 
@@ -135,9 +135,9 @@ device_type 属性值为字符串， IEEE 1275 会用到此属性，用于描述
 
 |属性|属性值类型|描述|
 |---|---|---|
-|#address-cells|< u32 >|在它的子节点的reg属性中, 使用多少个u32整数来描述地址(address)|
-|model|< string >|用于标识系统板卡(例如smdk2440开发板)，推荐的格式是“manufacturer,model-number”|
-|compatible|< stringlist >|定义一系列的字符串, 用来指定内核中哪个machinedesc可以支持本设备|
+|#address-cells|\< u32 >|在它的子节点的reg属性中, 使用多少个u32整数来描述地址(address)|
+|model|\< string >|用于标识系统板卡(例如smdk2440开发板)，推荐的格式是“manufacturer,model-number”|
+|compatible|\< stringlist >|定义一系列的字符串, 用来指定内核中哪个machinedesc可以支持本设备|
 
 例如：compatible = "samsung,smdk2440","samsung,s3c24xx" ,内核会优先寻找支持smdk2440的machinedesc结构体，如果找不到才会继续寻找支持s3c24xx的machine_desc结构体(优先选择第一项，然后才是第二项，第三项……)
 
@@ -155,7 +155,7 @@ aliases 节点的主要功能就是定义别名，定义别名的目的就是为
 
 所有设备树都需要一个memory设备节点，它描述了系统的物理内存布局。如果系统有多个内存块，可以创建多个memory节点，或者可以在单个memory节点的reg属性中指定这些地址范围和内存空间大小。
 
-例如：一个64位的系统有两块内存空间：RAM1：起始地址是0x0，地址空间是 0x80000000；RAM2：起始地址是0x10000000，地址空间也是0x80000000；同时根节点下的 #address-cells = <2>和#size-cells = <2>，这个memory节点描述为：
+例如：一个64位的系统有两块内存空间：RAM1：起始地址是0x0，地址空间是 0x80000000；RAM2：起始地址是0x10000000，地址空间也是0x80000000；同时根节点下的 #address-cells = \<2>和#size-cells = \<2>，这个memory节点描述为：
 
 `memory@0 {       device_type = "memory";       reg = <0x00000000 0x00000000 0x00000000 0x80000000              0x00000000 0x10000000 0x00000000 0x80000000>;   };   `
 
@@ -169,7 +169,7 @@ chosen 并不是一个真实的设备， chosen 节点主要是为了 uboot 向 
 
 `chosen {       bootargs = "root=/dev/nfs rw nfsroot=192.168.1.1 console=ttyS0,115200";   };   `
 
-### 2.2.3.4 /cpus 和 /cpus/cpu* 子节点
+### 2.2.3.4 /cpus 和 /cpus/cpu\* 子节点
 
 cpus节点下有1个或多个cpu子节点, cpu子节点中用reg属性用来标明自己是哪一个cpu，所以 /cpus 中有以下2个属性:
 
@@ -195,18 +195,17 @@ cpus节点下有1个或多个cpu子节点, cpu子节点中用reg属性用来标�
 
 .dtb文件是 .dts 被 DTC 编译后的二进制格式的设备树文件，它的文件布局如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从上图可以看出，DTB文件主要包含四部分内容：struct ftdheader、memory reservation block、structure block、strings block；
 
 - ① struct ftdheader：用来表明各个分部的偏移地址，整个文件的大小，版本号等；
-    
+
 - ② memory reservation block：在设备树中使用/memreserve/ 定义的保留内存信息；
-    
+
 - ③ structure block：保存节点的信息，节点的结构；
-    
+
 - ④ strings block：保存属性的名字，单独作为字符串保存；
-    
 
 struct ftd_header结构体的定义如下：
 
@@ -223,35 +222,32 @@ fdtreserveentry结构体如下：
 structure block是用于描述设备树节点的结构，保存着节点的信息、节点的结构，它有5种标记类型:
 
 - ① FDTBEGINNODE (0x00000001)：表示节点的开始，它的后面紧跟的是节点的名字；
-    
-- ② FDTENDNODE (0x00000002)：表示节点的结束；
-    
-- ③ FDTPROP (0x00000003) ：表示开始描述节点里面的一个属性，在FDTPROP后面紧跟一个结构体如下所示:
-    
 
-`struct {       uint32_t len;       /*表示属性值的长度*/       uint32_t nameoff;   /*属性的名字在string block的偏移*/   }` 
+- ② FDTENDNODE (0x00000002)：表示节点的结束；
+
+- ③ FDTPROP (0x00000003) ：表示开始描述节点里面的一个属性，在FDTPROP后面紧跟一个结构体如下所示:
+
+`struct {       uint32_t len;       /*表示属性值的长度*/       uint32_t nameoff;   /*属性的名字在string block的偏移*/   }`
 
 注：上面的这个结构体后紧跟着是属性值，属性的名字保存在字符串块（Strings block）中。
 
 - ④ FDT_END (0x00000009)：表示structure block的结束。
-    
 
 单个节点在structure block的存储格式如下图如所示：(注：子节点的存储格式也是一样)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 总结：
 
 - (1) DTB文件可以分为四个部分:struct ftdheader、memory reservation block、structure block、strings block；
-    
+
 - (2) 最开始的为struct ftdheader，包含其它三个部分的偏移地址；
-    
+
 - (3) memory reservation block记录保留内存信息；
-    
+
 - (4) structure block保存节点的信息，节点的结构；
-    
+
 - (5) strings block保存属性的名字，将属性名字单独作为字符串保存；
-    
 
 ### 2.2.5 DTB文件分析
 
@@ -261,54 +257,51 @@ structure block是用于描述设备树节点的结构，保存着节点的信�
 
 jz2440.dtb 文件的内容如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 接下来我们对应上图的编号逐一分析，其中编号①~⑩表示的是fdtheader 结构体的成员信息：
 
 - ① 对应 magic，表示设备树魔数，固定为0xd00dfeed；
-    
+
 - ② 对应 totalsize，表示整个设备设dtb文件的大小，从上图可知0x000001B9正好是dtb文件的大小441B；
-    
+
 - ③ 对应 offdtstruct，表示structure block的偏移地址，为 0x00000038；
-    
+
 - ④ 对应offdtstrings，表示 strings block的偏移地址，为 0x00000174；
-    
+
 - ⑤ 对应 offmemrsvmap;，表示memory reservation block的偏移地址，为 0x00000028；
-    
+
 - ⑥ 对应 version ，设备树版本的版本号为0x11；
-    
+
 - ⑦ 对应 lastcompversion，向下兼容版本号0x10；
-    
+
 - ⑧ 对应 bootcpuidphys，在多核处理器中用于启动的主cpu的物理id，为0x0；
-    
+
 - ⑨ 对应 sizedtstrings，strings block的大小为 0x45；
-    
+
 - ⑩ 对应 sizedtstruct，structure block的大小为 0x0000013C；
-    
+
 - ⑪~⑫ 对应结构体 fdtreserve_entry ，它所在的地址为0x28，jz2440.dts 设备树文件没有设置 /memreserve/，所以address = 0x0，size = 0x0；
-    
+
 - ⑬ 所处的地址是0x38，它处在structure block中，0x00000001表示的是设备节点的开始；
-    
+
 - ⑭ 接着紧跟的是设备节点的名字，这里是根节点，所以为0x00000000；
-    
+
 - ⑮ 0x00000003 表示的是开始描述设备节点的一个属性；
-    
+
 - ⑯ 表示这个属性值的长度为0x09；
-    
+
 - ⑰ 表示这个属性的名字在strings block的偏移量是0，找到strings block的地址0x0174的地方，可知这个属性的名字是model；
-    
+
 - ⑱ 这个model属性的值是"SMDK2440"，加上字符串的结束符NULL，刚好9个字节；
-    
 
 ### 2.2.6 DTB文件结构图
 
-(1) dtb 文件的结构图如下：![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+(1) dtb 文件的结构图如下：!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Linux设备树语法规范 (2) 设备节点的结构图如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)作者：疯狂写Bug 侵权删
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)作者：疯狂写Bug 侵权删
 
 Linux驱动71
 
@@ -327,125 +320,124 @@ Comment
 **留言 15**
 
 - Peter
-    
-    2021年9月28日
-    
-    Like2
-    
-    好
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    大佬就不用学习了![[偷笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年9月28日
+
+  Like2
+
+  好
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  大佬就不用学习了![[偷笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - momo爸爸
-    
-    2021年9月28日
-    
-    Like1
-    
-    干货满满
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like1
-    
-    对顾总来说就是小儿科。
-    
+
+  2021年9月28日
+
+  Like1
+
+  干货满满
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like1
+
+  对顾总来说就是小儿科。
+
 - 大飞歌
-    
-    2021年9月28日
-    
-    Like1
-    
-    ![[大哭]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年9月28日
+
+  Like1
+
+  ![[大哭]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 云淡风轻
-    
-    2022年1月19日
-    
-    Like
-    
-    有个地方可能有笔误，.dts写成了.dst文件
-    
+
+  2022年1月19日
+
+  Like
+
+  有个地方可能有笔误，.dts写成了.dst文件
+
 - hallo
-    
-    2021年9月29日
-    
-    Like
-    
-    学习了，干货
-    
+
+  2021年9月29日
+
+  Like
+
+  学习了，干货
+
 - Tab
-    
-    2021年9月28日
-    
-    Like
-    
-    nice![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年9月28日
+
+  Like
+
+  nice![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Gyj
-    
-    2021年9月28日
-    
-    Like
-    
-    想当年 Dts 可折磨了我一阵子
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    有套路的！
-    
+
+  2021年9月28日
+
+  Like
+
+  想当年 Dts 可折磨了我一阵子
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  有套路的！
+
 - One
-    
-    2021年9月28日
-    
-    Like
-    
-    学习硬货！！！
-    
+
+  2021年9月28日
+
+  Like
+
+  学习硬货！！！
+
 - 天然弧
-    
-    2021年9月28日
-    
-    Like
-    
-    好文章(✪▽✪)
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    学起来！！
-    
+
+  2021年9月28日
+
+  Like
+
+  好文章(✪▽✪)
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  学起来！！
+
 - 道哥#IOT物联网小镇
-    
-    2021年9月28日
-    
-    Like
-    
-    硬核干货![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    必须硬。
-    
+
+  2021年9月28日
+
+  Like
+
+  硬核干货![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  必须硬。
 
 已无更多数据
 
@@ -464,124 +456,123 @@ Comment
 **留言 15**
 
 - Peter
-    
-    2021年9月28日
-    
-    Like2
-    
-    好
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    大佬就不用学习了![[偷笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年9月28日
+
+  Like2
+
+  好
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  大佬就不用学习了![[偷笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - momo爸爸
-    
-    2021年9月28日
-    
-    Like1
-    
-    干货满满
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like1
-    
-    对顾总来说就是小儿科。
-    
+
+  2021年9月28日
+
+  Like1
+
+  干货满满
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like1
+
+  对顾总来说就是小儿科。
+
 - 大飞歌
-    
-    2021年9月28日
-    
-    Like1
-    
-    ![[大哭]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年9月28日
+
+  Like1
+
+  ![[大哭]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 云淡风轻
-    
-    2022年1月19日
-    
-    Like
-    
-    有个地方可能有笔误，.dts写成了.dst文件
-    
+
+  2022年1月19日
+
+  Like
+
+  有个地方可能有笔误，.dts写成了.dst文件
+
 - hallo
-    
-    2021年9月29日
-    
-    Like
-    
-    学习了，干货
-    
+
+  2021年9月29日
+
+  Like
+
+  学习了，干货
+
 - Tab
-    
-    2021年9月28日
-    
-    Like
-    
-    nice![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年9月28日
+
+  Like
+
+  nice![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Gyj
-    
-    2021年9月28日
-    
-    Like
-    
-    想当年 Dts 可折磨了我一阵子
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    有套路的！
-    
+
+  2021年9月28日
+
+  Like
+
+  想当年 Dts 可折磨了我一阵子
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  有套路的！
+
 - One
-    
-    2021年9月28日
-    
-    Like
-    
-    学习硬货！！！
-    
+
+  2021年9月28日
+
+  Like
+
+  学习硬货！！！
+
 - 天然弧
-    
-    2021年9月28日
-    
-    Like
-    
-    好文章(✪▽✪)
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    学起来！！
-    
+
+  2021年9月28日
+
+  Like
+
+  好文章(✪▽✪)
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  学起来！！
+
 - 道哥#IOT物联网小镇
-    
-    2021年9月28日
-    
-    Like
-    
-    硬核干货![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    一口Linux
-    
-    Author2021年9月28日
-    
-    Like
-    
-    必须硬。
-    
+
+  2021年9月28日
+
+  Like
+
+  硬核干货![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  一口Linux
+
+  Author2021年9月28日
+
+  Like
+
+  必须硬。
 
 已无更多数据

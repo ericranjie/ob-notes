@@ -2,35 +2,33 @@
 
 Adrian Ratiu Linux内核那些事
 
- _2021年11月23日 09:02_
+_2021年11月23日 09:02_
 
 ## 1. 前言
 
 在本系列的第 1 部分和第 2 部分中，我们对 eBPF 虚拟机进行了简洁的深入研究。阅读上述部分并不是理解第 3 部分的必修课，尽管很好地掌握了低级别的基础知识确实有助于更好地理解高级别的工具。为了理解这些工具是如何工作的，我们先定义一下 eBPF 程序的高层次组件：
 
 - 后端：这是在内核中加载和运行的 eBPF 字节码。它将数据写入内核 map 和环形缓冲区的数据结构中。
-    
+
 - 加载器：它将字节码后端加载到内核中。通常情况下，当加载器进程终止时，字节码会被内核自动卸载。
-    
+
 - 前端：从数据结构中读取数据（由后端写入）并将其显示给用户。
-    
+
 - 数据结构：这些是后端和前端之间的通信手段。它们是由内核管理的 map 和环形缓冲区，可以通过文件描述符访问，并需要在后端被加载之前创建。它们会持续存在，直到没有更多的后端或前端进行读写操作。
-    
 
 在第 1 部分和第 2 部分研究的 sock_example.c 中，所有的组件都被放置在一个 C 文件中，所有的动作都由用户进程完成。
 
 - 第 40-45 行创建 map数据结构。
-    
+
 - 第 47-61 行定义后端。
-    
+
 - 第 63-76 行在内核中加载后端
-    
+
 - 第 78-91 行是前端，负责将从 map 文件描述符中读取的数据打印给用户。
-    
 
 eBPF 程序可以更加复杂：多个后端可以由一个（或单独的多个！）加载器进程加载，写入多个数据结构，然后由多个前端进程读取，所有这些都可以发生在一个跨越多个进程的用户 eBPF 应用程序中。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 2. 层级 1：容易编写的后端：LLVM eBPF 编译器
 
@@ -38,7 +36,7 @@ eBPF 程序可以更加复杂：多个后端可以由一个（或单独的多个
 
 LLVM 将 “受限制的 C” 语言（记住，没有无界循环，最大 4096 条指令等等，见第 1 部分开始）编译成 ELF 对象文件，其中包含特殊区块（section)，并可基于 bpf()系统调用，使用 libbpf 等库加载到内核中。这种设计有效地将后端定义从加载器和前端中分离出来，因为 eBPF 字节码包含在 ELF 文件中。
 
-内核还在 samples/bpf/ 下提供了使用这种模式的例子：*_kern.c 文件被编译为 *_kern.o（后端代码），被 *_user.c（装载器和前端）加载。
+内核还在 samples/bpf/ 下提供了使用这种模式的例子：\*\_kern.c 文件被编译为 \*\_kern.o（后端代码），被 \*\_user.c（装载器和前端）加载。
 
 将本系列第 1 和第 2 部分的 sock_exapmle.c 原始字节码 转换为 “受限的 C” 代码“ sockex1_kern.c，这比原始字节码更容易理解和修改。
 
@@ -46,7 +44,7 @@ LLVM 将 “受限制的 C” 语言（记住，没有无界循环，最大 4096
 #include <uapi/linux/bpf.h>#include <uapi/linux/if_ether.h>#include <uapi/linux/if_packet.h>#include <uapi/linux/ip.h>#include "bpf_helpers.h"struct bpf_map_def SEC("maps") my_map = {    .type = BPF_MAP_TYPE_ARRAY,    .key_size = sizeof(u32),    .value_size = sizeof(long),    .max_entries = 256,};SEC("socket1")int bpf_prog1(struct __sk_buff *skb){    int index = load_byte(skb, ETH_HLEN + offsetof(struct iphdr, protocol));    long *value;    value = bpf_map_lookup_elem(&my_map, &index);    if (value)        __sync_fetch_and_add(value, skb->len);    return 0;}char _license[] SEC("license") = "GPL";
 ```
 
-产生的 eBPF ELF 对象 sockex1_kern.o，包含了分离的后端和数据结构定义。加载器和前端sockex1_user.c，用于解析 ELF 文件、创建所需的 map 和加载字节码中内核函数 bpf_prog1()，然后前端像以前一样继续运行。  
+产生的 eBPF ELF 对象 sockex1_kern.o，包含了分离的后端和数据结构定义。加载器和前端sockex1_user.c，用于解析 ELF 文件、创建所需的 map 和加载字节码中内核函数 bpf_prog1()，然后前端像以前一样继续运行。
 
 引入这个 “受限的 C” 抽象层所做的权衡是使 eBPF后端代码更容易用高级语言编写，代价是增加加载器的复杂性（现在需要解析 ELF 对象），而前端大部分不受影响。
 
@@ -57,47 +55,44 @@ LLVM 将 “受限制的 C” 语言（记住，没有无界循环，最大 4096
 BCC 项目有两个部分。
 
 - 编译器集合（BCC 本身）：这是用于编写 BCC 工具的框架，也是我们文章的重点。请继续阅读。
-    
+
 - BCC-tools：这是一个不断增长的基于 eBPF 且经过测试的程序集，提供了使用的例子和手册。更多信息见本教程。
-    
 
 BCC 的安装包很大：它依赖于 LLVM/clang 将 “受限的 C”、python/lua 等编译成 eBPF，它还包含像 libbcc（用 C++ 编写）、libbpf 等库实现【译者注：原文 python/lua 顺序有错，另外 libcc 是 BCC 项目，libbpf 目前已经是内核代码一部分】。部分内核代码的也被复制到 BCC 代码中，所以它不需要基于完整的内核源（只需要头文件）进行构建。它可以很容易地占用数百 MB 的空间，这对于小型嵌入式设备来说不友好，我们希望这些设备也可以从 eBPF 的力量中受益。探索嵌入式设备由于大小限制问题的解决方案，将是我们在第 4 部分的重点。
 
 eBPF 程序组件在 BCC 组织方式如下：
 
 - 后端和数据结构：用 “限制性 C” 编写。可以在单独的文件中，或直接作为多行字符串存储在加载器/前端的脚本中，以方便使用。参见：语言参考。【译者注：在 BCC 实现中，后端代码采用面向对象的做法，真正生成字节码的时候，BCC 会进行一次预处理，转换成真正的 C 语言代码方式，这也包括 map 等数据结构的定义方面】。
-    
+
 - 加载器和前端：可用非常简单的高级 python/lua 脚本编写。参见：语言参考。
-    
 
 因为 BCC 的主要目的是简化 eBPF 程序的编写，因此它尽可能地标准化和自动化：在后台完全自动化地通过 LLVM 编译 “受限的 C”后端，并产生一个标准的 ELF 对象格式类型，这种方式允许加载器对所有 BCC 程序只实现一次，并将其减少到最小的 API（2 行 python）。它还将数据结构的 API 标准化，以便于通过前端访问。简而言之，它将开发者的注意力集中在编写前端上，而不必担心较低层次的细节问题。
 
 为了最好地说明它是如何工作的，我们来看一个简单的具体例子，它是对前面文章中的 sock_example.c 的重新实现。该程序统计回环接口上收到了 TCP、UDP 和 ICMP 数据包的数量。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 与此前直接用 C 语言编写的方式不同，用 BCC 实现具有以下优势：
 
 - 忘掉原始字节码：你可以用更方便的 “限制性 C” 编写所有后端。
-    
+
 - 不需要维护任何 LLVM 的 “限制性 C” 构建逻辑。代码被 BCC 在脚本执行时直接编译和加载。
-    
+
 - 没有危险的 C 代码：对于编写前端和加载器来说，Python 是一种更安全的语言，不会出现像空解引用（null dereferences）的错误。
-    
+
 - 代码更简洁，你可以专注于应用程序的逻辑，而不是具体的机器问题。
-    
+
 - 脚本可以被复制并在任何地方运行（假设已经安装了 BCC），它不会被束缚在内核的源代码目录中。
-    
+
 - 等等。
-    
 
-在上面的例子中，我们使用了 BPF.SOCKET_FILTER 程序类型，其结果是我们挂载的 C 函数得到一个网络数据包缓冲区作为 context 上下文参数【译者注：本例中为 struct __sk_buff *skb】。我们还可以使用 BPF.KPROBE 程序类型来探测任意的内核函数。我们继续优化，不再使用与上面相同的接口，而是使用一个特殊的 kprobe__* 函数名称前缀，以描述一个更高级别的 BCC API。
+在上面的例子中，我们使用了 BPF.SOCKET_FILTER 程序类型，其结果是我们挂载的 C 函数得到一个网络数据包缓冲区作为 context 上下文参数【译者注：本例中为 struct __sk_buff \*skb】。我们还可以使用 BPF.KPROBE 程序类型来探测任意的内核函数。我们继续优化，不再使用与上面相同的接口，而是使用一个特殊的 kprobe__\* 函数名称前缀，以描述一个更高级别的 BCC API。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个例子来自于 bcc/examples/tracing/bitehist.py。它通过挂载在 blk_account_io_completion() 内核函数来打印一个 I/O 块大小的直方图。
 
-请注意：eBPF 的加载是根据 kprobe__blk_account_io_completion() 函数的名称自动发生的（加载器隐含实现）! 【译者注：kprobe__ 前缀会被 BCC 编译代码过程中自动识别并转换成对应的附加函数调用】从用 libbpf 在 C 语言中编写和加载字节码以来，我们已经走了很远。
+请注意：eBPF 的加载是根据 kprobe\_\_blk_account_io_completion() 函数的名称自动发生的（加载器隐含实现）! 【译者注：kprobe\_\_ 前缀会被 BCC 编译代码过程中自动识别并转换成对应的附加函数调用】从用 libbpf 在 C 语言中编写和加载字节码以来，我们已经走了很远。
 
 ## 4. 层级 3：Python 太低级了：BPFftrace
 
@@ -116,15 +111,14 @@ BPFtrace 在某些方面仍然是一个正在进行的工作。例如，目前�
 IOVisor 是 Linux 基金会的一个合作项目，基于本系列文章中介绍的 eBPF 虚拟机和工具。它使用了一些非常高层次的热门概念，如 “通用输入/输出”，专注于向云/数据中心开发人员和用户提供 eBPF 技术。
 
 - 内核 eBPF 虚拟机成为 “IO Visor 运行时引擎”
-    
+
 - 编译器后端成为 “IO Visor 编译器后端”
-    
+
 - 一般的 eBPF 程序被重新命名为 “IO 模块”
-    
+
 - 实现包过滤器的特定 eBPF 程序成为 “IO 数据平面模块/组件”
-    
+
 - 等等。
-    
 
 考虑到原来的名字（扩展的伯克利包过滤器），并没有代表什么意义，也许所有这些重命名都是受欢迎和有价值的，特别是如果它能使更多的行业利用 eBPF 的力量。
 

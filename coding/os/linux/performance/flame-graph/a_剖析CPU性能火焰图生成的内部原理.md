@@ -2,12 +2,13 @@
 
 大家好，我是飞哥！
 
-在进行CPU性能优化的时候，我们经常先需要分析出来我们的应用程序中的CPU资源在哪些函数中使用的比较多，这样才能高效地优化。一个非常好的分析工具就是《性能之巅》作者 Brendan Gregg 发明的火焰图。  
+在进行CPU性能优化的时候，我们经常先需要分析出来我们的应用程序中的CPU资源在哪些函数中使用的比较多，这样才能高效地优化。一个非常好的分析工具就是《性能之巅》作者 Brendan Gregg 发明的火焰图。\
 ![图1.png](https://kfngxl.cn/usr/uploads/2024/03/1639106072.png "图1.png")
 
 在这张火焰图中，一个函数占据的宽度越宽，表明该函数消耗的 CPU 占比越高。但对于位于火焰图下方的函数来说，它们虽然开销比较大，但都是因为其子函数执行消耗的。所以一般都是看最上方的宽度较长的函数，这是导致整个系统 CPU 比较高的热点，把它优化掉可以提升程序运行性能。
 
 我们今天就来介绍下火焰图的是怎么做出来的，以及它的工作原理。
+
 ## 一、火焰图的使用
 
 为了更好地展示火焰图的原理，我专门写了一小段代码，
@@ -47,7 +48,7 @@ int main() {
 # perf script | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > out.svg
 ```
 
-这样，一副火焰图就生成好了。  
+这样，一副火焰图就生成好了。\
 ![图2.png](https://kfngxl.cn/usr/uploads/2024/03/3888175034.png "图2.png")
 
 之所以选择我提供一个 demo 代码来生成，是因为这个足够简单和清晰，方便大家理解。在上面这个火焰图中，可以看出 main 函数调用了 funcA、funcB、funcC，其中 funcA 又调用了 funcD、funcE，然后这些函数的开销又都不是自己花掉的，而是因为自己调用的一个 CPU 密集型的函数 caculate。整个系统的调用栈的耗时统计就十分清晰的展现在眼前了。
@@ -123,7 +124,7 @@ int main() {
 
 perf在采样的过程大概分为两步，一是调用 perf_event_open 来打开一个 event 文件，而是调用 read、mmap等系统调用读取内核采样回来的数据。整体的工作流程图大概如下
 
-![![](图6.png)](https://kfngxl.cn/usr/uploads/2024/03/3703312428.png "![](图6.png)")
+![](https://kfngxl.cn/usr/uploads/2024/03/3703312428.png "![](图6.png)")
 
 其中 perf_event_open 完成了非常重要的几项工作。
 
@@ -267,7 +268,7 @@ funcA; 1
 funcD; 1
 ```
 
-我可以通过手工画一个类似的火焰图，如下：  
+我可以通过手工画一个类似的火焰图，如下：\
 ![图5.png](https://kfngxl.cn/usr/uploads/2024/03/3681326871.png "图5.png")
 
 其中 funcA 因为两行记录合并，所以占据了 3 的宽度。funcD 没有合并，占据就是1。另外 funcB、funcC都画在A上的上方，占据的宽度都是2。
@@ -284,8 +285,8 @@ funcD; 1
 
 更多干货内容，详见：
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [剖析CPU性能火焰图生成的内部原理](https://kfngxl.cn/index.php/archives/655/)
@@ -330,7 +331,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36925次
     - 本站运营：0年168天18小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

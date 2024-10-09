@@ -63,29 +63,29 @@ PE文件主要由两部分组成，一部分是为了兼容MS-DOS操作系统而
 
 1、MZ header。相关代码如下所示：
 
-> #ifdef CONFIG_EFI  
-> efi_head:  
->     add    x13, x18, #0x16 －－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->     b    stext  
-> #else  
->     b    stext－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）  
->     .long    0   
-> #endif  
->     .quad    _kernel_offset_le－－－－－－－－－－－－－－－－－－－－－－－－－（3）  
->     .quad    _kernel_size_le   
->     .quad    _kernel_flags_le  
->     .quad    0                // reserved  
->     .quad    0                // reserved  
->     .quad    0                // reserved  
->     .byte    0x41－－－－－－－－－－－－Magic number, "ARM\x64"  
->     .byte    0x52  
->     .byte    0x4d  
->     .byte    0x64
-> 
-> #ifdef CONFIG_EFI  
->     .long    pe_header - efi_head－－－－－－－－－－－－－－－－－－－－－－－（4）  
-> #else  
->     .word    0                // reserved  
+> #ifdef CONFIG_EFI\
+> efi_head:\
+> add    x13, x18, #0x16 －－－－－－－－－－－－－－－－－－－－－－－－－－（2）\
+> b    stext\
+> #else\
+> b    stext－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）\
+> .long    0 \
+> #endif\
+> .quad    \_kernel_offset_le－－－－－－－－－－－－－－－－－－－－－－－－－（3）\
+> .quad    \_kernel_size_le \
+> .quad    \_kernel_flags_le\
+> .quad    0                // reserved\
+> .quad    0                // reserved\
+> .quad    0                // reserved\
+> .byte    0x41－－－－－－－－－－－－Magic number, "ARM\\x64"\
+> .byte    0x52\
+> .byte    0x4d\
+> .byte    0x64
+>
+> #ifdef CONFIG_EFI\
+> .long    pe_header - efi_head－－－－－－－－－－－－－－－－－－－－－－－（4）\
+> #else\
+> .word    0                // reserved\
 > #endif
 
 这里定义了64字节的kernel image header，应对两种场景：一种是从普通的linux bootloader加载内核，另外一种是从UEFI firmware直接加载kernel（定义了CONFIG_EFI ），在这种场景下，这64B的内容被解释为MZ header。
@@ -98,7 +98,7 @@ PE文件主要由两部分组成，一部分是为了兼容MS-DOS操作系统而
 
 上图中的灰色区域就是64-Byte的MZ header（对应kernel image header的内容），当然，对于linux kernel而言，它只是伪装成PE格式而已，只要能够提供足够的信息给UEFI firmware的boot manager就OK了。PE格式的文件除了包括一个MZ header，还包括一段MS-DOS stub（上图中的黄色区域），当然，对于linux kernel image，我们没有提供这部分的内容。这里“add    x13, x18, #0x16”这条指令没有任何实际的意义，这条指令的opcode实际上就是MZ signature，用来标识这是一个DOS MZ executable的image。
 
-（3）对于UEFI firmware而言，MS-DOS header大部分的区域都是没有什么用处的，因此正好可以用来提供信息，以便让linux的bootloader可以知道如何加载kernel（非UEFI加载的情况）。_kernel_offset_le标识加载kernel的位置，如果等于0，表示加载到RAM的0地址的位置上。_kernel_size_le表示需要加载的kernel image的长度，_kernel_flags_le是表示kernel的一些属性，目前仅仅使用了bit 0，表示kernel的endianess。
+（3）对于UEFI firmware而言，MS-DOS header大部分的区域都是没有什么用处的，因此正好可以用来提供信息，以便让linux的bootloader可以知道如何加载kernel（非UEFI加载的情况）。\_kernel_offset_le标识加载kernel的位置，如果等于0，表示加载到RAM的0地址的位置上。\_kernel_size_le表示需要加载的kernel image的长度，\_kernel_flags_le是表示kernel的一些属性，目前仅仅使用了bit 0，表示kernel的endianess。
 
 （4）在UEFI firmware加载kernel的情况下，需要找到PE header以及各个section的定义了，以便boot manager完成加载kernel image的任务。在MS-DOS header中（offset是0x3c）有四个字节指向了PE header，通过它可以找到如何加载内核的各种信息。这个过程是这样的：UEFI firmware的boot manager如果发现了MZ header，那么就认为这是一个符合标准的EFI image，并在0x3c处获取PE header的位置，并继续解析其内容以便加载kernel image。
 
@@ -106,19 +106,19 @@ PE文件主要由两部分组成，一部分是为了兼容MS-DOS操作系统而
 
 PE header包括三部分的内容：PE signature、COFF（Common Object File Format）file header和optional header。PE signature和COFF file header的代码如下：
 
-> pe_header:  
->     .ascii    "PE" －－－－－－－－－－－－－－－－PE header signanature  
->     .short     0  
-> coff_header:  
->     .short    0xaa64－－－－－－－－－－表示machine type是AArch64  
->     .short    2－－－－－－－－－－－－该PE文件有多少个section  
->     .long    0－－－－－－－－－－－－该文件的创建时间  
->     .long    0－－－－－－－－－－－－符号表信息  
->     .long    1－－－－－－－－－－－－符号表中的符号的数目  
->     .short    section_table - optional_header －－－－－－－－optional header的长度  
->     .short    0x206－－－－－－－－－－－－－－－Characteristics，具体的含义请查看PE规格书
+> pe_header:\
+> .ascii    "PE" －－－－－－－－－－－－－－－－PE header signanature\
+> .short     0\
+> coff_header:\
+> .short    0xaa64－－－－－－－－－－表示machine type是AArch64\
+> .short    2－－－－－－－－－－－－该PE文件有多少个section\
+> .long    0－－－－－－－－－－－－该文件的创建时间\
+> .long    0－－－－－－－－－－－－符号表信息\
+> .long    1－－－－－－－－－－－－符号表中的符号的数目\
+> .short    section_table - optional_header －－－－－－－－optional header的长度\
+> .short    0x206－－－－－－－－－－－－－－－Characteristics，具体的含义请查看PE规格书
 
-上节我们说过，通过MZ header可以找到PE header，所谓PE header的开始位置实际上就是一个“PE\0\0”的signature，随后紧接着就是COFF file header，COFF file header具体的定义如下（该表格来自PE specification）：
+上节我们说过，通过MZ header可以找到PE header，所谓PE header的开始位置实际上就是一个“PE\\0\\0”的signature，随后紧接着就是COFF file header，COFF file header具体的定义如下（该表格来自PE specification）：
 
 |   |   |   |   |
 |---|---|---|---|
@@ -144,15 +144,15 @@ NumberOfSections定义了PE文件中的section的数目，对于linux kernel ima
 
 Standard fields包括了如何加载以及如何运行的信息。相关的代码如下：
 
-> optional_header:  
->     .short    0x20b                // PE32+ format  
->     .byte    0x02                // MajorLinkerVersion  
->     .byte    0x14                // MinorLinkerVersion  
->     .long    _end - stext            // SizeOfCode  
->     .long    0                // SizeOfInitializedData  
->     .long    0                // SizeOfUninitializedData  
->     .long    efi_stub_entry - efi_head    // AddressOfEntryPoint  
->     .long    stext_offset            // BaseOfCode
+> optional_header:\
+> .short    0x20b                // PE32+ format\
+> .byte    0x02                // MajorLinkerVersion\
+> .byte    0x14                // MinorLinkerVersion\
+> .long    \_end - stext            // SizeOfCode\
+> .long    0                // SizeOfInitializedData\
+> .long    0                // SizeOfUninitializedData\
+> .long    efi_stub_entry - efi_head    // AddressOfEntryPoint\
+> .long    stext_offset            // BaseOfCode
 
 比较重要的信息包括：代码段在image file中的偏移（BaseOfCode），正文段的大小（SizeOfCode），data段的大小（SizeOfInitializedData），bss段的大小（SizeOfUninitializedData），加载到memory后入口函数（AddressOfEntryPoint，对于linux kernel而言，入口函数是efi_stub_entry）。
 
@@ -160,7 +160,7 @@ Windows-specific fields和Data directories主要被Windows操作系统的linker�
 
 3、Section table和section Data
 
-大家有兴趣可以自己查阅PE规格，我这里就偷懒啦，^_^。
+大家有兴趣可以自己查阅PE规格，我这里就偷懒啦，^\_^。
 
 四、参考文献：
 
@@ -184,95 +184,93 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 **评论：**
 
-**蓝漪**  
+**蓝漪**\
 2017-03-08 16:50
 
-窝窝文中多次提及的64字节，其计算引起了我的兴趣。  
-我这边之前是这样算的：(4+4)+(6*8+4*1)+4=64，没错，和窝窝说的一样．  
-但后面又查了下PE的结构，按照其数据结构，实际应该是40字节．  
-  
-迷惑中，我对vmlinux进行了反汇编，相关结果如下：  
-ffffffc000080000 <_text>:  
-ffffffc000080000:   91005a4d    add x13, x18, #0x16  
-ffffffc000080004:   140003ff    b   ffffffc000081000 <stext>  
-ffffffc000080008:   00080000    .word   0x00080000  
-ffffffc00008000c:   00000000    .word   0x00000000  
-ffffffc000080010:   01b7c000    .word   0x01b7c000  
-    ...  
-ffffffc000080038:   644d5241    .word   0x644d5241  
-ffffffc00008003c:   00000040    .word   0x00000040  
-  
-这里可以看到，虽然定义的是quad类型，但实际vmlinux中是word类型．  
-因此实际的计算公式应该是(4+4)+(6*4+4*1)+4=40．  
-  
+窝窝文中多次提及的64字节，其计算引起了我的兴趣。\
+我这边之前是这样算的：(4+4)+(6*8+4*1)+4=64，没错，和窝窝说的一样．\
+但后面又查了下PE的结构，按照其数据结构，实际应该是40字节．
+
+迷惑中，我对vmlinux进行了反汇编，相关结果如下：\
+ffffffc000080000 \<\_text>:\
+ffffffc000080000:   91005a4d    add x13, x18, #0x16\
+ffffffc000080004:   140003ff    b   ffffffc000081000 <stext>\
+ffffffc000080008:   00080000    .word   0x00080000\
+ffffffc00008000c:   00000000    .word   0x00000000\
+ffffffc000080010:   01b7c000    .word   0x01b7c000\
+...\
+ffffffc000080038:   644d5241    .word   0x644d5241\
+ffffffc00008003c:   00000040    .word   0x00000040
+
+这里可以看到，虽然定义的是quad类型，但实际vmlinux中是word类型．\
+因此实际的计算公式应该是(4+4)+(6*4+4*1)+4=40．
+
 这里有个疑问，为什么类型会变呢？
 
 [回复](http://www.wowotech.net/armv8a_arch/UEFI.html#comment-5294)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-03-09 11:41
 
-@蓝漪：类型当然不会变，.quad代表的就是8个字节的数据。  
-  
-我帮你整理一下反汇编的结果你就明白了。  
-  
-fffffc000080000 <_text>:  
-ffffffc000080000:   91005a4d    add x13, x18, #0x16  
-ffffffc000080004:   140003ff    b   ffffffc000081000 <stext>  
-－－－－－－－－－－对应－－－－－－－－－－－－－－－  
-efi_head:  
-    add    x13, x18, #0x16  
-    b    stext  
-  
-  
-  
-ffffffc000080008:   00080000    .word   0x00080000  
-ffffffc00008000c:   00000000    .word   0x00000000  
-－－－－－－－－－－对应－－－－－－－－－－－－－－－  
-.quad    _kernel_offset_le
+@蓝漪：类型当然不会变，.quad代表的就是8个字节的数据。
+
+我帮你整理一下反汇编的结果你就明白了。
+
+fffffc000080000 \<\_text>:\
+ffffffc000080000:   91005a4d    add x13, x18, #0x16\
+ffffffc000080004:   140003ff    b   ffffffc000081000 <stext>\
+－－－－－－－－－－对应－－－－－－－－－－－－－－－\
+efi_head:\
+add    x13, x18, #0x16\
+b    stext
+
+ffffffc000080008:   00080000    .word   0x00080000\
+ffffffc00008000c:   00000000    .word   0x00000000\
+－－－－－－－－－－对应－－－－－－－－－－－－－－－\
+.quad    \_kernel_offset_le
 
 [回复](http://www.wowotech.net/armv8a_arch/UEFI.html#comment-5297)
 
-**蓝漪**  
+**蓝漪**\
 2017-03-09 22:29
 
-@linuxer：嗯，这样理解的话也解决了我另一个疑惑（那个size怎么想也不应该是0的...）。  
-那么计算的结果还是应该是64。  
-但是我了解到的结构体是这样的：  
-typedef struct _IMAGE_DOS_HEADER {      // DOS .EXE header    
-    WORD   e_magic;                     // Magic number    
-    WORD   e_cblp;                      // Bytes on last page of file    
-    WORD   e_cp;                        // Pages in file    
-    WORD   e_crlc;                      // Relocations    
-    WORD   e_cparhdr;                   // Size of header in paragraphs    
-    WORD   e_minalloc;                  // Minimum extra paragraphs needed    
-    WORD   e_maxalloc;                  // Maximum extra paragraphs needed    
-    WORD   e_ss;                        // Initial (relative) SS value    
-    WORD   e_sp;                        // Initial SP value    
-    WORD   e_csum;                      // Checksum    
-    WORD   e_ip;                        // Initial IP value    
-    WORD   e_cs;                        // Initial (relative) CS value    
-    WORD   e_lfarlc;                    // File address of relocation table    
-    WORD   e_ovno;                      // Overlay number    
-    WORD   e_res[4];                    // Reserved words    
-    WORD   e_oemid;                     // OEM identifier (for e_oeminfo)    
-    WORD   e_oeminfo;                   // OEM information; e_oemid specific    
-    WORD   e_res2[10];                  // Reserved words    
-    LONG   e_lfanew;                    // File address of new exe header  //PE头的偏移地址  
-  } IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;    
-其中是18个word类型即18*2=36字节；加上最后的long4字节，只有40字节。  
+@linuxer：嗯，这样理解的话也解决了我另一个疑惑（那个size怎么想也不应该是0的...）。\
+那么计算的结果还是应该是64。\
+但是我了解到的结构体是这样的：\
+typedef struct \_IMAGE_DOS_HEADER {      // DOS .EXE header  \
+WORD   e_magic;                     // Magic number  \
+WORD   e_cblp;                      // Bytes on last page of file  \
+WORD   e_cp;                        // Pages in file  \
+WORD   e_crlc;                      // Relocations  \
+WORD   e_cparhdr;                   // Size of header in paragraphs  \
+WORD   e_minalloc;                  // Minimum extra paragraphs needed  \
+WORD   e_maxalloc;                  // Maximum extra paragraphs needed  \
+WORD   e_ss;                        // Initial (relative) SS value  \
+WORD   e_sp;                        // Initial SP value  \
+WORD   e_csum;                      // Checksum  \
+WORD   e_ip;                        // Initial IP value  \
+WORD   e_cs;                        // Initial (relative) CS value  \
+WORD   e_lfarlc;                    // File address of relocation table  \
+WORD   e_ovno;                      // Overlay number  \
+WORD   e_res\[4\];                    // Reserved words  \
+WORD   e_oemid;                     // OEM identifier (for e_oeminfo)  \
+WORD   e_oeminfo;                   // OEM information; e_oemid specific  \
+WORD   e_res2\[10\];                  // Reserved words  \
+LONG   e_lfanew;                    // File address of new exe header  //PE头的偏移地址\
+} IMAGE_DOS_HEADER, *PIMAGE_DOS_HEADER;  \
+其中是18个word类型即18*2=36字节；加上最后的long4字节，只有40字节。\
 既然这里是伪装成PE格式的，大小对不上，这个不应该的吧？
 
 [回复](http://www.wowotech.net/armv8a_arch/UEFI.html#comment-5303)
 
-**mahjong**  
+**mahjong**\
 2017-07-05 07:10
 
 @蓝漪：e_lfanew指向PE header, dos header和pe header之间是长度不定的dos兼容代码
 
 [回复](http://www.wowotech.net/armv8a_arch/UEFI.html#comment-5772)
 
-**小豌豆**  
+**小豌豆**\
 2016-05-09 11:08
 
 感谢楼主
@@ -281,152 +279,155 @@ typedef struct _IMAGE_DOS_HEADER {      // DOS .EXE header  
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [Linux设备模型(1)_基本概念](http://www.wowotech.net/device_model/13.html)
-    - [實作 spinlock on raspberry pi 2](http://www.wowotech.net/231.html)
-    - [关于spin_lock的问题](http://www.wowotech.net/linux_kenrel/about_spin_lock.html)
-    - [Linux reset framework](http://www.wowotech.net/pm_subsystem/reset_framework.html)
-    - [X-013-UBOOT-使能autoboot功能](http://www.wowotech.net/x_project/uboot_autoboot.html)
+
+  - [Linux设备模型(1)\_基本概念](http://www.wowotech.net/device_model/13.html)
+  - [實作 spinlock on raspberry pi 2](http://www.wowotech.net/231.html)
+  - [关于spin_lock的问题](http://www.wowotech.net/linux_kenrel/about_spin_lock.html)
+  - [Linux reset framework](http://www.wowotech.net/pm_subsystem/reset_framework.html)
+  - [X-013-UBOOT-使能autoboot功能](http://www.wowotech.net/x_project/uboot_autoboot.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

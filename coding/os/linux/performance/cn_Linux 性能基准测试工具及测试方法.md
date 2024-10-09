@@ -1,10 +1,8 @@
-
 Linux云计算网络
 
- _2024年03月29日 08:13_ _广东_
+_2024年03月29日 08:13_ _广东_
 
 以下文章来源于SRE运维进阶之路 ，作者Clay
-
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM79wcKFyg4q8LGZYNjGOA6nu6sGB09OGWtJZUxIib7xeGg/0)
 
@@ -12,7 +10,7 @@ Linux云计算网络
 
 专注于 SRE 运维、云原生、稳定性、高可用性、可观测性、DevOps 等技术
 
-](https://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247507791&idx=1&sn=1fb40a3fde5ddf516b99c728d7aa5aee&chksm=ea77ebf7dd0062e10e2d4b7a11a2a2c02415c1e38a1f179c31ea2d317acb0959a363d900c1e6&mpshare=1&scene=24&srcid=0329Ij94IEgTWAZIxyNnDYGy&sharer_shareinfo=4fbef601515b719a1169209c062a1442&sharer_shareinfo_first=4fbef601515b719a1169209c062a1442&key=daf9bdc5abc4e8d0b426f7f7185846a6e0e73abf800b7b80d5244c5911deed63f124c92cbf01ca396a7e4374896490e7c66608dce18cf001e9bd415947771da039e7acb8a5ec169516f328c68f6d063fbde74bca0104aa8014ab8b8588ce9f09adca4c3a24bd404b1a067b54ef851c715049304209bf85612eb2c37bddf5cf7f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQmpt0h9qOothKyl%2FB7CLNnxLmAQIE97dBBAEAAAAAANPNNdPJuccAAAAOpnltbLcz9gKNyK89dVj0UF%2BW%2F8pKMTtf54dWd4t0bDLJVVU2l3uwK1olBEIWq1co5Ge%2BwnIvF9dvVVe%2BXkBKRABV5SD5W9p58dlMEmn9sOUUC2MvFSneoGZo45nww5AnlfsnwYuK3ULlrhcyGEA0Dz77Fscrh7dnpaOduXWSU3yje2DKLisfWR1p4SSYtwbpRT3RJlEsAHmEx%2FQi5T9VicwDk89q78gGICELdvfvk%2B543D66H%2FQ%2F%2B1YI1NnXGW50ehgmXobv%2FZWZAqjAJWF6&acctmode=0&pass_ticket=x25VnTPKr9%2F7PoUSvqmAqkQR7XWpPXgFfO3e5JkFLklBfDxcLpiHO9Zm33sj2nqL&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI1OTY2MzMxOQ==&mid=2247507791&idx=1&sn=1fb40a3fde5ddf516b99c728d7aa5aee&chksm=ea77ebf7dd0062e10e2d4b7a11a2a2c02415c1e38a1f179c31ea2d317acb0959a363d900c1e6&mpshare=1&scene=24&srcid=0329Ij94IEgTWAZIxyNnDYGy&sharer_shareinfo=4fbef601515b719a1169209c062a1442&sharer_shareinfo_first=4fbef601515b719a1169209c062a1442&key=daf9bdc5abc4e8d0b426f7f7185846a6e0e73abf800b7b80d5244c5911deed63f124c92cbf01ca396a7e4374896490e7c66608dce18cf001e9bd415947771da039e7acb8a5ec169516f328c68f6d063fbde74bca0104aa8014ab8b8588ce9f09adca4c3a24bd404b1a067b54ef851c715049304209bf85612eb2c37bddf5cf7f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQmpt0h9qOothKyl%2FB7CLNnxLmAQIE97dBBAEAAAAAANPNNdPJuccAAAAOpnltbLcz9gKNyK89dVj0UF%2BW%2F8pKMTtf54dWd4t0bDLJVVU2l3uwK1olBEIWq1co5Ge%2BwnIvF9dvVVe%2BXkBKRABV5SD5W9p58dlMEmn9sOUUC2MvFSneoGZo45nww5AnlfsnwYuK3ULlrhcyGEA0Dz77Fscrh7dnpaOduXWSU3yje2DKLisfWR1p4SSYtwbpRT3RJlEsAHmEx%2FQi5T9VicwDk89q78gGICELdvfvk%2B543D66H%2FQ%2F%2B1YI1NnXGW50ehgmXobv%2FZWZAqjAJWF6&acctmode=0&pass_ticket=x25VnTPKr9%2F7PoUSvqmAqkQR7XWpPXgFfO3e5JkFLklBfDxcLpiHO9Zm33sj2nqL&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/1TDxR6xkRSEplO6BjCUUzQ0dGo5KhZ6d3HYZCTGyWqauM0BLWKKtSOicg4czIvKTLbXB6frzdf5x9PY8jzbicZkg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -89,12 +87,12 @@ bw：磁盘的吞吐量，这个是顺序读写考察的重点
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/muS5JJVFcw9dibAY19CHk9icEqHt8Fap9LqicZ4pr5dZFpZ8Ng2RK05QtD7iajR6p8le8EVAlWFTnQLeVHn3BvboMg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/muS5JJVFcw9dibAY19CHk9icEqHt8Fap9L4EMJnXlQOBhDSDDyoPvfg9lNB8AerMOEL41W2aE8gQW8edKicuAxZgg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 > ⚠️  **因地制宜，灵活选取。在基准测试时，一定要注意根据应用程序 I/O 的特点，来具体评估指标。**
-> 
+>
 > 比如 etcd  磁盘性能衡量指标为：WAL 文件系统调用 fsync 的延迟分布，当 99% 样本的同步时间小于 10 毫秒就可以认为存储性能能够满足 etcd 的性能要求。
-> 
+>
 > `mkdir etcd-bench` `fio --rw=write --ioengine=sync --fdatasync=1 --directory=etcd-bench --size=22m --bs=2300 --name=etcd-bench`
-> 
-> ![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+>
+> !\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 网络
 
@@ -104,7 +102,7 @@ bw：磁盘的吞吐量，这个是顺序读写考察的重点
 
 `# 结果分析，看 rxpck/s,txpck/s 值即可，值越大，性能越好   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **网络带宽**
 
@@ -112,7 +110,7 @@ bw：磁盘的吞吐量，这个是顺序读写考察的重点
 
 `# 结果分析，看 rxkB/s,txkB/s 值即可，值越大，性能越好   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## Nginx
 
@@ -120,7 +118,7 @@ bw：磁盘的吞吐量，这个是顺序读写考察的重点
 
 `# 结果分析，Requests/sec 为 QPS   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 自动化压测脚本
 
@@ -128,7 +126,7 @@ bw：磁盘的吞吐量，这个是顺序读写考察的重点
 
 `git clone https://github.com/clay-wangzhi/bench.git   bash bench.sh   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 更多测试方法，详见 https://github.com/clay-wangzhi/bench
 
@@ -142,11 +140,7 @@ bw：磁盘的吞吐量，这个是顺序读写考察的重点
 
 公众号
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 1144
 

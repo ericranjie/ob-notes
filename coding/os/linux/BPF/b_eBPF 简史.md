@@ -1,9 +1,10 @@
 Linux内核那些事
- _2022年01月12日 13:05_
+_2022年01月12日 13:05_
 
 数日之前，笔者参加某一技术会议之时，为人所安利了一款开源项目，演讲者对其性能颇为称道，称其乃基于近年在内核中炙手可热的 eBPF 技术。
 
 对这 eBPF 的名号，笔者略有些耳熟，会后遂一番搜索学习，发现 eBPF 果然源于早年间的成型于 BSD 之上的传统技术 BPF（Berkeley Packet Filter），但无论其性能还是功能已然都不是 BPF 可以比拟的了，慨叹长江后浪推前浪，前浪死在沙滩上之余，笔者也发现国内相关文献匮乏，导致 eBPF 尚不为大众所知，遂撰此文，记录近日所得，希冀可以为广大读者打开新世界的大门。
+
 ### 源头：一篇 1992 年的论文
 
 考虑到 BPF 的知名度，在介绍 eBPF 之前，笔者自觉还是有必要先来回答另一个问题：
@@ -19,18 +20,18 @@ Linux内核那些事
 诚然，无论 BSD 和 Berkeley 如何变换，其后的 Packet Filter 总是不变的，这两个单词也基本概括了 BPF 的两大核心功能：
 
 - 过滤Filter
-    ：根据外界输入的规则过滤报文；
+  ：根据外界输入的规则过滤报文；
 - 复制Copy
-    ：将符合条件的报文由内核空间复制到用户空间；
-    
+  ：将符合条件的报文由内核空间复制到用户空间；
+
 以 `tcpdump` 为例：熟悉网络监控network monitoring的读者大抵都知道 `tcpdump` 依赖于 pcap 库，`tcpdump` 中的诸多核心功能都经由后者实现，其整体工作流程如下图所示：
-![[Pasted image 20240911194321.png]]
+!\[\[Pasted image 20240911194321.png\]\]
 _图 1. Tcpdump 工作流程_
 
 由图 1 不难看出，位于内核之中的 BPF 模块是整个流程之中最核心的一环：它一方面接受 `tcpdump` 经由 libpcap 转码而来的滤包条件（Pseudo Machine Language），另一方面也将符合条件的报文复制到用户空间最终经由 libpcap 发送给 `tcpdump`。
 
 读到这里，估计有经验的读者已经能够在脑海里大致勾勒出一个 BPF 实现的大概了，图 2 引自文献 1，读者们可以管窥一下当时 BPF 的设计：
-![[Pasted image 20240911194328.png]]
+!\[\[Pasted image 20240911194328.png\]\]
 _图 2. BPF Overview_
 
 时至今日，传统 BPF 仍然遵循图 2 的路数：途经网卡驱动层的报文在上报给协议栈的同时会多出一路来传送给 BPF，再经后者过滤后最终拷贝给用户态的应用。除开本文提及的 `tcpdump`，当时的 RARP 协议也可以利用 BPF 工作（Linux 2.2 起，内核开始提供 RARP 功能，因此如今的 RARP 已经不再需要 BPF 了）。
@@ -53,18 +54,16 @@ bash-3.2$ sudo tcpdump -d -i lo tcp and dst port 7070(000) ldh [12](
 这段看起来类似于汇编的代码，便是 BPF 用于定义 Filter 的伪代码，亦即图 1 中 libpcap 和内核交互的 pseudo machine language（也有一种说法是，BPF 伪代码设计之初参考过当时大行其道的 RISC 令集的设计理念），当 BPF 工作时，每一个进出网卡的报文都会被这一段代码过滤一遍，其中符合条件的（`ret #262144`）会被复制到用户空间，其余的（`ret #0`）则会被丢弃。
 
 BPF 采用的报文过滤设计的全称是 CFG（Computation Flow Graph），顾名思义是将过滤器构筑于一套基于 if-else 的控制流flow graph之上，例如清单 1 中的 filter 就可以用图 3 来表示：
-![[Pasted image 20240911194345.png]]
+!\[\[Pasted image 20240911194345.png\]\]
 _图 3 基于 CFG 实现的 filter 范例_
 
 CFG 模型最大的优势是快，参考文献 1 中就比较了 CFG 模型和基于树型结构构建出的 CSPF 模型的优劣，得出了基于 CFG 模型需要的运算量更小的结论；但从另一个角度来说，基于伪代码的设计却也增加了系统的复杂性：一方面伪指令集已经足够让人眼花缭乱的了；另一方面为了执行伪代码，内核中还需要专门实现一个虚拟机pseudo-machine，这也在一定程度上提高了开发和维护的门槛。
 
 当然，或许是为了提升系统的易用性，一方面 BPF 设计者们又额外在 `tcpdump` 中设计了我们今天常见的过滤表达式（实际实现于 libpcap，当然两者也都源于 Lawrence Berkeley Lab），令过滤器真正意义上“Human Readable”了起来；另一方面，由于设计目标只是过滤字节流形式的报文，虚拟机及其伪指令集的设计相对会简单不少：整个虚拟机只实现了两个 32 位的寄存器，分别是用于运算的累加器 A 和通用寄存器 X；且指令集也只有寥寥 20 来个，如表 1 所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 易用性方面的提升很大程度上弥补了 BPF 本身的复杂度带来的缺憾，很大程度上推动了 BPF 的发展，此后数年，BPF 逐渐称为大众所认同，包括 Linux 在内的众多操作系统都开始将 BPF 引入了内核。
 
@@ -123,18 +122,16 @@ Linux 内核代码的 samples 目录下有大量前人贡献的 eBPF sample，�
 对比一下清单 3&4 以及清单 2 的代码片段，很容易看出一些 eBPF 显而易见的革新：
 
 - 用 C 写成的 BPF 代码（sockex1_kern.o）；
-    
+
 - 基于 map 的内核与用户空间的交互方式；
-    
+
 - 全新的开发接口；
-    
 
 除此之外，还有一些不那么明显的改进隐藏在内核之中：
 
 - 全新的伪指令集设计；
-    
+
 - In-kernel verifier;
-    
 
 由一个文件（net/core/filter.c）进化到一个目录（kernel/bpf），eBPF 的蜕变三言两语间很难交代清楚，下面笔者就先基于上述的几点变化来帮助大家入个门，至于个中细节，就只能靠读者以后自己修行了。
 
@@ -159,11 +156,10 @@ Linux 内核代码的 samples 目录下有大量前人贡献的 eBPF sample，�
 清单 3 中我们看到 sockex1_kern.o 是由 `load_bpf_file()` 函数载入内存的，但实际上 eBPF 提供用来将 BPF 代码载入内核的正式接口函数其实是 `bpf_load_program()`，该接口负责通过参数向内核提供三类信息：
 
 - BPF 程序的类型、
-    
+
 - BPF 代码
-    
+
 - 代码运行时所需要的存放 log 的缓存地址（位于用户空间）；
-    
 
 有意思的是，目前所有注入内核的 BPF 程序都需要附带 GPL 协议支持信息，`bpf_load_program()` 的 license 参数就是用来载入协议字串的。
 
@@ -171,11 +167,11 @@ Linux 内核代码的 samples 目录下有大量前人贡献的 eBPF sample，�
 
 表 2 常见 bpf_prog_type 定义
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 深入对比清单 3（eBPF）和清单 2（cBPF）的实现的差异，还会发现一个比较明显的不同之处：BPF 代码进内核之后，cBPF 和内核通讯的方式是 `recv()`；而 eBPF 则将 socket 丢到一边，使用一种名为 map 的全新机制和内核通讯，其大致原理下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图 4 eBPF 的 map 机制_
 
@@ -187,7 +183,7 @@ map 机制解决的另一个问题是通信数据的多样性问题。cBPF 所�
 
 表 3. map 机制下的常见数据类型
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 新的指令集
 
@@ -202,45 +198,38 @@ sockex1_kern.o: file format ELF64-BPFDisassembly of section socket1:bpf_pr
 我们不用管这段汇编写了点儿什么，先跟清单 2 开头的那段 cBPF 代码对比一下两者的异同：
 
 - 寄存器：eBPF 支持更多的寄存器；
-    
 
 - cBPF：A, X + stack, 32bit;
-    
+
 - eBPF：R1~R10 + stack, 64bit，显然，如此的设计主要针对现在大行其道的 64 位硬件，同时更多的寄存器设计也便于运行时和真实环境下的寄存器进行对应，以提高效率；
-    
 
 - opcode：两者的格式不同；
-    
 
 - cBPF: op 16b, jt 8b, jf 8b, K 32b;
-    
+
 - eBPF: op 8b, dstReg 4b, srcReg 4b, off 16b, imm 32b;
-    
 
 - 其他：sockex1_kern.o 设计的比较简单，但还是可以从中看出 eBPF 的一大改进：可以调用内核中预设好的函数（Call 1，这里指向的函数是 `bpf_map_lookup_elem()`，如果需要比较全的预设函数索引的话可以移步这里）。除此之外，eBPF 命令集中比较重要的新晋功能还有：
-    
 
 - cBPF：仅可以读 packet（即 skb）以及读写 stack；
-    
+
 - eBPF：可以读写包括 stack/map/context，也即 BPF prog 的传入参数可读写。换句话说，任意传入 BPF 代码的数据流均可以被修改；
-    
+
 - load/store 多样化：
-    
+
 - 除开预设函数外，开发者还可以自定义 BPF 函数（JUMP_TAIL_CALL）；
-    
+
 - 除了前向跳转外（cBPF 支持），还可以后向跳转；
-    
 
 至于 eBPF 具体的指令表，因为过于庞杂这里笔者就不作文抄公了。不过 eBPF 中的几个寄存器的利用规则这里还是可以有的，否则要读懂清单 6 中的代码略有困难：
 
 - R0：一般用来表示函数返回值，包括整个 BPF 代码块（其实也可被看做一个函数）的返回值；
-    
+
 - R1~R5：一般用于表示内核预设函数的参数；
-    
+
 - R6~R9：在 BPF 代码中可以作存储用，其值不受内核预设函数影响；
-    
+
 - R10：只读，用作栈指针（SP）；
-    
 
 #### In-kernel Verifier
 
@@ -248,30 +237,25 @@ sockex1_kern.o: file format ELF64-BPFDisassembly of section socket1:bpf_pr
 
 为了最大限度的控制这些隐患，cBPF 时代就开始加入了代码检查机制以防止不规范的注入代码；到了 eBPF 时代则在载入程序（`bpf_load_program()`）时加入了更复杂的verifier 机制，在运行注入程序之前，先进行一系列的安全检查，最大限度的保证系统的安全。具体来说，verifier 机制会对注入的程序做两轮检查：
 
-- 首轮检查：  
-      
-    实现于 check_cfg()可以被认为是一次深度优先搜索，主要目的是对注入代码进行一次 DAG（有向无环图）检测，以保证其中没有循环存在；除此之外，一旦在代码中发现以下特征，verifier 也会拒绝注入：
-    
+- 首轮检查：
+
+  实现于 check_cfg()可以被认为是一次深度优先搜索，主要目的是对注入代码进行一次 DAG（有向无环图）检测，以保证其中没有循环存在；除此之外，一旦在代码中发现以下特征，verifier 也会拒绝注入：
 
 - 代码长度超过上限，目前（内核版本 4.12）eBPF 的代码长度上限为 4K 条指令——这在 cBPF 时代很难达到，但别忘了 eBPF 代码是可以用 C 实现的；
-    
-- 存在可能会跳出 eBPF 代码范围的 JMP，这主要是为了防止恶意代码故意让程序跑飞；
-    
-- 存在永远无法运行的 eBPF 令，例如位于 exit 之后的指令；
-    
 
-  
+- 存在可能会跳出 eBPF 代码范围的 JMP，这主要是为了防止恶意代码故意让程序跑飞；
+
+- 存在永远无法运行的 eBPF 令，例如位于 exit 之后的指令；
 
 - 次轮检查：
-    
-    实现于 do_check() 较之于首轮则要细致很多：在本轮检测中注入代码的所有逻辑分支从头到尾都会被完全跑上一遍，所有的指令的参数（寄存器）、访问的内存、调用的函数都会被仔细的捋一遍，任何的错误都会导致注入程序被退货。由于过分细致，本轮检查对于注入程序的复杂度也有所限制：首先程序中的分支不允许超过 1024 个；其次经检测的指令数也必须在 96K 以内。
-    
+
+  实现于 do_check() 较之于首轮则要细致很多：在本轮检测中注入代码的所有逻辑分支从头到尾都会被完全跑上一遍，所有的指令的参数（寄存器）、访问的内存、调用的函数都会被仔细的捋一遍，任何的错误都会导致注入程序被退货。由于过分细致，本轮检查对于注入程序的复杂度也有所限制：首先程序中的分支不允许超过 1024 个；其次经检测的指令数也必须在 96K 以内。
 
 #### Overview: eBPF 的架构
 
 诚然，eBPF 设计的复杂程度已是超越 cBPF 太多太多，笔者罗里吧嗦了大半天，其实也就是将将领着大家入门的程度而已，为了便于读者们能够把前文所述的碎片知识串到一起，这里笔者将 eBPF 的大体架构草绘一番，如下图所示，希望能帮助大家对 eBPF 构建一个整体的认识。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图 5. Architecture of eBPF_
 

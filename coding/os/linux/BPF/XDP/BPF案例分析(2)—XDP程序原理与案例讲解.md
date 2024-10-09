@@ -2,19 +2,9 @@
 
 Original 董旭 技术简说
 
- _2021年11月19日 15:08_
-
-  
-
-  
+_2021年11月19日 15:08_
 
 BPF案例分析(2)—XDP程序
-
-  
-
-  
-
-  
 
 **相关阅读清单**
 
@@ -22,21 +12,11 @@ BPF案例分析(2)—XDP程序
 
 .2、[BPF原理深度分析与案例分析(1)](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247484004&idx=1&sn=5b681f09f60f96aa8992d894bb3b7b4d&chksm=cfcaccaff8bd45b9d6694d931bd8824a5d025c3dd7f6246275b90dbda0a9ce5f3de3cbdafedb&scene=21#wechat_redirect)
 
-在[BPF深度分析与案例分析(1)](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247484004&idx=1&sn=5b681f09f60f96aa8992d894bb3b7b4d&chksm=cfcaccaff8bd45b9d6694d931bd8824a5d025c3dd7f6246275b90dbda0a9ce5f3de3cbdafedb&scene=21#wechat_redirect)中讲到BPF虚拟机会根据不同的BPF程序类型决定在何种事件触发BPF程序、何时触发BPF程序，同时BPF程序类型决定了BPF程序的上下文参数，例如在BPF深度分析与案例分析(1)中分析的套接字过滤程序(BPF_PROG_TYPE_SOCKER_FILTR类型的BPF程序)，该程序类型的BPF程序的上下文参数是struct __sk_buff,该结构体是内核结构体sk_buff中的一些关键字段，内核在执行BPF程序时会将对这些关键字段的访问转换成“真正”sk_buff结构体的偏移量。套接字过滤程序会附加到原始套接字上，用于对该套接字的观测，但是不允许修改数据包内容或更改其目的地。该程序类型用于数据包的旁路嗅探，tcpdump就是基于这个原理。
+在[BPF深度分析与案例分析(1)](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247484004&idx=1&sn=5b681f09f60f96aa8992d894bb3b7b4d&chksm=cfcaccaff8bd45b9d6694d931bd8824a5d025c3dd7f6246275b90dbda0a9ce5f3de3cbdafedb&scene=21#wechat_redirect)中讲到BPF虚拟机会根据不同的BPF程序类型决定在何种事件触发BPF程序、何时触发BPF程序，同时BPF程序类型决定了BPF程序的上下文参数，例如在BPF深度分析与案例分析(1)中分析的套接字过滤程序(BPF_PROG_TYPE_SOCKER_FILTR类型的BPF程序)，该程序类型的BPF程序的上下文参数是struct \_\_sk_buff,该结构体是内核结构体sk_buff中的一些关键字段，内核在执行BPF程序时会将对这些关键字段的访问转换成“真正”sk_buff结构体的偏移量。套接字过滤程序会附加到原始套接字上，用于对该套接字的观测，但是不允许修改数据包内容或更改其目的地。该程序类型用于数据包的旁路嗅探，tcpdump就是基于这个原理。
 
 本文将从上篇介绍套接字过滤程序(BPF_PROG_TYPE_SOCKER_FILTR类型的BPF程序)的方式讲解XDP程序。并在文章最后编写两个XDP程序进行实验和分析。
 
-  
-
-  
-
 XDP简介
-
-  
-
-  
-
-  
 
 XDP(eXpress Data Path)的程序类型是BPF_PROG_TYPE_XDP，该程序类型的BPF程序设计目标是在网络数据路径中引入可编程性，在Linux内核分配内存（skb）之前就已经完成处理,在网络包达到内核之前XDP就已经触发并执行。与套接字过滤程序(BPF_PROG_TYPE_SOCKER_FILTR类型的BPF程序)在处理路径上的不同：套接字过滤程序在内核协议栈处理收发包流程时进行旁路监听与观测，而XDP程序是在数据包到达内核协议栈之前(网卡驱动程序收到数据包时)触发XDP类型的BPF程序并进行数据包的处理。在行为上的不同：套接字过滤程序只能进行观测、过滤等旁路嗅探数据包，而XDP程序可以对数据包进行修改、重定向、丢弃等。
 
@@ -48,15 +28,7 @@ XDP(eXpress Data Path)的程序类型是BPF_PROG_TYPE_XDP，该程序类型的BP
 
 Native XDP(XDP_FLAGS_DRV_MODE):这是一种默认的模式，XDP BPF程序运行在网络驱动的早期接收路径(RX队列)上，但是要保证当前的驱动程序是否支持这种模式。Offloaded XDP(XDP_FLAGS_HW_MODE)：ffloadedXDP模式中，XDP BPF程序直接在NIC中处理报文，而不会使用主机的CPU。因此，处理报文的成本非常低，性能要远远高于native XDP。Generic XDP(XDP_FLAGS_SKB_MODE)：对没有实现native或offloaded模式的XDP，内核提供了一种处理XDP的通用方案，但性能远低于前两种模式。
 
-  
-
-  
-
 XDP程序的上下文参数(传入的参数)
-
-  
-
-  
 
 上篇文章讲到的套接字过滤程序(BPF_PROG_TYPE_SOCKER_FILTR类型的BPF程序)的上下文参数：
 
@@ -66,13 +38,7 @@ XDP程序(BPF_PROG_TYPE_SOCKER_FILTR类型的BPF程序)的上下文参数如下�
 
 `struct xdp_md {    __u32 data;//数据包的开始    __u32 data_end;//数据包的结束    __u32 data_meta;//供XDP程序与其他交换数据包元数据时使用   };   `
 
-  
-
-  
-
 XDP程序的返回值
-
-  
 
 在程序中可以定义以上的返回值，各返回值的产生的动作如下：
 
@@ -88,19 +54,9 @@ XDP_PASS :等效于不做任何处理
 
 XDP_ABORTED:eBPF程序错误
 
-  
-
-  
-
 如何attach XDP程序
 
-  
-
-  
-
-  
-
-在讲解套接字过滤程序时，分析了套接字过滤程序是通过SO_ATTACH_BPF setsockopt()进行attach，如下面的程序片段(可参考文章)：  
+在讲解套接字过滤程序时，分析了套接字过滤程序是通过SO_ATTACH_BPF setsockopt()进行attach，如下面的程序片段(可参考文章)：
 
 `....   if (load_bpf_file(filename)) {     printf("%s", bpf_log_buf);     return 1;    }     //主要是完成：sock = socket(PF_PACKET, SOCK_RAW | SOCK_NONBLOCK | SOCK_CLOEXEC, htons(ETH_P_ALL));    sock = open_raw_sock("lo");     /*因为 sockex1_kern.o 中 bpf 程序的类型为 BPF_PROG_TYPE_SOCKET_FILTER,所以这里需要用用 SO_ATTACH_BPF 来指明程序的 sk_filter 要挂载到哪一个套接字上，其中prof_fd为注入到内核的BPF程序的描述符*/    assert(setsockopt(sock, SOL_SOCKET, SO_ATTACH_BPF, prog_fd,        sizeof(prog_fd[0])) == 0);   ...   `
 
@@ -109,9 +65,8 @@ XDP_ABORTED:eBPF程序错误
 通过 netlink socket 消息 attach：
 
 - 首先创建一个 netlink 类型的 socket：socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE)
-    
+
 - 然后发送一个 NLA_F_NESTED | 43 类型的 netlink 消息，表示这是 XDP message。消息中包含 BPF fd, the interface index (ifindex) 等信息。
-    
 
 attach的具体实现：
 
@@ -121,33 +76,13 @@ attach的具体实现：
 
 大致就是上面说的创建一个 netlink 类型的 socket：socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE)，然后发送一个 NLA_F_NESTED | 43 类型的 netlink 消息。
 
-  
-
-  
-
 如何向内核加载XDP程序‍
-
-  
-
-  
-
-  
 
 在上一篇文章中介绍了加载eBPF程序的过程，主要是利用load_bpf_file->do_load_bpf_file函数，并最终调用 sys_bpf(BPF_PROG_LOAD, &attr, sizeof(attr))系统调用进行加载，详细可以阅读[上一篇文章](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247484004&idx=1&sn=5b681f09f60f96aa8992d894bb3b7b4d&chksm=cfcaccaff8bd45b9d6694d931bd8824a5d025c3dd7f6246275b90dbda0a9ce5f3de3cbdafedb&scene=21#wechat_redirect)。
 
 XDP程序除了可以上述系统调用的方式加载外，还可以通过iproute2中提供的ip命令，该命令具有充当XDP前端的能力，可以将XDP程序加载到HOOK点。下文会采用两种方式分别进行加载。
 
-  
-
-  
-
 XDP Demo1
-
-  
-
-  
-
-  
 
 ##### 本demo使用ip命令进行加载到HOOK点，没有使用到用户态展示XDP处理详情。
 
@@ -184,9 +119,8 @@ XDP Demo1
 可以看到在ens33网卡接口的MTU字段后面，显示了 xdpgeneric/id:27，它显示了两个有用的信息。
 
 - 已使用的驱动程序为xdpgeneric
-    
+
 - XDP程序的ID为32
-    
 
 2、查看XDP程序的效果
 
@@ -198,19 +132,9 @@ ping 8.8.8.8 共10次，结果如下，丢包为100%
 
 `#卸载命令  ip link set dev [dev name] xdp off   dx@ubuntu:~$ sudo ip link set dev ens33 xdp off   #验证如下，丢包率为0   dx@ubuntu:~$ ping 8.8.8.8 -c2   PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.   64 bytes from 8.8.8.8: icmp_seq=1 ttl=128 time=39.6 ms   64 bytes from 8.8.8.8: icmp_seq=2 ttl=128 time=42.5 ms      --- 8.8.8.8 ping statistics ---   2 packets transmitted, 2 received, 0% packet loss, time 1001ms   rtt min/avg/max/mdev = 39.625/41.085/42.545/1.460 ms   `
 
-###   
-
-  
-
-  
+### 
 
 XDP Demo2
-
-  
-
-  
-
-  
 
 ##### 本demo使用bpf的系统调用进行加载到HOOK点，并使用MAP映射，用户态读取Map并展示XDP处理详情。本程序在BPF 编程环境下进行编译与运行(参考：[BPF编程 环境搭建](http://mp.weixin.qq.com/s?__biz=Mzg5MTU1ODgyMA==&mid=2247483953&idx=1&sn=f204e441e066302b9999cdcff690981d&chksm=cfcaccfaf8bd45ec2912ab7fa388a0286659fb6c315bf8244ba1bda5b981fe7f7ab5fbf6dc1d&scene=21#wechat_redirect))。
 
@@ -238,9 +162,9 @@ XDP Demo2
 
 从xdp_demo2_user.c中就可以看出，xdp_demo2_kern.o是在执行用户态程序实时加载的：
 
- `snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);       //调用load_bpf_file函数，继而调用bpf系统调用将编辑的xdp程序进行加载    if (load_bpf_file(filename)) {     printf("%s", bpf_log_buf);     return 1;    }`
+`snprintf(filename, sizeof(filename), "%s_kern.o", argv[0]);       //调用load_bpf_file函数，继而调用bpf系统调用将编辑的xdp程序进行加载    if (load_bpf_file(filename)) {     printf("%s", bpf_log_buf);     return 1;    }`
 
-**运行：（因为该程序将TCP22端口的数据DROP掉了，不建议在远程连接服务器的环境下进行运行）**  
+**运行：（因为该程序将TCP22端口的数据DROP掉了，不建议在远程连接服务器的环境下进行运行）**
 
 `#2为指定的网卡索引，在这指我主机的ens33网卡接口   dx@ubuntu:/usr/src/linux-4.15.0/samples/bpf$ sudo ./xdp_demo2 2   `
 
@@ -264,19 +188,7 @@ XDP Demo2
 
 `dx@ubuntu:/usr/src/linux-4.15.0/samples/bpf$ sudo ./xdp02 2   yes   ICMP :         1 pkt   ICMP :         2 pkt   ICMP :         4 pkt   ICMP :         5 pkt   ICMP :         5 pkt   ICMP :         5 pkt   ICMP :         5 pkt   `
 
-  
-
-  
-
-  
-
 更易上手的XDP编程方式
-
-  
-
-  
-
-  
 
 BCC是 python 封装的 eBPF 外围工具集，可以大大提高BPF 程序开发的效率,而且安装以及搭建环境简单。
 
@@ -284,17 +196,7 @@ BCC仓库地址：https://github.com/iovisor/bcc，仓库中有相关环境搭�
 
 其中在：https://github.com/iovisor/bcc/tree/master/examples/networking/xdp有一些使用BCC实现XDP程序的案例。
 
-  
-
-  
-
 END
-
-  
-
-  
-
-  
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/EjWxxIM2EQI0YHzCpIYYwO0iaqh08EGCibYEjLqIqYm2CXPzmicQTkxqF453q1d9RcSicSLGjjCNyBsjDXdx8oDhcA/300?wx_fmt=png&wxfrom=19)
 
@@ -306,9 +208,9 @@ END
 
 公众号
 
-点个关注，一起学技术！  
+点个关注，一起学技术！
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 您的点赞和关注是我最大的动力
 

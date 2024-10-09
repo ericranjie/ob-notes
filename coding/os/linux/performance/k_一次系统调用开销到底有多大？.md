@@ -1,14 +1,14 @@
 # [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
 
-talk is cheap,  
+talk is cheap,\
 show me the code!
 
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
+- [首页](http://kfngxl.cn/index.php)
+- [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
+- [内存篇](https://kfngxl.cn/index.php/category/memory/)
+- [网络篇](https://kfngxl.cn/index.php/category/network/)
+- [关于](https://kfngxl.cn/index.php/about.html)
+-
 
 # [一次系统调用开销到底有多大？](https://kfngxl.cn/index.php/archives/608/)
 
@@ -86,7 +86,7 @@ x86-64 CPU有一个特权级别的概念。内核运行在最高级别，称为R
 
 对于普通的函数调用来说，一般只需要进行几次寄存器操作，如果有参数或返回函数的话，再进行几次用户栈操作而已。而且用户栈早已经被CPU cache接住，也并不需要真正进行内存IO。
 
-但是对于系统调用来说，这个过程就要麻烦一些了。系统调用时需要从用户态切换到内核态。由于内核态的栈用的是内核栈，因此还需要进行栈的切换。SS、ESP、EFLAGS、CS和EIP寄存器全部都需要进行切换。 
+但是对于系统调用来说，这个过程就要麻烦一些了。系统调用时需要从用户态切换到内核态。由于内核态的栈用的是内核栈，因此还需要进行栈的切换。SS、ESP、EFLAGS、CS和EIP寄存器全部都需要进行切换。
 
 而且栈切换后还可能有一个隐性的问题，那就是CPU调度的指令和数据一定程度上破坏了局部性原理，导致一二三级数据缓存、TLB页表缓存的命中率一定程度上有所下降。
 
@@ -154,30 +154,31 @@ x86-64 CPU有一个特权级别的概念。内核运行在最高级别，称为R
 # 相关命令
 
 - strace
-    
-    - strace -p $PID: 实时统计进程陷入的系统调用
-    - strace -cp $PID: 对进程执行一段时间内的汇总，然后以排行榜的形式给出来，非常实用
+
+  - strace -p $PID: 实时统计进程陷入的系统调用
+  - strace -cp $PID: 对进程执行一段时间内的汇总，然后以排行榜的形式给出来，非常实用
+
 - perf
-    
-    - perf list： 列出所有能够perf采样点
-    - perf stat： 统计CPU指令数、上下文切换等缺省时间
-    - perf stat -e 事件： 指定采样时间进行统计
-    - perf top： 统计整个系统内消耗最多的函数或指令
-    - perf top -e： 同上，但是可以指定采样点
+
+  - perf list： 列出所有能够perf采样点
+  - perf stat： 统计CPU指令数、上下文切换等缺省时间
+  - perf stat -e 事件： 指定采样时间进行统计
+  - perf top： 统计整个系统内消耗最多的函数或指令
+  - perf top -e： 同上，但是可以指定采样点
 
 # 结论
 
 - 系统调用虽然使用了“快速系统调用”指令，但耗时仍大约在200ns+，多的可能到十几us
 - 每个系统调用内核要进行许多工作，大约需要执行1000条左右的CPU指令
 
-> 系统调用确实开销蛮大的，函数调用时ns级别的，系统调用直接上升到了百ns，甚至是十几us，所以确实应该尽量减少系统调用。但是即使是10us，仍然是1ms的百分之一，所以还没到了谈系统调用色变的程度，能理性认识到它的开销既可。 
-> 
+> 系统调用确实开销蛮大的，函数调用时ns级别的，系统调用直接上升到了百ns，甚至是十几us，所以确实应该尽量减少系统调用。但是即使是10us，仍然是1ms的百分之一，所以还没到了谈系统调用色变的程度，能理性认识到它的开销既可。
+>
 > 为什么系统调用之间的耗时相差这么多？因为系统调用花在内核态用户态的切换上的时间是差不多的，但区别在于不同的系统调用当进入到内核态之后要处理的工作不同，呆在内核态里的时候相差较大。
 
 写在最后，由于我的这些知识在公众号里文章比较分散，很多人似乎没有理解到我对知识组织的体系结构。而且图文也不像视频那样理解起来更直接。所以我在知识星球上规划了视频系列课程，包括**硬件原理、内存管理、进程管理、文件系统、网络管理、Golang语言、容器原理、性能观测、性能优化九大部分大约 120 节内容**，每周更新。加入方式参见[我要开始搞知识星球啦](https://mp.weixin.qq.com/s/_8ux274sY-As__Xwoqmewg)、[如何才能高效地学习技术,我投“融汇贯通”一票](https://mp.weixin.qq.com/s/z82z9jqnt08gBLYGxLHY2g)
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [一次系统调用开销到底有多大？](https://kfngxl.cn/index.php/archives/608/)
@@ -222,5 +223,5 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36947次
     - 本站运营：0年168天19小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。

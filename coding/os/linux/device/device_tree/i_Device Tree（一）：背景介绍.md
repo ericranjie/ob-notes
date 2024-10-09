@@ -1,4 +1,3 @@
-
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-5-22 16:46 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
 一、前言
@@ -26,6 +25,7 @@
 1、自己撰写一个bootloader并传递适当的参数给kernel。除了传统的command line以及tag list之类的，最重要的是申请一个machine type，当拿到属于自己项目的machine type ID的时候，当时心情雀跃，似乎自己已经是开源社区的一份子了（其实当时是有意愿，或者说有目标是想将大家的代码并入到linux kernel main line的）。
 
 2、在内核的arch/arm目录下建立mach-xxx目录，这个目录下，放入该SOC的相关代码，例如中断controller的代码，时间相关的代码，内存映射，睡眠相关的代码等等。此外，最重要的是建立一个board specific文件，定义一个machine的宏：
+
 ```cpp
 MACHINE_START(project name, "xxx公司的xxx硬件平台")  
 .phys_io    = 0x40000000,  
@@ -37,6 +37,7 @@ MACHINE_START(project name, "xxx公司的xxx硬件平台")
 .init_machine    = xxx_init,  
 MACHINE_END
 ```
+
 在xxx_init函数中，一般会加入很多的platform device。因此，伴随这个board specific文件中是大量的静态table，描述了各种硬件设备信息。
 
 3、调通了system level的driver（timer，中断处理，clock等）以及串口terminal之后，linux kernel基本是可以起来了，后续各种driver不断的添加，直到系统软件支持所有的硬件。
@@ -52,7 +53,7 @@ MACHINE_END
 
 一切都很平常，也给出了足够的信息，然而，正是这个pull request引发了一场针对ARM linux的内核代码的争论。我相信Linus一定是对ARM相关的代码早就不爽了，ARM的merge工作量较大倒在其次，主要是他认为ARM很多的代码都是垃圾，代码里面有若干愚蠢的table，而多个人在维护这个table，从而导致了冲突。因此，在处理完OMAP的pull request之后（Linus并非针对OMAP平台，只是Tony Lindgren撞在枪口上了），他发出了怒吼：
 
-> Gaah. Guys, this whole ARM thing is a f*cking pain in the ass.
+> Gaah. Guys, this whole ARM thing is a f\*cking pain in the ass.
 
 负责ARM linux开发的Russell King脸上挂不住，进行了反驳：事情没有那么严重，这次的merge conficts就是OMAP和IMX/MXC之间一点协调的问题，不能抹杀整个ARM linux团队的努力。其他的各个ARM平台维护者也加入讨论：ARM平台如何复杂，如何庞大，对于arm linux code我们已经有一些思考，正在进行中……一时间，讨论的气氛有些尖锐，但总体是坦诚和友好的。
 
@@ -96,141 +97,140 @@ OK，终于来到了Device Tree了。本质上，Device Tree改变了原来用ha
 
 对于嵌入式系统，在系统启动阶段，bootloader会加载内核并将控制权转交给内核，此外，还需要把上述的三个参数信息传递给kernel，以便kernel可以有较大的灵活性。在linux kernel中，Device Tree的设计目标就是如此。
 
-  
-
 _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http://www.wowotech.net/linux_kenrel/why-dt.html)。
 
 标签: [Device](http://www.wowotech.net/tag/Device) [tree](http://www.wowotech.net/tag/tree)
 
----
+______________________________________________________________________
 
-« [蓝牙协议分析(1)_基本概念](http://www.wowotech.net/bluetooth/bt_overview.html) | [Linux电源管理(3)_Generic PM之Reboot过程](http://www.wowotech.net/pm_subsystem/reboot.html)»
+« [蓝牙协议分析(1)\_基本概念](http://www.wowotech.net/bluetooth/bt_overview.html) | [Linux电源管理(3)\_Generic PM之Reboot过程](http://www.wowotech.net/pm_subsystem/reboot.html)»
 
 **评论：**
 
-**DyalnW**  
+**DyalnW**\
 2022-10-12 14:06
 
 正在学习device tree，感谢大佬的文章
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-8686)
 
-**wolf2blood**  
+**wolf2blood**\
 2021-05-08 17:05
 
 想请教蜗窝一个问题:我现在对海思HI3536进行内核升级，从3.10升级到4.9.88，uboot是2010版本的，我拿的海思最新的补丁是HI3559的linux-4.9.37.patch，里面有关于HI3536的配置文件！我编译成功生成uImage，加载的时候卡在了Uncompressing Linux... done, booting the kernel，我追踪内核代码发现是在init/main的函数setup_arch-->paging_init-->devicemaps_init-->local_tlb_flush_all这里卡住了，清除TLB页表缓存不动作！这个uboot本来是传递机器码的，我现在按照网上那种方式传递dtb还是不行，是不是uboot不支持传递设备树所以配置了也没有用啊！我的配置是这样的bootcmd=ping 192.168.1.19; ping 192.168.1.19;tftp 0x42000000 uImage;tftp 0x45500000 hi3536dv100.dtb;bootm 0x42000000 - 0x45500000，内核大小为3.1M，我折腾了一个半月依然卡在这里，跪求蜗窝能给一些建议！
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-8235)
 
-**kein**  
+**kein**\
 2021-07-19 13:30
 
 @wolf2blood：老哥，问题有没有解决了，是什么原因？
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-8254)
 
-**Gonglja**  
+**Gonglja**\
 2022-04-28 20:32
 
 @wolf2blood：uboot中 添加对扁平化设备树的支持，CONFIG_OF_LIBFDT，然后机器码传递0xffffffff即可。
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-8605)
 
-**Jack**  
+**Jack**\
 2019-02-25 16:06
 
-請教蝸窩兩幾個問題：  
-1. 目前再研究如何將新的Kernel 移植到前人所交接的版子，原先是可以動作。(版本為Kernel 4.15左右)  
-但我去下載kernel 4.19版本來編譯後，根據其他網站及論壇所講解的方式及步驟，有成功將zImage所編譯出來。  
-放入燒錄後，但始終卡住在Starting kernel位置，不知蝸窩是否有什麼方向或是建議可提供。謝謝蝸窩。  
-2. 而我編譯的步驟為  
-   a. 下載源碼  
-   b. 設定環境變數export ARCH=arm;export CROSS_COMPILE=arm-linux-gnueabihf-;  
-   c. 開始編譯 make menuconfig;make;之後就會出現zImage  
-不知蝸窩有沒有什麼方向可以提供。謝謝。
+請教蝸窩兩幾個問題：
+
+1. 目前再研究如何將新的Kernel 移植到前人所交接的版子，原先是可以動作。(版本為Kernel 4.15左右)\
+   但我去下載kernel 4.19版本來編譯後，根據其他網站及論壇所講解的方式及步驟，有成功將zImage所編譯出來。\
+   放入燒錄後，但始終卡住在Starting kernel位置，不知蝸窩是否有什麼方向或是建議可提供。謝謝蝸窩。
+1. 而我編譯的步驟為\
+   a. 下載源碼\
+   b. 設定環境變數export ARCH=arm;export CROSS_COMPILE=arm-linux-gnueabihf-;\
+   c. 開始編譯 make menuconfig;make;之後就會出現zImage\
+   不知蝸窩有沒有什麼方向可以提供。謝謝。
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-7204)
 
-**Downey**  
+**Downey**\
 2019-07-11 16:39
 
 @Jack：可能是image地址的问题
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-7528)
 
-**bigbigtree**  
+**bigbigtree**\
 2018-04-16 07:34
 
 wowo大哥，您好！请问一下您上面讲的移植内核“调通了system level的driver（timer，中断处理，clock等）以及串口terminal之后，linux kernel基本是可以起来了”，这个是怎么做的呢？有没有一些文章介绍呢？就是让linux最小系统跑起来，可以进入终端，谢谢您
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6667)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2018-04-16 08:47
 
-@bigbigtree：你可以看看这个专题（不知道能否帮到你）：  
+@bigbigtree：你可以看看这个专题（不知道能否帮到你）：\
 http://www.wowotech.net/sort/x_project
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6669)
 
-**wason**  
+**wason**\
 2018-02-27 10:48
 
 你好，看了你的文章，感到非常惊讶，请问你是如何对linux设备树的历史背景了解得那么清楚呢？
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6567)
 
-**black**  
+**black**\
 2017-12-28 14:04
 
 逻辑上flat device tree实现了adv cfg & pwr management(acpi)中的cfg部分，但是power management部分怎么办？
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6428)
 
-**风露**  
+**风露**\
 2017-12-21 23:05
 
-请教蜗窝两个问题：  
-1、对于platform匹配，我的理解是这样的：  
-过去采用的方式是，Linux静态定义板级信息，通过bootloader传递的machine type ID 进行静态匹配，匹配上之后得到相关硬件资源和定义的初始化接口。  
-dt采用的方式是，Linux同样定义一些静态信息（DT_MACHINE_START和MACHINE_END），然后根据dts根目录中的“compatible”来进行匹配。  
-这样理解对吗？如果是这样，在platform匹配上面，这两种方式好像换汤不换药啊。  
-2、对于硬件信息的初始化。我的理解是这样的：  
-过去的方式是：通过静态配置的方式，把各种控制器相关的信息（如寄存器）写死，内核中配置上要使用的驱动，并给驱动传入这些寄存器等参数，完成硬件的初始化。  
+请教蜗窝两个问题：\
+1、对于platform匹配，我的理解是这样的：\
+过去采用的方式是，Linux静态定义板级信息，通过bootloader传递的machine type ID 进行静态匹配，匹配上之后得到相关硬件资源和定义的初始化接口。\
+dt采用的方式是，Linux同样定义一些静态信息（DT_MACHINE_START和MACHINE_END），然后根据dts根目录中的“compatible”来进行匹配。\
+这样理解对吗？如果是这样，在platform匹配上面，这两种方式好像换汤不换药啊。\
+2、对于硬件信息的初始化。我的理解是这样的：\
+过去的方式是：通过静态配置的方式，把各种控制器相关的信息（如寄存器）写死，内核中配置上要使用的驱动，并给驱动传入这些寄存器等参数，完成硬件的初始化。\
 dt的方式是，片上的硬件信息都写到dts中，内核配置上可能用到的驱动（会产生冗余？），然后Linux启动时会解析dtb，根据node来进行硬件设备的注册。这种理解对吗？另外，这是否就是dt引入的根本原因？
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6406)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-12-22 16:36
 
-@风露：基本上我是认同你的看法的。  
+@风露：基本上我是认同你的看法的。\
 DTS之前，bootloader可以通过tag list传递参数，以便实现内核的动态配置，但是，这时候设备往往是通过静态定义的xxx_device hardcode在代码中，DTS主要解决这个问题，顺便接管了原理tag list的功能，使之统一在dts的框架中。
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6408)
 
-**风露**  
+**风露**\
 2017-12-22 17:35
 
 @linuxer：关于tag list，bootargs可以通过在 chosen node中指定，但对于一些自定义tag在哪里进行传递
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6410)
 
-**Isara**  
+**Isara**\
 2017-10-27 10:59
 
 字里行间体现出的风采，和背后沉淀的底蕴，这都是装不出来的
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-6146)
 
-**zin**  
+**zin**\
 2017-07-17 18:29
 
 写的真好，学习了
 
 [回复](http://www.wowotech.net/device_model/why-dt.html#comment-5817)
 
-**光阴的事故**  
+**光阴的事故**\
 2017-02-08 10:21
 
 感谢，我是新手，有空就过来学习哈
@@ -241,152 +241,155 @@ DTS之前，bootloader可以通过tag list传递参数，以便实现内核的�
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [KASAN实现原理](http://www.wowotech.net/memory_management/424.html)
-    - [eMMC 原理 1 ：Flash Memory 简介](http://www.wowotech.net/basic_tech/flash_memory_intro.html)
-    - [irq wakeup in linux](http://www.wowotech.net/pm_subsystem/491.html)
-    - [Linux2.6.11版本：classic RCU的实现](http://www.wowotech.net/kernel_synchronization/linux2-6-11-RCU.html)
-    - [Linux时间子系统之（十二）：periodic tick](http://www.wowotech.net/timer_subsystem/periodic-tick.html)
+
+  - [KASAN实现原理](http://www.wowotech.net/memory_management/424.html)
+  - [eMMC 原理 1 ：Flash Memory 简介](http://www.wowotech.net/basic_tech/flash_memory_intro.html)
+  - [irq wakeup in linux](http://www.wowotech.net/pm_subsystem/491.html)
+  - [Linux2.6.11版本：classic RCU的实现](http://www.wowotech.net/kernel_synchronization/linux2-6-11-RCU.html)
+  - [Linux时间子系统之（十二）：periodic tick](http://www.wowotech.net/timer_subsystem/periodic-tick.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

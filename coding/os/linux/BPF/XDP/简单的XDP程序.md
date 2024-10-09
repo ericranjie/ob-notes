@@ -2,11 +2,11 @@
 
 Linux内核之旅
 
- _2021年09月28日 20:20_
+_2021年09月28日 20:20_
 
 The following article is from CodeTrip Author JiaoTuan
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4nExwIdGKOJulzBEKoUGflRjZAbvZGxl1Er4os44kBug/0)
 
@@ -14,7 +14,7 @@ The following article is from CodeTrip Author JiaoTuan
 
 今天也要加油鸭！
 
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664610351&idx=1&sn=1b04206388762a0a272909ac5ce37051&chksm=f04d97cac73a1edc0453677a614c4bb5edc0305d43b49325dde920c41b11455d5aa7207ab113&mpshare=1&scene=24&srcid=0928pRq4CX0wt7HcoxbhuWyi&sharer_sharetime=1632833087916&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d077cc348bb36e331e2c589d4748488b876f62b86a9a93d233fef92d70d87aa46bccf44187760b925dfa786ae1c695d289db3578d0e2f0a7e4c5b9beb007712a067a143393fab4cabc06989c0fda32be4c3d679cf08c94cf9be6ec62c9b0ffa8c838ef177e4c742ae36087fb26c7fc41e3de0dd883dd61e646&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQXf%2FHvbQUSZz5KRWLCRV5LxKUAgIE97dBBAEAAAAAAArPDA0EDp0AAAAOpnltbLcz9gKNyK89dVj0jaICPS2E1BzWzVTiK0vCL%2FP0wVWto6WUPWFD1PRIXLHMpFJlZgziqu4Y99igfX3gsrzPAa3wnKL3EEOlaZtjpbnJ1%2FfGl%2F%2Fq%2BDqCeMH4XWyUWIbbRc2izMGAz34DXYc%2BZP%2FhfFB7VDeIgsy5eRQDZwchn5DyCVjryS0G6kgZqEmYmDyu5YQKojkut7i0uZhViiKGdZ2aFGwqR%2FaF3Bpz2sfX0TRINKHmv8XYPsAGTjchEDP%2BhKGY4LLWq1ICKMabTD4NLKZGVbB20GTv3D8z%2Fg0HEZcUUUW8O5nrJMWfD76xqOpeBr%2FB7x3u2%2BWqfw%3D%3D&acctmode=0&pass_ticket=8R5Et6binWMNrB7qIBTB%2BGZuLLwOJDCMV2RpF8h2pcA0CfiujX6I21f8fUrBrCKl&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664610351&idx=1&sn=1b04206388762a0a272909ac5ce37051&chksm=f04d97cac73a1edc0453677a614c4bb5edc0305d43b49325dde920c41b11455d5aa7207ab113&mpshare=1&scene=24&srcid=0928pRq4CX0wt7HcoxbhuWyi&sharer_sharetime=1632833087916&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d077cc348bb36e331e2c589d4748488b876f62b86a9a93d233fef92d70d87aa46bccf44187760b925dfa786ae1c695d289db3578d0e2f0a7e4c5b9beb007712a067a143393fab4cabc06989c0fda32be4c3d679cf08c94cf9be6ec62c9b0ffa8c838ef177e4c742ae36087fb26c7fc41e3de0dd883dd61e646&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQXf%2FHvbQUSZz5KRWLCRV5LxKUAgIE97dBBAEAAAAAAArPDA0EDp0AAAAOpnltbLcz9gKNyK89dVj0jaICPS2E1BzWzVTiK0vCL%2FP0wVWto6WUPWFD1PRIXLHMpFJlZgziqu4Y99igfX3gsrzPAa3wnKL3EEOlaZtjpbnJ1%2FfGl%2F%2Fq%2BDqCeMH4XWyUWIbbRc2izMGAz34DXYc%2BZP%2FhfFB7VDeIgsy5eRQDZwchn5DyCVjryS0G6kgZqEmYmDyu5YQKojkut7i0uZhViiKGdZ2aFGwqR%2FaF3Bpz2sfX0TRINKHmv8XYPsAGTjchEDP%2BhKGY4LLWq1ICKMabTD4NLKZGVbB20GTv3D8z%2Fg0HEZcUUUW8O5nrJMWfD76xqOpeBr%2FB7x3u2%2BWqfw%3D%3D&acctmode=0&pass_ticket=8R5Et6binWMNrB7qIBTB%2BGZuLLwOJDCMV2RpF8h2pcA0CfiujX6I21f8fUrBrCKl&wx_header=0#)
 
 # 一个简单的XDP程序
 
@@ -45,19 +45,16 @@ sample/bpf目录下有内核bpf示例代码
 进入内核后：
 
 1. 配置内核
-    
 
 生成.config文件
 
 `make menuconfig   `
 
 2. 关联内核头文件
-    
 
 `make headers_install   `
 
 3. 编译内核bpf例子
-    
 
 `make M=sample/bpf   `
 
@@ -101,7 +98,7 @@ makefile有四处需要添加
 
 使用内核提供帮助函数更新BPF Map。
 
- `bpf_map_update_elem(&my_xdp1,&key , &p, BPF_ANY);`
+`bpf_map_update_elem(&my_xdp1,&key , &p, BPF_ANY);`
 
 内核程序可以直接访问BPF映射，参数一直接使用Map指针。
 
@@ -131,7 +128,7 @@ makefile有四处需要添加
 
 `参数一：` 目标网卡序号ip a查看
 
-`参数二：`prog_fd[0]为BPF程序加载到内存后生成的文件描述符fd
+`参数二：`prog_fd\[0\]为BPF程序加载到内存后生成的文件描述符fd
 
 加载内核空间BPF程序时，一旦fd生成后，就添加到这个数组中
 
@@ -169,7 +166,7 @@ makefile有四处需要添加
 
 使用wireshark抓包，可以看到正常通信
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 xdp_before
 
@@ -177,7 +174,7 @@ xdp_before
 
 可以看到除了IP为10.211.55.12其余IP都被过滤，且通过访问8090端口发现，其端口更改为8080
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 xdp_after
 

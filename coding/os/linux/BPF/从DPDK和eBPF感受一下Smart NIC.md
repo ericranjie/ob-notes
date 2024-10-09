@@ -1,19 +1,12 @@
-
 dog250 Linux阅码场
 
- _2021年12月07日 07:02_
+_2021年12月07日 07:02_
 
 _**原文作者：dog250**_
 
 _**原文链接：https://blog.csdn.net/dog250/article/details/103301816**_
 
-  
-
-  
-
 周三晚上，我演示了Linux下一代防火墙bpfilter的一个自制简易POC：
-
-  
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_gif/Ljib4So7yuWiaC0oer2QpXIolHVU3Xibtm9BNWiav660mHaB5qEd1dibMibUicNYmAzBBiadQP2s7HArdUxoWL5cDkTEbQ/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1)
 
@@ -24,8 +17,6 @@ _**原文链接：https://blog.csdn.net/dog250/article/details/103301816**_
 bpfilter是什么，让我演示给你看：
 
 https://blog.csdn.net/dog250/article/details/103283981
-
-  
 
 第一，引入虚拟地址的一个重要原因是在软件（操作系统）级进行页面保护，以防止进程间相互侵犯地址空间。由于这种保护是通过页表和翻译旁视缓冲器（TLB）中的保护位（protectionbit）实现的，直接使用虚拟地址来访问数据等于绕过了页面保护。一个解决办法是在缓存失效时查看TLB对应表项的保护位以确定是否可以加载缺失的数据。
 
@@ -50,24 +41,20 @@ https://www.ntop.org/products/packet-capture/pf_ring/
 DPDK似乎找到了一种正确的方法，即直接将数据包拉到用户态来处理，绕过操作系统内核(Tilera Core以及通用的netmap当然也是这种方式)。虽然它们的实现各自不同，但整体看来，这些机制又大又重。
 
 由于网卡功能有限，它没有逻辑计算单元，仅负责收发数据包的IO操作以及极少量的数据包缓存，大部分的协议流程都必须由主机CPU来完成，即便绕过了操作系统内核，CPU也还是必须的，因此DPDK一般而言都是专门分配一个或者几个CPU核心来处理数据包。
-![[Pasted image 20240920195200.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[\[Pasted image 20240920195200.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 既然数据包来自网卡，何不让网卡自己去处理？给网卡赋予逻辑处理能力就可以了。
 
 因此，ASIC以及FPGA承担了高性能网络处理的职责，专门的电路可以及时就地处理数据包，无需主机CPU参与，解放了CPU。
-![[Pasted image 20240920195205.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[\[Pasted image 20240920195205.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 但同样是大而重的，你必须采用专用的软件对专门的硬件进行编程，类似DPDK有一套需要学习后才能上手的SDK一样，FPGA甚至需要专门的语言。
 
 何不在网卡上装一个足够通用的CPU配备一块足够通用的内存呢，如此网卡就是一个五脏俱全的小型计算机了，既然是个计算机，那就可以执行通用代码咯。
-![[Pasted image 20240920195212.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240920195212.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **和DPDK把数据包拉到用户态的方向相反，与其把数据上拉被CPU处理，把处理数据包的代码向下注入网卡是殊途同归的，为了让网卡可以执行注下去的代码，给网卡内置几个CPU即可，这就是智能网卡的思路。**
 
@@ -76,18 +63,16 @@ DPDK从上面经由用户态bypass内核协议栈，智能网卡从下面在硬�
 在这个意义上，DPDK其实就是把x86 CPU+Ringbuffer和Intel网卡一起，当成了一块 “智能网卡”
 
 下面的图示展示了智能网卡的结构以及注入代码的执行逻辑，来自netronome的Open-NFP官网：
-![[Pasted image 20240920195216.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[\[Pasted image 20240920195216.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 netronome开创了智能网卡新时代，netronome SmartNIC可以配备几十个处理器同时执行网络数据包处理的代码，从而卸载主机CPU的劳力，这就是我们常说的硬件Offload。
 
 那么如何把代码注入到智能网卡呢？
 
 你可以使用专用的模式，阅读智能网卡厂商的指令集，然后确保最终的机器码对应该指令集即可，但幸运的是，我们有通用的eBPF的JIT编译，可以将eBPF中间字节码编译成智能网卡的机器码。整个过程从编程到部署，非常通用：
-![[Pasted image 20240920195221.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240920195221.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 目前netronome SmartNIC已经实现了该JIT编译器，参见Linux内核目录树：
 
@@ -109,14 +94,9 @@ netronome开创了智能网卡新时代，netronome SmartNIC可以配备几十�
 
 eBPF和智能网卡是我们这种手艺人的福音！
 
-
 **编程手艺人指的就是不懂大型软件工程流程，没参与过大型软件开发，不会高级编程语言，没写过多少代码，不会使用发布工具，不经常用git，但也不是一点都不会编程，还是稍微懂一点编程的。不过手艺人精通计算机原理，精通操作系统的实现，精通网络协议，所以手艺人一般可以轻松完成BUG的定位和fix工作，由于不会大段大段写代码，所以手艺人往往精于精准定位，一两行代码就能fix，比如加一个mb。所以，手艺人往往在职场工作量上吃亏，手艺人善于自己玩。**
 
-  
-
 几年前我没事就想折腾折腾协议栈，比如优化下nf_conntrack啦，把socket指针藏进nf_conntrack啦，把路由项藏进nf_conntrack啦，在网卡层短路协议栈啦，实现一个无状态NAT啦，在内核实现一个加密通道啦…然而最终也只是玩玩，如今，有了eBPF和XDP，并且eBPF支持了pinned map之后，以上这些都可以重玩了。有时间重新撸一遍，嗯，就这么定了！
-
-  
 
 介绍些资料：
 
@@ -124,13 +104,9 @@ https://lwn.net/Articles/760041/ 【netronome网卡进化路径上的绝佳一�
 
 https://lwn.net/Articles/675826/ 【多端口switch模型，Linux反客为主，打破网络设备厂商的垄断】
 
-  
-
 **通用的switchdev驱动模型之前，Linux需要厂商的专门工具套件操作交换机，控制权在厂商，switchdev之后，通用接口被实现，交换机正式纳入Linux网络设备体系，Linux至此可以用标准接口实现交换机的控制面和管理面了，至此以后，各大互联网厂商的自研交换机才开始遍地开花！！**
 
 http://wiki.netfilter.org/pablo/netdev0.1/papers/Rocker-switchdev-prototyping-vehicle.pdf 【多端口switch设备的实例】
-
-  
 
 下面是我自己写的一些关于eBPF的文章：
 
@@ -145,8 +121,6 @@ _https://blog.csdn.net/dog250/article/details/103094759_
 _https://blog.csdn.net/dog250/article/details/103014526_
 
 _https://blog.csdn.net/dog250/article/details/102884567_
-
-  
 
 阅读 5880
 
@@ -210,53 +184,52 @@ Linux阅码场
 **留言 6**
 
 - coconut
-    
-    2021年12月7日
-    
-    赞6
-    
-    这个”编程手艺人”的定义有意思
-    
+
+  2021年12月7日
+
+  赞6
+
+  这个”编程手艺人”的定义有意思
+
 - 康康
-    
-    2021年12月7日
-    
-    赞1
-    
-    “第一，引入虚拟地址的一个重要原因是在软件（操作系统）级进行页面保护，以防止进程间相互侵犯地址空间。由于这种保护是通过页表和翻译旁视缓冲器（TLB）中的保护位（protectionbit）实现的，直接使用 ==虚拟地址== 来访问数据等于绕过了页面保护。一个解决办法是在缓存失效时查看TLB对应表项的保护位以确定是否可以加载缺失的数据。” 上述表述 应该有问题，作者应该想说的是 “物理地址” 吧，感觉作者行文略显仓促，感觉可以写的更好
-    
+
+  2021年12月7日
+
+  赞1
+
+  “第一，引入虚拟地址的一个重要原因是在软件（操作系统）级进行页面保护，以防止进程间相互侵犯地址空间。由于这种保护是通过页表和翻译旁视缓冲器（TLB）中的保护位（protectionbit）实现的，直接使用 ==虚拟地址== 来访问数据等于绕过了页面保护。一个解决办法是在缓存失效时查看TLB对应表项的保护位以确定是否可以加载缺失的数据。” 上述表述 应该有问题，作者应该想说的是 “物理地址” 吧，感觉作者行文略显仓促，感觉可以写的更好
+
 - 西米宜家
-    
-    2021年12月8日
-    
-    赞
-    
-    居然没有提到温州皮鞋？这不科学啊![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月8日
+
+  赞
+
+  居然没有提到温州皮鞋？这不科学啊![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 杰克朱
-    
-    2021年12月7日
-    
-    赞
-    
-    文章更多的还是从网络协议栈和处理数据包任务卸载到SmartNIC的角度，ebpf显然更加精致。
-    
+
+  2021年12月7日
+
+  赞
+
+  文章更多的还是从网络协议栈和处理数据包任务卸载到SmartNIC的角度，ebpf显然更加精致。
+
 - Onēsimos
-    
-    2021年12月7日
-    
-    赞
-    
-    手艺人，能推荐相关书籍？介绍x86平台的硬件书籍，就好像 arm linux开发的时候，arm提供的手册文档一样
-    
+
+  2021年12月7日
+
+  赞
+
+  手艺人，能推荐相关书籍？介绍x86平台的硬件书籍，就好像 arm linux开发的时候，arm提供的手册文档一样
+
 - GongzZz
-    
-    2021年12月7日
-    
-    赞
-    
-    扫地僧
-    
+
+  2021年12月7日
+
+  赞
+
+  扫地僧
 
 已无更多数据
 
@@ -275,52 +248,51 @@ Linux阅码场
 **留言 6**
 
 - coconut
-    
-    2021年12月7日
-    
-    赞6
-    
-    这个”编程手艺人”的定义有意思
-    
+
+  2021年12月7日
+
+  赞6
+
+  这个”编程手艺人”的定义有意思
+
 - 康康
-    
-    2021年12月7日
-    
-    赞1
-    
-    “第一，引入虚拟地址的一个重要原因是在软件（操作系统）级进行页面保护，以防止进程间相互侵犯地址空间。由于这种保护是通过页表和翻译旁视缓冲器（TLB）中的保护位（protectionbit）实现的，直接使用 ==虚拟地址== 来访问数据等于绕过了页面保护。一个解决办法是在缓存失效时查看TLB对应表项的保护位以确定是否可以加载缺失的数据。” 上述表述 应该有问题，作者应该想说的是 “物理地址” 吧，感觉作者行文略显仓促，感觉可以写的更好
-    
+
+  2021年12月7日
+
+  赞1
+
+  “第一，引入虚拟地址的一个重要原因是在软件（操作系统）级进行页面保护，以防止进程间相互侵犯地址空间。由于这种保护是通过页表和翻译旁视缓冲器（TLB）中的保护位（protectionbit）实现的，直接使用 ==虚拟地址== 来访问数据等于绕过了页面保护。一个解决办法是在缓存失效时查看TLB对应表项的保护位以确定是否可以加载缺失的数据。” 上述表述 应该有问题，作者应该想说的是 “物理地址” 吧，感觉作者行文略显仓促，感觉可以写的更好
+
 - 西米宜家
-    
-    2021年12月8日
-    
-    赞
-    
-    居然没有提到温州皮鞋？这不科学啊![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月8日
+
+  赞
+
+  居然没有提到温州皮鞋？这不科学啊![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 杰克朱
-    
-    2021年12月7日
-    
-    赞
-    
-    文章更多的还是从网络协议栈和处理数据包任务卸载到SmartNIC的角度，ebpf显然更加精致。
-    
+
+  2021年12月7日
+
+  赞
+
+  文章更多的还是从网络协议栈和处理数据包任务卸载到SmartNIC的角度，ebpf显然更加精致。
+
 - Onēsimos
-    
-    2021年12月7日
-    
-    赞
-    
-    手艺人，能推荐相关书籍？介绍x86平台的硬件书籍，就好像 arm linux开发的时候，arm提供的手册文档一样
-    
+
+  2021年12月7日
+
+  赞
+
+  手艺人，能推荐相关书籍？介绍x86平台的硬件书籍，就好像 arm linux开发的时候，arm提供的手册文档一样
+
 - GongzZz
-    
-    2021年12月7日
-    
-    赞
-    
-    扫地僧
-    
+
+  2021年12月7日
+
+  赞
+
+  扫地僧
 
 已无更多数据

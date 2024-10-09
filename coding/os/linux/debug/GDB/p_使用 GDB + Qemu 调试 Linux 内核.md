@@ -1,5 +1,5 @@
 Linux云计算网络
- _2021年12月04日 08:13_
+_2021年12月04日 08:13_
 
 ## 1. 概述
 
@@ -18,11 +18,11 @@ $ sudo yum group install "Development Tools"$ yum install ncurses-devel
 $ cd linux-4.19.172/$ make menuconfig
 ```
 
-在内核编译选项中，开启如下 “Compile the kernel with debug info”， 4.19.172 中默认已经选中：  
+在内核编译选项中，开启如下 “Compile the kernel with debug info”， 4.19.172 中默认已经选中：
 
-Kernel hacking —> Compile-time checks and compiler options —> [ ] Compile the kernel with debug info
-![[Pasted image 20240928132246.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+Kernel hacking —> Compile-time checks and compiler options —> \[ \] Compile the kernel with debug info
+!\[\[Pasted image 20240928132246.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 以上配置完成后会在当前目录生成 `.config` 文件，我们可以使用 `grep` 进行验证：
 
@@ -36,7 +36,7 @@ Kernel hacking —> Compile-time checks and compiler options —> [ ] Compile th
  $ nproc       # 查看当前的系统核数 $ make -j 12  # 或者采用 make bzImage 进行编译， -j N，表示使用多少核并行编译  # 未压缩的内核文件，这个在 gdb 的时候需要加载，用于读取 symbol 符号信息，由于包含调试信息所以比较大 $ ls -hl vmlinux -rwxr-xr-x 1 root root 449M Feb  3 14:46 vmlinux# 压缩后的镜像文件 $ ls -hl ./arch/x86_64/boot/bzImagelrwxrwxrwx 1 root root 22 Feb  3 14:47 ./arch/x86_64/boot/bzImage -> ../../x86/boot/bzImage$ ls -hl ./arch/x86/boot/bzImage-rw-r--r-- 1 root root 7.6M Feb  3 14:47 ./arch/x86/boot/bzImage
 ```
 
-不同发行版本下的内核的详细编译文档可以参考这里。  
+不同发行版本下的内核的详细编译文档可以参考这里。
 
 ### 2.2 启动内存文件系统制作
 
@@ -53,7 +53,7 @@ $ tar -xvf busybox-1.32.1.tar.bz2$ cd busybox-1.32.1/$ make menuconfig# 
 echo "{==DBG==} INIT SCRIPT"mkdir /tmpmount -t proc none /procmount -t sysfs none /sysmount -t debugfs none /sys/kernel/debugmount -t tmpfs none /tmpmdev -s echo -e "{==DBG==} Boot took $(cut -d' ' -f1 /proc/uptime) seconds"# normal usersetsid /bin/cttyhack setuidgid 1000 /bin/sh
 ```
 
-到此为止我们已经编译了好了 Linux 内核（vmlinux 和 bzImage）和启动的内存文件系统（rootfs.img）。  
+到此为止我们已经编译了好了 Linux 内核（vmlinux 和 bzImage）和启动的内存文件系统（rootfs.img）。
 
 ### 2.3 错误排查
 
@@ -69,7 +69,7 @@ echo "{==DBG==} INIT SCRIPT"mkdir /tmpmount -t proc none /procmount -t�
 $ yum provides */libm.a// ...glibc-static-2.17-317.el7.x86_64 : C library static libraries for -static linking.Repo        : baseMatched from:Filename    : /usr/lib64/libm.a
 ```
 
-## 3. Qemu 启动内核  
+## 3. Qemu 启动内核
 
 在上述步骤准备好以后，我们需要在调试的 Ubuntu 20.04 的系统中安装 Qemu 工具，其中调测的 Ubuntu 系统使用 VirtualBox 安装。
 
@@ -77,7 +77,7 @@ $ yum provides */libm.a// ...glibc-static-2.17-317.el7.x86_64 : C library
 $ apt install qemu qemu-utils qemu-kvm virt-manager libvirt-daemon-system libvirt-clients bridge-utils
 ```
 
-把上述编译好的 vmlinux、bzImage、rootfs.img 和编译的源码拷贝到我们当前 Unbuntu 机器中。  
+把上述编译好的 vmlinux、bzImage、rootfs.img 和编译的源码拷贝到我们当前 Unbuntu 机器中。
 
 拷贝 Linux 编译的源码主要是在 gdb 的调试过程中查看源码，其中 vmlinux 和 linux 源码处于相同的目录，本例中 vmlinux 位于 linux-4.19.172 源目录中。
 
@@ -91,7 +91,7 @@ $ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "no
 qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokaslr console=ttyS0" -nographic
 ```
 
-其中命令行中各参数如下：  
+其中命令行中各参数如下：
 
 - `-kernel ./bzImage`：指定启用的内核镜像；
 - `-initrd ./rootfs.img`：指定启动的内存文件系统；
@@ -100,7 +100,8 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 - `-S` ：表示启动后就挂起，等待 gdb 连接；
 - `-nographic`：不启动图形界面，调试信息输出到终端与参数 `console=ttyS0` 组合使用；
 
-![[Pasted image 20240928132618.png]]
+!\[\[Pasted image 20240928132618.png\]\]
+
 ## 4. GDB 调试
 
 在使用 `qemu-system-x86_64` 命令启动内核以后，进入到我们从编译机器上拷贝过来的 Linux 内核源代码目录中，在另外一个终端我们来启动 gdb 命令：
@@ -109,16 +110,16 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 [linux-4.19.172]$ gdb (gdb) file vmlinux           # vmlinux 位于目录 linux-4.19.172 中(gdb) target remote :1234(gdb) break start_kernel     # 有些文档建议使用 hb 硬件断点，我在本地测试使用 break 也是 ok 的(gdb) c                      # 启动调试，则内核会停止在 start_kernel 函数处
 ```
 
-整体运行界面如下：  
-![[Pasted image 20240928132635.png]]
+整体运行界面如下：\
+!\[\[Pasted image 20240928132635.png\]\]
 
-## 5. Eclipse 图像化调试  
+## 5. Eclipse 图像化调试
 
 我们可以通过 eclipse-cdt 进行可视化项目调试。
 
 ”File“ -> “New” -> “Project” ，然后选择 ”Makefile Project with Existing Code“ 选项，后续按照向导导入代码。
-![[Pasted image 20240928132646.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928132646.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在 “Run” -> “Debug Configurations” 选项中，创建一个 ”C/C++ Attach to Application“ 的调试选项。
 
@@ -129,39 +130,34 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 - 在 Debugger 中的 Connection 信息中选择 ”TCP“，并填写端口为 ”1234“；
 
 启动 Debug 调试，即可看到与 gdb 类似的窗口。
-![[Pasted image 20240928132655.png]]
+!\[\[Pasted image 20240928132655.png\]\]
 
 启动 ”Debug“ 调试以后的窗口如下，在 Debug 窗口栏中，设置与 gdb 调试相同的步骤即可。
-![[Pasted image 20240928132702.png]]
+!\[\[Pasted image 20240928132702.png\]\]
 
 ## 6. 参考
 
 - How to compile and install Linux Kernel 5.6.9 from source code
-    
-- 用qemu + gdb调试linux内核 ***
-    
-- QEMU+busybox 搭建Linux内核运行环境 ***
-    
-- QEMU+gdb调试Linux内核全过程 *
-    
+
+- 用qemu + gdb调试linux内核 \*\*\*
+
+- QEMU+busybox 搭建Linux内核运行环境 \*\*\*
+
+- QEMU+gdb调试Linux内核全过程 \*
+
 - linux内核编译与调试方法
-    
+
 - How to Build A Custom Linux Kernel For Qemu (2015 Edition)
-    
+
 - qemu与qemu-kvm到底什么区别
-    
-- 在qemu环境中用gdb调试Linux内核 *
-    
+
+- 在qemu环境中用gdb调试Linux内核 \*
 
 原文：https://www.ebpf.top/post/qemu_gdb_busybox_debug_kernel/
 
-  
-
----
+______________________________________________________________________
 
 后台回复“加群”，带你进入高手如云交流群
-
-  
 
 **推荐阅读：**
 
@@ -169,9 +165,9 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 
 [Cilium 容器网络的落地实践](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247497237&idx=1&sn=d84b91d9e416bb8d18eee409b6993743&chksm=ea77c2addd004bbb0eda5815bbf216cff6a5054f74a25122c6e51fafd2512100e78848aad65e&scene=21#wechat_redirect)
 
-[【中断】的本质](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&scene=21#wechat_redirect)  
+[【中断】的本质](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&scene=21#wechat_redirect)
 
-[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)  
+[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)
 
 [Linux 应用内存调试神器- ASan](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496414&idx=1&sn=897d3d39e208652dcb969b5aca221ca1&chksm=ea77c666dd004f70ebee7b9b9d6e6ebd351aa60e3084149bfefa59bca570320ebcc7cadc6358&scene=21#wechat_redirect)
 
@@ -179,7 +175,7 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 
 [Page Cache和Buffer Cache关系](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495951&idx=1&sn=8bc76e05a63b8c9c9f05c3ebe3f99b7a&chksm=ea77c5b7dd004ca18c71a163588ccacd33231a58157957abc17f1eca17e5dcb35147b273bc52&scene=21#wechat_redirect)
 
-[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)  
+[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)
 
 [一文读懂基于Kubernetes打造的边缘计算](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495291&idx=1&sn=0aebc6ee54af03829e15ac659db923ae&chksm=ea77dac3dd0053d5cd4216e0dc91285ff37607c792d180b946bc09783d1a2032b0dffbcb03f0&scene=21#wechat_redirect)
 
@@ -213,13 +209,9 @@ qemu-system-x86_64 -kernel ./bzImage -initrd  ./rootfs.img -append "nokas
 
 ▼
 
-  
+_\*\*_****喜欢，就给我一个****“在看”\*\*\*\*_\*\*_
 
-_**_****喜欢，就给我一个****“在看”****_**_
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **10T 技术资源大放送！包括但不限于：云计算、虚拟化、微服务、大数据、网络、**Linux、**Docker、Kubernetes、Python、Go、C/C++、Shell、PPT 等。在公众号内回复「****1024****」**，即可免费获！！****
 

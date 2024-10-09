@@ -2,16 +2,17 @@
 
 大家好，我是飞哥！
 
-前几天写书整理旧文章的时候，发现内核已经将进程 pid 号的管理从 bitmap 换成了基数树(radix-tree)。 
+前几天写书整理旧文章的时候，发现内核已经将进程 pid 号的管理从 bitmap 换成了基数树(radix-tree)。
 
 第一次写进程创建的时候我使用的内核版本还是 3.10 的版本。在这个版本里已分配的进程 pid 号是用 bitmap 来存储的。但我在看 5.4 和 6.1 版本内核源码的时候，发现进程 pid 号管理实现已经从 bitmap 替换成了基数树（radix-tree）。后来翻了下各个版本的源码，原来自从 Linux 4.15 之后，内核就已经将 bitmap 换掉了。
 
 所以今天我来给大家聊聊为什么 Linux 内核要将 bitmap 替换成基数树，最后也看看这次替换的性能效果。
+
 ## 一、旧的 bitmap 方式管理 pid
 
 内核需要为每一个进程/线程都分配一个进程号。
 
-如果每个使用过的进程号如果使用传统的 int 变量来存储的话会消耗很大的内存。假如内核要支持最大 65535 个进程，那存储这些进程号需要 65535*4 字节 = 262,140字节 ≈ 260 KB。
+如果每个使用过的进程号如果使用传统的 int 变量来存储的话会消耗很大的内存。假如内核要支持最大 65535 个进程，那存储这些进程号需要 65535\*4 字节 = 262,140字节 ≈ 260 KB。
 
 bitmap 可以极大地压缩整数的存储。如果使用 bitmap 来存储使用过的进程号，用一个 bit 表示对应的 pid 是否被使用过了。最大支持 65535 个进程的话，只需要 65535 / 8 = 8 KB 的内存就够用了。相比上面的 260 KB，内存节约的非常的多。
 
@@ -90,7 +91,7 @@ struct xa_node {
 
 shift 表示了自己在数字中表示第几段数字。在Linux 中默认的基数大小为 6。这种情况下最低一层的内部节点，shift 为 0，倒数第二层 shift 为 6。 再上一层节点的 shift 为 12。以此类推，shift 从低往高， 逐层递增 6。
 
-slots 是一个指针数组，存储的是其指向的子节点的指针。内核中默认情况下 XA_CHUNK_SIZE 是 64，也就是是一个 *slots[64]。每个元素都指向下一级的树节点，没有下一级子节点的话指针指向 null。
+slots 是一个指针数组，存储的是其指向的子节点的指针。内核中默认情况下 XA_CHUNK_SIZE 是 64，也就是是一个 \*slots\[64\]。每个元素都指向下一级的树节点，没有下一级子节点的话指针指向 null。
 
 tags 用来记录 slog 数组中每一个下标的存储状态。其中每个树节点中还有一个 tag 节点，用来表示每一个 slot 是否已经分配出去的状态。它是一个 long 类型的数组，一个 long 类型的变量是 8 个字节，正好有 64 个 bit 位。
 
@@ -205,8 +206,8 @@ sys    0m0.184s    0m0.264s
 
 更多干货内容，详见：
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [为什么新版内核将进程pid管理从bitmap替换成了radix-tree？](https://kfngxl.cn/index.php/archives/738/)
@@ -251,7 +252,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36924次
     - 本站运营：0年168天18小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

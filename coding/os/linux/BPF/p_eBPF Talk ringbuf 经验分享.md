@@ -1,7 +1,6 @@
-
 Original Leon Hwang eBPF Talk
 
- _2024年08月26日 08:10_
+_2024年08月26日 08:10_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/6QxwXGlhS9FPHblxYiaxMiaYWhCKBUs37o2XqGcg9ickZoh10hor44VRx8KT08XIaCYKCzUNBdxb2JWPCy6TFTzjw/300?wx_fmt=png&wxfrom=19)
 
@@ -20,15 +19,14 @@ Original Leon Hwang eBPF Talk
 ringbuf 是 BPF 中能够取代 **PERF_EVENT_ARRAY** 的特殊 map 类型，提供了类似的 helpers:
 
 - `bpf_ringbuf_output()`: 将数据写入 ringbuf。
-    
+
 - `bpf_ringbuf_reserve()`: 为数据预留空间。
-    
+
 - `bpf_ringbuf_submit()`: 提交预留的数据。
-    
+
 - `bpf_ringbuf_discard()`: 丢弃预留的数据。
-    
-- bpf: Implement BPF ring buffer and verifier support for it[1] since 5.8 kernel.
-    
+
+- bpf: Implement BPF ring buffer and verifier support for it\[1\] since 5.8 kernel.
 
 根据该 commit，推荐的用法是 `bpf_ringbuf_reserve()` 加 `bpf_ringbuf_submit()`/`bpf_ringbuf_discard()`，而不是 `bpf_ringbuf_output()`；因为 `bpf_ringbuf_output()` 需要拷贝数据。
 
@@ -66,7 +64,7 @@ ringbuf 是 BPF 中能够取代 **PERF_EVENT_ARRAY** 的特殊 map 类型，
 
 其中的 `smp_load_acquire()` 涉及到内存屏障，会有一定的开销。
 
-参考：LINUX KERNEL MEMORY BARRIERS[2].
+参考：LINUX KERNEL MEMORY BARRIERS\[2\].
 
 ## ringbuf 的大小要求
 
@@ -79,19 +77,18 @@ ringbuf 是 BPF 中能够取代 **PERF_EVENT_ARRAY** 的特殊 map 类型，
 记住以下 3 点经验：
 
 0. 使用 `bpf_ringbuf_reserve()` 时，要注意锁的开销。
-    
+
 1. 可以通过 `bpf_ringbuf_query()` 查询 ringbuf 的未消费数据量，从而推算出可以用来塞数据的空间大小。
-    
-2. ringbuf 的 `max_entries` 必须是 2 的幂次方、而且还要求是 **PAGE_SIZE** 的倍数。
-    
+
+1. ringbuf 的 `max_entries` 必须是 2 的幂次方、而且还要求是 **PAGE_SIZE** 的倍数。
 
 参考资料
 
-[1]
+\[1\]
 
 bpf: Implement BPF ring buffer and verifier support for it: _https://github.com/torvalds/linux/commit/457f44363a8894135c85b7a9afd2bd8196db24ab_
 
-[2]
+\[2\]
 
 LINUX KERNEL MEMORY BARRIERS: _https://www.kernel.org/doc/Documentation/memory-barriers.txt_
 
@@ -99,9 +96,9 @@ LINUX KERNEL MEMORY BARRIERS: _https://www.kernel.org/doc/Documentation/memory-
 
 Leon Hwang
 
- 创作不易，赞赏杯咖啡☕️ 
+创作不易，赞赏杯咖啡☕️
 
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MjM5MTQxNTk5MA==&mid=2247485697&idx=1&sn=0a8f2bd5f299dfdf156e7e39df0bcceb&chksm=a7201ec40628e73d06c29c01689ed834233e3414d86d5b6e76825b94fc7f97f8c931b1aaf60c&mpshare=1&scene=24&srcid=0826ZzOJBAhoi6rKdXK54EIl&sharer_shareinfo=982a220c9df004f85055701d7f59ed90&sharer_shareinfo_first=982a220c9df004f85055701d7f59ed90&key=daf9bdc5abc4e8d0c082738b971249491db8c8309872cc330d6caf6d51c96ea7132529846c5cd53b21fca3444fd23ee341876a5a06487a142c2e81afea4e15d76bc28be2cfbd0e0699f46a24a06b55c6f9d7d9739b910257c587fa80309b62613f3e0ac2b3a20e6d2a4e52f93bc51a1ed3fd68aed07021920b90d3f3aeae28d4&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_1ca20b19d611&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQUnWY5naN1BNT%2B9%2FWsJ8r9RKUAgIE97dBBAEAAAAAACyWIlKsvMIAAAAOpnltbLcz9gKNyK89dVj0dfHVJoiMIU%2BJXwHLlXPdwAHqnjLxtIQcLR3MLAiCSOiwz15kfwe7%2BvqbxX4vyNpdN0DlM2DW5e5Q6j7DEYUIaWajVjLdwW4NI33t1FrZO9TtwTtrnJZPFVdK8p39wPMdUXjLRfEIw12r8Fm6RomMyYIuk%2FlK1LTqUPg%2FKlSZMY8zklq8X4GG9hW0R41jOdzFSgls8P3WPCZBp9qFolF72MidkTI%2FixFPvtDRo9EPLxzroLFFxw%2Bb2tGZakMnd%2FHoVrBdMvpk%2BuOmik5rU5iqzupNzUzcCdsHS2QWJywUx7l4scMUNhmtwdWDIibyjA%3D%3D&acctmode=0&pass_ticket=0sNJA9EKpMpl%2BO2AlAnNF2wqvDEeFje7LPXaZAHxLISCef8bSr8e2roc8v2Q7xGU&wx_header=0)Like the Author
+![赞赏二维码](<https://mp.weixin.qq.com/s?__biz=MjM5MTQxNTk5MA==&mid=2247485697&idx=1&sn=0a8f2bd5f299dfdf156e7e39df0bcceb&chksm=a7201ec40628e73d06c29c01689ed834233e3414d86d5b6e76825b94fc7f97f8c931b1aaf60c&mpshare=1&scene=24&srcid=0826ZzOJBAhoi6rKdXK54EIl&sharer_shareinfo=982a220c9df004f85055701d7f59ed90&sharer_shareinfo_first=982a220c9df004f85055701d7f59ed90&key=daf9bdc5abc4e8d0c082738b971249491db8c8309872cc330d6caf6d51c96ea7132529846c5cd53b21fca3444fd23ee341876a5a06487a142c2e81afea4e15d76bc28be2cfbd0e0699f46a24a06b55c6f9d7d9739b910257c587fa80309b62613f3e0ac2b3a20e6d2a4e52f93bc51a1ed3fd68aed07021920b90d3f3aeae28d4&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_1ca20b19d611&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQUnWY5naN1BNT%2B9%2FWsJ8r9RKUAgIE97dBBAEAAAAAACyWIlKsvMIAAAAOpnltbLcz9gKNyK89dVj0dfHVJoiMIU%2BJXwHLlXPdwAHqnjLxtIQcLR3MLAiCSOiwz15kfwe7%2BvqbxX4vyNpdN0DlM2DW5e5Q6j7DEYUIaWajVjLdwW4NI33t1FrZO9TtwTtrnJZPFVdK8p39wPMdUXjLRfEIw12r8Fm6RomMyYIuk%2FlK1LTqUPg%2FKlSZMY8zklq8X4GG9hW0R41jOdzFSgls8P3WPCZBp9qFolF72MidkTI%2FixFPvtDRo9EPLxzroLFFxw%2Bb2tGZakMnd%2FHoVrBdMvpk%2BuOmik5rU5iqzupNzUzcCdsHS2QWJywUx7l4scMUNhmtwdWDIibyjA%3D%3D&acctmode=0&pass_ticket=0sNJA9EKpMpl%2BO2AlAnNF2wqvDEeFje7LPXaZAHxLISCef8bSr8e2roc8v2Q7xGU&wx_header=0>)Like the Author
 
 eBPF Talk129
 

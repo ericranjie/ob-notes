@@ -1,8 +1,9 @@
 Original 逸珺 嵌入式客栈
- _2021年10月18日 17:30_
+_2021年10月18日 17:30_
 
-[导读] 大家好，我是逸珺。
+\[导读\] 大家好，我是逸珺。
 今天来分享整理如何正确的使用断言。
+
 ## 何为断言
 
 断言一般是用于检测在某个程序位置程序**必须**满足某些条件的宏。一般用的多的可以分两种种情况：
@@ -21,7 +22,9 @@ Original 逸珺 嵌入式客栈
 也可以编程者自己定义，比如：
 
 `#define assert(arg) { if( !(arg) ) { printf("assert in File="__FILE__" Line=%d ",__LINE__); return; } }   `
+
 ## 该怎么用
+
 # 前置条件
 
 比如某一个函数代码：
@@ -34,6 +37,7 @@ Original 逸珺 嵌入式客栈
 - buffer传入的地址必须不是NULL，否则func函数不会执行。
 
 具体断言判断失败了，断言宏干了什么，需要看看这个宏的实现，有可能是直接返回，有可能整个程序直接终止执行。所以看看其实现就知道了。
+
 # 后置条件
 
 后置条件断言一般是指判断函数的执行结果。比如：
@@ -41,6 +45,7 @@ Original 逸珺 嵌入式客栈
 `int func(int size, char *buffer ) {    int result;        /*中间处理部分更新这个返回值*/     ...          assert( result <= ALLOWED_SIZE );     return result;   }   `
 
 这样写表示这个函数的返回值永远不会大于ALLOWED_SIZE。如果大于了，就证明产生错误了。
+
 ## 什么时候用
 
 断言的最常用和最有效的用途是检查前置条件——即指定和检查函数的输入条件。两个非常常见的用途：
@@ -78,13 +83,11 @@ Original 逸珺 嵌入式客栈
 
 因为list只有两个元素，list.at(2)则是去访问第3个，显然访问的元素不存在，所以就断言了。
 
----
-
-
+______________________________________________________________________
 
 推荐阅读  点击蓝色字体即可跳转
 
-[☞ 实例分析如何远离漫天飞舞的全局变量](http://mp.weixin.qq.com/s?__biz=MzAwNjQ4OTE4Mw==&mid=2247485421&idx=1&sn=137b4301b7f36c31ce9edeef8e0258a3&chksm=9b0dd2ddac7a5bcb3713bd3f0b8495bb5feb86e1dad2836fa24b0f73fa9ea3f0ce653386583f&scene=21#wechat_redirect)  
+[☞ 实例分析如何远离漫天飞舞的全局变量](http://mp.weixin.qq.com/s?__biz=MzAwNjQ4OTE4Mw==&mid=2247485421&idx=1&sn=137b4301b7f36c31ce9edeef8e0258a3&chksm=9b0dd2ddac7a5bcb3713bd3f0b8495bb5feb86e1dad2836fa24b0f73fa9ea3f0ce653386583f&scene=21#wechat_redirect)
 
 ☞ [步进电机调速，S曲线调速算法你会吗？](http://mp.weixin.qq.com/s?__biz=MzAwNjQ4OTE4Mw==&mid=2247488567&idx=1&sn=9b02f251e013217733c9c2878e081546&chksm=9b0dc107ac7a4811e057bad4aac0f868e721d87878e8dd367c5191bcb8488bb2a05cbe3ad230&scene=21#wechat_redirect)
 
@@ -162,197 +165,196 @@ Comment
 **留言 24**
 
 - 逸珺
-    
-    2021年10月18日
-    
-    Like5
-    
-    有没有人喜欢钓鱼🎣？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like5
+
+  有没有人喜欢钓鱼🎣？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 一口Linux
-    
-    2021年10月18日
-    
-    Like
-    
-    学习了！！！
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like1
-    
-    嗯嗯，明白你是说钓鱼
-    
+
+  2021年10月18日
+
+  Like
+
+  学习了！！！
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like1
+
+  嗯嗯，明白你是说钓鱼
+
 - 骆伟健
-    
-    2021年10月18日
-    
-    Like1
-    
-    你说钓鱼我可就不困了啊
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like1
-    
-    ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，道友![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  你说钓鱼我可就不困了啊
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like1
+
+  ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，道友![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 石同学
-    
-    2021年10月18日
-    
-    Like1
-    
-    调试挺好用
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    是的，快速查虫
-    
+
+  2021年10月18日
+
+  Like1
+
+  调试挺好用
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  是的，快速查虫
+
 - 韦启发Cris🏀
-    
-    2021年10月18日
-    
-    Like1
-    
-    我喜欢
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    会上瘾![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  我喜欢
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  会上瘾![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 记得诚
-    
-    2021年10月18日
-    
-    Like1
-    
-    可以写一篇如何钓鱼🎣
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    哈哈，这个可以有，堂而皇之教人摸鱼![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  可以写一篇如何钓鱼🎣
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  哈哈，这个可以有，堂而皇之教人摸鱼![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 静思
-    
-    2021年10月18日
-    
-    Like1
-    
-    断言这鱼==5斤![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like1
-    
-    浮点不能这么断言![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    静思
-    
-    2021年10月18日
-    
-    Like1
-    
-    assert(type==红尾）
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    👍👍，看来是同道中人![😄](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  断言这鱼==5斤![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like1
+
+  浮点不能这么断言![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  静思
+
+  2021年10月18日
+
+  Like1
+
+  assert(type==红尾）
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  👍👍，看来是同道中人![😄](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Deven
-    
-    2021年10月20日
-    
-    Like
-    
-    #define assert(arg) { if( !(arg) ) { printf("assert in File="__FILE__" Line=%d ",__LINE__); return; } }， 这个只能在函数无返回值时使用，具有局限性，c库的assert 调用异常直接终止程序，我们很多时候并不想程序终止， 一般函数都有返回值作为成功或者操作结果错误码， 建议用return -1,来处理结果，只在返回为int 时调用， -1代表一般错误， 其它错误可以自定义。另外自定义assert可以使用自定义的printf,有的平台printf并不能使用，这里可以自定义
-    
-    Deven
-    
-    2021年10月20日
-    
-    Like
-    
-    补充： 用标准库的assert后， 在开发完后可以用 NDEBUG 取消断言，这样可减少代码量和提高执行速度。
-    
-    嵌入式客栈
-    
-    Author2021年10月20日
-    
-    Like
-    
-    👍👍，是的，自定义的话也可以做一个编译开关，还可以根据需要做出不同的assert变体宏
-    
+
+  2021年10月20日
+
+  Like
+
+  #define assert(arg) { if( !(arg) ) { printf("assert in File="__FILE__" Line=%d ",__LINE__); return; } }， 这个只能在函数无返回值时使用，具有局限性，c库的assert 调用异常直接终止程序，我们很多时候并不想程序终止， 一般函数都有返回值作为成功或者操作结果错误码， 建议用return -1,来处理结果，只在返回为int 时调用， -1代表一般错误， 其它错误可以自定义。另外自定义assert可以使用自定义的printf,有的平台printf并不能使用，这里可以自定义
+
+  Deven
+
+  2021年10月20日
+
+  Like
+
+  补充： 用标准库的assert后， 在开发完后可以用 NDEBUG 取消断言，这样可减少代码量和提高执行速度。
+
+  嵌入式客栈
+
+  Author2021年10月20日
+
+  Like
+
+  👍👍，是的，自定义的话也可以做一个编译开关，还可以根据需要做出不同的assert变体宏
+
 - 玩呀熊熊
-    
-    2021年10月18日
-    
-    Like
-    
-    不敲代码就钓鱼的路过
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    看来我要多写写钓鱼![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like
+
+  不敲代码就钓鱼的路过
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  看来我要多写写钓鱼![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Mango奶酪
-    
-    2021年10月18日
-    
-    Like
-    
-    🙌 从小喜欢到现在，不过都是从小在农村水库野钓的好玩，不懂专业钓法![[悠闲]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    我也是野钓，买了一个台钓箱子
-    
+
+  2021年10月18日
+
+  Like
+
+  🙌 从小喜欢到现在，不过都是从小在农村水库野钓的好玩，不懂专业钓法![[悠闲]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  我也是野钓，买了一个台钓箱子
+
 - 程序员小哈
-    
-    2021年10月18日
-    
-    Like
-    
-    想看如何入门🎣
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    我就是入门水平
-    
+
+  2021年10月18日
+
+  Like
+
+  想看如何入门🎣
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  我就是入门水平
 
 已无更多数据
 
@@ -371,196 +373,195 @@ Comment
 **留言 24**
 
 - 逸珺
-    
-    2021年10月18日
-    
-    Like5
-    
-    有没有人喜欢钓鱼🎣？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like5
+
+  有没有人喜欢钓鱼🎣？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 一口Linux
-    
-    2021年10月18日
-    
-    Like
-    
-    学习了！！！
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like1
-    
-    嗯嗯，明白你是说钓鱼
-    
+
+  2021年10月18日
+
+  Like
+
+  学习了！！！
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like1
+
+  嗯嗯，明白你是说钓鱼
+
 - 骆伟健
-    
-    2021年10月18日
-    
-    Like1
-    
-    你说钓鱼我可就不困了啊
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like1
-    
-    ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，道友![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  你说钓鱼我可就不困了啊
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like1
+
+  ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，道友![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 石同学
-    
-    2021年10月18日
-    
-    Like1
-    
-    调试挺好用
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    是的，快速查虫
-    
+
+  2021年10月18日
+
+  Like1
+
+  调试挺好用
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  是的，快速查虫
+
 - 韦启发Cris🏀
-    
-    2021年10月18日
-    
-    Like1
-    
-    我喜欢
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    会上瘾![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  我喜欢
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  会上瘾![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 记得诚
-    
-    2021年10月18日
-    
-    Like1
-    
-    可以写一篇如何钓鱼🎣
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    哈哈，这个可以有，堂而皇之教人摸鱼![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  可以写一篇如何钓鱼🎣
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  哈哈，这个可以有，堂而皇之教人摸鱼![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 静思
-    
-    2021年10月18日
-    
-    Like1
-    
-    断言这鱼==5斤![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like1
-    
-    浮点不能这么断言![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    静思
-    
-    2021年10月18日
-    
-    Like1
-    
-    assert(type==红尾）
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    👍👍，看来是同道中人![😄](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like1
+
+  断言这鱼==5斤![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like1
+
+  浮点不能这么断言![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  静思
+
+  2021年10月18日
+
+  Like1
+
+  assert(type==红尾）
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  👍👍，看来是同道中人![😄](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Deven
-    
-    2021年10月20日
-    
-    Like
-    
-    #define assert(arg) { if( !(arg) ) { printf("assert in File="__FILE__" Line=%d ",__LINE__); return; } }， 这个只能在函数无返回值时使用，具有局限性，c库的assert 调用异常直接终止程序，我们很多时候并不想程序终止， 一般函数都有返回值作为成功或者操作结果错误码， 建议用return -1,来处理结果，只在返回为int 时调用， -1代表一般错误， 其它错误可以自定义。另外自定义assert可以使用自定义的printf,有的平台printf并不能使用，这里可以自定义
-    
-    Deven
-    
-    2021年10月20日
-    
-    Like
-    
-    补充： 用标准库的assert后， 在开发完后可以用 NDEBUG 取消断言，这样可减少代码量和提高执行速度。
-    
-    嵌入式客栈
-    
-    Author2021年10月20日
-    
-    Like
-    
-    👍👍，是的，自定义的话也可以做一个编译开关，还可以根据需要做出不同的assert变体宏
-    
+
+  2021年10月20日
+
+  Like
+
+  #define assert(arg) { if( !(arg) ) { printf("assert in File="__FILE__" Line=%d ",__LINE__); return; } }， 这个只能在函数无返回值时使用，具有局限性，c库的assert 调用异常直接终止程序，我们很多时候并不想程序终止， 一般函数都有返回值作为成功或者操作结果错误码， 建议用return -1,来处理结果，只在返回为int 时调用， -1代表一般错误， 其它错误可以自定义。另外自定义assert可以使用自定义的printf,有的平台printf并不能使用，这里可以自定义
+
+  Deven
+
+  2021年10月20日
+
+  Like
+
+  补充： 用标准库的assert后， 在开发完后可以用 NDEBUG 取消断言，这样可减少代码量和提高执行速度。
+
+  嵌入式客栈
+
+  Author2021年10月20日
+
+  Like
+
+  👍👍，是的，自定义的话也可以做一个编译开关，还可以根据需要做出不同的assert变体宏
+
 - 玩呀熊熊
-    
-    2021年10月18日
-    
-    Like
-    
-    不敲代码就钓鱼的路过
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    看来我要多写写钓鱼![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  Like
+
+  不敲代码就钓鱼的路过
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  看来我要多写写钓鱼![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Mango奶酪
-    
-    2021年10月18日
-    
-    Like
-    
-    🙌 从小喜欢到现在，不过都是从小在农村水库野钓的好玩，不懂专业钓法![[悠闲]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    我也是野钓，买了一个台钓箱子
-    
+
+  2021年10月18日
+
+  Like
+
+  🙌 从小喜欢到现在，不过都是从小在农村水库野钓的好玩，不懂专业钓法![[悠闲]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  我也是野钓，买了一个台钓箱子
+
 - 程序员小哈
-    
-    2021年10月18日
-    
-    Like
-    
-    想看如何入门🎣
-    
-    嵌入式客栈
-    
-    Author2021年10月18日
-    
-    Like
-    
-    我就是入门水平
-    
+
+  2021年10月18日
+
+  Like
+
+  想看如何入门🎣
+
+  嵌入式客栈
+
+  Author2021年10月18日
+
+  Like
+
+  我就是入门水平
 
 已无更多数据

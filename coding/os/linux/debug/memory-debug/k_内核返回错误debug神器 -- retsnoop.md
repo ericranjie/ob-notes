@@ -2,7 +2,7 @@
 
 Original 陈涛 酷玩BPF
 
- _2024年09月29日 08:20_ _四川_
+_2024年09月29日 08:20_ _四川_
 
 在libbpf/bpftool的github issue列表上经常可以看到maintainer推荐retsnoop工具去定位eBPF工具执行失败的原因，例如：
 
@@ -38,43 +38,39 @@ retsnoop 支持三种不同且互补的模式：
 
 另外也支持进程号过滤：
 
-  `-p, --pid=PID              Only trace given PID. Can be specified multiple                                times     -P, --no-pid=PID           Skip tracing given PID. Can be specified multiple                                times`
+`-p, --pid=PID              Only trace given PID. Can be specified multiple                                times     -P, --no-pid=PID           Skip tracing given PID. Can be specified multiple                                times`
 
 如果只关注内核函数执行时长，可以通过-L参数：
 
-  `-L, --longer=MS            Only emit stacks that took at least a given amount                                of milliseconds`
+`-L, --longer=MS            Only emit stacks that took at least a given amount                                of milliseconds`
 
 # 源码解析
 
-resnoop用了大量的高版本eBPF特性，仅hook内核函数的方式就支持fentry、kprobe、kprobe_multi三种。除此之外，也用到了ringbuffer、全局变量、lbr特性等，如果想完整使用retsnoop的功能，建议使用5.16+内核。下面简单介绍下各*.bpf.c文件的作用。
+resnoop用了大量的高版本eBPF特性，仅hook内核函数的方式就支持fentry、kprobe、kprobe_multi三种。除此之外，也用到了ringbuffer、全局变量、lbr特性等，如果想完整使用retsnoop的功能，建议使用5.16+内核。下面简单介绍下各\*.bpf.c文件的作用。
 
 ### 相关文件
 
 - calib_feat.bpf.c
-    
 
 探测当前系统是否满足eBPF的高版本特性，例如是否支持ringbuffer、kprobe_mult、lbr采栈i等，择机使用当前系统上所能支持的eBPF特性。
 
 - mass_attacher.c
-    
 
 所有hook函数的入口，handle_func_entry/handle_func_exit 作为通过入口hook所有函数
 
 - retsnoop.bpf.c
-    
 
 整个retsnoop核心功能实现在此文件中，其实现的大致思路如下图所示。
 
 ### 整体实现思路
 
 1. 用户传入通配符匹配参数，通过通配符匹配如 “_sys_bpf_”，将所有跟sys_bpf相关的目标函数都会做hook处理；
-    
-2. 每个目标函数开始执行和执行返回都会做hook处理，如下图步骤1，2，在函数开始执行时记录时间、seq_id(唯一标识)等信息，在函数返回时根据其返回结果判断函数是否正常(是否为0、是否非NULL等)，如果不正常就记录其栈信息，如下图步骤3
-    
-3. 最后当记录的栈深度为0时，既如下图func1返回时，上报记录的追踪信息，如下图步骤4
-    
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 每个目标函数开始执行和执行返回都会做hook处理，如下图步骤1，2，在函数开始执行时记录时间、seq_id(唯一标识)等信息，在函数返回时根据其返回结果判断函数是否正常(是否为0、是否非NULL等)，如果不正常就记录其栈信息，如下图步骤3
+
+1. 最后当记录的栈深度为0时，既如下图func1返回时，上报记录的追踪信息，如下图步骤4
+
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 使用案例
 
@@ -84,13 +80,13 @@ resnoop用了大量的高版本eBPF特性，仅hook内核函数的方式就支�
 
 工具开发中，percpu map是我们经常用到的map类型，但其value 值有32K的限制，一旦超过该大小，当我们跑工具时会有右图的报错，单看“Cannot allocate memory”提示内存不足，但查整机还有很多free内存。直到使用retsnoop才看到是申请percpu 内存时返回了NULL，根因就是内核中`PCPU_MIN_UNIT_SIZE` (32K)的限制。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2.aarch64 原子指令未支持，造成load失败
 
 在5.15的aarch64内核上执行eBPF工具，报了“failed to load：-524”错误，以往当verifier失败时会有相关的内核日志，而此问题却只有一个错误码，难以定位错误原因。因此使用retsnoop抓取bpf load相关的函数，可以看到bpf_prog_load时内核报了”ENOTSUPPORT”错误，凭借此函数的错误提示定位到是代码中使用了sync_fetch_and_and原子子令，而aarch64下5.15的内核对该eBPF指令还未支持。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这么好用的工具只能在高版本使用确实心有不甘，所以感兴趣的朋友也可以尝试将其移植到低版本(仅支持kprobe和perf buffer的内核(4.19等))中，如果有相关实现也欢迎在给我们投稿。
 
@@ -99,8 +95,6 @@ resnoop用了大量的高版本eBPF特性，仅hook内核函数的方式就支�
 # 参考
 
 https://github.com/anakryiko/retsnoop
-
-  
 
 Reads 527
 

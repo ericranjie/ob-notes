@@ -1,20 +1,18 @@
-
-
 原创 晓泰 泰晓科技
 
- _2024年03月31日 16:25_ _广东_
+_2024年03月31日 16:25_ _广东_
 
-> Corrector: TinyCorrect v0.1 - [spaces toc]  
-> Author:    sugarfillet sugarfillet@yeah.net  
-> Date:      2023/04/17  
-> Revisor:   Falcon falcon@tinylab.org  
-> Project:   RISC-V Linux 内核剖析  
-> Proposal:  RISC-V UEFI 启动流程分析与 EDK2 移植  
+> Corrector: TinyCorrect v0.1 - \[spaces toc\]\
+> Author:    sugarfillet sugarfillet@yeah.net\
+> Date:      2023/04/17\
+> Revisor:   Falcon falcon@tinylab.org\
+> Project:   RISC-V Linux 内核剖析\
+> Proposal:  RISC-V UEFI 启动流程分析与 EDK2 移植\
 > Sponsor:   PLCT Lab, ISCAS
 
 早前我们简单介绍过 [RISC-V UEFI](http://mp.weixin.qq.com/s?__biz=MzA5NDQzODQ3MQ==&mid=2648188975&idx=1&sn=275dd87264b365ca42c214a8f9d8935b&chksm=88621d07bf159411f502eb73bb04af5242c65186a094bd72894c938d5c1f21cd953466707b8e&scene=21#wechat_redirect)，本周继续连载 RISC-V UEFI 系列文章，记得收藏分享+关注，合集：https://tinylab.org/riscv-linux
 
-**学习 RISC-V Linux，就用泰晓社区自研 RISC-V 实验盘 和 RISC-V 实验箱  
+**学习 RISC-V Linux，就用泰晓社区自研 RISC-V 实验盘 和 RISC-V 实验箱\
 （https://tinylab.org/tiny-riscv-box）！**
 
 # RISC-V Linux 内核 UEFI 启动过程分析（Part1）：构建、加载与启动内核
@@ -28,22 +26,20 @@
 _说明_
 
 - Linux 版本采用 v6.3
-    
+
 - UEFI 标准采用 2.10 版本文档
-    
+
 - edk2 版本采用 `edk2-stable202302` 分支
-    
 
 ## 构建 RISC-V EDK2 实验环境
 
 EDK2 作为 UEFI 标准的开源实现，主要包括以下三个代码仓库：
 
 - edk2：edk2 主分支
-    
+
 - edk2-platforms：edk2 的平台支持分支
-    
+
 - edk2-non-osi: 不兼容 edk2 和 edk2-platform license 的分支
-    
 
 在构建 RISC-V edk2 实验环境过程中，主要用到前两个仓库：可通过第一个仓库构建 QEMU virt 的 edk2 镜像 (参考)，也可结合第二仓库构建 QEMU sifive_u (HiFiveUnleashedBoard) 的 edk2 镜像 (参考)，这里以 QEMU virt 为例，列出几个关键步骤：
 
@@ -53,13 +49,13 @@ EDK2 作为 UEFI 标准的开源实现，主要包括以下三个代码仓库：
 
 > 注意：需要对 edk2 镜像文件的大小进行调整以解决后续 QEMU 启动过程中有关 pflash 的报错
 
-``git clone --recurse-submodule https://github.com/tianocore/edk2.git      export WORKSPACE=`pwd`   export GCC5_RISCV64_PREFIX=/usr/bin/riscv64-linux-gnu-   export PACKAGES_PATH=$WORKSPACE/edk2   export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools   source edk2/edksetup.sh   make -C edk2/BaseTools clean   make -C edk2/BaseTools   make -C edk2/BaseTools/Source/C   source edk2/edksetup.sh BaseTools   build -a RISCV64 --buildtarget RELEASE -p OvmfPkg/RiscVVirt/RiscVVirtQemu.dsc -t GCC5      truncate -s 32M Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT.fd   ``
+`` git clone --recurse-submodule https://github.com/tianocore/edk2.git      export WORKSPACE=`pwd`   export GCC5_RISCV64_PREFIX=/usr/bin/riscv64-linux-gnu-   export PACKAGES_PATH=$WORKSPACE/edk2   export EDK_TOOLS_PATH=$WORKSPACE/edk2/BaseTools   source edk2/edksetup.sh   make -C edk2/BaseTools clean   make -C edk2/BaseTools   make -C edk2/BaseTools/Source/C   source edk2/edksetup.sh BaseTools   build -a RISCV64 --buildtarget RELEASE -p OvmfPkg/RiscVVirt/RiscVVirtQemu.dsc -t GCC5      truncate -s 32M Build/RiscVVirtQemu/RELEASE_GCC5/FV/RISCV_VIRT.fd    ``
 
 ### 制作 efi.img
 
 提前编译好 RISC-V Linux 内核镜像文件 `arch/riscv/boot/Image`，并使用如下命令保存内核镜像到 `efi.img` 中。
 
-``fallocate -l 512M efi.img   sgdisk -n 1:34: -t 1:EF00 efi.img   sudo losetup -fP efi.img   loopdev=`losetup -j efi.img | awk -F: '{print $1}'`   efi_part="$loopdev"p1   sudo mkfs.msdos $efi_part   mkdir -p /tmp/mnt   sudo mount $efi_part /tmp/mnt/   sudo cp linux/arch/riscv/boot/Image /tmp/mnt/   sudo umount /tmp/mnt   sudo losetup -D $loopdev   ``
+`` fallocate -l 512M efi.img   sgdisk -n 1:34: -t 1:EF00 efi.img   sudo losetup -fP efi.img   loopdev=`losetup -j efi.img | awk -F: '{print $1}'`   efi_part="$loopdev"p1   sudo mkfs.msdos $efi_part   mkdir -p /tmp/mnt   sudo mount $efi_part /tmp/mnt/   sudo cp linux/arch/riscv/boot/Image /tmp/mnt/   sudo umount /tmp/mnt   sudo losetup -D $loopdev    ``
 
 ### 制作 RISC-V Rootfs
 
@@ -77,56 +73,55 @@ EDK2 作为 UEFI 标准的开源实现，主要包括以下三个代码仓库：
 
 RISC-V 架构的 edk2 移植的基本思路是基于 edk2 项目现有的启动流程以及构建环境，将 OpenSBI 编译为库并链接到 SEC 模块以充分利用 OpenSBI 进行平台的初始化。这里基于 UEFI 启动的七个启动阶段对 RISC-V 的实现做简单介绍（详见 edk2-platform 的 `Platform/RISC-V/PlatformPkg/Readme.md`）。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 riscv-edk2-boot.png
 
 - SEC 阶段
-    
-    处理系统上电或重启，执行 ResetVector 代码；创建临时内存；提供安全信任链的根；传送系统参数到下一阶段。
-    
-    RISC-V: SEC 阶段调用 `sbi_init` 执行 OpenSBI 的初始化，之后以 NextAddr 和 NextMode 跳转到 PEI 阶段。其中 SEC 以及 OpenSBI 运行在 M-mode，而之后的阶段（PEI/DXE/BDS）则运行在 NextMode 指定的 S-mode (OEM 可通过相关的 PCD 设置 `PcdPeiCorePrivilegeMode` 或者 `PcdDxeCorePrivilegeMode` 指定 PEI/DXE 阶段运行在其他模式）
-    
+
+  处理系统上电或重启，执行 ResetVector 代码；创建临时内存；提供安全信任链的根；传送系统参数到下一阶段。
+
+  RISC-V: SEC 阶段调用 `sbi_init` 执行 OpenSBI 的初始化，之后以 NextAddr 和 NextMode 跳转到 PEI 阶段。其中 SEC 以及 OpenSBI 运行在 M-mode，而之后的阶段（PEI/DXE/BDS）则运行在 NextMode 指定的 S-mode (OEM 可通过相关的 PCD 设置 `PcdPeiCorePrivilegeMode` 或者 `PcdDxeCorePrivilegeMode` 指定 PEI/DXE 阶段运行在其他模式）
+
 - PEI 阶段
-    
-    此阶段依次执行 PEIM (PEI Module) 进行平台的初始化，将需要传递给 DXE 的信息组成 HOB(Handoff Block) 表，最终将控制权转交给 DXE。
-    
-    RISC-V: PEI 运行在 `PcdPeiCorePrivilegeMode` 默认指定的 S-mode，如果需要运行 SEC 阶段的 PEI protocol interface (PPI) 代码，则要在该阶段早期安装 PPI 并通过 PlatformSecPpiLib 库来避免模式保护限制。
-    
-    PEI 通过 RiscVFirmwareContextLib 库访问 OpenSBI 固件上下文 -- EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT。
-    
-    `typedef struct {     UINT64              BootHartId;     VOID                *PeiServiceTable;      // PEI Service table // 向上以 PeiServiceTablePointerOpensbi 库提供访问     UINT64              FlattenedDeviceTree;   // Pointer to Flattened Device tree     UINT64              SecPeiHandOffData;     // This is EFI_SEC_PEI_HAND_OFF passed to PEI Core.     EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC  *HartSpecific[RISC_V_MAX_HART_SUPPORTED];   // Hart 信息（拓展支持、厂商信息、模式切换方法(HartSwitchMode))   } EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT;   `
-    
-    PEI 驱动可通过 PEI OpenSBI PPI 调用 SBI 服务。
-    
+
+  此阶段依次执行 PEIM (PEI Module) 进行平台的初始化，将需要传递给 DXE 的信息组成 HOB(Handoff Block) 表，最终将控制权转交给 DXE。
+
+  RISC-V: PEI 运行在 `PcdPeiCorePrivilegeMode` 默认指定的 S-mode，如果需要运行 SEC 阶段的 PEI protocol interface (PPI) 代码，则要在该阶段早期安装 PPI 并通过 PlatformSecPpiLib 库来避免模式保护限制。
+
+  PEI 通过 RiscVFirmwareContextLib 库访问 OpenSBI 固件上下文 -- EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT。
+
+  `typedef struct {     UINT64              BootHartId;     VOID                *PeiServiceTable;      // PEI Service table // 向上以 PeiServiceTablePointerOpensbi 库提供访问     UINT64              FlattenedDeviceTree;   // Pointer to Flattened Device tree     UINT64              SecPeiHandOffData;     // This is EFI_SEC_PEI_HAND_OFF passed to PEI Core.     EFI_RISCV_FIRMWARE_CONTEXT_HART_SPECIFIC  *HartSpecific[RISC_V_MAX_HART_SUPPORTED];   // Hart 信息（拓展支持、厂商信息、模式切换方法(HartSwitchMode))   } EFI_RISCV_OPENSBI_FIRMWARE_CONTEXT;   `
+
+  PEI 驱动可通过 PEI OpenSBI PPI 调用 SBI 服务。
+
 - DXE 阶段
-    
-    该阶段执行系统初始化工作，为后续 UEFI Application 和操作系统提供 UEFI 系统表、启动服务和运行时服务。
-    
-    RISC-V: DXE 运行在 `PcdDxeCorePrivilegeMode` 默认指定的 S-mode，DXE 驱动可通过 DXE OpenSBI protocol 调用 OpenSBI 服务。
-    
+
+  该阶段执行系统初始化工作，为后续 UEFI Application 和操作系统提供 UEFI 系统表、启动服务和运行时服务。
+
+  RISC-V: DXE 运行在 `PcdDxeCorePrivilegeMode` 默认指定的 S-mode，DXE 驱动可通过 DXE OpenSBI protocol 调用 OpenSBI 服务。
+
 - BDS 阶段
-    
-    此阶段枚举每个启动设备，并执行启动策略（由全局 NVRAM 变量指定，运行时可修改）。如果 BDS 启动失败，系统会重新调用 DXE 派遣器，再次进入寻找启动设备的流程。
-    
-    RISC-V: BDS 阶段必须要在将系统控制权移交给 S-mode 的 OS、OS loader、UEFI Application 之前切换到 S-mode。
-    
+
+  此阶段枚举每个启动设备，并执行启动策略（由全局 NVRAM 变量指定，运行时可修改）。如果 BDS 启动失败，系统会重新调用 DXE 派遣器，再次进入寻找启动设备的流程。
+
+  RISC-V: BDS 阶段必须要在将系统控制权移交给 S-mode 的 OS、OS loader、UEFI Application 之前切换到 S-mode。
+
 - TSL 阶段
-    
-    此阶段为 OS loader（比如：grub、Linux EFI Boot Stub）执行的第一阶段，在这个阶段系统资源还是被 UEFI 所控制，直到 OS loader 执行 `BS.ExitBootServices()` 退出 Boot Service 进入 Runtime 阶段。
-    
-    RISC-V：此阶段为 Linux 内核的 EFI Boot Stub 处理流程，我们放在后文详细介绍。
-    
+
+  此阶段为 OS loader（比如：grub、Linux EFI Boot Stub）执行的第一阶段，在这个阶段系统资源还是被 UEFI 所控制，直到 OS loader 执行 `BS.ExitBootServices()` 退出 Boot Service 进入 Runtime 阶段。
+
+  RISC-V：此阶段为 Linux 内核的 EFI Boot Stub 处理流程，我们放在后文详细介绍。
+
 - RT 阶段
-    
-    UEFI 各种系统资源被转移到 OS loader，启动服务不能再使用，仅保留运行时服务供操作系统使用。
-    
-    RISC-V: 此阶段涉及 Linux 内核的 UEFI 运行时的初始化流程，我们放在后文详细介绍。
-    
+
+  UEFI 各种系统资源被转移到 OS loader，启动服务不能再使用，仅保留运行时服务供操作系统使用。
+
+  RISC-V: 此阶段涉及 Linux 内核的 UEFI 运行时的初始化流程，我们放在后文详细介绍。
+
 - AL 阶段
-    
-    在 RT 阶段，如果系统遇到灾难性错误，系统固件需要提供错误处理和灾难恢复机制，这种机制运行在 AL（AferLife）阶段。UEFI 和 UEFI PI 标准都没有定义此阶段的行为和规范。
-    
+
+  在 RT 阶段，如果系统遇到灾难性错误，系统固件需要提供错误处理和灾难恢复机制，这种机制运行在 AL（AferLife）阶段。UEFI 和 UEFI PI 标准都没有定义此阶段的行为和规范。
 
 ## UEFI Linux 启动过程
 
@@ -150,14 +145,13 @@ UEFI Boot Manager 用于加载并执行 PE 格式的 UEFI 镜像，UEFI 镜像�
 
 `    // arch/riscv/include/asm/image.h : 55      struct riscv_image_header {           u32 code0;           u32 code1;           u64 text_offset;           ...           u32 res3;   };      // arch/riscv/kernel/head.S : 21      __HEAD   ENTRY(_start)   #ifdef CONFIG_EFI           c.li s4,-13        // #define MZ_MAGIC        0x5a4d           j _start_kernel   #else           j _start_kernel           .word 0   #endif           .balign 8              // ...   #ifdef CONFIG_EFI           .word pe_head_start - _start // riscv_image_header.rev3   pe_head_start:           __EFI_PE_HEADER   #else           .word 0   #endif             // ...    `
 
-`riscv_image_header.res3` 为最后的成员，存储 PE 头与 _start 的偏移，并在其后追加 PE 头 `__EFI_PE_HEADER`。`__EFI_PE_HEADER` 定义在 `arch/riscv/kernel/efi-header.S` 文件中，按照 PE 镜像相关结构进行布局，这里摘录几个关键的点进行介绍：
+`riscv_image_header.res3` 为最后的成员，存储 PE 头与 \_start 的偏移，并在其后追加 PE 头 `__EFI_PE_HEADER`。`__EFI_PE_HEADER` 定义在 `arch/riscv/kernel/efi-header.S` 文件中，按照 PE 镜像相关结构进行布局，这里摘录几个关键的点进行介绍：
 
 - `coff_header.Machine` 定义为 `IMAGE_FILE_MACHINE_RISCV64` 或者 `IMAGE_FILE_MACHINE_RISCV32`，此值与前面介绍的 UEFI 镜像中的 "Machine" 字段相对应，在 edk2 中定义为 `EFI_IMAGE_MACHINE_RISCV64` 和 `EFI_IMAGE_MACHINE_RISCV32`
-    
+
 - `extra_header_fields.Subsystem` 定义为 `IMAGE_SUBSYSTEM_EFI_APPLICATION`，表明此镜像为 EFI Application 类型的 UEFI 镜像，此值在 edk2 中定义为 `EFI_IMAGE_SUBSYSTEM_EFI_APPLICATION`
-    
+
 - `optional_header.AddressOfEntryPoint` 定义为 `__efistub_efi_pe_entry - _start`，表明此镜像被加载后并执行的入口函数为 `efi_pe_entry`（`__efi_stub_` 前缀为 EFI Boot Stub 相关代码 objcopy 时所添加）
-    
 
 `    // arch/riscv/kernel/efi-header.S : 10              .macro  __EFI_PE_HEADER           .long   PE_MAGIC   coff_header:   #ifdef CONFIG_64BIT           .short  IMAGE_FILE_MACHINE_RISCV64              // Machine   #else           .short  IMAGE_FILE_MACHINE_RISCV32              // Machine   #endif      optional_header:   #ifdef CONFIG_64BIT           .short  PE_OPT_MAGIC_PE32PLUS                   // PE32+ format   #else           .short  PE_OPT_MAGIC_PE32                       // PE32 format   #endif              .long   __efistub_efi_pe_entry - _start         // AddressOfEntryPoint      extra_header_fields:           //...           .short  IMAGE_SUBSYSTEM_EFI_APPLICATION         // Subsystem      // ./drivers/firmware/efi/libstub/Makefile : 149      STUBCOPY_FLAGS-$(CONFIG_RISCV)  += --prefix-alloc-sections=.init \                                      --prefix-symbols=__efistub_   STUBCOPY_RELOC-$(CONFIG_RISCV)  := R_RISCV_HI20    `
 
@@ -168,11 +162,10 @@ UEFI Boot Manager 用于加载并执行 PE 格式的 UEFI 镜像，UEFI 镜像�
 `efi_pe_entry` 作为 UEFI 镜像的入口函数，遵守 UEFI 标准中 EFI 镜像入口点 -- "EFI_IMAGE_ENTRY_POINT" 的接口定义，此接口的第一个参数 `ImageHandle` 是固件为当前镜像创建的句柄，在入口函数的后续流程中可通过 `EFI_LOADED_IMAGE_PROTOCOL` 获取当前镜像的一些信息；第二个参数 `SystemTable` 为系统表，这个参数主要包含以下信息：
 
 - 控制台的标准输入输出、错误输出 (ConsoleInHandle/ConsoleOutHandle/StandardErrorHandle)
-    
+
 - Boot Services / Runtime 服务表 (BootServices/RuntimeServices)，后续分析中会大量用到 Boot Services 提供的服务
-    
+
 - 配置表 (ConfigurationTable)，比如：ACPI, SMBIOS、设备树 等等
-    
 
 `// MdePkg/Include/Uefi/UefiSpec.h : 1975      typedef   EFI_STATUS   (EFIAPI *EFI_IMAGE_ENTRY_POINT) (     IN EFI_HANDLE                  ImageHandle,     IN EFI_SYSTEM_TABLE            *SystemTable     );      typedef struct {     EFI_TABLE_HEADER                   Hdr;     CHAR16                             *FirmwareVendor;     UINT32                             FirmwareRevision;     EFI_HANDLE                         ConsoleInHandle;     EFI_SIMPLE_TEXT_INPUT_PROTOCOL     *ConIn;     EFI_HANDLE                         ConsoleOutHandle;     EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *ConOut;     EFI_HANDLE                         StandardErrorHandle;     EFI_SIMPLE_TEXT_OUTPUT_PROTOCOL    *StdErr;     EFI_RUNTIME_SERVICES               *RuntimeServices;     EFI_BOOT_SERVICES                  *BootServices;     UINTN                              NumberOfTableEntries;     EFI_CONFIGURATION_TABLE            *ConfigurationTable;   } EFI_SYSTEM_TABLE;   `
 
@@ -187,19 +180,18 @@ UEFI Boot Manager 用于加载并执行 PE 格式的 UEFI 镜像，UEFI 镜像�
 `efi_pe_entry()` 在对内核镜像进行重定位后，调用 `efi_stub_common()` 访问必要的 UEFI 接口执行一些简单的初始化任务，最终调用 `efi_boot_kernel()` 启动正式内核：
 
 - `check_platform_features()` 通过 `RISCV_EFI_BOOT_PROTOCOL_GUID` 协议设置 `hartid`，如果失败则通过配置表中的 FDT 的 "chosen" 节点的 "boot-hartid" 属性获取（可通过平台级的 `PcdBootHartId` 进行配置）
-    
-- `setup_graphics()` 通过 `EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID` 协议获取显示相关信息
-    
-- `efi_load_initrd()` 加载 initrd
-    
-    initrd 一般有两个来源，固件提供（比如：QEMU 命令行指定、或者通过 UEFI Shell 的 initrd 命令指定）以及 Linux 命令行指定。第一种情况下，执行 `efi_load_initrd_dev_path()` 访问 `LINUX_EFI_INITRD_MEDIA_GUID` 配置表来获取；第二种情况下，执行 `efi_load_initrd_cmdline()` 调用 `efi_open_file` 来获取。之后，在 `EFI_LOADER_DATA` 中为其分配内存空间，并将 initrd 以 `LINUX_EFI_INITRD_MEDIA_GUID` 安装到配置表中。
-    
-- `efi_random_get_seed()` 通过 `EFI_RNG_PROTOCOL_GUID` 获取随机源，并将其以 `LINUX_EFI_RANDOM_SEED_TABLE_GUID` 安装到配置表中
-    
-- `install_memreserve_table()` 安装 `LINUX_EFI_MEMRESERVE_TABLE_GUID` 配置表
-    
 
-``// drivers/firmware/efi/libstub/efi-stub.c : 287      efi_stub_common(handle, image, image_addr, cmdline_ptr);          check_platform_features(); // set `hartid` by RISCV_EFI_BOOT_PROTOCOL_GUID          setup_graphics(); // get struct screen_info by EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID          efi_load_initrd() // loaded initrd         efi_load_initrd_dev_path()         efi_load_initrd_cmdline()          efi_random_get_seed()  // EFI_RNG_PROTOCOL random bytes saved as a configuration table          efi_novamap // 此变量表示代表是否支持为 RT 设置虚拟地址，后文做详细介绍          install_memreserve_table()  // BS.InstallConfigurationTable LINUX_EFI_MEMRESERVE_TABLE_GUID          efi_boot_kernel(handle, image, image_addr, cmdline_ptr);   ``
+- `setup_graphics()` 通过 `EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID` 协议获取显示相关信息
+
+- `efi_load_initrd()` 加载 initrd
+
+  initrd 一般有两个来源，固件提供（比如：QEMU 命令行指定、或者通过 UEFI Shell 的 initrd 命令指定）以及 Linux 命令行指定。第一种情况下，执行 `efi_load_initrd_dev_path()` 访问 `LINUX_EFI_INITRD_MEDIA_GUID` 配置表来获取；第二种情况下，执行 `efi_load_initrd_cmdline()` 调用 `efi_open_file` 来获取。之后，在 `EFI_LOADER_DATA` 中为其分配内存空间，并将 initrd 以 `LINUX_EFI_INITRD_MEDIA_GUID` 安装到配置表中。
+
+- `efi_random_get_seed()` 通过 `EFI_RNG_PROTOCOL_GUID` 获取随机源，并将其以 `LINUX_EFI_RANDOM_SEED_TABLE_GUID` 安装到配置表中
+
+- `install_memreserve_table()` 安装 `LINUX_EFI_MEMRESERVE_TABLE_GUID` 配置表
+
+`` // drivers/firmware/efi/libstub/efi-stub.c : 287      efi_stub_common(handle, image, image_addr, cmdline_ptr);          check_platform_features(); // set `hartid` by RISCV_EFI_BOOT_PROTOCOL_GUID          setup_graphics(); // get struct screen_info by EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID          efi_load_initrd() // loaded initrd         efi_load_initrd_dev_path()         efi_load_initrd_cmdline()          efi_random_get_seed()  // EFI_RNG_PROTOCOL random bytes saved as a configuration table          efi_novamap // 此变量表示代表是否支持为 RT 设置虚拟地址，后文做详细介绍          install_memreserve_table()  // BS.InstallConfigurationTable LINUX_EFI_MEMRESERVE_TABLE_GUID          efi_boot_kernel(handle, image, image_addr, cmdline_ptr);    ``
 
 ### EFI Boot Stub efi_boot_kernel
 
@@ -210,19 +202,18 @@ UEFI Boot Manager 用于加载并执行 PE 格式的 UEFI 镜像，UEFI 镜像�
 第一个是与 dtb 相关的处理：dtb 与 initrd 类似有两个来源，一个是固件提供（比如：QEMU 提供给 edk2 的 dtb），还有一个是通过 Linux 命令行提供的。前者从配置表 `DEVICE_TREE_GUID` 中获取，后者通过 `efi_load_dtb()` 走 UEFI 文件接口来获取。之后为 dtb 分配内存，并执行 `update_fdt()` 函数在 dtb 的 chosen 节点中创建如下几个 chosen 变量，配合后续的 `update_fdt_memmap()` 函数对其进行设置。这几个变量会在 EFI Boot Stub 跳转到正式内核后以 dtb 的形式提供，而正式内核则解析这些变量继而执行相应的初始化。
 
 - `bootargs`
-    
-    存放命令行参数，传递给正式内核进行解析
-    
+
+  存放命令行参数，传递给正式内核进行解析
+
 - `linux,uefi-system-table`
-    
-    存放系统表，正式内核可通过系统表获取 ACPI/INITRD/SMBIOS 等配置表信息并执行对应的初始化，也可通过系统表获取到 UEFI Runtime 服务表。相关内容会在后文详细介绍。
-    
+
+  存放系统表，正式内核可通过系统表获取 ACPI/INITRD/SMBIOS 等配置表信息并执行对应的初始化，也可通过系统表获取到 UEFI Runtime 服务表。相关内容会在后文详细介绍。
+
 - `linux,uefi-mmap-start`, `linux,uefi-mmap-size`, `linux,uefi-mmap-desc-size`, `linux,uefi-mmap-desc-ver`
-    
-    存放 UEFI 内存映射，正式内核可通过 UEFI 内存映射表了解物理内存布局，从而更新 memblock 内存分配器。
-    
-    edk2 中以内存描述符 -- `EFI_MEMORY_DESCRIPTOR` 构成的链表描述 UEFI 内存映射表，并对外提供 `EFI_BOOT_SERVICES.GetMemoryMap()` 接口获取内存映射表。在执行之后的 `efi_exit_boot_services()` 过程中会调用此接口并通过 `update_fdt_memmap()` 函数对相关的 chosen 变量进行更新。相关结构定义如下：
-    
+
+  存放 UEFI 内存映射，正式内核可通过 UEFI 内存映射表了解物理内存布局，从而更新 memblock 内存分配器。
+
+  edk2 中以内存描述符 -- `EFI_MEMORY_DESCRIPTOR` 构成的链表描述 UEFI 内存映射表，并对外提供 `EFI_BOOT_SERVICES.GetMemoryMap()` 接口获取内存映射表。在执行之后的 `efi_exit_boot_services()` 过程中会调用此接口并通过 `update_fdt_memmap()` 函数对相关的 chosen 变量进行更新。相关结构定义如下：
 
 `// MdePkg/Include/Uefi/UefiSpec.h : 160      typedef struct {      UINT32                     Type;   // enum EFI_MEMORY_TYPE eg: EfiLoaderCode、EfiLoaderData、EfiBootServicesCode、EfiBootServicesData ..      EFI_PHYSICAL_ADDRESS       PhysicalStart; // 物理内存起始地址      EFI_VIRTUAL_ADDRESS        VirtualStart; // 虚拟地址起始地址      UINT64                     NumberOfPages; // 内存空间大小      UINT64                     Attribute; // 内存属性 eg: Memory cacheability attribute、Physical memory protection attribute、Runtime memory attribute     } EFI_MEMORY_DESCRIPTOR;      typedef   EFI_STATUS   (EFIAPI *EFI_GET_MEMORY_MAP) (      IN OUT UINTN                  *MemoryMapSize,  // 整个内存映射表的大小      OUT EFI_MEMORY_DESCRIPTOR     *MemoryMap,  // 内存映射表      OUT UINTN                     *MapKey,     // 固件返回的内存映射 key 值      OUT UINTN                     *DescriptorSize, // 内存描述符的大小      OUT UINT32                    *DescriptorVersion //  内存描述符的版本 -- EFI_MEMORY_DESCRIPTOR_VERSION = 1     );   `
 
@@ -249,24 +240,21 @@ Linux EFI Boot Stub 作为一种 UEFI OS Loader 在 UEFI 的 TSL 阶段调用 Bo
 ## 参考资料
 
 - UEFI 标准
-    
+
 - OpenSBI/U-Boot/UEFI 简介
-    
 
----
+______________________________________________________________________
 
-**首发地址**：https://tinylab.org/riscv-linux-uefi-boot-1  
+**首发地址**：https://tinylab.org/riscv-linux-uefi-boot-1\
 **技术服务**：https://tinylab.org/ruma.tech
 
 左下角 **阅读原文** 可访问外链。都看到这里了，就随手在看+分享一下吧 ;-)
-
-  
 
 ![](https://mmbiz.qlogo.cn/mmbiz_png/1tEsbMpHLZI1QWGqkrkKGqDOOicX6ptkaFYaVfDXR4XTic5lafHBFKib1ly1TdKkwb01S9WTUQlQQ5lBdgY6riaedg/0?wx_fmt=png)
 
 晓泰
 
- ～一份支持，一份动力～ 
+～一份支持，一份动力～
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzA5NDQzODQ3MQ==&mid=2648193286&idx=1&sn=9a5a19e790dd6ef30ea9233e3df8c5c2&chksm=88620c2ebf158538aa2ef8e765fc1acde0e5548558d02e67bb2e1e03bc5f900dba348d0b1419&mpshare=1&scene=24&srcid=0331781tFMCNYwY07GuE0Njx&sharer_shareinfo=b07f39f3bcfea08519f4909db229349f&sharer_shareinfo_first=b07f39f3bcfea08519f4909db229349f&key=daf9bdc5abc4e8d07c170694cff643b81e62b1ce0035cd2193fb39a227b97394110500edd61e5b6bd905e55aa1e22abbcaa388026df1adf7d71f5c91d2bb3f6a634c9afd2afe747052035b2605f6f7d96bd550a81702bbeaef25f3427fde22e40fbc4c5dd25705993fbef54eac8cd2b8b287e0ffa1a10d4964625238bee03628&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ%2BYO9bsjj59vTwO3QOWugChLmAQIE97dBBAEAAAAAAKDULl2z2FYAAAAOpnltbLcz9gKNyK89dVj0B9mdIlVfuyiaU4g09p3tIRgon8%2FYjYn9Y04vKsV%2BP78KyGAoAPUe8sWHBtzWfSyBX3w07BabFZaVbs4K9u7ii%2FAztrQIFluJHjKiYgvv2avUX8oHTvGGCWjyRQulhHYcOOzd6vm0guwcVHgiVogIujXBFBoao8T35b3LnS3aLgijKGhzrtQ9CMH%2FIfkMHYz7G9IhpXxlh7J1R6GzV2RFGCR1KdrNsyTZb36syjTzM4OoUX%2FcDmtVL1OBIwmXqBeG&acctmode=0&pass_ticket=uFlIUDjboxYkLvu5vGqKunefyUxvAkNfVJGZLnuoCsWaYIhtyCVELXx2WlWSuOFj&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 

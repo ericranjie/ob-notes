@@ -1,7 +1,6 @@
-
 原创 代码改变世界ctw 人人极客社区
 
- _2021年12月05日 21:14_
+_2021年12月05日 21:14_
 
 ## linux kernel中的中断irq的栈stack
 
@@ -11,7 +10,7 @@
 
 `/*    * Interrupt handling.    */    .macro irq_handler    ldr_l x1, handle_arch_irq   -----将handle地址保存在x1    mov x0, sp    irq_stack_entry   ------ 切换栈，也就是将svc栈切换程irq栈. 在此之前，SP还是EL1_SP，在此函数中，将EL1_SP保存，再将IRQ栈的地址写入到SP寄存器    blr x1     ——————执行中断处理函数    irq_stack_exit   ------ 恢复EL1_SP(svc栈)    .endm   `
 
- `.macro irq_stack_entry    mov x19, sp   // preserve the original sp    //将svc mode下的栈地址(也就是EL1_SP)保存到x19       /*     * Compare sp with the base of the task stack.     * If the top ~(THREAD_SIZE - 1) bits match, we are on a task stack,     * and should switch to the irq stack.     */   #ifdef CONFIG_THREAD_INFO_IN_TASK    ldr x25, [tsk, TSK_STACK]    eor x25, x25, x19    and x25, x25, #~(THREAD_SIZE - 1)    cbnz x25, 9998f   #else    and x25, x19, #~(THREAD_SIZE - 1)    cmp x25, tsk    b.ne 9998f   #endif       adr_this_cpu x25, irq_stack, x26    mov x26, #IRQ_STACK_START_SP     //IRQ_STACK_START_SP这是irq mode的栈地址    add x26, x25, x26       /* switch to the irq stack */    mov sp, x26     //将irq栈地址，写入到sp       /*     * Add a dummy stack frame, this non-standard format is fixed up     * by unwind_frame()     */    stp     x29, x19, [sp, #-16]!    mov x29, sp      9998:    .endm`
+`.macro irq_stack_entry    mov x19, sp   // preserve the original sp    //将svc mode下的栈地址(也就是EL1_SP)保存到x19       /*     * Compare sp with the base of the task stack.     * If the top ~(THREAD_SIZE - 1) bits match, we are on a task stack,     * and should switch to the irq stack.     */   #ifdef CONFIG_THREAD_INFO_IN_TASK    ldr x25, [tsk, TSK_STACK]    eor x25, x25, x19    and x25, x25, #~(THREAD_SIZE - 1)    cbnz x25, 9998f   #else    and x25, x19, #~(THREAD_SIZE - 1)    cmp x25, tsk    b.ne 9998f   #endif       adr_this_cpu x25, irq_stack, x26    mov x26, #IRQ_STACK_START_SP     //IRQ_STACK_START_SP这是irq mode的栈地址    add x26, x25, x26       /* switch to the irq stack */    mov sp, x26     //将irq栈地址，写入到sp       /*     * Add a dummy stack frame, this non-standard format is fixed up     * by unwind_frame()     */    stp     x29, x19, [sp, #-16]!    mov x29, sp      9998:    .endm`
 
 `/*    * x19 should be preserved between irq_stack_entry and    * irq_stack_exit.    */   .macro irq_stack_exit   mov sp, x19     //x19保存着svc mode下的栈，也就是EL1_SP   .endm   `
 
@@ -59,7 +58,7 @@ Linux kernel在内核线程，或用户线程时都会分配一个page frame，�
 
 linux kernel arm64中定义的irq栈，在内存"首地址"处，大小16k. irq_hander使用irq栈。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "虚线阴影分割线")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "虚线阴影分割线")
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/9sNwsXcN68pL55XIyzTrCHZTbIUdTibQcuzuCaYeGTXNMyn6ACmicUrpoDC0xZSap46XJ59sKysPg9Rg379f32cA/300?wx_fmt=png&wxfrom=19)
 
@@ -71,11 +70,9 @@ linux kernel arm64中定义的irq栈，在内存"首地址"处，大小16k. irq_
 
 公众号
 
-5T技术资源大放送！包括但不限于：C/C++，Arm, Linux，Android，人工智能，单片机，树莓派，等等。在上面的【人人都是极客】公众号内回复「peter」，即可免费获取！！  
+5T技术资源大放送！包括但不限于：C/C++，Arm, Linux，Android，人工智能，单片机，树莓派，等等。在上面的【人人都是极客】公众号内回复「peter」，即可免费获取！！
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) **记得点击****分享****、****赞****和****在看****，给我充点儿电吧**
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) **记得点击****分享****、****赞****和****在看****，给我充点儿电吧**
 
 Linux93
 
@@ -94,45 +91,44 @@ Linux · 目录
 **留言 5**
 
 - 哲思
-    
-    2021年12月31日
-    
-    赞
-    
-    当时钟中断后，调用schedule，这时CPU的指针和栈切换到了新的进程上，那么此时的中断栈呢，这时候中断栈还没有释放。请问这块怎么理解？？
-    
-    人人极客社区
-    
-    作者2021年12月31日
-    
-    赞
-    
-    和架构设计有关，arm64的中断栈留在原地
-    
-    哲思
-    
-    2021年12月31日
-    
-    赞
-    
-    那如果是X86的栈呢？如果栈中还保存着上次的内容，新的中断来后，栈中还有上次的残留，会有影响吧
-    
+
+  2021年12月31日
+
+  赞
+
+  当时钟中断后，调用schedule，这时CPU的指针和栈切换到了新的进程上，那么此时的中断栈呢，这时候中断栈还没有释放。请问这块怎么理解？？
+
+  人人极客社区
+
+  作者2021年12月31日
+
+  赞
+
+  和架构设计有关，arm64的中断栈留在原地
+
+  哲思
+
+  2021年12月31日
+
+  赞
+
+  那如果是X86的栈呢？如果栈中还保存着上次的内容，新的中断来后，栈中还有上次的残留，会有影响吧
+
 - 逸
-    
-    2021年12月5日
-    
-    赞
-    
-    希望可以出一期内核调试的
-    
-    人人极客社区
-    
-    作者2021年12月5日
-    
-    赞
-    
-    之前有出过，可以号里搜索下哈，如果没有的话欢迎提出具体的需求![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月5日
+
+  赞
+
+  希望可以出一期内核调试的
+
+  人人极客社区
+
+  作者2021年12月5日
+
+  赞
+
+  之前有出过，可以号里搜索下哈，如果没有的话欢迎提出具体的需求![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据
 
@@ -151,44 +147,43 @@ Linux · 目录
 **留言 5**
 
 - 哲思
-    
-    2021年12月31日
-    
-    赞
-    
-    当时钟中断后，调用schedule，这时CPU的指针和栈切换到了新的进程上，那么此时的中断栈呢，这时候中断栈还没有释放。请问这块怎么理解？？
-    
-    人人极客社区
-    
-    作者2021年12月31日
-    
-    赞
-    
-    和架构设计有关，arm64的中断栈留在原地
-    
-    哲思
-    
-    2021年12月31日
-    
-    赞
-    
-    那如果是X86的栈呢？如果栈中还保存着上次的内容，新的中断来后，栈中还有上次的残留，会有影响吧
-    
+
+  2021年12月31日
+
+  赞
+
+  当时钟中断后，调用schedule，这时CPU的指针和栈切换到了新的进程上，那么此时的中断栈呢，这时候中断栈还没有释放。请问这块怎么理解？？
+
+  人人极客社区
+
+  作者2021年12月31日
+
+  赞
+
+  和架构设计有关，arm64的中断栈留在原地
+
+  哲思
+
+  2021年12月31日
+
+  赞
+
+  那如果是X86的栈呢？如果栈中还保存着上次的内容，新的中断来后，栈中还有上次的残留，会有影响吧
+
 - 逸
-    
-    2021年12月5日
-    
-    赞
-    
-    希望可以出一期内核调试的
-    
-    人人极客社区
-    
-    作者2021年12月5日
-    
-    赞
-    
-    之前有出过，可以号里搜索下哈，如果没有的话欢迎提出具体的需求![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月5日
+
+  赞
+
+  希望可以出一期内核调试的
+
+  人人极客社区
+
+  作者2021年12月5日
+
+  赞
+
+  之前有出过，可以号里搜索下哈，如果没有的话欢迎提出具体的需求![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据

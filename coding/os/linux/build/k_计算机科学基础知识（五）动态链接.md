@@ -35,7 +35,7 @@ Static Linker（对于本文的场景，它就是arm-linux-ld）接收下面的�
 
 （2）linker script
 
-（3）各种.o文件，这些.o文件有些是你自己的源程序生成的，有些是系统自带的，例如crt*.o
+（3）各种.o文件，这些.o文件有些是你自己的源程序生成的，有些是系统自带的，例如crt\*.o
 
 （4）各种动态库文件。同样的，可以自己生成动态库，也可以是系统自带的，例如c lib。
 
@@ -49,13 +49,13 @@ Static Linker最终生成了一个ELF格式的可执行程序。要把它变成�
 
 我们写一个小程序test.c来访问libfoo.so中的数据（libfoo.so的源代码参考[动态库和位置无关代码](http://www.wowotech.net/basic_subject/pic.html)），代码如下：
 
-> #include <stdio.h>  
-> extern int xxx;  
-> extern int yyy;  
-> int main(char argc, char** argv)  
-> {  
->     foo();  
->     printf("xxx = %x, yyy = %x \n", xxx, yyy);  
+> #include \<stdio.h>\
+> extern int xxx;\
+> extern int yyy;\
+> int main(char argc, char\*\* argv)\
+> {\
+> foo();\
+> printf("xxx = %x, yyy = %x \\n", xxx, yyy);\
 > }
 
 2、运行模块之间的数据访问如何实现？
@@ -73,27 +73,25 @@ Static Linker最终生成了一个ELF格式的可执行程序。要把它变成�
 我们看看在程序中是如何访问xxx符号的：
 
 > 000085cc
-> 
-> :  
-> ……  
->     85e8:    e59f3020     ldr    r3, [pc, #32]    ; 8610 <.text+0xf4>  
->     85ec:    e5932000     ldr    r2, [r3]  
-> ……  
->     8610:    000107ec     .word    0x000107ec  
+>
+> :\
+> ……\
+> 85e8:    e59f3020     ldr    r3, \[pc, #32\]    ; 8610 \<.text+0xf4>\
+> 85ec:    e5932000     ldr    r2, \[r3\]\
+> ……\
+> 8610:    000107ec     .word    0x000107ec\
 > ……
-> 
->   
 
 看起来这段代码和我们想像的有些差距，看起来xxx这个符号被安排在本程序的bss section（0x000107ec这个地址属于bss section），从section table中可以看出来这一点：
 
-> [23] .bss              NOBITS          **000107e8** 0007e8 **00000c** 00  WA  0   0  4
+> \[23\] .bss              NOBITS          **000107e8** 0007e8 **00000c** 00  WA  0   0  4
 
 起始地址是0x107e8开始的长度为0xc的区域属于bss section。我们在上一节中所有美好的想像都崩塌了。难道我们需要对xxx这个符号进行重定位吗？好吧，我们来看看test的重定位信息，在.rel.dyn section中：
 
-> Relocation section '.rel.dyn' at offset 0x478 contains 3 entries:  
-> Offset     Info    Type            Sym.Value  Sym. Name  
-> 000107dc  00001415 R_ARM_GLOB_DAT    00000000   __gmon_start__  
-> 000107e8  00000114 R_ARM_COPY        000107e8   yyy  
+> Relocation section '.rel.dyn' at offset 0x478 contains 3 entries:\
+> Offset     Info    Type            Sym.Value  Sym. Name\
+> 000107dc  00001415 R_ARM_GLOB_DAT    00000000   __gmon_start__\
+> 000107e8  00000114 R_ARM_COPY        000107e8   yyy\
 > **000107ec  00000614 R_ARM_COPY        000107ec   xxx**
 
 R_ARM_COPY这种类型的重定位信息只是用于ELF可执行文件，dynamic linker看到R_ARM_COPY这种类型的重定位信息就知道是在定位动态库中的一个符号，这时候，dynamic linker会copy指定size（动态连接符号表.dynsym中有该符号的size）的动态库中的memory到目标地址（对应xxx这个场景就是0x107ec，也就是bss section中的xxx符号）。copy之后，dynamic linker还会做一件事情，就是把所有访问该符号（包括动态库）的进行重定位，让这些代码使用0x107ec来访问xxx这个符号。在[动态库和位置无关代码](http://www.wowotech.net/basic_subject/pic.html)文档中，我们知道，动态库代码访问xxx变量也是通过GOT进行的，dynamic linker将xxx符号对应的GOT Entry修改成0x107ec即可。
@@ -108,20 +106,20 @@ OK，我们根据实际的观察可以得出结论：动态库中的data segemnt
 
 源代码还是上一章的代码，只不过我们重点关注foo函数的调用。
 
-> ……  
->     85e4:    ebffffc3     bl    84f8 <.text-0x24>  
+> ……\
+> 85e4:    ebffffc3     bl    84f8 \<.text-0x24>\
 > ……
 
 我们知道，bl是PC-relative的，代码执行到这里会跳转到.text-0x24这个位置，这是一个什么样的神秘东东呢？我们看看test的program header就会明白了：
 
-> ……  
->   LOAD           0x000000 0x00008000 0x00008000 0x006c0 0x006c0 R E 0x8000 ------code segment  
->   LOAD           0x0006c0 0x000106c0 0x000106c0 0x00128 0x00134 RW  0x8000------data segment  
+> ……\
+> LOAD           0x000000 0x00008000 0x00008000 0x006c0 0x006c0 R E 0x8000 ------code segment\
+> LOAD           0x0006c0 0x000106c0 0x000106c0 0x00128 0x00134 RW  0x8000------data segment\
 > ……
-> 
-> Code Segment mapping:  
-> …… .rel.dyn .rel.plt .init **.plt .text** .fini .rodata .ARM.exidx .eh_frame   
->    ……
+>
+> Code Segment mapping:\
+> …… .rel.dyn .rel.plt .init **.plt .text** .fini .rodata .ARM.exidx .eh_frame \
+> ……
 
 code segment由若干个section组成，.text-0x24实际上会涉及.text section前面的那个section，也就是.plt。
 
@@ -147,15 +145,15 @@ OK，虽然对于PIC而言，不使用PLT是OK的，但是有开销。想像一�
 
 通过第一节的描述，我们知道，在test程序中，跳转到foo实际上是跳转到foo对应的PLT entry，代码如下：
 
-> 84f4:    ……  
-> 84f8:    e28fc600     add    ip, pc, #0    ; 0x0－－－－－－－－－ip寄存器保存了当前PC值  
-> 84fc:    e28cca08     add    ip, ip, #32768    ; 0x8000  
-> 8500:    e5bcf2d0     ldr    pc, [ip, #720]!－－－－－－－－－－－获取got的地址并跳转到该处  
+> 84f4:    ……\
+> 84f8:    e28fc600     add    ip, pc, #0    ; 0x0－－－－－－－－－ip寄存器保存了当前PC值\
+> 84fc:    e28cca08     add    ip, ip, #32768    ; 0x8000\
+> 8500:    e5bcf2d0     ldr    pc, \[ip, #720\]!－－－－－－－－－－－获取got的地址并跳转到该处\
 > 8504:    ……
 
 上面的代码不是那么直观，我们可以直接计算一下看看：0x84f8处的指令执行之后，ip等于当前的PC值，也就是0x84f8＋8＝0x8500，加上0x8000之后等于0x10500，再加上720（0x2d0）就是0x107d0了，也就是位于.got section：
 
-> [21] .got              PROGBITS        000107bc 0007bc 000024 04  WA  0   0  4
+> \[21\] .got              PROGBITS        000107bc 0007bc 000024 04  WA  0   0  4
 
 我们再来看看foo的重定位信息，位于.rel.plt，.rel.plt section的每一个entry对应一个PLT entry：
 
@@ -164,35 +162,35 @@ OK，虽然对于PIC而言，不使用PLT是OK的，但是有开销。想像一�
 foo符号的PLT entry地址是0x84f8（参考上文），foo符号对应的got entry位于0x107d0，重定位的类型是R_ARM_JUMP_SLOT。到底foo对应的got entry上是什么内容呢？我们来看看：
 
 > Disassembly of section .got:
-> 
-> 000107bc <_global_offset_table_>:  
->     ...  
->    107c8:    000084cc     .word    0x000084cc  
->    107cc:    000084cc     .word    0x000084cc  
->    **107d0:    000084cc     .word    0x000084cc**
+>
+> 000107bc \<_global_offset_table_>:\
+> ...\
+> 107c8:    000084cc     .word    0x000084cc\
+> 107cc:    000084cc     .word    0x000084cc\
+> **107d0:    000084cc     .word    0x000084cc**
 
 因此，实际上，通过PLT和GOT的协助，程序最终跳转到0x000084cc执行。而通过section table：
 
-> [11] .plt              PROGBITS        000084cc 0004cc 000050 04  AX  0   0  4
+> \[11\] .plt              PROGBITS        000084cc 0004cc 000050 04  AX  0   0  4
 
 我们可以看出，跳转到0x000084cc实际上是跳转到了PLT section的第一个entry。走了一大圈，又回到了原地，不着急，我们继续看代码：
 
-> 000084cc <.plt>:  
->     84cc:    e52de004     str    lr, [sp, #-4]!－－－－－－－－－－－－－－－－将lr压入栈  
->     84d0:    e59fe004     ldr    lr, [pc, #4]    ; 84dc <.plt+0x10>－－－－－－－将0x000082e0赋值给lr  
->     84d4:    e08fe00e     add    lr, pc, lr  
->     84d8:    e5bef008     ldr    pc, [lr, #8]!－－－－－－－－－－－－－－－－跳转到GOT[2]  
->     84dc:    000082e0     .word    0x000082e0  
->     84e0:    ……
+> 000084cc \<.plt>:\
+> 84cc:    e52de004     str    lr, \[sp, #-4\]!－－－－－－－－－－－－－－－－将lr压入栈\
+> 84d0:    e59fe004     ldr    lr, \[pc, #4\]    ; 84dc \<.plt+0x10>－－－－－－－将0x000082e0赋值给lr\
+> 84d4:    e08fe00e     add    lr, pc, lr\
+> 84d8:    e5bef008     ldr    pc, \[lr, #8\]!－－－－－－－－－－－－－－－－跳转到GOT\[2\]\
+> 84dc:    000082e0     .word    0x000082e0\
+> 84e0:    ……
 
-看起来代码没有那么直观，我们还是照旧，直接计算。0x84d4地址的指令执行后lr = 0x000082e0 + 0x84d4 + 8 = 0x107BC，实际上就是.got的首地址，.got section的entry size是4，因此，0x84d8处的指令实际上就是跳转到GOT[2]处的指令执行。GOT的前三个entry是特殊的entry，GOT[0]是.dynamic segment的地址，dynamic linker需要这个信息进行动态符号定位（例如：找到动态符号表和重定位信息）。GOT[1]中保存的是识别本模块的信息。GOT[2]中保存了dynamic linker的入口函数地址。
+看起来代码没有那么直观，我们还是照旧，直接计算。0x84d4地址的指令执行后lr = 0x000082e0 + 0x84d4 + 8 = 0x107BC，实际上就是.got的首地址，.got section的entry size是4，因此，0x84d8处的指令实际上就是跳转到GOT\[2\]处的指令执行。GOT的前三个entry是特殊的entry，GOT\[0\]是.dynamic segment的地址，dynamic linker需要这个信息进行动态符号定位（例如：找到动态符号表和重定位信息）。GOT\[1\]中保存的是识别本模块的信息。GOT\[2\]中保存了dynamic linker的入口函数地址。
 
-实际上，在静态链接阶段，我们是无法确定dynamic linker的入口函数地址的，这时候，static linker只能是填写全0值，在内核完成将dynamic linker mapping到进程地址空间之后，才能确定该地址，从而写入GOT[2]。因此，第一次访问foo符号，实际进入了dynamic linker的代码执行，这时候dynamic linker当然就是解析出foo的符号地址（这时候，libfoo.so已经loading了），并且把foo的最终的运行地址写入foo对应的GOT entry（也就是0x107d0，初始化的时候被设定成.plt的首地址0x000084cc，以便去往dynamic linker）。这样，第二次访问foo的时候就可以直接去到实际的foo函数，而不必让dynamic linker对它进行relocation了。这么做，也就是实现了传说中的lazy binding。和lazy binding相反的是eager binding，也就是说在进入到程序的第一条指令执行前，所有的没有重定位的符号（主程序以及各个动态库）都先由dynamic linker扫描一遍，找到其运行地址并写入GOT，也就是说，当程序开始执行的时候，所有的符号都已经绑定了最后的running address。和eager binding不同，lazy binding那是相当懒惰，只有在程序执行到该函数的时候，才会调用dynamic linker来重定位该符号。我们知道，其实程序中很多代码都是出错处理，很可能整个进程生命期结束了都不会调用到那些代码，既然如此，为何还需要在一开始就对那些符号进行重定位呢？这不是让dynamic linker瞎费功夫嘛，这也是lazy binding存在的意义。
+实际上，在静态链接阶段，我们是无法确定dynamic linker的入口函数地址的，这时候，static linker只能是填写全0值，在内核完成将dynamic linker mapping到进程地址空间之后，才能确定该地址，从而写入GOT\[2\]。因此，第一次访问foo符号，实际进入了dynamic linker的代码执行，这时候dynamic linker当然就是解析出foo的符号地址（这时候，libfoo.so已经loading了），并且把foo的最终的运行地址写入foo对应的GOT entry（也就是0x107d0，初始化的时候被设定成.plt的首地址0x000084cc，以便去往dynamic linker）。这样，第二次访问foo的时候就可以直接去到实际的foo函数，而不必让dynamic linker对它进行relocation了。这么做，也就是实现了传说中的lazy binding。和lazy binding相反的是eager binding，也就是说在进入到程序的第一条指令执行前，所有的没有重定位的符号（主程序以及各个动态库）都先由dynamic linker扫描一遍，找到其运行地址并写入GOT，也就是说，当程序开始执行的时候，所有的符号都已经绑定了最后的running address。和eager binding不同，lazy binding那是相当懒惰，只有在程序执行到该函数的时候，才会调用dynamic linker来重定位该符号。我们知道，其实程序中很多代码都是出错处理，很可能整个进程生命期结束了都不会调用到那些代码，既然如此，为何还需要在一开始就对那些符号进行重定位呢？这不是让dynamic linker瞎费功夫嘛，这也是lazy binding存在的意义。
 
 _原创文章，转发请注明出处。蜗窝科技_
 
-_[http://www.wowotech.net/basic_subject/dynamic-link.html](http://www.wowotech.net/basic_subject/dynamic-link.html)  
-_
+\_[http://www.wowotech.net/basic_subject/dynamic-link.html](http://www.wowotech.net/basic_subject/dynamic-link.html)\
+\_
 
 标签: [dynamic](http://www.wowotech.net/tag/dynamic) [link](http://www.wowotech.net/tag/link) [动态链接](http://www.wowotech.net/tag/%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5)
 
@@ -202,14 +200,14 @@ _
 
 **评论：**
 
-**leon_unique**  
+**leon_unique**\
 2019-08-08 14:10
 
 想请教下驱动模块在加载至系统中时，模块内部各sections在内存中是如何布局的？例如，A.ko模块内部有4个text段，分别为.text，.unlikely.text，.init.text，.exit.text，这四个代码段的长度均超过0x10000。A.ko在内存中的装载地址为0xffffff8000b58000，当由于直接或间接的原因导致内核panic时，调用栈中的某一地址为0xffffff8000b58ff0，在不结合代码及上下文的情况下如何定位该地址落在哪一个text段中？
 
 [回复](http://www.wowotech.net/basic_subject/dynamic-link.html#comment-7578)
 
-**leon_unique**  
+**leon_unique**\
 2019-08-10 18:11
 
 @leon_unique：Fixed, 参考kernel/module.c
@@ -218,152 +216,155 @@ _
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [zRAM内存压缩技术原理与应用](http://www.wowotech.net/memory_management/zram.html)
-    - [ARM64的启动过程之（五）：UEFI](http://www.wowotech.net/armv8a_arch/UEFI.html)
-    - [DRAM 原理 4 ：DRAM Timing](http://www.wowotech.net/basic_tech/330.html)
-    - [页面回收的基本概念](http://www.wowotech.net/memory_management/page_reclaim_basic.html)
-    - [X-005-UBOOT-device tree移植(Bubblegum-96平台)](http://www.wowotech.net/x_project/bubblegum_uboot_device_tree.html)
+
+  - [zRAM内存压缩技术原理与应用](http://www.wowotech.net/memory_management/zram.html)
+  - [ARM64的启动过程之（五）：UEFI](http://www.wowotech.net/armv8a_arch/UEFI.html)
+  - [DRAM 原理 4 ：DRAM Timing](http://www.wowotech.net/basic_tech/330.html)
+  - [页面回收的基本概念](http://www.wowotech.net/memory_management/page_reclaim_basic.html)
+  - [X-005-UBOOT-device tree移植(Bubblegum-96平台)](http://www.wowotech.net/x_project/bubblegum_uboot_device_tree.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

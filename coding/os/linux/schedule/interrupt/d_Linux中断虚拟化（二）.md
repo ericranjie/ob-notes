@@ -159,6 +159,7 @@ break;
 }
 
 当Guest内核的块设备驱动发出I/O通知VIRTIO_PCI_QUEUE_NOTIFY时，将触发CPU从Guest模式切换到Host模式，KVM中的块模拟设备开始I/O操作，比如访问保存Guest文件系统的镜像文件。virtio blk这个提交，块设备的I/O处理是同步的，也就是说，一直要等到文件操作完成，才会向Guest发送中断，返回Guest。当然同步阻塞在这里是不合理的，而是应该马上返回Guest，这样Guest可以执行其他的任务，虚拟设备完成I/O操作后，再通知Guest，这是kvmtool初期的实现，后来已经改进为异步的方式。代码中在一个while循环处理完设备驱动的I/O请求后，调用了函数kvm\_\_irq_line，irq_line对应8259A的管脚IR0~7，其代码如下：
+
 ```cpp
 ﻿commit 4155ba8cda055b7831489e4c4a412b073493115b
 kvm: Fix virtio block device support some more
@@ -177,7 +178,9 @@ if(ioctl(self->vm_fd, KVM_IRQ_LINE, &irq_level) \< 0)
 die_perror("KVM_IRQ_LINE failed");
 }
 ```
+
 函数kvm\_\_irq_line将irq number和管脚电平信息，这里是1，表示拉高电平了，封装到结构体kvm_irq_level中，传递给内核中的KVM模块：
+
 ```cpp
 ﻿﻿commit 85f455f7ddbed403b34b4d54b1eaf0e14126a126
 KVM: Add support for in-kernel PIC emulation
@@ -195,6 +198,7 @@ break;
 …
 }
 ```
+
 KVM模块将kvmtool中组织的中断信息从用户空间复制到内核空间中，然后调用虚拟8259A的模块中提供的API kvm_pic_set_irq，向8259A发出中断请求。
 
 ### **2 记录中断到IRR**
@@ -202,6 +206,7 @@ KVM模块将kvmtool中组织的中断信息从用户空间复制到内核空间�
 中断处理需要一个过程，从外设发出请求，一直到ISR处理完成发出EOI。而且可能中断来了并不能马上处理，或者之前已经累加了一些中断，大家需要排队依次请求CPU处理，等等，因此，需要一些寄存器来记录这些状态。当外设中断请求到来时，8259A首先需要将他们记录下来，这个寄存器就是IRR(Interrupt Request Register)，8259A用他来记录有哪些pending的中断需要处理。
 
 当KVM模块收到外设的请求，调用虚拟8259A的API kvm_pic_set_irq是，其第1件事就是将中断记录到IRR寄存器中：
+
 ```cpp
 ﻿commit 85f455f7ddbed403b34b4d54b1eaf0e14126a126
 KVM: Add support for in-kernel PIC emulation
@@ -228,6 +233,7 @@ s->last_irr |= mask;
 s->last_irr &= ~mask;
 }
 ```
+
 信号有边缘触发和水平触发，在物理上可以理解为，8329A在前一个周期检测到管脚信号是0，当前周前检测到管脚信号是1，如果是上升沿触发模式，那么8259A就认为外设有请求了，这种触发模式就是边缘触发。对于水平触发，以高电平触发为例，当8259A检测到管脚处于高电平，则认为外设来请求了。
 
 在虚拟8259A的结构体kvm_kpic_state中，寄存器elcr就是用来记录8259A被设置的触发模式的。参数level即相当于硬件层面的电信号，0表示低电平，1表示高电平。以边缘触发为例，当管脚收到一个低电平时，即level的值为0，代码进入else分支，结构体kvm_kpic_state中的字段last_irr中会清除该IRQ对应IRR的位，即相当于设置该中断管脚为低电平状态。当管脚收到高电平时，即level的值为1，代码进入if分支，此时8259A将判断之前该管脚的状态，也就是判断结构体kvm_kpic_state中的字段last_irr中该IRQ对应IRR的位，如果为低电平，那么则认为中断源有中断请求，将其记录到IRR中。当然，同时需要在字段last_irr记录下当前该管脚的状态。

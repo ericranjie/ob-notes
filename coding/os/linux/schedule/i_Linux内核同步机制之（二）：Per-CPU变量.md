@@ -5,9 +5,11 @@
 ## 1、lock bus带来的性能问题
 
 在ARM平台上，ARMv6之前，SWP和SWPB指令被用来支持对shared memory的访问：
+
 ```cpp
 SWP <Rt>, <Rt2>, \[<Rn>\]
 ```
+
 Rn中保存了SWP指令要操作的内存地址，通过该指令可以将Rn指定的内存数据加载到Rt寄存器，同时将Rt2寄存器中的数值保存到Rn指定的内存中去。
 
 我们在[原子操作](http://www.wowotech.net/linux_kenrel/atomic.html)那篇文档中描述的read-modify-write的问题本质上是一个保持对内存read和write访问的原子性的问题。也就是说对内存的读和写的访问不能被打断。对该问题的解决可以通过硬件、软件或者软硬件结合的方法来进行。早期的ARM CPU给出的方案就是依赖硬件：SWP这个汇编指令执行了一次读内存操作、一次写内存操作，但是从程序员的角度看，SWP这条指令就是原子的，读写之间不会被任何的异步事件打断。具体底层的硬件是如何做的呢？这时候，硬件会提供一个lock signal，在进行memory操作的时候设定lock信号，告诉总线这是一个不可被中断的内存访问，直到完成了SWP需要进行的两次内存访问之后再clear lock信号。
@@ -103,12 +105,15 @@ type就是变量的类型，name是per cpu变量符号。DEFINE_PER_CPU_SECTION�
 （3）arch-specific。这是和硬件相关的接口，在arch/arm/include/asm/percpu.h，定义了ARM平台中，具体和per cpu相关的接口代码。
 
 我们回到正题，看看\_\_PCPU_ATTRS的定义：
+
 ```cpp
 define \_\_PCPU_ATTRS(sec)                        \\
 \_\_percpu attribute((section(PER_CPU_BASE_SECTION sec)))    \\
 PER_CPU_ATTRIBUTES
 ```
+
 PER_CPU_BASE_SECTION 定义了基础的section name symbol，定义如下：
+
 ```cpp
 ifndef PER_CPU_BASE_SECTION\
 ifdef CONFIG_SMP\
@@ -118,6 +123,7 @@ define PER_CPU_BASE_SECTION ".data"\
 endif\
 endif
 ```
+
 虽然有各种各样的静态Per-CPU变量定义方法，但是都是类似的，只不过是放在不同的section中，属性不同而已，这里就不看其他的实现了，直接给出section的安排：
 
 （1）普通per cpu变量的section安排
@@ -175,6 +181,7 @@ endif
 [![percpu](http://www.wowotech.net/content/uploadfile/201410/8d9ace9500fce839a185e4567a9c3de420141016031726.gif "percpu")](http://www.wowotech.net/content/uploadfile/201410/1fe906ab8a54768c668f4ea25eed3ab620141016031724.gif)
 
 内存管理子系统会根据当前的内存配置为每一个CPU分配一大块memory，对于UMA，这个memory也是位于main memory，对于NUMA，有可能是分配最靠近该CPU的memory（也就是说该cpu访问这段内存最快），但无论如何，这些都是内存管理子系统需要考虑的。无论静态还是动态per cpu变量的分配，其机制都是一样的，只不过，对于静态per cpu变量，需要在系统初始化的时候，对应per cpu section，预先动态分配一个同样size的per cpu chunk。在vmlinux.lds.h文件中，定义了percpu section的排列情况：
+
 ```cpp
 define PERCPU_INPUT(cacheline)                        \\
 VMLINUX_SYMBOL(\_\_per_cpu_start) = .;                \\
@@ -188,6 +195,7 @@ VMLINUX_SYMBOL(\_\_per_cpu_start) = .;                \\
 \*(.data..percpu..shared_aligned)                \\
 VMLINUX_SYMBOL(\_\_per_cpu_end) = .;
 ```
+
 对于build in内核的那些per cpu变量，必然位于\_\_per_cpu_start和\_\_per_cpu_end之间的per cpu section。在系统初始化的时候（setup_per_cpu_areas），分配per cpu memory chunk，并将per cpu section copy到每一个chunk中。
 
 2、访问静态定义的per cpu变量

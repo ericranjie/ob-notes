@@ -31,11 +31,11 @@ TTY是TeleTYpe的缩写，直译成中文就是电传打字机。我们都熟悉
 虚拟终端的主设备号是4，字符设备，前64个设备是虚拟控制台设备，具体的次设备号分配如下：
 
 > 4 char    TTY devices
-> 
->          0 = /dev/tty0        Current virtual console  
->           1 = /dev/tty1        First virtual console  
->             ...  
->          63 = /dev/tty63          63rd virtual console
+>
+> 0 = /dev/tty0        Current virtual console\
+> 1 = /dev/tty1        First virtual console\
+> ...\
+> 63 = /dev/tty63          63rd virtual console
 
 虽然内核支持了64个Virtual terminal设备，但是具体整个系统是否支持还是要看配置。一般而言，GNU/linux操作系统在启动的时候支持6个虚拟终端（使用tty1～tty6）。次设备号等于0的tty设备比较特殊，代表当前的虚拟控制台。如果不启动GUI系统，那么缺省tty0指向tty1，之后可以根据用户的动作进行切换，但是无论如何，tty0指向了当前的Virtual terminal。
 
@@ -51,7 +51,7 @@ TTY是TeleTYpe的缩写，直译成中文就是电传打字机。我们都熟悉
 
 可以通过kernel启动的command line来设定系统控制台，例如：
 
-> root=/dev/mtdblock0 console=ttyS2,115200 mem=64M  
+> root=/dev/mtdblock0 console=ttyS2,115200 mem=64M
 
 通过这样的设置可以选择串口设备做为系统控制台。
 
@@ -69,20 +69,19 @@ TTY是TeleTYpe的缩写，直译成中文就是电传打字机。我们都熟悉
 
 串口终端好象没有什么好说的，大家都熟悉的很，这里就顺便说一下串口终端的设备节点吧，如下：
 
->   
-> 主设备号是4的字符设备是TTY devices，虚拟终端占据了0～63的minor设备号，之后的minor是串口设备使用  
->          64 = /dev/ttyS0         First UART serial port  
->             ...  
->         255 = /dev/ttyS191    192nd UART serial port
-> 
-> USB串口终端的主设备号是188的字符设备，这是主机侧的USB serial converters devices，具体如下：  
->           0 = /dev/ttyUSB0    First USB serial converter  
->           1 = /dev/ttyUSB1    Second USB serial converter  
->             ...  
-> 主设备号是127的字符设备是gadget侧的USB serial devices，具体如下：  
-> 0 = /dev/ttyGS0      First USB serial converter  
->           1 = /dev/ttyGS1     Second USB serial converter  
->             ...
+> 主设备号是4的字符设备是TTY devices，虚拟终端占据了0～63的minor设备号，之后的minor是串口设备使用\
+> 64 = /dev/ttyS0         First UART serial port\
+> ...\
+> 255 = /dev/ttyS191    192nd UART serial port
+>
+> USB串口终端的主设备号是188的字符设备，这是主机侧的USB serial converters devices，具体如下：\
+> 0 = /dev/ttyUSB0    First USB serial converter\
+> 1 = /dev/ttyUSB1    Second USB serial converter\
+> ...\
+> 主设备号是127的字符设备是gadget侧的USB serial devices，具体如下：\
+> 0 = /dev/ttyGS0      First USB serial converter\
+> 1 = /dev/ttyGS1     Second USB serial converter\
+> ...
 
 三、进程管理中和终端相关的概念
 
@@ -96,11 +95,11 @@ TTY是TeleTYpe的缩写，直译成中文就是电传打字机。我们都熟悉
 
 对于系统工程师，我们更关注command line类型的shell。在系统的启动过程中，init进程会根据/etc/inittab中的设定进行系统初始化（这里还是说的传统的系统启动过程，如果使用systemd那么启动过程将会不一样，但是概念类似），和tty相关的内容包括：
 
-> 1:2345:respawn:/sbin/getty 38400 tty1  
-> 2:23:respawn:/sbin/getty 38400 tty2  
-> 3:23:respawn:/sbin/getty 38400 tty3  
-> 4:23:respawn:/sbin/getty 38400 tty4  
-> 5:23:respawn:/sbin/getty 38400 tty5  
+> 1:2345:respawn:/sbin/getty 38400 tty1\
+> 2:23:respawn:/sbin/getty 38400 tty2\
+> 3:23:respawn:/sbin/getty 38400 tty3\
+> 4:23:respawn:/sbin/getty 38400 tty4\
+> 5:23:respawn:/sbin/getty 38400 tty5\
 > 6:23:respawn:/sbin/getty 38400 tty6
 
 init进程会创建6个getty进程，这六个getty进程会分别监听在tty1～tty6这六个虚拟终端上，等待用户登录。用户登录之后会根据用户的配置文件（/etc/passwd）启动指定shell程序（例如/bin/bash）。因此，shell其实就是一个命令解析器，运行在拥有计算资源的一侧，通过tty驱动和对端tty设备（可能是物理的终端设备，也可能是模拟的）进行交互。
@@ -137,7 +136,7 @@ init进程会创建6个getty进程，这六个getty进程会分别监听在tty1�
 
 a) Suspend key（缺省control-Z），对应SIGTSTP信号
 
-b) Quit key（缺省control-\），对应SIGQUIT信号
+b) Quit key（缺省control-\\），对应SIGQUIT信号
 
 c) Interrupt key（缺省control-C），对应SIGINT信号，
 
@@ -155,7 +154,7 @@ c) Interrupt key（缺省control-C），对应SIGINT信号，
 
 通过上面的描述，很多工程师可能认为Shell可以同时运行一个前台进程和任意多个后台进程，其实不然，shell其实是以进程组（也就是Job了）来控制前台和后台的。我们给一个具体的例子：用户通过终端输入的一组命令行，命令之间通过管道连接，这些命令将会形成一个进程组，例如下面的命令：
 
-> $ proc1 | proc2 &  
+> $ proc1 | proc2 &\
 > $ proc3 | proc4 | proc5
 
 对于第一行命令，shell创建了一个新的后台进程组，同时会创建两个进程proc1和proc2，并把这两个进程放入那个新创建的后台进程组（不能访问终端）。执行第二行命令的时候，shell创建了proc3、proc4和proc5三个进程，并把这三个进程加入shell新创建的前台进程组（可以访问终端）。
@@ -259,131 +258,136 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [Linux TTY framework(5)_System console driver](http://www.wowotech.net/tty_framework/system_console_driver.html) | [Linux TTY framework(4)_TTY driver](http://www.wowotech.net/tty_framework/tty_driver.html)»
+« [Linux TTY framework(5)\_System console driver](http://www.wowotech.net/tty_framework/system_console_driver.html) | [Linux TTY framework(4)\_TTY driver](http://www.wowotech.net/tty_framework/tty_driver.html)»
 
 **评论：**
 
-**motou**  
+**motou**\
 2016-12-14 15:18
 
-有两个问题：  
-1. “比如说shell程序属于进程组A，当用户输入aaa程序启动一个新进程的时候（是shell创建了该进程，没有&符号，是前台进程），aaa进程则归属与进程组A（和shell程序属于同一个进程组）。”这个和后面的描述有冲突吧？后面描述的又是aaa新创建了新一个aaa的进程组。  
-2. ps –eo stat,comm,sid,pid,pgid,tty | grep tty | more & 这个需要fg才能输出。但是如果命令是ps –eo stat,comm,sid,pid,pgid,tty |ｇｒｅｐ tty &. 终端还是正常输出，more在这里面起了个什么作用。
+有两个问题：
+
+1. “比如说shell程序属于进程组A，当用户输入aaa程序启动一个新进程的时候（是shell创建了该进程，没有&符号，是前台进程），aaa进程则归属与进程组A（和shell程序属于同一个进程组）。”这个和后面的描述有冲突吧？后面描述的又是aaa新创建了新一个aaa的进程组。
+1. ps –eo stat,comm,sid,pid,pgid,tty | grep tty | more & 这个需要fg才能输出。但是如果命令是ps –eo stat,comm,sid,pid,pgid,tty |ｇｒｅｐ tty &. 终端还是正常输出，more在这里面起了个什么作用。
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-5020)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-12-15 10:27
 
-@motou：1、多谢指正，哈哈，有些文字是一年多前写的，自己没有仔细检查。没有&符号，shell也是创建新的进程组，只不过自己隐居幕后，待前台进程组执行完毕，自己则再度出山。  
-2、我自己也试了一下，的确是这样的，很有意思的。使用  
-ps –eo stat,comm,sid,pid,pgid,tty | grep tty | more &  
-这个命令的时候，ps、grep和more进程都进入stop状态，而使用  
-ps –eo stat,comm,sid,pid,pgid,tty | grep tty  &  
-这个命令的时候，ps和grep并没有进入stop状态。  
-  
-当然，这和后台进程组对终端写入的配置有关，两种可能的配置是：  
-（1）后台进程组可以向终端输出  
-（2）前台进程组可以输出，但是后台进程组不可以。如果发生了后台进程组对终端的写访问动作，终端驱动将发送SIGTOUT信号给相应的后台进程组，这将导致后台进程组进入stop状态。  
-  
+@motou：1、多谢指正，哈哈，有些文字是一年多前写的，自己没有仔细检查。没有&符号，shell也是创建新的进程组，只不过自己隐居幕后，待前台进程组执行完毕，自己则再度出山。\
+2、我自己也试了一下，的确是这样的，很有意思的。使用\
+ps –eo stat,comm,sid,pid,pgid,tty | grep tty | more &\
+这个命令的时候，ps、grep和more进程都进入stop状态，而使用\
+ps –eo stat,comm,sid,pid,pgid,tty | grep tty  &\
+这个命令的时候，ps和grep并没有进入stop状态。
+
+当然，这和后台进程组对终端写入的配置有关，两种可能的配置是：\
+（1）后台进程组可以向终端输出\
+（2）前台进程组可以输出，但是后台进程组不可以。如果发生了后台进程组对终端的写访问动作，终端驱动将发送SIGTOUT信号给相应的后台进程组，这将导致后台进程组进入stop状态。
+
 我思考的方向是这样的，有时间的话可以去查看一些这些程序的代码。
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-5024)
 
-**motou**  
+**motou**\
 2016-12-15 13:45
 
-@linuxer：你的文章很不错，很羡慕你这么有恒心把东西总结写出来，并分享给大家。我也受益匪浅，也帮我把很多平时零散的东西归类重新学习了一下。  
+@linuxer：你的文章很不错，很羡慕你这么有恒心把东西总结写出来，并分享给大家。我也受益匪浅，也帮我把很多平时零散的东西归类重新学习了一下。\
 对于第二个问题，我的理解是后台进程组是可以向终端输出的，但是不能输入。因为我们平时执行后台程序，他们的log信息都可以显示出来的。根子可能在more，因为more是要与终端交互的，因为不能输入，而把整个进程组挂起。我想知道怎么知道进程组收到哪个信号了？怎么知道后台进程组收到的是SIGTOUT信号？我看到的是SIGCONT。
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-5025)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-12-15 16:40
 
-@motou：这个问题的回答是需要去阅读more的源代码的，本来比较懒，想让你去看看代码，呵呵～～～算了，还是自己看看代码吧，哈哈，工程师的天性如此，对于疑问不解决就不舒服。  
-  
-正如我前面所说，后台进程组可以设定为允许向终端输出，也可以禁止（发SIGTOUT信号)，具体如何设定可以通过stty -a命令来看，如果看到的是-tostop，那么允许后台进程组访问终端，这时候允许ls &，ls进程仍然能够立刻执行，输出到终端，然后正常结束，不会进入stop状态。  
-  
-如果运行stty tostop这个命令来禁止后台进程组写终端，同样运行ls &，这时候，ls进程不会输出，而是进入stop状态。  
-  
-同样的实验可以在more上进行。例如进入linux的源代码目录，运行more Makefile &。这时候，无论如何，more进程都会进入stop状态，就好象对当前终端的设定没有任何的作用。  
-  
-带着这个疑问，我下载了util-linux 2.25.2（我计算机上做实验的版本）并阅读了more的源代码，代码片段如下：  
-－－－－－－－－－－－－－－－－－－－  
-            int tgrp;  
-            /* Wait until we're in the foreground before we  
-             * save the terminal modes. */  
-            if ((tgrp = tcgetpgrp(fileno(stdout))) < 0) {  
-                perror("tcgetpgrp");  
-                exit(EXIT_FAILURE);  
-            }  
-            if (tgrp != getpgrp(0)) {  
-                kill(0, SIGTTOU);  
-                goto retry;  
-            }  
-－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－  
-  
+@motou：这个问题的回答是需要去阅读more的源代码的，本来比较懒，想让你去看看代码，呵呵～～～算了，还是自己看看代码吧，哈哈，工程师的天性如此，对于疑问不解决就不舒服。
+
+正如我前面所说，后台进程组可以设定为允许向终端输出，也可以禁止（发SIGTOUT信号)，具体如何设定可以通过stty -a命令来看，如果看到的是-tostop，那么允许后台进程组访问终端，这时候允许ls &，ls进程仍然能够立刻执行，输出到终端，然后正常结束，不会进入stop状态。
+
+如果运行stty tostop这个命令来禁止后台进程组写终端，同样运行ls &，这时候，ls进程不会输出，而是进入stop状态。
+
+同样的实验可以在more上进行。例如进入linux的源代码目录，运行more Makefile &。这时候，无论如何，more进程都会进入stop状态，就好象对当前终端的设定没有任何的作用。
+
+带着这个疑问，我下载了util-linux 2.25.2（我计算机上做实验的版本）并阅读了more的源代码，代码片段如下：\
+－－－－－－－－－－－－－－－－－－－\
+int tgrp;\
+/\* Wait until we're in the foreground before we\
+\* save the terminal modes. \*/\
+if ((tgrp = tcgetpgrp(fileno(stdout))) \< 0) {\
+perror("tcgetpgrp");\
+exit(EXIT_FAILURE);\
+}\
+if (tgrp != getpgrp(0)) {\
+kill(0, SIGTTOU);\
+goto retry;\
+}\
+－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－
+
 从代码可知，more程序在操作终端之前就自己判断是否是前台进程组，如果不是那么手动发送SIGTTOU信号，一切终于可以大白了。
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-5026)
 
-**motou**  
+**motou**\
 2016-12-15 20:07
 
 @linuxer：非常感谢，茅塞顿开。
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-5029)
 
-**[electrlife](http://www.wowotech.net/)**  
+**[electrlife](http://www.wowotech.net/)**\
 2016-11-17 14:39
 
-再次拜读了一遍，有一些疑问：  
-  
-1、可以支持single user mode进行登录  
-什么是single user mode，不太了解  
-  
-2、接收来自内核的日志信息和告警信息  
-我的理解kernel的log是存放在ring buffer中，应用klogd和其它的一些logs应用来负责其输出到哪里。终端或是console能否显示kernel的log为何是由终端的类型来定的（如，console可以显示）？  
-  
-3、为何process group leader不能调用setsid来创建session呢？  
+再次拜读了一遍，有一些疑问：
+
+1、可以支持single user mode进行登录\
+什么是single user mode，不太了解
+
+2、接收来自内核的日志信息和告警信息\
+我的理解kernel的log是存放在ring buffer中，应用klogd和其它的一些logs应用来负责其输出到哪里。终端或是console能否显示kernel的log为何是由终端的类型来定的（如，console可以显示）？
+
+3、为何process group leader不能调用setsid来创建session呢？\
 对于这个的解释，还是不太理解？
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-4883)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-18 09:32
 
-@electrlife：1、当丢失了root口令需要通过single user mode登录进行恢复，其实就是Runlevel 1，在我们的inittab文件可以看出一点端倪：  
-# Runlevel 0 is halt.  
-# Runlevel 1 is single-user.  
-# Runlevels 2-5 are multi-user.  
-# Runlevel 6 is reboot.  
-  
-2、你的描述也对，内核的日志（通过printk输出日志）的确是放到一个buffer中，并且在适当的时机进行下面的动作：  
-（1）通知用户空间的klogd和syslogd进行处理  
-（2）遍历系统中注册的console driver，把buffer中的数据写入console driver  
-  
+@electrlife：1、当丢失了root口令需要通过single user mode登录进行恢复，其实就是Runlevel 1，在我们的inittab文件可以看出一点端倪：
+
+# Runlevel 0 is halt.
+
+# Runlevel 1 is single-user.
+
+# Runlevels 2-5 are multi-user.
+
+# Runlevel 6 is reboot.
+
+2、你的描述也对，内核的日志（通过printk输出日志）的确是放到一个buffer中，并且在适当的时机进行下面的动作：\
+（1）通知用户空间的klogd和syslogd进行处理\
+（2）遍历系统中注册的console driver，把buffer中的数据写入console driver
+
 3、process group leader调用setsid来创建session，而创建session的同时也就创建了一个进程组，该进程组的ID就是process group leader的进程ID（我们称之A），而在旧的session中也同样存在同样的ID是A的进程组，这样进程组A的所有进程并不是在一个session中，而是分布在两个session中。
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-4890)
 
-**[electrlife](http://www.wowotech.net/)**  
+**[electrlife](http://www.wowotech.net/)**\
 2016-11-10 12:00
 
 这篇文章太好了，串起了先前的所有疑惑，但还是有点模糊的感觉！如果能结合linux代码就完美了！
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-4859)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-10 19:03
 
-@electrlife：其实在写这份文档的时候就规划了一个叫做内核代码实现的章节，后来删除了，有时间我整理一下，形成一篇《进程管理和终端驱动：内核代码实现》。  
+@electrlife：其实在写这份文档的时候就规划了一个叫做内核代码实现的章节，后来删除了，有时间我整理一下，形成一篇《进程管理和终端驱动：内核代码实现》。\
 其实不同的人有不同的需求，刚开始的工程师喜欢代码情景分析这样的文档，可以手把手的告诉你一切细节，其实随着经验的增加，你渐渐会更喜欢概念性的、框架性的文档，呵呵～～
 
 [回复](http://www.wowotech.net/process_management/process-tty-basic.html#comment-4863)
 
-**西人**  
+**西人**\
 2016-11-01 10:19
 
 昨天还在问进程组的问题，今天就有新文章出来了，好及时啊，哈哈
@@ -392,152 +396,155 @@ ps –eo stat,comm,sid,pid,pgid,tty | grep tty  &
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [futex基础问答](http://www.wowotech.net/kernel_synchronization/futex.html)
-    - [CFS调度器（3）-组调度](http://www.wowotech.net/process_management/449.html)
-    - [Linux电源管理(10)_autosleep](http://www.wowotech.net/pm_subsystem/autosleep.html)
-    - [kobject在字符设备中的使用](http://www.wowotech.net/116.html)
-    - [文件缓存回写简述](http://www.wowotech.net/memory_management/327.html)
+
+  - [futex基础问答](http://www.wowotech.net/kernel_synchronization/futex.html)
+  - [CFS调度器（3）-组调度](http://www.wowotech.net/process_management/449.html)
+  - [Linux电源管理(10)\_autosleep](http://www.wowotech.net/pm_subsystem/autosleep.html)
+  - [kobject在字符设备中的使用](http://www.wowotech.net/116.html)
+  - [文件缓存回写简述](http://www.wowotech.net/memory_management/327.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

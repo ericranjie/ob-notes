@@ -1,7 +1,6 @@
-
 闻茂泉 深入浅出BPF
 
- _2024年03月18日 12:09_ _上海_
+_2024年03月18日 12:09_ _上海_
 
 **01** **欲穷千里目，更上一层楼**
 
@@ -27,20 +26,19 @@ $ cat ./source/tools/lib/bpf/Makefile
 
 主流的C语言实现的eBPF编程方案，大体上就是以下三种，笔者总共将其归纳为3代。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 除了经典的C语言编程方案，一些编程框架还选择使用Python语言，Go语言，或者Rust语言作为用户态加载的实现语言。
 
 **尽管libbpf-bootstrap骨架C语言方案、基于libbpfgo库的go语言方案等已经被大家广泛使用和接受。但笔者认为基于原生libbpf库的eBPF编程方案仍然具备很多独特的优势。以下是原生libbpf库eBPF编程方案的一些独特优势：**
 
 1. **更深的控制和灵活性**：直接使用原生libbpf 库的方案意味着可以与更底层交互，实现更多的控制，定制加载和管理 eBPF 程序和 maps 过程，满足更复杂的需求。
-    
-2. **更好的学习和理解**：libbpf-bootstrap封装抽象屏蔽了很多细节，直接使用原生libbpf可以对 eBPF 子系统有更深入的理解，有利于开发者对 eBPF 内部工作原理的理解。
-    
-3. **更细粒度的依赖管理**：直接使用原生libbpf库能够指定依赖的 libbpf 库版本和功能，进而更精细化地管理项目依赖关系。
-    
-4. **更好的低版本内核适应性**：基于原生libbpf库的方案，在低版本操作系统发行版和低版本内核上可以有更好的兼容性。
-    
+
+1. **更好的学习和理解**：libbpf-bootstrap封装抽象屏蔽了很多细节，直接使用原生libbpf可以对 eBPF 子系统有更深入的理解，有利于开发者对 eBPF 内部工作原理的理解。
+
+1. **更细粒度的依赖管理**：直接使用原生libbpf库能够指定依赖的 libbpf 库版本和功能，进而更精细化地管理项目依赖关系。
+
+1. **更好的低版本内核适应性**：基于原生libbpf库的方案，在低版本操作系统发行版和低版本内核上可以有更好的兼容性。
 
 本文将由浅入深介绍第 2 代原生libbpf库的eBPF编程方案，并提出一种改进思路。
 
@@ -107,11 +105,10 @@ $ cd $NATIVE_LIBBPF                                    # 返回工作目录
 再介绍下本项目trace_execve_libbpf130和libbpf-1.3.0库的对应关系。下载libbpf-1.3.0库解压后，使用diff命令进行目录对比。
 
 1. 目录native_libbpf_guide/trace_execve_libbpf130/tools/lib/bpf/内容，除Makefile内容外都来自目录~/libbpf-1.3.0/src/。
-    
-2. 目录native_libbpf_guide/trace_execve_libbpf130/tools/include/来自目录~/libbpf-1.3.0/include/，所有内容都完全一致。
-    
-3. 除以上两部分来自libbpf-1.3.0库以外的文件，其余都由本项目原创贡献。
-    
+
+1. 目录native_libbpf_guide/trace_execve_libbpf130/tools/include/来自目录~/libbpf-1.3.0/include/，所有内容都完全一致。
+
+1. 除以上两部分来自libbpf-1.3.0库以外的文件，其余都由本项目原创贡献。
 
 ```
 $ cd ~
@@ -132,13 +129,12 @@ $ cd $NATIVE_LIBBPF                                    # 返回工作目录
 trace_execve_libbpf130项目有4个Makefile，分别如下：
 
 1. ./Makefile是主文件，用于生成用户态eBPF程序trace_execve。
-    
-2. ./progs/Makefile 用于生成内核态BPF程序trace_execve.bpf.o。
-    
-3. ./tools/lib/bpf/Makefile 用于生成libbpf.a静态库。
-    
-4. ./tools/build/feature/Makefile 用于一些feature的探测。
-    
+
+1. ./progs/Makefile 用于生成内核态BPF程序trace_execve.bpf.o。
+
+1. ./tools/lib/bpf/Makefile 用于生成libbpf.a静态库。
+
+1. ./tools/build/feature/Makefile 用于一些feature的探测。
 
 在项目空间的根目录运行make命令进行项目构建时，会首先执行Makefile文件。在Makefile文件中会通过make的-C选项间接触发progs/Makefile和tools/lib/bpf/Makefile的执行。
 
@@ -153,17 +149,16 @@ trace_execve_libbpf130项目有4个Makefile，分别如下：
 除了日常我们熟知的-I选项，clang/gcc的目录搜索选项还有很多，它们优先级的顺序依次如下：
 
 1. 头文件引用方式include "myheader.h"，则在当前文件所在目录查找myheader.h头文件。
-    
-2. 头文件引用方式include "myheader.h"，如果有-iquote mydir选项，则在mydir目录查找myheader.h头文件。
-    
-3. 头文件引用方式include <myheader.h>，如果有-I mydir选项，则在mydir目录查找myheader.h头文件。
-    
-4. 头文件引用方式include <myheader.h>，如果有-isystem mydir选项，则在mydir目录查找myheader.h头文件。
-    
-5. 头文件引用方式include <myheader.h>，继续在标准系统目录（Standard system directories）查找myheader.h头文件。标准系统目录是指/usr/lib64/clang/15.0.7/include 、/usr/local/include 和/usr/include。
-    
-6. 头文件引用方式include <myheader.h>，如果有-idirafter mydir选项，则在mydir目录查找myheader.h头文件。
-    
+
+1. 头文件引用方式include "myheader.h"，如果有-iquote mydir选项，则在mydir目录查找myheader.h头文件。
+
+1. 头文件引用方式include \<myheader.h>，如果有-I mydir选项，则在mydir目录查找myheader.h头文件。
+
+1. 头文件引用方式include \<myheader.h>，如果有-isystem mydir选项，则在mydir目录查找myheader.h头文件。
+
+1. 头文件引用方式include \<myheader.h>，继续在标准系统目录（Standard system directories）查找myheader.h头文件。标准系统目录是指/usr/lib64/clang/15.0.7/include 、/usr/local/include 和/usr/include。
+
+1. 头文件引用方式include \<myheader.h>，如果有-idirafter mydir选项，则在mydir目录查找myheader.h头文件。
 
 **4.5  内核态bpf程序编译参数解析**
 
@@ -182,17 +177,16 @@ $ clang -iquote ./../include/ -iquote ./../helpers -I./../tools/lib/ -I./../tool
 下面对一些关键环节做一些解析：
 
 1. 头文件vmlinux.h由bpftool工具在编译时动态生成，vmlinux.h包含了绝大多数bpf程序的内核态和用户态(uapi)依赖。通过编译选项-I./../tools/lib/可以搜索到vmlinux.h头文件。
-    
-2. 通过-I./../tools/lib/编译选项，可以在./tools/lib/目录下的bpf子目录中查找到bpf_helpers.h和bpf_tracing.h头文件，这些头文件都是对vmlinux.h头文件内核态依赖的补充。
-    
-3. 通过-iquote ./../include/编译选项，可以在./include/目录中查找到trace_execve.h和common.h头文件。
-    
-4. 在上面这些头文件依赖的预处理过程中，会依赖一些宏变量来决定预处理的展开逻辑。上面编译命令中的宏就是起这些作用，-DENABLE_ATOMICS_TESTS -D__KERNEL__ -D__BPF_TRACING__ -D__TARGET_ARCH_x86。比如在bpf_tracing.h头文件中，就有#if defined(__TARGET_ARCH_x86)的宏判断语句，来决定预处理展开逻辑走x86分支。
-    
-5. 编译选项-target bpf，指示Clang将代码生成为针对eBPF目标的目标代码。编译选项-mcpu=v3，指示Clang生成针对v3版本的eBPF处理器的目标代码。编译选项-mlittle-endian：指示Clang生成适用于小端序处理器的目标代码。
-    
-6. 通过-I./../tools/include/uapi编译选项，可以在./tools/include/uapi/目录下的linux子目录中查找到bpf.h头文件。同时kernel-headers包引入的/usr/include/linux/目录下也有bpf.h，./tools/include/uapi下的bpf.h优先级会覆盖它。此外，目录./tools/include/uapi/linux下的头文件和vmlinux.h头文件存在一定的重叠，通常情况下同时加载会出现编译冲突。如果在一些简单的 ebpf 使用场景，可以使用<linux/bpf.h>替代<vmlinux.h>。
-    
+
+1. 通过-I./../tools/lib/编译选项，可以在./tools/lib/目录下的bpf子目录中查找到bpf_helpers.h和bpf_tracing.h头文件，这些头文件都是对vmlinux.h头文件内核态依赖的补充。
+
+1. 通过-iquote ./../include/编译选项，可以在./include/目录中查找到trace_execve.h和common.h头文件。
+
+1. 在上面这些头文件依赖的预处理过程中，会依赖一些宏变量来决定预处理的展开逻辑。上面编译命令中的宏就是起这些作用，-DENABLE_ATOMICS_TESTS -D\_\_KERNEL\_\_ -D\_\_BPF_TRACING\_\_ -D\_\_TARGET_ARCH_x86。比如在bpf_tracing.h头文件中，就有#if defined(\_\_TARGET_ARCH_x86)的宏判断语句，来决定预处理展开逻辑走x86分支。
+
+1. 编译选项-target bpf，指示Clang将代码生成为针对eBPF目标的目标代码。编译选项-mcpu=v3，指示Clang生成针对v3版本的eBPF处理器的目标代码。编译选项-mlittle-endian：指示Clang生成适用于小端序处理器的目标代码。
+
+1. 通过-I./../tools/include/uapi编译选项，可以在./tools/include/uapi/目录下的linux子目录中查找到bpf.h头文件。同时kernel-headers包引入的/usr/include/linux/目录下也有bpf.h，./tools/include/uapi下的bpf.h优先级会覆盖它。此外，目录./tools/include/uapi/linux下的头文件和vmlinux.h头文件存在一定的重叠，通常情况下同时加载会出现编译冲突。如果在一些简单的 ebpf 使用场景，可以使用\<linux/bpf.h>替代\<vmlinux.h>。
 
 **4.6  用户态加载程序编译参数解析**
 
@@ -208,23 +202,21 @@ $ cat trace_execve.c
 gcc -iquote ./helpers/ -iquote ./include/ -I./tools/lib/ -I./tools/include/ -g -c -o trace_execve.o trace_execve.c
 ```
 
-1. 通过-I./tools/include/编译选项，可以在./tools/include/目录下的linux子目录中查找到<linux/ring_buffer.h>头文件。
-    
-2. 通过-I./tools/lib/编译选项，可以在./tools/lib/目录下的bpf子目录中查找到<bpf/libbpf.h>头文件。在一些古老的代码示例中，有<libbpf.h>这样使用头文件的用法，目前最新的ebpf项目实例，都会将libbpf库的libbpf.h以及同目录的头文件都放到bpf子目录下，因此推荐统一使用<bpf/libbpf.h>的用法。
-    
-3. 通过-iquote ./include/编译选项，可以在./include/目录中查找到trace_execve.h和common.h头文件。
-    
-4. 其他头文件都可以在由kerne-headers包提供的标准系统目录（Standard system directories）的/usr/include/目录及子目录中查找到。所以，<linux/perf_event.h>最终会在/usr/include/linux/perf_event.h位置被查找到。可以看出同样是<linux/xxx.h>形式的头文件，<linux/perf_event.h>和<linux/ring_buffer.h>却在两个完全不同的搜索路径查找到。
-    
+1. 通过-I./tools/include/编译选项，可以在./tools/include/目录下的linux子目录中查找到\<linux/ring_buffer.h>头文件。
+
+1. 通过-I./tools/lib/编译选项，可以在./tools/lib/目录下的bpf子目录中查找到\<bpf/libbpf.h>头文件。在一些古老的代码示例中，有\<libbpf.h>这样使用头文件的用法，目前最新的ebpf项目实例，都会将libbpf库的libbpf.h以及同目录的头文件都放到bpf子目录下，因此推荐统一使用\<bpf/libbpf.h>的用法。
+
+1. 通过-iquote ./include/编译选项，可以在./include/目录中查找到trace_execve.h和common.h头文件。
+
+1. 其他头文件都可以在由kerne-headers包提供的标准系统目录（Standard system directories）的/usr/include/目录及子目录中查找到。所以，\<linux/perf_event.h>最终会在/usr/include/linux/perf_event.h位置被查找到。可以看出同样是\<linux/xxx.h>形式的头文件，\<linux/perf_event.h>和\<linux/ring_buffer.h>却在两个完全不同的搜索路径查找到。
 
 **4.7  libbpf.a静态库编译解析**
 
 关于libbpf.a静态库的编译过程，上一篇文章已经有所介绍。这里仅再次强调下，在本项目中，我们完全实现了libbpf库的自主可控，可控源代码，可控编译构建过程。这至少给我们带来如下两方面好处：
 
 1. 对于一些ebpf的资深人士，可以自主修改libbpf库中不尽如人意的地方，实现满足自己业务需求的优化。
-    
-2. 对于一些ebpf的初学者，完全可以在libbpf库中任意感兴趣的地方，通过插入printf或其他断点方式，深入学习libbpf库的原理。
-    
+
+1. 对于一些ebpf的初学者，完全可以在libbpf库中任意感兴趣的地方，通过插入printf或其他断点方式，深入学习libbpf库的原理。
 
 **05**
 
@@ -240,9 +232,9 @@ $ cd $NATIVE_LIBBPF                                    # 返回工作目录
 
 从实验结果可以看出，当我们把bpf目标文件trace_execve.bpf.o改名为trace_execve.bpf.o.bak后，trace_execve程序执行会报错，提示读取trace_execve.bpf.o文件不存在。而当我们再次将备份后的bpf目标文件trace_execve.bpf.o.bak改回原名trace_execve.bpf.o后，重新执行trace_execve程序又一切正常了。这说明，当前方案构建后，需要将trace_execve程序和bpf目标文件trace_execve.bpf.o这一组文件一起进行分发，才能正常执行。这给我们在工程的实现上带来了很大的挑战。
 
-为了解决上面提到的问题，第 3 代 ebpf 编程方案 libbpf-bootstrap框架发明了skeleton骨架，即使用*.skel.h头文件的方式，将bpf目标文件trace_execve.bpf.o的内容编译进trace_execve程序。这样后续只需分发trace_execve二进制程序文件即可。
+为了解决上面提到的问题，第 3 代 ebpf 编程方案 libbpf-bootstrap框架发明了skeleton骨架，即使用\*.skel.h头文件的方式，将bpf目标文件trace_execve.bpf.o的内容编译进trace_execve程序。这样后续只需分发trace_execve二进制程序文件即可。
 
-如果不依赖libbpf-bootstrap编程框架，继续仅依赖 libbpf 库是否可以做到这一点呢？答案是可以的，本文独辟蹊径，给大家分享一个使用hexdump命令轻松实现*.skel.h头文件的方式。
+如果不依赖libbpf-bootstrap编程框架，继续仅依赖 libbpf 库是否可以做到这一点呢？答案是可以的，本文独辟蹊径，给大家分享一个使用hexdump命令轻松实现\*.skel.h头文件的方式。
 
 **5.2  使用hexdump生成skel.h头文件**
 
@@ -258,7 +250,7 @@ $ cd $NATIVE_LIBBPF                                    # 返回工作目录
 
 分析libbpf-bootstrap编程框架的实现原理，可以了解到。在第3步会依靠bpftool工具将trace_execve.bpf.o这个目标文件转换成十六进制格式的文本，并将这个文本内容作为trace_execve.skel.h头文件中的一个变量的值，最后还需要让trace_execve.c用户态加载文件包含这个trace_execve.skel.h头文件。这其中将bpf目标文件转换成十六进制文本并生成skel.h头文件的过程最为关键。
 
-libbpf-bootstrap编程框架非常成熟，但方案使用中必须遵循他的一些规则，比如头文件trace_execve.skel.h的命令必须包含程序的关键词trace_execve，再比如加载函数trace_execve_bpf__load()也必须包含程序的关键词trace_execve。如何能不依赖这个规范，实现一个更加轻量级的编程方案呢？这让我们想到了hexdump命令，可以用它替换bpftool工具，并且生成符合自己期望的头文件。
+libbpf-bootstrap编程框架非常成熟，但方案使用中必须遵循他的一些规则，比如头文件trace_execve.skel.h的命令必须包含程序的关键词trace_execve，再比如加载函数trace_execve_bpf\_\_load()也必须包含程序的关键词trace_execve。如何能不依赖这个规范，实现一个更加轻量级的编程方案呢？这让我们想到了hexdump命令，可以用它替换bpftool工具，并且生成符合自己期望的头文件。
 
 ```
 $ hexdump -v -e '"\\\x" 1/1 "%02x"' trace_execve.bpf.o > trace_execve.hex
@@ -299,9 +291,8 @@ $ cat make.log | grep -n "Considering target file"
 从关键构建步骤中，我们可以了解到：
 
 1. probe_execve和trace_execve两个target都是all目标的下级目标，并且probe_execve和trace_execve是串行的。这个里隐含的一个意思是，当trace_execve开始构建的时候，probe_execve已经完全构建完毕，probe_execve这个最终可执行文件已经生成完毕。此时，probe_execve构建过程中所依赖的所有中间文件都不再需要了。所以，probe_execve和trace_execve构建过程中依赖的中间文件是可以重名的。
-    
-2. tools/lib/bpf/libbpf.a和helpers/uprobe_helper.o已经提前编译好了，就不再做过多的说明了。最终的用户态可执行加载程序的主要依赖链条如下。
-    
+
+1. tools/lib/bpf/libbpf.a和helpers/uprobe_helper.o已经提前编译好了，就不再做过多的说明了。最终的用户态可执行加载程序的主要依赖链条如下。
 
 ```
 trace_execve
@@ -313,7 +304,7 @@ trace_execve
 $(HELPER_OBJECTS): %.o:%.c
 ```
 
-其中任何一个静态模式规则的目标集合，都是通过项目根目录下*.c文件的集合，进行局部字符串替换获得。
+其中任何一个静态模式规则的目标集合，都是通过项目根目录下\*.c文件的集合，进行局部字符串替换获得。
 
 ```
 SOURCES := $(wildcard *.c)
@@ -335,15 +326,15 @@ char filename[256] = "progs/trace_execve.bpf.o";
 #include "skeleton.skel.h"
 ```
 
-很明显libbpf库提供了bpf_object__open_file（bpf_object__open）和bpf_object__open_mem两个函数用于读取elf格式的bpf目标文件trace_execve.bpf.o。区别是bpf_object__open_file是在trace_execve运行时，再去读取trace_execve.bpf.o文件内容，而bpf_object__open_mem是在编译时，已经把elf内容编译进trace_execve程序。至于bpf_object__open函数在libbpf库的libbpf.c文件中是对bpf_object__open_file函数的封装。
+很明显libbpf库提供了bpf_object\_\_open_file（bpf_object\_\_open）和bpf_object\_\_open_mem两个函数用于读取elf格式的bpf目标文件trace_execve.bpf.o。区别是bpf_object\_\_open_file是在trace_execve运行时，再去读取trace_execve.bpf.o文件内容，而bpf_object\_\_open_mem是在编译时，已经把elf内容编译进trace_execve程序。至于bpf_object\_\_open函数在libbpf库的libbpf.c文件中是对bpf_object\_\_open_file函数的封装。
 
-这两个libbpf库函数，最终都是调用elf标准库函数实现了相关功能，具体代码实现是在libbpf库的libbpf.c文件中的bpf_object__elf_init函数中，代码如下：
+这两个libbpf库函数，最终都是调用elf标准库函数实现了相关功能，具体代码实现是在libbpf库的libbpf.c文件中的bpf_object\_\_elf_init函数中，代码如下：
 
 ```
 static int bpf_object__elf_init(struct bpf_object *obj){
 ```
 
-可以看出，bpf_object__open_mem函数的最终实现是elf的elf_memory函数，bpf_object__open_file函数的最终实现是elf的elf_begin函数。
+可以看出，bpf_object\_\_open_mem函数的最终实现是elf的elf_memory函数，bpf_object\_\_open_file函数的最终实现是elf的elf_begin函数。
 
 **5.6  原生libbpf库与libbpf-bootstrap的若干区别**
 
@@ -351,35 +342,35 @@ static int bpf_object__elf_init(struct bpf_object *obj){
 
 这里将这三种方案的主要区别归纳总结如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-这里补充下，trace_execve_bpf__open()函数的实现，也是间接通过libbpf库的bpf_object__open_skeleton()函数，最终也调用了bpf_object__open_mem()函数。
+这里补充下，trace_execve_bpf\_\_open()函数的实现，也是间接通过libbpf库的bpf_object\_\_open_skeleton()函数，最终也调用了bpf_object\_\_open_mem()函数。
 
 **5.7  使用attach_tracepoint替代attach**
 
-在ebpf用户态程序的加载过程中，有一个attach的步骤。细心的读者应该已经发现了，在trace_execve_libbpf130项目中，我们使用的是bpf_program__attach()函数实现的静态探针点的attach。而在hexdump_skel_libbpf130项目中，我们使用的却是bpf_program__attach_tracepoint()函数实现的静态探针点的attach。区别是bpf_program__attach_tracepoint函数的参数中会指定静态探针点的具体信息，而bpf_program__attach不用指定静态探针点的信息。进一步阅读bpf_program__attach函数的源代码可以了解到，它是依靠内核态的bpf目标文件中SEC的节名称信息来获取和确定静态探针点的信息的。总结这两种方法如下：
+在ebpf用户态程序的加载过程中，有一个attach的步骤。细心的读者应该已经发现了，在trace_execve_libbpf130项目中，我们使用的是bpf_program\_\_attach()函数实现的静态探针点的attach。而在hexdump_skel_libbpf130项目中，我们使用的却是bpf_program\_\_attach_tracepoint()函数实现的静态探针点的attach。区别是bpf_program\_\_attach_tracepoint函数的参数中会指定静态探针点的具体信息，而bpf_program\_\_attach不用指定静态探针点的信息。进一步阅读bpf_program\_\_attach函数的源代码可以了解到，它是依靠内核态的bpf目标文件中SEC的节名称信息来获取和确定静态探针点的信息的。总结这两种方法如下：
 
 |   |   |   |
 |---|---|---|
 ||**trace_execve.c中相关代码**|**trace_execve.bpf.c中相关代码**|
-|attach方案A|bpf_program__attach(bpf_prog)|SEC("tracepoint/syscalls/sys_enter_execve")|
-|attach方案B|bpf_program__attach_tracepoint(bpf_prog, "syscalls", "sys_enter_execve")|SEC("tracepoint")|
+|attach方案A|bpf_program\_\_attach(bpf_prog)|SEC("tracepoint/syscalls/sys_enter_execve")|
+|attach方案B|bpf_program\_\_attach_tracepoint(bpf_prog, "syscalls", "sys_enter_execve")|SEC("tracepoint")|
 
-很明显，在trace_execve.c和trace_execve.bpf.c的代码中，只要有一处设置静态探针点即可。如果两处都设置，而且两处设置的静态探针点信息冲突的情况下，会以用户态的bpf_program__attach_tracepoint函数设置的信息为准。
+很明显，在trace_execve.c和trace_execve.bpf.c的代码中，只要有一处设置静态探针点即可。如果两处都设置，而且两处设置的静态探针点信息冲突的情况下，会以用户态的bpf_program\_\_attach_tracepoint函数设置的信息为准。
 
-libbpf库中的bpf_link__destroy()函数是负责对attach函数生成的link进行销毁的函数。attach和destroy的过程实际上就是对内核静态探针点开启和关闭的过程。
+libbpf库中的bpf_link\_\_destroy()函数是负责对attach函数生成的link进行销毁的函数。attach和destroy的过程实际上就是对内核静态探针点开启和关闭的过程。
 
-在这里特别推荐使用方案B中的bpf_program__attach_tracepoint替代方案A中的bpf_program__attach方法，这样方便我们在用户态代码中灵活的开关ebpf的采集。除了专门用于静态探针点的bpf_program__attach_tracepoint()函数，还有适用于其他类型的专用的attach函数，例如bpf_program__attach_kprobe()、bpf_program__attach_kprobe()、bpf_program__attach_uprobe()和bpf_program__attach_usdt()等。
+在这里特别推荐使用方案B中的bpf_program\_\_attach_tracepoint替代方案A中的bpf_program\_\_attach方法，这样方便我们在用户态代码中灵活的开关ebpf的采集。除了专门用于静态探针点的bpf_program\_\_attach_tracepoint()函数，还有适用于其他类型的专用的attach函数，例如bpf_program\_\_attach_kprobe()、bpf_program\_\_attach_kprobe()、bpf_program\_\_attach_uprobe()和bpf_program\_\_attach_usdt()等。
 
 **5.8  使用by_name替代by_title**
 
-在稍早一些libbpf库中提供2个函数用于获取bpf progam 类型数据，分别是bpf_object__find_program_by_name()函数和bpf_object__find_program_by_title()函数。以trace_execve_libbpf130项目的 bpf代码为例。
+在稍早一些libbpf库中提供2个函数用于获取bpf progam 类型数据，分别是bpf_object\_\_find_program_by_name()函数和bpf_object\_\_find_program_by_title()函数。以trace_execve_libbpf130项目的 bpf代码为例。
 
 ```
 SEC("tracepoint/syscalls/sys_enter_execve")
 ```
 
-其中tracepoint/syscalls/sys_enter_execve这个字符串就称为title，trace_execve_enter这个函数名就称为name。结合上文的结论，后续推荐bpf内核态代码中都使用SEC("tracepoint")的语法格式，那么使用by_title函数将不再能做出区分。因此这里特别推荐大家今后使用by_name的函数替代by_titile的函数。而且，在最新版的libbpf库中，也彻底移除了bpf_object__find_program_by_title()函数。
+其中tracepoint/syscalls/sys_enter_execve这个字符串就称为title，trace_execve_enter这个函数名就称为name。结合上文的结论，后续推荐bpf内核态代码中都使用SEC("tracepoint")的语法格式，那么使用by_title函数将不再能做出区分。因此这里特别推荐大家今后使用by_name的函数替代by_titile的函数。而且，在最新版的libbpf库中，也彻底移除了bpf_object\_\_find_program_by_title()函数。
 
 **06**
 
@@ -419,7 +410,7 @@ $ find /usr/include/ -name sdt.h
 $ find /usr/include/ -name sdt.h
 ```
 
-令人欣慰的是，这个sdt.h头文件并无太多额外依赖，简单修改后，可以独立维护。于是，我们可以将其拷贝到本项目根目录。并将<sys/sdt.h>的头文件引用方式改为"sdt.h"。
+令人欣慰的是，这个sdt.h头文件并无太多额外依赖，简单修改后，可以独立维护。于是，我们可以将其拷贝到本项目根目录。并将\<sys/sdt.h>的头文件引用方式改为"sdt.h"。
 
 **6.2  构建基于libbpf库的USDT和Uprobe项目**
 
@@ -437,7 +428,7 @@ trace_user_libbpf130项目的构建和编译过程与前面项目hexdump_skel_li
 
 trace_user_libbpf130项目中的USDT部分，开启了2个usdt静态探针点的跟踪，这2个静态探针点分别是probe1和probe2。
 
-第一个静态探针点实例，选择在attach时，通过bpf_program__attach_usdt函数的参数指定静态探针点的相关信息。包括跟踪的进程信息"/usr/bin/umark"，usdt组名信息"groupa"，usdt名称信息"probe1"等，代码如下：
+第一个静态探针点实例，选择在attach时，通过bpf_program\_\_attach_usdt函数的参数指定静态探针点的相关信息。包括跟踪的进程信息"/usr/bin/umark"，usdt组名信息"groupa"，usdt名称信息"probe1"等，代码如下：
 
 ```
 bpf_program__attach_usdt(bpf_prog1, -1, "/usr/bin/umark", "groupa", "probe1", NULL);
@@ -465,16 +456,15 @@ int BPF_USDT(usdt_probe1, int x)
 int usdt_probe2(struct pt_regs *ctx);
 ```
 
-这4行代码，前两行是函数声明，后两行是函数定义。usdt_probe2函数内部调用了____usdt_probe2函数。一些代码解读：
+这4行代码，前两行是函数声明，后两行是函数定义。usdt_probe2函数内部调用了\_\_\_\_usdt_probe2函数。一些代码解读：
 
 1. always_inline，意味着无论优化设置如何，编译器都应该始终将这个函数内联到任何调用它的地方。
-    
-2. typeof(usdt_probe2(0)) 用于确定 usdt_probe2 的返回类型，从而确保 ____usdt_probe2 与 usdt_probe2 有相同的返回类型。
-    
-3. ({ long _x; bpf_usdt_arg(ctx, 0, &_x); (void *)_x; }) 这个复合语句用于获取USDT探针的参数值。
-    
-4. 使用 bpf_usdt_arg 辅助函数来获取探针的第一个参数，并将其存储到局部变量 _x 中。再将 _x 强制转换为 void * 类型并传递给 ____usdt_probe2 函数。同样的操作也对第二个参数 y 进行。
-    
+
+1. typeof(usdt_probe2(0)) 用于确定 usdt_probe2 的返回类型，从而确保 \_\_\_\_usdt_probe2 与 usdt_probe2 有相同的返回类型。
+
+1. ({ long \_x; bpf_usdt_arg(ctx, 0, &\_x); (void \*)\_x; }) 这个复合语句用于获取USDT探针的参数值。
+
+1. 使用 bpf_usdt_arg 辅助函数来获取探针的第一个参数，并将其存储到局部变量 \_x 中。再将 \_x 强制转换为 void * 类型并传递给 \_\_\_\_usdt_probe2 函数。同样的操作也对第二个参数 y 进行。
 
 特别强调一下bpf_usdt_arg辅助函数来自于usdt.bpf.h头文件，但本项目有2个usdt.bpf.h头文件，其中一个在libbpf库中，另外一个在./helpers/目录下，helpers 目录下的是经过本项目改造过的。此示例中生效的是./helpers/目录下的。
 
@@ -486,7 +476,7 @@ $ cd $NATIVE_LIBBPF                                    # 返回工作目录
 
 trace_user_libbpf130项目中的Uprobe部分，开启了2个uprobe类型探针点的跟踪，这2个uprobe探针点分别是probe1和probe2。
 
-第一个uprobe探针点实例，选择在attach时，通过bpf_program__attach_uprobe函数的参数指定uprobe探针点的相关信息。包括uprobe的类型（0表示函数进入时，1表示函数返回时），跟踪的进程信息"/usr/bin/umark"，被跟踪的函数在进程中的偏移量 func_off1等。需要提前通过get_elf_func_offset()函数计算出这个偏移量，此函数定义在了helpers/uprobe_helper.c文件内。相关代码如下：
+第一个uprobe探针点实例，选择在attach时，通过bpf_program\_\_attach_uprobe函数的参数指定uprobe探针点的相关信息。包括uprobe的类型（0表示函数进入时，1表示函数返回时），跟踪的进程信息"/usr/bin/umark"，被跟踪的函数在进程中的偏移量 func_off1等。需要提前通过get_elf_func_offset()函数计算出这个偏移量，此函数定义在了helpers/uprobe_helper.c文件内。相关代码如下：
 
 ```
 func_off1 = get_elf_func_offset("/usr/bin/umark", "func_uprobe1");
@@ -514,14 +504,13 @@ int BPF_KPROBE(user_probe1, unsigned long long int x)
 long user_probe2(struct pt_regs *ctx);
 ```
 
-这4行代码，前两行是函数声明，后两行是函数定义。user_probe2函数内部调用了____user_probe2函数。一些代码解读：
+这4行代码，前两行是函数声明，后两行是函数定义。user_probe2函数内部调用了\_\_\_\_user_probe2函数。一些代码解读：
 
-1. inline typeof(user_probe2(0)) ____user_probe2(struct pt_regs *ctx, unsigned long long int x, unsigned long long int y);  这是内联函数____user_probe2的声明。
-    
-2. typeof(user_probe2(0))用于确定____user_probe2函数的返回类型，保证与user_probe2函数的返回类型一致。
-    
-3. typeof(user_probe2(0)) user_probe2(struct pt_regs *ctx) { return ____user_probe2(ctx, (unsigned long long int)PT_REGS_PARM1(ctx), (unsigned long long int)PT_REGS_PARM2(ctx)); }  这是user_probe2函数的定义。它使用PT_REGS_PARM1(ctx)和PT_REGS_PARM2(ctx)宏来获取用户空间探针传递给eBPF程序的前两个参数。
-    
+1. inline typeof(user_probe2(0)) \_\_\_\_user_probe2(struct pt_regs \*ctx, unsigned long long int x, unsigned long long int y);  这是内联函数\_\_\_\_user_probe2的声明。
+
+1. typeof(user_probe2(0))用于确定\_\_\_\_user_probe2函数的返回类型，保证与user_probe2函数的返回类型一致。
+
+1. typeof(user_probe2(0)) user_probe2(struct pt_regs \*ctx) { return \_\_\_\_user_probe2(ctx, (unsigned long long int)PT_REGS_PARM1(ctx), (unsigned long long int)PT_REGS_PARM2(ctx)); }  这是user_probe2函数的定义。它使用PT_REGS_PARM1(ctx)和PT_REGS_PARM2(ctx)宏来获取用户空间探针传递给eBPF程序的前两个参数。
 
 如果对于以上的代码解读如果还有不明白的地方，可以尝试问问GPT。
 
@@ -536,9 +525,8 @@ long user_probe2(struct pt_regs *ctx);
 欢迎有想法或者有问题的同学，加群交流eBPF技术以及工程实践。
 
 - SREWorks数智运维工程群（**钉钉群号：35853026**）
-    
+
 - 跟踪诊断技术 SIG 开发者&用户群（**钉钉群号：33304007**）
-    
 
 ## **附录**
 
@@ -583,15 +571,13 @@ long user_probe2(struct pt_regs *ctx);
 
 **更多推荐**
 
-[![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=Mzg4MzgxNDk2OA==&mid=2247488689&idx=1&sn=5caacb9017d20a0e19d2e4fbe8bd38e7&chksm=cf40f3e6f8377af09fcd89e4c954129abad0fce08b6f9821e13b68db65fdda1899258b57b6bb&scene=21&cur_album_id=2629420659357483011#wechat_redirect)
+[!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=Mzg4MzgxNDk2OA==&mid=2247488689&idx=1&sn=5caacb9017d20a0e19d2e4fbe8bd38e7&chksm=cf40f3e6f8377af09fcd89e4c954129abad0fce08b6f9821e13b68db65fdda1899258b57b6bb&scene=21&cur_album_id=2629420659357483011#wechat_redirect)
 
-[![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=Mzg4MzgxNDk2OA==&mid=2247488312&idx=1&sn=73a92f6f5eb5d6ca266b66033c3bfdd0&chksm=cf40f46ff8377d791342ff49eb1262059996b4e2cd98ba7f99212e3af866305d9f3a9677107a&token=1384723228&lang=zh_CN&scene=21#wechat_redirect)
+[!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=Mzg4MzgxNDk2OA==&mid=2247488312&idx=1&sn=73a92f6f5eb5d6ca266b66033c3bfdd0&chksm=cf40f46ff8377d791342ff49eb1262059996b4e2cd98ba7f99212e3af866305d9f3a9677107a&token=1384723228&lang=zh_CN&scene=21#wechat_redirect)
 
-[![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=Mzg4MzgxNDk2OA==&mid=2247492170&idx=1&sn=71efb188901359ba2c928750d6d88be7&chksm=cf43051df8348c0bc1b3faa5610ef7f386afa118aebb9741e4aa896a12df1404c295b11857d2&scene=21&cur_album_id=2629420659357483011#wechat_redirect)
+[!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=Mzg4MzgxNDk2OA==&mid=2247492170&idx=1&sn=71efb188901359ba2c928750d6d88be7&chksm=cf43051df8348c0bc1b3faa5610ef7f386afa118aebb9741e4aa896a12df1404c295b11857d2&scene=21&cur_album_id=2629420659357483011#wechat_redirect)
 
-阿里云大数据计算&机器学习推出免费试用活动，其中包含Maxcompute、Hologres、实时计算Flink版、机器学习PAI等多款热门产品，点击「**阅读原文**」了解详细试用规则，一键参与试用。  
-
-  
+阿里云大数据计算&机器学习推出免费试用活动，其中包含Maxcompute、Hologres、实时计算Flink版、机器学习PAI等多款热门产品，点击「**阅读原文**」了解详细试用规则，一键参与试用。
 
 阅读原文
 

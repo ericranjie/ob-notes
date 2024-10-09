@@ -1,11 +1,10 @@
-
 极客重生
 
- _2022年01月13日 18:12_
+_2022年01月13日 18:12_
 
 以下文章来源于Linux内核那些事 ，作者songsong001
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6dwH9qJmWO5T0Rnsiaib5jEUibibJgLmkkG02PrbyOWab4UA/0)
 
@@ -13,7 +12,7 @@
 
 以简单的方式介绍 Linux 内核的原理，以通俗的语言分析 Linux 内核的实现。如果你没有接触过 Linux 内核，那么就关注我们的公众号吧，我们将以图解的方式让内核更亲民...
 
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247567092&idx=1&sn=4061e264c76c430a4a4b9b4cddf34a62&chksm=c18531a5f6f2b8b3a083edc30d9ca2da558807c3afe79f7065e93f8a3e0989777801bcd54f30&mpshare=1&scene=24&srcid=01130NA47vHHHM3e5XsOs9KW&sharer_sharetime=1642070225452&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0514216f68094454118befd839a218539defcfdf0e6b52179891a2c509ae9bd2f52b6de140c05ca49dffeb1564b11b9d6fc97325f724f3be3a623994b77d7f3ed3c39f9714f44a3f3a8a00562c4c19ea7e2b908e8e07835d2a5411af50fc3a9781b227878a768afa3dfbf37005cdc9752b7857e144d0df865&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQVmTZeCF6dfNEWQH7DZJ1tRLmAQIE97dBBAEAAAAAANRfI254pf4AAAAOpnltbLcz9gKNyK89dVj0PxzbtniFc4MrnYlbLZxKE%2B%2FqZOeKaVmuhMEt3XiT5HC%2BDcyqAVzmcKHdFNyzKKOWL7H2%2Bhb%2B36EG%2Ft%2B%2FZZOmciNRUZORb15i8WdSfIbkKvlp0VDbwtdT6yJkOLxKA%2FNKrwsz8FtyC71uYX%2FK2eH87dUNbiecWvqRyQbCk99HSizNIaXxHfmgfcgyQ5Nw8WFba%2F%2B7nQai0qh5RvdSDvdjzwWMQAu06nRjXvuIV0gFQzzZQutzjBhLjDPHTBXpRf%2Ba&acctmode=0&pass_ticket=lHMwFoGBbebNVg0ZvJQ1gZc49ilgx0s%2FBHh4nSjuawvLCljkHgYo5a8YFLpm2LWi&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247567092&idx=1&sn=4061e264c76c430a4a4b9b4cddf34a62&chksm=c18531a5f6f2b8b3a083edc30d9ca2da558807c3afe79f7065e93f8a3e0989777801bcd54f30&mpshare=1&scene=24&srcid=01130NA47vHHHM3e5XsOs9KW&sharer_sharetime=1642070225452&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0514216f68094454118befd839a218539defcfdf0e6b52179891a2c509ae9bd2f52b6de140c05ca49dffeb1564b11b9d6fc97325f724f3be3a623994b77d7f3ed3c39f9714f44a3f3a8a00562c4c19ea7e2b908e8e07835d2a5411af50fc3a9781b227878a768afa3dfbf37005cdc9752b7857e144d0df865&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQVmTZeCF6dfNEWQH7DZJ1tRLmAQIE97dBBAEAAAAAANRfI254pf4AAAAOpnltbLcz9gKNyK89dVj0PxzbtniFc4MrnYlbLZxKE%2B%2FqZOeKaVmuhMEt3XiT5HC%2BDcyqAVzmcKHdFNyzKKOWL7H2%2Bhb%2B36EG%2Ft%2B%2FZZOmciNRUZORb15i8WdSfIbkKvlp0VDbwtdT6yJkOLxKA%2FNKrwsz8FtyC71uYX%2FK2eH87dUNbiecWvqRyQbCk99HSizNIaXxHfmgfcgyQ5Nw8WFba%2F%2B7nQai0qh5RvdSDvdjzwWMQAu06nRjXvuIV0gFQzzZQutzjBhLjDPHTBXpRf%2Ba&acctmode=0&pass_ticket=lHMwFoGBbebNVg0ZvJQ1gZc49ilgx0s%2FBHh4nSjuawvLCljkHgYo5a8YFLpm2LWi&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 ## 一、什么是系统调用
 
@@ -40,16 +39,13 @@ typedef void (*sys_call_ptr_t)(void);const sys_call_ptr_t sys_call_table[__N
 ```
 
 上面的代码会根据 `eax` 寄存器中的值来调用正确的系统调用，其过程如下图所示：
-![[Pasted image 20240928195526.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928195526.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+整体流程
 
-整体流程  
-
-  
-![[Pasted image 20240928195532.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928195532.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 三、系统调用拦截
 
@@ -75,12 +71,11 @@ typedef void (*sys_call_ptr_t)(void);const sys_call_ptr_t sys_call_table[__N
 sudo cat /boot/System.map-`uname -r` | grep sys_call_table
 ```
 
-结果如下图所示：  
-  
-![[Pasted image 20240928195543.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+结果如下图所示：
 
-  
+!\[\[Pasted image 20240928195543.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 从上图可知，`sys_call_table` 数组的虚拟地址为：`ffffffff818001c0`。
 
 #### 第二种方法：通过 `kallsyms_lookup_name()` 函数来获取
@@ -190,67 +185,37 @@ root# insmod syscall.ko
 
 公众号
 
-  
-
 - END -
 
----
+______________________________________________________________________
 
-  
+**看完一键三连********在看******\*\*，**转发**\*\*，\*\*\*\*****点赞****
 
-**看完一键三连********在看********，**转发****，********点赞****
-
-**是对文章最大的赞赏，极客重生感谢你****![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
-
-  
+**是对文章最大的赞赏，极客重生感谢你**\*\*!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)\*\*
 
 推荐阅读
 
-  
+\[
 
-  
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 大厂后台开发基本功修炼路线和经典资料
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247566986&idx=1&sn=40c3846a5a328ba18b73a16d329b756f&chksm=c18531dbf6f2b8cd4a93bd9aa5cad4020daf8da7a54156f754f5c2b403c58b02b40a79ed79f4&scene=21#wechat_redirect)
 
+\[
 
-
-
-
-
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247566986&idx=1&sn=40c3846a5a328ba18b73a16d329b756f&chksm=c18531dbf6f2b8cd4a93bd9aa5cad4020daf8da7a54156f754f5c2b403c58b02b40a79ed79f4&scene=21#wechat_redirect)
-
-  
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2022新年重磅技术分享|深入理解Linux操作系统
 
-
-
-
-
-
-
-](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247566121&idx=1&sn=a169fb93b7f961d8409ef4494ddd1735&chksm=c1853478f6f2bd6ee1a675d10eede0c2a435380729d9a534eff1ea6dcf2a5d2263dfd7979c11&scene=21#wechat_redirect)
-
-  
+\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247566121&idx=1&sn=a169fb93b7f961d8409ef4494ddd1735&chksm=c1853478f6f2bd6ee1a675d10eede0c2a435380729d9a534eff1ea6dcf2a5d2263dfd7979c11&scene=21#wechat_redirect)
 
 你好，这里是极客重生，我是阿荣，大家都叫我荣哥，从华为->外企->到互联网大厂，目前是大厂资深工程师，多次获得五星员工，多年职场经验，技术扎实，专业后端开发和后台架构设计，热爱底层技术，丰富的实战经验，分享技术的本质原理，希望帮助更多人蜕变重生，拿BAT大厂offer，培养高级工程师能力，成为技术专家，实现高薪梦想，期待你的关注！[**点击蓝字查看我的成长之路**。](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247564006&idx=1&sn=8c88b0d7222ce0e310a012e90bff961f&chksm=c1850db7f6f284a133be27ad27ecd965c3c942583f69bd1a26c34ebf179b4cd6ceb3d7e787b4&scene=21#wechat_redirect)
 
-  
+校招/社招/简历/面试技巧/大厂技术栈分析/后端开发进阶/优秀开源项目/直播分享/技术视野/实战高手等, [极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247563979&idx=1&sn=b26f56f933d9c9e2fd1fe3260362d6e5&chksm=c1850d9af6f2848cf5e3282aa6464b79fc32d848bb8d8155f317c3be7a021a19ac937f8dd10b&scene=21#wechat_redirect)希望成为最有技术价值星球，尽最大努力为星球的同学提供技术和成长帮助！详情查看->[极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247563979&idx=1&sn=b26f56f933d9c9e2fd1fe3260362d6e5&chksm=c1850d9af6f2848cf5e3282aa6464b79fc32d848bb8d8155f317c3be7a021a19ac937f8dd10b&scene=21#wechat_redirect)
 
-校招/社招/简历/面试技巧/大厂技术栈分析/后端开发进阶/优秀开源项目/直播分享/技术视野/实战高手等, [极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247563979&idx=1&sn=b26f56f933d9c9e2fd1fe3260362d6e5&chksm=c1850d9af6f2848cf5e3282aa6464b79fc32d848bb8d8155f317c3be7a021a19ac937f8dd10b&scene=21#wechat_redirect)希望成为最有技术价值星球，尽最大努力为星球的同学提供技术和成长帮助！详情查看->[极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247563979&idx=1&sn=b26f56f933d9c9e2fd1fe3260362d6e5&chksm=c1850d9af6f2848cf5e3282aa6464b79fc32d848bb8d8155f317c3be7a021a19ac937f8dd10b&scene=21#wechat_redirect)  
-
-  
-
-                                                                求点赞，在看，分享三连![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+求点赞，在看，分享三连!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 2414
 

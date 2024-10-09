@@ -1,6 +1,5 @@
 土豆居士 一口Linux
- _2021年12月10日 11:50_
-
+_2021年12月10日 11:50_
 
 在探讨这个问题之前，我们先来弄清什么是进程。
 
@@ -10,7 +9,7 @@
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/icRxcMBeJfcibNZrQ7MJaddQtgYRQuaAHMoDEn4PcEicQvcvibZibQT3hU8YrYocic5s1cgasV6GcLe041C6nIecMj3w/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
-程序运行必须加载在内存中，当有过多的就绪态或阻塞态进程在内存中没有运行，因为内存很小，有可能不足。系统需要把他们移动到内存外磁盘中，称为挂起状态。就绪状态的进程挂起就是挂起就绪状态，阻塞进程挂起就称为阻塞挂起状态。  
+程序运行必须加载在内存中，当有过多的就绪态或阻塞态进程在内存中没有运行，因为内存很小，有可能不足。系统需要把他们移动到内存外磁盘中，称为挂起状态。就绪状态的进程挂起就是挂起就绪状态，阻塞进程挂起就称为阻塞挂起状态。
 
 每个进程的产生都有自己的唯一的ID号(pid)，并且附带有一个它父进程的ID号(ppid)。进程死亡时，ID被回收。
 
@@ -18,9 +17,7 @@
 
 # 二：僵尸进程
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么什么称为僵尸进程呢？
 
@@ -32,15 +29,11 @@
 
 我们将它挂在后台执行，可以看到结果，用ps可以看到子进程后有一个<defunct> ,defunct是已死的，僵尸的意思,可以看出这时的子进程已经是一个僵尸进程了。因为子进程已经结束，而其父进程并未释放其PCB，所以产生了这个僵尸进程。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们也可以用ps -aux | grep pid 查看进程状态
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一个进程在调用exit命令结束自己的生命的时候，其实它并没有真正的被销毁，而是留下一个称为僵尸进程（Zombie）的数据结构（系统调用exit，它的作用是使进程退出，但也仅仅限于将一个正常的进程变成一个僵尸进程，并不能将其完全销毁）。在Linux进程的状态中，僵尸进程是非常特殊的一种，它已经放弃了几乎所有内存空间，没有任何可执行代码，也不能被调度，仅仅在进程列表中保留一个位置，记载该进程的退出状态等信息供其他进程收集，除此之外，僵尸进程不再占有任何内存空间。这个僵尸进程需要它的父进程来为它收尸，如果他的父进程没有处理这个僵尸进程的措施，那么它就一直保持僵尸状态，如果这时父进程结束了，那么init进程自动会接手这个子进程，为它收尸，它还是能被清除的。但是如果如果父进程是一个循环，不会结束，那么子进程就会一直保持僵尸状态，这就是为什么系统中有时会有很多的僵尸进程。
 
@@ -60,9 +53,7 @@
 #include<stdio.h>#include<stdlib.h>#include<unistd.h>#include<string.h>#include<assert.h>#include<sys/types.h> int main(){	pid_t pid=fork(); 	if(pid==0)	{		printf("child ppid is %d\n",getppid());		sleep(10);     //为了让父进程先结束		printf("child ppid is %d\n",getppid());	}	else	{		printf("parent id is %d\n",getpid());	} 	exit(0);}
 ```
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从执行结果来看，此时由pid == 4168父进程创建的子进程，其输出的父进程pid == 1，说明当其为孤儿进程时被init进程回收，最终并不会占用资源，这就是为什么要将孤儿进程分配给init进程。
 
@@ -82,8 +73,6 @@
 #include <sys/types.h> /* 提供类型pid_t的定义，实际就是int型 */
 ```
 
-  
-
 参数status用来保存被收集进程退出时的一些状态，它是一个指向int类型的指针。但如果我们对这个子进程是如何死掉的毫不在意，只想把这个僵尸进程消灭掉，（事实上绝大多数情况下，我们都会这样想），我们就可以设定这个参数为NULL，就象下面这样：pid=wait(NULL)；如果成功，wait会返回被收集的子进程的进程ID，如果调用进程没有子进程，调用就会失败，此时wait返回-1，同时errno被置为ECHILD。
 
 由于调用wait之后，就必须阻塞，直到有子进程结束，所以，这样来说是非常不高效的，我们的父进程难道要一直等待你子进程完成，最后才能执行自己的代码吗？难道就不能我父进程执行自己的代码，你子进程什么时候完成我就什么时候去处理你，不用一直等你？当然是有这种方式了。
@@ -98,9 +87,7 @@
 
 进行测试后确定了是在父进程睡眠10s时子进程结束，父进程接收到了SIGCHLD信号，调用了deal_child函数，释放了子进程的PCB后又回到自己本身的代码中执行。我们看看运行结果
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 说到这里，我们再来看看signal函数（不是阻塞函数）
 
@@ -118,7 +105,7 @@ eg: signal(SIGINT ,SIG_ING ); //SIG_ING 代表忽略SIGINT信号
 eg:signal(SIGINT,SIG_DFL); //SIGINT信号代表由InterruptKey产生，通常是CTRL +C或者是DELETE。
 ```
 
-发送给所有ForeGroundGroup的进程。  
+发送给所有ForeGroundGroup的进程。
 
 SIG_DFL代表执行系统默认操作，其实对于大多数信号的系统默认动作是终止该进程。这与不写此处理函数是一样的。
 
@@ -140,13 +127,7 @@ void deal_child(int sig_no) {    for (;;) {        if (waitpid(-1, NULL, WNOHANG
 
 end
 
-  
-
-  
-
-**一口Linux** 
-
-  
+**一口Linux**
 
 **关注，回复【****1024****】海量Linux资料赠送**
 
@@ -160,7 +141,7 @@ end
 
 公众号
 
-**精彩文章合集**  
+**精彩文章合集**
 
 文章推荐
 
@@ -179,8 +160,6 @@ end
 ☞【干货】[嵌入式驱动工程师学习路线](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247496985&idx=1&sn=c3d5e8406ff328be92d3ef4814108cd0&chksm=f96b87edce1c0efb6f60a6a0088c714087e4a908db1938c44251cdd5175462160e26d50baf24&scene=21#wechat_redirect)
 
 ☞【干货】[Linux嵌入式所有知识点-思维导图](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247497822&idx=1&sn=1e2aed9294f95ae43b1ad057c2262980&chksm=f96b8aaace1c03bc2c9b0c3a94c023062f15e9ccdea20cd76fd38967b8f2eaad4dfd28e1ca3d&scene=21#wechat_redirect)
-
-  
 
 点击“**阅读原文**”查看更多分享，欢迎**点分享、收藏、点赞、在看**
 
@@ -201,37 +180,36 @@ linux · 目录
 **留言 4**
 
 - 堇
-    
-    2021年12月10日
-    
-    赞1
-    
-    进程：你骂谁？![[奸笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    一口Linux
-    
-    作者2021年12月10日
-    
-    赞1
-    
-    ![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月10日
+
+  赞1
+
+  进程：你骂谁？![[奸笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  一口Linux
+
+  作者2021年12月10日
+
+  赞1
+
+  ![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - sure
-    
-    2022年2月19日
-    
-    赞
-    
-    docker container里面没有指定init程序，有时候就会产生僵尸进程。加上SIGCHLD处理函数和waitpid还是有好处的。
-    
-    一口Linux
-    
-    作者2022年2月19日
-    
-    赞
-    
-    是的![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月19日
+
+  赞
+
+  docker container里面没有指定init程序，有时候就会产生僵尸进程。加上SIGCHLD处理函数和waitpid还是有好处的。
+
+  一口Linux
+
+  作者2022年2月19日
+
+  赞
+
+  是的![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据
 
@@ -250,36 +228,35 @@ linux · 目录
 **留言 4**
 
 - 堇
-    
-    2021年12月10日
-    
-    赞1
-    
-    进程：你骂谁？![[奸笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    一口Linux
-    
-    作者2021年12月10日
-    
-    赞1
-    
-    ![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月10日
+
+  赞1
+
+  进程：你骂谁？![[奸笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  一口Linux
+
+  作者2021年12月10日
+
+  赞1
+
+  ![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - sure
-    
-    2022年2月19日
-    
-    赞
-    
-    docker container里面没有指定init程序，有时候就会产生僵尸进程。加上SIGCHLD处理函数和waitpid还是有好处的。
-    
-    一口Linux
-    
-    作者2022年2月19日
-    
-    赞
-    
-    是的![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月19日
+
+  赞
+
+  docker container里面没有指定init程序，有时候就会产生僵尸进程。加上SIGCHLD处理函数和waitpid还是有好处的。
+
+  一口Linux
+
+  作者2022年2月19日
+
+  赞
+
+  是的![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据

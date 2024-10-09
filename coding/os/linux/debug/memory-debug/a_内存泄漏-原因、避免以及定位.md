@@ -1,7 +1,6 @@
-
 原创 雨乐 高性能架构探索
 
- _2022年01月12日 12:08_
+_2022年01月12日 12:08_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhKgtwWvzaYZodgfpphdA6WWKEMXTn6ImCCCuEzlPKicNBcpzBUyjK1XicWwqIwusqLGpwyyOc87JPQ/300?wx_fmt=png&wxfrom=19)
 
@@ -13,7 +12,7 @@
 
 公众号
 
-你好，我是雨乐！  
+你好，我是雨乐！
 
 作为C/C++开发人员，内存泄漏是最容易遇到的问题之一，这是由C/C++语言的特性引起的。C/C++语言与其他语言不同，需要开发者去申请和释放内存，即需要开发者去管理内存，如果内存使用不当，就容易造成`段错误(segment fault)`或者`内存泄漏(memory leak)`。
 
@@ -36,8 +35,8 @@ C/C++语言中，内存的分配与回收都是由开发人员在编写代码时
 内存泄漏（Memory Leak）是指程序中己动态分配的堆内存由于某种原因程序未释放或无法释放，造成系统内存的浪费，导致程序运行速度减慢甚至系统崩溃等严重后果。
 
 当我们在程序中对原始指针(raw pointer)使用`new`操作符或者`free`函数的时候，实际上是在堆上为其分配内存，这个内存指的是RAM，而不是硬盘等永久存储。持续申请而不释放(或者少量释放)内存的应用程序，最终因内存耗尽导致`OOM(out of memory)`。
-![[Pasted image 20240928180353.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928180353.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 方便大家理解内存泄漏的危害，举个简单的例子。有一个宾馆，共有100间房间，顾客每次都是在前台进行登记，然后拿到房间钥匙。如果有些顾客不需要该房间了，既不去前台处登记退房，也不归还钥匙，久而久之，前台处可用房间越来越少，收入也越来越少，濒临倒闭。当程序申请了内存，而不进行归还，久而久之，可用内存越来越少，OS就会进行自我保护，杀掉该进程，这就是我们常说的`OOM(out of memory)`。
 
@@ -46,9 +45,8 @@ C/C++语言中，内存的分配与回收都是由开发人员在编写代码时
 内存泄漏分为以下两类：
 
 - 堆内存泄漏：我们经常说的内存泄漏就是堆内存泄漏，在堆上申请了资源，在结束使用的时候，没有释放归还给OS，从而导致该块内存永远不会被再次使用
-    
+
 - 资源泄漏：通常指的是系统资源，比如socket，文件描述符等，因为这些在系统中都是有限制的，如果创建了而不归还，久而久之，就会耗尽资源，导致其他程序不可用
-    
 
 本文主要分析堆内存泄漏，所以后面的内存泄漏均指的是`堆内存泄漏`。
 
@@ -63,46 +61,43 @@ C/C++语言中，内存的分配与回收都是由开发人员在编写代码时
 这就得从进程的内存布局说起。
 
 ### 进程内存布局
-![[Pasted image 20240928180402.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240928180402.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图为32位进程的内存布局，从上图中主要包含以下几个块：
 
 - 内核空间：供内核使用，存放的是内核代码和数据
-    
+
 - stack：这就是我们经常所说的栈，用来存储自动变量(automatic variable)
-    
+
 - mmap:也成为内存映射，用来在进程虚拟内存地址空间中分配地址空间，创建和物理内存的映射关系
-    
+
 - heap:就是我们常说的堆，动态内存的分配都是在堆上
-    
+
 - bss:包含所有未初始化的全局和静态变量，此段中的所有变量都由0或者空指针初始化，程序加载器在加载程序时为BSS段分配内存
-    
+
 - ds:初始化的数据块
-    
 
 - 包含显式初始化的全局变量和静态变量
-    
+
 - 此段的大小由程序源代码中值的大小决定，在运行时不会更改
-    
+
 - 它具有读写权限，因此可以在运行时更改此段的变量值
-    
+
 - 该段可进一步分为初始化只读区和初始化读写区
-    
 
 - text：也称为文本段
-    
 
 - 该段包含已编译程序的二进制文件。
-    
+
 - 该段是一个只读段，用于防止程序被意外修改
-    
+
 - 该段是可共享的，因此对于文本编辑器等频繁执行的程序，内存中只需要一个副本
-    
 
 由于本文主要讲内存分配相关，所以下面的内容仅涉及到栈(stack)和堆(heap)。
-![[Pasted image 20240928180411.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928180411.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 栈
 
@@ -159,19 +154,18 @@ void fun() {
 #### 特点
 
 - 分配速度快：分配大小由编译器在编译期完成
-    
+
 - 不会产生内存碎片：栈内存分配是连续的，以FILO的方式进栈和出栈
-    
+
 - 大小受限：栈的大小依赖于操作系统
-    
+
 - 访问受限：只能在当前函数或者作用域内进行访问
-    
 
 ### 堆
 
 堆（heap）是一种内存管理方式。内存管理对操作系统来说是一件非常复杂的事情，因为首先内存容量很大，其次就是内存需求在时间和大小块上没有规律（操作系统上运行着几十甚至几百个进程，这些进程可能随时都会申请或者是释放内存，并且申请和释放的内存块大小是随意的）。
 
-堆这种内存管理方式的特点就是自由（随时申请、随时释放、大小块随意）。堆内存是操作系统划归给堆管理器（操作系统中的一段代码，属于操作系统的内存管理单元）来管理的，堆管理器提供了对应的接口_sbrk、_mmap等，只是该接口往往由运行时库(Linux为glibc)进行调用，即也可以说由运行时库进行堆内存管理，运行时库提供了malloc/free函数由开发人员调用，进而使用堆内存。
+堆这种内存管理方式的特点就是自由（随时申请、随时释放、大小块随意）。堆内存是操作系统划归给堆管理器（操作系统中的一段代码，属于操作系统的内存管理单元）来管理的，堆管理器提供了对应的接口_sbrk、\_mmap等，只是该接口往往由运行时库(Linux为glibc)进行调用，即也可以说由运行时库进行堆内存管理，运行时库提供了malloc/free函数由开发人员调用，进而使用堆内存。
 
 #### 分配方式
 
@@ -180,15 +174,14 @@ void fun() {
 #### 特点
 
 - 变量可以在进程范围内访问，即进程内的所有线程都可以访问该变量
-    
+
 - 没有内存大小限制，这个其实是相对的，只是相对于栈大小来说没有限制，其实最终还是受限于RAM
-    
+
 - 相对栈来说访问比较慢
-    
+
 - 内存碎片
-    
+
 - 由开发者管理内存，即内存的申请和释放都由开发人员来操作
-    
 
 ### 堆与栈区别
 
@@ -197,46 +190,36 @@ void fun() {
 对于栈来讲，是由编译器自动管理，无需我们手工控制；对于堆来说，释放工作由程序员控制，容易产生memory leak
 
 - 空间大小不同
-    
 
 - 一般来讲在 32 位系统下，堆内存可以达到3G的空间，从这个角度来看堆内存几乎是没有什么限制的。
-    
+
 - 对于栈来讲，一般都是有一定的空间大小的，一般依赖于操作系统(也可以人工设置)
-    
 
 - 能否产生碎片不同
-    
 
 - 对于堆来讲，频繁的内存分配和释放势必会造成内存空间的不连续，从而造成大量的碎片，使程序效率降低。
-    
+
 - 对于栈来讲，内存都是连续的，申请和释放都是指令移动，类似于数据结构中的`进栈和出栈`
-    
 
 - 增长方向不同
-    
 
 - 对于堆来讲，生长方向是向上的，也就是向着内存地址增加的方向
-    
+
 - 对于栈来讲，它的生长方向是向下的，是向着内存地址减小的方向增长
-    
 
 - 分配方式不同
-    
 
 - 堆都是动态分配的，比如我们常见的malloc/new；而栈则有静态分配和动态分配两种。
-    
+
 - 静态分配是编译器完成的，比如局部变量的分配，而栈的动态分配则通过alloca()函数完成
-    
+
 - 二者动态分配是不同的，栈的动态分配的内存由编译器进行释放，而堆上的动态分配的内存则必须由开发人自行释放
-    
 
 - 分配效率不同
-    
 
 - 栈有操作系统分配专门的寄存器存放栈的地址，压栈出栈都有专门的指令执行，这就决定了栈的效率比较高
-    
+
 - 堆内存的申请和释放专门有运行时库提供的函数，里面涉及复杂的逻辑，申请和释放效率低于栈
-    
 
 截止到这里，栈和堆的基本特性以及各自的优缺点、使用场景已经分析完成，在这里给开发者一个建议，能使用栈的时候，就尽量使用栈，一方面是因为效率高于堆，另一方面内存的申请和释放由编译器完成，这样就避免了很多问题。
 
@@ -250,22 +233,21 @@ void fun() {
 
 `#include <stdio.h>   #include <stdlib.h>      int main() {     int a;     int *p;     p = (int *)malloc(sizeof(int));     free(p);        return 0;   }   `
 
-上述代码很简单，有两个变量a和p，类型分别为int和int *，其中，a和p存储在栈上，p的值为在堆上的某块地址(在上述代码中，p的值为0x1c66010)，上述代码布局如下图所示：
-![[Pasted image 20240928180428.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+上述代码很简单，有两个变量a和p，类型分别为int和int \*，其中，a和p存储在栈上，p的值为在堆上的某块地址(在上述代码中，p的值为0x1c66010)，上述代码布局如下图所示：
+!\[\[Pasted image 20240928180428.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 产生方式
 
 以产生的方式来分类，内存泄漏可以分为四类:
 
 - 常发性内存泄漏
-    
+
 - 偶发性内存泄漏
-    
+
 - 一次性内存泄漏
-    
+
 - 隐式内存泄漏
-    
 
 ### 常发性内存泄漏
 
@@ -296,11 +278,10 @@ void fun() {
 比较常见的隐式内存泄漏有以下三种：
 
 - 内存碎片：还记得我们之前的那篇文章[深入理解glibc内存管理精髓](https://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247485953&idx=1&sn=f8cd484607ab07f15247ecde773d2e1c&scene=21#wechat_redirect)，程序跑了几天之后，进程就因为OOM导致了退出，就是因为内存碎片导致剩下的内存不能被重新分配导致
-    
+
 - 即使我们调用了free/delete，运行时库不一定会将内存归还OS，具体[深入理解glibc内存管理精髓](https://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247485953&idx=1&sn=f8cd484607ab07f15247ecde773d2e1c&scene=21#wechat_redirect)
-    
+
 - 用过STL的知道，STL内部有一个自己的allocator，我们可以当做一个memory poll，当调用vector.clear()时候，内存并不会归还OS，而是放回allocator，其内部根据一定的策略，在特定的时候将内存归还OS，是不是跟glibc原理很像😁
-    
 
 ## 分类
 
@@ -327,16 +308,14 @@ void fun() {
 在C++中，我们经常使用new操作符来进行内存分配，其内部主要做了两件事：
 
 1. 通过operator new从堆上申请内存(glibc下，operator new底层调用的是malloc)
-    
-2. 调用构造函数(如果操作对象是一个class的话)
-    
+
+1. 调用构造函数(如果操作对象是一个class的话)
 
 对应的，使用delete操作符来释放内存，其顺序正好与new相反：
 
 1. 调用对象的析构函数(如果操作对象是一个class的话)
-    
-2. 通过operator delete释放内存
-    
+
+1. 通过operator delete释放内存
 
 `void* operator new(std::size_t size) {       void* p = malloc(size);       if (p == nullptr) {           throw("new failed to allocate %zu bytes", size);       }       return p;   }   void* operator new[](std::size_t size) {       void* p = malloc(size);       if (p == nullptr) {           throw("new[] failed to allocate %zu bytes", size);       }       return p;   }      void  operator delete(void* ptr) throw() {       free(ptr);   }   void  operator delete[](void* ptr) throw() {       free(ptr);   }      `
 
@@ -347,13 +326,12 @@ void fun() {
 在上述main函数中，我们使用new 操作符创建一个Test类指针
 
 1. 通过operator new申请内存(底层malloc实现)
-    
-2. 通过placement new在上述申请的内存块上调用构造函数
-    
-3. 调用ptr->~Test()释放Test对象的成员变量
-    
-4. 调用operator delete释放内存
-    
+
+1. 通过placement new在上述申请的内存块上调用构造函数
+
+1. 调用ptr->~Test()释放Test对象的成员变量
+
+1. 调用operator delete释放内存
 
 上述过程，可以理解为如下：
 
@@ -369,7 +347,7 @@ void fun() {
 
 此处会产生内存泄漏，在上面，我们已经分析过，new操作符会先通过operator new分配一块内存，然后在该块内存上调用placement new即调用Test的构造函数。而在上述代码中，只是通过free函数释放了内存，但是没有调用Test的析构函数以释放Test的成员变量，从而引起`内存泄漏`。
 
-#### new[] 和 delete
+#### new\[\] 和 delete
 
 `int main() {     Test *t = new Test [10];     // do sth     delete t;     return 0;   }   `
 
@@ -377,7 +355,7 @@ void fun() {
 
 `in Test   in Test   in Test   in Test   in Test   in Test   in Test   in Test   in Test   in Test   in ~Test   `
 
-从上面输出结果可以看出，调用了10次构造函数，但是只调用了一次析构函数，所以引起了`内存泄漏`。这是因为调用delete t释放了通过operator new[]申请的内存，即malloc申请的内存块，且只调用了t[0]对象的析构函数，t[1..9]对象的析构函数并没有被调用。
+从上面输出结果可以看出，调用了10次构造函数，但是只调用了一次析构函数，所以引起了`内存泄漏`。这是因为调用delete t释放了通过operator new\[\]申请的内存，即malloc申请的内存块，且只调用了t\[0\]对象的析构函数，t\[1..9\]对象的析构函数并没有被调用。
 
 ### 虚析构
 
@@ -418,20 +396,18 @@ void fun() {
 派生类对象在创建时构造函数调用顺序：
 
 1. 调用父类的构造函数
-    
-2. 调用父类成员变量的构造函数
-    
-3. 调用派生类本身的构造函数
-    
+
+1. 调用父类成员变量的构造函数
+
+1. 调用派生类本身的构造函数
 
 派生类对象在析构时的析构函数调用顺序：
 
 1. 执行派生类自身的析构函数
-    
-2. 执行派生类成员变量的析构函数
-    
-3. 执行父类的析构函数
-    
+
+1. 执行派生类成员变量的析构函数
+
+1. 执行父类的析构函数
 
 为了避免存在继承关系时候的内存泄漏，请遵守一条规则：无论派生类有没有申请堆上的资源，请将父类的`析构函数声明为virtual`。
 
@@ -454,8 +430,8 @@ void fun() {
 通过上面输出可以发现，因为引用计数都是2，所以在main函数结束的时候，不会调用controller和sub_controller的析构函数，所以就出现了`内存泄漏`。
 
 上面产生内存泄漏的原因，就是我们常说的`循环引用`。
-![[Pasted image 20240928180452.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928180452.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 为了解决std::shared_ptr循环引用导致的内存泄漏，我们可以使用std::weak_ptr来单面去除上图中的循环。
 
@@ -466,8 +442,8 @@ void fun() {
 `controller use_count: 1   sub_controller use_count: 2   in ~Controller   in ~SubController   `
 
 从上面结果可以看出，controller和sub_controller均以释放，所以`循环引用`引起的内存泄漏问题，也得以解决。
-![[Pasted image 20240928180501.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240928180501.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可能有人会问，使用std::shared_ptr可以直接访问对应的成员函数，如果是std::weak_ptr的话，怎么访问呢？我们可以使用下面的方式:
 
@@ -484,11 +460,10 @@ void fun() {
 ### 手动释放
 
 - 对于malloc函数分配的内存，在结束使用的时候，使用free函数进行释放
-    
+
 - 对于new操作符创建的对象，切记使用delete来进行释放
-    
-- 对于new []创建的对象，使用delete[]来进行释放(使用free或者delete均会造成内存泄漏)
-    
+
+- 对于new \[\]创建的对象，使用delete\[\]来进行释放(使用free或者delete均会造成内存泄漏)
 
 ### 避免使用裸指针
 
@@ -496,18 +471,17 @@ void fun() {
 
 `int fun(int *ptr) {// fun 是一个接口或lib函数     // do sth          return 0;   }      int main() {}     int a = 1000;     int *ptr = &a;     // ...     fun(ptr);          return 0;   }      `
 
-在上面的fun函数中，有一个参数ptr,为int *，我们需要根据上下文来分析这个指针是否需要释放，这是一种`很不好的设计`
+在上面的fun函数中，有一个参数ptr,为int \*，我们需要根据上下文来分析这个指针是否需要释放，这是一种`很不好的设计`
 
 ### 使用STL中或者自己实现对象
 
 在C++中，提供了相对完善且可靠的STL供我们使用，所以能用STL的尽可能的避免使用C中的编程方式，比如：
 
-- 使用std::string 替代char *, string类自己会进行内存管理，而且优化的相当不错
-    
+- 使用std::string 替代char \*, string类自己会进行内存管理，而且优化的相当不错
+
 - 使用std::vector或者std::array来替代传统的数组
-    
+
 - 其它适合使用场景的对象
-    
 
 ### 智能指针
 
@@ -520,17 +494,16 @@ unique_ptr是限制最严格的一种智能指针，用来替代之前的auto_pt
 unique_ptr对象分为以下两类：
 
 - unique_ptr该类型的对象关联了单个Type类型的指针
-    
-    `std::unique_ptr<Type>   p1(new Type); // c++11   auto p1 = std::make_unique<Type>(); // c++14   `
-    
-- unique_ptr<Type[]> 该类型的对象关联了多个Type类型指针，即一个对象数组
-    
-    `std::unique_ptr<Type[]> p2(new Type[n]()); // c++11   auto p2 = std::make_unique<Type[]>(n); // c++14   `
-    
+
+  `std::unique_ptr<Type>   p1(new Type); // c++11   auto p1 = std::make_unique<Type>(); // c++14   `
+
+- unique_ptr\<Type\[\]> 该类型的对象关联了多个Type类型指针，即一个对象数组
+
+  `std::unique_ptr<Type[]> p2(new Type[n]()); // c++11   auto p2 = std::make_unique<Type[]>(n); // c++14   `
+
 - 不可用被复制
-    
-    `unique_ptr<int> a(new int(0));   unique_ptr<int> b = a;  // 编译错误   unique_ptr<int> b = std::move(a); // 可以通过move语义进行所有权转移   `
-    
+
+  `unique_ptr<int> a(new int(0));   unique_ptr<int> b = a;  // 编译错误   unique_ptr<int> b = std::move(a); // 可以通过move语义进行所有权转移   `
 
 根据使用场景，可以使用std::unique_ptr来避免内存泄漏，如下：
 
@@ -568,7 +541,7 @@ RAII的做法是使用一个对象，在其构造时获取对应的资源，在�
 
 `std::mutex mutex_;      void fun() {     std::lock_guard<std::mutex> guard(mutex_);        if (...) {       return;     }   }   `
 
-在guard出了fun作用域的时候，会自动调用mutex_.lock()进行释放，避免了很多不必要的问题。
+在guard出了fun作用域的时候，会自动调用mutex\_.lock()进行释放，避免了很多不必要的问题。
 
 ## 定位
 
@@ -597,9 +570,8 @@ RAII的做法是使用一个对象，在其构造时获取对应的资源，在�
 `#include <stdlib.h>      void func (void){       char *buff = (char*)malloc(10);   }      int main (void){       func(); // 产生内存泄漏       return 0;   }   `
 
 - 通过`gcc -g leak.c -o leak`命令进行编译
-    
+
 - 执行`valgrind --leak-check=full ./leak`
-    
 
 在上述的命令执行后，会输出如下：
 
@@ -608,13 +580,12 @@ RAII的做法是使用一个对象，在其构造时获取对应的资源，在�
 valgrind的检测信息将内存泄漏分为如下几类：
 
 - definitely lost：确定产生内存泄漏
-    
+
 - indirectly lost：间接产生内存泄漏
-    
+
 - possibly lost：可能存在内存泄漏
-    
+
 - still reachable：即使在程序结束时候，仍然有指针在指向该块内存，常见于全局变量
-    
 
 主要上面输出的下面几句：
 
@@ -625,9 +596,9 @@ valgrind的检测信息将内存泄漏分为如下几类：
 valgrind不仅可以检测内存泄漏，还有其他很强大的功能，由于本文以内存泄漏为主，所以其他的功能就不在此赘述了，有兴趣的可以通过`valgrind --help`来进行查看
 
 > ❝
-> 
+>
 > 对于Windows下的内存泄漏检测工具，笔者推荐一款轻量级功能却非常强大的工具`UMDH`，笔者在十二年前，曾经在某外企负责内存泄漏，代码量几百万行，光编译就需要两个小时，尝试了各种工具(免费的和收费的)，最终发现了UMDH，如果你在Windows上进行开发，强烈推荐。
-> 
+>
 > ❞
 
 ### 经验之谈
@@ -637,13 +608,12 @@ valgrind不仅可以检测内存泄漏，还有其他很强大的功能，由于
 在开发过程中遵守下面的规则，基本能90+%避免内存泄漏：
 
 - 良好的编程习惯，只有有malloc/new，就得有free/delete
-    
+
 - 尽可能的使用智能指针，智能指针就是为了解决内存泄漏而产生
-    
+
 - 使用log进行记录
-    
+
 - 也是最重要的一点，`谁申请，谁释放`
-    
 
 对于malloc分配内存，分配失败的时候返回值为NULL，此时程序可以直接退出了，而对于new进行内存分配，其分配失败的时候，是抛出`std::bad_alloc`，所以为了第一时间发现问题，不要对new异常进行catch，毕竟内存都分配失败了，程序也没有运行的必要了。
 
@@ -671,33 +641,21 @@ https://www.usna.edu/Users/cs/roche/courses/s19ic221/lab05.html
 
 https://stackoverflow.com/questions/6261201/how-to-find-memory-leak-in-a-c-code-project
 
-  
-
 如果对本文有疑问可以加笔者**微信**直接交流，笔者也建了C/C++相关的技术群，有兴趣的可以联系笔者加群。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **往期****精彩****回顾**
 
-  
+[GDB调试-从入门实践到原理](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486816&idx=1&sn=a6dfc1361ce15ce5ad1c7d7734f9c939&chksm=c3376ba7f440e2b18267c303c35572ab089fb97d3b2fe0adb58009637d6631020bb52bd9a28c&scene=21#wechat_redirect)
 
-  
+[【线上问题】P1级公司故障，年终奖不保](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486357&idx=1&sn=3e7b88218f4416980b20add7575baa9a&chksm=c3376d52f440e444d28a01ef930ddfb92b5d30f26e7284012f08624ca1599e7efac1da3fb17c&scene=21#wechat_redirect)
 
-  
-
-  
-
-[GDB调试-从入门实践到原理](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486816&idx=1&sn=a6dfc1361ce15ce5ad1c7d7734f9c939&chksm=c3376ba7f440e2b18267c303c35572ab089fb97d3b2fe0adb58009637d6631020bb52bd9a28c&scene=21#wechat_redirect)  
-
-[【线上问题】P1级公司故障，年终奖不保](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486357&idx=1&sn=3e7b88218f4416980b20add7575baa9a&chksm=c3376d52f440e444d28a01ef930ddfb92b5d30f26e7284012f08624ca1599e7efac1da3fb17c&scene=21#wechat_redirect)  
-
-[【性能优化】lock-free在召回引擎中的实现](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486314&idx=1&sn=b35ba826f97019d08671e143d5302152&chksm=c3376dadf440e4bb44c6b69cb135f980b5f2101066eab1730d2d33987764bf67507037ff7195&scene=21#wechat_redirect)  
+[【性能优化】lock-free在召回引擎中的实现](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486314&idx=1&sn=b35ba826f97019d08671e143d5302152&chksm=c3376dadf440e4bb44c6b69cb135f980b5f2101066eab1730d2d33987764bf67507037ff7195&scene=21#wechat_redirect)
 
 [【性能优化】高效内存池的设计与实现](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486254&idx=1&sn=ebce58aa6b547af2a818faa5a6412e89&chksm=c3376de9f440e4ffea267926b7ce09ac439ab33a1da9dc6b4d631c971053f628cf91202d0f53&scene=21#wechat_redirect)
 
 [2万字|30张图带你领略glibc内存管理精髓](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247485953&idx=1&sn=f8cd484607ab07f15247ecde773d2e1c&chksm=c3376cc6f440e5d047f7e648c951fd583df82ab4e3dab5767baeddef9fe7c1270f05b039d8c4&scene=21#wechat_redirect)
-
-  
 
 **点个关注吧!**
 

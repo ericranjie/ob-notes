@@ -43,7 +43,7 @@
 
 对比是一个不错的学习方法，我们先看看ARM32的情况。对于ARM32而言，cpu可以处在各种processor mode下，例如User、FIQ、IRQ、Abort、Undefined、System，这些不同的mode又对应两种privilege level，non-privilege（user processor mode）和privilege（其他processor mode）。
 
-来到ARM64，processor mode这个概念已经消失了，取而代之的是exception level，如果没有支持两个security state（但是支持虚拟化），那么ARM64有3个exception level，分别是：EL0（对应user mode的application），EL1（guest OS）和EL2（Hypervisor）。如果支持两个security state（但是不支持虚拟化），ARM64还是有3个exception level，分别是：EL0（对应trusted service），EL1（trusted OS kernel）和EL3（Secure monitor）。如果支持了虚拟化并且同时支持两种security state，那么ARM64的处理器可以处于4种exception level，具体如下（摘自wowo同学的文章里面的图片，^_^）：
+来到ARM64，processor mode这个概念已经消失了，取而代之的是exception level，如果没有支持两个security state（但是支持虚拟化），那么ARM64有3个exception level，分别是：EL0（对应user mode的application），EL1（guest OS）和EL2（Hypervisor）。如果支持两个security state（但是不支持虚拟化），ARM64还是有3个exception level，分别是：EL0（对应trusted service），EL1（trusted OS kernel）和EL3（Secure monitor）。如果支持了虚拟化并且同时支持两种security state，那么ARM64的处理器可以处于4种exception level，具体如下（摘自wowo同学的文章里面的图片，^\_^）：
 
 ![](http://www.wowotech.net/content/uploadfile/201507/7ffa71881f6356c740ef254b01cecf1520150707143059.gif)
 
@@ -157,26 +157,26 @@ synchronoud abort有可能在cpu执行指令过程中的任何一步发生。例
 
 1、EL1的异常向量表。当发生一个异常，并且处理器迁移到了EL1这个exception level，那么该异常由EL1的异常向量表来决定如果跳转到相应的exception handler。具体代码如下：
 
->     .align    11－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）  
-> ENTRY(vectors)－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->     ventry    el1_sync_invalid        // Synchronous EL1t－－－－－－－－－－－－－－（3）  
->     ventry    el1_irq_invalid            // IRQ EL1t  
->     ventry    el1_fiq_invalid            // FIQ EL1t  
->     ventry    el1_error_invalid        // Error EL1t
-> 
->     ventry    el1_sync            // Synchronous EL1h －－－－－－－－－－－－－－－－（4）  
->     ventry    el1_irq                // IRQ EL1h  
->     ventry    el1_fiq_invalid            // FIQ EL1h  
->     ventry    el1_error_invalid        // Error EL1h
-> 
->     ventry    el0_sync            // Synchronous 64-bit EL0 －－－－－－－－－－－－－－（5）  
->     ventry    el0_irq                // IRQ 64-bit EL0  
->     ventry    el0_fiq_invalid            // FIQ 64-bit EL0  
->     ventry    el0_error_invalid        // Error 64-bit EL0   
->     ventry    el0_sync_invalid        // Synchronous 32-bit EL0 －－－－－－－－－－－－（6）  
->     ventry    el0_irq_invalid            // IRQ 32-bit EL0  
->     ventry    el0_fiq_invalid            // FIQ 32-bit EL0  
->     ventry    el0_error_invalid        // Error 32-bit EL0  
+> .align    11－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）\
+> ENTRY(vectors)－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）\
+> ventry    el1_sync_invalid        // Synchronous EL1t－－－－－－－－－－－－－－（3）\
+> ventry    el1_irq_invalid            // IRQ EL1t\
+> ventry    el1_fiq_invalid            // FIQ EL1t\
+> ventry    el1_error_invalid        // Error EL1t
+>
+> ventry    el1_sync            // Synchronous EL1h －－－－－－－－－－－－－－－－（4）\
+> ventry    el1_irq                // IRQ EL1h\
+> ventry    el1_fiq_invalid            // FIQ EL1h\
+> ventry    el1_error_invalid        // Error EL1h
+>
+> ventry    el0_sync            // Synchronous 64-bit EL0 －－－－－－－－－－－－－－（5）\
+> ventry    el0_irq                // IRQ 64-bit EL0\
+> ventry    el0_fiq_invalid            // FIQ 64-bit EL0\
+> ventry    el0_error_invalid        // Error 64-bit EL0 \
+> ventry    el0_sync_invalid        // Synchronous 32-bit EL0 －－－－－－－－－－－－（6）\
+> ventry    el0_irq_invalid            // IRQ 32-bit EL0\
+> ventry    el0_fiq_invalid            // FIQ 32-bit EL0\
+> ventry    el0_error_invalid        // Error 32-bit EL0\
 > END(vectors)
 
 （1）EL1的异常向量表保存在VBAR_EL1寄存器中（Vector Base Address Register (EL1)），该寄存器的低11bit是reserve的，11～63表示了Vector Base Address，因此这里的异常向量表是2K对齐的。
@@ -191,7 +191,7 @@ synchronoud abort有可能在cpu执行指令过程中的任何一步发生。例
 
 （6）同（5）不过发生异常的现场处于AArch32状态。
 
-2、EL2的异常向量表。在本文的场景下（不支持虚拟化），实际上EL2的异常向量表没有存在的意义，如果硬件支持EL2，这时候，linux kernel可以做为hypervisor存在。启动的时候，在el2_setup函数中会设定一个dummy的EL2异常向量表（__hyp_stub_vectors）。当然，真正的EL2的异常向量表会在kvm初始化的时候完成设定。
+2、EL2的异常向量表。在本文的场景下（不支持虚拟化），实际上EL2的异常向量表没有存在的意义，如果硬件支持EL2，这时候，linux kernel可以做为hypervisor存在。启动的时候，在el2_setup函数中会设定一个dummy的EL2异常向量表（\_\_hyp_stub_vectors）。当然，真正的EL2的异常向量表会在kvm初始化的时候完成设定。
 
 六、参考文献
 
@@ -207,181 +207,181 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [显示技术介绍(2)_电子显示的前世今生](http://www.wowotech.net/display/display_tech_intro.html) | [Linux进程冻结技术](http://www.wowotech.net/pm_subsystem/237.html)»
+« [显示技术介绍(2)\_电子显示的前世今生](http://www.wowotech.net/display/display_tech_intro.html) | [Linux进程冻结技术](http://www.wowotech.net/pm_subsystem/237.html)»
 
 **评论：**
 
-**伊斯科明**  
+**伊斯科明**\
 2020-07-30 17:16
 
 大佬，你这昵称很危险啊
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-8075)
 
-**renameit**  
+**renameit**\
 2020-07-28 16:49
 
 我很想知道，对于System error，这个V8独有的中断向量定义，对应的v7里面是怎么处理的
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-8071)
 
-**[bsp](http://www.wowotech.net/)**  
+**[bsp](http://www.wowotech.net/)**\
 2018-11-28 11:31
 
-arm32的中断向量表地址一般是0xffff0000，然后中断或异常发生时 由硬件跳转到对应的地址，比如  
-ffff1004 t vector_rst  
-ffff1020 t vector_irq  
-ffff10a0 t vector_dabt  
-ffff1120 t vector_pabt  
-ffff11a0 t vector_und  
-ffff1220 t vector_addrexcptn  
-ffff1240 T vector_fiq  
+arm32的中断向量表地址一般是0xffff0000，然后中断或异常发生时 由硬件跳转到对应的地址，比如\
+ffff1004 t vector_rst\
+ffff1020 t vector_irq\
+ffff10a0 t vector_dabt\
+ffff1120 t vector_pabt\
+ffff11a0 t vector_und\
+ffff1220 t vector_addrexcptn\
+ffff1240 T vector_fiq\
 那么，Arm-v8a在硬件层是怎么跳转的呢？
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-7059)
 
-**[bsp](http://www.wowotech.net/)**  
+**[bsp](http://www.wowotech.net/)**\
 2018-11-28 11:39
 
 @bsp：sorry，看玩了文章，已经有所了解，多谢楼主！
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-7060)
 
-**[badao](http://cole.sciecne/)**  
+**[badao](http://cole.sciecne/)**\
 2018-07-04 13:50
 
 十分感谢，最近在看arm的异常分发流程，看到您的博客真的是省了很多时间
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-6836)
 
-**CHENYAN**  
+**CHENYAN**\
 2016-09-27 16:45
 
 看了你的文章深受启发,最近一直在研究ARM64 Linux的系统调用的HOOK方法.记得以前X86平台下可以通过IDT寄存器获取系统调用表的基地址.我看了ARM64的内核代码,貌似没有类似的寄存器.想问一下ARM64由办法获取系统调用表的基地址吗?感谢楼主
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4617)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-09-27 19:12
 
-@CHENYAN：对于ARM64，VBAR_ELx寄存器保存中各个exception level的异常向量表的基地址，应该类似与X86的IDT寄存器。  
-  
+@CHENYAN：对于ARM64，VBAR_ELx寄存器保存中各个exception level的异常向量表的基地址，应该类似与X86的IDT寄存器。
+
 你问题中的系统调用表是指什么？是指保存各个系统调用跳转函数的入口表格（sys_call_table）吗？这个表是软件定义，和硬件无关啊。
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4619)
 
-**CHENYAN**  
+**CHENYAN**\
 2016-09-28 10:14
 
-@linuxer：@linuxer 多谢你的回复!  
-  
-我的需求是要能够在自己编写的内核模块获取sys_call_table,然后通过sys_call_table获取和修改系统调用表中的跳转地址. 比如 :  
-  read函数指针类型 old_read = sys_call_table[_NR_read];  
-  sys_call_table[__NR_read] = xxxx;  
-  
-我看ARM64平台的sys_call_table是在sys.c文件中定义的,  
-       void *sys_call_table[__NR_syscalls] __aligned(4096) = {  
-           [0 ... __NR_syscalls - 1] = sys_ni_syscall,  
-               #include <asm/unistd.h>  
-       };  
-  在entry.S文件中直接访问 : adrp  stbl, sys_call_table.  
-  这样我的理解是, 自己编写的内核模块代码根本没办法访问sys_call_table, 因为sys_call_table入口既和寄存器没有半毛钱关系, 又没有哪个头文件有extern const unsigned long sys_call_table[] 这样的语句.  
-  
-  请问我的理解正确吗? 还有其他的思路能获取sys_call_table吗?
+@linuxer：@linuxer 多谢你的回复!
+
+我的需求是要能够在自己编写的内核模块获取sys_call_table,然后通过sys_call_table获取和修改系统调用表中的跳转地址. 比如 :\
+read函数指针类型 old_read = sys_call_table\[\_NR_read\];\
+sys_call_table\[\_\_NR_read\] = xxxx;
+
+我看ARM64平台的sys_call_table是在sys.c文件中定义的,\
+void \*sys_call_table\[\_\_NR_syscalls\] \_\_aligned(4096) = {\
+\[0 ... \_\_NR_syscalls - 1\] = sys_ni_syscall,\
+#include \<asm/unistd.h>\
+};\
+在entry.S文件中直接访问 : adrp  stbl, sys_call_table.\
+这样我的理解是, 自己编写的内核模块代码根本没办法访问sys_call_table, 因为sys_call_table入口既和寄存器没有半毛钱关系, 又没有哪个头文件有extern const unsigned long sys_call_table\[\] 这样的语句.
+
+请问我的理解正确吗? 还有其他的思路能获取sys_call_table吗?
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4622)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-09-28 11:16
 
 @CHENYAN：sys_call_table本身是一个内核符号，如果你的内核模块编译进入kernel image，那么其实你可以直接访问这个符号。如果你的内核模块是以模块的形式插入内核，那么就有点麻烦了，因为sys_call_table不是导出符号（EXPORT_SYMBOL），你的模块应该是无法访问的。
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4624)
 
-**CHENYAN**  
+**CHENYAN**\
 2016-09-28 13:51
 
 @linuxer：感谢你的回复! 这样说来我基本都明白了!
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4626)
 
-**tchvsps**  
+**tchvsps**\
 2016-12-05 11:29
 
-@CHENYAN：请问你看懂  
-[0 ... __NR_syscalls - 1] = sys_ni_syscall  
+@CHENYAN：请问你看懂\
+\[0 ... \_\_NR_syscalls - 1\] = sys_ni_syscall\
 这行代码了吗？
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4966)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2016-12-05 16:36
 
-@tchvsps：定义一个指针数组，并将其中的每个元素都初始化为sys_ni_syscall，效果和下面的类似：  
-char sa[8] = {                                                                    
-        [0 ... 7] = 0xaa,                                                        
+@tchvsps：定义一个指针数组，并将其中的每个元素都初始化为sys_ni_syscall，效果和下面的类似：\
+char sa\[8\] = {                                                                  \
+\[0 ... 7\] = 0xaa,                                                      \
 };
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-4967)
 
-**[madang](http://www.wowotech.net/)**  
+**[madang](http://www.wowotech.net/)**\
 2015-12-30 11:53
 
-这一组异常对应异常状态的迁移是EL1到EL1的迁移，并且选择使用了SP_EL0。对于linux kernel而言，这类exception vector实际上就是Invalid mode handlers  
-//------------------------------  
-请教一下：  
-这是什么场景下要用的异常向量表？没看明白。  
+这一组异常对应异常状态的迁移是EL1到EL1的迁移，并且选择使用了SP_EL0。对于linux kernel而言，这类exception vector实际上就是Invalid mode handlers\
+//------------------------------\
+请教一下：\
+这是什么场景下要用的异常向量表？没看明白。\
 同时Synchronous EL1t ，Synchronous EL1h 分表代表什么意思？
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-3308)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-12-30 12:35
 
-@madang：不同的exception level可以选择其使用的栈指针：  
-1、对于EL0，不能选择只能使用EL0_SP，我们简称为EL0t  
-2、对于EL1，可以选择使用EL0_SP，我们简称为EL1t，或者选择EL1_SP，我们简称EL1h  
-3、对于EL2，可以选择使用EL0_SP，我们简称为EL2t，或者选择EL2_SP，我们简称EL1h  
-4、对于EL3，可以选择使用EL0_SP，我们简称为EL3t，或者选择EL3_SP，我们简称EL1h  
-  
-t表示thread，h表示handler  
-  
-当发生一次异常之后，系统可以迁移到某个exception level（可能是t，也可能是h）。  
-  
+@madang：不同的exception level可以选择其使用的栈指针：\
+1、对于EL0，不能选择只能使用EL0_SP，我们简称为EL0t\
+2、对于EL1，可以选择使用EL0_SP，我们简称为EL1t，或者选择EL1_SP，我们简称EL1h\
+3、对于EL2，可以选择使用EL0_SP，我们简称为EL2t，或者选择EL2_SP，我们简称EL1h\
+4、对于EL3，可以选择使用EL0_SP，我们简称为EL3t，或者选择EL3_SP，我们简称EL1h
+
+t表示thread，h表示handler
+
+当发生一次异常之后，系统可以迁移到某个exception level（可能是t，也可能是h）。
+
 因此这一组异常向量对应系统迁移到EL1t这个状态。
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-3309)
 
-**[tigger](http://www.wowotech.net/)**  
+**[tigger](http://www.wowotech.net/)**\
 2015-11-26 14:04
 
 soga 哈哈
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-3145)
 
-**[tigger](http://www.wowotech.net/)**  
+**[tigger](http://www.wowotech.net/)**\
 2015-11-26 11:18
 
 上面那张讲exception level的图，secure firmware 不应该在 secure EL0 吧，应该在EL3, secure EL0 应该放的是secure的APP
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-3142)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-11-26 12:14
 
-@tigger：我是借用wowo同学的图片，如果是我画的话我会写 trusted application。  
-不过没有关系，领会精神就OK了（^_^，主要是我不想修改图片了）
+@tigger：我是借用wowo同学的图片，如果是我画的话我会写 trusted application。\
+不过没有关系，领会精神就OK了（^\_^，主要是我不想修改图片了）
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-3143)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2015-11-26 15:29
 
 @linuxer：哈哈，话说Tiger同学的眼神是相当的好啊。其实这个图片也不只我自己画的，主流的说法（包括ARM的Spec），都是trusted application。我之所以copy了一个非主流的，主要是里面隐藏的一个含义：trusted application的地位和用户application并不对等，虽然从软件层次上在一个level，但在功能上，trusted application更像一个firmware。PS：在嵌入式的语意里，firmware和application的概念类似，只是不能随意改动而已。
 
 [回复](http://www.wowotech.net/armv8a_arch/238.html#comment-3148)
 
-**[tigger](http://www.wowotech.net/)**  
+**[tigger](http://www.wowotech.net/)**\
 2015-11-26 17:13
 
 @wowo：最近在研究这个，所以比较关注这里。作为工程师就是要不断吸收新的东西，永不停歇啊
@@ -390,152 +390,155 @@ soga 哈哈
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [ARM Linux上的系统调用代码分析](http://www.wowotech.net/process_management/syscall-arm.html)
-    - [显示技术介绍(1)_概述](http://www.wowotech.net/display/display_tech_overview.html)
-    - [我眼中的可穿戴设备](http://www.wowotech.net/tech_discuss/106.html)
-    - [进程管理和终端驱动：基本概念](http://www.wowotech.net/process_management/process-tty-basic.html)
-    - [SDRAM Internals](http://www.wowotech.net/basic_tech/sdram-internals.html)
+
+  - [ARM Linux上的系统调用代码分析](http://www.wowotech.net/process_management/syscall-arm.html)
+  - [显示技术介绍(1)\_概述](http://www.wowotech.net/display/display_tech_overview.html)
+  - [我眼中的可穿戴设备](http://www.wowotech.net/tech_discuss/106.html)
+  - [进程管理和终端驱动：基本概念](http://www.wowotech.net/process_management/process-tty-basic.html)
+  - [SDRAM Internals](http://www.wowotech.net/basic_tech/sdram-internals.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

@@ -1,5 +1,6 @@
 Linux内核那些事
- _2021年10月19日 09:02_
+_2021年10月19日 09:02_
+
 ## 前言
 
 Unix标准的复制进程的系统调用时fork（即分叉），但是Linux，BSD等操作系统并不止实现这一个，确切的说linux实现了三个，fork,vfork,clone（确切说vfork创造出来的是轻量级进程，也叫线程，是共享资源的进程）
@@ -13,10 +14,10 @@ Unix标准的复制进程的系统调用时fork（即分叉），但是Linux，B
 fork, vfork和clone的系统调用的入口地址分别是sys_fork, sys_vfork和sys_clone, 而他们的定义是依赖于体系结构的, 因为在用户空间和内核空间之间传递参数的方法因体系结构而异
 
 > **系统调用的参数传递**
-> 
+>
 > 系统调用的实现与C库不同, 普通C函数通过将参数的值压入到进程的栈中进行参数的传递。由于系统调用是通过中断进程从用户态到内核态的一种特殊的函数调用，没有用户态或者内核态的堆栈可以被用来在调用函数和被调函数之间进行参数传递。系统调用通过CPU的寄存器来进行参数传递。在进行系统调用之前，系统调用的参数被写入CPU的寄存器，而在实际调用系统服务例程之前，内核将CPU寄存器的内容拷贝到内核堆栈中，实现参数的传递。
 
-因此不同的体系结构可能采用不同的方式或者不同的寄存器来传递参数，而上面函数的任务就是从处理器的寄存器中提取用户空间提供的信息, 并调用体系结构无关的 **_do_fork（或者早期的do_fork）函数, 负责进程的复制**
+因此不同的体系结构可能采用不同的方式或者不同的寄存器来传递参数，而上面函数的任务就是从处理器的寄存器中提取用户空间提供的信息, 并调用体系结构无关的 **\_do_fork（或者早期的do_fork）函数, 负责进程的复制**
 
 即不同的体系结构可能需要采用不同的方式或者寄存器来存储函数调用的参数， 因此linux在设计系统调用的时候, 将其划分成体系结构相关的层次和体系结构无关的层次, 前者复杂提取出依赖与体系结构的特定的参数，后者则依据参数的设置执行特定的真正操作。
 
@@ -41,9 +42,8 @@ linux2.5.32以后, 添加了TLS(Thread Local Storage)机制, clone的标识CLONE
 老版本的do_fork只有在如下情况才会定义
 
 - 只有当系统不支持通过TLS参数通过参数传递而是使用pt_regs寄存器列表传递时
-    
+
 - 未定义CONFIG_HAVE_COPY_THREAD_TLS宏
-    
 
 |参数|描述|
 |---|---|
@@ -55,8 +55,8 @@ linux2.5.32以后, 添加了TLS(Thread Local Storage)机制, clone的标识CLONE
 |child_tidptr|与clone的ctid参数相同, 子进程在用户太下pid的地址，该参数在CLONE_CHILD_SETTID标志被设定时有意义|
 
 其中clone_flags如下表所示
-![[Pasted image 20240923195855.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923195855.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 CLONE_FLAGS
 
@@ -151,31 +151,29 @@ SYSCALL_DEFINE5(clone, unsigned long, clone_flags, unsigned long, newsp, 
 
 ## 创建子进程的流程
 
-### _do_fork的流程
+### \_do_fork的流程
 
-> _do_fork和do_fork在进程的复制的时候并没有太大的区别, 他们就只是在进程tls复制的过程中实现有细微差别
+> \_do_fork和do_fork在进程的复制的时候并没有太大的区别, 他们就只是在进程tls复制的过程中实现有细微差别
 
 所有进程复制(创建)的fork机制最终都调用了kernel/fork.c中的_do_fork(一个体系结构无关的函数),
 
 > 其定义在 http://lxr.free-electrons.com/source/kernel/fork.c?v=4.2#L1679
 
-_do_fork以调用copy_process开始, 后者执行生成新的进程的实际工作, 并根据指定的标志复制父进程的数据。在子进程生成后, 内核必须执行下列收尾操作:
+\_do_fork以调用copy_process开始, 后者执行生成新的进程的实际工作, 并根据指定的标志复制父进程的数据。在子进程生成后, 内核必须执行下列收尾操作:
 
 1. 调用 copy_process 为子进程复制出一份进程信息
-    
-2. 如果是 vfork（设置了CLONE_VFORK和ptrace标志）初始化完成处理信息
-    
-3. 调用 wake_up_new_task 将子进程加入调度器，为之分配 CPU
-    
-4. 如果是 vfork，父进程等待子进程完成 exec 替换自己的地址空间
-    
 
-> 我们从<深入linux'内核架构>中找到了早期的流程图，基本一致可以作为参考
+1. 如果是 vfork（设置了CLONE_VFORK和ptrace标志）初始化完成处理信息
 
-![[Pasted image 20240923200025.png]]
+1. 调用 wake_up_new_task 将子进程加入调度器，为之分配 CPU
 
+1. 如果是 vfork，父进程等待子进程完成 exec 替换自己的地址空间
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+> 我们从\<深入linux'内核架构>中找到了早期的流程图，基本一致可以作为参考
+
+!\[\[Pasted image 20240923200025.png\]\]
+
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 do_fork
 
@@ -188,23 +186,22 @@ long _do_fork(unsigned long clone_flags,      unsigned long stack_sta
 > http://lxr.free-electrons.com/source/kernel/fork.c?v=4.5#L1237
 
 1. 调用 dup_task_struct 复制当前的 task_struct
-    
-2. 检查进程数是否超过限制
-    
-3. 初始化自旋锁、挂起信号、CPU 定时器等
-    
-4. 调用 sched_fork 初始化进程数据结构，并把进程状态设置为 TASK_RUNNING
-    
-5. 复制所有进程信息，包括文件系统、信号处理函数、信号、内存管理等
-    
-6. 调用 copy_thread_tls 初始化子进程内核栈
-    
-7. 为新进程分配并设置新的 pid
-    
 
-> 我们从<深入linux'内核架构>中找到了早期的流程图，基本一致可以作为参考
-![[Pasted image 20240923195950.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 检查进程数是否超过限制
+
+1. 初始化自旋锁、挂起信号、CPU 定时器等
+
+1. 调用 sched_fork 初始化进程数据结构，并把进程状态设置为 TASK_RUNNING
+
+1. 复制所有进程信息，包括文件系统、信号处理函数、信号、内存管理等
+
+1. 调用 copy_thread_tls 初始化子进程内核栈
+
+1. 为新进程分配并设置新的 pid
+
+> 我们从\<深入linux'内核架构>中找到了早期的流程图，基本一致可以作为参考
+> !\[\[Pasted image 20240923195950.png\]\]
+> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 do_fork
 
@@ -221,18 +218,16 @@ static struct task_struct *dup_task_struct(struct task_struct *orig){ stru
 ```
 
 1. 调用alloc_task_struct_node分配一个 task_struct 节点
-    
-2. 调用alloc_thread_info_node分配一个 thread_info 节点，其实是分配了一个thread_union联合体,将栈底返回给 ti
-    
+
+1. 调用alloc_thread_info_node分配一个 thread_info 节点，其实是分配了一个thread_union联合体,将栈底返回给 ti
 
 ```c
 union thread_union {   struct thread_info thread_info;  unsigned long stack[THREAD_SIZE/sizeof(long)];};
 ```
 
 - 最后将栈底的值 ti 赋值给新节点的栈
-    
+
 - 最终执行完dup_task_struct之后，子进程除了tsk->stack指针不同之外，全部都一样！
-    
 
 ## sched_fork 流程
 
@@ -243,9 +238,8 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p){ unsigne
 我们可以看到sched_fork大致完成了两项重要工作，
 
 - 一是将子进程状态设置为 TASK_RUNNING，
-    
+
 - 二是为其分配 CPU
-    
 
 ## copy_thread和copy_thread_tls流程
 
@@ -271,34 +265,32 @@ int copy_thread_tls(unsigned long clone_flags, unsigned long sp,    un
 copy_thread 这段代码为我们解释了两个相当重要的问题！
 
 - 一是，为什么 fork 在子进程中返回0，原因是childregs->ax = 0;这段代码将子进程的 eax 赋值为0
-    
+
 - 二是，p->thread.ip = (unsigned long) ret_from_fork;将子进程的 ip 设置为 ret_form_fork 的首地址，因此子进程是从 ret_from_fork 开始执行的
-    
 
 ## 总结
 
 fork, vfork和clone的系统调用的入口地址分别是sys_fork, sys_vfork和sys_clone, 而他们的定义是依赖于体系结构的, 而他们最终都调用了_do_fork（linux-4.2之前的内核中是do_fork），在_do_fork中通过copy_process复制进程的信息，调用wake_up_new_task将子进程加入调度器中
 
 1. dup_task_struct中为其分配了新的堆栈
-    
-2. 调用了sched_fork，将其置为TASK_RUNNING
-    
-3. copy_thread(_tls)中将父进程的寄存器上下文复制给子进程，保证了父子进程的堆栈信息是一致的,
-    
-4. 将ret_from_fork的地址设置为eip寄存器的值
-    
-5. 为新进程分配并设置新的pid
-    
-6. 最终子进程从ret_from_fork开始执行
-    
+
+1. 调用了sched_fork，将其置为TASK_RUNNING
+
+1. copy_thread(\_tls)中将父进程的寄存器上下文复制给子进程，保证了父子进程的堆栈信息是一致的,
+
+1. 将ret_from_fork的地址设置为eip寄存器的值
+
+1. 为新进程分配并设置新的pid
+
+1. 最终子进程从ret_from_fork开始执行
 
 进程的创建到执行过程如下图所示
-![[Pasted image 20240923201201.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923201201.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 进程的状态
 
-转自：  
+转自：
 
 https://blog.csdn.net/gatieme/article/details/51569932
 

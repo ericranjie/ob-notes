@@ -57,11 +57,11 @@ Netlink 是一种在内核与用户应用间进行双向数据传输的非常好
 **Netlink 相对于系统调用，[ioctl](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=2&q=ioctl&zhida_source=entity) 以及 /proc 文件系统而言具有以下优点：**
 
 1. 为了使用 netlink，用户仅需要在 include/linux/netlink.h 中增加一个新类型的 netlink 协议定义即可， 如 #define NETLINK_MYTEST 17 然后，内核和用户态应用就可以立即通过 socket API 使用该 netlink 协议类型进行数据交换。但系统调用需要增加新的系统调用，ioctl 则需要增加设备或文件， 那需要不少代码，proc 文件系统则需要在 /proc 下添加新的文件或目录，那将使本来就混乱的 /proc 更加混乱。
-2. netlink是一种[异步通信机制](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=1&q=%E5%BC%82%E6%AD%A5%E9%80%9A%E4%BF%A1%E6%9C%BA%E5%88%B6&zhida_source=entity)，在内核与用户态应用之间传递的消息保存在socket缓存队列中，发送消息只是把消息保存在接收者的socket的接 收队列，而不需要等待接收者收到消息，但系统调用与 ioctl 则是[同步通信](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=1&q=%E5%90%8C%E6%AD%A5%E9%80%9A%E4%BF%A1&zhida_source=entity)机制，如果传递的数据太长，将影响调度粒度。
-3. 使用 netlink 的内核部分可以采用模块的方式实现，使用 netlink 的应用部分和内核部分没有编译时依赖，但系统调用就有依赖，而且新的系统调用的实现必须静态地连接到内核中，它无法在模块中实现，使用新系统调用的应用在编译时需要依赖内核。
-4. netlink 支持多播，内核模块或应用可以把消息多播给一个netlink组，属于该neilink 组的任何内核模块或应用都能接收到该消息，[内核事件](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=2&q=%E5%86%85%E6%A0%B8%E4%BA%8B%E4%BB%B6&zhida_source=entity)向用户态的通知机制就使用了这一特性，任何对内核事件感兴趣的应用都能收到该子系统发送的内核事件，在 后面的文章中将介绍这一机制的使用。
-5. 内核可以使用 netlink 首先发起会话，但系统调用和 ioctl 只能由用户应用发起调用。
-6. netlink 使用标准的 socket API，因此很容易使用，但系统调用和 ioctl则需要专门的培训才能使用。
+1. netlink是一种[异步通信机制](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=1&q=%E5%BC%82%E6%AD%A5%E9%80%9A%E4%BF%A1%E6%9C%BA%E5%88%B6&zhida_source=entity)，在内核与用户态应用之间传递的消息保存在socket缓存队列中，发送消息只是把消息保存在接收者的socket的接 收队列，而不需要等待接收者收到消息，但系统调用与 ioctl 则是[同步通信](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=1&q=%E5%90%8C%E6%AD%A5%E9%80%9A%E4%BF%A1&zhida_source=entity)机制，如果传递的数据太长，将影响调度粒度。
+1. 使用 netlink 的内核部分可以采用模块的方式实现，使用 netlink 的应用部分和内核部分没有编译时依赖，但系统调用就有依赖，而且新的系统调用的实现必须静态地连接到内核中，它无法在模块中实现，使用新系统调用的应用在编译时需要依赖内核。
+1. netlink 支持多播，内核模块或应用可以把消息多播给一个netlink组，属于该neilink 组的任何内核模块或应用都能接收到该消息，[内核事件](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=2&q=%E5%86%85%E6%A0%B8%E4%BA%8B%E4%BB%B6&zhida_source=entity)向用户态的通知机制就使用了这一特性，任何对内核事件感兴趣的应用都能收到该子系统发送的内核事件，在 后面的文章中将介绍这一机制的使用。
+1. 内核可以使用 netlink 首先发起会话，但系统调用和 ioctl 只能由用户应用发起调用。
+1. netlink 使用标准的 socket API，因此很容易使用，但系统调用和 ioctl则需要专门的培训才能使用。
 
 Netlink协议基于BSD socket和AF_NETLINK地址簇，使用32位的端口号寻址，每个Netlink协议通常与一个或一组内核服务/组件相关联，如NETLINK_ROUTE用于获取和设置路由与链路信息、NETLINK_KOBJECT_UEVENT用于内核向用户空间的udev进程发送通知等。
 
@@ -244,17 +244,17 @@ struct nlmsghdr
 ```
 
 1. 标志NLM_F_REQUEST用于表示消息是一个请求，所有应用首先发起的消息都应设置该标志。
-2. 标志NLM_F_MULTI 用于指示该消息是一个多部分消息的一部分，后续的消息可以通过宏NLMSG_NEXT来获得。
-3. 宏NLM_F_ACK表示该消息是前一个请求消息的响应，顺序号与进程ID可以把请求与响应关联起来。
-4. 标志NLM_F_ECHO表示该消息是相关的一个包的回传。
-5. 标志NLM_F_ROOT 被许多 netlink 协议的各种数据获取操作使用，该标志指示被请求的数据表应当整体返回用户应用，而不是一个条目一个条目地返回。有该标志的请求通常导致响应消息设置 NLM_F_MULTI标志。注意，当设置了该标志时，请求是协议特定的，因此，需要在字段 nlmsg_type 中指定协议类型。
-6. 标志 NLM_F_MATCH 表示该协议特定的请求只需要一个数据子集，数据子集由指定的协议特定的过滤器来匹配。
-7. 标志 NLM_F_ATOMIC 指示请求返回的数据应当原子地收集，这预防数据在获取期间被修改。
-8. 标志 NLM_F_DUMP 未实现。
-9. 标志 NLM_F_REPLACE 用于取代在数据表中的现有条目。
-10. 标志 NLM_F_EXCL_ 用于和 CREATE 和 APPEND 配合使用，如果条目已经存在，将失败。
-11. 标志 NLM_F_CREATE 指示应当在指定的表中创建一个条目。
-12. 标志 NLM_F_APPEND 指示在表末尾添加新的条目。
+1. 标志NLM_F_MULTI 用于指示该消息是一个多部分消息的一部分，后续的消息可以通过宏NLMSG_NEXT来获得。
+1. 宏NLM_F_ACK表示该消息是前一个请求消息的响应，顺序号与进程ID可以把请求与响应关联起来。
+1. 标志NLM_F_ECHO表示该消息是相关的一个包的回传。
+1. 标志NLM_F_ROOT 被许多 netlink 协议的各种数据获取操作使用，该标志指示被请求的数据表应当整体返回用户应用，而不是一个条目一个条目地返回。有该标志的请求通常导致响应消息设置 NLM_F_MULTI标志。注意，当设置了该标志时，请求是协议特定的，因此，需要在字段 nlmsg_type 中指定协议类型。
+1. 标志 NLM_F_MATCH 表示该协议特定的请求只需要一个数据子集，数据子集由指定的协议特定的过滤器来匹配。
+1. 标志 NLM_F_ATOMIC 指示请求返回的数据应当原子地收集，这预防数据在获取期间被修改。
+1. 标志 NLM_F_DUMP 未实现。
+1. 标志 NLM_F_REPLACE 用于取代在数据表中的现有条目。
+1. 标志 NLM_F_EXCL\_ 用于和 CREATE 和 APPEND 配合使用，如果条目已经存在，将失败。
+1. 标志 NLM_F_CREATE 指示应当在指定的表中创建一个条目。
+1. 标志 NLM_F_APPEND 指示在表末尾添加新的条目。
 
 内核需要读取和修改这些标志，对于一般的使用，用户把它设置为 0 就可以，只是一些高级应用（如 netfilter 和路由 daemon 需要它进行一些复杂的操作），字段 nlmsg_seq 和 nlmsg_pid 用于[应用追踪](https://zhida.zhihu.com/search?content_id=242331924&content_type=Article&match_order=1&q=%E5%BA%94%E7%94%A8%E8%BF%BD%E8%B8%AA&zhida_source=entity)消息，前者表示顺序号，后者为消息来源进程 ID。下面是一个示例：
 
@@ -800,27 +800,27 @@ from kernel:hello users!!!
 
 ![动图封面](https://pic3.zhimg.com/v2-937a1ab104f7526be077ec69d7c41c42_b.jpg)
 
----
+______________________________________________________________________
 
 发布于 2024-04-22 17:34・IP 属地湖南
 
-[
+\[
 
 进程间通信
 
-](https://www.zhihu.com/topic/20138175)
+\](https://www.zhihu.com/topic/20138175)
 
-[
+\[
 
 Linux
 
-](https://www.zhihu.com/topic/19554300)
+\](https://www.zhihu.com/topic/19554300)
 
-[
+\[
 
 C / C++
 
-](https://www.zhihu.com/topic/19601705)
+\](https://www.zhihu.com/topic/19601705)
 
 ​赞同 22​​1 条评论
 
@@ -840,8 +840,6 @@ C / C++
 
 理性发言，友善互动
 
-  
-
 1 条评论
 
 默认
@@ -860,23 +858,23 @@ C / C++
 
 ### 文章被以下专栏收录
 
-[
+\[
 
 ![Linux内核](https://picx.zhimg.com/v2-f111d7ee1c41944859e975a712c0883b_l.jpg?source=172ae18b)
 
-](https://www.zhihu.com/column/c_1290342714786152448)
+\](https://www.zhihu.com/column/c_1290342714786152448)
 
-## [
+## \[
 
 Linux内核
 
-](https://www.zhihu.com/column/c_1290342714786152448)
+\](https://www.zhihu.com/column/c_1290342714786152448)
 
 一种开源电脑操作系统内核。C语言写成
 
 ### 推荐阅读
 
-[
+\[
 
 ![一文了解linux 内核与用户空间通信之netlink使用方法](https://picx.zhimg.com/v2-079893de15b959258de121a8195bd22e_250x0.jpg?source=172ae18b)
 
@@ -884,9 +882,7 @@ Linux内核
 
 极致Linux内核
 
-
-
-](https://zhuanlan.zhihu.com/p/552291792)[
+\](https://zhuanlan.zhihu.com/p/552291792)\[
 
 ![由浅入深探讨Linux进程间通信（上篇）](https://pic1.zhimg.com/v2-24c6236e675e9870f1505cd35cf564cb_250x0.jpg?source=172ae18b)
 
@@ -894,9 +890,7 @@ Linux内核
 
 物联网心球
 
-
-
-](https://zhuanlan.zhihu.com/p/669988948)[
+\](https://zhuanlan.zhihu.com/p/669988948)\[
 
 # Linux进程间通信的实现原理？
 
@@ -904,9 +898,7 @@ Linux内核
 
 point...发表于linux...
 
-
-
-](https://zhuanlan.zhihu.com/p/69553562)[
+\](https://zhuanlan.zhihu.com/p/69553562)\[
 
 # Linux进程间通信方式有哪些？
 
@@ -914,6 +906,4 @@ point...发表于linux...
 
 守望
 
-
-
-](https://zhuanlan.zhihu.com/p/63916424)
+\](https://zhuanlan.zhihu.com/p/63916424)
