@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
+                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
+                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
+                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md"
+                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md"
               }
             }
           }
@@ -146,9 +146,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "b_RISC-V架构系列之1：指令集和特权模式.md",
+    "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
+    "README.md",
+    "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
+    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/schedule/i_Linux内核同步机制之（二）：Per-CPU变量.md",
+    "ztrash/b_RISC-V架构系列之1：指令集和特权模式.md",
+    "ztrash/一文搞懂大模型、RAG、函数调用、Agent、知识库、向量数据库、知识图谱、AGI的区别和联系！！.md",
+    "ztrash",
+    "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
     "zx99-image/Pasted image 20241009114447.png",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "zx99-image/Pasted image 20241009113121.png",
@@ -177,13 +185,6 @@
     "coding/cpp/grammar/b_（文末赠书）学了许多年 C++ 终于想通了.......md",
     "coding/cpp/grammar/「现代C++设计魅力」虚函数继承-thunk技术初探.md",
     "coding/cpp/grammar/reflect/C++反射TS初探.md",
-    "coding/cpp/grammar/pointer/i_C++ 智能指针用法详解.md",
-    "coding/os/linux/modules/timer/Linux的时钟.md",
-    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
-    "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
-    "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
-    "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
-    "coding/os/linux/performance/an _微信工程师：常见性能优化方案与实用工具.md",
     "coding/cpp/schedule/coroutine",
     "coding/cpp/schedule",
     "coding/cpp/memory",
@@ -193,7 +194,6 @@
     "coding/os/linux/memory/page-folio",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom",
-    "learning",
     "Untitled.canvas",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"

@@ -1,6 +1,6 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-8-14 19:12 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
-一、前言
+# 一、前言
 
 一个合格的linux驱动工程师需要对kernel中的中断子系统有深刻的理解，只有这样，在写具体driver的时候才能：
 
@@ -12,7 +12,7 @@
 
 基于上面的原因，我希望能够通过一系列的文档来描述清楚linux kernel中的中断子系统方方面面的知识。一方面是整理自己的思绪，另外一方面，希望能够对其他的驱动工程师（或者想从事linux驱动工作的工程师）有所帮助。
 
-二、中断系统相关硬件描述
+# 二、中断系统相关硬件描述
 
 中断硬件系统主要有三种器件参与，各个外设、中断控制器和CPU。各个外设提供irq request line，在发生中断事件的时候，通过irq request line上的电气信号向CPU系统请求处理。外设的irq request line太多，CPU需要一个小伙伴帮他，这就是Interrupt controller。Interrupt Controller是连接外设中断系统和CPU系统的桥梁。根据外设irq request line的多少，Interrupt Controller可以级联。CPU的主要功能是运算，因此CPU并不处理中断优先级，那是Interrupt controller的事情。对于CPU而言，一般有两种中断请求，例如：对于ARM，是IRQ和FIQ信号线，分别让ARM进入IRQ mode和FIQ mode。对于X86，有可屏蔽中断和不可屏蔽中断。
 
@@ -64,7 +64,7 @@ Interrupt controller有的是支持多个CPU core的（例如GIC、APIC等），
 
 很多问题其实我也没有答案，慢慢思考，慢慢逼近真相吧。
 
-二、中断子系统相关的软件框架
+# 二、中断子系统相关的软件框架
 
 linux kernel的中断子系统相关的软件框架图如下所示：
 
@@ -80,7 +80,7 @@ linux kernel的中断子系统相关的软件框架图如下所示：
 
 （4）普通外设的驱动。这些驱动将使用Linux kernel通用中断处理模块的API来实现自己的驱动逻辑。
 
-三、中断子系统文档规划
+# 三、中断子系统文档规划
 
 中断相关的文档规划如下：
 
