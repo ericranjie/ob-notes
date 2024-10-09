@@ -1,31 +1,21 @@
-
 Original 腾讯程序员 腾讯技术工程
-
  _2023年08月29日 18:01_ _广东_
-
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 作者：lark
 
 > 梳理一下C++的知识体系，温故而知新。文章很长，建议收藏。
 
 ### **写在前面**
-
 #### ✧ **C++的主战场**
 
 > 都2023年了，还在说C++，难道不应该多讲讲golang/rust/python吗？其他公司我不知道，但在至少在腾讯内，如果能把C++代码写好，仍然有不错的饭碗，比如游戏/微信后台等。
 
-C++在行业里的主战场，有网友做了一个图，可以看看：
+![[Pasted image 20241009075522.png]]
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+C++在行业里的主战场，有网友做了一个图，可以看看：
 
 > **谁在蚕食C++的市场？** C++的基本盘虽然很稳，但是我们也能感受到一些明显的趋势：--过去几年招聘的时候，优秀的C++程序员越来越不好招，取而代之的是大量的java/golang/python程序员进入市场。--从2020年开始，腾讯PCG开始搞研效工程，在推出trpcgo框架后，很多团队很快就从C++切换到了golang。
 
 为什么是golang，从下面这篇文章可以一窥端倪，本文从“performance, simplicity, safety, features, scale, and concurrency“等几个方面对Golang和Rust做了对比，可以看看：
-
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### ✧ **C++知识体系**
 
@@ -35,8 +25,7 @@ C++知识体系的搭建基于笔者过往的编程经验，而具体的知识�
 
 > 关于C++的语言核心：✧ 新特性：使用新特性有助于简化代码，提高编程效率。例如，一个auto关键字，合理使用可以大大降低大脑和手指的负担，大脑不用记住太多东西， 手指也可以少敲很多代码，体会一下这行代码：for(auto &it : vec) { ... } ✧ 面向对象：继承/多态/运算符重载是对象对象的核心特征，IOStream作为官方库标准库，是使用面向对象的典范 ✧ 泛型编程：基于template的编程，可能是C++最强大的地方，这是一种和面向对象完全不同的思维方式，STL是使用泛型编程的典范 ✧ 第三方库：编程语言要想发挥巨大作用，必须依赖第三方库，本文重点在语言内核上，对第三方库不做过多介绍 关于C++工程化：主要涉及代码构建，单元测试，代码调试，编程环境IDE
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20241009075835.png]]
 #### ✧ **关于学习方法**
 
 作为程序员，编程语言不仅仅是工具，更是饭碗，须勤学苦练，谈几点笔者的看法：
@@ -47,7 +36,7 @@ C++知识体系的搭建基于笔者过往的编程经验，而具体的知识�
 
 ✧ 程序员之上是架构师，有扎实编程功底，有良好代码品味的架构师才是货真价实的，否则就是花架子，talk is cheap。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009075908.png]]
 
 教学相长，在谈谈笔者对教学方法与学习方法的体会：
 
@@ -55,8 +44,7 @@ C++知识体系的搭建基于笔者过往的编程经验，而具体的知识�
 
 ✧ 关于学习方法：在精通一门语言的情况下，如何快速学习一门新语言？在笔者看过的众多编程书籍里面，《PHP&MySQL 范例精解——创建/修改/复用》这本书明确提出了一个非常有效的方法：找到工业级代码范例，然后“Create-Modify-Reuse”，这是笔者认为最好的学习方法，代码是最好的老师。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20241009075939.png]]
 ### 1. **C++新特性（常用）**
 
 > C++11是C++发展的一个分水岭，从此C++进入了所谓的“现代C++”阶段，往后C++14/17/20持续发展。
@@ -66,39 +54,34 @@ C++知识体系的搭建基于笔者过往的编程经验，而具体的知识�
 > 就C++具体版本而言，在生产环境中主要还是C++11，例如在微信后台生产环境中gcc的版本是：gcc version 7.5.0 (GCC) ，笔者所在部门腾讯视频，云开发机默认是gcc (GCC) 4.8.5 (Red Hat 4.8.5-39)（注：截止2023.7）。
 
 - 不同GCC版本支持的C++编译标准：
-    
-    ![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
-    参考：[GCC -std编译标准一览表](https://link.zhihu.com/?target=http%3A//c.biancheng.net/view/8053.html)
-    
 
+![[Pasted image 20241009075952.png]]
+
+参考：[GCC -std编译标准一览表](https://link.zhihu.com/?target=http%3A//c.biancheng.net/view/8053.html)
+    
 这一节对C++常用的新特性做简明扼要的介绍：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009080024.png]]
 
 参考：
-
 [https://www.zhihu.com/pub/reader/120162226/chapter/1354802170299080704](https://www.zhihu.com/pub/reader/120162226/chapter/1354802170299080704) 
-
 #### 1.1. **auto&decltype**
 
 auto：变量类型推断 decltype：表达式类型推断
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009080041.png]]
 
 参考：https://zhuanlan.zhihu.com/p/137662774
-
 #### 1.2. **for range**
 
 基于范围的for循环：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20241009080211.png]]
 #### 1.3. **function&bind&lambda**
 
 ✓ **std::function 快速创建一个函数对象**
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009080227.png]]
 
 ✓ **std::bind**bind：绑定函数参数
 

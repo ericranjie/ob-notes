@@ -1,68 +1,40 @@
 Linux开发架构之路
-
  _2024年05月10日 19:35_ _湖南_
 
-## 
+# 1. 无锁队列原理
 
-1.无锁队列原理
-
-### 
-
-1.1.队列操作模型
+## 1.1. 队列操作模型
 
 队列是一种非常重要的数据结构，其特性是先进先出（FIFO），符合流水线业务流程。在进程间通信、网络通信间经常采用队列做缓存，缓解数据处理压力。根据操作队列的场景分为：单生产者——单消费者、多生产者——单消费者、单生产者——多消费者、多生产者——多消费者四大模型。根据队列中数据分为：队列中的数据是定长的、队列中的数据是变长的。
 
 （1）单生产者——单消费者
 ![[Pasted image 20241003120639.png]]
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxwvdt4Ge69XvK3cXTTHGxrqAReBqP56aEJ86y6I4ZUZunhrnHbZ3sVA/640?wx_fmt=png&from=appmsg&wxfrom=13)
-
-  
 
 （2）多生产者——单消费者
 ![[Pasted image 20241003120646.png]]
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxu2Cgibu2ibzVHzibib3ecDBHUyGULmQ8pHILt6d7WTFCtSk0icGJl1fbu7A/640?wx_fmt=png&from=appmsg&wxfrom=13)
-
-  
 
 （3）单生产者——多消费者
 ![[Pasted image 20241003120652.png]]
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxcDrf53VtOFHdsIKX6YoEhZaQfDkp6OvyUBDT674CSopUcrlP0sIruw/640?wx_fmt=png&from=appmsg&wxfrom=13)
-
-  
 
 （4）多生产者——多消费者
 ![[Pasted image 20241003120700.png]]
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0yiaWhIOgGVNMIXdlz2F6dGxe55aL9qvurqkASDia52dSias89ehbxcHdOwHZh3dPF7ia360csX9S87yA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
 
 （5）数据定长队列
 ![[Pasted image 20241003120705.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 （6）数据变长队列
 ![[Pasted image 20241003120713.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-### 
-
-1.2.无锁队列简介
+## 1.2. 无锁队列简介
 
 生产环境中广泛使用生产者和消费者模型，要求生产者在生产的同时，消费者可以进行消费，通常使用互斥锁保证数据同步。但线程互斥锁的开销仍然比较大，因此在要求高性能、低延时场景中，推荐使用无锁队列。
-
-### 
-
-1.3.CAS操作
+## 1.3. CAS操作
 
 CAS即Compare and Swap，是所有CPU指令都支持CAS的原子操作（X86中CMPXCHG汇编指令），用于实现实现各种无锁（lock free）数据结构。
 
 CAS操作的C语言实现如下：
 ```c
-bool compare_and_swap ( int *memory_location, int expected_value, int new_value)  
-{  
-    if (*memory_location == expected_value)  
-    {  
+bool compare_and_swap ( int *memory_location, int expected_value, int new_value) {  
+    if (*memory_location == expected_value) {  
         *memory_location = new_value;  
         return true;  
     }  
@@ -76,7 +48,6 @@ CAS用于检查一个内存位置是否包含预期值，如果包含，则把�
 GCC4.1+版本中支持CAS原子操作。
 ```c
 bool __sync_bool_compare_and_swap (type *ptr, type oldval type newval, ...);  
-   
 type __sync_val_compare_and_swap (type *ptr, type oldval type newval, ...);
 ```
 （2）Windows对CAS支持
@@ -104,58 +75,33 @@ bool atomic_compare_exchange_weak( volatile std::atomic* obj,T* expected, T desi
 Fetch-And-Add：一般用来对变量做+1的原子操作
 
 Test-and-set：写值到某个内存位置并传回其旧值
+# 2. 无锁队列方案
 
-## 
-
-2.无锁队列方案
-
-### 
-
-2.1.boost方案
+## 2.1. boost方案
 
 boost提供了三种无锁方案，分别适用不同使用场景。
 
 boost::lockfree::queue是支持多个生产者和多个消费者线程的无锁队列。
-
 boost::lockfree::stack是支持多个生产者和多个消费者线程的无锁栈。
-
 boost::lockfree::spsc_queue是仅支持单个生产者和单个消费者线程的无锁队列，比boost::lockfree::queue性能更好。
 
 Boost无锁数据结构的API通过轻量级原子锁实现lock-free，不是真正意义的无锁。
 
 Boost提供的queue可以设置初始容量，添加新元素时如果容量不够，则总容量自动增长；但对于无锁数据结构，添加新元素时如果容量不够，总容量不会自动增长。
-
-### 
-
-2.2.ConcurrentQueue
+## 2.2. ConcurrentQueue
 
 ConcurrentQueue是基于C++实现的工业级无锁队列方案。
-
 GitHub：https://github.com/cameron314/concurrentqueue
 
 ReaderWriterQueue是基于C++实现的单生产者单消费者场景的无锁队列方案。
-
 GitHub：https://github.com/cameron314/readerwriterqueue
-
-### 
-
-2.3.Disruptor
+## 2.3. Disruptor
 
 Disruptor是英国外汇交易公司LMAX基于JAVA开发的一个高性能队列。
-
 GitHub：https://github.com/LMAX-Exchange/disruptor
+# 3.无锁队列实现
 
-需要C/C++ Linux服务器架构师学习资料加qun812855908获取（资料包括C/C++，Linux，golang技术，Nginx，ZeroMQ，MySQL，Redis，fastdfs，MongoDB，ZK，流媒体，CDN，P2P，K8S，Docker，TCP/IP，协程，DPDK，ffmpeg等），免费分享
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-## 
-
-3.无锁队列实现
-
-### 
-
-3.1.环形缓冲区
+## 3.1. 环形缓冲区
 
 RingBuffer是生产者和消费者模型中常用的数据结构，生产者将数据追加到数组尾端，当达到数组的尾部时，生产者绕回到数组的头部；消费者从数组头端取走数据，当到达数组的尾部时，消费者绕回到数组头部。
 
@@ -183,49 +129,36 @@ x = data[front];
    
 front = (front+1)%maxn;
 ```
-### 
-
-3.2.单生产者单消费者
+## 3.2. 单生产者单消费者
 
 对于单生产者和单消费者场景，由于read_index和write_index都只会有一个线程写，因此不需要加锁也不需要原子操作，直接修改即可，但读写数据时需要考虑遇到数组尾部的情况。
 
 线程对write_index和read_index的读写操作如下：
 
 （1）写操作。先判断队列时否为满，如果队列未满，则先写数据，写完数据后再修改write_index。
-
 （2）读操作。先判断队列是否为空，如果队列不为空，则先读数据，读完再修改read_index。
-
-### 
-
-3.3.多生产者单消费者
+## 3.3. 多生产者单消费者
 
 多生产者和单消费者场景中，由于多个生产者都会修改write_index，所以在不加锁的情况下必须使用原子操作。
-
-### 
-
-3.4.RingBuffer实现
+## 3.4. RingBuffer实现
 
 RingBuffer.hpp文件：
 ```c
 #pragma once  
    
 template <class T>  
-class RingBuffer  
-{  
+class RingBuffer {
 public:  
-    RingBuffer(unsigned size): m_size(size), m_front(0), m_rear(0)  
-    {  
+    RingBuffer(unsigned size): m_size(size), m_front(0), m_rear(0) {  
         m_data = new T[size];  
     }  
-   
-    ~RingBuffer()  
-    {  
+
+    ~RingBuffer() {  
         delete [] m_data;  
         m_data = NULL;  
     }  
    
-    inline bool isEmpty() const  
-    {  
+    inline bool isEmpty() const { 
         return m_front == m_rear;  
     }  
    
@@ -288,27 +221,25 @@ private:
     T* m_data;// 数据缓冲区  
 };
 ```
+
 RingBufferTest.cpp测试代码：
+
 ```c
 #include <stdio.h>  
 #include <thread>  
 #include <unistd.h>  
 #include <sys/time.h>  
 #include "RingBuffer.hpp"  
-   
-   
-class Test  
-{  
+
+class Test { 
 public:  
-   Test(int id = 0, int value = 0)  
-   {  
+   Test(int id = 0, int value = 0) {
         this->id = id;  
         this->value = value;  
         sprintf(data, "id = %d, value = %d\n", this->id, this->value);  
    }  
    
-   void display()  
-   {  
+   void display() {
       printf("%s", data);  
    }  
 private:  
@@ -317,8 +248,7 @@ private:
    char data[128];  
 };  
    
-double getdetlatimeofday(struct timeval *begin, struct timeval *end)  
-{  
+double getdetlatimeofday(struct timeval *begin, struct timeval *end) {
     return (end->tv_sec + end->tv_usec * 1.0 / 1000000) -  
            (begin->tv_sec + begin->tv_usec * 1.0 / 1000000);  
 }  
@@ -327,8 +257,7 @@ RingBuffer<Test> queue(1 << 12);2u000
    
 #define N (10 * (1 << 20))  
    
-void produce()  
-{  
+void produce() {
     struct timeval begin, end;  
     gettimeofday(&begin, NULL);  
     unsigned int i = 0;  
@@ -375,21 +304,14 @@ int main(int argc, char const *argv[])
 }
 ```
 编译：
-
 g++ --std=c++11  RingBufferTest.cpp -o test -pthread
 ![[Pasted image 20241003121039.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
 
 单生产者单消费者场景下，消息吞吐量为350万条/秒左右。
-
-### 
-
-3.5.LockFreeQueue实现
+## 3.5. LockFreeQueue实现
 
 LockFreeQueue.hpp:
-```c
+```cpp
 #include <stdio.h>  
 #include <stdlib.h>  
 #include <string.h>  
@@ -407,24 +329,19 @@ LockFreeQueue.hpp:
 #define MEMORY_BARRIER __sync_synchronize()  
    
 template <class T>  
-class LockFreeQueue  
-{  
+class LockFreeQueue {
 protected:  
-    typedef struct  
-    {  
+    typedef struct {
         int m_lock;  
-        inline void spinlock_init()  
-        {  
+        inline void spinlock_init() {
             m_lock = 0;  
         }  
    
-        inline void spinlock_lock()  
-        {  
+        inline void spinlock_lock() {
             while(!__sync_bool_compare_and_swap(&m_lock, 0, 1)) {}  
         }  
    
-        inline void spinlock_unlock()  
-        {  
+        inline void spinlock_unlock() {
             __sync_lock_release(&m_lock);  
         }  
     } spinlock_t;  
@@ -432,21 +349,16 @@ protected:
 public:  
     // size:队列大小  
     // name:共享内存key的路径名称，默认为NULL，使用数组作为底层缓冲区。  
-    LockFreeQueue(unsigned int size, const char* name = NULL)  
-    {  
+    LockFreeQueue(unsigned int size, const char* name = NULL) {
         memset(shm_name, 0, sizeof(shm_name));  
         createQueue(name, size);  
     }  
    
-    ~LockFreeQueue()  
-    {  
-        if(shm_name[0] == 0)  
-        {  
+    ~LockFreeQueue() {
+        if (shm_name[0] == 0) {
             delete [] m_buffer;  
             m_buffer = NULL;  
-        }  
-        else  
-        {  
+        } else {
             if (munmap(m_buffer, m_size * sizeof(T)) == -1) {  
                 perror("munmap");  
             }  
@@ -456,32 +368,27 @@ public:
         }  
     }  
    
-    bool isFull()const  
-    {  
+    bool isFull() const {  
 #ifdef USE_POT  
         return m_head == (m_tail + 1) & (m_size - 1);  
 #else  
         return m_head == (m_tail + 1) % m_size;  
 #endif  
     }  
-   
-    bool isEmpty()const  
-    {  
+
+    bool isEmpty() const {  
         return m_head == m_tail;  
     }  
    
-    unsigned int front()const  
-    {  
+    unsigned int front() const {
         return m_head;  
     }  
-   
-    unsigned int tail()const  
-    {  
+
+    unsigned int tail() const {  
         return m_tail;  
     }  
    
-    bool push(const T& value)  
-    {  
+    bool push(const T& value) { 
 #ifdef USE_LOCK  
         m_spinLock.spinlock_lock();  
 #endif  

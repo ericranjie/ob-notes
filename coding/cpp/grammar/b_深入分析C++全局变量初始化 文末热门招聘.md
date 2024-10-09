@@ -1,39 +1,15 @@
-# 
-
 Original 字节跳动STE团队 字节跳动SYS Tech
-
  _2023年09月08日 17:30_ _河南_
 
-![](http://mmbiz.qpic.cn/mmbiz_png/Z4txjviceemNaH5Gc7V2ltc9AB79kQxpM7pOjtTiagt1TlQtCTrJ6zyPma8xbw3sGpeecTwveKP4GLqQa2nJ49EA/300?wx_fmt=png&wxfrom=19)
-
-**字节跳动SYS Tech**
-
-聚焦系统技术领域，分享前沿技术动态、技术创新与实践、行业技术热点分析。
-
-42篇原创内容
-
-公众号
-
-  
-
-**背景**
+# **背景**
 
 在C++开发中， 我们经常会面临一些有关全局对象的一些问题， 比如两个动态库之间全局对象初始化相互引用的问题， 即用外部的全局对象来初始化当前全局对象， 由于引用的外部全局对象未预先初始化，从而触发了coredump。那么如何在开发中避免由于全局对象初始化顺序而引发的各种程序崩溃呢？我们需要了解清楚全局变量是何时完成初始化， 初始化的顺序是什么， 以及如何控制全局对象的初始化顺序。本篇文章将重点介绍全局对象的初始化相关的内容，并进行深入分析，帮助大家更好地理解其原理。
-
-  
-
-![Image](https://mmbiz.qpic.cn/mmbiz_svg/hqDXUD6csU8f9Z5wkbLZ7NdTOqRuPmCFM1boKo7picnBCiaSDv1gG2PN7GiaOfwMpVvEaaDsy64sBvta5XSmHYlXfsIibSS0MNb0/640?wx_fmt=svg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 **测试环境**
 
 - CPU 架构：x86_64  
-    
 - 操作系统及基础库版本：Debian GLIBC 2.28-10
-    
 - Compiled by GNU CC version 8.3.0.
-    
-
-  
 
 **程序启动入口是 main 吗**
 
@@ -45,7 +21,6 @@ struct C { C() {} // <== break }; C c; int main() { return 0; }
 
 编译成可执行文件， 使用 gdb 在第 2 行打一个断点，运行：
 ![[Pasted image 20240909083246.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到， 在调用栈中并没有看到 main 的身影， 这是因为在 main 之前， 先进入到了全局对象 c 的构造函数中， 来完成初始化相关的工作。并且栈底指向了 _start， 这可能就是我们要找的入口函数。在确定 _start 是不是我们要找的入口函数之前， 需要先了解一下 Entry point 的概念：
 

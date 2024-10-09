@@ -1,6 +1,6 @@
 Original zgrxmm linux源码阅读
  _2024年09月11日 00:03_ _浙江_
-# **1* * 简介
+# **1** 简介
 
 在现代 C++ 编程中，标准模板库（STL）中的头文件提供了大量高效且灵活的算法，极大地简化了数据处理任务。从简单的元素比较到复杂的集合操作，这些算法覆盖了广泛的应用场景。
 
@@ -14,43 +14,33 @@ Original zgrxmm linux源码阅读
 在 C++ 标准库中，提供了多种算法用于合并、排序以及集合操作。以下是对 std::merge, std::inplace_merge, std::set_union, std::set_intersection, std::set_difference, 和 std::set_symmetric_difference 的详细介绍及示例代码。
 
 - std::merge：将两个有序区间合并成一个新的有序区间。
-    
 - std::inplace_merge：就地合并两个有序区间。
-    
 - std::set_union：计算两个集合并集。
-    
 - std::set_intersection：计算两个集合交集。
-    
 - std::set_difference：计算两个集合差集。
-    
 - std::set_symmetric_difference：计算两个集合的对称差集。
-    
 
 std::merge
 
 std::merge 用于合并两个有序范围，并将结果存储到另一个有序范围内。该算法假设输入范围已经是排序好的。
+## **函数原型**
 
-  
-
-**函数原型**
-
-```
-template< class InputIterator1, class InputIterator2, class OutputIterator >
+```cpp
+template< class InputIterator1, class InputIterator2, class OutputIterator > OutputIterator merge( InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, InputIterator2 last2, OutputIterator result );
 ```
 
-  
+## **示例代码**
 
-**示例代码**
-
+```cpp
+#include <iostream> 
+#include <vector> 
+#include <algorithm> // std::merge 
+int main() { std::vector<int> vec1 = {1, 3, 5}; std::vector<int> vec2 = {2, 4, 6}; std::vector<int> result(vec1.size() + vec2.size()); // 合并 vec1 和 vec2 到 result 
+std::merge(vec1.begin(), vec1.end(), vec2.begin(), vec2.end(), result.begin()); // 输出结果 
+for (int num : result) { std::cout << num << " "; } std::cout << std::endl; return 0; }
 ```
-#include <iostream>
-```
 
-  
-
-  
-
-**运行结果**
+## **运行结果**
 
 ```
 1 2 3 4 5 6

@@ -5,7 +5,6 @@
 
 [红星闪闪](https://www.zhihu.com/people/hong-xing-shan-shan-17-75)
 数据库资深工程师。在后台开发，高性能计算，分布式领域深耕。
-韦易笑 等 1353 人赞同了该文章
 
 《What Every Programmer Should Know About Memory》是Ulrich Drepper大佬的一篇神作，洋洋洒洒100多页，基本上涵盖了当时（2007年）关于访存原理和优化的所有问题。即使今天的CPU又有了进一步的发展，但是依然没有跳出这篇文章的探讨范围。只要是讨论访存优化的文章，基本上都会引用这篇论文。
 
@@ -24,132 +23,70 @@
 
 - 每个Core中有两个Hyper-Thread，常见于Intel的CPU，每个H-Thread对上抽象出一个Core，但并没有物理上的拓展，硬件级别进行[时间片](https://zhida.zhihu.com/search?q=%E6%97%B6%E9%97%B4%E7%89%87&zhida_source=entity&is_preview=1)并发。优势在于，当一个H-Thread执行内存Stall的指令时，可以切换成另一个H-Thread，并不阻塞。
 - 每个Core有一个L1d和一个L1i。两个H-Thread共享通过一个L1指令和数据Cache。
-
 - L2和L3被多个Core共享
-
-  
 
 真实场景：
 
-  
-
 ![](https://pic4.zhimg.com/80/v2-a5ea71f84ae7486c2e1e3a20059b023b_1440w.webp)
 
-  
-
 1个物理CPU，里面有4个core，每个core有两个H-Thread。对上层一共暴露1*4*2=8个CPU
-
   
-
 ![](https://pic1.zhimg.com/80/v2-49ec26a955bc8fa702d834ff54e50dfc_1440w.webp)
-
-  
-
-  
 
 ![](https://picx.zhimg.com/80/v2-4777e75437e0c30cbe35c547477039f5_1440w.webp)
 
-  
-
 L1的Data和Instruction Cache被同一个Core的两个H-Thread共用
-
-  
 
 ![](https://pic4.zhimg.com/80/v2-28d10e4967238c2756c1e8523ddc9cf9_1440w.webp)
 
-  
-
-  
-
 ![](https://picx.zhimg.com/80/v2-00f16c9fa7cbf99c262b2fd490459867_1440w.webp)
 
-  
-
 L2和L3都是Unified类型，可以同时存指令和数据。L3被同一个CPU封装里的所有Core共享，和论文所述一致。但是L2有点不一样，只被同一个Core的两个H-Thread共享，不跨Core共享。
-
 ## 1.2 Cache速度差距
-
-  
 
 ![](https://pic3.zhimg.com/80/v2-9bcc7186a94080ca9d1c5a0048896128_1440w.webp)
 
-  
-
-  
-
 ![](https://picx.zhimg.com/80/v2-f7ea4e112e0d45b5ca88ac11d41ff1eb_1440w.webp)
 
-  
-
 L1d：2^13 L2：2^20
-
 ## 1.3 Cache实现细节
-
 ### 1.3.1 Cache的Key
-
-  
 
 ![](https://pic3.zhimg.com/80/v2-f5873c14a04bd7bb4cfc372884970b8c_1440w.webp)
 
-  
-
 - T和S一起，唯一标识一个CacheLine，将Cache的组织想象成一个二维数组，通过两个角标T和S定位
 - Offset标识CacheLine里的具体数据位置。一个CacheLine通常是64Byte，所以需要6bit的Offset来定位里面的每个Byte
-
 ### 1.3.2 Associative Cache
 
 - 全路组相连：最朴素的思想，没有Set位，Cache用一维数组的方式组织。查询时直接通过Tag拿到数据。但是当Cache较大时，需要大量的Comp原件，成本高。
 
 ![](https://pic4.zhimg.com/80/v2-367c5e3775d78370e31c1646c468dba9_1440w.webp)
 
-  
-
 - 直接组相连。一个Set里面只有一个CacheLine，给定Set值可以唯一选择（MUX）出一个Tag
-
-  
 
 ![](https://pic2.zhimg.com/80/v2-0bf15e9972db4a7ecfe10196b00b568d_1440w.webp)
 
-  
-
 - 多路组相连。一个Set里面有多个CacheLine，给定Set值可以选择出多个Tag，再通过Tag，拿到数据。
+
 ![[Pasted image 20240913120135.png]]
   
-
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='934' height='666'></svg>)
-
-  
-
 下图是各种组相连的性能数据：
 
 - Cache越大CacheMiss越小
 - 组数的提升有利于CacheMiss的减少
-
   
 ![[Pasted image 20240913120141.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='874' height='876'></svg>)
-
-  
-
 ## 1.4 Cache实验
-
 ### 1.4.1 实验设计
-
   
 ![[Pasted image 20240913120148.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='870' height='266'></svg>)
-
-  
 
 在内存中开辟一块连续的内存初始化成结构体数组，每个结构体如上图所示。有两个变化点：
 
 - 指针n（如下图所示）：
-
 - 依次指向下一个item，顺序访问
 - 随机指向一个item，随机访问
-
 - 填充数据pad：用于增加减少两个item的内存距离
-
   
 ![[Pasted image 20240913120156.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='888' height='572'></svg>)
@@ -162,29 +99,20 @@ L1d：2^13 L2：2^20
 
   
 ![[Pasted image 20240913120203.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='910' height='874'></svg>)
-
-  
 
 上图是NPAD=0的顺序访问，实际上就是顺序遍历一个数组：
 
 - 总体耗时曲线都比较低。最大也就9个Cycle，这是因为顺序访问会触发CPU硬件预取，减少了CacheMiss
 - 有3个较为明显的台阶。分别对应L1，L2和Memory。不是有预取么？为啥还有有差异？这是因为访问数据时还没有完全预取上来，会有一定的Memory Stall，但这个Stall时间远远小于Cache Miss的时间
-
 ### 不同NPAD的顺序读
 
-  
 ![[Pasted image 20240913120211.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='844' height='918'></svg>)
-
-  
 
 NPAD的增加，意味着顺序访问的步长增加：
 
 - NPAD=0就是前面的图3.10，在这张图里基本上是一条直线
 - 在L1 Cache内，NPAD的差异基本对性能没有影响，不涉及任何的预取。
 - 在L2Cache内，NPAD=0除外的3条线基本在一起，并高于NPAD=0的用时。这和CacheLine相关，CacheLine的Cache的基本单位，通常是64Byte：
-
 - 当NPAD=0时，sizeof(struct_l)=8Byte，一个CacheLine可以装8个Struct元素。一次预取可以支持8个元素的访问。
 - 当NPAD=7时，sizeof(struct_l)=64Byte，一个CacheLine只能装1个Struct元素。一次预取只能支持1个元素的访问。
 - 当NPAD>7时类似
@@ -195,20 +123,14 @@ NPAD的增加，意味着顺序访问的步长增加：
 
 - Prefetch无法完全消除Memory Stall。被访问的数据虽然被预取，但是在访问时还没有完全加载到Cache中。这个原因可以解释NPAD >= 7的3条线高于NPAD=0，但是无法解释NPAD7，15，31的差异。
 - PageBoundaries的影响。一个物理页通常是4KB，在物理页边界时无法预取，因为PageFault需要操作系统来调度，CPU做不了。当NPAD越大，达到PageBoundaries所需要的元素个数越少，每次PageBoundaries开销均摊下来也就越大。
-- TLB表Miss。假设有N个TLB表entry，平均访问了N*4K大小后，会触发一次TLB表Miss。如果NPAD越大，达到TLBMiss所需要的元素个数越少，每次TLB表Miss开销均摊下来也就越大。
-
+- TLB表Miss。假设有N个TLB表entry，平均访问了N * 4K大小后，会触发一次TLB表Miss。如果NPAD越大，达到TLBMiss所需要的元素个数越少，每次TLB表Miss开销均摊下来也就越大。
 ### 触发TLB表Miss的场景
 
-  
 ![[Pasted image 20240913120221.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='910' height='948'></svg>)
-
-  
 
 - On Cache Line表示一个数组元素的大小为64Byte，也就是一个CacheLine大小，也是图3.11中的NPAD=7
 - On Page表示一个数组元素大小为4K，也就是一个物理页大小，每次指针跳跃会跨越一个Page
 - 计算Working Set Size的逻辑不太一样：
-
 - OnCacheLine的逻辑是计算真实消耗的内存，一个数组元素消耗的真实内存是64B，WorkingSetSize也是64B
 - OnPage的逻辑是指计算一个Page个中的CacheLine大小。一个元素占用了一个Page的大小（4K），但是只算一个CacheLine的大小（64B）。
 - 也就是说，同样是64B的WorkingSize，OnCacheLine消耗真实内存64B，OnPage消耗真实内存是4K
@@ -217,21 +139,14 @@ NPAD的增加，意味着顺序访问的步长增加：
 - 可以看到从2^13开始OnPage飙高，这意味着2^12刚好可以装载TLB中，也就是2^12/2^6=64个Page（如前面所述，一个Page在WorkingSize中只算64Byte）可以推算出这台机器的TLB表有64个entry
 - 作者特别强调了这个实验进行了内存锁定，不会有Page Fault的影响。
 - 虽然Stride是一个Page，但是每次只是访问一个CacheLine，为什么Cache没有生效？L2的key是物理地址，需要先经过TLB的转换，所以失效。L1通常是依照逻辑地址，但是载入L1之前需要先载入到L2，所以也受TLB限制。
-- 超过64*4K=2^18Byte就会触发TLB Miss，TLB Miss的开销是很大的。这也解释了图3.11的NPAD=31为啥在顺序访问主存用时为300多Cycle，这台机器的理论主存访问为240个Cycle。
-
+- 超过64 * 4K=2^18Byte就会触发TLB Miss，TLB Miss的开销是很大的。这也解释了图3.11的NPAD=31为啥在顺序访问主存用时为300多Cycle，这台机器的理论主存访问为240个Cycle。
 ### 随机读
-
   
 ![[Pasted image 20240913120230.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='936' height='906'></svg>)
-
-  
 
 - 在L1内，随机读和顺序读没有本质差别
 - 超出L1后，顺序读和随机读逐渐拉开差距，顺序读基本上是一条水平线，开销很小。
-
 ## 二 实践
-
 ## 2.1 绕开Cache
 
 Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache污染，提高Cache利用率。
@@ -241,20 +156,12 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 但也存在另外一种场景，就是写完数据后很长一段时间并不会用到，此时采用“写回”的Cache模式就很浪费，Cache住的脏数据占据了Cache，但实际上并不会被用到。此时可以考虑使用“写穿”的模式，“写穿”不是默认行为，需要调用特定的API，称为Non-temporal接口。
 
 “写穿”需要进行内存访问，所以很慢，但是现代CPU有“write-combining”机制可以解决这个问题。设计实验如下：
-
   
 ![[Pasted image 20240913120240.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='956' height='616'></svg>)
-
-  
 
 分配一个二维数组，每一行的数据在物理内存上连续，每列数据在物理内存上不连续（也就是按行存）。左边是行优先遍历，右边是列优先遍历。
-
   
 ![[Pasted image 20240913120248.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='746' height='346'></svg>)
-
-  
 
 遍历耗时如上图所示，在行优先的场景下，Non-temporal的性能和Normal的性能一样。Non-temporal需要直接写到内存，为什么速度和Normal这种写Cache的一样？
 
@@ -265,29 +172,18 @@ Cache被无关数据占据称为Cache污染，我们需要尽可能减少Cache�
 有的CPU还提供类“读穿”的功能，配合combining机制，也可以做到既不退性能，也不污染Cache。
 
 此外，这个实验还告诉我们一个道理，尽可能优化算法变成顺序访问，现代CPU有很多优化顺序访问的机制。
-
 ## 2.2 优化L1 Data访问
-
 ### 2.2.1 算法优化
 
 主要是调整算法，提升代码的时间和空间局部性。以[矩阵乘法](https://zhida.zhihu.com/search?q=%E7%9F%A9%E9%98%B5%E4%B9%98%E6%B3%95&zhida_source=entity&is_preview=1)为例：
-
   
 ![[Pasted image 20240913120256.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='902' height='110'></svg>)
-
-  
-
   
 ![[Pasted image 20240913120306.png]]
-![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='868' height='222'></svg>)
-
-  
 
 根据前面的论述，最里面循环的mul1是行优先遍历，访存友好，mul2是列优先遍历，访存不友好，有优化空间
 
 根据数学变化，调整代码如下：
-
   
 ![[Pasted image 20240913120313.png]]
 ![](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='892' height='130'></svg>)

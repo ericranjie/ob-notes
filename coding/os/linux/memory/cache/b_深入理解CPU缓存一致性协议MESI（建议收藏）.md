@@ -52,12 +52,12 @@ MESI 是指4中状态的首字母。每个Cache line有4个状态，可用2个bi
 |S 共享 (Shared)|该Cache line有效，数据和内存中的数据一致，数据存在于很多Cache中。|缓存行也必须监听其它缓存使该缓存行无效或者独享该缓存行的请求，并将该缓存行变成无效（Invalid）。|
 |I 无效 (Invalid)|该Cache line无效。|无|
 
-**注意：****对于M和E状态而言总是精确的，他们在和该缓存行的真正状态是一致的，而S状态可能是非一致的**。如果一个缓存将处于S状态的缓存行作废了，而另一个缓存实际上可能已经独享了该缓存行，但是该缓存却不会将该缓存行升迁为E状态，这是因为其它缓存不会广播他们作废掉该缓存行的通知，同样由于缓存并没有保存该缓存行的copy的数量，因此（即使有这种通知）也没有办法确定自己是否已经独享了该缓存行。
+**注意：对于M和E状态而言总是精确的，他们在和该缓存行的真正状态是一致的，而S状态可能是非一致的**。如果一个缓存将处于S状态的缓存行作废了，而另一个缓存实际上可能已经独享了该缓存行，但是该缓存却不会将该缓存行升迁为E状态，这是因为其它缓存不会广播他们作废掉该缓存行的通知，同样由于缓存并没有保存该缓存行的copy的数量，因此（即使有这种通知）也没有办法确定自己是否已经独享了该缓存行。
 
 从上面的意义看来E状态是一种投机性的优化：如果一个CPU想修改一个处于S状态的缓存行，总线事务需要将所有该缓存行的copy变成invalid状态，而修改E状态的缓存不需要使用总线事务。
 ### MESI状态转换
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYk7THsbICK6APjU0nSChg0mtBNvCFwGVbLyvQepM1uaTLnmDkicJMI6Bw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20241009080828.png]]
 
 理解该图的前置说明：1.触发事件
 
@@ -74,68 +74,57 @@ MESI 是指4中状态的首字母。每个Cache line有4个状态，可用2个bi
 
 上图的切换解释（点击看大图）：
 ![[Pasted image 20240911170751.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-点击上图看大图  
 
 下图示意了，当一个cache line的调整的状态的时候，另外一个cache line 需要调整的状态。
-
+```cpp
 ||M|E|S|**I**|
 |---|---|---|---|---|
 |**M**|×|×|×|√|
 |**E**|×|×|×|√|
 |**S**|×|×|√|√|
 |**I**|√|√|√|√|
-
+```
 举个栗子来说：
 
 假设cache 1 中有一个变量x = 0的cache line 处于S状态(共享)。那么其他拥有x变量的cache 2、cache 3等x的cache line调整为S状态（共享）或者调整为 I 状态（无效）。
-
 ### 多核缓存协同操作
 
-假设有三个CPU A、B、C，对应三个缓存分别是cache a、b、 c。在主内存中定义了x的引用值为0。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYk3SPbV1HCiazeAAvFU7k38jo8nhFfXsePmgBr7BG3G3icV8tf19svUCxw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
+假设有三个CPU A、B、C，对应三个缓存分别是cache a、b、 c。在主内存中定义了x的引用值为0。  
+![[Pasted image 20241009081347.png]]
 #### 单核读取
 
-那么执行流程是：CPU A发出了一条指令，从主内存中读取x。从主内存通过bus读取到缓存中（远端读取Remote read）,这是该Cache line修改为E状态（独享）.![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYkPSZ0AHIsLemVMIbrtGRQbVo44IOnUibakBfsAqEv04rnd12cwcKCibBQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
+那么执行流程是：CPU A发出了一条指令，从主内存中读取x。从主内存通过bus读取到缓存中（远端读取Remote read）,这是该Cache line修改为E状态（独享）.  
+![[Pasted image 20241009081422.png]]
 #### 双核读取
 
-那么执行流程是：CPU A发出了一条指令，从主内存中读取x。CPU A从主内存通过bus读取到 cache a中并将该cache line 设置为E状态。CPU B发出了一条指令，从主内存中读取x。CPU B试图从主内存中读取x时，CPU A检测到了地址冲突。这时CPU A对相关数据做出响应。此时x 存储于cache a和cache b中，x在chche a和cache b中都被设置为S状态(共享)。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYkVSMGp0FG7ibVb4sxic8NwMQojso1u0PqFAlohU55mic1UMicCyJvFbdGug/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
+那么执行流程是：CPU A发出了一条指令，从主内存中读取x。CPU A从主内存通过bus读取到 cache a中并将该cache line 设置为E状态。CPU B发出了一条指令，从主内存中读取x。CPU B试图从主内存中读取x时，CPU A检测到了地址冲突。这时CPU A对相关数据做出响应。此时x 存储于cache a和cache b中，x在chche a和cache b中都被设置为S状态(共享)。
+![[Pasted image 20241009081456.png]]
 #### 修改数据
 
-那么执行流程是：CPU A 计算完成后发指令需要修改x. CPU A 将x设置为M状态（修改）并通知缓存了x的CPU B, CPU B将本地cache  b中的x设置为I状态(无效) CPU A 对x进行赋值。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYkAscXNYU26bF0nDGYRgKdoMPQCJt8w5Vpys8MiaIkYYA8Us8jYxkibIcQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
+那么执行流程是：CPU A 计算完成后发指令需要修改x. CPU A 将x设置为M状态（修改）并通知缓存了x的CPU B, CPU B将本地cache  b中的x设置为I状态(无效) CPU A 对x进行赋值。
+![[Pasted image 20241009081518.png]]
 #### 同步数据
 
 那么执行流程是：
 
-CPU B 发出了要读取x的指令。CPU B 通知CPU A,CPU A将修改后的数据同步到主内存时cache a 修改为E（独享） CPU A同步CPU B的x,将cache a和同步后cache b中的x设置为S状态（共享）。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-![Image](https://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwHOPicX5xdeNlDHLuN08eYYkae7vLKBymyHOLFG4kHm1y0oUAm5c05pqpEyEeklLzFT6AhGLxmSnRw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
+CPU B 发出了要读取x的指令。CPU B 通知CPU A,CPU A将修改后的数据同步到主内存时cache a 修改为E（独享） CPU A同步CPU B的x,将cache a和同步后cache b中的x设置为S状态（共享）。
+![[Pasted image 20241009081537.png]]
 ## MESI优化和他们引入的问题
 
 缓存的一致性消息传递是要时间的，这就使其切换时会产生延迟。当一个缓存被切换状态时其他缓存收到消息完成各自的切换并且发出回应消息这么一长串的时间中CPU都会等待所有缓存响应完成。可能出现的阻塞都会导致各种各样的性能问题和稳定性问题。
-
 ### CPU切换状态阻塞解决-存储缓存（Store Bufferes）
 
 比如你需要修改本地缓存中的一条信息，那么你必须将I（无效）状态通知到其他拥有该缓存数据的CPU缓存中，并且等待确认。等待确认的过程会阻塞处理器，这会降低处理器的性能。应为这个等待远远比一个指令的执行时间长的多。
-
 #### Store Bufferes
 
 为了避免这种CPU运算能力的浪费，Store Bufferes被引入使用。处理器把它想要写入到主存的值写到缓存，然后继续去处理其他事情。当所有失效确认（Invalidate Acknowledge）都接收到时，数据才会最终被提交。这么做有两个风险
-
 #### Store Bufferes的风险
 
 第一、就是处理器会尝试从存储缓存（Store buffer）中读取值，但它还没有进行提交。这个的解决方案称为Store Forwarding，它使得加载的时候，如果存储缓存中存在，则进行返回。第二、保存什么时候会完成，这个并没有任何保证。
-
-`value = 3；      void exeToCPUA(){     value = 10;     isFinsh = true;   }   void exeToCPUB(){     if(isFinsh){       //value一定等于10？！       assert value == 10;     }   }   `
-
+```cpp
+value = 3；      void exeToCPUA(){     value = 10;     isFinsh = true;   }   void exeToCPUB(){     if(isFinsh){       //value一定等于10？！
+assert value == 10;     }   }   
+```
 试想一下开始执行时，CPU  A保存着finished在E(独享)状态，而value并没有保存在它的缓存中。（例如，Invalid）。在这种情况下，value会比finished更迟地抛弃存储缓存。完全有可能CPU B读取finished的值为true，而value的值不等于10。
 
 **即isFinsh的赋值在value赋值之前。**
@@ -145,17 +134,13 @@ CPU B 发出了要读取x的指令。CPU B 通知CPU A,CPU A将修改后的数�
 它只是意味着其他的CPU会读到跟程序中写入的顺序不一样的结果。
 
 顺便提一下NIO的设计和Store Bufferes的设计是非常相像的。
-
 ### 硬件内存模型
 
 执行失效也不是一个简单的操作，它需要处理器去处理。另外，存储缓存（Store Buffers）并不是无穷大的，所以处理器有时需要等待失效确认的返回。这两个操作都会使得性能大幅降低。为了应付这种情况，引入了失效队列。它们的约定如下：
 
 - 对于所有的收到的Invalidate请求，Invalidate Acknowlege消息必须立刻发送
-    
 - Invalidate并不真正执行，而是被放在一个特殊的队列中，在方便的时候才会去执行。
-    
 - 处理器不会发送任何消息给所处理的缓存条目，直到它处理Invalidate。
-    
 
 即便是这样处理器已然不知道什么时候优化是允许的，而什么时候并不允许。干脆处理器将这个任务丢给了写代码的人。这就是内存屏障（Memory Barriers）。
 
@@ -166,26 +151,19 @@ CPU B 发出了要读取x的指令。CPU B 通知CPU A,CPU A将修改后的数�
 **读屏障**
 
 > **读屏障Load Memory Barrier (a.k.a. LD, RMB, smp_rmb)是一条告诉处理器在执行任何的加载前，先应用所有已经在失效队列中的失效操作的指令。**
-
-`void executedOnCpu0() {       value = 10;       //在更新数据之前必须将所有存储缓存（store buffer）中的指令执行完毕。       storeMemoryBarrier();       finished = true;   }   void executedOnCpu1() {       while(!finished);       //在读取之前将所有失效队列中关于该数据的指令执行完毕。       loadMemoryBarrier();       assert value == 10;   }   `
-
+```cpp
+void executedOnCpu0() {       value = 10;       //在更新数据之前必须将所有存储缓存（store buffer）中的指令执行完毕。       
+	storeMemoryBarrier();       finished = true;   }   void executedOnCpu1() {       while(!finished);       //在读取之前将所有失效队列中关于该数据的指令执行完毕。      
+loadMemoryBarrier();       
+assert value == 10;   }   
+```
 现在确实安全了。完美无暇！
 
 **好了，今天就到这儿吧，我是冰河，我们下期见~~**
 
 _转自：cnblogs.com/yanlong300/p/8986041.html_
 
-![](http://mmbiz.qpic.cn/mmbiz_png/2hHcUic5FEwEsQmOPMjJS0EZKCJ66T4VwM2ia7E7Dxj8pWyco8fSSt6EeUOTeRHM64TE2MGkxHibrXYibUALgGLncA/300?wx_fmt=png&wxfrom=19)
-
-**冰河技术**
-
-分享各种编程语言、开发技术、分布式与微服务架构、分布式数据库、分布式事务、云原生、大数据与云计算技术和渗透技术。另外，还会分享各种面试题和面试技巧。
-
-673篇原创内容
-
-公众号
-
-点击上方卡片关注我
+---
 
 精通高并发系列140
 

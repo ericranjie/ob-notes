@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md",
+                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md",
+                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md",
+                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "auxiliary/self-improvement/hair/hair-quote.md"
+                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md"
               }
             }
           }
@@ -148,53 +148,53 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
-    "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
-    "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
-    "coding/os/linux/schedule/debug/p_n_关于numa loadbance的死锁分析.md",
-    "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
-    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/schedule/interrupt/p_中断上下文中调度会怎样？.md",
-    "coding/os/linux/schedule/lock/k_Linux内核同步机制之（六）：Seqlock.md",
-    "coding/os/linux/schedule/lock/Perf book 9.3章节翻译（上）.md",
-    "coding/os/linux/schedule/b_n_一例centos7.6内核hardlock的解析.md",
-    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
-    "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
+    "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
+    "coding/cpp/grammar/i_C++ Trick：右值引用、万能引用傻傻分不清楚.md",
+    "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
+    "coding/cpp/lock/k_冷门知识点：进程间通信如何加锁？.md",
+    "coding/cpp/lock/b_n_详解C++高性能无锁队列的原理与实现.md",
+    "coding/cpp/low-level/i_sizeof(void)之谜.md",
+    "coding/cpp/memory/高性能C++内存池：解密并发环境下的内存管理.md",
+    "coding/cpp/memory/k_内存池设计与实现.md",
+    "coding/cpp/lock",
+    "coding/cpp/schedule",
+    "coding/cpp/memory",
+    "coding/cpp/schedule/k_C++ 线程的使用.md",
+    "coding/cpp/STL/b_n_C++ STL之合并、反转和其他算法.md",
+    "coding/cpp/STL",
+    "coding/cpp/memory/k_C++常见的三种内存破的场景和分析.md",
+    "zx99-image/Pasted image 20241009083212.png",
+    "zx99-image/Pasted image 20241009083507.png",
+    "zx99-image/Pasted image 20241009083446.png",
+    "coding/cpp/idiom/a_n_惊爆C C++编程技巧 解锁无限可能的黑科技.md",
+    "coding/cpp/learning/内推字节 Linux C C++ 开发的那位同学没通过面试.......md",
+    "zx99-image/Pasted image 20241009082503.png",
+    "coding/os/linux/memory/cache/a_n_深入理解CPU缓存：性能优化的关键.md",
+    "zx99-image/Pasted image 20241009082619.png",
+    "zx99-image/Pasted image 20241009082533.png",
     "README.md",
-    "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
-    "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
-    "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
-    "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
-    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
-    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
-    "coding/os/linux/schedule/lock/spinlock/b_Linux内核的自旋锁.md",
-    "coding/os/linux/schedule/lock/spinlock/d_Linux内核同步机制之（九）：Queued spinlock.md",
-    "coding/os/linux/schedule/lock/i_mlock锁原理剖析.md",
-    "coding/os/linux/schedule/lock/i_什么时候需要cpu_relax()锁.md",
-    "coding/os/linux/schedule/d_load_balance函数代码详解.md",
-    "coding/os/linux/schedule/d_n_多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
-    "zx99-image/Pasted image 20241008205719.png",
-    "zx99-image/Pasted image 20241008190725.png",
-    "Pasted image 20241008190450.png",
-    "zx99-image/Pasted image 20241008185413.png",
-    "zx99-image/Pasted image 20241008184145.png",
-    "zx99-image/Pasted image 20241008183012.png",
-    "zx99-image/Pasted image 20241008183324.png",
-    "zx99-image/Pasted image 20241008183317.png",
-    "zx99-image/Pasted image 20241008183310.png",
-    "zx99-image/Pasted image 20241008183259.png",
+    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+    "coding/os/linux/memory/cache/a_n_cache的58问，您能回答上来几个？.md",
+    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
+    "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
+    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
+    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+    "zx99-image/Pasted image 20241009081347.png",
+    "zx99-image/Pasted image 20241009081537.png",
+    "zx99-image/Pasted image 20241009081518.png",
+    "zx99-image/Pasted image 20241009081456.png",
+    "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
+    "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
+    "coding/cpp/learning/a_n_C++知识体系总结：语言核心与代码工程.md",
+    "coding/cpp/learning/i_n_研究了一波RTTI，再介绍软件开发的201个原则，文末再送6本书.md",
+    "coding/cpp/learning/c_C语言深度指南《Modern C》迎来再版，免费PDF资源一并放出书.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/page-folio",
     "coding/os/linux/memory/hardware",
     "coding/cpp/idiom",
     "learning",
     "coding/app/nginx",
-    "auxiliary/self-improvement/Chrisma/Untitled",
     "Untitled.canvas",
-    "coding/cpp/grammar/Untitled",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/delete",
-    "0x01-leetcode/2-dimensional/tree/binary-search-tree/unique-BST",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
   ]

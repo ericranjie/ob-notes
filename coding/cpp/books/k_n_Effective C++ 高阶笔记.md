@@ -1,40 +1,22 @@
-
 程序员贺同学
-
  _2021年11月30日 18:00_
-
-以下文章来源于畅游码海 ，作者CallMeEngineer
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM64xwHaVbpExZZAQkfwibGD4ExzQibjEianicwUMOPOo3qc6Q/0)
-
-**畅游码海**.
-
-记录学习过程中的知识，从零开始构建学习框架，大家共同学习、共同进步！
 
 ](https://mp.weixin.qq.com/s?__biz=MzIzNzg5MDg0OA==&mid=2247489803&idx=2&sn=87012df52ebcd7067a542c8676b3c10c&chksm=e8c0e544dfb76c52f7b38ec26076768922515bfc0915b71a3d18b51c0a16ba7640918867a0ed&mpshare=1&scene=24&srcid=1201XZI4O2RNXTkQM4xpmHnW&sharer_sharetime=1638291363696&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0f0dc7289d73481b1eeaa18706aa9f329fd4717f7c7cc3e9043bf1187aeacd0942b5bf72b62826706f9da0d00f5a3b7498f98fdffd43c4a2f15bda1b40073160aa6ef86e2930c14d22eae2f9b53af5afaaf638fad8df854aa7a6f99d03839a043c7eacfcd85f0df042014c57995d1b0b22606bd350398bfc0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQyWeiY1QBv32WlC1ipAHjsBLmAQIE97dBBAEAAAAAANd3LCBdpKoAAAAOpnltbLcz9gKNyK89dVj0CClYMrfo2IAW12woIcqgRLOnRNuXuKdwJCtbqSij6Up21%2FhNHqr9Q%2F%2Bv9Q6A0JHApWJcpzx0cD7BNeGqVP9KgWbTAp5gm4ONKWFQCIoYgI1QTVx2ZHs7dF0kChpKYIHqpcQvXW0x%2FTBS7r1b0DnpARA07FS%2BIWGJ4dJPqjSIq7yU3PplMv%2FY8WmT7paSuHFEeTenzCWADgQHEmm%2Bw6QQwvioVD9R7RqnwmNkEfuAlOGKP3swl6Av32QlGRQAKlPN&acctmode=0&pass_ticket=DtCoxrbLL2IYlHdRVfcXJyDACEf4T0ystHecsfuVSTzd50i%2F%2FUotZituUa%2BV%2B255&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/QMtSGqOCILmSSG7r2JlmvT8RHDxcjIjNfOUpiaUD3Xqrqibrmcnx4sfFxbtIp4NxSibyib2Zjp0QbpoibkVu0OaTrgA/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
-公众号：畅游码海   这里有更多高质量原创文章和大量免费学习资料！
-
 # Part1一、让自己习惯C++
-
 ### 条款01：视C++为**一个语言联邦**
 
 C++并不是一个带有一组守则的一体语言：他是从四个次语言( C、Object-Oriented C++、Template、STL )  组成的联邦政府，每个次语言都有自己的规约。记住这四个次于语言你就会发现C++容易了解得多。
-
 ### 条款02:尽量以const,enum,inline替换 #define
-
+```cpp
  #define ASPECT_RATIO 1.653
-
+```
 以上句为例，是通过预处理器处理而不是编译器处理，有可能ASPECT_RATIO 没进入记号表内，于是如果出现了编译错误，那么编译器会提示错误信息是 1.653  而不是 ASPECT_RATIO ，你会感到非常困惑。
 
 解决方法是用常量替换宏
-
+```cpp
 const double AspectRatio = 1.653
-
+```
 这样编译器就可以看到ASPECT_RATIO ，而且使用常量会使代码量较小，因为预处理器只会盲目的替换而出现多份 1.653
 
 string对象通常比char* 更好一点
@@ -45,7 +27,6 @@ string对象通常比char* 更好一点
     2. 如果不支持，则在类内定义，在对应的实现文件中赋值  
 
 如果你需要在编译器就使用一个class常量值，则应最好改用枚举类型enum，且枚举不能用来取地址，不会为它分配额外的存储空间对于形似函数的宏，最好改用inline的模板函数
-
 ### 条款 03:尽可能使用const
 
 const出现在星号左边目标是指物是常量,出现在星号右边表示指针本身是常量,如果出现在两边，则指针和物都是常量void f1(const Widget* pw)和void f2(Widget const* pw)两种写法意义相同,都表示被指物是常量 对于STL迭代器来说，如果你希望迭代器所指的动科不可改动，你需要的是const_iterator 令函数返回一个常量值，往往可以降低因客户错误而造成的意外(例如把一个值赋值给一个返回值) 将const实施与成员函数的目的是为了明确该成员函数可作用于const对象:
@@ -54,18 +35,20 @@ const出现在星号左边目标是指物是常量,出现在星号右边表示�
     1. 他们使class接口比较容易理解    2. 他们使得可以操作const对象
 ```
 
-const成员函数和no-const成员函数可重载，即可以同时出现，在传入不同的参数时候会调用不同的版本，但是有时我们需要这样，但是又不想代码重复，我们可以在no-const成员调用const成员函数来处理这个代码重复问题 例如：const_cast<char &>( static_cast<const TextBlock&>(*this)[position]);,经过这样里面 先安全转型使得调用的是const版本，外面再去const转型
-
+const成员函数和no-const成员函数可重载，即可以同时出现，在传入不同的参数时候会调用不同的版本，但是有时我们需要这样，但是又不想代码重复，我们可以在no-const成员调用const成员函数来处理这个代码重复问题 例如：
+```cpp
+const_cast<char &>( static_cast<const TextBlock&>(*this)[position]);
+```
+,经过这样里面 先安全转型使得调用的是const版本，外面再去const转型
 ### 条款 04:确定对象被使用前已先被初始化
 
 对于内置类型要进行手工初始化构造函数最好使用成员初值列表，不要在构造函数中使用赋值操作来初始化，而且初值列表列出的成员变量次序应该和在class中声明的次序一样，因为声明次序就是C++保证的初始化次序 对于static对象，在跨编译单元之间的初始化次序是不能确定的，因为C++只保证在本文件内使用之前一定被初始化了
 
 举例(使用如下方式可以解决这个问题即以loacl static对象替换non-local static对象)：
-
-`class FileSystem{...};   FileSystem& tfs(){       static FileSystem fs;       return fs;   }   `
-
+```cpp
+class FileSystem{...};   FileSystem& tfs(){       static FileSystem fs;       return fs;   }   
+```
 # Part2二、构造/析构/赋值运算
-
 ### 条款05:了解C++默默编写并调用了哪些函数
 
 如果你不定义，编译器会自动帮你实习默认的构造函数，析构函数，拷贝赋值运算符和拷贝构造函数，但是如下几种情况不会替你生成默认的拷贝赋值运算符
@@ -73,11 +56,9 @@ const成员函数和no-const成员函数可重载，即可以同时出现，在�
 ```
     1. 类中含有**引用**的成员变量    2. 类中含有**const**的成员变量    3. 类的**基类**中的拷贝赋值运算符是**私有**成员函数
 ```
-
 ### 条款06：若不想使用编译器自动生成的函数，就应该明确拒绝
 
 当我们不希望编译器帮我们生成相应的成员函数的时候，我们可以将其声明为private并且不予以实现
-
 ### 条款07：为多态基类声明virtual析构函数
 
 以下情况应该为类声明一个virtual析构函数:
@@ -98,45 +79,46 @@ const成员函数和no-const成员函数可重载，即可以同时出现，在�
 
 > 解决办法之一：
 
-`class Transaction{       publci:        explicit Transaction(const std::string& logInfo);        void logTransaction(const std::string& logIngo) const;//把它变成这样的non-virtual函数        ...   };   Transaction::Transaction(const std::string& logInfo){       ...       logTransaction(logInfo);//这样调用   }   class BuyTransaction: public Transaction{        BuyTransaction( parameters ):Transaction(createLogString( parameters )){...}//将log信息传给基类的构造函数       private:        static std::string createLogString( parameters );//注意此函数为static函数   }      `
-
+```cpp
+class Transaction{       publci:        explicit Transaction(const std::string& logInfo);        void logTransaction(const std::string& logIngo) const;//把它变成这样的non-virtual函数        
+				  ...   };   Transaction::Transaction(const std::string& logInfo){       ...       logTransaction(logInfo);//这样调用   
+				  }   class BuyTransaction: public Transaction{        BuyTransaction( parameters ):Transaction(createLogString( parameters )){...}//将log信息传给基类的构造函数       
+				  private:        static std::string createLogString( parameters );//注意此函数为static函数   
+				  }      
+```
 ### 条款10：令operator= 返回一个reference to *this
 
 为了实现连锁赋值如内置类型x= y = z =15由于=采用右结合律，所以等价于x = (y = (z = 15)),因此，为了使我们自定义类也实现，所以*重载=,+=,-=,*=使其返回refercence to this
-
 ### 条款11：在operator= 中处理“自我赋值”
 
 在赋值的时候会出现对自我进行赋值的情况，这种情况下我们很容易写出不安全的代码
-
-`Widget::operator=(const Widget& rhs){    delete pb; //把自己释放了    pb = new Bitmap(*rhs.pb);//这就不安全了    return *this;   }   `
-
+```cpp
+Widget::operator=(const Widget& rhs){    delete pb; //把自己释放了    pb = new Bitmap(*rhs.pb);//这就不安全了    return *this;   }   
+```
 因此有三种推荐的做法
 
 1. ##### 先验证是不是相同的，是不是自我赋值
     
-
-`Widget::operator=(const Widget& rhs){   if(this == &rhs) return *this;//验证是不是相同    delete pb;     pb = new Bitmap(*rhs.pb);    return *this;   }   `
-
+```cpp
+Widget::operator=(const Widget& rhs){   if(this == &rhs) return *this;//验证是不是相同    delete pb;     pb = new Bitmap(*rhs.pb);    return *this;   }   
+```
 2. ##### 在复制pb所指的东西之前别删除pb
     
-
-`Widget::operator=(const Widget& rhs){    Bitmap* pOrig = pb;    pb = new Bitmap(*rhs.pb);//让pb指向*pb的一个副本       delete pOrig; //删除原先的pb    return *this;   }   `
-
+```cpp
+Widget::operator=(const Widget& rhs){    Bitmap* pOrig = pb;    pb = new Bitmap(*rhs.pb);//让pb指向*pb的一个副本       delete pOrig; //删除原先的pb    return *this;   }   
+```
 3. ##### 使用交换数据的函数
     
-
-`class Widget{   ...   void swap(Widget& rhs);//交换*this和rhs的数据   ...   };   Widget::operator=(const Widget& rhs){    Widget temp(rhs);//创建一个rhs副本    swap(temp);//交换*this和上面的副本    return *this;   }   `
-
+```cpp
+class Widget{   ...   void swap(Widget& rhs);//交换*this和rhs的数据   ...   };   Widget::operator=(const Widget& rhs){    Widget temp(rhs);//创建一个rhs副本    swap(temp);//交换*this和上面的副本    return *this;   }   
+```
 ### 条款12：复制对象时勿忘其每一个成分
 
 为了确保复制的时候复制对象内的所有成员变量，我们应该在字类的构造和赋值函数中调用父类的构造和赋值函数来完成各自的任务 不要尝试在复制构造函数和赋值函数中相互调用，如果想消除重复代码，请建立一个新的成员函数，并且最好将其设为私有且命名为init
-
 # Part3三、资源管理
-
 ### 条款13：以对象管理资源
 
 为了防止资源泄露，我们应该在构造函数中获取资源，在析构函数中释放资源，这样可以有效的避免资源泄露 使用智能指针是一个好的办法，在C++11中auto_ptr已经被弃用，有三个常用的是unique_ptr,share_ptr和weak_ptr
-
 ### 条款14：在资源管理类中心copying行为
 
 我们在管理RAII(构造函数中获得，析构函数中释放)观念的类时，应该对不同的情况，根据不同的目的进行处理
@@ -381,59 +363,6 @@ Boost是一个社群，也是一个网站。致力于免费、源码开放、同
 ---
 
   
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-**点击蓝字 · 关注我们**
-
-  
-
-  
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
-
-**扫码关注我们**
-
-  
-
-  
-
-  
-
-更多高质量原创文章等你来看！
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-**END**
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-点个“在看”不失联
-
-  
-
-阅读 943
-
-​
-
 写留言
 
 **留言 1**

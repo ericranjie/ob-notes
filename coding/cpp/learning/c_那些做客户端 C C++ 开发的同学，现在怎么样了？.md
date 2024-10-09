@@ -1,7 +1,4 @@
-# 
-
 Original 张小方 CppGuide
-
  _2022年03月08日 14:30_
 
 我读研的时候，沉迷于 Windows 编程而不能自拔，那个时候也和楼主有一样的困惑。毕业的时候找工作，非 Windows C/C++ 岗位不去，因为技术功底比较好，很快就成为客户端负责人。
@@ -16,24 +13,10 @@ Original 张小方 CppGuide
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/ic8RqseyjxMPO6P0hhKbZUn85JnvzicQz951IAmiaKNsGmibc1a65uuiahgeYNbxUWTWa7h4TGIPNxwXpO2RRn49PSQ/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-对电驴源码感兴趣的，可以点击下面的公众号获取： 
-
-![](http://mmbiz.qpic.cn/mmbiz_png/OIdl32LQlqpmKgWE0wRXCiafyf8F0GZbX5ldCfUdmYLpngEDp1QfSD6RsuukHIq0llJ8yiayfCqEFibVX9n6OQwTQ/300?wx_fmt=png&wxfrom=19)
-
-**程序员小方**
-
-技术，生活，编码，加班，读书学习，这里是程序员小方的 IT 生活。
-
-21篇原创内容
-
-公众号
-
-打开后回复“**五套源码**”，获取电驴源码  
 
 如上图所示，假设操作系统选择 Windows，使用语言使用 C++，这就要求您必须熟悉 C++ 常用的语法，如果还不熟悉，就需要补充这方面的知识。
 
 在熟悉 C++ 语法的前提下，从这款产品实现技术来看，我们的目标产品分为 UI 和网络通信部分。下面将详细介绍这两部分。
-
 ### UI 部分
 
 对于 UI 部分，我们的认识是，这里需要使用 Windows 的窗口技术。可以直接使用原生的 Win 32 API 来制作自己的界面库，也可以选择一些熟悉的界面框架，如 MFC、WTL、Duilib、wxWidgets 等。无论您是在阅读别人的项目还是需要自己开发这样的项目，在确定了这款软件使用的 UI 库（或者使用原生 Win 32 API），您就需要对 Windows 的窗口、对话框、消息产生、派发与处理机制进行了解。同样的道理，如果不熟悉您需要补充相关的知识（关于这一点，下文不再赘述）。
