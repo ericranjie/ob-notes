@@ -1,10 +1,7 @@
-# 
 
 原创 蒋冲 阿里云开发者
 
 _2021年12月15日 08:00_
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 双十一压测过程中，常见的问题之一就是load 飙高，通常这个时候业务上都有受影响，比如服务rt飙高，比如机器无法登录，比如机器上执行命令hang住等等。本文就来说说，什么是load，load是怎么计算的，什么情况下load 会飙高，load飙高是不是必然业务受影响。
 
@@ -44,6 +41,8 @@ a1 = a0 * factor + a * (1 - factor)，其中a0是上一时刻的值，a1是当
 
 ```
 #define EXP_1 1884       /* 1/exp(5sec/1min) */
+#define EXP_5 2014      /* 1/exp(5sec/5min) */
+#define EXP_15 2037   /* 1/exp(5sec/15min) */ 
 ```
 
 这三个系数是怎么来的呢？公式如下：
@@ -60,8 +59,9 @@ a1 = a0 * factor + a * (1 - factor)，其中a0是上一时刻的值，a1是当
 
 我们看看内核中实际代码：
 
-```
-/*
+```c
+/* * a1 = a0 * e + a * (1 - e) */     
+static inline unsigned longcalc_load(unsigned long load, unsigned long exp, unsigned long active){               unsigned long newload;        // FIXED_1 = 2048        newload = load * exp + active * (FIXED_1 - exp);        if (active >= load)                newload += FIXED_1-1;         return newload / FIXED_1;}
 ```
 
 就是一个很直观的实现。上面代码中，第一个参数就是上一时刻的load， 第二个参数就是常量系数，第三个参数是active的进程/线程数量（包括runnable 和 uninterruptible）。
@@ -78,7 +78,7 @@ load的计算分为两个步骤：
 
 整体流程如下图所示，在每个tick到来时（时钟中断），执行以下逻辑：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009122033.png]]
 
 上图中，棕色的calc_global_load_tick函数就是完成第一个步骤的，绿色的calc_global_load 是完成第二个步骤，蓝色的calc_load 就是上一节中描述的核心算法。
 
@@ -144,15 +144,15 @@ task 在申请内存的时候，可能会触发内存回收，如果触发的是
 
 #### **查找UNINTERRUPTIBLE状态进程**
 
-#### UNINTERRUPTIBLE，通常也称为D状态，下文就用D状态来描述。有一些简单的工具可以统计当前D状态进程的数量， 稍微复杂一点的工具可以把D状态进程的调用链也就是stack输出。这类工具一般都是从内核提供的proc 文件系统取数。
+UNINTERRUPTIBLE，通常也称为D状态，下文就用D状态来描述。有一些简单的工具可以统计当前D状态进程的数量， 稍微复杂一点的工具可以把D状态进程的调用链也就是stack输出。这类工具一般都是从内核提供的proc 文件系统取数。
 
 查看/proc/${pid}/stat 以及/proc/${pid}/task/${pid}/stat 文件，可以判断哪些task 处于D状态，如下所示：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009122052.png]]
 
 第三个字段就是task的状态。然后再查看/proc/${pid}/stack 文件就可以知道task 等在哪里。如：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241009122102.png]]
 
 但有时候，D状态的task 不固定，这会导致抓不到D状态或者抓到stack的不准确。这时候，就得上另一个终极大招，延迟分析。
 

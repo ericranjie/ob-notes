@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
+                "file": "coding/os/linux/BPF/b_eBPF 简史.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
+                "file": "coding/os/linux/BPF/b_eBPF 简史.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
+                "file": "coding/os/linux/BPF/b_eBPF 简史.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md"
+                "file": "coding/os/linux/BPF/b_eBPF 简史.md"
               }
             }
           }
@@ -146,45 +146,45 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/BPF/a_BPF内核实现详解.md",
+    "coding/os/linux/BPF/c_Linux eBPF学习路径.md",
+    "coding/os/linux/BPF/a_浅谈一下，Linux中基于eBPF的恶意利用与检测机制.md",
+    "coding/os/linux/BPF/b_eBPF 简史.md",
+    "coding/os/linux/BPF/b_BPF C 编程入门.md",
+    "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+    "coding/os/linux/performance/d_闻茂泉：系统性能监控与分析的工程化实践之路.md",
+    "zx99-image/Pasted image 20241009122511.png",
+    "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
+    "coding/os/linux/performance/cn_Linux 性能基准测试工具及测试方法.md",
+    "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
+    "coding/os/linux/performance/pn_Linux问题分析与性能优化.md",
+    "coding/os/linux/performance/t_性能优化的路有多远？.md",
+    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
+    "coding/os/linux/performance/b_n_一文说清linux system load.md",
+    "zx99-image/Pasted image 20241009122033.png",
+    "zx99-image/Pasted image 20241009122102.png",
+    "zx99-image/Pasted image 20241009122052.png",
+    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
+    "coding/os/linux/performance/a_n _微信工程师：常见性能优化方案与实用工具.md",
+    "coding/os/linux/performance/b_n_系统性能分析从入门到进阶.md",
+    "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
+    "coding/os/linux/device/一文搞懂 Linux 驱动的来龙去脉.md",
+    "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
     "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
     "README.md",
     "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
     "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
     "coding/os/linux/schedule/i_Linux内核同步机制之（二）：Per-CPU变量.md",
-    "ztrash/b_RISC-V架构系列之1：指令集和特权模式.md",
-    "ztrash/一文搞懂大模型、RAG、函数调用、Agent、知识库、向量数据库、知识图谱、AGI的区别和联系！！.md",
     "ztrash",
-    "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
     "zx99-image/Pasted image 20241009114447.png",
-    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "zx99-image/Pasted image 20241009113121.png",
     "zx99-image/Pasted image 20241009113143.png",
-    "coding/cpp/low-level/a_做引擎开发，更需要深入 C++ 内存管理.md",
     "zx99-image/Pasted image 20241009113502.png",
     "zx99-image/Pasted image 20241009113451.png",
     "zx99-image/Pasted image 20241009113422.png",
-    "zx99-image/Pasted image 20241009113409.png",
-    "zx99-image/Pasted image 20241009113354.png",
-    "zx99-image/Pasted image 20241009113341.png",
-    "zx99-image/Pasted image 20241009113253.png",
-    "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
-    "coding/cpp/idiom/a_n_惊爆C C++编程技巧 解锁无限可能的黑科技.md",
-    "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
-    "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
-    "coding/app/SOTA技术概述.md",
-    "coding/app/a_云风Skynet源码剖析及原理实战（一）.md",
-    "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
-    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/cpp/low-level/a_C++ 内存管理（一）.md",
-    "coding/cpp/grammar/C++ 日期和时间编程.md",
-    "coding/cpp/grammar/an_万字长文带你掌握C++11中auto和decltype的用法和区别.md",
-    "coding/cpp/grammar/b_（文末赠书）学了许多年 C++ 终于想通了.......md",
-    "coding/cpp/grammar/「现代C++设计魅力」虚函数继承-thunk技术初探.md",
-    "coding/cpp/grammar/reflect/C++反射TS初探.md",
     "coding/cpp/schedule/coroutine",
     "coding/cpp/schedule",
     "coding/cpp/memory",

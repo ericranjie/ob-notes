@@ -6,13 +6,11 @@ _2022年01月17日 08:02_
 
 闻茂泉，阿里巴巴计算平台事业部大数据基础工程团队SRE运维专家。通过阅码场平台将日常工作中积累的一些性能分析方面的经验，与打造的性能分析的工具跟大家一起做个分享。系统性能分析ssar工具已经开源到了龙蜥社区。
 
-一、系统性能分析工具ssar功能定位
-
-![图片](https://mmbiz.qpic.cn/mmbiz_svg/6mXOeYa4HU9Np8b6CdA91AZOXoX1tI2vWN8zicFeYNrW28ZpI6viayAMlz7t2bAWsbY1xWkuicwsxBia8w0HgY5NpficZQCneDiclP/640?wx_fmt=svg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+# 一、系统性能分析工具ssar功能定位
 
 说起性能分析就不得不提到《性能之巅》这本书，它是业界里程碑式的经典书籍。在书中第4章观测工具部分，Brendan告诉我们观测工具主要包括：计数器(Counters)、跟踪(Tracing)、采样(Profiling)和监控(Monitoring)几大类。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6byuUMpQ02jBuXvdD92FyJAdJuaS2eV47Xt0qCcpnTnML2QUdC036t61lk1dFPZicPtW0thSs3uaYa0g/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009122511.png]]
 
 依据数据获取方式和数据实时性，将性能观测工具做了分类：
 
@@ -46,12 +44,8 @@ _2022年01月17日 08:02_
 
 下文我会用几个例子说明我们是如何结合使用系统性能监控工具和跟踪采样工具的。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_svg/6mXOeYa4HU9Np8b6CdA91AZOXoX1tI2vn61qxJ3qwAk1VjLcZNq4ZTaApB9CEkPKYHLjZ1JJGUD2NrJA0MFXiaIhANDwq8yBN/640?wx_fmt=svg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-二、系统性能分析工具ssar介绍
-
-![图片](https://mmbiz.qpic.cn/mmbiz_svg/6mXOeYa4HU9Np8b6CdA91AZOXoX1tI2vWN8zicFeYNrW28ZpI6viayAMlz7t2bAWsbY1xWkuicwsxBia8w0HgY5NpficZQCneDiclP/640?wx_fmt=svg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
+# 二、系统性能分析工具ssar介绍
+ 
 系统性能监控工具ssar开源地址：
 
 https://gitee.com/anolis/tracing-ssar.git

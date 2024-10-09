@@ -63,7 +63,7 @@ Systamp就是解决了这个问题得以发展的，它使用了ko的方式来�
 
 整个BPF的开发过程大概如下图所示：
 
-!\[\[Pasted image 20240920131635.png\]\]
+![[Pasted image 20240920131635.png]]
 
 ## 1.bpf()系统调用
 
@@ -147,7 +147,7 @@ DFS(Depth-first Search)深度优先算法来遍历BPF程序的代码路径，确
 
 DAG的DFS算法可以参考“Graph”一文。其中最重要的概念如下图：
 
-!\[\[Pasted image 20240920132031.png\]\]
+![[Pasted image 20240920132031.png]]
 
 一个图形"Graph"经过DAG的DFS算法遍历后，对每一个根节点都会形成一颗树“DFS Tree”，多个根节点得到的多棵树形成一个森林"DFS Forest"。根据搜索的结构整个“Graph”的边“Edge”可以**分成四类**：
 

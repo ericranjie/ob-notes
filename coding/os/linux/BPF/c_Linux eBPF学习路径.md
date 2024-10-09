@@ -2,17 +2,13 @@ Original cloud clouds
 
 _2024年07月27日 11:38_
 
-### ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/Bh66jm0ozvYuBmCrWlIeq84BlZZSVSPa8lZqagI7aC40wadKr3a1bxicdZiceXFMAy6WQNcPiaFu76f7CuicQg0Vcg/640?wx_fmt=jpeg&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 eBPF是现代数据中心和云原生领域里的一批良马，一只良弓，值得我们IT从业者拥有.
 
 良弓难张，然可以及高入深；
 
 良马难乘，然可以任重致远；
 
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/Bh66jm0ozvYuBmCrWlIeq84BlZZSVSPaGbt0VdTetEMJiaawtbOGXGsBIKABmDHuhFpLicWSiaEhX0K1icTEjRk0BA/640?wx_fmt=jpeg&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-#### 
+z#### 
 
 #### **阶段一：基础知识**
 
