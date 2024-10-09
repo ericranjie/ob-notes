@@ -55,7 +55,7 @@ bash-3.2$ sudo tcpdump -d -i lo tcp and dst port 7070(000) ldh [12](
 这段看起来类似于汇编的代码，便是 BPF 用于定义 Filter 的伪代码，亦即图 1 中 libpcap 和内核交互的 pseudo machine language（也有一种说法是，BPF 伪代码设计之初参考过当时大行其道的 RISC 令集的设计理念），当 BPF 工作时，每一个进出网卡的报文都会被这一段代码过滤一遍，其中符合条件的（`ret #262144`）会被复制到用户空间，其余的（`ret #0`）则会被丢弃。
 
 BPF 采用的报文过滤设计的全称是 CFG（Computation Flow Graph），顾名思义是将过滤器构筑于一套基于 if-else 的控制流flow graph之上，例如清单 1 中的 filter 就可以用图 3 来表示：
-!\[\[Pasted image 20240911194345.png\]\]
+![[Pasted image 20240911194345.png]]
 _图 3 基于 CFG 实现的 filter 范例_
 
 CFG 模型最大的优势是快，参考文献 1 中就比较了 CFG 模型和基于树型结构构建出的 CSPF 模型的优劣，得出了基于 CFG 模型需要的运算量更小的结论；但从另一个角度来说，基于伪代码的设计却也增加了系统的复杂性：一方面伪指令集已经足够让人眼花缭乱的了；另一方面为了执行伪代码，内核中还需要专门实现一个虚拟机pseudo-machine，这也在一定程度上提高了开发和维护的门槛。
