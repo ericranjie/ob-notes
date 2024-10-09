@@ -22,9 +22,9 @@ ReentrantLock的lock（），unlock（）等API其实依赖于内部的Synchroni
 /\*\* Synchronizer providing all implementation mechanics */\
 private final Sync sync;\
 /*\*\
-* Base of synchronization control for this lock. Subclassed\
-* into fair and nonfair versions below. Uses AQS state to\
-* represent the number of holds on the lock.\
+\* Base of synchronization control for this lock. Subclassed\
+\* into fair and nonfair versions below. Uses AQS state to\
+\* represent the number of holds on the lock.\
 \*/\
 abstract static class Sync extends AbstractQueuedSynchronizer {\
 ......\
@@ -37,16 +37,16 @@ sync.lock();\
 那么这个sync又是什么？我们看到Sync 继承自AbstractQueueSynchronizer（AQS），AQS是concurrent包的基石，AQS本身并不实现任何同步接口（比如lock,unlock,countDown等等），但是它定义了一个并发资源控制逻辑的框架（运用了template method 设计模式），它定义了acquire和release方法用于独占地（exclusive）获取和释放资源，以及acquireShared和releaseShared方法用于共享地获取和释放资源。比如acquire/release用于实现ReentrantLock，而acquireShared/releaseShared用于实现CountDownLacth，Semaphore。比如acquire的框架如下：
 
 /\*\*\
-* Acquires in exclusive mode, ignoring interrupts.  Implemented\
-* by invoking at least once {@link #tryAcquire},\
-* returning on success.  Otherwise the thread is queued, possibly\
-* repeatedly blocking and unblocking, invoking {@link\
-* #tryAcquire} until success.  This method can be used\
-* to implement method {@link Lock#lock}.\
+\* Acquires in exclusive mode, ignoring interrupts.  Implemented\
+\* by invoking at least once {@link #tryAcquire},\
+\* returning on success.  Otherwise the thread is queued, possibly\
+\* repeatedly blocking and unblocking, invoking {@link\
+\* #tryAcquire} until success.  This method can be used\
+\* to implement method {@link Lock#lock}.\
 \*\
-* @param arg the acquire argument.  This value is conveyed to\
-*        {@link #tryAcquire} but is otherwise uninterpreted and\
-*        can represent anything you like.\
+\* @param arg the acquire argument.  This value is conveyed to\
+\*        {@link #tryAcquire} but is otherwise uninterpreted and\
+\*        can represent anything you like.\
 \*/\
 public final void acquire(int arg) {\
 if (!tryAcquire(arg) &&\
@@ -59,10 +59,10 @@ selfInterrupt();\
 addWaiter的代码如下：
 
 /\*\*\
-* Creates and enqueues node for current thread and given mode.\
+\* Creates and enqueues node for current thread and given mode.\
 \*\
-* @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared\
-* @return the new node\
+\* @param mode Node.EXCLUSIVE for exclusive, Node.SHARED for shared\
+\* @return the new node\
 \*/\
 private Node addWaiter(Node mode) {\
 //创建节点,设置关联线程和模式(独占或共享)\
@@ -88,9 +88,9 @@ return node;\
 enq(node)的代码如下：
 
 /\*\*\
-* Inserts node into queue, initializing if necessary. See picture above.\
-* @param node the node to insert\
-* @return node's predecessor\
+\* Inserts node into queue, initializing if necessary. See picture above.\
+\* @param node the node to insert\
+\* @return node's predecessor\
 \*/\
 private Node enq(final Node node) {\
 for (;;) {\
@@ -118,12 +118,12 @@ addWaiter执行结束后，同步队列的结构如下所示：
 acquireQueued的代码如下：
 
 /\*\*\
-* Acquires in exclusive uninterruptible mode for thread already in\
-* queue. Used by condition wait methods as well as acquire.\
+\* Acquires in exclusive uninterruptible mode for thread already in\
+\* queue. Used by condition wait methods as well as acquire.\
 \*\
-* @param node the node\
-* @param arg the acquire argument\
-* @return {@code true} if interrupted while waiting\
+\* @param node the node\
+\* @param arg the acquire argument\
+\* @return {@code true} if interrupted while waiting\
 \*/\
 final boolean acquireQueued(final Node node, int arg) {\
 boolean failed = true;\
@@ -165,7 +165,7 @@ acquireQueued的逻辑是：
 ReentrantLock内部使用的FairSync和NonfairSync，它们都是AQS的子类，比如FairSync的主要代码如下：
 
 /\*\*\
-* Sync object for fair locks\
+\* Sync object for fair locks\
 \*/\
 static final class FairSync extends Sync {\
 private static final long serialVersionUID = -3000897897090466540L;
@@ -175,8 +175,8 @@ acquire(1);\
 }
 
 /\*\*\
-* Fair version of tryAcquire.  Don't grant access unless\
-* recursive call or no waiters or is first.\
+\* Fair version of tryAcquire.  Don't grant access unless\
+\* recursive call or no waiters or is first.\
 \*/\
 protected final boolean tryAcquire(int acquires) {\
 final Thread current = Thread.currentThread();\
@@ -814,8 +814,8 @@ current->timer_slack_ns);\
 
 retry:\
 /\*\
-* Prepare to wait on uaddr. On success, holds hb lock and increments\
-* q.key refs.\
+\* Prepare to wait on uaddr. On success, holds hb lock and increments\
+\* q.key refs.\
 \*/\
 ret = futex_wait_setup(uaddr, val, flags, &q, &hb);\
 if (ret)\
@@ -834,8 +834,8 @@ if (to && !to->task)\
 goto out;
 
 /\*\
-* We expect signal_pending(current), but we might be the\
-* victim of a spurious wakeup as well.\
+\* We expect signal_pending(current), but we might be the\
+\* victim of a spurious wakeup as well.\
 \*/\
 if (!signal_pending(current))\
 goto retry;
@@ -867,20 +867,20 @@ return ret;\
 -
 
 \* futex_wait_setup() - Prepare to wait on a futex\
-* @uaddr:      the futex userspace address\
-* @val:        the expected value\
-* @flags:      futex flags (FLAGS_SHARED, etc.)\
-* @q:          the associated futex_q\
-* @hb:         storage for hash_bucket pointer to be returned to caller\
+\* @uaddr:      the futex userspace address\
+\* @val:        the expected value\
+\* @flags:      futex flags (FLAGS_SHARED, etc.)\
+\* @q:          the associated futex_q\
+\* @hb:         storage for hash_bucket pointer to be returned to caller\
 \*\
-* Setup the futex_q and locate the hash_bucket.  Get the futex value and\
-* compare it with the expected value.  Handle atomic faults internally.\
-* Return with the hb lock held and a q.key reference on success, and unlocked\
-* with no q.key reference on failure.\
+\* Setup the futex_q and locate the hash_bucket.  Get the futex value and\
+\* compare it with the expected value.  Handle atomic faults internally.\
+\* Return with the hb lock held and a q.key reference on success, and unlocked\
+\* with no q.key reference on failure.\
 \*\
-* Return:\
-*  -  0 - uaddr contains val and hb has been locked;\
-*  - \<1 - -EFAULT or -EWOULDBLOCK (uaddr does not contain val) and hb is unlocked\
+\* Return:\
+\*  -  0 - uaddr contains val and hb has been locked;\
+\*  - \<1 - -EFAULT or -EWOULDBLOCK (uaddr does not contain val) and hb is unlocked\
 \*/\
 static int futex_wait_setup(u32 \_\_user \*uaddr, u32 val, unsigned int flags,\
 struct futex_q \*q, struct futex_hash_bucket \*\*hb)\
@@ -928,19 +928,19 @@ return ret;\
 然后调用futex_wait_queue_me 把当前进程挂起：
 
 /\*\*\
-* futex_wait_queue_me() - queue_me() and wait for wakeup, timeout, or signal\
-* @hb:         the futex hash bucket, must be locked by the caller\
-* @q:          the futex_q to queue up on\
-* @timeout:    the prepared hrtimer_sleeper, or null for no timeout\
+\* futex_wait_queue_me() - queue_me() and wait for wakeup, timeout, or signal\
+\* @hb:         the futex hash bucket, must be locked by the caller\
+\* @q:          the futex_q to queue up on\
+\* @timeout:    the prepared hrtimer_sleeper, or null for no timeout\
 \*/\
 static void futex_wait_queue_me(struct futex_hash_bucket \*hb, struct futex_q \*q,\
 struct hrtimer_sleeper *timeout)\
 {\
 /*\
-* The task state is guaranteed to be set before another task can\
-* wake it. set_current_state() is implemented using smp_store_mb() and\
-* queue_me() calls spin_unlock() upon completion, both serializing\
-* access to the hash list and forcing another memory barrier.\
+\* The task state is guaranteed to be set before another task can\
+\* wake it. set_current_state() is implemented using smp_store_mb() and\
+\* queue_me() calls spin_unlock() upon completion, both serializing\
+\* access to the hash list and forcing another memory barrier.\
 \*/\
 set_current_state(TASK_INTERRUPTIBLE);\
 queue_me(q, hb);
@@ -950,14 +950,14 @@ if (timeout)\
 hrtimer_start_expires(&timeout->timer, HRTIMER_MODE_ABS);
 
 /\*\
-* If we have been removed from the hash list, then another task\
-* has tried to wake us, and we can skip the call to schedule().\
+\* If we have been removed from the hash list, then another task\
+\* has tried to wake us, and we can skip the call to schedule().\
 */\
 if (likely(!plist_node_empty(&q->list))) {\
 /*\
-* If the timer has already expired, current will already be\
-* flagged for rescheduling. Only call schedule if there\
-* is no timeout, or if it has yet to expire.\
+\* If the timer has already expired, current will already be\
+\* flagged for rescheduling. Only call schedule if there\
+\* is no timeout, or if it has yet to expire.\
 \*/\
 if (!timeout || timeout->task)\
 freezable_schedule();\

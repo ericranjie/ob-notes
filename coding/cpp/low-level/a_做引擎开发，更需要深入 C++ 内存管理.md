@@ -1,4 +1,4 @@
-## **言**
+## **前言**
 
 说到 C++ 的内存管理，我们可能会想到栈空间的本地变量、堆上通过 new 动态分配的变量以及全局命名空间的变量等，这些变量的分配位置都是由系统来控制管理的，而调用者只需要考虑**变量的生命周期**相关内容即可，而无需关心变量的**具体布局**。这对于普通软件的开发已经足够，但对于引擎开发而言，我们必须对内存有着更为精细的管理。
 
@@ -7,8 +7,7 @@
 在文章的开篇，先对一些基础概念进行简单的介绍，以便能够更好地理解后续的内容。
 
 ### **内存布局**
-
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRVRJZbfpFibn2SQMeQ932icrSW2driaNJGWDUH3FmLZsgxp2MNeYldDfVQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRVRJZbfpFibn2SQMeQ932icrSW2driaNJGWDUH3FmLZsgxp2MNeYldDfVQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113121.png]]
 
 内存分布（可执行映像）
 
@@ -45,8 +44,8 @@
 ① 函数返回地址
 
 ② 局部变量/CPU寄存器数据备份
+![[Pasted image 20241009113143.png]]
 
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRTaiapgibicjbianytZfjSB8wLHxoXsyLsbjR9WAOplOgZfmKicEZCQByyicw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRTaiapgibicjbianytZfjSB8wLHxoXsyLsbjR9WAOplOgZfmKicEZCQByyicw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 函数压栈
 
@@ -84,8 +83,8 @@ int main()
 在硬件设计上，数据读取的处理器只能从地址为k的倍数的内存处开始读取数据。这种读取方式相当于将内存分为了多个"块“，假设内存可以从任意位置开始存放的话，数据很可能会被分散到多个“块”中，处理分散在多个块中的数据需要移除首尾不需要的字节，再进行合并，非常耗时。
 
 为了提高数据读取的效率，程序分配的内存并不是连续存储的，而是按首地址为k的倍数的方式存储；这样就可以一次性读取数据，而不需要额外的操作。
+![[Pasted image 20241009113200.png]]
 
-data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
 读取非对齐内存的过程示例
 
@@ -119,8 +118,7 @@ int main()
     return 0;
 }
 ```
-
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRBKiae2Gl1zZuT4iaWC3CYRW4NOdO5nROuOJmGTc4EiaJDetN4udeyWCRg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRBKiae2Gl1zZuT4iaWC3CYRW4NOdO5nROuOJmGTc4EiaJDetN4udeyWCRg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113221.png]]
 
 内存排布示例
 
@@ -131,8 +129,7 @@ int main()
 (1) 内部碎片：系统分配的内存大于实际所需的内存（由于对齐机制）；
 
 (2) 外部碎片：不断分配回收不同大小的内存，由于内存分布散乱，较大内存无法分配；
-
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRZCUHYJLRxowNxpibQ7H0HiaKgvibVWqnicS5T3Z3UcbDAfjOQcm8Ktpmog/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRZCUHYJLRxowNxpibQ7H0HiaKgvibVWqnicS5T3Z3UcbDAfjOQcm8Ktpmog/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113253.png]]
 
 内部碎片和外部碎片
 
@@ -159,14 +156,13 @@ vtable中包含当前类的所有虚函数指针。
 ● 大端（big_endian)：高位有效字节存储于较低的内存位置
 
 我们使用的PC开发机默认是小端存储。
+![[Pasted image 20241009113341.png]]
 
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRh0Emiaic6OPicd3peW0A8nx58BRanYnyDybicA3NkfBw6txhGib0TUWdudA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRh0Emiaic6OPicd3peW0A8nx58BRanYnyDybicA3NkfBw6txhGib0TUWdudA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 大小端排布
 
 一般情况下，多字节量的排列顺序对编码没有影响。但如果要考虑跨平台的一些操作，就有必要考虑到大小端的问题。如下图，ue4引擎使用了PLATFORM_LITTLE_ENDIAN这一宏，在不同平台下对数据做特殊处理（内存排布交换，确保存储时的结果一致）。
-
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRgoWCLDwD9pZmYJjIiaTvUciaK9zl8q0uXSDC2gVHKZXeLtlWDBpWEcwg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRgoWCLDwD9pZmYJjIiaTvUciaK9zl8q0uXSDC2gVHKZXeLtlWDBpWEcwg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113354.png]]
 
 ue4针对大小端对数据做特殊处理（ByteSwap.h)
 
@@ -186,7 +182,8 @@ SIMD，即Single Instruction Multiple Data，用一个指令并行地对多个�
 
 SSE指令采用128位寄存器，我们通常将4个32位浮点值打包到128位寄存器中，单个指令可完成4对浮点数的计算，这对于矩阵/向量操作非常友好（除此之外，还有Neon/FPU等寄存器）
 
-data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
+![[Pasted image 20241009113409.png]]
+
 
 SIMD并行计算
 
@@ -196,7 +193,7 @@ SIMD并行计算
 
 当我们把数据加载内存后，要对数据进行一定操作时，会将数据从内存载入CPU寄存器。考虑到CPU读/写主内存速度较慢，处理器使用了高速的缓存（Cache)，作为内存到CPU中间的媒介。
 
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRFm0YOdCYZicCjkYeA2NrT0IVzZ5VIEyqds5XllL5vsDwlFz23tot7Nw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRFm0YOdCYZicCjkYeA2NrT0IVzZ5VIEyqds5XllL5vsDwlFz23tot7Nw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113422.png]]
 
 L1缓存和L2缓存
 
@@ -373,13 +370,13 @@ int main()
 
 当我们调用new时，实际上执行了operator new运算符表达式，和其它函数一样，operator new有多种重载，如上文中的placement new，就是operator new以下形式的一个重载：
 
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQR6yUIEF6fDhQYSNsPoHjURrOpMxEePWXdFWfQV7OX0EcHvUAMwuibNzg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQR6yUIEF6fDhQYSNsPoHjURrOpMxEePWXdFWfQV7OX0EcHvUAMwuibNzg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113502.png]]
 
 placement new的定义
 
 新语法（C++17）还支持带对齐的operator new：
 
-[https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRKVE7IJRoWicC6eyAmCz2AzTxbJAvMRYIWYSVXvlC8NIhzxe1QFZHcGA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpg0UgCnkG0VDh3vhbwxEzQRKVE7IJRoWicC6eyAmCz2AzTxbJAvMRYIWYSVXvlC8NIhzxe1QFZHcGA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241009113451.png]]
 
 aligned new的声明
 
