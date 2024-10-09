@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
+                "file": "coding/cpp/low-level/多线程程序中操作的原子性.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
+                "file": "coding/cpp/low-level/多线程程序中操作的原子性.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
+                "file": "coding/cpp/low-level/多线程程序中操作的原子性.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md"
+                "file": "coding/cpp/low-level/多线程程序中操作的原子性.md"
               }
             }
           }
@@ -148,6 +148,7 @@
   },
   "active": "e2d90085bd089a6c",
   "lastOpenFiles": [
+    "coding/cpp/grammar/k_解读C++即将迎来的重大更新（二）：C++20的核心语言.md",
     "coding/cpp/grammar/k_曾被“劝退”的 C++ 20 正式发布！.md",
     "coding/cpp/grammar/i_C++ Trick：右值引用、万能引用傻傻分不清楚.md",
     "coding/cpp/grammar/b_深入分析C++全局变量初始化 文末热门招聘.md",
@@ -187,7 +188,6 @@
     "coding/os/linux/memory/a_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/cpp/learning/a_n_C++知识体系总结：语言核心与代码工程.md",
     "coding/cpp/learning/i_n_研究了一波RTTI，再介绍软件开发的201个原则，文末再送6本书.md",
-    "coding/cpp/learning/c_C语言深度指南《Modern C》迎来再版，免费PDF资源一并放出书.md",
     "coding/os/linux/memory/reclaim",
     "coding/os/linux/memory/page-folio",
     "coding/os/linux/memory/hardware",
