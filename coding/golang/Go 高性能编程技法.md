@@ -2,11 +2,9 @@
 
 腾讯程序员 腾讯技术工程
 
- _2022年03月17日 18:00_
+_2022年03月17日 18:00_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
 
 作者：dablelv，腾讯 IEGggG 后台开发工程师
 
@@ -125,15 +123,14 @@ encoding/binary 包实现了数字和字节序列之间的简单转换以及 var
 行内拼接字符串为了书写方便快捷，最常用的两个方法是：
 
 - 运算符+
-    
+
 - `fmt.Sprintf()`
-    
 
 行内字符串的拼接，主要追求的是代码的简洁可读。`fmt.Sprintf()` 能够接收不同类型的入参，通过格式化输出完成字符串的拼接，使用非常方便。但因其底层实现使用了反射，性能上会有所损耗。
 
 运算符 + 只能简单地完成字符串之间的拼接，非字符串类型的变量需要单独做类型转换。行内拼接字符串不会产生内存分配，也不涉及类型地动态转换，所以性能上优于`fmt.Sprintf()`。
 
-**从性能出发，兼顾易用可读，如果待拼接的变量不涉及类型转换且数量较少（<=5），行内拼接字符串推荐使用运算符 +，反之使用 `fmt.Sprintf()`。**
+**从性能出发，兼顾易用可读，如果待拼接的变量不涉及类型转换且数量较少（\<=5），行内拼接字符串推荐使用运算符 +，反之使用 `fmt.Sprintf()`。**
 
 下面看下二者的性能对比。
 
@@ -169,13 +166,13 @@ encoding/binary 包实现了数字和字节序列之间的简单转换以及 var
 
 `BenchmarkJoinStrWithStringsBuilderPreAlloc-8    60079003                20.95 ns/op   `
 
-#### 5.遍历 []struct{} 使用下标而不是 range
+#### 5.遍历 \[\]struct{} 使用下标而不是 range
 
 Go 中遍历切片或数组有两种方式，一种是通过下标，一种是 range。二者在功能上没有区别，但是在性能上会有区别吗？
 
-##### 5.1 []int
+##### 5.1 \[\]int
 
-首先看一下遍历基本类型切片时二者的性能差别，以 []int 为例。
+首先看一下遍历基本类型切片时二者的性能差别，以 \[\]int 为例。
 
 `// genRandomIntSlice 生成指定长度的随机 []int 切片   func genRandomIntSlice(n int) []int {    rand.Seed(time.Now().UnixNano())    nums := make([]int, 0, n)    for i := 0; i < n; i++ {     nums = append(nums, rand.Int())    }    return nums   }      func BenchmarkIndexIntSlice(b *testing.B) {    nums := genRandomIntSlice(1024)    for i := 0; i < b.N; i++ {     var tmp int     for k := 0; k < len(nums); k++ {      tmp = nums[k]     }     _ = tmp    }   }      func BenchmarkRangeIntSlice(b *testing.B) {    nums := genRandomIntSlice(1024)    for i := 0; i < b.N; i++ {     var tmp int     for _, num := range nums {      tmp = num     }     _ = tmp    }   }   `
 
@@ -183,11 +180,11 @@ Go 中遍历切片或数组有两种方式，一种是通过下标，一种是 r
 
 `go test -bench=IntSlice$ .   goos: windows   goarch: amd64   pkg: main/perf   cpu: Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz   BenchmarkIndexIntSlice-8         5043324               236.2 ns/op   BenchmarkRangeIntSlice-8         5076255               239.1 ns/op   `
 
-`genRandomIntSlice()` 函数用于生成指定长度元素类型为 int 的切片。从最终的结果可以看到，遍历 []int 类型的切片，下标与 range 遍历性能几乎没有区别。
+`genRandomIntSlice()` 函数用于生成指定长度元素类型为 int 的切片。从最终的结果可以看到，遍历 \[\]int 类型的切片，下标与 range 遍历性能几乎没有区别。
 
-##### 5.2 []struct{}
+##### 5.2 \[\]struct{}
 
-那么对于稍微复杂一点的 []struct 类型呢？
+那么对于稍微复杂一点的 \[\]struct 类型呢？
 
 `type Item struct {    id  int    val [1024]byte   }      func BenchmarkIndexStructSlice(b *testing.B) {    var items [1024]Item    for i := 0; i < b.N; i++ {     var tmp int     for j := 0; j < len(items); j++ {      tmp = items[j].id     }     _ = tmp    }   }      func BenchmarkRangeIndexStructSlice(b *testing.B) {    var items [1024]Item    for i := 0; i < b.N; i++ {     var tmp int     for k := range items {      tmp = items[k].id     }     _ = tmp    }   }      func BenchmarkRangeStructSlice(b *testing.B) {    var items [1024]Item    for i := 0; i < b.N; i++ {     var tmp int     for _, item := range items {      tmp = item.id     }     _ = tmp    }   }   `
 
@@ -195,15 +192,15 @@ Go 中遍历切片或数组有两种方式，一种是通过下标，一种是 r
 
 `go test -bench=StructSlice$ .   goos: windows   goarch: amd64   pkg: main/perf   cpu: Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz   BenchmarkIndexStructSlice-8              5079468               234.9 ns/op   BenchmarkRangeIndexStructSlice-8         5087448               236.2 ns/op   BenchmarkRangeStructSlice-8                38716               32265 ns/op   `
 
-可以看出，两种通过 index 遍历 []struct 性能没有差别，但是 range 遍历 []struct 中元素时，性能非常差。
+可以看出，两种通过 index 遍历 \[\]struct 性能没有差别，但是 range 遍历 \[\]struct 中元素时，性能非常差。
 
-range 只遍历 []struct 下标时，性能比 range 遍历  []struct 值好很多。从这里我们应该能够知道二者性能差别之大的原因。
+range 只遍历 \[\]struct 下标时，性能比 range 遍历  \[\]struct 值好很多。从这里我们应该能够知道二者性能差别之大的原因。
 
-Item 是一个结构体类型 ，Item 由两个字段构成，一个类型是 int，一个是类型是 [1024]byte，如果每次遍历 []Item，都会进行一次值拷贝，所以带来了性能损耗。
+Item 是一个结构体类型 ，Item 由两个字段构成，一个类型是 int，一个是类型是 \[1024\]byte，如果每次遍历 \[\]Item，都会进行一次值拷贝，所以带来了性能损耗。
 
 此外，因为 range 时获取的是值拷贝的副本，所以对副本的修改，是不会影响到原切片。
 
-##### 5.3 []*struct
+##### 5.3 \[\]\*struct
 
 那如果切片中是指向结构体的指针，而不是结构体呢？
 
@@ -213,13 +210,13 @@ Item 是一个结构体类型 ，Item 由两个字段构成，一个类型是 in
 
 `go test -bench=Pointer$ main/perf   goos: windows   goarch: amd64   pkg: main/perf   cpu: Intel(R) Core(TM) i7-9700 CPU @ 3.00GHz   BenchmarkIndexPointer-8           773634              1521 ns/op   BenchmarkRangePointer-8           752077              1514 ns/op   `
 
-切片元素从结构体 Item 替换为指针 *Item 后，for 和 range 的性能几乎是一样的。而且使用指针还有另一个好处，可以直接修改指针对应的结构体的值。
+切片元素从结构体 Item 替换为指针 \*Item 后，for 和 range 的性能几乎是一样的。而且使用指针还有另一个好处，可以直接修改指针对应的结构体的值。
 
 ##### 5.4 小结
 
 range 在迭代过程中返回的是元素的拷贝，index 则不存在拷贝。
 
-如果 range 迭代的元素较小，那么 index 和 range 的性能几乎一样，如基本类型的切片 []int。但如果迭代的元素较大，如一个包含很多属性的 struct 结构体，那么 index 的性能将显著地高于 range，有时候甚至会有上千倍的性能差异。对于这种场景，建议使用 index。如果使用 range，建议只迭代下标，通过下标访问元素，这种使用方式和 index 就没有区别了。如果想使用 range 同时迭代下标和值，则需要将切片/数组的元素改为指针，才能不影响性能。
+如果 range 迭代的元素较小，那么 index 和 range 的性能几乎一样，如基本类型的切片 \[\]int。但如果迭代的元素较大，如一个包含很多属性的 struct 结构体，那么 index 的性能将显著地高于 range，有时候甚至会有上千倍的性能差异。对于这种场景，建议使用 index。如果使用 range，建议只迭代下标，通过下标访问元素，这种使用方式和 index 就没有区别了。如果想使用 range 同时迭代下标和值，则需要将切片/数组的元素改为指针，才能不影响性能。
 
 ### 内存管理
 
@@ -277,7 +274,7 @@ CPU 访问内存时，并不是逐个字节访问，而是以字长（word size�
 
 CPU 始终以字长访问内存，如果不进行内存对齐，很可能增加 CPU 访问内存的次数，例如：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 变量 a、b 各占据 3 字节的空间，内存对齐后，a、b 占据 4 字节空间，CPU 读取 b 变量的值只需要进行一次内存访问。如果不进行内存对齐，CPU 读取 b 变量的值需要进行 2 次内存访问。第一次访问得到 b 变量的第 1 个字节，第二次访问得到 b 变量的后两个字节。
 
@@ -294,11 +291,10 @@ Go Language Specification 中 [Size and alignment guarantees](https://go.dev/re
 > 1.For a variable x of any type: unsafe.Alignof(x) is at least 1. 2.For a variable x of struct type: unsafe.Alignof(x) is the largest of all the values unsafe.Alignof(x.f) for each field f of x, but at least 1. 3.For a variable x of array type: unsafe.Alignof(x) is the same as the alignment of a variable of the array's element type.
 
 - 对于任意类型的变量 x ，unsafe.Alignof(x) 至少为 1。
-    
+
 - 对于结构体类型的变量 x，计算 x 每一个字段 f 的 unsafe.Alignof(x.f)，unsafe.Alignof(x) 等于其中的最大值。
-    
+
 - 对于数组类型的变量 x，unsafe.Alignof(x) 等于构成数组的元素类型的对齐系数。
-    
 
 其中函数 `unsafe.Alignof` 用于获取变量的对齐系数。对齐系数决定了字段的偏移和变量的大小，两者必须是对齐系数的整数倍。
 
@@ -320,7 +316,7 @@ Go Language Specification 中 [Size and alignment guarantees](https://go.dev/re
 
 demo2 的对齐系数由 c 的对齐系数决定，也是 4，因此，demo2 的内存占用为 12 字节。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **因此，在对内存特别敏感的结构体的设计上，我们可以通过调整字段的顺序，将字段宽度从小到大由上到下排列，来减少内存的占用。**
 
@@ -339,17 +335,16 @@ demo2 的对齐系数由 c 的对齐系数决定，也是 4，因此，demo2 的
 变量逃逸一般发生在如下几种情况：
 
 - 变量较大
-    
+
 - 变量大小不确定
-    
+
 - 变量类型不确定
-    
+
 - 返回指针
-    
+
 - 返回引用
-    
+
 - 闭包
-    
 
 知道变量逃逸的原因后，我们可以有意识的控制变量不发生逃逸，将其控制在栈上，减少堆变量的分配，降低 GC 成本，提高程序性能。
 
@@ -381,7 +376,7 @@ sliceFibonacci() 函数中分配的局部变量切片因为要返回到函数外
 
 可以看到，arrayFibonacci() 和 sliceFibonacci() 函数均可内联。sliceFibonacci() 函数中定义的局部变量切片逃逸到了堆。
 
-那么多大的变量才算是小变量呢？对 Go 编译器而言，超过一定大小的局部变量将逃逸到堆上，不同的 Go 版本的大小限制可能不一样。一般是 <64KB，局部变量将不会逃逸到堆上。
+那么多大的变量才算是小变量呢？对 Go 编译器而言，超过一定大小的局部变量将逃逸到堆上，不同的 Go 版本的大小限制可能不一样。一般是 \<64KB，局部变量将不会逃逸到堆上。
 
 ##### 3.2 返回值 VS 返回指针
 
@@ -432,9 +427,8 @@ sync.Pool 的使用方式非常简单，只需要实现 New 函数即可。对�
 `stu := studentPool.Get().(*Student)   json.Unmarshal(buf, stu)   studentPool.Put(stu)   `
 
 - Get() 用于从对象池中获取对象，因为返回值是 interface{}，因此需要类型转换。
-    
+
 - Put() 则是在对象使用完毕后，放回到对象池。
-    
 
 ##### 4.4 性能差异
 
@@ -491,7 +485,6 @@ fmt.Printf() 的调用是非常频繁的，利用 sync.Pool 复用 pp 对象能�
 （2）为了方便打印链表内容，实现一个`String()`方法遍历链表，且使用值作为接收者，避免打印对象指针时无法生效。
 
 > 5. If an operand implements method String() string, that method will be invoked to convert the object to a string, which will then be formatted as required by the verb (if any).
->     
 
 我们分别对两种链表做一个并发写入的操作验证一下其功能。
 
@@ -513,7 +506,7 @@ fmt.Printf() 的调用是非常频繁的，利用 sync.Pool 复用 pp 对象能�
 
 这里我介绍的是后台微服务开发经常遇到的一种情况。我们经常需要并发拉取多方面的信息，汇聚到一个变量上。那么此时就存在对同一个变量互斥写入的情况。比如批量并发拉取用户信息写入到一个 map。此时我们可以将每个协程拉取的结果写入到一个临时对象，这样便将并发地协程与同一个变量解绑，然后再将其汇聚到一起，这样便可以不用使用锁。即独立处理，然后合并。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 为了模拟上面的情况，简单地写个示例程序，对比下性能。
 
@@ -551,7 +544,7 @@ Go 标准库 sync 提供了两种锁，互斥锁（sync.Mutex）和读写锁（s
 
 互斥锁的作用是保证共享资源同一时刻只能被一个 Goroutine 占用，一个 Goroutine 占用了，其他的 Goroutine 则阻塞等待。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 sync.Mutex 提供了两个导出方法用来使用锁。
 
@@ -566,13 +559,12 @@ sync.Mutex 提供了两个导出方法用来使用锁。
 一般来说，有如下几种情况：
 
 - 读锁之间不互斥，没有写锁的情况下，读锁是无阻塞的，多个协程可以同时获得读锁。
-    
-- 写锁之间是互斥的，存在写锁，其他写锁阻塞。
-    
-- 写锁与读锁是互斥的，如果存在读锁，写锁阻塞，如果存在写锁，读锁阻塞。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- 写锁之间是互斥的，存在写锁，其他写锁阻塞。
+
+- 写锁与读锁是互斥的，如果存在读锁，写锁阻塞，如果存在写锁，读锁阻塞。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 sync.RWMutex 提供了五个导出方法用来使用锁。
 
@@ -587,11 +579,10 @@ sync.RWMutex 提供了五个导出方法用来使用锁。
 接下来，我们测试三种情景下，互斥锁和读写锁的性能差异。
 
 - 读多写少(读占 80%)
-    
+
 - 读写一致(各占 50%)
-    
+
 - 读少写多(读占 20%)
-    
 
 首先根据互斥锁和读写锁分别实现对共享 map 的并发读写。
 
@@ -644,12 +635,10 @@ Go 程（goroutine）是由 Go 运行时管理的轻量级线程。通过它我�
 Go 的开销主要是三个方面：创建（占用内存）、调度（增加调度器负担）和删除（增加 GC 压力）。
 
 - 内存开销
-    
 
 空间上，一个 Go 程占用约 2K 的内存，在源码 src/runtime/runtime2.go里面，我们可以找到 Go 程的结构定义type g struct。
 
 - 调度开销
-    
 
 时间上，协程调度也会有 CPU 开销。我们可以利用runntime.Gosched()让当前协程主动让出 CPU 去执行另外一个协程，下面看一下协程之间切换的耗时。
 
@@ -662,7 +651,6 @@ Go 的开销主要是三个方面：创建（占用内存）、调度（增加�
 可见一次协程的切换，耗时大概在 100ns，相对于线程的微秒级耗时切换，性能表现非常优秀，但是仍有开销。
 
 - GC 开销 创建 Go 程到运行结束，占用的内存资源是需要由 GC 来回收，如果无休止地创建大量 Go 程后，势必会造成对 GC 的压力。
-    
 
 `package main      import (    "fmt"    "runtime"    "runtime/debug"    "sync"    "time"   )      func createLargeNumGoroutine(num int, wg *sync.WaitGroup) {    wg.Add(num)    for i := 0; i < num; i++ {     go func() {      defer wg.Done()     }()    }   }      func main() {    // 只设置一个 Processor 保证 Go 程串行执行    runtime.GOMAXPROCS(1)    // 关闭GC改为手动执行    debug.SetGCPercent(-1)       var wg sync.WaitGroup    createLargeNumGoroutine(1000, &wg)    wg.Wait()    t := time.Now()    runtime.GC() // 手动GC    cost := time.Since(t)    fmt.Printf("GC cost %v when goroutine num is %v\n", cost, 1000)       createLargeNumGoroutine(10000, &wg)    wg.Wait()    t = time.Now()    runtime.GC() // 手动GC    cost = time.Since(t)    fmt.Printf("GC cost %v when goroutine num is %v\n", cost, 10000)       createLargeNumGoroutine(100000, &wg)    wg.Wait()    t = time.Now()    runtime.GC() // 手动GC    cost = time.Since(t)    fmt.Printf("GC cost %v when goroutine num is %v\n", cost, 100000)   }   `
 
@@ -682,7 +670,7 @@ Go 的开销主要是三个方面：创建（占用内存）、调度（增加�
 
 `func main() {    var wg sync.WaitGroup    ch := make(chan struct{}, 3)    for i := 0; i < 10; i++ {     ch <- struct{}{}     wg.Add(1)     go func(i int) {      defer wg.Done()      log.Println(i)      time.Sleep(time.Second)      <-ch     }(i)    }    wg.Wait()   }   `
 
-上例中创建了缓冲区大小为 3 的 channel，在没有被接收的情况下，至多发送 3 个消息则被阻塞。开启协程前，调用`ch <- struct{}{}`，若缓存区满，则阻塞。协程任务结束，调用 <-ch 释放缓冲区。
+上例中创建了缓冲区大小为 3 的 channel，在没有被接收的情况下，至多发送 3 个消息则被阻塞。开启协程前，调用`ch <- struct{}{}`，若缓存区满，则阻塞。协程任务结束，调用 \<-ch 释放缓冲区。
 
 sync.WaitGroup 并不是必须的，例如 Http 服务，每个请求天然是并发的，此时使用 channel 控制并发处理的任务数量，就不需要 sync.WaitGroup。
 
@@ -699,9 +687,8 @@ sync.WaitGroup 并不是必须的，例如 Http 服务，每个请求天然是�
 协程池化，我们可以自己写一个协程池，但不推荐这么做。因为已经有成熟的开源库可供使用，无需再重复造轮子。目前有很多第三方库实现了协程池，可以很方便地用来控制协程的并发数量，比较受欢迎的有：
 
 - [Jeffail/tunny](https://github.com/Jeffail/tunny)
-    
+
 - [panjf2000/ants](https://github.com/panjf2000/ants)
-    
 
 下面以 panjf2000/ants 为例，简单介绍其使用。
 
@@ -726,27 +713,24 @@ Golang 为并发而生。Goroutine 是由 Go 运行时管理的轻量级线程�
 sync.Once 是 Go 标准库提供的使函数只执行一次的实现，常应用于单例模式，例如初始化配置、保持数据库连接等。作用与 init 函数类似，但有区别。
 
 - init 函数是当所在的 package 首次被加载时执行，若迟迟未被使用，则既浪费了内存，又延长了程序加载时间。
-    
+
 - sync.Once 可以在代码的任意位置初始化和调用，因此可以延迟到使用时再执行，并发场景下是线程安全的。
-    
 
 在多数情况下，sync.Once 被用于控制变量的初始化，这个变量的读写满足如下三个条件：
 
 - 当且仅当第一次访问某个变量时，进行初始化（写）；
-    
+
 - 变量初始化过程中，所有读都被阻塞，直到初始化完成；
-    
+
 - 变量仅初始化一次，初始化完成后驻留在内存里。
-    
 
 ###### 3.2 原理
 
 sync.Once 用来保证函数只执行一次。要达到这个效果，需要做到两点：
 
 - 计数器，统计函数执行次数；
-    
+
 - 线程安全，保障在多 Go 程的情况下，函数仍然只执行一次，比如锁。
-    
 
 ###### 3.2.1 源码
 
@@ -820,7 +804,7 @@ sync.Cond 的定义如下：
 
 `// Cond implements a condition variable, a rendezvous point   // for goroutines waiting for or announcing the occurrence   // of an event.   //   // Each Cond has an associated Locker L (often a *Mutex or *RWMutex),   // which must be held when changing the condition and   // when calling the Wait method.   //   // A Cond must not be copied after first use.   type Cond struct {    noCopy noCopy       // L is held while observing or changing the condition    L Locker       notify  notifyList    checker copyChecker   }   `
 
-每个 Cond 实例都会关联一个锁 L（互斥锁 *Mutex，或读写锁 *RWMutex），当修改条件或者调用 Wait 方法时，必须加锁。
+每个 Cond 实例都会关联一个锁 L（互斥锁 \*Mutex，或读写锁 \*RWMutex），当修改条件或者调用 Wait 方法时，必须加锁。
 
 sync.Cond 的四个成员函数定义如下：
 
@@ -845,13 +829,12 @@ Signal 只唤醒任意 1 个等待条件变量 c 的 goroutine，无需锁保护
 `var done = false      func read(name string, c *sync.Cond) {    c.L.Lock()    for !done {     c.Wait()    }    log.Println(name, "starts reading")    c.L.Unlock()   }      func write(name string, c *sync.Cond) {    log.Println(name, "starts writing")    time.Sleep(time.Second)    done = true    log.Println(name, "wakes all")    c.Broadcast()   }      func main() {    cond := sync.NewCond(&sync.Mutex{})       go read("reader1", cond)    go read("reader2", cond)    go read("reader3", cond)    write("writer", cond)       time.Sleep(time.Second * 3)   }   `
 
 - done 即多个 Goroutine 阻塞等待的条件。
-    
+
 - read() 调用 Wait() 等待通知，直到 done 为 true。
-    
+
 - write() 接收数据，接收完成后，将 done 置为 true，调用 Broadcast() 通知所有等待的协程。
-    
+
 - write() 中的暂停了 1s，一方面是模拟耗时，另一方面是确保前面的 3 个 read 协程都执行到 Wait()，处于等待状态。main 函数最后暂停了 3s，确保所有操作执行完毕。
-    
 
 运行输出：
 
@@ -862,50 +845,42 @@ Signal 只唤醒任意 1 个等待条件变量 c 的 goroutine，无需锁保护
 ##### 4.5 注意事项
 
 - sync.Cond 不能被复制
-    
 
 sync.Cond 不能被复制的原因，并不是因为其内部嵌套了 Locker。因为 NewCond 时传入的 Mutex/RWMutex 指针，对于 Mutex 指针复制是没有问题的。
 
 主要原因是 sync.Cond 内部是维护着一个 Goroutine 通知队列 notifyList。如果这个队列被复制的话，那么就在并发场景下导致不同 Goroutine 之间操作的 notifyList.wait、notifyList.notify 并不是同一个，这会导致出现有些 Goroutine 会一直阻塞。
 
 - 唤醒顺序
-    
 
 从等待队列中按照顺序唤醒，先进入等待队列，先被唤醒。
 
 - 调用 Wait() 前要加锁
-    
 
 调用 Wait() 函数前，需要先获得条件变量的成员锁，原因是需要互斥地变更条件变量的等待队列。在 Wait() 返回前，会重新上锁。
 
 **参考文献**
 
 - [github.com/uber-go/guide](https://github.com/uber-go/guide)
-    
+
 - [go-proverbs](https://go-proverbs.github.io/)
-    
+
 - [github/dgryski/go-perfbook](https://github.com/dgryski/go-perfbook)
-    
+
 - [High Performance Go Workshop - Dave Cheney](https://dave.cheney.net/high-performance-go-workshop/dotgo-paris.html)
-    
+
 - [atomic 的原理与使用场景](https://blog.csdn.net/chai2010/article/details/120426568)
-    
+
 - [极客兔兔.Go 语言高性能编程](https://geektutu.com/post/high-performance-go.html)
-    
+
 - [深度解密Go 语言之sync.Pool - Stefno - 博客园](https://www.cnblogs.com/qcrao-2018/p/12736031.html)
-    
 
-  
+**最近好文：**
 
-**最近好文：**  
+[在鹅厂工作1到11年的程序媛](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649768568&idx=1&sn=68dc084a79407a41762f8705b28e1257&chksm=beccd10389bb5815ae094ed7423a32f421fd143d724cbf0330efaeaf0382e683e575e6350f30&scene=21#wechat_redirect)
 
-[在鹅厂工作1到11年的程序媛](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649768568&idx=1&sn=68dc084a79407a41762f8705b28e1257&chksm=beccd10389bb5815ae094ed7423a32f421fd143d724cbf0330efaeaf0382e683e575e6350f30&scene=21#wechat_redirect)  
+[技术她力量，鹅厂女博士的寻“豹”之旅](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769049&idx=1&sn=b8ac0e6409b073758fa0bbcde1acd952&chksm=beccd72289bb5e34bacb76669650d8ebb70563fb35b381f452f20c62b86968f2efbeb98d8337&scene=21#wechat_redirect)
 
-[技术她力量，鹅厂女博士的寻“豹”之旅](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769049&idx=1&sn=b8ac0e6409b073758fa0bbcde1acd952&chksm=beccd72289bb5e34bacb76669650d8ebb70563fb35b381f452f20c62b86968f2efbeb98d8337&scene=21#wechat_redirect)  
-
-[微信全文搜索技术优化](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769274&idx=1&sn=a46fc1574ecbf5cfddd1f40af9cb1b4f&chksm=beccd64189bb5f57f80799fd2ea51c7669942254a2223dea55fe7d2bfa5762410a784dec8e2f&scene=21#wechat_redirect)  
-
-  
+[微信全文搜索技术优化](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769274&idx=1&sn=a46fc1574ecbf5cfddd1f40af9cb1b4f&chksm=beccd64189bb5f57f80799fd2ea51c7669942254a2223dea55fe7d2bfa5762410a784dec8e2f&scene=21#wechat_redirect)
 
 ![](https://res.wx.qq.com/t/fed_upload/b39ef69e-c4d6-4169-8612-5f00a84860e7/wx-avatar-default.svg)
 

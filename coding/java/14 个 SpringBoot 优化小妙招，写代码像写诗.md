@@ -2,7 +2,7 @@
 
 点击关注 👉 顶级架构师
 
- _2024年09月06日 17:31_ _浙江_
+_2024年09月06日 17:31_ _浙江_
 
 **推荐关注**
 
@@ -16,58 +16,43 @@
 
 顶级架构师后台回复 **1024** 有特别礼包
 
-  
-
 来源：Java后端编程
 
 链接：blog.csdn.net/weixin_44912855/article/details/120866194
 
-  
-
 上一篇：[要不要发给你们后端？ 看看人家后端 API 接口写的，那叫一个优雅！](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247575070&idx=1&sn=82e972c297759c804f8fe915c1d28c77&chksm=e8db07bbdfac8eadfc046d970ca1541e98cd933c945a5347a2f2280aad8cede37666b887d83e&scene=21#wechat_redirect)
-
-  
 
 ****大家好，我是顶级架构师。****
 
-  
-
 [**最新的 GPT-4o 在国内可以直接使用 ！**](http://mp.weixin.qq.com/s?__biz=MzkyMjY4NDgzNQ==&mid=2247483916&idx=1&sn=f6ddddf7dd27d669586ac5d988d3c236&chksm=c1f1dec0f68657d6ffae3ee1fefb2a60a90ae069e4eeed80a582b092cc71a9f129cd2221bdd4&scene=21#wechat_redirect)
 
-  
-
 - [1.定义配置文件信息](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [2. 用@RequiredArgsConstructor代替@Autowired](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [3.代码模块化](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [4. 抛异常而不是返回](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [5. 减少不必要的db](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [6. 不要返回null](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [7. if else](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [8. 减少controller业务代码](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [9. 利用好Idea](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [10. 阅读源码](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [11. 设计模式](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [12. 拥抱新知识](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [13. 基础问题](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
+
 - [14. 判断元素是否存在](http://mp.weixin.qq.com/s?__biz=Mzg2ODU0NTA2Mw==&mid=2247488419&idx=2&sn=0b80c7f9f73fca89b91e257a269cfada&chksm=ceabf4ebf9dc7dfdaa605a9bb92d31c9fc0a10a7a94351234181a89ba5800672c6e7da2ebfbe&scene=21#wechat_redirect)
-    
-
-  
-
-  
 
 到代码优化，很多人上来就是各种理论、架构、核心思路；其实优化这个事情说简单也简单，说复杂也可以很复杂，但是我觉得最重要的就是要有一个良好的编码习惯，代码"屎山”并非一朝一夕形成的，往往是经过了日积月累；因此，培养一个好的习惯，可以让我们的代码变的更加优雅、易维护，系统变的更加健壮；下面就分享14个小技巧，让优化变成顺手就完成的小事儿；
 
@@ -76,25 +61,24 @@
 有时候我们为了统一管理会把一些变量放到 yml 配置文件中；而不是到处设置“魔数”，一旦那天需要修改，只需要修改配置文件即可，不需要满项目去搜索替换；
 
 - **例如**
-    
-    ![Image](https://mmbiz.qpic.cn/mmbiz_png/GjuWRiaNxhnRCK3vEh7h7uS52AqXzEgmDq4iaYqebOzHjGslvzRgicue5G96h8lL1eFhxZqqHs14O3fO19kFsRiaIA/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1&tp=wxpic)
-    
-    用 @ConfigurationProperties 代替 @Value
-    
+
+  ![Image](https://mmbiz.qpic.cn/mmbiz_png/GjuWRiaNxhnRCK3vEh7h7uS52AqXzEgmDq4iaYqebOzHjGslvzRgicue5G96h8lL1eFhxZqqHs14O3fO19kFsRiaIA/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1&tp=wxpic)
+
+  用 @ConfigurationProperties 代替 @Value
+
 - **使用方法**
-    
-    定义对应字段的实体
-    
-    ```
-    @Data// 指定前缀@ConfigurationProperties(prefix = "developer")@Componentpublic class DeveloperProperty {    private String name;    private String website;    private String qq;    private String phoneNumber;}@Data// 指定前缀@ConfigurationProperties(prefix = "developer")@Componentpublic class DeveloperProperty {    private String name;    private String website;    private String qq;    private String phoneNumber;}
-    ```
-    
-    使用时注入这个bean
-    
-    ```
-    @RestController@RequiredArgsConstructorpublic class PropertyController {     final DeveloperProperty developerProperty;     @GetMapping("/property")    public Object index() {       return developerProperty.getName();    }}
-    ```
-    
+
+  定义对应字段的实体
+
+  ```
+  @Data// 指定前缀@ConfigurationProperties(prefix = "developer")@Componentpublic class DeveloperProperty {    private String name;    private String website;    private String qq;    private String phoneNumber;}@Data// 指定前缀@ConfigurationProperties(prefix = "developer")@Componentpublic class DeveloperProperty {    private String name;    private String website;    private String qq;    private String phoneNumber;}
+  ```
+
+  使用时注入这个bean
+
+  ```
+  @RestController@RequiredArgsConstructorpublic class PropertyController {     final DeveloperProperty developerProperty;     @GetMapping("/property")    public Object index() {       return developerProperty.getName();    }}
+  ```
 
 ## **2. 用@RequiredArgsConstructor代替@Autowired**
 
@@ -117,13 +101,12 @@
 在写业务代码的时候，经常会根据不同的结果返回不同的信息，尽量减少返回，会显得代码比较乱
 
 - **反例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 - **正例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## **5. 减少不必要的db**
 
@@ -134,26 +117,24 @@
 删除一个服务（已下架或未上架的才能删除），之前有看别人写的代码，会先根据id查询该记录，然后做一些判断
 
 - **反例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 - **正例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## **6. 不要返回 null**
 
 避免调用方法时，造成不必要的空指针
 
 - **反例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 - **正例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## **7. if else**
 
@@ -164,13 +145,12 @@
 业务代码尽量放到service层进行处理，后期维护起来也好操作而且美观
 
 - **反例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 - **正例**
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## **9. 利用好IDEA**
 
@@ -182,11 +162,11 @@ IDEA会对我们的代码进行判断，提出合理的建议
 
 **例如：**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 它推荐我们用lanbda的形式代替，点击replace
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## **10. 阅读源码**
 
@@ -205,25 +185,24 @@ IDEA会对我们的代码进行判断，提出合理的建议
 ## **13. 基础问题**
 
 - **Map遍历**
-    
-    ```
-    HashMap<String, String> map = new HashMap<>();map.put("name", "du");for (String key : map.keySet()) {   String value = map.get(key);} map.forEach((k, v) -> {}); // 推荐for (Map.Entry<String, String> entry : map.entrySet()) { }
-    ```
-    
+
+  ```
+  HashMap<String, String> map = new HashMap<>();map.put("name", "du");for (String key : map.keySet()) {   String value = map.get(key);} map.forEach((k, v) -> {}); // 推荐for (Map.Entry<String, String> entry : map.entrySet()) { }
+  ```
+
 - **optional 判空**
-    
-    ```
-    //获取子目录列表public List<CatalogueTreeNode> getChild(String pid) {    if (V.isEmpty(pid)) {        pid = BasicDic.TEMPORARY_DIRECTORY_ROOT;    }    CatalogueTreeNode node = treeNodeMap.get(pid);     return Optional.ofNullable(node)              .map(CatalogueTreeNode::getChild)              .orElse(Collections.emptyList());}
-    ```
-    
+
+  ```
+  //获取子目录列表public List<CatalogueTreeNode> getChild(String pid) {    if (V.isEmpty(pid)) {        pid = BasicDic.TEMPORARY_DIRECTORY_ROOT;    }    CatalogueTreeNode node = treeNodeMap.get(pid);     return Optional.ofNullable(node)              .map(CatalogueTreeNode::getChild)              .orElse(Collections.emptyList());}
+  ```
+
 - **递归**
-    
-    大数据量的递归时，避免在递归方法里new对象，可以试试把对象当作方法参数进行传递使用
-    
+
+  大数据量的递归时，避免在递归方法里new对象，可以试试把对象当作方法参数进行传递使用
+
 - **注释**
-    
-    类 接口方法 注解 较复杂的方法 注释都要写而且要写清楚, 有时候写注释不是给别人看的 而是给自己看的
-    
+
+  类 接口方法 注解 较复杂的方法 注释都要写而且要写清楚, 有时候写注释不是给别人看的 而是给自己看的
 
 ## **14. 判断元素是否存在**
 
@@ -241,9 +220,7 @@ HashSet<String> set = new HashSet<>(); // 判断a是否在set中 int ind
 
 由此可见其复杂度为O1。
 
-**欢迎大家进行观点的探讨和碰撞，各抒己见。如果你有疑问，也可以找我沟通和交流。**扩展：[接私活儿](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247534656&idx=2&sn=2781baec773a9340091436c521430648&chksm=e8dae9e5dfad60f33204393e3c333800e8fb8dd39fd43064d496b665cd31c0a61b742f2f23b2&scene=21#wechat_redirect)[](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247534656&idx=2&sn=2781baec773a9340091436c521430648&chksm=e8dae9e5dfad60f33204393e3c333800e8fb8dd39fd43064d496b665cd31c0a61b742f2f23b2&scene=21#wechat_redirect)
-
-  
+\*\*欢迎大家进行观点的探讨和碰撞，各抒己见。如果你有疑问，也可以找我沟通和交流。\*\*扩展：[接私活儿](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247534656&idx=2&sn=2781baec773a9340091436c521430648&chksm=e8dae9e5dfad60f33204393e3c333800e8fb8dd39fd43064d496b665cd31c0a61b742f2f23b2&scene=21#wechat_redirect)[](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247534656&idx=2&sn=2781baec773a9340091436c521430648&chksm=e8dae9e5dfad60f33204393e3c333800e8fb8dd39fd43064d496b665cd31c0a61b742f2f23b2&scene=21#wechat_redirect)
 
 [上周，又劝退十几个了。。。](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247570612&idx=2&sn=61b7b724f86908509f208ddb30485f2b&chksm=e8db7511dfacfc07ec8279b81ee0f3a694d7750d2c4f8057c20b7e265a93bcc7fd62aba86ded&scene=21#wechat_redirect)
 
@@ -255,7 +232,7 @@ HashSet<String> set = new HashSet<>(); // 判断a是否在set中 int ind
 
 最大优势：可实现会话隔离！突破限制：官方限制每个账号三小时可使用40次4.0本网站可实现次数上限之后，手动切换下一个未使用的账号【相当于一个4.0帐号，同享受一百个账号轮换使用权限】
 
-[![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzkwODI0Njc1OA==&mid=2247496302&idx=2&sn=075c6581c8a4f4229db1752d75d8689b&chksm=c0ce59e7f7b9d0f102b08845199c766a425df62660d11fa965a27b8c407e13bb52899a721446&scene=21#wechat_redirect)
+[!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzkwODI0Njc1OA==&mid=2247496302&idx=2&sn=075c6581c8a4f4229db1752d75d8689b&chksm=c0ce59e7f7b9d0f102b08845199c766a425df62660d11fa965a27b8c407e13bb52899a721446&scene=21#wechat_redirect)
 
 为了跟上AI时代我干了一件事儿，我创建了一个知识星球社群：ChartGPT与副业。想带着大家一起探索**ChatGPT和新的AI时代**。
 
@@ -263,7 +240,7 @@ HashSet<String> set = new HashSet<>(); // 判断a是否在set中 int ind
 
 不光是增长速度最快，我们的星球品质也绝对经得起考验，短短一个月时间，我们的课程团队发布了**8个专栏、18个副业项目**：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **简单说下这个星球能给大家提供什么：**
 
@@ -293,27 +270,23 @@ HashSet<String> set = new HashSet<>(); // 判断a是否在set中 int ind
 
 #### 
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最后给读者整理了一份**BAT**大厂面试真题，需要的可扫码回复“**面试题**”即可获取。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-****![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)****  
+****!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)****
 
 公众号后台回复 **架构** 或者 **架构整洁** 有惊喜礼包！
 
 **顶级架构师交流群**
 
- **「顶级架构师」建立了读者架构师交流群，大家可以添加小编微信进行加群。欢迎有想法、乐于分享的朋友们一起交流学习。**
+**「顶级架构师」建立了读者架构师交流群，大家可以添加小编微信进行加群。欢迎有想法、乐于分享的朋友们一起交流学习。**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-扫描添加好友邀你进架构师群，加我时注明**【****姓名+公司+职位】**  
-
-  
+扫描添加好友邀你进架构师群，加我时注明\*\*【\*\***姓名+公司+职位】**
 
 **版权申明：内容来源网络，版权归原作者所有。如有侵权烦请告知，我们会立即删除并表示歉意。谢谢。**
 
@@ -323,17 +296,15 @@ HashSet<String> set = new HashSet<>(); // 判断a是否在set中 int ind
 
 [牛逼啊！接私活必备的 N 个开源项目！赶快收藏吧（附源码合集第九期）！](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247565796&idx=2&sn=ff266d1782b8147c3c809a10f45af012&chksm=e8db6041dface957e9cb0ea634fda9e977d1aeaf598d54f8475cdd68744a4ce219d1d0e72c81&scene=21#wechat_redirect)
 
-[看看人家那 IM 即时通讯系统，那叫一个优雅（附源码）](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247520498&idx=1&sn=247bed1ab2e30cad54981a3eeff00810&chksm=e8da3157dfadb84118310e1067c0af1e8fc3e41b15d2dfde8ab61889b8522f603bbda08bed8c&scene=21#wechat_redirect)  
+[看看人家那 IM 即时通讯系统，那叫一个优雅（附源码）](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247520498&idx=1&sn=247bed1ab2e30cad54981a3eeff00810&chksm=e8da3157dfadb84118310e1067c0af1e8fc3e41b15d2dfde8ab61889b8522f603bbda08bed8c&scene=21#wechat_redirect)
 
-[一张图理解微服务架构设计](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247571243&idx=1&sn=85fe76423dda1d91edc3ead0a7bfa005&chksm=e8db768edfacff98ef1013523aec35fad53a8e92013d0dfe6935f651bfb5009c86a7ae7a4117&scene=21#wechat_redirect)  
+[一张图理解微服务架构设计](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247571243&idx=1&sn=85fe76423dda1d91edc3ead0a7bfa005&chksm=e8db768edfacff98ef1013523aec35fad53a8e92013d0dfe6935f651bfb5009c86a7ae7a4117&scene=21#wechat_redirect)
 
-[面试必问：Redis 如何实现库存扣减操作？](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247571156&idx=3&sn=fc3042d3fc2eea42b8faec7b122cda28&chksm=e8db7771dfacfe6732c51ac9dd3690e081c9a9baa3d157b64a86a3f9affcbd354f4c13e73a37&scene=21#wechat_redirect)  
+[面试必问：Redis 如何实现库存扣减操作？](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247571156&idx=3&sn=fc3042d3fc2eea42b8faec7b122cda28&chksm=e8db7771dfacfe6732c51ac9dd3690e081c9a9baa3d157b64a86a3f9affcbd354f4c13e73a37&scene=21#wechat_redirect)
 
 [10条sql语句优化的建议](http://mp.weixin.qq.com/s?__biz=MzIzNjM3MDEyMg==&mid=2247571961&idx=1&sn=738671233a4192c132aff85d4bbafe79&chksm=e8db785cdfacf14acf6999c9bd8f3c70a5aa566ae74bf2a0eeaea38f022e9b28c0ea6ad0d117&scene=21#wechat_redirect)
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最近面试BAT，整理一份面试资料《**Java面试BAT通关手册**》，覆盖了Java核心技术、JVM、Java并发、SSM、微服务、数据库、数据结构等等。
 

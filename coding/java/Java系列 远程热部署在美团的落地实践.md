@@ -2,11 +2,11 @@
 
 原创 凯哥 占峰 李晗等 美团技术团队
 
- _2022年03月17日 19:57_
+_2022年03月17日 19:57_
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/hEx03cFgUsUrXicw2VXTQTVVN5yxXWEacdY1ZdxTH195Pgibtib8EENJRMia3tzEnyVfgyfAgRibMssKqwlE186TLSw/640?wx_fmt=png&wxfrom=13&tp=wxpic)  
+![图片](https://mmbiz.qpic.cn/mmbiz_png/hEx03cFgUsUrXicw2VXTQTVVN5yxXWEacdY1ZdxTH195Pgibtib8EENJRMia3tzEnyVfgyfAgRibMssKqwlE186TLSw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
-**总第495****篇**
+**总第495\*\*\*\*篇**
 
 **2022年 第012篇**
 
@@ -15,58 +15,50 @@
 Sonic是美团内部一款用于热部署的IDEA插件。本文主要讲述Sonic的实现细节以及底层原理，从IDEA插件到自动化部署，再到沉浸式开发产品闭环，全方位讲述了Sonic在美团的落地与实践经验。目前业界对标的产品并不多，希望本文能对从事联调/开发/测试等相关方向的同学有所帮助或启发。
 
 - 1 前言
-    
 
 - 1.1 什么是热部署
-    
+
 - 1.2 为什么我们需要热部署
-    
+
 - 1.3 热部署难在哪
-    
+
 - 1.4 Sonic可以做什么
-    
+
 - 1.5 技术产品落地和推广实践经验
-    
 
 - 2 整体设计方案
-    
 
 - 2.1 Sonic结构
-    
+
 - 2.2 走进Agent
-    
+
 - 2.3 那些年JVM和HotSwap之间的相爱相杀
-    
+
 - 2.4 Sonic如何解决Instrumentation的局限性
-    
 
 - 3 Sonic热部署技术解析
-    
 
 - 3.1 Sonic整体架构模型
-    
+
 - 3.2 Sonic功能流转
-    
+
 - 3.3 文件监听
-    
+
 - 3.4 Jvm Class Reload
-    
+
 - 3.5 Spring Bean重载
-    
+
 - 3.6 Spring XML重载
-    
+
 - 3.7 MyBatis 热部署
-    
 
 - 4 总结
-    
 
 - 4.1 热部署功能一览
-    
+
 - 4.2 IDE插件集成
-    
+
 - 4.3 推广使用情况
-    
 
 Sonic是美团内部研发设计的一款用于热部署的IDEA插件，本文其实现原理及落地的一些技术细节。在阅读本文之前，建议大家先熟悉一下[Spring源码](https://www.cnblogs.com/java-chen-hao/category/1480619.html)、[Spring MVC 源码](https://blog.csdn.net/win7system/article/details/90674757) 、[Spring Boot源码](https://www.cnblogs.com/java-chen-hao/p/11829344.html) 、[Agent字节码增强](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)、[Javassist](https://github.com/jboss-javassist/javassist/wiki)、[Classloader](https://juejin.cn/post/6844903794627608589)等相关知识。
 
@@ -106,7 +98,7 @@ Sonic是美团内部研发设计的一款用于热部署的IDEA插件，本文�
 
 为什么业界目前没有好用的开源工具？因为热部署不等同于热重启，像Tomcat或者Spring Boot DevTools此类热重启模式需要重新加载项目，性能较差。增量热部署难度较大，需要兼容常用的中间件版本，需要深入启动销毁加载流程。以美团为例，我们需要对JPDA（Java Platform Debugger Architecture）、Java Agent、ASM字节码增强、Classloader、Spring框架、Spring Boot框架、MyBatis框架、Mtthrift（美团RPC框架）、Zebra（美团持久层框架）、Pigeon（美团RPC框架），MDP（美团快速开发框架）、XFrame（美团快速开发脚手架）、Crane（美团分布式任务调度框架）等众多框架和技术原理深入了解才能做到全面的兼容和支持。另外，还需要IDEA插件开发能力，形成整体的产品解决方案闭环，美团的热部署插件Sonic正是在这种背景下应运而生。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 4
 
@@ -116,11 +108,11 @@ Sonic是美团内部研发设计的一款IDEA插件，旨在通过低代码开�
 
 目前，使用Sonic热部署可以解决大部分代码重复构建的问题。Sonic可以使用户在本地编写代码一键部署到远程环境，修改代码、部署、联调请求、查看日志，循环反复。如果不考虑代码修改时间，通常一个循环需要20~35分钟，而使用Sonic可以把整个时长缩短至5~10秒，而且能够给开发者带来高效沉浸式的开发体验。在实际编码工作中，多文件修改是家常便饭，Sonic对多文件的热部署能力尤为突出，它可以通过依赖分析等手段来对多文件批量进行远程热部署，并且支持Spring Bean Class、普通Class、Spring XML、MyBatis XML等多类型文件混合热部署。下面的动图就演示了多文件复查场景下的增量热部署：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么跟业界现有的产品相比，Sonic有哪些优劣势呢？下面我们尝试给出几种产品的对比，仅供大家参考：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上表未把Sofa-Ark、Osgi、Arthas列举，此类属于插件化、模块化应用框架，以及Java在线诊断工具，核心能力非热部署。值得注意的是，Spring Boot DevTools只能应用在Spring Boot项目中，并且它不是增量热部署，而是通过Classloader迭代的方式重启项目，对大项目而言，性能上是无法接受的。虽然，JRebel支持三方插件较多，生态庞大，但是对于国产的插件不支持，例如FastJson等，同时它还存在远程热部署配置局限，对于公司内部的中间件需要个性化开发，并且是商业软件，整体的使用成本较高。
 
@@ -128,7 +120,7 @@ Sonic是美团内部研发设计的一款IDEA插件，旨在通过低代码开�
 
 相信大家都知道，对于技术产品的推广，尤其是开发、测试阶段使用的产品，由于远离线上环境，推动力、执行力、产品功能闭环能否做好，是决定着该产品是否能在企业内部落地并得到大多数人认可的重要的一环。此外，因为很多开发者在开发、测试阶段已逐渐形成了“固化动作”，如何改变这些用户的行为，让他们拥抱新产品，也是Sonic面临的艰巨挑战之一。我们从主动沟通、零成本（或极低成本）快速接入、自动化脚本，以及产品自动诊断、收集反馈等方向出发，践行出了四条原则。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 6
 
@@ -138,7 +130,7 @@ Sonic是美团内部研发设计的一款IDEA插件，旨在通过低代码开�
 
 Sonic插件由4大部分组成，包括脚本端、插件端、Agent端，以及Sonic服务端。脚本端负责自动化构建Sonic启动参数、服务启动等集成工作；IDEA插件端集成环境为开发者提供更便捷的热部署服务；Agent端随项目启动负责热部署的功能实现；服务端则负责收集热部署信息、失败上报等统计工作。如下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 7
 
@@ -146,36 +138,36 @@ Sonic插件由4大部分组成，包括脚本端、插件端、Agent端，以及
 
 #### 2.2.1 Instrumentation类常用API
 
-public interface Instrumentation {  
-  
-    //增加一个Class 文件的转换器，转换器用于改变 Class 二进制流的数据，参数 canRetransform 设置是否允许重新转换。  
-    void addTransformer(ClassFileTransformer transformer, boolean canRetransform);  
-  
-    //在类加载之前，重新定义 Class 文件，ClassDefinition 表示对一个类新的定义，  
-    //如果在类加载之后，需要使用 retransformClasses 方法重新定义。addTransformer方法配置之后，后续的类加载都会被Transformer拦截。  
-    //对于已经加载过的类，可以执行retransformClasses来重新触发这个Transformer的拦截。类加载的字节码被修改后，除非再次被retransform，否则不会恢复。  
-    void addTransformer(ClassFileTransformer transformer);  
-  
-    //删除一个类转换器  
-    boolean removeTransformer(ClassFileTransformer transformer);  
-      
-    //是否允许对class retransform  
-    boolean isRetransformClassesSupported();  
-  
-    //在类加载之后，重新定义 Class。这个很重要，该方法是1.6 之后加入的，事实上，该方法是 update 了一个类。  
-    void retransformClasses(Class<?>... classes) throws UnmodifiableClassException;  
-     
-    //是否允许对class重新定义  
-    boolean isRedefineClassesSupported();  
-  
-    //此方法用于替换类的定义，而不引用现有的类文件字节，就像从源代码重新编译以进行修复和继续调试时所做的那样。  
-    //在要转换现有类文件字节的地方（例如在字节码插装中），应该使用retransformClasses。  
-    //该方法可以修改方法体、常量池和属性值，但不能新增、删除、重命名属性或方法，也不能修改方法的签名  
-    void redefineClasses(ClassDefinition... definitions) throws  ClassNotFoundException, UnmodifiableClassException;  
-  
-    //获取已经被JVM加载的class，有className可能重复（可能存在多个classloader）  
-    @SuppressWarnings("rawtypes")  
-    Class[] getAllLoadedClasses();  
+public interface Instrumentation {
+
+//增加一个Class 文件的转换器，转换器用于改变 Class 二进制流的数据，参数 canRetransform 设置是否允许重新转换。\
+void addTransformer(ClassFileTransformer transformer, boolean canRetransform);
+
+//在类加载之前，重新定义 Class 文件，ClassDefinition 表示对一个类新的定义，\
+//如果在类加载之后，需要使用 retransformClasses 方法重新定义。addTransformer方法配置之后，后续的类加载都会被Transformer拦截。\
+//对于已经加载过的类，可以执行retransformClasses来重新触发这个Transformer的拦截。类加载的字节码被修改后，除非再次被retransform，否则不会恢复。\
+void addTransformer(ClassFileTransformer transformer);
+
+//删除一个类转换器\
+boolean removeTransformer(ClassFileTransformer transformer);\
+\
+//是否允许对class retransform\
+boolean isRetransformClassesSupported();
+
+//在类加载之后，重新定义 Class。这个很重要，该方法是1.6 之后加入的，事实上，该方法是 update 了一个类。\
+void retransformClasses(Class\<?>... classes) throws UnmodifiableClassException;\
+\
+//是否允许对class重新定义\
+boolean isRedefineClassesSupported();
+
+//此方法用于替换类的定义，而不引用现有的类文件字节，就像从源代码重新编译以进行修复和继续调试时所做的那样。\
+//在要转换现有类文件字节的地方（例如在字节码插装中），应该使用retransformClasses。\
+//该方法可以修改方法体、常量池和属性值，但不能新增、删除、重命名属性或方法，也不能修改方法的签名\
+void redefineClasses(ClassDefinition... definitions) throws  ClassNotFoundException, UnmodifiableClassException;
+
+//获取已经被JVM加载的class，有className可能重复（可能存在多个classloader）\
+@SuppressWarnings("rawtypes")\
+Class\[\] getAllLoadedClasses();\
 }
 
 #### 2.2.2 Instrument简介
@@ -186,7 +178,7 @@ JVMTIAgent是一个利用JVMTI暴露出来的接口提供了代理启动时加�
 
 #### 2.2.3 启动时和运行时加载Instrument Agent过程
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 8
 
@@ -212,7 +204,7 @@ JVMTIAgent是一个利用JVMTI暴露出来的接口提供了代理启动时加�
 
 上一章节我们主要介绍了Sonic的组成。下图详细介绍了Sonic在运行期间各个组成部分的工作职责，由它们形成一整套完备的技术产品落地闭环方案：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 9
 
@@ -220,7 +212,7 @@ JVMTIAgent是一个利用JVMTI暴露出来的接口提供了代理启动时加�
 
 Sonic通过NIO监听本地文件变更，触发文件变更事件，例如Class新增、Class修改、Spring Bean重载等事件流程。下图展示了一次热部署单个文件的生命周期：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 10
 
@@ -228,7 +220,7 @@ Sonic通过NIO监听本地文件变更，触发文件变更事件，例如Class�
 
 Sonic首先会在本地和远程预定义两个目录，`/var/tmp/sonic/extraClasspath`和`/var/tmp/sonic/classes`。extraClasspath为Sonic自定义的拓展Classpath URL，classes为Sonic监听的目录，当有文件变更时，通过IDEA插件来部署到远程/本地，触发Agent的监听目录，来继续下面的热加载逻辑：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 11
 
@@ -236,7 +228,7 @@ Sonic首先会在本地和远程预定义两个目录，`/var/tmp/sonic/extraCla
 
 所以，Sonic采用拓展ClassPath URL路径来实现文件的修改和新增。并且存在这么一种场景，多个业务侧的项目引入相同的JAR包，在JAR里面配置MyBatis的XML和注解。在此类情况下，Sonic没有办法直接来修改JAR包中源文件，通过拓展路径的方式可以不需要关注JAR包，来修改JAR包中某一文件和XML。同理，采用此类方法可以进行整个JAR包的热替换。下面我们简单介绍一下Sonic的核心监听器，如下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 12
 
@@ -246,13 +238,13 @@ JVM的字节码批量重载逻辑，通过新的字节码二进制流和旧的Cl
 
 新增class Sonic如何保证可以加载到Classloader上下文中？由于项目在远程执行，所以运行环境复杂，有可能是JAR包方式启动（Spring Boot），也有可能是普通项目，也有可能是War Web项目，针对此类情况Sonic做了一层Classloader URL拓展。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 13
 
 User ClassLoader是框架自定义的ClassLoader统称，例如Jetty项目是WebAppclassLoader。其中Urlclasspath为当前项目的lib文件件下，例如Spring Boot项目也是从当前项目BOOT-INF/lib/路径中加载CLass等等，不同框架的自定义位置稍有不同。所以针对此类情况，Agent必须拿到用户的自定义Classloader，如果是常规方式启动的，比如普通Spring XML项目，借助Plus（美团内部服务发布平台）发布，此类没有自定义Classloader，是默认AppClassLoader，所以Agent在用户项目启动过程中，借助字节码增强的方式来获取到真正的用户Classloader。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 14
 
@@ -262,7 +254,7 @@ Sonic获取到URL数组，把Sonic自定义的拓展Classpath目录加入到URL�
 
 为什么不直接对Appclassloader进行加强？而是对框架的自定义Classloader进行加强？
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 15
 
@@ -272,7 +264,7 @@ Sonic获取到URL数组，把Sonic自定义的拓展Classpath目录加入到URL�
 
 Spring Bean Reload过程中，Bean的销毁和重启流程，主要内容如下图展示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 16
 
@@ -284,7 +276,7 @@ Spring Bean Reload过程中，Bean的销毁和重启流程，主要内容如下�
 
 当用户修改/新增Spring XML时，需要对XML中所有Bean进行重载。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 17
 
@@ -294,7 +286,7 @@ Spring Bean Reload过程中，Bean的销毁和重启流程，主要内容如下�
 
 Spring MyBatis热部署的主要处理流程是在启动期间获取所有Configuration路径，并维护它和Spring Context的对应关系，在热部署Class、XML时去匹配Configuration，从而重新加载Configuration以达到热部署的目的。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 18
 
@@ -304,7 +296,7 @@ Spring MyBatis热部署的主要处理流程是在启动期间获取所有Config
 
 上一章节主要讲述了Spring Bean、Spring MVC、MyBatis的重载流程，Sonic还支持其它常用的开发框架，丰富的框架支持和兼容能力是Sonic的基石，下面列举一些Sonic支持的常用的第三方框架：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图19 美团内部框架以及常用开源框架
 
@@ -314,7 +306,7 @@ Spring MyBatis热部署的主要处理流程是在启动期间获取所有Config
 
 Sonic也提供了功能强大的IDEA插件，让用户进行沉浸式开发，远程热部署也变得更加便利。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 20
 
@@ -328,51 +320,47 @@ Sonic也提供了功能强大的IDEA插件，让用户进行沉浸式开发，�
 
 ## 6 参考文章
 
-[1] [基于Javassist和Javaagent实现动态切面](https://www.cnblogs.com/chiangchou/p/javassist.html)
+\[1\] [基于Javassist和Javaagent实现动态切面](https://www.cnblogs.com/chiangchou/p/javassist.html)
 
-[2] [Spring MVC 源码解析](https://blog.csdn.net/win7system/article/details/90674757)
+\[2\] [Spring MVC 源码解析](https://blog.csdn.net/win7system/article/details/90674757)
 
-[3] [Spring IOC源码解析](https://blog.csdn.net/zhanyu1/article/details/83023854)
+\[3\] [Spring IOC源码解析](https://blog.csdn.net/zhanyu1/article/details/83023854)
 
-[4] [MyBatis源码解析](https://www.cnblogs.com/javazhiyin/p/12340498.html)
+\[4\] [MyBatis源码解析](https://www.cnblogs.com/javazhiyin/p/12340498.html)
 
-[5] [Spring Boot源码解析](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
+\[5\] [Spring Boot源码解析](https://www.cnblogs.com/java-chen-hao/p/11829344.html)
 
-[6] [Spring AOP源码解析](https://javadoop.com/post/spring-aop-source)
+\[6\] [Spring AOP源码解析](https://javadoop.com/post/spring-aop-source)
 
-[7] [Spring事务源码解析](https://www.jianshu.com/p/622f60520674)
+\[7\] [Spring事务源码解析](https://www.jianshu.com/p/622f60520674)
 
-[8] [Cglib源码解析](https://blog.csdn.net/lpq374606827/article/details/79392658)
+\[8\] [Cglib源码解析](https://blog.csdn.net/lpq374606827/article/details/79392658)
 
-[9] [JDK Proxy源码解析](https://www.cnblogs.com/zyl2016/p/11841492.html)
+\[9\] [JDK Proxy源码解析](https://www.cnblogs.com/zyl2016/p/11841492.html)
 
-[10] [Dcevm简介](https://ssw.jku.at/Research/Papers/Wuerthinger10a/Wuerthinger10a.pdf)
+\[10\] [Dcevm简介](https://ssw.jku.at/Research/Papers/Wuerthinger10a/Wuerthinger10a.pdf)
 
-[11] [字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
+\[11\] [字节码增强技术探索](https://tech.meituan.com/2019/09/05/java-bytecode-enhancement.html)
 
-[12] [Javassist API](https://github.com/jboss-javassist/javassist/wiki)
+\[12\] [Javassist API](https://github.com/jboss-javassist/javassist/wiki)
 
 ----------  END  ----------
 
-**也许你还想看**  
+**也许你还想看**
 
-  **| [](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651754955&idx=1&sn=8411133d2e5f22b9e2c5a34cdc67985d&chksm=bd1248868a65c1900dd1b7203ce17159740253df2324a208ea9c71ee764e1bde1ed2616d77ce&scene=21#wechat_redirect)** [Java中9种常见的CMS GC问题分析与解决](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651754955&idx=1&sn=8411133d2e5f22b9e2c5a34cdc67985d&chksm=bd1248868a65c1900dd1b7203ce17159740253df2324a208ea9c71ee764e1bde1ed2616d77ce&scene=21#wechat_redirect)**[](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651754955&idx=1&sn=8411133d2e5f22b9e2c5a34cdc67985d&chksm=bd1248868a65c1900dd1b7203ce17159740253df2324a208ea9c71ee764e1bde1ed2616d77ce&scene=21#wechat_redirect)**
+**| [](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651754955&idx=1&sn=8411133d2e5f22b9e2c5a34cdc67985d&chksm=bd1248868a65c1900dd1b7203ce17159740253df2324a208ea9c71ee764e1bde1ed2616d77ce&scene=21#wechat_redirect)** [Java中9种常见的CMS GC问题分析与解决](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651754955&idx=1&sn=8411133d2e5f22b9e2c5a34cdc67985d&chksm=bd1248868a65c1900dd1b7203ce17159740253df2324a208ea9c71ee764e1bde1ed2616d77ce&scene=21#wechat_redirect)**[](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651754955&idx=1&sn=8411133d2e5f22b9e2c5a34cdc67985d&chksm=bd1248868a65c1900dd1b7203ce17159740253df2324a208ea9c71ee764e1bde1ed2616d77ce&scene=21#wechat_redirect)**
 
-  **|** [Java线程池实现原理及其在美团业务中的实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651751537&idx=1&sn=c50a434302cc06797828782970da190e&chksm=bd125d3c8a65d42aaf58999c89b6a4749f092441335f3c96067d2d361b9af69ad4ff1b73504c&scene=21#wechat_redirect)
+**|** [Java线程池实现原理及其在美团业务中的实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651751537&idx=1&sn=c50a434302cc06797828782970da190e&chksm=bd125d3c8a65d42aaf58999c89b6a4749f092441335f3c96067d2d361b9af69ad4ff1b73504c&scene=21#wechat_redirect)
 
-  **|** [Java 动态调试技术原理及实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651750923&idx=2&sn=55102c505cd57f185219d35b94de50d5&chksm=bd125b468a65d2505706c962af707e009105cb7f0b78bbd27c6dbcd7e895c2a7fe631953ae46&scene=21#wechat_redirect)
-
-  
+**|** [Java 动态调试技术原理及实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651750923&idx=2&sn=55102c505cd57f185219d35b94de50d5&chksm=bd125b468a65d2505706c962af707e009105cb7f0b78bbd27c6dbcd7e895c2a7fe631953ae46&scene=21#wechat_redirect)
 
 **阅读更多**
 
----  
+______________________________________________________________________
 
 [前端](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765958&idx=1&sn=8201546812e5a95a2bee9dffc6d12f00&chksm=bd12658b8a65ec9de2f5be1e96796dfb3c8f1a374d4b7bd91266072f557caf8118d4ddb72b07&scene=21#wechat_redirect) **|**  [](https://t.1yb.co/jo7v)[算法](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765981&idx=1&sn=c2dd86f15dee2cbbc89e27677d985060&chksm=bd1265908a65ec86d4d08f7600d1518b61c90f6453074f9b308c96861c045712280a73751c73&scene=21#wechat_redirect) **|** [后端](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765982&idx=1&sn=231b41f653ac7959f3e3b8213dcec2b0&chksm=bd1265938a65ec85630c546169444d56377bc2f11401d251da7ca50e5d07e353aa01580c7216&scene=21#wechat_redirect) **|** [数据](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765964&idx=1&sn=ab6d8db147234fe57f27dd46eec40fef&chksm=bd1265818a65ec9749246dd1a2eb3bf7798772cc4d5b4283b15eae2f80bc6db63a1471a9e61e&scene=21#wechat_redirect)
 
 [安全](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765965&idx=1&sn=37e0c56c8b080146ce5249243bfd84d8&chksm=bd1265808a65ec96d3a2b2c87c6e27c910d49cb6b149970fb2db8bf88045a0a85fed2e6a0b84&scene=21#wechat_redirect) **|** [Android](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765972&idx=1&sn=afe02ec92762c1ce18740d03324c4ac3&chksm=bd1265998a65ec8f10d5f58d0f3681ddfc5325137218e568e1cda3a50e427749edb5c6a7dcf5&scene=21#wechat_redirect) **|** [iOS](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765973&idx=1&sn=32a23bf1d278dda0398f993ab60a697e&chksm=bd1265988a65ec8e630ef4d24b4946ab6bd7e66702c1d712481cf3c471468a059c470a14c30d&scene=21#wechat_redirect)  **|** [运维](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765963&idx=1&sn=a3de9ef267d07d94118c1611776a4b28&chksm=bd1265868a65ec906592d25ad65f2a8516338d07ec3217059e6975fc131fc0107d66a8cd2612&scene=21#wechat_redirect) **|** [测试](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765974&idx=1&sn=763c1e37d04acffd0142a2852ecfb000&chksm=bd12659b8a65ec8dfcfeb2028ef287fae7c38f134a665375ba420556ce5d2e4cf398147bd12e&scene=21#wechat_redirect)
-
-  
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/hEx03cFgUsVGibnsaEib3aNlqF0tOrA2RGEmNSbia2nnohE4Tpf95UyTiaSjDVbHRfY8WNBeTuLLTaVdSckkNyEx1Q/300?wx_fmt=png&wxfrom=19)
 
@@ -407,243 +395,242 @@ Spring1
 **留言 29**
 
 - 王克远
-    
-    2022年3月17日
-    
-    赞18
-    
-    期待开源
-    
-    置顶
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞9
-    
-    今后有机会会考虑开源，大家可以先关注Dcevm、Spring Loader等优秀的类似产品。
-    
+
+  2022年3月17日
+
+  赞18
+
+  期待开源
+
+  置顶
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞9
+
+  今后有机会会考虑开源，大家可以先关注Dcevm、Spring Loader等优秀的类似产品。
+
 - 李爽
-    
-    2022年3月17日
-    
-    赞9
-    
-    很好用，特别是一些相对复杂的应用，热部署很方便![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    置顶
-    
+
+  2022年3月17日
+
+  赞9
+
+  很好用，特别是一些相对复杂的应用，热部署很方便![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  置顶
+
 - 赵泽恩
-    
-    2022年3月17日
-    
-    赞10
-    
-    sonic的推广离不开某位老哥曾经在各种大象群里疯狂发软文哈哈哈
-    
-    置顶
-    
+
+  2022年3月17日
+
+  赞10
+
+  sonic的推广离不开某位老哥曾经在各种大象群里疯狂发软文哈哈哈
+
+  置顶
+
 - 喝咖啡的猫
-    
-    2022年3月17日
-    
-    赞21
-    
-    非常期待开源![/::B](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞21
+
+  非常期待开源![/::B](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 红色的红🙈🎯
-    
-    2022年3月17日
-    
-    赞9
-    
-    这文章太干了，处处是知识点，能够把各种应用框架打通，且提供idea插件闭环，很是佩服，这是一个大工程
-    
+
+  2022年3月17日
+
+  赞9
+
+  这文章太干了，处处是知识点，能够把各种应用框架打通，且提供idea插件闭环，很是佩服，这是一个大工程
+
 - 丰富
-    
-    2022年3月17日
-    
-    赞9
-    
-    看起来很牛的样子，有2个问题：1. 支持proxy吗，很多公司是不允许开发机直连服务器的？2. 有计划开源吗？
-    
+
+  2022年3月17日
+
+  赞9
+
+  看起来很牛的样子，有2个问题：1. 支持proxy吗，很多公司是不允许开发机直连服务器的？2. 有计划开源吗？
+
 - 履霜坚冰至
-    
-    2022年3月17日
-    
-    赞7
-    
-    一直在用jrebel
-    
+
+  2022年3月17日
+
+  赞7
+
+  一直在用jrebel
+
 - 王大圆🌸
-    
-    2022年3月17日
-    
-    赞6
-    
-    凯哥最帅！！！![[皱眉]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞6
+
+  凯哥最帅！！！![[皱眉]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 合
-    
-    2022年3月17日
-    
-    赞6
-    
-    咨询一个问题：如果业务依赖于通过某个 class 的 static 字段，且该字段是个 map，热更新以后业务逻辑能保证正常吗？热更新是否会把这个 map 中缓存的值清理掉呢？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞4
-    
-    热更新之后不会保留原有堆内存中的数据，Map里面的值也会相应的清空，热部署关注“新”代码逻辑，不关注“旧”数据状态。
-    
+
+  2022年3月17日
+
+  赞6
+
+  咨询一个问题：如果业务依赖于通过某个 class 的 static 字段，且该字段是个 map，热更新以后业务逻辑能保证正常吗？热更新是否会把这个 map 中缓存的值清理掉呢？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞4
+
+  热更新之后不会保留原有堆内存中的数据，Map里面的值也会相应的清空，热部署关注“新”代码逻辑，不关注“旧”数据状态。
+
 - 拖雷鸡鸭
-    
-    2022年3月17日
-    
-    赞5
-    
-    目前应该还没有开源吧，求开源推广![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞5
+
+  目前应该还没有开源吧，求开源推广![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Sparkle
-    
-    2022年3月17日
-    
-    赞4
-    
-    完美解决了我们的痛点，顺便问一下有没有go版本的![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞4
+
+  完美解决了我们的痛点，顺便问一下有没有go版本的![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Luck
-    
-    2022年3月17日
-    
-    赞3
-    
-    凯哥牛逼，不愧是多年前就很牛逼的技术大神！
-    
+
+  2022年3月17日
+
+  赞3
+
+  凯哥牛逼，不愧是多年前就很牛逼的技术大神！
+
 - 欢
-    
-    2022年3月17日
-    
-    赞3
-    
-    期待开源
-    
+
+  2022年3月17日
+
+  赞3
+
+  期待开源
+
 - 🎅 🌞
-    
-    2022年4月22日
-    
-    赞2
-    
-    强烈期待开源，天下苦jvm久已
-    
+
+  2022年4月22日
+
+  赞2
+
+  强烈期待开源，天下苦jvm久已
+
 - 滚石
-    
-    2022年3月18日
-    
-    赞2
-    
-    看起来很nb的样子，批量更新会不会出现更新失败、或者短时间内不一致的情况？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞2
-    
-    不会出现不一致的情况，但是在热部署期间如果有流量打进来会出现错误。
-    
+
+  2022年3月18日
+
+  赞2
+
+  看起来很nb的样子，批量更新会不会出现更新失败、或者短时间内不一致的情况？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞2
+
+  不会出现不一致的情况，但是在热部署期间如果有流量打进来会出现错误。
+
 - 沈军禹
-    
-    2022年3月18日
-    
-    赞2
-    
-    热部署的时候，如果有请求过来怎么办？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞2
-    
-    热部署时，流量打进来，在瞬时内，MVC服务有可能会出现404，RPC服务上游调用方可能会无法找到可用服务。
-    
+
+  2022年3月18日
+
+  赞2
+
+  热部署的时候，如果有请求过来怎么办？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞2
+
+  热部署时，流量打进来，在瞬时内，MVC服务有可能会出现404，RPC服务上游调用方可能会无法找到可用服务。
+
 - Dong
-    
-    2022年3月18日
-    
-    赞2
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)确实给力，对于我们这种懒人，写完代码发到多环境，流水线自动触发部署，涉及到编译和发布！整体流程比较大的项目基本上是10-20分钟左右，导致该一行代码也是这种成本，真滴无语！提高效率yyds！但是要是能支持go和c++就行了
-    
+
+  2022年3月18日
+
+  赞2
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)确实给力，对于我们这种懒人，写完代码发到多环境，流水线自动触发部署，涉及到编译和发布！整体流程比较大的项目基本上是10-20分钟左右，导致该一行代码也是这种成本，真滴无语！提高效率yyds！但是要是能支持go和c++就行了
+
 - PerJoker
-    
-    2022年3月17日
-    
-    赞2
-    
-    dcevm也是有一定限制的，如果仅仅是本地应用热部署，可以使用idea的hotswap agent插件，然后把本地的jvm里面的dll文件替换成dcevm的。dcevm的限制，完全可以看hot swap agent 的官方介绍。
-    
+
+  2022年3月17日
+
+  赞2
+
+  dcevm也是有一定限制的，如果仅仅是本地应用热部署，可以使用idea的hotswap agent插件，然后把本地的jvm里面的dll文件替换成dcevm的。dcevm的限制，完全可以看hot swap agent 的官方介绍。
+
 - 番薯和米饭一起吃出辣椒的味道
-    
-    2022年3月17日
-    
-    赞2
-    
-    非常好用，节省大量部署代码的时间，提升工作效率
-    
+
+  2022年3月17日
+
+  赞2
+
+  非常好用，节省大量部署代码的时间，提升工作效率
+
 - alex
-    
-    2022年3月17日
-    
-    赞2
-    
-    试了一下，果然牛逼。对于不适合本地调试的大内存应用来说，简直是救星![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞2
+
+  试了一下，果然牛逼。对于不适合本地调试的大内存应用来说，简直是救星![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - ⊙_⊙
-    
-    2022年3月23日
-    
-    赞1
-    
-    美图的jvm文章真不错，这种基础框架真心对开发来说真是好东西。希望后面多介绍下框架架构![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)和实现
-    
+
+  2022年3月23日
+
+  赞1
+
+  美图的jvm文章真不错，这种基础框架真心对开发来说真是好东西。希望后面多介绍下框架架构![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)和实现
+
 - Winterer
-    
-    2022年3月17日
-    
-    赞1
-    
-    这是需要用dcevm替换原生jvm吗？如果用原生jvm的话有办法在运行时attach进程进行热更新吗？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞1
-    
-    是的，需要在JDK中打补丁，用原生JDK可以修改MyBatis等不改变类结构的热更新操作，无法通过Attach的方式，因为在项目启动期间，需要字节码增强来维护一些框架的基础数据。
-    
+
+  2022年3月17日
+
+  赞1
+
+  这是需要用dcevm替换原生jvm吗？如果用原生jvm的话有办法在运行时attach进程进行热更新吗？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞1
+
+  是的，需要在JDK中打补丁，用原生JDK可以修改MyBatis等不改变类结构的热更新操作，无法通过Attach的方式，因为在项目启动期间，需要字节码增强来维护一些框架的基础数据。
+
 - 莫道
-    
-    2022年3月17日
-    
-    赞1
-    
-    听起来是浩大的工程量
-    
+
+  2022年3月17日
+
+  赞1
+
+  听起来是浩大的工程量
+
 - 石头剪刀布💪
-    
-    广东2023年9月1日
-    
-    赞
-    
-    太好了，太好了。如果能开源，对中国开源行业是一件大事情，对全世界的Java用户都非常有价值。。
-    
+
+  广东2023年9月1日
+
+  赞
+
+  太好了，太好了。如果能开源，对中国开源行业是一件大事情，对全世界的Java用户都非常有价值。。
 
 已无更多数据
 
@@ -662,242 +649,241 @@ Spring1
 **留言 29**
 
 - 王克远
-    
-    2022年3月17日
-    
-    赞18
-    
-    期待开源
-    
-    置顶
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞9
-    
-    今后有机会会考虑开源，大家可以先关注Dcevm、Spring Loader等优秀的类似产品。
-    
+
+  2022年3月17日
+
+  赞18
+
+  期待开源
+
+  置顶
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞9
+
+  今后有机会会考虑开源，大家可以先关注Dcevm、Spring Loader等优秀的类似产品。
+
 - 李爽
-    
-    2022年3月17日
-    
-    赞9
-    
-    很好用，特别是一些相对复杂的应用，热部署很方便![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    置顶
-    
+
+  2022年3月17日
+
+  赞9
+
+  很好用，特别是一些相对复杂的应用，热部署很方便![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  置顶
+
 - 赵泽恩
-    
-    2022年3月17日
-    
-    赞10
-    
-    sonic的推广离不开某位老哥曾经在各种大象群里疯狂发软文哈哈哈
-    
-    置顶
-    
+
+  2022年3月17日
+
+  赞10
+
+  sonic的推广离不开某位老哥曾经在各种大象群里疯狂发软文哈哈哈
+
+  置顶
+
 - 喝咖啡的猫
-    
-    2022年3月17日
-    
-    赞21
-    
-    非常期待开源![/::B](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞21
+
+  非常期待开源![/::B](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 红色的红🙈🎯
-    
-    2022年3月17日
-    
-    赞9
-    
-    这文章太干了，处处是知识点，能够把各种应用框架打通，且提供idea插件闭环，很是佩服，这是一个大工程
-    
+
+  2022年3月17日
+
+  赞9
+
+  这文章太干了，处处是知识点，能够把各种应用框架打通，且提供idea插件闭环，很是佩服，这是一个大工程
+
 - 丰富
-    
-    2022年3月17日
-    
-    赞9
-    
-    看起来很牛的样子，有2个问题：1. 支持proxy吗，很多公司是不允许开发机直连服务器的？2. 有计划开源吗？
-    
+
+  2022年3月17日
+
+  赞9
+
+  看起来很牛的样子，有2个问题：1. 支持proxy吗，很多公司是不允许开发机直连服务器的？2. 有计划开源吗？
+
 - 履霜坚冰至
-    
-    2022年3月17日
-    
-    赞7
-    
-    一直在用jrebel
-    
+
+  2022年3月17日
+
+  赞7
+
+  一直在用jrebel
+
 - 王大圆🌸
-    
-    2022年3月17日
-    
-    赞6
-    
-    凯哥最帅！！！![[皱眉]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞6
+
+  凯哥最帅！！！![[皱眉]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 合
-    
-    2022年3月17日
-    
-    赞6
-    
-    咨询一个问题：如果业务依赖于通过某个 class 的 static 字段，且该字段是个 map，热更新以后业务逻辑能保证正常吗？热更新是否会把这个 map 中缓存的值清理掉呢？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞4
-    
-    热更新之后不会保留原有堆内存中的数据，Map里面的值也会相应的清空，热部署关注“新”代码逻辑，不关注“旧”数据状态。
-    
+
+  2022年3月17日
+
+  赞6
+
+  咨询一个问题：如果业务依赖于通过某个 class 的 static 字段，且该字段是个 map，热更新以后业务逻辑能保证正常吗？热更新是否会把这个 map 中缓存的值清理掉呢？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞4
+
+  热更新之后不会保留原有堆内存中的数据，Map里面的值也会相应的清空，热部署关注“新”代码逻辑，不关注“旧”数据状态。
+
 - 拖雷鸡鸭
-    
-    2022年3月17日
-    
-    赞5
-    
-    目前应该还没有开源吧，求开源推广![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞5
+
+  目前应该还没有开源吧，求开源推广![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Sparkle
-    
-    2022年3月17日
-    
-    赞4
-    
-    完美解决了我们的痛点，顺便问一下有没有go版本的![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞4
+
+  完美解决了我们的痛点，顺便问一下有没有go版本的![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Luck
-    
-    2022年3月17日
-    
-    赞3
-    
-    凯哥牛逼，不愧是多年前就很牛逼的技术大神！
-    
+
+  2022年3月17日
+
+  赞3
+
+  凯哥牛逼，不愧是多年前就很牛逼的技术大神！
+
 - 欢
-    
-    2022年3月17日
-    
-    赞3
-    
-    期待开源
-    
+
+  2022年3月17日
+
+  赞3
+
+  期待开源
+
 - 🎅 🌞
-    
-    2022年4月22日
-    
-    赞2
-    
-    强烈期待开源，天下苦jvm久已
-    
+
+  2022年4月22日
+
+  赞2
+
+  强烈期待开源，天下苦jvm久已
+
 - 滚石
-    
-    2022年3月18日
-    
-    赞2
-    
-    看起来很nb的样子，批量更新会不会出现更新失败、或者短时间内不一致的情况？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞2
-    
-    不会出现不一致的情况，但是在热部署期间如果有流量打进来会出现错误。
-    
+
+  2022年3月18日
+
+  赞2
+
+  看起来很nb的样子，批量更新会不会出现更新失败、或者短时间内不一致的情况？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞2
+
+  不会出现不一致的情况，但是在热部署期间如果有流量打进来会出现错误。
+
 - 沈军禹
-    
-    2022年3月18日
-    
-    赞2
-    
-    热部署的时候，如果有请求过来怎么办？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞2
-    
-    热部署时，流量打进来，在瞬时内，MVC服务有可能会出现404，RPC服务上游调用方可能会无法找到可用服务。
-    
+
+  2022年3月18日
+
+  赞2
+
+  热部署的时候，如果有请求过来怎么办？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞2
+
+  热部署时，流量打进来，在瞬时内，MVC服务有可能会出现404，RPC服务上游调用方可能会无法找到可用服务。
+
 - Dong
-    
-    2022年3月18日
-    
-    赞2
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)确实给力，对于我们这种懒人，写完代码发到多环境，流水线自动触发部署，涉及到编译和发布！整体流程比较大的项目基本上是10-20分钟左右，导致该一行代码也是这种成本，真滴无语！提高效率yyds！但是要是能支持go和c++就行了
-    
+
+  2022年3月18日
+
+  赞2
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)确实给力，对于我们这种懒人，写完代码发到多环境，流水线自动触发部署，涉及到编译和发布！整体流程比较大的项目基本上是10-20分钟左右，导致该一行代码也是这种成本，真滴无语！提高效率yyds！但是要是能支持go和c++就行了
+
 - PerJoker
-    
-    2022年3月17日
-    
-    赞2
-    
-    dcevm也是有一定限制的，如果仅仅是本地应用热部署，可以使用idea的hotswap agent插件，然后把本地的jvm里面的dll文件替换成dcevm的。dcevm的限制，完全可以看hot swap agent 的官方介绍。
-    
+
+  2022年3月17日
+
+  赞2
+
+  dcevm也是有一定限制的，如果仅仅是本地应用热部署，可以使用idea的hotswap agent插件，然后把本地的jvm里面的dll文件替换成dcevm的。dcevm的限制，完全可以看hot swap agent 的官方介绍。
+
 - 番薯和米饭一起吃出辣椒的味道
-    
-    2022年3月17日
-    
-    赞2
-    
-    非常好用，节省大量部署代码的时间，提升工作效率
-    
+
+  2022年3月17日
+
+  赞2
+
+  非常好用，节省大量部署代码的时间，提升工作效率
+
 - alex
-    
-    2022年3月17日
-    
-    赞2
-    
-    试了一下，果然牛逼。对于不适合本地调试的大内存应用来说，简直是救星![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月17日
+
+  赞2
+
+  试了一下，果然牛逼。对于不适合本地调试的大内存应用来说，简直是救星![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[色]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - ⊙_⊙
-    
-    2022年3月23日
-    
-    赞1
-    
-    美图的jvm文章真不错，这种基础框架真心对开发来说真是好东西。希望后面多介绍下框架架构![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)和实现
-    
+
+  2022年3月23日
+
+  赞1
+
+  美图的jvm文章真不错，这种基础框架真心对开发来说真是好东西。希望后面多介绍下框架架构![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)和实现
+
 - Winterer
-    
-    2022年3月17日
-    
-    赞1
-    
-    这是需要用dcevm替换原生jvm吗？如果用原生jvm的话有办法在运行时attach进程进行热更新吗？
-    
-    美团技术团队
-    
-    作者2022年3月18日
-    
-    赞1
-    
-    是的，需要在JDK中打补丁，用原生JDK可以修改MyBatis等不改变类结构的热更新操作，无法通过Attach的方式，因为在项目启动期间，需要字节码增强来维护一些框架的基础数据。
-    
+
+  2022年3月17日
+
+  赞1
+
+  这是需要用dcevm替换原生jvm吗？如果用原生jvm的话有办法在运行时attach进程进行热更新吗？
+
+  美团技术团队
+
+  作者2022年3月18日
+
+  赞1
+
+  是的，需要在JDK中打补丁，用原生JDK可以修改MyBatis等不改变类结构的热更新操作，无法通过Attach的方式，因为在项目启动期间，需要字节码增强来维护一些框架的基础数据。
+
 - 莫道
-    
-    2022年3月17日
-    
-    赞1
-    
-    听起来是浩大的工程量
-    
+
+  2022年3月17日
+
+  赞1
+
+  听起来是浩大的工程量
+
 - 石头剪刀布💪
-    
-    广东2023年9月1日
-    
-    赞
-    
-    太好了，太好了。如果能开源，对中国开源行业是一件大事情，对全世界的Java用户都非常有价值。。
-    
+
+  广东2023年9月1日
+
+  赞
+
+  太好了，太好了。如果能开源，对中国开源行业是一件大事情，对全世界的Java用户都非常有价值。。
 
 已无更多数据

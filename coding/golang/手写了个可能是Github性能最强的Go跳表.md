@@ -1,12 +1,8 @@
-
-
 腾讯程序员 腾讯技术工程
 
- _2022年09月01日 18:00_ _广东_
+_2022年09月01日 18:00_ _广东_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
 
 作者：phongchen，腾讯 IEG 后台开发工程师
 
@@ -22,20 +18,16 @@
 
 前几周孩子放假回老家，家里没人打扰了，调研了一下有没有类似 C++中 STL 的泛型库，发现要么很薄弱要么根本就不支持泛型。于是就花了几个周末和一些晚上的时间，写了个基于泛型的容器和算法库，暂且起名叫[stl4go](https://github.com/chen3feng/stl4go)（👏 加 ⭐，🙏）。其中的有序 Map 我没有选择红黑树而是用了跳表，花了一些时间用了一些手法优化，测试了一下，基本上可以说是全 GitHub 上能找到的最快的 Go 的实现了。
 
-  
-
 ### 二、跳表是什么
 
 跳表（[skiplist](http://en.wikipedia.org/wiki/Skip_list)）是一种随机化的数据， 由 William Pugh 在论文[《Skip lists: a probabilistic alternative to balanced trees》](http://www.cl.cam.ac.uk/teaching/0506/Algorithms/skiplists.pdf)中提出， 跳表以有序的方式在层次化的链表中保存元素， 效率和平衡树媲美 —— 查找、删除、添加等操作都可以在 O(logN)期望时间下完成， 综合能力相当于平衡二叉树，并且比起平衡树来说， 跳跃表的实现要简单直观得多，核心功能在 200 行以内即可实现，遍历的时间复杂度是 O(N)，代码简单，空间上也比较节省，因此在挺多的场景得到应用。比如[Redis 的 Sorted Set](https://redis.io/docs/data-types/sorted-sets/)、[LevelDB](https://github.com/google/leveldb/blob/main/db/skiplist.h)，详细原理和算法请移步下面这篇文章：[Skip List--跳表（全网最详细的跳表文章没有之一）](https://www.jianshu.com/p/9d8296562806)，不再赘述。
 
-完整代码见：  
+完整代码见：\
 [https://github.com/chen3feng/stl4go/blob/master/skiplist.go](https://github.com/chen3feng/stl4go/blob/master/skiplist.go)
 
 附带单元测试和性能测试。
 
 SkipList 用于需要有序的场合，在不需要有序的场景下，go 自带的 map 容器依然是优先选择。
-
-  
 
 ### 三、接口设计
 
@@ -55,13 +47,13 @@ SkipList 用于需要有序的场合，在不需要有序的场景下，go 自�
 
 虽然不少讲跳表原理示意图会把每层的索引节点单独列出来：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 出处：[Skip List--跳表（全网最详细的跳表文章没有之一）](https://www.jianshu.com/p/9d8296562806)
 
 但是一般的实现都会把索引节点实现为最底层节点的一个数组，这样每个元素只需要一个节点，节省了单独的索引节点的存储开销，也提高了性能。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 因此节点定义如下：
 
@@ -96,9 +88,8 @@ https://github.com/redis/redis/blob/7.0/src/t_zset.c#L118-L128
 简单直白。但是存在两个问题：
 
 - math.Float64() （以及任何全局随机函数）内部为共享的随机数生成器对象，每次调用都会加锁解锁，在竞争情况下性能下降很厉害。详情参见源代码 https://cs.opensource.google/go/go/+/refs/tags/go1.19:src/math/rand/rand.go
-    
+
 - 多次生成随机数。下面我们将看到，其实只用生成一次就可以了。
-    
 
 所以在 gostl 的实现中，改用了生成一个某范围内的随机数，根据其均匀分布的特点，来计算 level：
 
@@ -114,14 +105,13 @@ level := 0for k < total {    levelN >>= 1    total -= levelN  �
 
 也就是生成的随机数越小，level 越高，比如 maxLevel 为 10 时，total=1023，那么：
 
-- 512<k<1023 之间的概率为 1/2，level=1
-    
-- 256<k<511 之间的概率为 1/4，level=2
-    
-- 128<k<255 之间的概率为 1/8，level=3
-    
+- 512\<k\<1023 之间的概率为 1/2，level=1
+
+- 256\<k\<511 之间的概率为 1/4，level=2
+
+- 128\<k\<255 之间的概率为 1/8，level=3
+
 - ...
-    
 
 当 level 比较高时，循环次数就会增加。不过可以观察到在生成的随机二进制中，数值增减一半正好等于改变一个 bit 位，因此我改用直接调用 math/bits 里的 Len64()函数来计算生成的随机数的最小位数的方式来实现：
 
@@ -142,18 +132,16 @@ https://github.com/golang/go/blob/go1.19/src/math/bits/bits.go#L330-L345
 sl.maxLevel 是一个实例级别的固定常量，跳表创建后便不再修改，因此有两个问题：
 
 - 当实际元素很少时，查找函数中循环的前几次 cur 变量基本上都是空指针，白白浪费时间查找，所以他的实现里 defaultMaxLevel 设置的很小。
-    
+
 - 由于默认的 maxLevel 很小，只有 10，插入 1024 个元素后，最上层基本上就接近平衡二叉树的情况了，如果再继续插入大量的元素，每层索引节点数量都快速增加，性能急剧下降。如果在构造时就根据预估容量设置一个足够大的 maxLevel 既可避免这个问题，但是很多时候这个数不是那么好预估，而且用起来不方便，漏了设置又可能会导致意料之外的性能恶化。
-    
 
 因此我把 level 设计为根据元素的个数动态自适应调整：
 
 - 设置一个 level 成员记录最高的 level 值
-    
+
 - 当插入元素时，如果出现了更高的层，再插入后就调大 level
-    
+
 - 当删除元素时，如果最顶层的索引变空了，就减少 level。
-    
 
 通过这种方式，就解决了上述问题。
 
@@ -165,7 +153,7 @@ sl.maxLevel 是一个实例级别的固定常量，跳表创建后便不再修�
 
 插入时如果 key 不存在或者删除时节点存在，都需要找到每层索引中的前一个节点，放入 prevs 数组返回，用于插入或者删除节点后各层链表的重新组织。
 
-gostl 的实现中，是先在 findPrevNodes 函数里的循环中得到所有的 prevs，然后再比较[0]层的值来判断 key 是否相等决定更新或者返回。
+gostl 的实现中，是先在 findPrevNodes 函数里的循环中得到所有的 prevs，然后再比较\[0\]层的值来判断 key 是否相等决定更新或者返回。
 
 [https://github.com/liyue201/gostl/blob/e5590f19a43ac53f35893c7c679b37d967c4859c/ds/skiplist/skiplist.go#L186-L201](https://github.com/liyue201/gostl/blob/e5590f19a43ac53f35893c7c679b37d967c4859c/ds/skiplist/skiplist.go#L186-L201)
 
@@ -183,7 +171,7 @@ gostl 的实现中，是先在 findPrevNodes 函数里的循环中得到所有�
 
 `// findInsertPoint returns (*node, nil) to the existed node if the key exists,   // or (nil, []*node) to the previous nodes if the key doesn't exist   func (sl *skipListOrdered[K, V]) findInsertPoint(key K) (*skipListNode[K, V], []*skipListNode[K, V]) {       prevs := sl.prevsCache[0:sl.level]       prev := &sl.head       for i := sl.level - 1; i >= 0; i-- {           for next := prev.next[i]; next != nil; next = next.next[i] {               if next.key == key {                   // Key 已经存在，停止搜索                   return next, nil               }               if next.key > key {                   // All other node in this level must be greater than the key,                   // search the next level.                   break               }               prev = next           }           prevs[i] = prev       }       return nil, prevs   }   `
 
-node和prevs只会有一个不空：  
+node和prevs只会有一个不空：
 
 `// Insert inserts a key-value pair into the skiplist.   // If the key is already in the skip list, it's value will be updated.   func (sl *SkipList[K, V]) Insert(key K, value V) {       node, prevs := sl.impl.findInsertPoint(key)       if node != nil {           // Already exist, update the value           node.value = value           return       }       // 生成及插入新节点，略去   }`
 
@@ -217,7 +205,7 @@ https://github.com/chen3feng/stl4go/commit/1d444f1530cc43c99a978dcf0b1d7f83bcb57
 
 无论是理论上还是实测，内存分配对性能的影响还是挺大的。Go 不像 Java 和 C#的堆内存分配那么简单，因此应当减少不必要的内存分配。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 来源：[Go 生态下的字节跳动大规模微服务性能优化实践](https://my.oschina.net/u/5632822/blog/5565821)
 
@@ -243,8 +231,6 @@ https://github.com/chen3feng/stl4go/blob/master/skiplist_newnode_generate.sh
 
 另外我在调试这段代码时发现 go 的 switch case 语句即使对简单的全数值居然也是通过[二分法](https://github.com/golang/go/blob/8ee9bca2729ead81da6bf5a18b87767ff396d1b7/src/cmd/compile/internal/gc/swt.go#L375)而非 C++常用的[跳转表](https://sites.google.com/site/arch1utep/jump-tables)来实现的。不过估计是因为有更耗时的内存分配的原因，尝试把 case 1，2 等单独拿出来也没有提升，因此估计这里对性能没有影响。如果 case 非常多的话可以考虑对最常见的 case 单独处理，或者用函数指针数组来优化。
 
-  
-
 ### 五、C++实现
 
 类似的代码在 C++中由于支持模板非类型参数，可以简单不少：
@@ -261,11 +247,9 @@ C++实现为 Go 代码的手工转译，功能未做充分的验证，仅供对�
 
 [https://github.com/chen3feng/skiplist-survey/tree/master/skiplist](https://github.com/chen3feng/skiplist-survey/tree/master/skiplist)
 
-  
-
 ### 六、Benchmark
 
-sean-public@github.com 实现了一个以 float64 为 key 的跳表：  
+sean-public@github.com 实现了一个以 float64 为 key 的跳表：\
 [https://github.com/sean-public/fast-skiplist](https://github.com/sean-public/fast-skiplist)
 
 并和其他实现做了个比较证明自己的最快：
@@ -278,41 +262,34 @@ https://github.com/sean-public/skiplist-survey
 
 以下是部分评测结果，数值越小越好：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 虽然也有少量指标不是最快的，但是总体上在大部分指标上，超越了我在 github 上找到的其他实现。并且大部分其他实现 key 只支持 int64 或者 float64，使得无法用于 string 等类型。
 
 另外也对 C++的实现测了一下性能：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发现 Go 的实现性能很多指标基本接近 C++，其中 Delete 反而更快一些，是因为 C++在删除时要析构节点并释放内存，而 Go 采用 GC 的方式延后旁路处理。
 
-  
-
 ### 七、心得
 
-1）go1.18 引入的泛型还可以，虽然功能上不算很强大，但是已经能满足挺大一部分的需求。我们组现在正在升级到 go1.19，很快就能用得上。  
-2）Go 的开发生态还是不错的，github 上大量垂手可得的库，VS Code 高度集成，各种便利的工具，这是我写 C++代码很难体验到的。大部分优化是基于 benchmark test 来做的。  
-3）很多编程语言需要的基础知识都是相通的，打好基础，学习新技术并不太难。  
+1）go1.18 引入的泛型还可以，虽然功能上不算很强大，但是已经能满足挺大一部分的需求。我们组现在正在升级到 go1.19，很快就能用得上。\
+2）Go 的开发生态还是不错的，github 上大量垂手可得的库，VS Code 高度集成，各种便利的工具，这是我写 C++代码很难体验到的。大部分优化是基于 benchmark test 来做的。\
+3）很多编程语言需要的基础知识都是相通的，打好基础，学习新技术并不太难。\
 4）跳出自己的舒适区，多学习一些编程语言开阔视野涨见识，有利于持续提高自己的技术能力。
 
 **参考资料**
 
 1. [Wikipedia -- Skip list](https://en.wikipedia.org/wiki/Skip_list)
-    
-2. [Go 生态下的字节跳动大规模微服务性能优化实践](https://my.oschina.net/u/5632822/blog/5565821)
-    
-3. [Skip List--跳表（全网最详细的跳表文章没有之一）](https://www.jianshu.com/p/9d8296562806)
-    
-4. https://github.com/liyue201/gostl/blob/master/ds/skiplist/skiplist.go
-    
-5. https://github.com/sean-public/skiplist-survey
-    
 
-  
+1. [Go 生态下的字节跳动大规模微服务性能优化实践](https://my.oschina.net/u/5632822/blog/5565821)
 
-  
+1. [Skip List--跳表（全网最详细的跳表文章没有之一）](https://www.jianshu.com/p/9d8296562806)
+
+1. https://github.com/liyue201/gostl/blob/master/ds/skiplist/skiplist.go
+
+1. https://github.com/sean-public/skiplist-survey
 
 **欢迎观看腾讯程序员最新视频**
 

@@ -2,11 +2,11 @@
 
 小夕学算法
 
- _2021年10月19日 22:51_
+_2021年10月19日 22:51_
 
 以下文章来源于编程熊 ，作者编程熊
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6viahxlJQyWQeVEfkJhQ9sAXKTnINHTwaR1PtI2Jdic3Pw/0)
 
@@ -14,7 +14,7 @@
 
 ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生。
 
-](https://mp.weixin.qq.com/s?__biz=MzA5NjM5NTc5NQ==&mid=2247492510&idx=2&sn=c2957900619d4272de928c5e82172793&chksm=90b214e2a7c59df4ea1b6bc1225dd319181371f6e534e38d7a33651a1319112b61a98321aec7&mpshare=1&scene=24&srcid=10217531U0JpMm6dYLbf4yjp&sharer_sharetime=1634777616029&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e9526b0c0f6d3460f715587418d83429b043a306c1f3d81789b206e0873e2fca206a6f90cfcaa6365830326175355976ad1273cd2cdd8786f47004ac219903836863b39513d4ac9a2009a1d8e1a5ed8ac8f3248426c0e40d12b071f12e13816926f12a8657db507be391f11de4b950240d26d83797b53c24&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ6sSEaqCg8e2IwSiM7oeCiRLmAQIE97dBBAEAAAAAAPUtF9NrtocAAAAOpnltbLcz9gKNyK89dVj0iTbnJ3TsLqEC3U5cFcLxL2Ot%2BagdjX%2Fded34Xk0vkZk131MYtppRyfd4KVayQZ1D177UfU9paOYa0BIJ02WcPICXze1QI6ezatVFDthANiU8ISj3V4qnfgaJlQMfICHTGHrQxJmfkOUHyK74qUdOf9z3fk0RcMdPqlJhnDeGJaw%2FZkuUmUnsjNFMuoOTSwnS8AT2tW%2BKX8XslSl9fWgtg%2BzweHtjbvOIAXUYx%2BMrZ%2BbI%2ByBtRQ4%2BCXUBG2yJRiVw&acctmode=0&pass_ticket=kxz20gAaXNSwv2LunvkdB3CPJNy87P%2FYTWGU%2BxQhIZouvKdivOmIErcWOBSJ%2FLRK&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzA5NjM5NTc5NQ==&mid=2247492510&idx=2&sn=c2957900619d4272de928c5e82172793&chksm=90b214e2a7c59df4ea1b6bc1225dd319181371f6e534e38d7a33651a1319112b61a98321aec7&mpshare=1&scene=24&srcid=10217531U0JpMm6dYLbf4yjp&sharer_sharetime=1634777616029&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e9526b0c0f6d3460f715587418d83429b043a306c1f3d81789b206e0873e2fca206a6f90cfcaa6365830326175355976ad1273cd2cdd8786f47004ac219903836863b39513d4ac9a2009a1d8e1a5ed8ac8f3248426c0e40d12b071f12e13816926f12a8657db507be391f11de4b950240d26d83797b53c24&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ6sSEaqCg8e2IwSiM7oeCiRLmAQIE97dBBAEAAAAAAPUtF9NrtocAAAAOpnltbLcz9gKNyK89dVj0iTbnJ3TsLqEC3U5cFcLxL2Ot%2BagdjX%2Fded34Xk0vkZk131MYtppRyfd4KVayQZ1D177UfU9paOYa0BIJ02WcPICXze1QI6ezatVFDthANiU8ISj3V4qnfgaJlQMfICHTGHrQxJmfkOUHyK74qUdOf9z3fk0RcMdPqlJhnDeGJaw%2FZkuUmUnsjNFMuoOTSwnS8AT2tW%2BKX8XslSl9fWgtg%2BzweHtjbvOIAXUYx%2BMrZ%2BbI%2ByBtRQ4%2BCXUBG2yJRiVw&acctmode=0&pass_ticket=kxz20gAaXNSwv2LunvkdB3CPJNy87P%2FYTWGU%2BxQhIZouvKdivOmIErcWOBSJ%2FLRK&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 大家好，我是编程熊。
 
@@ -69,9 +69,8 @@ ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生�
 给定`key`，有两种查询方式。
 
 1. 查找`key` 是否存在于哈希表中。
-    
-2. 查找`key`对应的`value`。
-    
+
+1. 查找`key`对应的`value`。
 
 ## 哈希函数
 
@@ -91,7 +90,7 @@ ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生�
 
 下图演示了`key1="abc"`，`key2="bcd"`，两个不同的`key`，经过哈希函数，映射到同一个数组下标`X`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
 
 哈希冲突
 
@@ -105,7 +104,7 @@ ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生�
 
 下图展示了需要插入哈希表的数组`a`，哈希函数`h(x)`，使用拉链法解决哈希冲突的例子。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
 
 拉链法
 
@@ -118,11 +117,10 @@ ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生�
 发生冲突后，以什么样的”规则“找到空闲的位置，有很多种方法:
 
 - 线行探查法: 从冲突的位置开始，依次判断下一个位置是否空闲，直至找到空闲位置。
-    
+
 - 平方探查法:  从冲突的位置x开始，第一次增加`1^2`个位置，第二次增加`2^2`...，直至找到空闲的位置。
-    
+
 - 双散列函数探查法等等
-    
 
 #### 再哈希法
 
@@ -139,11 +137,10 @@ ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生�
 C++中常用的哈希结构有以下三个:
 
 - 数组
-    
+
 - unordered_set(集合)
-    
+
 - unordered_map(映射: 键值对)
-    
 
 |种类|底层实现|Key是否有序|Key是否可以重复|Key是否可以修改|增删查效率|
 |---|---|---|---|---|---|
@@ -178,7 +175,7 @@ C++标准库中的set、map底层基于红黑树，将会在后续章节中详�
 
 下图以示例演示一下哈希表，将数组插入到哈希表中，查找给定的`key`，即可以在`O(1)` 的时间复杂度查找到，图中`a，b，c，d`指代哈希表的下标。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
 
 示例
 
@@ -218,7 +215,7 @@ C++标准库中的set、map底层基于红黑树，将会在后续章节中详�
 
 下图以示例展示，如何利用哈希表，找到最长连续序列。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "哈希-编程熊")
 
 示例
 
@@ -229,15 +226,12 @@ C++标准库中的set、map底层基于红黑树，将会在后续章节中详�
 ### 习题推荐
 
 1. LeetCode 217. 存在重复元素
-    
-2. LeetCode 594. 最长和谐子序列
-    
-3. LeetCode 149. 直线上最多的点数
-    
-4. LeetCode 332. 重新安排行程
-    
-      
-    
+
+1. LeetCode 594. 最长和谐子序列
+
+1. LeetCode 149. 直线上最多的点数
+
+1. LeetCode 332. 重新安排行程
 
 我是编程熊，我们下期见。
 
@@ -253,10 +247,10 @@ ACM亚洲区域赛金牌，字节跳动、旷视科技前员工，985研究生�
 
 ---END---
 
-你好，我是编程熊，双非逆袭选手，校招时拿下字节跳动、旷视科技等大厂offer，ACM亚洲区域赛金牌选手，保研985的研究生，《ACM金牌选手讲解LeetCode算法系列》作者。  
+你好，我是编程熊，双非逆袭选手，校招时拿下字节跳动、旷视科技等大厂offer，ACM亚洲区域赛金牌选手，保研985的研究生，《ACM金牌选手讲解LeetCode算法系列》作者。\
 点击下方【阅读原文】，直达学习算法与数据结构的宝藏仓库，欢迎star；公众号后台回复【书】，免费领取计算机学习核心资源；加星标，更快获取编程熊最新精彩文章。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读原文
 

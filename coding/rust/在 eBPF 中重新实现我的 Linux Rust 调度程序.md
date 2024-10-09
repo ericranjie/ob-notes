@@ -2,11 +2,9 @@
 
 云原生技术爱好者社区
 
- _2024年08月22日 08:22_ _广东_
+_2024年08月22日 08:22_ _广东_
 
 **_1_**
-
-  
 
 **概述**
 
@@ -19,8 +17,6 @@ BPF_MAP_TYPE_RINGBUF 即使使用环形缓冲区（ / ）可以大大改善通�
 为了减少这种“缓冲区膨胀”效应，我决定在 BPF 中完全重新实现 scx_rustland，摆脱用户空间开销，并将这个新的调度程序命名为 scx_bpfland。
 
 **_2_**
-
-  
 
 **执行**
 
@@ -36,8 +32,6 @@ scx_bpfland 使用与分类交互式任务和常规任务相同的逻辑 scx_rus
 
 **_3_**
 
-  
-
 **测试**
 
 调度程序的逻辑非常简单，但在实践中被证明非常有效。当然，它并不是在所有可能的情况下都表现良好，但调度程序的整个目的是高度专业化，优先考虑延迟敏感的工作负载，而不是 CPU 密集型工作负载。
@@ -50,11 +44,9 @@ scx_bpfland 使用与分类交互式任务和常规任务相同的逻辑 scx_rus
 
 **_4_**
 
-  
-
 **结果**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 与默认调度程序相比，PostgreSQL 和 Hackbench 都显示出显着的提升（PostgreSQL 的读/写延迟高达 39%），因为它们的工作负载纯粹受延迟限制。
 
@@ -72,10 +64,6 @@ nginx 和 Apache 基准测试都依赖于 wrk，这是一个 HTTP 基准测试�
 
 ```
 
-  
-
-  
-
 ```
 [nginx - scx_bpfland]
 ```
@@ -89,8 +77,6 @@ nginx 和 Apache 基准测试都依赖于 wrk，这是一个 HTTP 基准测试�
 ```
 
 首先让我们看一下样本量（通过 bpftrace 在每次任务切换时收集）。我们可以看到，Apache 的任务切换次数比 nginx 高得多（大约 10 倍）。
-
-  
 
 考虑到客户端是相同的（wrk），差异显然是在服务器上，实际上 Apache 以阻塞方式处理响应，而 nginx 以非阻塞方式处理响应。
 
@@ -110,8 +96,6 @@ Apache 的回归表明它 scx_bpfland 总体上不是一个更好的调度程序
 
 **_5_**
 
-  
-
 **结论**
 
 总之， 使用 Rust 在用户空间中设计新的调度程序原型，然后在 BPF 中重新实现它们可以成为设计新的专用调度程序的有效工作流程。
@@ -124,11 +108,9 @@ scx_bpfland 是这种方法的一个实际示例，展示了如何将灵活的 R
 
 ## 推荐
 
-[运维技能大合集](https://mp.weixin.qq.com/s?__biz=MzI3NTEwOTA4OQ==&mid=2649185045&idx=1&sn=e8a669ff8ea1b91ab79ae86cb3761f30&chksm=f27b15f0f7f305bd0908a0b8c54fc31da02d650225531a3e3a8aa592f67a88cc5bafae0918c4&mpshare=1&scene=24&srcid=08248NBiNFGsPB4PF9BbdTyv&sharer_shareinfo=425611c28badade47c8976230008c633&sharer_shareinfo_first=e2dd5afd9e9472b3a8fdfc523328544a&key=daf9bdc5abc4e8d03fb3f182ff654b48f32fa98f23f9934040f7729799e5d83edf2368a6047833988b37e62d0c3a0f9a8725c6d8c71ec0595dfa14ab51080dd67800bf5235796e86b63f5765c23062d0134a45419c4f41e4b80dd61b731b0f5b8fe349fd02a386c76693daf23c8c1d7ebfc8369068ba600a6cd939aea085df67&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQzyCOzuUf%2FTGBpQhy0kH0wBKUAgIE97dBBAEAAAAAAOd8EmT7%2BckAAAAOpnltbLcz9gKNyK89dVj0rG02lgpT52O012TvgoEJ1U%2FHzYIa%2FtGJ78qG9wzajL5ZV8xYiA2ySDQreFfuZzxgF25PECcQQ4L%2BpoYd4kbounb%2BADRV7X%2F3lXSzb4PTSlhX2dg6Ic9AM4Deuc582U5wJk09VEeIsI9uGRHB6ynGvTK8mr75VHejD7leeW4G9S3Z2HI884YSwqqn9MH5nixsx8bo79%2BM0e5mrzbw%2FMY2dwHCy8pDXVuZcpMSkVURi6fFjE%2BjVyEhUAynN3xR6Kdbn6W7tqFSt6OQSBuIJhzHYbuxwv1GNJCLRdOl6xUKp2VYS4OR6sRb%2FXrcyF059w%3D%3D&acctmode=0&pass_ticket=8%2BY%2BfEgUhrEBRq0jbdpBF2%2B4ZIn5hi3ct0vE%2Ba85w1gIUNVNiJbX5IRua%2F7B4Duj&wx_header=0)
+[运维技能大合集](<https://mp.weixin.qq.com/s?__biz=MzI3NTEwOTA4OQ==&mid=2649185045&idx=1&sn=e8a669ff8ea1b91ab79ae86cb3761f30&chksm=f27b15f0f7f305bd0908a0b8c54fc31da02d650225531a3e3a8aa592f67a88cc5bafae0918c4&mpshare=1&scene=24&srcid=08248NBiNFGsPB4PF9BbdTyv&sharer_shareinfo=425611c28badade47c8976230008c633&sharer_shareinfo_first=e2dd5afd9e9472b3a8fdfc523328544a&key=daf9bdc5abc4e8d03fb3f182ff654b48f32fa98f23f9934040f7729799e5d83edf2368a6047833988b37e62d0c3a0f9a8725c6d8c71ec0595dfa14ab51080dd67800bf5235796e86b63f5765c23062d0134a45419c4f41e4b80dd61b731b0f5b8fe349fd02a386c76693daf23c8c1d7ebfc8369068ba600a6cd939aea085df67&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQzyCOzuUf%2FTGBpQhy0kH0wBKUAgIE97dBBAEAAAAAAOd8EmT7%2BckAAAAOpnltbLcz9gKNyK89dVj0rG02lgpT52O012TvgoEJ1U%2FHzYIa%2FtGJ78qG9wzajL5ZV8xYiA2ySDQreFfuZzxgF25PECcQQ4L%2BpoYd4kbounb%2BADRV7X%2F3lXSzb4PTSlhX2dg6Ic9AM4Deuc582U5wJk09VEeIsI9uGRHB6ynGvTK8mr75VHejD7leeW4G9S3Z2HI884YSwqqn9MH5nixsx8bo79%2BM0e5mrzbw%2FMY2dwHCy8pDXVuZcpMSkVURi6fFjE%2BjVyEhUAynN3xR6Kdbn6W7tqFSt6OQSBuIJhzHYbuxwv1GNJCLRdOl6xUKp2VYS4OR6sRb%2FXrcyF059w%3D%3D&acctmode=0&pass_ticket=8%2BY%2BfEgUhrEBRq0jbdpBF2%2B4ZIn5hi3ct0vE%2Ba85w1gIUNVNiJbX5IRua%2F7B4Duj&wx_header=0>)
 
----
-
-  
+______________________________________________________________________
 
 随手关注或者”在看“，诚挚感谢！
 

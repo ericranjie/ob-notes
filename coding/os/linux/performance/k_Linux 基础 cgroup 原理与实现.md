@@ -1,16 +1,7 @@
-
 CPP开发者
-
  _2022年01月19日 11:55_
-
 以下文章来源于Linux内核那些事 ，作者songsong001
 
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6dwH9qJmWO5T0Rnsiaib5jEUibibJgLmkkG02PrbyOWab4UA/0)
-
-**Linux内核那些事**.
-
-以简单的方式介绍 Linux 内核的原理，以通俗的语言分析 Linux 内核的实现。如果你没有接触过 Linux 内核，那么就关注我们的公众号吧，我们将以图解的方式让内核更亲民...
 
 ](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651170173&idx=1&sn=b6e4974e3a871c55519694d124c52e01&chksm=80647422b713fd347379c7f626e270d457cae59c600cd5a99e2c89dac84b0736723a5fa275ea&mpshare=1&scene=24&srcid=0120Mo30LDcgQ4jb6rWB3cvx&sharer_sharetime=1642640351758&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0519fb95cd017bad5065115f61fb823341e21c132cb23bfa1b8dd674658308e59dea49252b5102ac160b7cc8754b8bab973f7bd28b69d6b549d5d929412c2deab8a90f76d0ec38154a8e277d8fc3951b2d029f68bd6f36fba4e4d98cbd79dbd12594faffa5353abe66ad63644f6575ab71ecfae3daeb6e8bf&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQkWiIguhR8d5%2Blj08juApPRLmAQIE97dBBAEAAAAAAF1fExA76NsAAAAOpnltbLcz9gKNyK89dVj09Q%2FKUeBA8yUe88RsjBpCzFzdp97tQHknrzU8swESrxEQ3yKZ6uPMwqFatQr7jFFn1YqJhMo6HvQhRD%2B5RcTWh%2BjDdqXSK3xSnZAIZUXuCltsfGz6rkRXmr5SNb%2By9Qqxoxvf%2FOgPC%2BmwjbC8Vm4aa6VosK5k4ZW4doXIIUH25ZKdYk9eVQbRE%2Bb4Cy%2F39U1Irm6UCXgM%2F0l6Au3HTh5t5WPLb1WkuYEc0ca46uot27vKj89sfSXixRiEykTsH9wO&acctmode=0&pass_ticket=QlKY08gowgF%2B61ooIJ4Q6SOpdGoVSLVlqLuu8mJmOmYIy7xfPUvze38WPto3j2vF&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
@@ -27,23 +18,15 @@ struct cgroup {    unsigned long flags;        /* "unsigned lo
 下面我们来介绍一下 `cgroup` 结构体各个字段的用途：
 
 1. `flags`: 用于标识当前 `cgroup` 的状态。
-    
 2. `count`: 引用计数器，表示有多少个进程在使用这个 `cgroup`。
-    
 3. `sibling、children、parent`: 由于 `cgroup` 是通过 `层级` 来进行管理的，这三个字段就把同一个 `层级` 的所有 `cgroup` 连接成一棵树。`parent` 指向当前 `cgroup` 的父节点，`sibling` 连接着所有兄弟节点，而 `children` 连接着当前 `cgroup` 的所有子节点。
-    
 4. `dentry`: 由于 `cgroup` 是通过 `虚拟文件系统` 来进行管理的，在介绍 `cgroup` 使用时说过，可以把 `cgroup` 当成是 `层级` 中的一个目录，所以 `dentry` 字段就是用来描述这个目录的。
-    
 5. `subsys`: 前面说过，`子系统` 能够附加到 `层级`，而附加到 `层级` 的 `子系统` 都有其限制进程组使用资源的算法和统计数据。所以 `subsys` 字段就是提供给各个 `子系统` 存放其限制进程组使用资源的统计数据。我们可以看到 `subsys` 字段是一个数组，而数组中的每一个元素都代表了一个 `子系统` 相关的统计数据。从实现来看，`cgroup` 只是把多个进程组织成控制进程组，而真正限制资源使用的是各个 `子系统`。
-    
 6. `root`: 用于保存 `层级` 的一些数据，比如：`层级` 的根节点，附加到 `层级` 的 `子系统` 列表（因为一个 `层级` 可以附加多个 `子系统`），还有这个 `层级` 有多少个 `cgroup` 节点等。
-    
 7. `top_cgroup`: `层级` 的根节点（根cgroup）。
     
-
 我们通过下面图片来描述 `层级` 中各个 `cgroup` 组成的树状关系：
 ![[Pasted image 20240920124925.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cgroup-links
 
@@ -52,27 +35,33 @@ cgroup-links
 每个 `子系统` 都有属于自己的资源控制统计信息结构，而且每个 `cgroup` 都绑定一个这样的结构，这种资源控制统计信息结构就是通过 `cgroup_subsys_state` 结构体实现的，其定义如下：
 
 ```c
-struct cgroup_subsys_state {    struct cgroup *cgroup;    atomic_t refcnt;    unsigned long flags;};
+struct cgroup_subsys_state {    
+	struct cgroup *cgroup;    
+	atomic_t refcnt;    
+	unsigned long flags;
+};
 ```
 
 下面介绍一下 `cgroup_subsys_state` 结构各个字段的作用：
 
 1. `cgroup`: 指向了这个资源控制统计信息所属的 `cgroup`。
-    
 2. `refcnt`: 引用计数器。
-    
 3. `flags`: 标志位，如果这个资源控制统计信息所属的 `cgroup` 是 `层级` 的根节点，那么就会将这个标志位设置为 `CSS_ROOT` 表示属于根节点。
-    
 
 从 `cgroup_subsys_state` 结构的定义看不到各个 `子系统` 相关的资源控制统计信息，这是因为 `cgroup_subsys_state` 结构并不是真实的资源控制统计信息结构，比如 `内存子系统` 真正的资源控制统计信息结构是 `mem_cgroup`，那么怎样通过这个 `cgroup_subsys_state` 结构去找到对应的 `mem_cgroup` 结构呢？我们来看看 `mem_cgroup` 结构的定义：
 
 ```c
-struct mem_cgroup {    struct cgroup_subsys_state css; // 注意这里    struct res_counter res;    struct mem_cgroup_lru_info info;    int prev_priority;    struct mem_cgroup_stat stat;};
+struct mem_cgroup {    
+	struct cgroup_subsys_state css; // 注意这里    
+	struct res_counter res;    
+	struct mem_cgroup_lru_info info;    
+	int prev_priority;    
+	struct mem_cgroup_stat stat;
+};
 ```
 
 从 `mem_cgroup` 结构的定义可以发现，`mem_cgroup` 结构的第一个字段就是一个 `cgroup_subsys_state` 结构。下面的图片展示了他们之间的关系：
 ![[Pasted image 20240920124937.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cgroup-state-memory
 
@@ -81,7 +70,7 @@ cgroup-state-memory
 由于 `cgroup_subsys_state` 部分在 `mem_cgroup` 结构的首部，所以要将 `cgroup_subsys_state` 结构转换成 `mem_cgroup` 结构，只需要通过指针类型转换即可。
 
 `cgroup` 结构与 `cgroup_subsys_state` 结构之间的关系如下图：
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 ![[Pasted image 20240920124951.png]]
 cgroup-subsys-state
 
@@ -96,13 +85,9 @@ struct css_set {    struct kref ref;    struct list_head list;  
 下面介绍一下 `css_set` 结构体各个字段的作用：
 
 1. `ref`: 引用计数器，用于计算有多少个进程在使用此 `css_set`。
-    
 2. `list`: 用于连接所有 `css_set`。
-    
 3. `tasks`: 由于可能存在多个进程同时受到相同的 `cgroup` 控制，所以用此字段把所有使用此 `css_set` 的进程连接起来。
-    
 4. `subsys`: 用于收集各种 `子系统` 的统计信息结构。
-    
 
 进程描述符 `task_struct` 有两个字段与此相关，如下：
 
@@ -114,9 +99,6 @@ struct task_struct {    ...    struct css_set *cgroups;    struc
 
 `task_struct` 结构与 `css_set` 结构的关系如下图：
 ![[Pasted image 20240920125058.png]]
-
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cgroup-task-cssset
 
@@ -133,23 +115,16 @@ struct cgroup_subsys {    struct cgroup_subsys_state *(*create)(struct 
 除了函数指针外，`cgroup_subsys` 结构还包含了很多字段，下面说明一下各个字段的作用：
 
 1. `subsys_id`: 表示了子系统的ID。
-    
 2. `active`: 表示子系统是否被激活。
-    
 3. `disabled`: 子系统是否被禁止。
-    
 4. `name`: 子系统名称。
-    
 5. `root`: 被附加到的层级挂载点。
-    
 6. `sibling`: 用于连接被附加到同一个层级的所有子系统。
-    
 7. `private`: 私有数据。
-    
 
 `内存子系统` 定义了一个名为 `mem_cgroup_subsys` 的 `cgroup_subsys` 结构，如下：
 
-```
+```c
 struct cgroup_subsys mem_cgroup_subsys = {    .name = "memory",    .subsys_id = mem_cgroup_subsys_id,    .create = mem_cgroup_create,    .pre_destroy = mem_cgroup_pre_destroy,    .destroy = mem_cgroup_destroy,    .populate = mem_cgroup_populate,    .attach = mem_cgroup_move_task,    .early_init = 0,};
 ```
 

@@ -1,7 +1,6 @@
-
 Golang技术分享
 
- _2022年01月05日 08:01_
+_2022年01月05日 08:01_
 
 编者荐语：
 
@@ -9,7 +8,7 @@ Golang技术分享
 
 以下文章来源于网管叨bi叨 ，作者KevinYan11
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7xEq7qxG9ickUKJd2MD9A9sEe6YhvCFeZd8jImnffzq9g/0)
 
@@ -17,7 +16,7 @@ Golang技术分享
 
 分享软件开发和系统架构设计基础、Go 语言和Kubernetes。
 
-](https://mp.weixin.qq.com/s?__biz=MzkyMzIyNjIxMQ==&mid=2247485793&idx=1&sn=c467fff326f420f4c357baf123fcc97f&chksm=c1e9106df69e997be3d14f2b9d6e89f02c747027d6d1316ae437d8f9e42b92db68cf23b84944&mpshare=1&scene=24&srcid=0105UdOLeSnNHtU5MfC8vmkO&sharer_sharetime=1641361923434&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0644ef99587dcfd3587d5d251c743309e4bc4aa1310dd8c8a3ce8edaf223a3117d1747413d31208c51140c02a4d279de1a2978f563782c02f7618ffe5414013638f5ac10c47455332a747292fadc198a8f94c2764f4a4f43d28984eb5b54fd67f7a1285d415e000bb5ecb2ec59c173770879581d6f306d229&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQI7ntgCKtyHhlkWCkQMuA0hLmAQIE97dBBAEAAAAAAJzVLGitgP0AAAAOpnltbLcz9gKNyK89dVj0%2BCH0Q1yq2ipcI1Pysbtvje4SNuB%2B3d7biDEmrUjK7hnYKuoU8H2S%2BiY93VTiYe7jjEsag%2BphoTBIJodSYFLTDqJ2yGkMH6LvI9ze5JaManF1fzkoj%2FJQA%2FMrMicyqpg0%2Fz9%2FUvVc%2FO4pdHd%2FVyP8yCAdcrkO%2F3RXVtnC7VuKHpPWbG4DOORT2ppx4DRej%2BoMP4m%2FnHg3VYcM8HViUtLIjqV0GnOQ3BOqaJjzd%2ByccGFyNBoTXJc7SFa6Eun%2FXAX4&acctmode=0&pass_ticket=Gq40St6FppqHckohUpl5IAx%2F1RtKy4OgI%2FZ1KOFnrl0LiuVcdurHh8r5PD3RUcde&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMzIyNjIxMQ==&mid=2247485793&idx=1&sn=c467fff326f420f4c357baf123fcc97f&chksm=c1e9106df69e997be3d14f2b9d6e89f02c747027d6d1316ae437d8f9e42b92db68cf23b84944&mpshare=1&scene=24&srcid=0105UdOLeSnNHtU5MfC8vmkO&sharer_sharetime=1641361923434&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0644ef99587dcfd3587d5d251c743309e4bc4aa1310dd8c8a3ce8edaf223a3117d1747413d31208c51140c02a4d279de1a2978f563782c02f7618ffe5414013638f5ac10c47455332a747292fadc198a8f94c2764f4a4f43d28984eb5b54fd67f7a1285d415e000bb5ecb2ec59c173770879581d6f306d229&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQI7ntgCKtyHhlkWCkQMuA0hLmAQIE97dBBAEAAAAAAJzVLGitgP0AAAAOpnltbLcz9gKNyK89dVj0%2BCH0Q1yq2ipcI1Pysbtvje4SNuB%2B3d7biDEmrUjK7hnYKuoU8H2S%2BiY93VTiYe7jjEsag%2BphoTBIJodSYFLTDqJ2yGkMH6LvI9ze5JaManF1fzkoj%2FJQA%2FMrMicyqpg0%2Fz9%2FUvVc%2FO4pdHd%2FVyP8yCAdcrkO%2F3RXVtnC7VuKHpPWbG4DOORT2ppx4DRej%2BoMP4m%2FnHg3VYcM8HViUtLIjqV0GnOQ3BOqaJjzd%2ByccGFyNBoTXJc7SFa6Eun%2FXAX4&acctmode=0&pass_ticket=Gq40St6FppqHckohUpl5IAx%2F1RtKy4OgI%2FZ1KOFnrl0LiuVcdurHh8r5PD3RUcde&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 今天来聊一个平时用的不多，但是很多框架或者基础库会用到的语言特性--反射，反射并不是`Go`语言独有的能力，其他编程语言都有。这篇文章的目标是简单地给大家梳理一下反射的应用场景和使用方法。
 
@@ -57,11 +56,11 @@ Golang技术分享
 
 现在我们的目标是，改造`createQuery`函数，让它能接受任何结构作为参数并基于结构字段创建`INSERT` 语句。比如如果传给`createQuery`的参数不再是`order`类型的结构体，而是`employee`类型的结构体时
 
- `e := employee {           name: "Naveen",           id: 565,           address: "Science Park Road, Singapore",           salary: 90000,           country: "Singapore",       }`
+`e := employee {           name: "Naveen",           id: 565,           address: "Science Park Road, Singapore",           salary: 90000,           country: "Singapore",       }`
 
 那它应该返回的`INSERT`语句应该是
 
-`INSERT INTO employee (name, id, address, salary, country)    VALUES("Naveen", 565, "Science Park Road, Singapore", 90000, "Singapore")`  
+`INSERT INTO employee (name, id, address, salary, country)    VALUES("Naveen", 565, "Science Park Road, Singapore", 90000, "Singapore")`
 
 由于`createQuery` 函数要适用于任何结构体，因此它需要一个 `interface{}`类型的参数。为了说明问题，简单起见，我们假定`createQuery`函数只处理包含`string` 和 `int` 类型字段的结构体。
 
@@ -83,7 +82,7 @@ Golang技术分享
 
 上面的程序会输出：
 
-`Type  main.order     Value  {456 56}` 
+`Type  main.order     Value  {456 56}`
 
 上面的程序里`createQuery`函数接收一个`interface{}`类型的实参，然后把实参传给了`reflect.Typeof`和`reflect.Valueof` 函数的调用。从输出，我们可以看到程序输出了`interface{}`类型实参对应的底层具体类型和值。
 
@@ -92,11 +91,10 @@ Golang技术分享
 这里插播一下反射的三法则，他们是：
 
 1. 从接口值可以反射出反射对象。
-    
-2. 从反射对象可反射出接口值。
-    
-3. 要修改反射对象，其值必须可设置。
-    
+
+1. 从反射对象可反射出接口值。
+
+1. 要修改反射对象，其值必须可设置。
 
 反射的第一条法则是，我们能够吧`Go`中的接口类型变量转换成反射对象，上面提到的`reflect.TypeOf`和 `reflect.ValueOf` 就是完成的这种转换。第二条指的是我们能把反射类型的变量再转换回到接口类型，最后一条则是与反射值是否可以被更改有关。三法则详细的说明可以去看看德莱文大神写的文章 [Go反射的实现原理](https://mp.weixin.qq.com/s?__biz=MzU5NTAzNjc3Mg==&mid=2247483962&idx=1&sn=e13df5c5e016215302205f5ec8fbb857&scene=21#wechat_redirect)，文章开头就有对三法则说明的图解，再次膜拜。
 
@@ -112,7 +110,7 @@ Golang技术分享
 
 上面的程序会输出
 
-`Type  main.order     Kind  struct`  
+`Type  main.order     Kind  struct`
 
 通过输出让我们清楚了两者之间的区别。`reflect.Type` 表示接口的实际类型，即本例中`main.order` 而`Kind`表示类型的所属的种类，即`main.order`是一个「struct」类型，类似的类型`map[string]string`的Kind就该是「map」。
 
@@ -154,7 +152,7 @@ Golang技术分享
 
 同学们可以把代码拿到本地运行一下，上面的例子会根据传递给函数不同的结构体实参，输出对应的标准`SQL`插入语句
 
-`INSERT INTO order (ordId, customerId); VALUES (456, 56);    INSERT INTO employee (name, id, address, salary, country); VALUES ('Naveen', 565, 'Coimbatore', 90000, 'India');` 
+`INSERT INTO order (ordId, customerId); VALUES (456, 56);    INSERT INTO employee (name, id, address, salary, country); VALUES ('Naveen', 565, 'Coimbatore', 90000, 'India');`
 
 ## 总结
 

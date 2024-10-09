@@ -1,4 +1,5 @@
 Original RiemannChow 老周聊架构  _2022年03月21日 18:20_
+
 ## 一、前言
 
 最近有很多读者要我出一些面试题的文章，一般我会给他一个老周整理的电子书，但有些读者反馈回来的面试题我觉得还是蛮经典的，而老周又在写系列的文章，本着对读者负责的态度，我会穿插写几篇我认为比较经典的面试题，让大家对这种经典问题不再是背八股文，而是深入底层原理以及数据结构。后续再碰到这类问题，不管哪个公司问的，你都会得心应手、从容不迫的回答。
@@ -77,7 +78,6 @@ MySQL 中实现索引的方式主要有两种：BTREE 和 HASH，具体和表的
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQ5FNibrpaft2Lgec9icn7ZcibGtB32Az8UzmvLr2mM0tPCulxqTU0ZLJcw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
 从上图不难发现，user_id2 和 user_id3 经过哈希函数计算出来的值都是 4，这就是哈希冲突，但没有关系，后面会拉出一个链表出来。当你要查询 user_id2 姓名的时候，先经过哈希函数得到 4，再按顺序遍历，找到 name2 。
 
 这里要提一下这个点，user_idn 的值并不是递增的，这样有个好处，新增用户的时候会很快，只需要往后追加；但也有缺点，因为不是有序的，所以哈希索引做区间查询的速度是很慢的。
@@ -86,12 +86,11 @@ MySQL 中实现索引的方式主要有两种：BTREE 和 HASH，具体和表的
 
 ### 4.2 有序数组
 
-上面的哈希表不适合范围查询，而有序数组在等值查询和范围查询场景中的性能就都非常优秀。  
+上面的哈希表不适合范围查询，而有序数组在等值查询和范围查询场景中的性能就都非常优秀。
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQiaVMAA49Ha4ibyuibmAdjSdua8TT209183vCyQzWm2BG7gt78Q0zb1iccQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
-我们来分别看看有序数组针对等值查询与范围查询的时间复杂度，等值查询比如你要查 user_id2 对应的名字，用二分法就可以快速得到，这个时间复杂度是 O(log(N))。范围查询比如你要查询 [user_id2, user_id5] 之间的用户，同样利用二分查找先找到 user_id2（如果不存在 user_id2，就找到大于 user_id2 的第一个用户），然后向右遍历，直到查到第一个大于 user_id5，退出循环。
+我们来分别看看有序数组针对等值查询与范围查询的时间复杂度，等值查询比如你要查 user_id2 对应的名字，用二分法就可以快速得到，这个时间复杂度是 O(log(N))。范围查询比如你要查询 \[user_id2, user_id5\] 之间的用户，同样利用二分查找先找到 user_id2（如果不存在 user_id2，就找到大于 user_id2 的第一个用户），然后向右遍历，直到查到第一个大于 user_id5，退出循环。
 
 查询场景确实很优秀，但有序数组也有缺点，更新数据的时候那就有点麻烦了，比如你往中间插入一条用户，该用户后面所有的记录都要往后移动，成本太高了。
 
@@ -104,20 +103,17 @@ MySQL 中实现索引的方式主要有两种：BTREE 和 HASH，具体和表的
 我们先来看下二叉树的特点：
 
 - 二叉树的平均时间复杂度为 O(log(N))
-    
+
 - 每个节点最多只能有两个子节点
-    
 
 一般二叉树：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQurwfEibXKfzScKhzN1W4XvdJzLS0ff6rQfdAzrxIa0FNLkEHyvxNmrw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
-最坏情形的二叉树，出现链化的情况：  
+最坏情形的二叉树，出现链化的情况：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQ3J8Gs5KHHUmAHE16fPQIed6zCVR5orfT0QcYOAXXU2A9RXggUh4rHA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
 实现：
 
 因为一个二叉树节点最多有两个子节点，所以我们可以保存直接链接到它们的链。树节点的声明在结构上类似于双链表的声明，在声明中，节点就是由 element（元素）的信息加上两个到其它节点的引用（left 和 right）组成的结构。如下：
@@ -139,17 +135,15 @@ BinaryNode right; // Right child
 我们先来看下二叉查找树的特点：
 
 - 二叉查找树的平均时间复杂度为 O(log(N))
-    
+
 - 每个节点最多只能有两个子节点
-    
+
 - 左子节点的值小于本节点的值，右子节点的值大于本节点的值。
-    
 
 我们来看下如下结构：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQlxoVN50qxFn0GkpcMTKhQYpUd9NqEKV0nVBYRVMWNPO1ly6ibh7YrZw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
 根据二叉查找树的特点，我们很快就能知道，最左边的图是二叉查找树；中间的树则不是，因为在为 6 的根节点左边出现了一个为 7 的节点，不满足二叉树第三点的特性；右边的树则是链化的二叉查找树。
 
 实现：
@@ -181,18 +175,16 @@ this.right = rt;
 我们先来看下平衡二叉查找树的特点：
 
 - 二叉查找树的平均时间复杂度为 O(log(N))
-    
+
 - 每个节点最多只能有两个子节点
-    
+
 - 每个节点的左右子树高度差不超过 1
-    
 
 我们来看下如下结构：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQymqTdnmb9ESw2CtFFRPbSuOfO8A7EQbIuwXbgwD6BANeJc1YYSEr3g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
-左边的是 AVL 树，它的任何节点的两个子树的高度差别都 <=1；而右边的不是AVL树，因为 7 的两棵子树的高度相差为 2（以 2 为根节点的树的高度是 3，而以 8 为根节点的树的高度是 1）。
+左边的是 AVL 树，它的任何节点的两个子树的高度差别都 \<=1；而右边的不是AVL树，因为 7 的两棵子树的高度相差为 2（以 2 为根节点的树的高度是 3，而以 8 为根节点的树的高度是 1）。
 
 实现：
 
@@ -217,19 +209,17 @@ AVLTreeNode(T t) {            this(t, null, null);       
 BTree 是平衡搜索多叉树，设树的度为2d（d>1），高度为 h，那么 BTree 要满足以下条件：
 
 - 每个叶子节点的高度一样，等于 h。
-    
-- 每个非叶子节点由 n-1 个 key 和 n 个指针 point 组成，其中 d<=n<=2d，key 和 point 相互间隔，节点两端一定是 key。
-    
+
+- 每个非叶子节点由 n-1 个 key 和 n 个指针 point 组成，其中 d\<=n\<=2d，key 和 point 相互间隔，节点两端一定是 key。
+
 - 叶子节点指针都为 null
-    
-- 非叶子节点都是 [key，data] 二元组，其中 key 表示作为索引的键，data 为键值所在行的数据。
-    
+
+- 非叶子节点都是 \[key，data\] 二元组，其中 key 表示作为索引的键，data 为键值所在行的数据。
 
 BTree 结构如下：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQc4VaUN8b5vMpnG32NZEWk4sHstq4evniaibiaTQicVDtIKEePJQIMuVKFA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
 BTree 可以使用二分查找的查找方式，查找复杂度为 h * O(log(N))，一般来说树的高度是很小的，一般为 3 左右，因此 BTree 是一个非常高效的查找结构。
 
 ### 4.7 B+Tree
@@ -237,13 +227,12 @@ BTree 可以使用二分查找的查找方式，查找复杂度为 h * O(log(N))
 B+Tree 是 BTree 的一个变种，设 d 为树的度数，h 为树的高度，B+Tree 和 BTree 的不同主要在于：
 
 - B+Tree 中的非叶子结点不存储数据，只存储键值。
-    
-- B+Tree 的叶子节点没有指针，所有键值都会出现在叶子节点上，且 key 存储的键值对应 data 数据的物理地址。
-    
-- B+Tree 的每个非叶子节点由 n 个键值 key 和 n 个指针 point 组成
-    
 
-B+Tree 的结构如下：  
+- B+Tree 的叶子节点没有指针，所有键值都会出现在叶子节点上，且 key 存储的键值对应 data 数据的物理地址。
+
+- B+Tree 的每个非叶子节点由 n 个键值 key 和 n 个指针 point 组成
+
+B+Tree 的结构如下：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQNBVGn20kGkKVyryELDWDcAn0n4YCNgBNH2ClZzCt6ZmCNc5ERESGjw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
@@ -253,7 +242,6 @@ B+Tree 的结构如下：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQMDhrS3gics04QeExl90ZZsrva0L7Kr4p8V0qyXdzaGc2vK3r1Zfrw4A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
 如上图所示，在 B+Tree 的每个叶子节点增加一个指向相邻叶子节点的指针，就形成了带有顺序访问指针的 B+Tree。做这个优化的目的是为了提高区间访问的性能，如果要查询 key 为从 18 到 49 的所有数据记录，当找到 18 后，只需顺着节点和指针顺序遍历就可以一次性访问到所有数据节点，极大提到了区间查询效率。
 
 ## 五、MySQL 为什么使用 B+Tree
@@ -262,11 +250,10 @@ B+Tree 的结构如下：
 
 ### 5.1 磁盘 IO 与预读
 
-上面说到了访问磁盘，那么这里先简单介绍一下磁盘 IO 和预读，磁盘读取数据靠的是机械运动，每次读取数据花费的时间可以分为寻道时间、旋转延迟、传输时间三个部分，寻道时间指的是磁臂移动到指定磁道所需要的时间，主流磁盘一般在 5ms 以下；旋转延迟就是我们经常听说的磁盘转速，比如一个磁盘 7200 转，表示每分钟能转 7200 次，也就是说 1 秒钟能转 120 次，旋转延迟就是1/120/2 = 4.17ms；传输时间指的是从磁盘读出或将数据写入磁盘的时间，一般在零点几毫秒，相对于前两个时间可以忽略不计。那么访问一次磁盘的时间，即一次磁盘 IO 的时间约等于 5+4.17 = 9ms 左右，听起来还挺不错的，但要知道一台 500 -MIPS 的机器每秒可以执行 5 亿条指令，因为指令依靠的是电的性质，换句话说执行一次 IO 的时间可以执行 40 万条指令，数据库动辄十万百万乃至千万级数据，每次 9 毫秒的时间，显然是个灾难。下图是计算机硬件延迟的对比图，供大家参考：  
+上面说到了访问磁盘，那么这里先简单介绍一下磁盘 IO 和预读，磁盘读取数据靠的是机械运动，每次读取数据花费的时间可以分为寻道时间、旋转延迟、传输时间三个部分，寻道时间指的是磁臂移动到指定磁道所需要的时间，主流磁盘一般在 5ms 以下；旋转延迟就是我们经常听说的磁盘转速，比如一个磁盘 7200 转，表示每分钟能转 7200 次，也就是说 1 秒钟能转 120 次，旋转延迟就是1/120/2 = 4.17ms；传输时间指的是从磁盘读出或将数据写入磁盘的时间，一般在零点几毫秒，相对于前两个时间可以忽略不计。那么访问一次磁盘的时间，即一次磁盘 IO 的时间约等于 5+4.17 = 9ms 左右，听起来还挺不错的，但要知道一台 500 -MIPS 的机器每秒可以执行 5 亿条指令，因为指令依靠的是电的性质，换句话说执行一次 IO 的时间可以执行 40 万条指令，数据库动辄十万百万乃至千万级数据，每次 9 毫秒的时间，显然是个灾难。下图是计算机硬件延迟的对比图，供大家参考：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQWxKsKAcboAaUibicNWBPXqEVHB0pOAjvGR5FYGRM9p3xiaib85znWL2kSg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
 考虑到磁盘 IO 是非常高昂的操作，计算机操作系统做了一些优化，当一次 IO 时，不光把当前磁盘地址的数据，而是把相邻的数据也都读取到内存缓冲区内，因为局部预读性原理告诉我们，当计算机访问一个地址的数据的时候，与其相邻的数据也会很快被访问到。每一次 IO 读取的数据我们称之为一页（page）。具体一页有多大数据跟操作系统有关，一般为 4k 或 8k，也就是我们读取一页内的数据时候，实际上才发生了一次 IO，这个理论对于索引的数据结构设计非常有帮助。
 
 ### 5.2 B-/+ Tree索引的性能分析
@@ -321,8 +308,6 @@ MyISAM 的索引方式也叫做“非聚集”的，之所以这么称呼是为�
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qJsEtic2EMiasxzVhLYQmMgcQe1exouM77R8icianXCHqzW9TliaqMD2GBketXTwRGnmqHrAMiaZNAVfJ1g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "> 这里是引用")
 
-  
-
 这里以英文字符的 ASCII 码作为比较准则。聚集索引这种实现方式使得按主键的搜索十分高效，但是辅助索引搜索需要检索两遍索引：首先检索辅助索引获得主键，然后用主键到主索引中检索获得记录。
 
 ### 6.3 问题
@@ -334,11 +319,11 @@ MyISAM 的索引方式也叫做“非聚集”的，之所以这么称呼是为�
 ### 6.4 MyISAM 与 InnoDB 对比
 
 - InnoDB 支持事务，MyISAM 不支持事务。这是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一。
-    
+
 - InnoDB 支持外键，而 MyISAM 不支持。对一个包含外键的 InnoDB 表转为 MYISAM 会失败。
-    
+
 - InnoDB 是聚集索引，MyISAM 是非聚集索引。聚簇索引的文件存放在主键索引的叶子节点上，因此 InnoDB 必须要有主键，通过主键索引效率很高。但是辅助索引需要两次查询，先查询到主键，然后再通过主键查询到数据。因此，主键不应该过大，因为主键太大，其他索引也都会很大。而 MyISAM 是非聚集索引，数据文件是分离的，索引保存的是数据文件的指针。主键索引和辅助索引是独立的。
-    
-- InnoDB 不保存表的具体行数，执行 select count(*) from table 时需要全表扫描。而 MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快。
-    
+
+- InnoDB 不保存表的具体行数，执行 select count(\*) from table 时需要全表扫描。而 MyISAM 用一个变量保存了整个表的行数，执行上述语句时只需要读出该变量即可，速度很快。
+
 - InnoDB 最小的锁粒度是行锁，MyISAM 最小的锁粒度是表锁。一个更新语句会锁住整张表，导致其他查询和更新都会被阻塞，因此并发访问受限。这也是 MySQL 将默认存储引擎从 MyISAM 变成 InnoDB 的重要原因之一。

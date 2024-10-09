@@ -1,6 +1,5 @@
-
 阿里巴巴技术质量 阿里云开发者
- _2024年04月18日 08:31_ _浙江_
+_2024年04月18日 08:31_ _浙江_
 
 阿里妹导读
 
@@ -56,9 +55,9 @@ netstat-an|grep TIME_WAIT|wc -l查看连接数等待time_wait状态连接数。
 
 **为什么会TIME-WAIT过多？解决方法是怎样的？**
 
-**可能原因：**高并发短连接的TCP服务器上，当服务器处理完请求后立刻按照主动正常关闭连接。
+\*\*可能原因：\*\*高并发短连接的TCP服务器上，当服务器处理完请求后立刻按照主动正常关闭连接。
 
-**解决：**负载均衡服务器；Web服务器首先关闭来自负载均衡服务器的连接。
+\*\*解决：\*\*负载均衡服务器；Web服务器首先关闭来自负载均衡服务器的连接。
 
 #### 1、OSI与TCP/IP模型
 
@@ -79,24 +78,25 @@ TCP/IP五层：物理层、数据链路层、网络层、传输层、应用层
 物理层：中继器、集线器
 
 #### 3、TCP与UDP区别及场景
-![[Pasted image 20241003144941.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**基于UDP的协议：**RIP、DNS、SNMP
+!\[\[Pasted image 20241003144941.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**基于TCP的协议：**HTTP、FTP、SMTP
+\*\*基于UDP的协议：\*\*RIP、DNS、SNMP
+
+\*\*基于TCP的协议：\*\*HTTP、FTP、SMTP
 
 #### 4、TCP滑动窗口，拥塞控制
 
-**TCP通过：**应用数据分割、对数据包进行编号、校验和、流量控制、拥塞控制、超时重传等措施保证数据的可靠传输；
+\*\*TCP通过：\*\*应用数据分割、对数据包进行编号、校验和、流量控制、拥塞控制、超时重传等措施保证数据的可靠传输；
 
-**拥塞控制目的：**为了防止过多的数据注入到网络中，避免网络中的路由器、链路过载。
+\*\*拥塞控制目的：\*\*为了防止过多的数据注入到网络中，避免网络中的路由器、链路过载。
 
-**拥塞控制过程：**TCP维护一个拥塞窗口，该窗口随着网络拥塞程度动态变化，通过慢开始、拥塞避免等算法减少网络拥塞的发生。
+\*\*拥塞控制过程：\*\*TCP维护一个拥塞窗口，该窗口随着网络拥塞程度动态变化，通过慢开始、拥塞避免等算法减少网络拥塞的发生。
 
 #### 5、TCP粘包原因和解决方法
 
-**TCP粘包是指：**发送方发送的若干包数据到接收方接收时粘成一包。
+\*\*TCP粘包是指：\*\*发送方发送的若干包数据到接收方接收时粘成一包。
 
 **发送方原因：**
 
@@ -113,17 +113,16 @@ TCP将接收到的数据包保存在接收缓存里，如果TCP接收数据包�
 最本质原因在与接收对等方无法分辨消息与消息之间的边界在哪，通过使用某种方案给出边界，例如：
 
 - 发送定长包。每个消息的大小都是一样的，接收方只要累计接收数据，直到数据等于一个定长的数值就将它作为一个消息。
-    
-- 包尾加上\r\n标记。FTP协议正是这么做的。但问题在于如果数据正文中也含有\r\n，则会误判为消息的边界。
-    
+
+- 包尾加上\\r\\n标记。FTP协议正是这么做的。但问题在于如果数据正文中也含有\\r\\n，则会误判为消息的边界。
+
 - 包头加上包体长度。包头是定长的4个字节，说明了包体的长度。接收对等方先接收包体长度，依据包体长度来接收包体。
-    
 
 #### 6、TCP、UDP报文格式
 
 **TCP报文格式：**
-![[Pasted image 20241003144949.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241003144949.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **源端口号和目的端口号：**
 
@@ -143,13 +142,13 @@ TCP将接收到的数据包保存在接收缓存里，如果TCP接收数据包�
 
 首部长度给出首部中32 bit字的数目。需要这个值是因为任选字段的长度是可变的。这个字段占4 bit，因此TCP最多有60字节的首部。然而，没有任选字段，正常的长度是20字节。
 
-**标志字段：**在TCP首部中有6个标志比特。它们中的多个可同时被设置为1.
+\*\*标志字段：\*\*在TCP首部中有6个标志比特。它们中的多个可同时被设置为1.
 
-URG紧急指针（u rgent pointer）有效  
-ACK确认序号有效  
-PSH接收方应该尽快将这个报文段交给应用层  
-RST重建连接  
-SYN同步序号用来发起一个连接。这个标志和下一个标志将在第18章介绍  
+URG紧急指针（u rgent pointer）有效\
+ACK确认序号有效\
+PSH接收方应该尽快将这个报文段交给应用层\
+RST重建连接\
+SYN同步序号用来发起一个连接。这个标志和下一个标志将在第18章介绍\
 FIN发端完成发送任务
 
 **窗口大小：**
@@ -169,8 +168,8 @@ TCP的流量控制由连接的每一端通过声明的窗口大小来提供。�
 最常见的可选字段是最长报文大小，又称为MSS(Maximum Segment Size)。每个连接方通常都在通信的第一个报文段（为建立连接而设置SYN标志的那个段）中指明这个选项。它指明本端所能接收的最大长度的报文段。
 
 **UDP报文格式：**
-![[Pasted image 20241003145005.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241003145005.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **端口号：**
 
@@ -184,9 +183,9 @@ UDP长度字段指的是UDP首部和UDP数据的字节长度。该字段的最�
 
 UDP检验和是一个端到端的检验和。它由发送端计算，然后由接收端验证。其目的是为了发现UDP首部和数据在发送端到接收端之间发生的任何改动。
 
-**IP报文格式：**普通的IP首部长为20个字节，除非含有可选项字段。
-![[Pasted image 20241003145010.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+\*\*IP报文格式：\*\*普通的IP首部长为20个字节，除非含有可选项字段。
+!\[\[Pasted image 20241003145010.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **4位版本：**
 
@@ -217,8 +216,8 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 首部检验和字段是根据IP首部计算的检验和码。它不对首部后面的数据进行计算。ICMP、IGMP、UDP和TCP在它们各自的首部中均含有同时覆盖首部和数据检验和码。
 
 **以太网报文格式：**
-![[Pasted image 20241003145017.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241003145017.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **目的地址和源地址：**
 
@@ -228,38 +227,36 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 
 以太网帧中的数据长度规定最小46字节，最大1500字节，ARP和RARP数据包的长度不够46字节，要在后面补填充位。最大值1500称为以太网的最大传输单元（MTU），不同的网络类型有不同的MTU，如果一个数据包从以太网路由到拨号链路上，数据包度大于拨号链路的MTU了，则需要对数据包进行分片fragmentation）。ifconfig命令的输出中也有“MTU:1500”。注意，MTU个概念指数据帧中有效载荷的最大长度，不包括帧首部的长度。
 
-  
-
 **HTTP协议**
 
 #### 1、HTTP协议1.0_1.1_2.0
 
-**HTTP1.0：**服务器处理完成后立即断开TCP连接**（无连接）**，服务器不跟踪每个客户端也不记录过去的请求**（无状态）；**
+**HTTP1.0：**服务器处理完成后立即断开TCP连接**（无连接）**，服务器不跟踪每个客户端也不记录过去的请求\*\*（无状态）；\*\*
 
-**HTTP1.1：**KeepAlived**长连接**避免了连接建立和释放的开销；通过Content-Length来判断当前请求数据是否已经全部接受**（有状态）；**
+**HTTP1.1：**KeepAlived**长连接**避免了连接建立和释放的开销；通过Content-Length来判断当前请求数据是否已经全部接受\*\*（有状态）；\*\*
 
-**HTTP2.0：**引入二进制数据帧和流的概念，其中帧对数据进行顺序标识；因为有了序列，服务器可以并行的传输数据。
+\*\*HTTP2.0：\*\*引入二进制数据帧和流的概念，其中帧对数据进行顺序标识；因为有了序列，服务器可以并行的传输数据。
 
 **http1.0和http1.1的主要区别如下：**
 
-1、缓存处理：1.1添加更多的缓存控制策略（如：Entity tag，If-Match）；  
-2、网络连接的优化：1.1支持断点续传；  
-3、错误状态码的增多：1.1新增了24个错误状态响应码，丰富的错误码更加明确各个状态；  
-4、Host头处理：支持Host头域，不在以IP为请求方标志；  
+1、缓存处理：1.1添加更多的缓存控制策略（如：Entity tag，If-Match）；\
+2、网络连接的优化：1.1支持断点续传；\
+3、错误状态码的增多：1.1新增了24个错误状态响应码，丰富的错误码更加明确各个状态；\
+4、Host头处理：支持Host头域，不在以IP为请求方标志；\
 5、长连接：减少了建立和关闭连接的消耗和延迟。
 
 **http1.1和http2.0的主要区别：**
 
-1、新的传输格式：2.0使用二进制格式，1.0依然使用基于文本格式；  
-2、多路复用：连接共享，不同的request可以使用同一个连接传输（最后根据每个request上的id号组合成正常的请求）；  
-3、header压缩：由于1.X中header带有大量的信息，并且得重复传输，2.0使用encoder来减少需要传输的hearder大小；  
+1、新的传输格式：2.0使用二进制格式，1.0依然使用基于文本格式；\
+2、多路复用：连接共享，不同的request可以使用同一个连接传输（最后根据每个request上的id号组合成正常的请求）；\
+3、header压缩：由于1.X中header带有大量的信息，并且得重复传输，2.0使用encoder来减少需要传输的hearder大小；\
 4、服务端推送：同google的SPDUY（1.0的一种升级）一样；
 
 #### 2、HTTP与HTTPS之间的区别
 
 **HTTP与HTTPS之间的区别：**
-![[Pasted image 20241003145025.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241003145025.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **HTTPS链接建立的过程：**
 
@@ -284,12 +281,12 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 #### 3、Get和Post请求区别
 
 **HTTP请求：**
-![[Pasted image 20241003145030.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241003145030.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **get和Post区别：**
-![[Pasted image 20241003145035.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241003145035.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 4、HTTP常见响应状态码
 
@@ -339,25 +336,21 @@ cookie不是很安全，别人可以分析存放在本地的COOKIE并进行欺�
 
 Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务端记录⽤户的状态
 
-  
-
 **浏览器输入URL过程**
 
-**过程：**DNS解析、TCP连接、发送HTTP请求、服务器处理请求并返回HTTP报文、浏览器渲染、结束。
-![[Pasted image 20241003145043.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+\*\*过程：\*\*DNS解析、TCP连接、发送HTTP请求、服务器处理请求并返回HTTP报文、浏览器渲染、结束。
+!\[\[Pasted image 20241003145043.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 操作系统基础
 
-  
-
 **进程和线程的区别**
 
-**进程：**是资源分配的最小单位，一个进程可以有多个线程，多个线程共享进程的堆和方法区资源，不共享栈、程序计数器。
+\*\*进程：\*\*是资源分配的最小单位，一个进程可以有多个线程，多个线程共享进程的堆和方法区资源，不共享栈、程序计数器。
 
-**线程：**是任务调度和执行的最小单位，线程并行执行存在资源竞争和上下文切换的问题。
+\*\*线程：\*\*是任务调度和执行的最小单位，线程并行执行存在资源竞争和上下文切换的问题。
 
-**协程：**是一种比线程更加轻量级的存在，正如一个进程可以拥有多个线程一样，一个线程可以拥有多个协程。
+\*\*协程：\*\*是一种比线程更加轻量级的存在，正如一个进程可以拥有多个线程一样，一个线程可以拥有多个协程。
 
 #### 1、进程间通信方式IPC
 
@@ -376,9 +369,8 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 **共享内存(share memory)：**
 
 - 使得多个进程可以可以直接读写同一块内存空间，是最快的可用IPC形式。是针对其他通信机制运行效率较低而设计的。
-    
+
 - 由于多个进程共享一段内存，因此需要依靠某种同步机制（如信号量）来达到进程间的同步及互斥。
-    
 
 **信号量(Semaphores)：**
 
@@ -390,9 +382,9 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 
 #### 2、用户态和核心态
 
-**用户态：**只能受限的访问内存，运行所有的应用程序。
+\*\*用户态：\*\*只能受限的访问内存，运行所有的应用程序。
 
-**核心态：**运行操作系统程序，cpu可以访问内存的所有数据，包括外围设备。
+\*\*核心态：\*\*运行操作系统程序，cpu可以访问内存的所有数据，包括外围设备。
 
 **为什么要有用户态和内核态：**
 
@@ -424,11 +416,9 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 
 **线程共享堆区、静态区**
 
-  
-
 **操作系统内存管理**
 
-**存管理方式：**页式管理、段式管理、段页式管理
+\*\*存管理方式：\*\*页式管理、段式管理、段页式管理
 
 **分段管理：**
 
@@ -444,7 +434,7 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 
 #### 1、页面置换算法FIFO、LRU
 
-**置换算法：**先进先出FIFO、最近最久未使用LRU、最佳置换算法OPT。
+\*\*置换算法：\*\*先进先出FIFO、最近最久未使用LRU、最佳置换算法OPT。
 
 **先进先出FIFO:**
 
@@ -484,8 +474,6 @@ public class LRUCache {
 /**
 ```
 
-  
-
 **最佳置换算法OPT:**
 
 原理：每次选择当前物理块中的页面在未来长时间不被访问的或未来不再使用的页面进行淘汰。
@@ -508,7 +496,7 @@ public class LRUCache {
 
 循环等待条件：系统中若干进程组成环路，环路中每个进程都在等待相邻进程占用的资源。
 
-**解决方法：**破坏死锁的任意一条件。
+\*\*解决方法：\*\*破坏死锁的任意一条件。
 
 乐观锁，破坏资源互斥条件，**CAS。**
 
@@ -520,8 +508,8 @@ public class LRUCache {
 
 总结
 
-在面试中，对于网络部分，应对TCP协议、OSI网络模型、网络服务分组有明确的理解。重点理解滑动窗口和拥塞控制的实现方式，并能结合实际情况进行详细阐述。尤其注意TCP连接建立的三次握手和断开的四次挥手过程中的细节以及他们背后的原理。  
-  
+在面试中，对于网络部分，应对TCP协议、OSI网络模型、网络服务分组有明确的理解。重点理解滑动窗口和拥塞控制的实现方式，并能结合实际情况进行详细阐述。尤其注意TCP连接建立的三次握手和断开的四次挥手过程中的细节以及他们背后的原理。
+
 对于操作系统部分，需要理解进程和线程之间的差别，以及它们在操作系统中是如何进行通信和管理的。掌握常见的Linux操作命令，并熟悉利用他们处理如CPU使用率过高、内存溢出和进程死锁等线上问题。另外在页面置换算法中，LRU（最近最久未使用）算法是一个笔试中的重点，需要熟练掌握。
 
 【这些年背过的面试题】系列文章欢迎**点击阅读原文**查看合集！
@@ -537,37 +525,36 @@ public class LRUCache {
 **留言 4**
 
 - 4ever
-    
-    山东4月18日
-    
-    赞4
-    
-    多发点这种实用的
-    
+
+  山东4月18日
+
+  赞4
+
+  多发点这种实用的
+
 - mofangxiaowu
-    
-    河南4月20日
-    
-    赞
-    
-    多发，爱看
-    
+
+  河南4月20日
+
+  赞
+
+  多发，爱看
+
 - 张松
-    
-    北京4月18日
-    
-    赞
-    
-    非常好，干活满满
-    
+
+  北京4月18日
+
+  赞
+
+  非常好，干活满满
+
 - 举个栗子
-    
-    四川4月18日
-    
-    赞
-    
-    ![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  四川4月18日
+
+  赞
+
+  ![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据
 
@@ -586,36 +573,35 @@ public class LRUCache {
 **留言 4**
 
 - 4ever
-    
-    山东4月18日
-    
-    赞4
-    
-    多发点这种实用的
-    
+
+  山东4月18日
+
+  赞4
+
+  多发点这种实用的
+
 - mofangxiaowu
-    
-    河南4月20日
-    
-    赞
-    
-    多发，爱看
-    
+
+  河南4月20日
+
+  赞
+
+  多发，爱看
+
 - 张松
-    
-    北京4月18日
-    
-    赞
-    
-    非常好，干活满满
-    
+
+  北京4月18日
+
+  赞
+
+  非常好，干活满满
+
 - 举个栗子
-    
-    四川4月18日
-    
-    赞
-    
-    ![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  四川4月18日
+
+  赞
+
+  ![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据

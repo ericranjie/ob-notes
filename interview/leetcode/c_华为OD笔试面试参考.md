@@ -1,6 +1,6 @@
 题库：这是牛客网题库 可以练习一下输入输出
 www.nowcoder.com/ta/huawei刷简单和中等难度的
-题型：三道题是简单+简单+中等难度的题型。第一二题可能会是循环、数组、字符串、栈这些，第三题会难一点，二分查找、动态规划、DFS、BFS这些。 
+题型：三道题是简单+简单+中等难度的题型。第一二题可能会是循环、数组、字符串、栈这些，第三题会难一点，二分查找、动态规划、DFS、BFS这些。
 参考资料：可看一下leetcode网的典型练习题目，编号如下：
 字符串：3，49，30
 线性表：86，16，27，732
@@ -10,7 +10,6 @@ www.nowcoder.com/ta/huawei刷简单和中等难度的
 dfs：105，112，98，494，547，1254
 bfs：1091，1129，102，101，752
 
-
 牛客网刷题
 
 一、刷题类型建议：
@@ -18,7 +17,7 @@ bfs：1091，1129，102，101，752
 建议一定要准备算法题练习（牛客，leetcode） ，牛客网刷题注意选择 ACM 模式，需要
 
 二、牛客网刷题流程介绍：
-![[Pasted image 20241005155350.png]]
+!\[\[Pasted image 20241005155350.png\]\]
 三、实用算法知识点，请重点练习：
 
 1、 字符串的操作（注意一些字符串的处理小技巧）
@@ -36,10 +35,10 @@ https://leetcode-cn.com/problems/distribute-candies/ 数组操作
 https://leetcode-cn.com/problems/zheng-ze-biao-da-shi-pi-pei-lcof/ 字符串，字符串匹配https://leetcode-cn.com/problems/longest-increasing-subsequence/
 
 12. 整数转罗马数字 哈希 https://leetcode-cn.com/problems/integer-to-roman/
-36. 有效的数独 https://leetcode-cn.com/problems/valid-sudoku/
-15. 三数之和 https://leetcode-cn.com/problems/3sum/
-122. 买卖股票的最佳时机 II https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/
-11. 盛最多水的容器 https://leetcode-cn.com/problems/container-with-most-water/
+01. 有效的数独 https://leetcode-cn.com/problems/valid-sudoku/
+01. 三数之和 https://leetcode-cn.com/problems/3sum/
+01. 买卖股票的最佳时机 II https://leetcode-cn.com/problems/best-time-to-buy-and-sell-stock-ii/
+01. 盛最多水的容器 https://leetcode-cn.com/problems/container-with-most-water/
 
 附上牛客网刷题经验贴（一定要看哟） ：
 

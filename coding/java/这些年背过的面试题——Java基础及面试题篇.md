@@ -1,30 +1,24 @@
-
-
 淘苏 阿里云开发者
 
- _2024年04月28日 08:30_ _浙江_
+_2024年04月28日 08:30_ _浙江_
 
-## ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/Z6bicxIx5naKYDPHezofk52wtehyT2xMh9WCnDsRRVdAfzY1KjZK2rJ3JaswYvNnCgnWlZqnG95yHacB7uDt0icg/640?wx_fmt=jpeg&from=appmsg&wxfrom=13&tp=wxpic)  
+## ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/Z6bicxIx5naKYDPHezofk52wtehyT2xMh9WCnDsRRVdAfzY1KjZK2rJ3JaswYvNnCgnWlZqnG95yHacB7uDt0icg/640?wx_fmt=jpeg&from=appmsg&wxfrom=13&tp=wxpic)
 
 阿里妹导读
-
-  
 
 本文是技术人面试系列Java基础及面试题篇，面试中关于Java基础及面试题都需要了解哪些内容？一文带你详细了解，欢迎收藏！
 
 Java基础
 
-  
-
 **面向对象三大特性**
 
-**特性：**封装、继承、多态；
+\*\*特性：\*\*封装、继承、多态；
 
-**封装：**对抽象的事物抽象化成一个对象，并对其对象的属性私有化，同时提供一些能被外界访问属性的方法；
+\*\*封装：\*\*对抽象的事物抽象化成一个对象，并对其对象的属性私有化，同时提供一些能被外界访问属性的方法；
 
-**继承：**子类扩展新的数据域或功能，并复用父类的属性与功能，单继承，多实现；
+\*\*继承：\*\*子类扩展新的数据域或功能，并复用父类的属性与功能，单继承，多实现；
 
-**多态：**通过继承（多个⼦类对同⼀⽅法的重写）、也可以通过接⼝（实现接⼝并覆盖接⼝）；
+\*\*多态：\*\*通过继承（多个⼦类对同⼀⽅法的重写）、也可以通过接⼝（实现接⼝并覆盖接⼝）；
 
 #### 1、Java与C++区别
 
@@ -46,7 +40,7 @@ Java基础
 
 #### 3、static和final关键字
 
-**static：**可以修饰属性、方法
+\*\*static：\*\*可以修饰属性、方法
 
 **static修饰属性：**
 
@@ -56,7 +50,7 @@ Java基础
 
 随着类的加载而加载；可以使用类名直接调用；静态方法中，只能调用静态的成员，不可用this；
 
-**final：**关键字主要⽤在三个地⽅：变量、⽅法、类。
+\*\*final：\*\*关键字主要⽤在三个地⽅：变量、⽅法、类。
 
 **final修饰变量：**
 
@@ -76,9 +70,9 @@ final修饰类时，表明这个类不能被继承。final类中的所有成员�
 
 #### 4、抽象类和接口
 
-**抽象类：**包含抽象方法的类，即使用abstract修饰的类；抽象类只能被继承，所以不能使用final修饰，抽象类不能被实例化；
+\*\*抽象类：\*\*包含抽象方法的类，即使用abstract修饰的类；抽象类只能被继承，所以不能使用final修饰，抽象类不能被实例化；
 
-**接口：**接口是一个抽象类型，是抽象方法的集合，接口支持多继承，接口中定义的方法，默认是public abstract修饰的抽象方法；
+\*\*接口：\*\*接口是一个抽象类型，是抽象方法的集合，接口支持多继承，接口中定义的方法，默认是public abstract修饰的抽象方法；
 
 **相同点：**
 
@@ -136,24 +130,21 @@ Java的泛型是伪泛型，使用泛型的时候加上类型参数，在编译�
 1.类名.class(就是一份字节码)
 ```
 
-  
-
 使用场景：
 
 - **开发通用框架**-反射最重要的用途就是开发各种通用框架。很多框架（比如 Spring）都是配置化的（比如通过XML文件配置JavaBean、Filter等），为了保证框架的通用性，需要根据配置文件运行时动态加载不同的对象或类，调用不同的方法。
-    
+
 - **动态代理**-在切面编程（AOP）中，需要拦截特定的方法，通常，会选择动态代理方式。这时，就需要反射技术来实现了。
-    
-    JDK：spring默认动态代理，需要实现接口；
-    
-    CGLIB：通过asm框架序列化字节流，可配置，性能差；
-    
+
+  JDK：spring默认动态代理，需要实现接口；
+
+  CGLIB：通过asm框架序列化字节流，可配置，性能差；
+
 - **自定义注解**-注解本身仅仅是起到标记作用，它需要利用反射机制，根据注解标记去调用注解解释器，执行行为。
-    
 
 #### 7、Java异常体系
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Throwable是Java语言中所有错误或异常的超类。下一层分为Error 和Exception。
 
@@ -171,19 +162,17 @@ Throwable是Java语言中所有错误或异常的超类。下一层分为Error �
 
 **运行错误**是引起程序非正常终端的错误，需要通过异常处理的方式处理运行错误。
 
-**RuntimeException：**运行时异常，程序应该从逻辑角度尽可能避免这类异常的发生。
+\*\*RuntimeException：\*\*运行时异常，程序应该从逻辑角度尽可能避免这类异常的发生。
 
 如NullPointerException、ClassCastException ；
 
-**CheckedException：**受检异常，程序使用trycatch进行捕捉处理；
+\*\*CheckedException：\*\*受检异常，程序使用trycatch进行捕捉处理；
 
 如IOException、SQLException、NotFoundException；
 
-  
-
 **数据结构**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 1、ArrayList和LinkedList
 
@@ -195,7 +184,7 @@ Throwable是Java语言中所有错误或异常的超类。下一层分为Error �
 
 **LinkedList：**
 
-底层基于双向链表实现，适合数据的动态插入和删除；  
+底层基于双向链表实现，适合数据的动态插入和删除；\
 内部提供了List接口中没有定义的方法，用于操作表头和表尾元素，可以当作堆栈、队列和双向队列使用。（比如jdk官方推荐使用基于linkedList的Deque进行堆栈操作）
 
 **ArrayList与LinkedList区别：**
@@ -208,7 +197,7 @@ Throwable是Java语言中所有错误或异常的超类。下一层分为Error �
 
 建议使用concurrent并发包下的**CopyOnWriteArrayList**的。
 
-①**Vector:**底层通过synchronize修饰保证线程安全，效率较差。
+①\*\*Vector:\*\*底层通过synchronize修饰保证线程安全，效率较差。
 
 ②**CopyOnWriteArrayList**：写时加锁，使用了一种叫**写时复制**的方法；读操作是可以不用加锁的。
 
@@ -220,15 +209,11 @@ Throwable是Java语言中所有错误或异常的超类。下一层分为Error �
 for(int i=0; i < list.size(); i++){
 ```
 
-  
-
 **② 迭代遍历,用list.remove(i)方法删除元素**
 
 ```
 Iterator<Integer> it = list.iterator();
 ```
-
-  
 
 **③foreach遍历List删除元素**
 
@@ -236,15 +221,13 @@ Iterator<Integer> it = list.iterator();
 for(Integer i:list){
 ```
 
-  
-
-**fail—fast：**快速失败
+\*\*fail—fast：\*\*快速失败
 
 当异常产生时，直接抛出异常，程序终止。
 
 fail-fast主要是体现在当我们在遍历集合元素的时候，经常会使用迭代器，但在迭代器遍历元素的过程中，如果集合的结构（modCount）被改变的话，就会抛出异常ConcurrentModificationException，防止继续遍历。这就是所谓的快速失败机制。
 
-**fail—safe：**安全失败
+\*\*fail—safe：\*\*安全失败
 
 采用安全失败机制的集合容器，在遍历时不是直接在集合内容上访问的，而是先复制原有集合内容，在拷贝的集合上进行遍历。由于在遍历过程中对原集合所作的修改并不能被迭代器检测到，所以不会触发ConcurrentModificationException。
 
@@ -254,7 +237,7 @@ fail-fast主要是体现在当我们在遍历集合元素的时候，经常会�
 
 #### 3、详细介绍HashMap
 
-**角度：**数据结构+扩容情况+put查找的详细过程+哈希函数+容量为什么始终都是2^N，JDK1.7与1.8的区别。
+\*\*角度：\*\*数据结构+扩容情况+put查找的详细过程+哈希函数+容量为什么始终都是2^N，JDK1.7与1.8的区别。
 
 参考：https://www.jianshu.com/p/9fe4cb316c05
 
@@ -270,17 +253,15 @@ HashMap在底层数据结构上采用了数组＋链表＋红黑树，通过散�
 
 【2】1.7采用Entry的重新hash运算，1.8采用高于运算。
 
-put操作步骤： 
+put操作步骤：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1、判断数组是否为空，为空进行初始化;
 
 2、不为空，则计算 key的hash值，通过(n - 1) & hash计算应当存放在数组中的下标 index;
 
-3、查看table[index] 是否存在数据，没有数据就构造一个Node节点存放在 table[index] 中；
+3、查看table\[index\] 是否存在数据，没有数据就构造一个Node节点存放在 table\[index\] 中；
 
 4、存在数据，说明发生了hash冲突(存在二个节点key的hash值一样), 继续判断key是否相等，相等，用新的value替换原数据；
 
@@ -308,7 +289,7 @@ JDK1.8 HashMap：
 
 底层数据结构上采用了**数组＋链表＋红黑树**；当链表⻓度⼤于阈值（默认为 8-泊松分布），数组的⻓度大于 64时，链表将转化为红⿊树，以减少搜索时间。（解决了tomcat臭名昭著的url参数dos攻击问题）
 
-#### 4、ConcurrentHashMap 
+#### 4、ConcurrentHashMap
 
 可以通过**ConcurrentHashMap**和**Hashtable**来实现线程安全；Hashtable 是原始API类，通过synchronize同步修饰，效率低下；ConcurrentHashMap通过分段锁实现，效率较比Hashtable要好。
 
@@ -316,7 +297,7 @@ JDK1.8 HashMap：
 
 **JDK1.7的ConcurrentHashMap**底层采⽤ 分段的数组+链表 实现；采用 **分段锁**（Sagment） 对整个桶数组进⾏了分割分段(Segment默认16个)，每⼀把锁只锁容器其中⼀部分数据，多线程访问容器⾥不同数据段的数据，就不会存在锁竞争，提⾼并发访问率。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **JDK1.8的 ConcurrentHashMap**采⽤的数据结构跟HashMap1.8的结构⼀样，数组+链表/红⿊树；摒弃了Segment的概念，⽽是直接⽤ Node 数组+链表+红⿊树的数据结构来实现，通过并发控制**synchronized**和**CAS**来操作保证线程的安全。
 
@@ -324,9 +305,9 @@ JDK1.8 HashMap：
 
 序列化的意思就是将对象的状态转化成字节流，以后可以通过这些值再生成相同状态的对象。对象序列化是对象持久化的一种实现方法，它是将对象的属性和方法转化为一种序列化的形式用于存储和传输。反序列化就是根据这些保存的信息重建对象的过程。
 
-**序列化：**将java对象转化为字节序列的过程。
+\*\*序列化：\*\*将java对象转化为字节序列的过程。
 
-**反序列化：**将字节序列转化为java对象的过程。 
+\*\*反序列化：\*\*将字节序列转化为java对象的过程。
 
 **优点：**
 
@@ -344,8 +325,6 @@ String使用**数组**存储内容，数组使用**final**修饰，因此String�
 
 StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuilder。
 
-  
-
 **设计模式与原则**
 
 #### 1、单例模式
@@ -354,9 +333,9 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 
 **优点：**
 
-**唯一访问：**如生成唯一序列化的场景、或者spring默认的bean类型。
+\*\*唯一访问：\*\*如生成唯一序列化的场景、或者spring默认的bean类型。
 
-**提高性能：**频繁实例化创建销毁或者耗时耗资源的场景，如连接池、线程池。
+\*\*提高性能：\*\*频繁实例化创建销毁或者耗时耗资源的场景，如连接池、线程池。
 
 **缺点：**
 
@@ -364,33 +343,31 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 
 **实现方式：**
 
-**饿汉式：**线程安全速度快；
+\*\*饿汉式：\*\*线程安全速度快；
 
-**懒汉式：**双重检测锁，第一次减少锁的开销、第二次防止重复、volatile防止重排序导致实例化未完成；
+\*\*懒汉式：\*\*双重检测锁，第一次减少锁的开销、第二次防止重复、volatile防止重排序导致实例化未完成；
 
-**静态内部类：**线程安全利用率高；
+\*\*静态内部类：\*\*线程安全利用率高；
 
-**枚举：**effictiveJAVA推荐，反射也无法破坏；
+\*\*枚举：\*\*effictiveJAVA推荐，反射也无法破坏；
 
 #### 2、工厂模式
 
 定义一个用于创建产品的接口，由子类决定生产何种产品。
 
-**优点：**解耦：提供参数即可获取产品，通过配置文件可以不修改代码增加具体产品。
+\*\*优点：\*\*解耦：提供参数即可获取产品，通过配置文件可以不修改代码增加具体产品。
 
-**缺点：**每增加一个产品就得新增一个产品类。
+\*\*缺点：\*\*每增加一个产品就得新增一个产品类。
 
 #### 3、抽象工厂模式
 
 提供一个接口，用于创建相关或者依赖对象的家族，并由此进行约束。
 
-**优点：**可以在类的内部对产品族进行约束。
+\*\*优点：\*\*可以在类的内部对产品族进行约束。
 
-**缺点：**假如产品族中需要增加一个新的产品，则几乎所有的工厂类都需要进行修改。
+\*\*缺点：\*\*假如产品族中需要增加一个新的产品，则几乎所有的工厂类都需要进行修改。
 
 面试题
-
-  
 
 **构造方法**
 
@@ -398,15 +375,11 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 
 构造方法没有返回值，构造方法的作用是创建新对象。
 
-  
-
 **初始化块**
 
 静态初始化块的优先级最高，会最先执行，在非静态初始化块之前执行。
 
 静态初始化块会在类第一次被加载时最先执行，因此在main方法之前。
-
-  
 
 **This**
 
@@ -414,15 +387,11 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 
 关键字this不可以在静态方法中使用。静态方法不依赖于类的具体对象的引用。
 
-  
-
 **重写和重载的区别**
 
 重载指在同一个类中定义多个方法，这些方法名称相同，签名不同。
 
 重写指在子类中的方法的名称和签名都和父类相同，使用override注解。
-
-  
 
 **Object类方法**
 
@@ -440,13 +409,11 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 
 **notify、wait**用于线程通知和唤醒；
 
-  
-
 **基本数据类型和包装类**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 【这些年背过的面试题】系列文章欢迎**点击阅读原文**查看合集！
 
@@ -461,21 +428,20 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 **留言 2**
 
 - 下里巴人
-    
-    浙江5月10日
-    
-    赞
-    
-    👍
-    
+
+  浙江5月10日
+
+  赞
+
+  👍
+
 - QC
-    
-    湖北4月28日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  湖北4月28日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据
 
@@ -494,20 +460,19 @@ StringBuffer对方法加了同步锁，线程安全，效率略低于StringBuild
 **留言 2**
 
 - 下里巴人
-    
-    浙江5月10日
-    
-    赞
-    
-    👍
-    
+
+  浙江5月10日
+
+  赞
+
+  👍
+
 - QC
-    
-    湖北4月28日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  湖北4月28日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据

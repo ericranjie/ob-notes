@@ -2,7 +2,7 @@
 
 原创 程序员Carl 代码随想录
 
- _2021年12月29日 11:30_
+_2021年12月29日 11:30_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/ciaqDnJprwv51v7KicZPnVjl8OtTYQwNPibIFibtn0ic4vmGTd5gvrqT9fwiba1jKicc2gsSxicpYNKSGLUvwXoCGc8q2w/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
@@ -19,32 +19,28 @@
 示例 1：
 
 - 输入：2
-    
+
 - 输出：2
-    
+
 - 解释：有两种方法可以爬到楼顶。
-    
 
 - 1 阶 + 1 阶
-    
+
 - 2 阶
-    
 
 示例 2：
 
 - 输入：3
-    
+
 - 输出：3
-    
+
 - 解释：有三种方法可以爬到楼顶。
-    
 
 - 1 阶 + 1 阶 + 1 阶
-    
+
 - 1 阶 + 2 阶
-    
+
 - 2 阶 + 1 阶
-    
 
 ## 思路
 
@@ -61,65 +57,60 @@
 定义一个一维数组来记录不同楼层的状态
 
 1. 确定dp数组以及下标的含义
-    
 
-dp[i]：爬到第i层楼梯，有dp[i]种方法
+dp\[i\]：爬到第i层楼梯，有dp\[i\]种方法
 
 2. 确定递推公式
-    
 
-如果可以推出dp[i]呢？
+如果可以推出dp\[i\]呢？
 
-从dp[i]的定义可以看出，dp[i] 可以有两个方向推出来。
+从dp\[i\]的定义可以看出，dp\[i\] 可以有两个方向推出来。
 
-首先是dp[i - 1]，上i-1层楼梯，有dp[i - 1]种方法，那么再一步跳一个台阶不就是dp[i]了么。
+首先是dp\[i - 1\]，上i-1层楼梯，有dp\[i - 1\]种方法，那么再一步跳一个台阶不就是dp\[i\]了么。
 
-还有就是dp[i - 2]，上i-2层楼梯，有dp[i - 2]种方法，那么再一步跳两个台阶不就是dp[i]了么。
+还有就是dp\[i - 2\]，上i-2层楼梯，有dp\[i - 2\]种方法，那么再一步跳两个台阶不就是dp\[i\]了么。
 
-那么dp[i]就是 dp[i - 1]与dp[i - 2]之和！
+那么dp\[i\]就是 dp\[i - 1\]与dp\[i - 2\]之和！
 
-所以dp[i] = dp[i - 1] + dp[i - 2] 。
+所以dp\[i\] = dp\[i - 1\] + dp\[i - 2\] 。
 
-在推导dp[i]的时候，一定要时刻想着dp[i]的定义，否则容易跑偏。
+在推导dp\[i\]的时候，一定要时刻想着dp\[i\]的定义，否则容易跑偏。
 
 这体现出确定dp数组以及下标的含义的重要性！
 
 3. dp数组如何初始化
-    
 
-在回顾一下dp[i]的定义：爬到第i层楼梯，有dp[i]中方法。
+在回顾一下dp\[i\]的定义：爬到第i层楼梯，有dp\[i\]中方法。
 
-那么i为0，dp[i]应该是多少呢，这个可以有很多解释，但都基本是直接奔着答案去解释的。
+那么i为0，dp\[i\]应该是多少呢，这个可以有很多解释，但都基本是直接奔着答案去解释的。
 
-例如强行安慰自己爬到第0层，也有一种方法，什么都不做也就是一种方法即：dp[0] = 1，相当于直接站在楼顶。
+例如强行安慰自己爬到第0层，也有一种方法，什么都不做也就是一种方法即：dp\[0\] = 1，相当于直接站在楼顶。
 
 但总有点牵强的成分。
 
-那还这么理解呢：我就认为跑到第0层，方法就是0啊，一步只能走一个台阶或者两个台阶，然而楼层是0，直接站楼顶上了，就是不用方法，dp[0]就应该是0.
+那还这么理解呢：我就认为跑到第0层，方法就是0啊，一步只能走一个台阶或者两个台阶，然而楼层是0，直接站楼顶上了，就是不用方法，dp\[0\]就应该是0.
 
-**其实这么争论下去没有意义，大部分解释说dp[0]应该为1的理由其实是因为dp[0]=1的话在递推的过程中i从2开始遍历本题就能过，然后就往结果上靠去解释dp[0] = 1**。
+**其实这么争论下去没有意义，大部分解释说dp\[0\]应该为1的理由其实是因为dp\[0\]=1的话在递推的过程中i从2开始遍历本题就能过，然后就往结果上靠去解释dp\[0\] = 1**。
 
-从dp数组定义的角度上来说，dp[0] = 0 也能说得通。
+从dp数组定义的角度上来说，dp\[0\] = 0 也能说得通。
 
 需要注意的是：题目中说了n是一个正整数，题目根本就没说n有为0的情况。
 
-所以本题其实就不应该讨论dp[0]的初始化！
+所以本题其实就不应该讨论dp\[0\]的初始化！
 
-我相信dp[1] = 1，dp[2] = 2，这个初始化大家应该都没有争议的。
+我相信dp\[1\] = 1，dp\[2\] = 2，这个初始化大家应该都没有争议的。
 
-所以我的原则是：不考虑dp[0]如果初始化，只初始化dp[1] = 1，dp[2] = 2，然后从i = 3开始递推，这样才符合dp[i]的定义。
+所以我的原则是：不考虑dp\[0\]如果初始化，只初始化dp\[1\] = 1，dp\[2\] = 2，然后从i = 3开始递推，这样才符合dp\[i\]的定义。
 
 4. 确定遍历顺序
-    
 
-从递推公式dp[i] = dp[i - 1] + dp[i - 2];中可以看出，遍历顺序一定是从前向后遍历的
+从递推公式dp\[i\] = dp\[i - 1\] + dp\[i - 2\];中可以看出，遍历顺序一定是从前向后遍历的
 
 5. 举例推导dp数组
-    
 
 举例当n为5的时候，dp table（dp数组）应该是这样的
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 70.爬楼梯
 
@@ -127,7 +118,7 @@ dp[i]：爬到第i层楼梯，有dp[i]种方法
 
 **此时大家应该发现了，这不就是斐波那契数列么！**
 
-唯一的区别是，没有讨论dp[0]应该是什么，因为dp[0]在本题没有意义！
+唯一的区别是，没有讨论dp\[0\]应该是什么，因为dp\[0\]在本题没有意义！
 
 以上五部分析完之后，C++代码如下：
 
@@ -136,9 +127,8 @@ dp[i]：爬到第i层楼梯，有dp[i]种方法
 ```
 
 - 时间复杂度：
-    
+
 - 空间复杂度：
-    
 
 当然依然也可以，优化一下空间复杂度，代码如下：
 
@@ -147,9 +137,8 @@ dp[i]：爬到第i层楼梯，有dp[i]种方法
 ```
 
 - 时间复杂度：
-    
+
 - 空间复杂度：
-    
 
 后面将讲解的很多动规的题目其实都是当前状态依赖前两个，或者前三个状态，都可以做空间上的优化，**但我个人认为面试中能写出版本一就够了哈，清晰明了，如果面试官要求进一步优化空间的话，我们再去优化**。
 
@@ -171,7 +160,7 @@ class Solution {public:    int climbStairs(int n) {        vect
 
 **以上代码不能运行哈，我主要是为了体现只要把m换成2，粘过去，就可以AC爬楼梯这道题，不信你就粘一下试试，哈哈**。
 
-**此时我就发现一个绝佳的大厂面试题**，第一道题就是单纯的爬楼梯，然后看候选人的代码实现，如果把dp[0]的定义成1了，就可以发难了，为什么dp[0]一定要初始化为1，此时可能候选人就要强行给dp[0]应该是1找各种理由。那这就是一个考察点了，对dp[i]的定义理解的不深入。
+**此时我就发现一个绝佳的大厂面试题**，第一道题就是单纯的爬楼梯，然后看候选人的代码实现，如果把dp\[0\]的定义成1了，就可以发难了，为什么dp\[0\]一定要初始化为1，此时可能候选人就要强行给dp\[0\]应该是1找各种理由。那这就是一个考察点了，对dp\[i\]的定义理解的不深入。
 
 然后可以继续发难，如果一步一个台阶，两个台阶，三个台阶，直到 m个台阶，有多少种方法爬到n阶楼顶。这道题目leetcode上并没有原题，绝对是考察候选人算法能力的绝佳好题。
 
@@ -229,9 +218,9 @@ var climbStairs = function(n) {    // dp[i] 为第 i 阶楼梯有多
 
 [十年所学，终成《代码随想录》！](http://mp.weixin.qq.com/s?__biz=MzUxNjY5NTYxNA==&mid=2247496927&idx=1&sn=1e76678226a125b9b57342f7a95a774d&chksm=f9a1c78eced64e98ce45d9ce826788f01e09ad147f23cb5b28500738d8b0ae9d7a5ee83be258&scene=21#wechat_redirect)
 
-[今年双12，《代码随想录》冲榜TOP1](http://mp.weixin.qq.com/s?__biz=MzUxNjY5NTYxNA==&mid=2247496947&idx=1&sn=71763d5384d12de4486020455ad46f23&chksm=f9a1c7a2ced64eb458a0730890937928d0c0f1aedfcaea4399bffc4baf99b605f677edb77e4d&scene=21#wechat_redirect) 
+[今年双12，《代码随想录》冲榜TOP1](http://mp.weixin.qq.com/s?__biz=MzUxNjY5NTYxNA==&mid=2247496947&idx=1&sn=71763d5384d12de4486020455ad46f23&chksm=f9a1c7a2ced64eb458a0730890937928d0c0f1aedfcaea4399bffc4baf99b605f677edb77e4d&scene=21#wechat_redirect)
 
-[最强八股文](http://mp.weixin.qq.com/s?__biz=MzUxNjY5NTYxNA==&mid=2247496557&idx=1&sn=4f49617553c14b3ca938253d16a011b4&chksm=f9a1c03cced6492a530e4c71895c67b2c595379872ff5838b78081aac532b2c4a705e9ff46f1&scene=21#wechat_redirect)PDF！ 
+[最强八股文](http://mp.weixin.qq.com/s?__biz=MzUxNjY5NTYxNA==&mid=2247496557&idx=1&sn=4f49617553c14b3ca938253d16a011b4&chksm=f9a1c03cced6492a530e4c71895c67b2c595379872ff5838b78081aac532b2c4a705e9ff46f1&scene=21#wechat_redirect)PDF！
 
 [明年按这个要价！](http://mp.weixin.qq.com/s?__biz=MzUxNjY5NTYxNA==&mid=2247497345&idx=1&sn=72dadfd4323ce74aca48a9c4fc3a29dc&chksm=f9a1c5d0ced64cc67378f80e8a200682b78d0636038ae5216a2d34d39d7d8164d561fcc4163f&scene=21#wechat_redirect)
 

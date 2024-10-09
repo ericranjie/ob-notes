@@ -2,13 +2,11 @@
 
 Original 寻剑 阿里云开发者
 
- _2024年09月05日 08:30_ _浙江_
+_2024年09月05日 08:30_ _浙江_
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/Z6bicxIx5naKrDkHRiaSlsQTMgBicQkzT4u5emBHqpzYlbAqibCLkiayf8YGdlZsxdIZ5gUyAGgH6aPOuylO8vj72bA/640?wx_fmt=jpeg&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 阿里妹导读
-
-  
 
 本文阐述了阿里云表格存储（Tablestore）如何通过其向量检索服务应对大规模数据检索的需求，尤其是在成本、规模和召回率这三个关键挑战方面。
 
@@ -20,8 +18,6 @@ Original 寻剑 阿里云开发者
 
 这里介绍两个经典的向量数据库场景，一是新兴的 RAG 应用，二是传统的多模态搜索，通过整合向量数据库，用户可以高效和灵活的访问大规模数据。
 
-  
-
 **场景一：新兴的RAG应用**
 
 RAG（Retrieval-Augmented Generation）是一种结合检索与生成的方法，主要用于自然语言处理任务。它通过首先从知识库中检索相关语料，再将这些信息输入给生成式模型，用于对话或文本生成。这种方法的优势在于能够同时结合事实或私域信息与生成模型的双重能力，生成更准确和丰富的文本。
@@ -32,13 +28,11 @@ RAG（Retrieval-Augmented Generation）是一种结合检索与生成的方法�
 
 RAG 在问答系统、内容创作、语言翻译、信息检索、对话系统等领域具备极大的优势，这些领域需要大量的背景信息和上下文理解，相比传统的基于全文检索和基于规则的方式更加准确，更加自然和符合语境。
 
-  
-
 **场景二：传统的图片、视频、文本**
 
 传统的图片、视频、文本搜索是经典的多模态检索问题，在以网盘为代表的系统里最为常见。过去，用户只能通过关键词搜索来查找他们想要的内容，会因为关键词不准确而查询不到目标作品。因此，各类网盘开始引入基于向量数据库的多模态搜索方案。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 在这个方案中，用户输入一段描述或上传一张图片，系统会将这些输入转化为向量。向量数据库能够在海量的数据中检索出与用户输入相似度高的图像和视频。例如，当用户上传一张风景照片时，搜索引擎能够识别出照片中的山脉、湖泊等元素，迅速找到其他类似的风景图片和视频，并将其展示在搜索结果中。此外，用户也可以在查询时使用自然语言表述，比如“寻找以秋天为主题的风景”，系统会在向量数据库中查找与秋天相关的多张图像和视频，提供更精准的搜索结果。
 
@@ -46,17 +40,13 @@ RAG 在问答系统、内容创作、语言翻译、信息检索、对话系统�
 
 在向量数据库领域，技术方案主要有两种：基于 HNSW 的图算法和聚类方法。这两种方法在高维数据的检索与存储上都有着广泛的应用，尤其是在处理大规模数据集时，它们各自有优点和局限性。
 
-  
-
 **HNSW 图算法**
 
 HNSW 是一种基于图的数据结构，用于高效地进行最近邻搜索。它通过构建一个多层次的图来实现快速查询。在这个结构中，数据以节点形式存在，节点之间的边表示它们的相似性。HNSW 将节点分层，每一层的节点数量逐级减少，从而在查询时，可以从较高层次开始，迅速缩小搜索范围，大大加快了查找速度。
 
 HNSW 图算法的最大优点是召回率高，性能好。但是缺点也很明显，一是数据需要全部加载在内存里面里面，成本很高。二是规模受内存限制，很难支持到千万级以上规模。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
-
-  
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 **聚类算法**
 
@@ -64,20 +54,17 @@ HNSW 图算法的最大优点是召回率高，性能好。但是缺点也很明
 
 聚类算法的最大优点是成本低，索引性能好，但是缺点也很明显，召回率低。常见的聚类算法包括 K-means、层次聚类和 DBSCAN 等。在高维空间中，不同的聚类算法对数据的分布特点有不同的适应性，因此选择合适的聚类算法及其参数很重要，否则会出现聚类数目、聚类中心等选择不佳导致向量检索效果不理想。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
-
-  
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 **开源系统**
 
 开源的向量检索产品十分丰富，分为“专用向量数据库”和“传统数据库附加向量检索功能”。专用向量数据库由于其数据库方面的特性发展相对不完善，还有很大提升空间，因此大多数用户倾向于使用传统的附加向量检索功能的数据库，比较常见的有如下一些相关产品。
 
-- PG：通过 pgvector [1]插件整合了向量检索能力，索引能力包括FLAT索引提供线性暴力扫描、基于聚类的 IVFFLAT、 基于图的 HNSW。
-    
-- Redis：通过 RedisStack [2]提供了向量检索，索引能力包括FLAT索引提供线性暴力扫描、基于图的 HNSW。
-    
-- Elasticsearch：通过 Lucene [3]提供了向量检索能力，索引能力包括 FLAT 索引提供线性暴力扫描、基于图的HNSW。
-    
+- PG：通过 pgvector \[1\]插件整合了向量检索能力，索引能力包括FLAT索引提供线性暴力扫描、基于聚类的 IVFFLAT、 基于图的 HNSW。
+
+- Redis：通过 RedisStack \[2\]提供了向量检索，索引能力包括FLAT索引提供线性暴力扫描、基于图的 HNSW。
+
+- Elasticsearch：通过 Lucene \[3\]提供了向量检索能力，索引能力包括 FLAT 索引提供线性暴力扫描、基于图的HNSW。
 
 问题和挑战
 
@@ -105,7 +92,7 @@ HNSW 图算法的最大优点是召回率高，性能好。但是缺点也很明
 
 表格存储针对上述在向量检索领域遇到的成本、规模、召回率等挑战，发布了低成本、大规模、高性能、高召回率的向量检索服务，其能以较低成本支持千亿规模向量数据的存储和检索，接下来介绍一下为什么可以做到上述这些优势。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 **1.DiskANN**
 
@@ -127,35 +114,33 @@ DiskAnn 该算法专为磁盘设计，其内部为磁盘友好的层次化图结
 
 表格存储向量检索支持多种索引：Flat、PQ、DiskANN、倒排索引等。这些索引类型不需要用户选择，会根据用户写入模式和数据规模自适应选择最佳方案，实现高效的向量检索，大幅降低用户的参数选择困扰，以及避免参数错误导致的性能不足或者召回率低的问题。无论是实时性要求高的小数据量应用，还是对存储和计算资源敏感的大规模数据量应用，我们的解决方案都能提供出色的检索能力。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 - Flat：最简单和直接的索引，其存储了用户的原始向量，后续可以通过线性暴力扫描的方式进行检索。此方式仅适合小规模数据，尽管时间复杂度较高，但在数据量较小时，可以提供 100% 准确的结果。
-    
+
 - PQ（Product Quantization）：PQ 可以将高维数据压缩为低维特征，通过量化的方式显著减少内存使用并加快检索速度，尤其在处理大规模数据时，PQ 能够更有效地平衡准确性和性能。
-    
+
 - DiskANN：专为大规模数据设计的索引，它将向量存储在磁盘上，通过高效的图索引和聚类算法，实现近似最近邻搜索。这一方法不仅大大降低了内存占用，还提高了检索速度，特别适合规模较大的场景。
-    
+
 - 标量索引：用于支持非向量部分的标量数据的查询。表格存储的多元索引在传统标量索引场景下能力十分出众，支持字符串、数字、日期、地理位置、数组、Json 嵌套等各种类型的索引，能持完成任意列查询、多字段自由组合查询、地理位置查询、全文检索、模糊查询、前缀查询、嵌套查询、去重、排序等丰富的功能。
-    
 
 **4.极高的写入吞吐**
 
 表格存储具备极高的向量索引写入吞吐能力，该能力得益于不同的构建策略和远端构建能力。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 #### 构建策略
 
 表格存储的向量索引使用了不同的索引构建策略，在不同规模和场景下自动选择，无需用户关心，避免参数选择困扰。不同的构建策略可以减少 LSM-Tree 架构下的写入放大问题，提升写入吞吐能力，并节省用户成本。
 
 - 数据量少时，仅构建 Flat 索引。
-    
+
 - 数据量中等时，仅构建 Flat 和 PQ 索引。
-    
+
 - 数据量多时，构建 Flat、PQ、DiskANN 等多种索引。
-    
+
 - 后台 Compaction：构建 Flat、PQ、DiskANN 等多种索引。
-    
 
 #### 远端构建（Remote Compaction）
 
@@ -169,87 +154,77 @@ DiskAnn 该算法专为磁盘设计，其内部为磁盘友好的层次化图结
 
 3.大幅减少毛刺。之前在后台构建向量索引的同时进行普通查询，因 CPU 和内存资源消耗极高，会给普通查询带来较高的查询毛刺，使用远端构建后可以将查询毛刺降低 2 个量级，毛刺从秒级别降低到十毫秒级别。
 
-  
-
 **5.自适应的查询策略**
 
 #### 索引选择
 
 在一个索引内部，数据是组织在 Segment 这样的最小单元上。在上述的写入介绍中，我们了解到向量检索服务在索引构建时候使用了自适应的策略，每个 Segment 的向量索引类型会不同，在数据量较少时候只有 Flat 原始向量索引，在数据量较多时候会额外构建 PQ 索引，在数据量较大时候会再额外构建 DiskANN 索引。因此在查询时候，会根据每个 Segment 的索引情况进行选择，优先选择已经存在的索引。在所有索引都存在的情况下，需要结合用户查询模式来动态选择，具体的策略见下述的混合查询优化。
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 #### 混合查询优化
 
 表格存储支持同时查询标量和向量，在标量和向量同时查询的场景提供了多样化的查询策略，旨在提升用户体验并降低使用复杂度。系统会分析索引特征、数据规模、查询命中规模、查询模式等，能够自适应地选择最优的查询策略。当前支持如下 4 种查询策略：
 
 - Brute Force 线性暴力扫描。
-    
-- Pre Filtering 前置筛选标量。
-    
-- Post Filtering 后置筛选标量。
-    
-- Single Stage Filtering 遍历图索引同时筛选标量。
-    
 
-﻿![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
+- Pre Filtering 前置筛选标量。
+
+- Post Filtering 后置筛选标量。
+
+- Single Stage Filtering 遍历图索引同时筛选标量。
+
+﻿!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)﻿
 
 性能指标
 
 该测试使用 GIST1M 数据集，100 万行 960 维数据，表格存储和其它开源产品使用相同配置和参数下进行测试。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
 如何使用
 
 您可以使用控制台或者 SDK 使用表格存储的向量检索服务。
 
-- 控制台：登录表格存储控制台[4]，完成创建实例、表后，再创建包含向量字段的多元索引，通过控制台导入数据后，可以通过索引管理界面的搜索功能进行在线查询，具体参考文档向量检索介绍与使用[5]。
-    
-- SDK：您可以通过 Java SDK[6]、Go SDK[7]、Python SDK[8]或Node.js SDK[9]使用向量检索功能，具体参考文档向量检索介绍与使用[10]。
-    
+- 控制台：登录表格存储控制台\[4\]，完成创建实例、表后，再创建包含向量字段的多元索引，通过控制台导入数据后，可以通过索引管理界面的搜索功能进行在线查询，具体参考文档向量检索介绍与使用\[5\]。
+
+- SDK：您可以通过 Java SDK\[6\]、Go SDK\[7\]、Python SDK\[8\]或Node.js SDK\[9\]使用向量检索功能，具体参考文档向量检索介绍与使用\[10\]。
 
 如果您需要将文本通过词嵌入（Embedding）模型转化为向量，可以参考如下文档：
 
-- ﻿使用开源模型将Tablestore数据转成向量﻿[11]
-    
-- ﻿使用云服务将Tablestore数据转成向量﻿[12]
-    
+- ﻿使用开源模型将Tablestore数据转成向量﻿\[11\]
+
+- ﻿使用云服务将Tablestore数据转成向量﻿\[12\]
 
 **参考链接：**
 
-[1]https://github.com/pgvector/pgvector
+\[1\]https://github.com/pgvector/pgvector
 
-[2]https://redis.io/docs/latest/develop/get-started/vector-database/
+\[2\]https://redis.io/docs/latest/develop/get-started/vector-database/
 
-[3]https://github.com/apache/lucene/
+\[3\]https://github.com/apache/lucene/
 
-[4]https://otsnext.console.aliyun.com/
+\[4\]https://otsnext.console.aliyun.com/
 
-[5]https://help.aliyun.com/zh/tablestore/knn-vector-query
+\[5\]https://help.aliyun.com/zh/tablestore/knn-vector-query
 
-[6]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-of-search-index-by-using-java-sdk
+\[6\]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-of-search-index-by-using-java-sdk
 
-[7]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-by-using-go-sdk
+\[7\]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-by-using-go-sdk
 
-[8]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-by-using-python-sdk
+\[8\]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-by-using-python-sdk
 
-[9]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-by-using-nodejs-sdk
+\[9\]https://help.aliyun.com/zh/tablestore/developer-reference/vector-retrieval-by-using-nodejs-sdk
 
-[10]https://help.aliyun.com/zh/tablestore/knn-vector-query
+\[10\]https://help.aliyun.com/zh/tablestore/knn-vector-query
 
-[11]https://help.aliyun.com/zh/tablestore/use-a-open-source-model-to-convert-data-from-tablestore-into-vector
+\[11\]https://help.aliyun.com/zh/tablestore/use-a-open-source-model-to-convert-data-from-tablestore-into-vector
 
-[12]https://help.aliyun.com/zh/tablestore/use-the-dashscope-to-convert-the-data-in-the-tablestore-into-a-vector
+\[12\]https://help.aliyun.com/zh/tablestore/use-the-dashscope-to-convert-the-data-in-the-tablestore-into-a-vector
 
 **分布式训练和部署Llama 2模型**
 
-  
-
 灵骏支持业界各类流行的开源大语言模型，包括Llama2系列、Bloom系列、Falcon系列、GLM/ChatGLM系列，以及领域大模型galactica等的高效训练和部署。本方案整体可用于企业样本标注、创意文本生成、智能对话助手、文本类创作辅助等场景。
-
-  
 
 点击阅读原文查看详情。
 

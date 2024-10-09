@@ -2,13 +2,9 @@
 
 allendbwu 腾讯技术工程
 
- _2021年11月22日 18:00_
+_2021年11月22日 18:00_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
-
-  
 
 > Golang 的一些编程思维和思想，以及总结一些常见的优雅编程实战技巧。
 
@@ -19,59 +15,54 @@ allendbwu 腾讯技术工程
 首先，我们先来看下最基本的，就是 Golang 的学习技巧，比如通读 Golang 的一些好的文章：
 
 - [Frequently Asked Questions (FAQ)](https://golang.org/doc/faq)
-    
+
 - [FAQ 的中文翻译](http://www.qaulau.com/books/Golang_Tutorial/go_programming_faq.html)
-    
+
 - [Go 精华文章列表](https://github.com/golang/go/wiki/Articles)
-    
+
 - [Go 相关博客列表](https://github.com/golang/go/wiki/Blogs)
-    
+
 - [Go Talks](https://github.com/golang/go/wiki/GoTalks)
-    
 
 要通读 golang 官方的编码规范，主要是要参考官方的 [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments) 和 [Effective Go](https://golang.org/doc/effective_go.html) 这两篇官方文章，真的非常推荐必须要好好的看完、看懂这两篇文章（英文不好的同学可以看中文翻译文档），然后按照官方编码规范来具体 coding，主要是能够在具体的编码中有迹可循。
 
 参考业界大牛们的代码，主要是看一些开源的优质的项目，比如 Google 他们这帮人自己搞的 Kubernetes、Istio，还有一些好的项目如 Docker、CoreDNS、etcd 等等。
 
 - 项目基本架构的组织
-    
+
 - 代码基本的编码封装
-    
+
 - 代码的基本原则规范
-    
+
 - 并发的设计思想
-    
+
 - 面向对象编程的设计思想
-    
+
 - 可扩展性的设计思想
-    
 
 然后就是实践，实实在在的跑一些代码示例，可以自己建立一个 base-code 的项目，里面就是你的各种示例，然后进行一些修改、执行。具体的代码示例可以从官方文档上来，推荐[Go by Example](https://gobyexample.com/)，里面有大量非常好的例子。也可以自己网上随便搜下，重要的自己要修改并执行，查看和分析结果：[Go 101](https://go101.org/article/101.html)
 
 其次，要理解 Golang 编程思维，首先要理解 Golang 这门语言的创始初衷，初衷就是为了解决好 Google 内部大规模高并发服务的问题，主要核心就是围绕高并发来开展；并且同时又不想引入面向对象那种很复杂的继承关系。首先，就是可以方便的解决好并发问题（包括高并发），那么就需要有并发思维，能够并发处理就通过并发来进行任务分配
 
 - 这个就是涉及到了 context、 goroutine、channel（select）；
-    
+
 - 创建大量 goroutine， 但是需要能通过 context、 channel 建立 "父子"关系，保证子任务可以能够被回收、被主动控制（如 杀死）。
-    
 
 再者，面向对象编程思想，利用好 interface、 struct 来实现继承、多态的用法：
 
 - struct 匿名组合来实现继承；
-    
+
 - terface 和 struct 来实现多态；
-    
+
 - interface 定义接口，尽可能的保持里面的方法定义简单，然后多个 interface 进行组合。
-    
 
 然后，理解 Golang 语言本身的一些特性: - 强类型，语法上要注意处理；- GC，实际中要观察 GC 日志并分析；- 注意语法语义尽可能的简单、保持各种类型定义尽可能精简。
 
 最后，从 Golang 社区的一些最佳实践来看，Golang 的各种组件需要尽可能的精简。
 
 - Golang 中用好的一些开源组件库，都是比较轻量级的，然后可以各自随意组合来达到最佳实践。
-    
+
 - 我们自己进行组件封装、模块封装的时候，也是保持这个原则，尽可能的精简，然后使用方进行组合。
-    
 
 ### 二、Golang 高级编码技巧
 
@@ -100,75 +91,62 @@ Golang 里面可以通过 interface + struct 来实现虚基类的用法。inter
 具体流程如下，这个是我实际项目（大型 IM 架构）中的实现方式：
 
 1. 定义一个 interface 接口 MsgModel，包含了一些方法，这个就相当于 "虚基类"
-    
-    `type MsgModel interface {       Persist(context context.Context, msg interface{}) bool       PersistOnSensitive(context context.Context, session_type, level, SensitiveStatus int32, msg interface{}) bool   }   `
-    
-2. 定义一个类型 msgModelImpl struct{}，用来实现上面的 interface 接口
-    
-    `定义一个struct用来实现接口类型   type msgModelImpl struct{}         定义一个变量MsgModelImpl等于msgModelImpl，相当于可以通过MsgModelImpl来调用msgModelImpl的成员   var MsgModelImpl = msgModelImpl{}      实现接口的两个方法   func (m msgModelImpl) Persist(context context.Context, msgIface interface{}) bool {   // 具体实现省略   }      func (m msgModelImpl) UpdateDbContent(context context.Context, msgIface interface{}) bool {   // 具体实现省略   }   `
-    
 
-3. 再定义一个 struct 类型的 msgService，包含上述接口类型 MsgModel，相当于组合了。这样的话，这个类型就需要要实现接口方法。
-    
-    `type msgService struct {      msgModel MsgModel   }   `
-    
+   `type MsgModel interface {       Persist(context context.Context, msg interface{}) bool       PersistOnSensitive(context context.Context, session_type, level, SensitiveStatus int32, msg interface{}) bool   }   `
 
-4. 再定义一个变量 MsgService，首字母大写，并且赋值为 msgService 对象，同时给成员 msgModel 赋值为上述已经实现了接口的 struct 对象 MsgModelImpl。
-    
-    `将上述已经实现接口类型的类型(MsgModelImpl) 赋值给此变量(此变量并且要是包含了接口类型的类型), 然后这个变量就可以供外部调用   var  MsgService = msgService{           msgModel:  MsgModelImpl,   }   `
-    
-5. 这样就全部实现了，后面只要通过 MsgService 中的接口方法就可以调用 interface 中定义的方法
-    
+1. 定义一个类型 msgModelImpl struct{}，用来实现上面的 interface 接口
+
+   `定义一个struct用来实现接口类型   type msgModelImpl struct{}         定义一个变量MsgModelImpl等于msgModelImpl，相当于可以通过MsgModelImpl来调用msgModelImpl的成员   var MsgModelImpl = msgModelImpl{}      实现接口的两个方法   func (m msgModelImpl) Persist(context context.Context, msgIface interface{}) bool {   // 具体实现省略   }      func (m msgModelImpl) UpdateDbContent(context context.Context, msgIface interface{}) bool {   // 具体实现省略   }   `
+
+1. 再定义一个 struct 类型的 msgService，包含上述接口类型 MsgModel，相当于组合了。这样的话，这个类型就需要要实现接口方法。
+
+   `type msgService struct {      msgModel MsgModel   }   `
+
+1. 再定义一个变量 MsgService，首字母大写，并且赋值为 msgService 对象，同时给成员 msgModel 赋值为上述已经实现了接口的 struct 对象 MsgModelImpl。
+
+   `将上述已经实现接口类型的类型(MsgModelImpl) 赋值给此变量(此变量并且要是包含了接口类型的类型), 然后这个变量就可以供外部调用   var  MsgService = msgService{           msgModel:  MsgModelImpl,   }   `
+
+1. 这样就全部实现了，后面只要通过 MsgService 中的接口方法就可以调用 interface 中定义的方法
 
 - 注意，定义个 MsgService，里面的成员变量 msgModel 赋值为 MsgModelImpl 的目的是为了做封装，对外暴露接口的都是 MsgService，隐藏了内部具体的 MsgModelImpl 实现。
-    
 
 6. 小结：
-    
 
 - MsgModel 是一个 interface
-    
 
 - interface 是一组抽象方法的集合，interface 未具体实现的方法，仅包含方法名参数返回值的方法
-    
 
 - msgModelImpl 是一个 struct，它实现了 MsgModel 这个 interface 的所有方法
-    
 
 - 如果实现了 interface 中的所有方法，即该类/对象就实现了该接口
-    
 
 - MsgModelImpl 是 msgModelImpl 这个 struct 的对象
-    
+
 - msgService 是一个 struct，它包含了 MsgModel，相当于组合
-    
+
 - MsgService 是 msgService 这个 struct 的对象，并对成员变量赋值
-    
 
 - 后面就通过 MsgService 对外提供服务，隐藏内部具体的 MsgModelImpl 实现。
-    
 
 #### 4 Golang 的 model service 模型【类 MVC 模型】
 
 在一个项目工程中，为了使得代码更优雅，需要抽象出一些模型出来，同时基于 C++面向对象编程的思想，需要考虑到一些类、继承相关。在 Golang 中，没有类、继承的概念，但是我们完全可以通过 struct 和 interface 来建立我们想要的任何模型。在我们的工程中，抽象出一种我自认为是类似 MVC 的模型，但是不完全一样，个人觉得这个模型抽象的比较好，容易扩展，模块清晰。对于使用 java 和 PHP 编程的同学对这个模型应该是再熟悉不过了，我这边通过代码来说明下这个模型
 
 1. 首先一个 model 包，通过 interface 来实现，包含一些基础方法，需要被外部引用者来具体实现
-    
-    `package model      // 定义一个基础model   type MsgModel interface {    Persist(context context.Context, msg interface{}) bool    UpdateDbContent(context context.Context, msgIface interface{}) bool    GetList(context context.Context, uid, peerId, sinceMsgId, maxMsgId int64, count int) (interface{}, bool)]      `
-    
-2. 再定义一个 msg 包，用来具体实现 model 包中 MsgModel 模型的所有方法
-    
-    `package msg   type msgModelImpl struct{}   var MsgModelImpl = msgModelImpl{}   func (m msgModelImpl) Persist(context context.Context, msgIface interface{}) bool {     // 具体实现   }      func (m msgModelImpl) UpdateDbContent(context context.Context, msgIface interface{}) bool {       // 具体实现   }      func GetList(context context.Context, uid, peerId, sinceMsgId, maxMsgId int64, count int) (interface{}, bool)]{       // 具体实现   }      `
-    
 
-3. model 和 具体实现方定义并实现 ok 后，那么就还需要一个 service 来统筹管理
-    
-    `package service      // 定义一个msgService struct包含了model里面的UserModel和MsgModel两个model   type msgService struct {    userModel  model.UserModel    msgModel   model.MsgModel   }      // 定义一个MsgService的变量，并初始化，这样通过MsgService，就能引用并访问model的所有方法   var (       MsgService = msgService{     userModel:      user.UserModelImpl,     msgModel:       msg.MsgModelImpl,    }   )   `
-    
-4. 调用访问
-    
-    `import service   service.MsgService.Persist(ctx, xxx)   `
-    
+   `package model      // 定义一个基础model   type MsgModel interface {    Persist(context context.Context, msg interface{}) bool    UpdateDbContent(context context.Context, msgIface interface{}) bool    GetList(context context.Context, uid, peerId, sinceMsgId, maxMsgId int64, count int) (interface{}, bool)]      `
+
+1. 再定义一个 msg 包，用来具体实现 model 包中 MsgModel 模型的所有方法
+
+   `package msg   type msgModelImpl struct{}   var MsgModelImpl = msgModelImpl{}   func (m msgModelImpl) Persist(context context.Context, msgIface interface{}) bool {     // 具体实现   }      func (m msgModelImpl) UpdateDbContent(context context.Context, msgIface interface{}) bool {       // 具体实现   }      func GetList(context context.Context, uid, peerId, sinceMsgId, maxMsgId int64, count int) (interface{}, bool)]{       // 具体实现   }      `
+
+1. model 和 具体实现方定义并实现 ok 后，那么就还需要一个 service 来统筹管理
+
+   `package service      // 定义一个msgService struct包含了model里面的UserModel和MsgModel两个model   type msgService struct {    userModel  model.UserModel    msgModel   model.MsgModel   }      // 定义一个MsgService的变量，并初始化，这样通过MsgService，就能引用并访问model的所有方法   var (       MsgService = msgService{     userModel:      user.UserModelImpl,     msgModel:       msg.MsgModelImpl,    }   )   `
+
+1. 调用访问
+
+   `import service   service.MsgService.Persist(ctx, xxx)   `
 
 总结一下，model 对应 MVC 的 M，service 对应 MVC 的 C， 调用访问的地方对应 MVC 的 V
 
@@ -187,52 +165,38 @@ singleton.NewSingleton 就是具体单例模式的实现，然后赋值给 Singl
 Golang 工程 Layout 规范，网上有较多探讨，每个人的理解也会不一致，但是有些基础的理解是可以保持统一的：
 
 - cmd
-    
 
 - main 函数文件目录，这个目录下面，每个文件在编译之后都会生成一个可执行的文件。如果只有一个 app 文件，那就是 main.go。这里面的代码尽可能简单。
-    
 
 - conf
-    
 
 - 配置文件，如 toml、yaml 等文件
-    
 
 - config
-    
 
 - 配置文件的解析
-    
 
 - docs
-    
 
 - 文档
-    
 
 - pkg
-    
 
 - 底层各种实现，每一种实现封装一个文件夹
-    
+
 - 业界知名开源项目如 Kubernetes、Istio 都是这样的姿势
-    
 
 - build
-    
 
 - 编译脚本
-    
+
 - CI 脚本
-    
+
 - 上下线脚本
-    
 
 - vendor
-    
 
 - 依赖库
-    
 
 一个简单示例如下：
 
@@ -265,8 +229,6 @@ apply 命令如下，具体 apply 相关的 Run 方法忽略：
 `package apply      import (    "fmt"    "github.com/spf13/cobra"    "example/pkg/apply"    "example/pkg/files"   )      type RequestApplyOptions struct {    configPath string   }      func NewRequestApplyOptions() *RequestApplyOptions {    o := &RequestApplyOptions{}       return o   }      func NewVPARequestApply() *cobra.Command {    o := NewRequestApplyOptions()       cmd := &cobra.Command{     Use:   "apply [json file]",     Short: "apply request by json file",     Long:  "apply request by new request json file",     Args:  cobra.MinimumNArgs(1),     RunE: func(c *cobra.Command, args []string) error {      if err := o.Run(args); err != nil {       return err      }      return nil     },    }       return cmd   }   `
 
 然后只需要在各自的 Run 方法中实现对应的逻辑即可。
-
-  
 
 **腾讯程序员视频号最新视频**
 

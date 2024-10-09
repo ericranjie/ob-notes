@@ -11,8 +11,7 @@
 通过memblock模块，我们已经收集了内存布局的信息（memory type类型的数组），也知道了free memory资源的信息（memory type类型的数组减去reserved type类型的数组，从集合论的角度看，reserved type类型的数组是memory type类型的数组的真子集），但是，要管理这些珍贵的系统内存，首先要能够访问他们啊（顺便说一句：memblock中的那些数组定义的地址都是物理地址），通过前面的分析文章，我们知道有两段内存已经是可见的（完成了地址映射），一个是kernel image段，另外一个是fdt段。而广大的系统内存区域仍然在黑暗之中，等待我们去拯救（进行地址映射）。
 
 最后，我们思考这样一个问题：是否memory type类型的数组代表了整个的系统内存的地址空间呢？当然不是，有些驱动可能会保留一段系统内存区域为自己使用，同时也不希望OS管理这段内存（或者说对OS不可见），而是自己创建该段内存的地址映射。如果你对dts中的memory reserve节点比较熟悉的话，那么实际上这样的reserved memory region是有no-map属性的。这时候，内核初始化过程中，在解析该reserved-memory节点的时候，会将该段地址从memblock模块中移除。而在map_mem函数中，为所有memory type类型的数组创建地址映射的时候，有no-map属性的那段内存地址将不会创建地址映射，也就不在OS的控制范围内了。
-
-三、概览
+# 三、概览
 
 创建系统内存地址映射的代码在map_mem中，如下：
 ```cpp
@@ -59,13 +58,12 @@ memblock_set_current_limit(MEMBLOCK_ALLOC_ANYWHERE);－－－－－－－－－�
 在这种情况下，调用create_mapping（）的时候会分配pte页表内存（没有对齐2M，无法进行section mapping）。怎么破？还好第一个memory block（也就是kernel image所在的block）的start address是必定对齐在2M地址上的，所以只要考虑end地址，这时候需要适当的缩小limit到end & SECTION_MASK就可以保证分配的页表内存是已经建立地址映射的了。
 
 （4）__map_memblock代码如下：
-
-> static void __init __map_memblock(phys_addr_t start, phys_addr_t end)  
-> {  
->     create_mapping(start, __phys_to_virt(start), end - start,  
->             PAGE_KERNEL_EXEC);  
-> }
-
+```cpp
+static void init __map_memblock(phys_addr_t start, phys_addr_t end) {  
+create_mapping(start, __phys_to_virt(start), end - start,  
+PAGE_KERNEL_EXEC);  
+}
+```
 需要说明的是，在map_mem之后，所有之前通过__create_page_tables创建的描述符都被覆盖了，取而代之的是新的映射，并且memory attribute如下：
 
 > #define PAGE_KERNEL_EXEC    __pgprot(_PAGE_DEFAULT | PTE_UXN | PTE_DIRTY | PTE_WRITE)
@@ -73,109 +71,96 @@ memblock_set_current_limit(MEMBLOCK_ALLOC_ANYWHERE);－－－－－－－－－�
 大部分memory attribute保持不变（例如MT_NORMAL、PTE_AF 、 PTE_SHARED等），有几个bit需要说明一下：PTE_UXN，Unprivileged Execute-never bit，也就是限制userspace从这里取指执行。PTE_DIRTY是一个软件设定的bit，硬件并不操作这个bit，OS软件用这个bit标识该entry是clean or dirty，如果是dirty的话，说明该page的数据已经被写入过，如果该page需要被swapped out，那么还需要保存dirty的数据才能回收该page。关于PTE_WRITE的解释todo。
 
 （5）所有的系统内存的地址映射已经建立完毕，取消之前的上限，让memblock模块可以自由的分配内存。
-
-四、填充PGD中的描述符
+# 四、填充PGD中的描述符
 
 create_mapping实际上是调用底层的__create_mapping函数完成地址映射的，具体代码如下：
-
-> static void __init create_mapping(phys_addr_t phys, unsigned long virt,  
->                   phys_addr_t size, pgprot_t prot)  
-> {  
->     if (virt < VMALLOC_START) {  
->         pr_warn("BUG: not creating mapping for %pa at 0x%016lx - outside kernel range\n",  
->             &phys, virt);  
->         return;  
->     }  
->     __create_mapping(&init_mm, pgd_offset_k(virt & PAGE_MASK), phys, virt,  
->              size, prot, early_alloc);  
-> }
-
+```cpp
+static void init create_mapping(phys_addr_t phys, unsigned long virt,  
+phys_addr_t size, pgprot_t prot)  
+{  
+if (virt < VMALLOC_START) {  
+pr_warn("BUG: not creating mapping for %pa at 0x%016lx - outside kernel range\n",  
+&phys, virt);  
+return;  
+}  
+__create_mapping(&init_mm, pgd_offset_k(virt & PAGE_MASK), phys, virt,  
+size, prot, early_alloc);  
+}
+```
 create_mapping的作用是将起始物理地址等于phys，大小是size的这一段物理内存mapping到起始虚拟地址是virt的虚拟地址空间，映射的memory attribute是prot。内核的虚拟地址空间从VMALLOC_START开始，低于这个地址就不对了，验证完虚拟地址，底层是调用__create_mapping函数，传递的参数情况是这样的，init_mm是内核空间的内存描述符，pgd_offset_k是根据给定的虚拟地址，在kernel space的pgd中找到对应的描述符的位置，early_alloc是在mapping过程中，如果需要分配内存的话（页表需要内存），调用该函数进行内存的分配。__create_mapping函数具体代码如下：
+```cpp
+static void  create_mapping(struct mm_struct mm, pgd_t *pgd,  
+phys_addr_t phys, unsigned long virt,  
+phys_addr_t size, pgprot_t prot,  
+void *(*alloc)(unsigned long size))  
+{  
+unsigned long addr, length, end, next;
 
-> static void  __create_mapping(struct mm_struct *mm, pgd_t *pgd,  
->                     phys_addr_t phys, unsigned long virt,  
->                     phys_addr_t size, pgprot_t prot,  
->                     void *(*alloc)(unsigned long size))  
-> {  
->     unsigned long addr, length, end, next;
-> 
->     addr = virt & PAGE_MASK;－－－－－－－－－－－－－－－－－－－－－－－－（1）  
->     length = PAGE_ALIGN(size + (virt & ~PAGE_MASK));
-> 
->     end = addr + length;  
->     do {－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
->         next = pgd_addr_end(addr, end);－－－－－－－－－－－－－－－－－－－－（3）  
->         alloc_init_pud(mm, pgd, addr, next, phys, prot, alloc);－－－－－－－－－－（4）  
->         phys += next - addr;  
->     } while (pgd++, addr = next, addr != end);  
-> }
+addr = virt & PAGE_MASK;－－－－－－－－－－－－－－－－－－－－－－－－（1）  
+length = PAGE_ALIGN(size + (virt & ~PAGE_MASK));
 
+end = addr + length;  
+do {－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）  
+next = pgd_addr_end(addr, end);－－－－－－－－－－－－－－－－－－－－（3）  
+alloc_init_pud(mm, pgd, addr, next, phys, prot, alloc);－－－－－－－－－－（4）  
+phys += next - addr;  
+} while (pgd++, addr = next, addr != end);  
+}
+```
 创建地址映射熟悉要明确地址空间，不同的进程有不同的地址空间，struct mm_struct就是描述一个进程的虚拟地址空间，当然，我们这里的场景是为内核虚拟地址空间而创建地址映射，因此传递的参数是init_mm。需要创建地址映射的起始虚拟地址是virt，该虚拟地址对应的PUD中的描述符是一个8B的内存，pgd就是指向这个描述符内存的指针。
 
 （1）因为地址映射的最小单位是page，因此这里进行mapping的虚拟地址需要对齐到page size，同样的，长度也需要对齐到page size。经过对齐运算，（addr，length）定义的地址范围应该是囊括（virt，size）定义的地址范围，并且是对齐到page的。
-
 （2）（addr，length）这个虚拟地址范围可能需要占据多个PGD entry，因此这里我们需要一个循环，不断的调用alloc_init_pud函数来完成（addr，length）这个虚拟地址范围的映射，当然，alloc_init_pud函数其实也会建立下游（例如PUD、PMD、PTE）翻译表的entry。
-
 （3）pgd中的一个描述符只能mapping有限区域的虚拟地址（PGDIR_SIZE），pgd_addr_end的宏就是计算addr所在区域的end address。如果计算出来的end address小于传入的end地址参数，那么返回end参数值。也就是说，如果（addr，length）这个虚拟地址范围的mapping需要跨越多个pgd entry，那么next变量保存了下一个pgd entry的起始虚拟地址。
-
 （4）这个函数有两个作用，一是填充pgd entry，二是创建后续的pud translation table（如果需要的话）并进行下游Translation table的建立。
-
-五、分配PUD页表内存并填充相应的描述符
+# 五、分配PUD页表内存并填充相应的描述符
 
 alloc_init_pud并非只是操作pud，实际上它是操作pgd的一个entry，并分配初始pud以及后续translation table的。填充PGD的entry需要给出对应PUD translation table的内存地址，如果PUD不存在，那么alloc_init_pud还需要分配PUD translation table（page size），只有得到PUD翻译表的物理内存地址，我们才能填充PGD entry。具体代码如下：
+```cpp
+static void alloc_init_pud(struct mm_struct mm, pgd_t *pgd,  
+unsigned long addr, unsigned long end,  
+phys_addr_t phys, pgprot_t prot,  
+void *(*alloc)(unsigned long size))  
+{  
+pud_t *pud;  
+unsigned long next;
 
-> static void alloc_init_pud(struct mm_struct *mm, pgd_t *pgd,  
->                   unsigned long addr, unsigned long end,  
->                   phys_addr_t phys, pgprot_t prot,  
->                   void *(*alloc)(unsigned long size))  
-> {  
->     pud_t *pud;  
->     unsigned long next;
-> 
->     if (pgd_none(*pgd)) {－－－－－－－－－－－－－－－－－－－－－－－－－－（1）  
->         pud = alloc(PTRS_PER_PUD * sizeof(pud_t));  
->         pgd_populate(mm, pgd, pud);  
->     }   
->     pud = pud_offset(pgd, addr); －－－－－－－－－－－－－－－－－－－－－（2）  
->     do { －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）  
->         next = pud_addr_end(addr, end);
-> 
->         if (use_1G_block(addr, next, phys)) { －－－－－－－－－－－－－－－－（4）  
->             pud_t old_pud = *pud;  
->             set_pud(pud, __pud(phys | pgprot_val(mk_sect_prot(prot)))); －－－－－（5）
-> 
->             if (!pud_none(old_pud)) { －－－－－－－－－－－－－－－－－－－－－（6）  
->                 flush_tlb_all(); －－－－－－－－－－－－－－－－－－－－－－－－（7）  
->                 if (pud_table(old_pud)) {  
->                     phys_addr_t table = __pa(pmd_offset(&old_pud, 0));  
->                     if (!WARN_ON_ONCE(slab_is_available()))  
->                         memblock_free(table, PAGE_SIZE); －－－－－－－－－－－－（8）  
->                 }  
->             }  
->         } else {  
->             alloc_init_pmd(mm, pud, addr, next, phys, prot, alloc);  
->         }  
->         phys += next - addr;  
->     } while (pud++, addr = next, addr != end);  
-> }
+if (pgd_none(*pgd)) {－－－－－－－－－－－－－－－－－－－－－－－－－－（1）  
+pud = alloc(PTRS_PER_PUD * sizeof(pud_t));  
+pgd_populate(mm, pgd, pud);  
+}   
+pud = pud_offset(pgd, addr); －－－－－－－－－－－－－－－－－－－－－（2）  
+do { －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）  
+next = pud_addr_end(addr, end);
 
+if (use_1G_block(addr, next, phys)) { －－－－－－－－－－－－－－－－（4）  
+pud_t old_pud = *pud;  
+set_pud(pud, pud(phys | pgprot_val(mk_sect_prot(prot)))); －－－－－（5）
+
+if (!pud_none(old_pud)) { －－－－－－－－－－－－－－－－－－－－－（6）  
+flush_tlb_all(); －－－－－－－－－－－－－－－－－－－－－－－－（7）  
+if (pud_table(old_pud)) {  
+phys_addr_t table = __pa(pmd_offset(&old_pud, 0));  
+if (!WARN_ON_ONCE(slab_is_available()))  
+memblock_free(table, PAGE_SIZE); －－－－－－－－－－－－（8）  
+}  
+}  
+} else {  
+alloc_init_pmd(mm, pud, addr, next, phys, prot, alloc);  
+}  
+phys += next - addr;  
+} while (pud++, addr = next, addr != end);  
+}
+```
 （1）如果当前pgd entry是全0的话，说明还没有对应的下级PUD页表内存，因此需要进行PUD页表内存的分配。需要说明的是这时候，伙伴系统没有ready，分配内存仍然使用memblock模块，pgd_populate用来建立pgd entry和PUD 页表内存的关系。
-
 （2）至此，pud的页表内存已经有了，但是addr对应PUD中的哪一个描述符呢？pud_offset给出了答案，其返回的指针指向传入参数addr地址对应的pud 描述符内存，而我们随后的任务就是填充pud entry了。
-
 （3）虽然（addr，end）之间的虚拟地址范围共享一个pgd entry，但是这个地址范围对应的pud entry可能有多个，通过循环，逐一填充pud entry，同时分配并初始化下一阶页表。
-
 （4）如果没有可能存在的1G block地址映射，这里的代码逻辑和上一节中的类似，只不过不断的循环调用alloc_init_pud改成alloc_init_pmd即可。然而，ARM64的MMU硬件提供了灰常强大的功能，系统支持1G size的block mapping，如果能够应用会获取非常多的好处：不需要分配下级的translation table节省了内存，更重要的是大大降低了TLB miss，提高了性能。既然这么好，当然要使用，不过有什么条件呢？首先系统配置必须是4k的page size，这种配置下，一个PUD entry可以覆盖1G的memory block。此外，起止虚拟地址以及映射到的物理地址都必须要对齐在1G size上。
-
 （5）填写一个PUD描述符，一次搞定1G size的address mapping，没有PMD和PTE的页表内存，没有对PMD 和PTE描述符的访问，多么简单，多么美妙啊。假设系统内存4G，并且物理地址对齐在1G上（虚拟地址PAGE_OFFSET本来就是对齐在1G的），那么4个PUD的描述符就搞定了内核空间的线性地址映射区间。
-
 （6）如果pud entry是非空的，那么就说明之前已经有了对该段地址的mapping（也许是只映射了部分）。一个简单的例子就是起始阶段的kernel image mapping，在__create_page_tables创建pud 以及pmd中entry。如果不能进行section mapping，那么还建立了PTE中的描述符，现在这些描述符都没有用了，我们可以丢弃它们了。
-
 （7）虽然建立了新的页表，但是旧的页表还残留在了TLB中，必须将其“赶尽杀绝”，清除出TLB。
-
 （8）如果pud指向了一个table描述符，也就是说明该entry指向一个PMD table，那么需要释放其memory。
-
-六、分配PMD页表内存并填充相应的描述符
+# 六、分配PMD页表内存并填充相应的描述符
 
 1G block mapping虽好，不一定适合所有的系统，下面我一起看看PUD entry中填充的是block descriptor的情况（描述符指向PMD translation table）：
 

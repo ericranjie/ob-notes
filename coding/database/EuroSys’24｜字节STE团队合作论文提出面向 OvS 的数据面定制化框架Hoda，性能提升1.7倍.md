@@ -2,7 +2,7 @@
 
 原创 字节跳动STE团队 字节跳动SYS Tech
 
- _2023年09月15日 17:25_ _北京_
+_2023年09月15日 17:25_ _北京_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/Z4txjviceemNaH5Gc7V2ltc9AB79kQxpM7pOjtTiagt1TlQtCTrJ6zyPma8xbw3sGpeecTwveKP4GLqQa2nJ49EA/300?wx_fmt=png&wxfrom=19)
 
@@ -14,11 +14,7 @@
 
 公众号
 
-  
-
 近日，由中国科学院计算技术研究所、字节跳动、中国科学院计算机网络信息中心和 Intel 共同撰写的关于 Open vSwitch 转发性能优化的论文被系统领域顶级国际会议 EuroSys 2024 正式接受。EuroSys 由 ACM SIGOPS 组织于 2005 年发起并承办，是目前欧洲系统领域最好的国际学术会议之一，也是目前国际系统领域的重要会议，本次EuroSys分为春季与秋季两个投稿周期，春季周期共有244篇论文投稿，39篇被接收，接收率为16.0%。
-
-  
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_svg/hqDXUD6csU8f9Z5wkbLZ7GBRFq8v9CzicWzGibLtwhqwicbAhQ6EPIucJwp9CMM0oIriaEz8U00ul5EZFc9axAqeibbzmvVTcGtC6/640?wx_fmt=svg&wxfrom=13)
 
@@ -27,8 +23,6 @@
 Heng Pan, Peng He, Zhenyu Li, Pan Zhang, Junjie Wan, Yuhao Zhou, XiongChun Duan, Yu Zhang, Gaogang Xie. **Hoda: a High-performance Open vSwitch Dataplane with Multiple Specialized Data Paths**. Proceedings of the 19th European Conference on Computer Systems, Athens, Greece, April, 2024.
 
 云网络通常采用 Open vSwitch (OvS) 构建底层灵活可编程数据面，但在复杂云场景下（如隧道、带状态防火墙等）其转发性能会大幅下降。通过细粒度的性能诊断与分析，发现性能下降的根本原因主要是在于不同场景的转发任务的差异性与当前 OvS 数据面一刀切的通用设计之间存在巨大鸿沟。为此，设计了一种面向 OvS 的数据面定制化框架——Hoda，Hoda 相比于最新的 OvS **性能提升高达 1.7 倍**，端到端典型的 Nginx 服务**请求处理时间可降低 20%**。
-
-  
 
 **热门招聘**
 
@@ -78,13 +72,11 @@ Heng Pan, Peng He, Zhenyu Li, Pan Zhang, Junjie Wan, Yuhao Zhou, XiongChun Duan,
 
 [十年磨一剑，veLinux深度解读](http://mp.weixin.qq.com/s?__biz=Mzg3Mjg2NjU4NA==&mid=2247483680&idx=1&sn=d767d17e8b28baacb25f759c02e7bd0c&chksm=cee9f757f99e7e4136580232d4c56d619feacdd939e84ed9780d010b73417c5739b223a5c4dd&scene=21#wechat_redirect)
 
-  
-
 **关于STE团队**
 
 **字节跳动STE团队**（System Technologies&Engineering，系统技术与工程），一直致力于操作系统内核与虚拟化、系统基础软件与基础库的构建和性能优化、超大规模数据中心的系统稳定性和可靠性建设、新硬件与软件的协同设计等基础技术领域的研发与工程化落地，具备全面的基础软件工程能力，为字节上层业务保驾护航。同时，团队积极关注社区技术动向，拥抱开源和标准，欢迎更多同学加入我们，一起交流学习。扫描下方二维码了解职位详情，欢迎大家投递简历至huangxuechun.hr@bytedance.com 、wangan.hr@bytedance.com。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 扫码查看职位详情
 

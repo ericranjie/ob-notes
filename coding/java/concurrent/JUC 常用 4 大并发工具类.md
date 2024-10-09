@@ -2,7 +2,7 @@
 
 Linux爱好者
 
- _2021年09月24日 11:50_
+_2021年09月24日 11:50_
 
 ↓推荐关注↓
 
@@ -10,13 +10,13 @@ Linux爱好者
 
 **Go开发大全**
 
-点击获取6万star的Go开源库。[ Go开发大全 ] 日常分享 Go, 云原生、k8s、Docker和微服务方面的技术文章和行业动态。
+点击获取6万star的Go开源库。\[ Go开发大全 \] 日常分享 Go, 云原生、k8s、Docker和微服务方面的技术文章和行业动态。
 
 21篇原创内容
 
 公众号
 
-  **什么是JUC?**
+**什么是JUC?**
 
 JUC就是java.util.concurrent包,这个包俗称JUC,里面都是解决并发问题的一些东西
 
@@ -60,7 +60,7 @@ toString:这个就不用说了
 
 里面的Sync是一个内部类,外面的方法其实都是操作这个内部类的,这个内部类继承了AQS,实现的标准方法,AQS将在后面的章节写
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 主线程中创建CountDownLatch(3),然后主线程await阻塞,然后线程A,B,C各自完成了任务,调用了countDown,之后,每个线程调用一次计数器就会减一,初始是3,然后A线程调用后变成2,B线程调用后变成1,C线程调用后,变成0,这时就会唤醒正在await的主线程,然后主线程继续执行
 
@@ -94,7 +94,7 @@ CyclicBarrier的构造参数有两个
 
 首先这个第一个参数也树Int类型的,传入的是执行线程的个数,这个数量和CountDownLatch不一样,这个数量是需要和线程数量吻合的,CountDownLatch则不一样,CountDownLatch可以大于等于,而CyclicBarrier只能等于,然后是第二个参数,第二个参数是barrierAction,这个参数是当屏障开放后,执行的任务线程,如果当屏障开放后需要执行什么任务,可以写在这个线程中
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 主线程创建CyclicBarrier(3,barrierAction),然后由线程开始执行,线程A,B执行完成后都调用了await,然后他们都在一个屏障前阻塞者,需要等待线程C也,执行完成,调用await之后,然后三个线程都达到屏障后,屏障开放,然后线程继续执行,并且barrierAction在屏障开放的一瞬间也开始执行
 
@@ -174,13 +174,9 @@ Exchanger,俗称交换器,用于在线程之间交换数据,但是比较受限,�
 
 以上就是JUC的4大常用并发工具类了
 
-  
-
 > 转自：彼岸舞
-> 
+>
 > 链接：www.cnblogs.com/flower-dance/p/13714006.html
-
-  
 
 - EOF -
 
@@ -192,9 +188,7 @@ Exchanger,俗称交换器,用于在线程之间交换数据,但是比较受限,�
 
 3、[利用 Linux 查找重复文件](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666557648&idx=3&sn=345d2f5d13c52018ccc431d31f1b6e0d&chksm=80dcb47bb7ab3d6da5c015d07c12047d45de1891acd1f855a101551d3f155990cffeab246b58&scene=21#wechat_redirect)
 
-  
-
-看完本文有收获？请分享给更多人  
+看完本文有收获？请分享给更多人
 
 推荐关注「Linux 爱好者」，提升Linux技能
 

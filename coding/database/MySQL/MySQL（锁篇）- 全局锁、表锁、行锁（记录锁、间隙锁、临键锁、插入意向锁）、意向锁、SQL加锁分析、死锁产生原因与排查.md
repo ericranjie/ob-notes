@@ -1,9 +1,8 @@
-
 [](https://juejin.cn/user/4022488531210768/posts)
 
 2024-05-146,144阅读31分钟
 
-专栏： 
+专栏：
 
 Mysql
 
@@ -42,11 +41,11 @@ sql
 **按锁功能分**
 
 - **共享锁Shared Lock（S锁，也叫做读锁）**
-    - 加了读锁的记录，允许其他事务再加读锁
-    - 加锁方式：select ... lock in share mode
+  - 加了读锁的记录，允许其他事务再加读锁
+  - 加锁方式：select ... lock in share mode
 - **排它锁Exclusive Lock（X锁，也叫写锁）**
-    - 加了写锁的记录，不允许其他事务再加读锁或者写锁
-    - 加锁方式：select ... for update
+  - 加了写锁的记录，不允许其他事务再加读锁或者写锁
+  - 加锁方式：select ... for update
 
 ## 2.2 全局锁
 
@@ -87,8 +86,8 @@ sql
 - 表读锁（Table Read Lock）：阻塞对当前表的写，但不阻塞读
 - 表写锁（Table Write Lock）：阻塞对当前表的读和写
 - 元数据锁（meta data lock, MDL）：不需要显式指定，在访问表时会被自动加上，作用保证读写的正确性
-    - 当对表做增删改查操作时加元数据读锁
-    - 当对表做结构变更操作的时候加元数据写锁
+  - 当对表做增删改查操作时加元数据读锁
+  - 当对表做结构变更操作的时候加元数据写锁
 - 自增锁（ATUO-INC Lock）：一种特殊的表级锁，自增列事务性插入操作时产生
 
 ## 3.2 表读锁、写锁
@@ -239,15 +238,16 @@ Mysql的**行级锁**， 是由**存储引擎来实现的**，这里我们主要
 **只有通过索引条件检索的数据，Inn oDb才能使用行级锁，否则，InnoDB将使用表锁！**
 
 - InnoDB的行级锁，按照**锁定范围**来说，分为4种：
-    
-    - **记录锁**（Record Locks）：锁定索引中的一条记录
-    - **间隙锁**（Gap Locks）：要么锁住索引记录中间的值，要么锁住第一个索引记录前面的值或者最后一个索引记录后面的值。
-    - **临键锁**（Next-Key Locks）：是索引记录上的记录锁和在索引记录之间的间隙锁的组合（间隙锁+记录锁）
-    - **插入意向锁**（Insert Intention Locks）：做insert操作时添加的对记录ID的锁
+
+  - **记录锁**（Record Locks）：锁定索引中的一条记录
+  - **间隙锁**（Gap Locks）：要么锁住索引记录中间的值，要么锁住第一个索引记录前面的值或者最后一个索引记录后面的值。
+  - **临键锁**（Next-Key Locks）：是索引记录上的记录锁和在索引记录之间的间隙锁的组合（间隙锁+记录锁）
+  - **插入意向锁**（Insert Intention Locks）：做insert操作时添加的对记录ID的锁
+
 - InnoDB的行级锁，按照**功能**来说，分为两种：
-    
-    - 读锁：允许一个事务去读一行，阻止其他事务更新目标行数据。同时阻止其他事务加写锁，但不允许其他事务加读锁。
-    - 写锁：允许获得排他锁的事务更新数据，阻止其他事务获取或修改数据。同时阻止其他事务加读锁和写锁。
+
+  - 读锁：允许一个事务去读一行，阻止其他事务更新目标行数据。同时阻止其他事务加写锁，但不允许其他事务加读锁。
+  - 写锁：允许获得排他锁的事务更新数据，阻止其他事务获取或修改数据。同时阻止其他事务加读锁和写锁。
 
 **如果加行级锁？**
 
@@ -263,7 +263,7 @@ sql
 
 复制代码
 
-``CREATE TABLE `t1_simple` ( `id` int(11) NOT NULL, `pubtime` int(11) NULL DEFAULT NULL, PRIMARY KEY (`id`) USING BTREE, INDEX `idx_pu`(`pubtime`) USING BTREE ) ENGINE = InnoDB; INSERT INTO `t1_simple` VALUES (1, 10); INSERT INTO `t1_simple` VALUES (4, 3); INSERT INTO `t1_simple` VALUES (6, 100); INSERT INTO `t1_simple` VALUES (8, 5); INSERT INTO `t1_simple` VALUES (10, 1); INSERT INTO `t1_simple` VALUES (100, 20);``
+`` CREATE TABLE `t1_simple` ( `id` int(11) NOT NULL, `pubtime` int(11) NULL DEFAULT NULL, PRIMARY KEY (`id`) USING BTREE, INDEX `idx_pu`(`pubtime`) USING BTREE ) ENGINE = InnoDB; INSERT INTO `t1_simple` VALUES (1, 10); INSERT INTO `t1_simple` VALUES (4, 3); INSERT INTO `t1_simple` VALUES (6, 100); INSERT INTO `t1_simple` VALUES (8, 5); INSERT INTO `t1_simple` VALUES (10, 1); INSERT INTO `t1_simple` VALUES (100, 20); ``
 
 **添加读锁**
 
@@ -292,9 +292,9 @@ sql
 ### 4.2.2 间隙锁
 
 1. 间隙锁（Gap Locks），仅仅锁住一个索引区间（开区间，不包含双端端点）
-2. 在索引记录之间的间隙中加锁，或者是在某个索引记录之前或者之后加锁，并不包含该索引记录本身。
-3. **间隙锁可用于防止幻读**，保证**索引间隙**不会被插入数据
-4. 在可重复读（REPETABLE READ）这个隔离级别下生效。
+1. 在索引记录之间的间隙中加锁，或者是在某个索引记录之前或者之后加锁，并不包含该索引记录本身。
+1. **间隙锁可用于防止幻读**，保证**索引间隙**不会被插入数据
+1. 在可重复读（REPETABLE READ）这个隔离级别下生效。
 
 **主键ID索引的行锁区间划分图**
 
@@ -322,15 +322,15 @@ sql
 
 ### 4.2.3 临键锁
 
-1. 临键锁（Next—Key Locks）相当于记录锁+间隙锁 **【左开右闭区间】**，例如(5,8]
-2. **默认情况下，innodb使用临键锁来锁定记录。** 但是在不同场景中会退化
+1. 临键锁（Next—Key Locks）相当于记录锁+间隙锁 **【左开右闭区间】**，例如(5,8\]
+1. **默认情况下，innodb使用临键锁来锁定记录。** 但是在不同场景中会退化
 
 ![image.png](https://p3-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/02e20f002ca04eda8d4bd057a6c600fe~tplv-k3u1fbpfcp-jj-mark:3024:0:0:0:q75.avis#?w=962&h=672&s=94769&e=png&b=f9f9f9)
 
 - 默认情况下，InnoDB使用临键锁来锁定记录，但会在不同场景中退化
 - 场景01-**唯一性字段等值（=）且记录存在，退化为记录锁**
 - 场景02-**唯一性字段等值（=）且记录不存在，退化为间隙锁**
-- 场景03-**唯一性字段范围（< >），还是临键锁**
+- 场景03-**唯一性字段范围（\< >），还是临键锁**
 - 场景04-**非唯一性字段，默认是临键锁**
 
 session1执行：
@@ -374,8 +374,8 @@ sql
 **什么是插入意向锁？**
 
 1. 插入意向锁是一种在INSERT操作之前设置的一种特殊的间隙锁。
-2. 插入意向锁表示了一种插入意图，即当多个不同的事务，同时往同一个索引的同一个间隙插入数据的时候，他们互相之间无需等待，即不会阻塞。
-3. 插入意向锁不会阻止插入意向锁，但是**插入意向锁会阻止其他间隙写锁（排他锁）、记录锁**
+1. 插入意向锁表示了一种插入意图，即当多个不同的事务，同时往同一个索引的同一个间隙插入数据的时候，他们互相之间无需等待，即不会阻塞。
+1. 插入意向锁不会阻止插入意向锁，但是**插入意向锁会阻止其他间隙写锁（排他锁）、记录锁**
 
 session01执行
 
@@ -408,20 +408,20 @@ sql
 **主键索引**
 
 - 等值条件：
-    - 命中：加记录锁
-    - 未命中，加间隙锁
+  - 命中：加记录锁
+  - 未命中，加间隙锁
 - 范围条件：
-    - 命中，包含where条件的临键区间，加临键锁
-    - 未命中，加间隙锁
+  - 命中，包含where条件的临键区间，加临键锁
+  - 未命中，加间隙锁
 
 **辅助索引**
 
 - 等值条件：
-    - 命中：命中记录的辅助索引项，回表主键索引项加记录锁，辅助索引项两侧加间隙锁
-    - 未命中：加间隙锁
+  - 命中：命中记录的辅助索引项，回表主键索引项加记录锁，辅助索引项两侧加间隙锁
+  - 未命中：加间隙锁
 - 范围条件
-    - 命中：包含where条件的临键区间加临键锁。命中记录回表主键索引项加记录锁
-    - 未命中：加间隙锁
+  - 命中：包含where条件的临键区间加临键锁。命中记录回表主键索引项加记录锁
+  - 未命中：加间隙锁
 
 ## 4.4 意向锁
 
@@ -438,7 +438,7 @@ InnoDB也实现了表锁，也就是意向锁。意向锁是Mysql内部使用的
 当我们需要加一个写锁时，需要根据意向锁区判断表里有没有数据行被锁定；
 
 1. 如果行锁，则需要遍历每一行去确认。
-2. 如果表锁，则只需要判断一次即可知道没有有数据行被锁定，提升性能。
+1. 如果表锁，则只需要判断一次即可知道没有有数据行被锁定，提升性能。
 
 ### 4.4.2 作用
 
@@ -461,7 +461,7 @@ InnoDB所使用的**行级锁定**争用状态查看：
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
@@ -487,7 +487,7 @@ sql
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
@@ -497,7 +497,7 @@ sql
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
@@ -511,29 +511,30 @@ sql
 这个答案对吗？ 不一定，因为已知条件不足，这个问题没有答案。 判断这个问题，需要一些前提，前提不同，答案也不相同。
 
 - **前提一**：id列是不是主键？
-    
+
 - **前提二**：当前系统的隔离级别是什么？
-    
+
 - **前提三**：ID列如果不是主键，那么ID列上有索引吗？
-    
+
 - **前提四**：ID列上如果有索引，那么这个索引是唯一索引吗？
-    
+
 - **前提五**：两个SQL的执行计划是什么？索引扫描？全表扫描？
-    
+
 - **读已提交【RC】隔离级别**
-    
-    - 组合一：id列是主键
-    - 组合二：id列是二级唯一索引
-    - 组合三：id列是二级非唯一索引
-    - 组合四：id列上没有索引
+
+  - 组合一：id列是主键
+  - 组合二：id列是二级唯一索引
+  - 组合三：id列是二级非唯一索引
+  - 组合四：id列上没有索引
+
 - **可重复读【RR】隔离级别**
-    
-    - 组合五：id列是主键
-    - 组合六：id列是二级唯一索引
-    - 组合七：id列是二级非唯一索引
-    - 组合八：id列上没有索引
+
+  - 组合五：id列是主键
+  - 组合六：id列是二级唯一索引
+  - 组合七：id列是二级非唯一索引
+  - 组合八：id列上没有索引
+
 - **组合九：Serializable隔离级别**
-    
 
 ## 5.1 读已提交RC
 
@@ -607,7 +608,7 @@ sql
 
 > **如何保证两次当前读返回一致的记录？** 那就需要在第一次当前读与第二次当前读之间，其他的事务不会插入新的满足条件的记录并提交。为了实现这个功能，间隙锁应运而生。
 
-**结论**：RR隔离级别下，ID列上有一个非唯一索引，对应SQL：`delete from t1 where id = 10;` 首先：**通过ID索引定位到第一条满足查询条件的记录，对该记录上写锁，加GAP的间隙锁，然后加主键索引上记录的写锁，然后返回；然后读取吓一跳，重复进行。直到进行到第一条不满足条件的记录[11,f]，此时，不需要加记录写锁，但是仍旧需要加间隙锁，最后返回结束。**
+**结论**：RR隔离级别下，ID列上有一个非唯一索引，对应SQL：`delete from t1 where id = 10;` 首先：**通过ID索引定位到第一条满足查询条件的记录，对该记录上写锁，加GAP的间隙锁，然后加主键索引上记录的写锁，然后返回；然后读取吓一跳，重复进行。直到进行到第一条不满足条件的记录\[11,f\]，此时，不需要加记录写锁，但是仍旧需要加间隙锁，最后返回结束。**
 
 ### 5.2.4 组合八：ID无索引
 
@@ -615,11 +616,11 @@ RR情况下，ID无索引：`delete from t1 where id = 10;` 只能走全表扫�
 
 ![image.png](https://p6-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/18b714a340ab4908a6b9fc66ca5782c9~tplv-k3u1fbpfcp-jj-mark:3024:0:0:0:q75.avis#?w=1072&h=1002&s=191116&e=png&b=f6f6f6)
 
-如图，**聚簇索引上的所有记录都被加上了写锁**，其次，**聚簇索引每条记录的间隙，也同时被加上了间隙锁。**这个实例表，总共6条数据，一共需要6个记录锁，7个间隙锁。那么如果是1000万条记录呢？
+如图，**聚簇索引上的所有记录都被加上了写锁**，其次，\*\*聚簇索引每条记录的间隙，也同时被加上了间隙锁。\*\*这个实例表，总共6条数据，一共需要6个记录锁，7个间隙锁。那么如果是1000万条记录呢？
 
 在这种情况下，这个表上，除了不加锁的快照读，其他任何加锁的并发SQL都不能被执行，不能更新，不能删除，不能插入，全表被锁死。
 
-当前，跟组合四类似，这种情况下，Mysql也做了优化，就是所谓的semi-consistent read。semi-consistent read开启的情况下，对于不满足查询条件的记录，Mysql会提前放锁。针对上面的这个用例，就是除了记录[d,10],[g,10]之外，其他的记录锁都会被释放，同时不加间隙锁。
+当前，跟组合四类似，这种情况下，Mysql也做了优化，就是所谓的semi-consistent read。semi-consistent read开启的情况下，对于不满足查询条件的记录，Mysql会提前放锁。针对上面的这个用例，就是除了记录\[d,10\],\[g,10\]之外，其他的记录锁都会被释放，同时不加间隙锁。
 
 **semi-consistent read如何触发？** 要么是RC隔离级别；要么是RR隔离级别，同时设置了**innodb_locks_unsafe_for_binlog 参数。**
 
@@ -639,7 +640,7 @@ Serializable隔离级别，影响的是SQL1这条SQL： `select * from t1 w
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
@@ -653,7 +654,7 @@ sql
 
 在详细分析这条SQL的加锁情况前，还需要一个知识储备，那就是一个SQL中的where条件如何拆分？
 
-- **index key**: pubtime > 1 and pubtime < 20。此条件，用于确定SQL在idx_t1_pu索引上的查询范围。
+- **index key**: pubtime > 1 and pubtime \< 20。此条件，用于确定SQL在idx_t1_pu索引上的查询范围。
 - **index Filter**: userid = 'hero'. 此条件，可以在idx_t1_pu索引上进行过滤，但不属于index key。
 - **Table Filter**：comment is not null。此条件，在idx_t1_pu索引上无法过滤，只能在SQL- Layer上过滤。
 
@@ -664,7 +665,7 @@ sql
 - 不支持ICP：Index Filter在Mysql Server层过滤，不满足Index Filter的记录，也要加上记录写锁
 - 支持ICP：则在Index上过滤，则不满足Index Filter的记录，无需加记录写锁。
 
-而Table Filter对应的过滤条件，则在聚簇索引中读取后，在Mysql Server层过滤，因此聚簇索引上也需要写锁。最后，选取出了一条满足条件的记录[8, hero, d, 5, handsome]，但是加锁的数量，要远远大于满足条件的记录数量。
+而Table Filter对应的过滤条件，则在聚簇索引中读取后，在Mysql Server层过滤，因此聚簇索引上也需要写锁。最后，选取出了一条满足条件的记录\[8, hero, d, 5, handsome\]，但是加锁的数量，要远远大于满足条件的记录数量。
 
 **结论：**
 
@@ -688,11 +689,11 @@ sql
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
-``CREATE TABLE `t1_deadlock` ( `id` int(11) NOT NULL, `name` varchar(100) DEFAULT NULL, `age` int(11) NOT NULL, `address` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`), KEY `idx_age` (`age`) USING BTREE, KEY `idx_name` (`name`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4; Insert into t1_deadlock(id,name,age,address) values (1,'刘备',18,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (2,'关羽',17,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (3,'张飞',16,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (4,'关羽',16,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (5,'诸葛亮',35,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (6,'曹孟德',32,'魏国');``
+`` CREATE TABLE `t1_deadlock` ( `id` int(11) NOT NULL, `name` varchar(100) DEFAULT NULL, `age` int(11) NOT NULL, `address` varchar(255) DEFAULT NULL, PRIMARY KEY (`id`), KEY `idx_age` (`age`) USING BTREE, KEY `idx_name` (`name`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4; Insert into t1_deadlock(id,name,age,address) values (1,'刘备',18,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (2,'关羽',17,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (3,'张飞',16,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (4,'关羽',16,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (5,'诸葛亮',35,'蜀国'); Insert into t1_deadlock(id,name,age,address) values (6,'曹孟德',32,'魏国'); ``
 
 产生死锁的两个例子：
 
@@ -712,7 +713,7 @@ sql
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
@@ -726,11 +727,11 @@ sql
 
 sql
 
- 代码解读
+代码解读
 
 复制代码
 
-``CREATE TABLE `t1_deadlock03` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cnt` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE index `idx_cnt` (`cnt`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4; insert into t1_deadlock03(id,cnt) values (1,'abc-130-sz'); -- Session01 begin; delete from t1_deadlock03 where cnt='abc-130-sz'; insert into t1_deadlock03(cnt) values ('abc-130-sz'); -- 在加写锁之前会先加读锁 commit; -- Session01 begin; delete from t1_deadlock03 where cnt='abc-130-sz'; commit;``
+`` CREATE TABLE `t1_deadlock03` ( `id` int(11) NOT NULL AUTO_INCREMENT, `cnt` varchar(32) DEFAULT NULL, PRIMARY KEY (`id`), UNIQUE index `idx_cnt` (`cnt`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4; insert into t1_deadlock03(id,cnt) values (1,'abc-130-sz'); -- Session01 begin; delete from t1_deadlock03 where cnt='abc-130-sz'; insert into t1_deadlock03(cnt) values ('abc-130-sz'); -- 在加写锁之前会先加读锁 commit; -- Session01 begin; delete from t1_deadlock03 where cnt='abc-130-sz'; commit; ``
 
 ![image.png](https://p9-juejin.byteimg.com/tos-cn-i-k3u1fbpfcp/5a4efd56c23543e691377d13212d846b~tplv-k3u1fbpfcp-jj-mark:3024:0:0:0:q75.avis#?w=1290&h=264&s=377295&e=png&b=1e3648)
 
@@ -742,24 +743,22 @@ sql
 
 perl
 
- 代码解读
+代码解读
 
 复制代码
 
-``------------------------ LATEST DETECTED DEADLOCK ------------------------ 2024-05-14 10:49:51 0x7f8c2c06f700 *** (1) TRANSACTION: TRANSACTION 2428, ACTIVE 4 sec starting index read mysql tables in use 1, locked 1 LOCK WAIT 2 lock struct(s), heap size 1136, 1 row lock(s) MySQL thread id 207, OS thread handle 140239876904704, query id 721 localhost root updating delete from t1_deadlock03 where cnt='abc-130-sz' *** (1) WAITING FOR THIS LOCK TO BE GRANTED: RECORD LOCKS space id 44 page no 4 n bits 72 index idx_cnt of table `hello`.`t1_deadlock03` trx id 2428 lock_mode X waiting Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 32  0: len 10; hex 6162632d3133302d737a; asc abc-130-sz;;  1: len 4; hex 80000004; asc     ;; *** (2) TRANSACTION: TRANSACTION 2427, ACTIVE 8 sec inserting mysql tables in use 1, locked 1 4 lock struct(s), heap size 1136, 3 row lock(s), undo log entries 2 MySQL thread id 208, OS thread handle 140240010802944, query id 722 localhost root update insert into t1_deadlock03(cnt) values ('abc-130-sz') *** (2) HOLDS THE LOCK(S): RECORD LOCKS space id 44 page no 4 n bits 72 index idx_cnt of table `hello`.`t1_deadlock03` trx id 2427 lock_mode X locks rec but not gap Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 32  0: len 10; hex 6162632d3133302d737a; asc abc-130-sz;;  1: len 4; hex 80000004; asc     ;; *** (2) WAITING FOR THIS LOCK TO BE GRANTED: RECORD LOCKS space id 44 page no 4 n bits 72 index idx_cnt of table `hello`.`t1_deadlock03` trx id 2427 lock mode S waiting Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 32  0: len 10; hex 6162632d3133302d737a; asc abc-130-sz;;  1: len 4; hex 80000004; asc     ;; *** WE ROLL BACK TRANSACTION (1)``
+`` ------------------------ LATEST DETECTED DEADLOCK ------------------------ 2024-05-14 10:49:51 0x7f8c2c06f700 *** (1) TRANSACTION: TRANSACTION 2428, ACTIVE 4 sec starting index read mysql tables in use 1, locked 1 LOCK WAIT 2 lock struct(s), heap size 1136, 1 row lock(s) MySQL thread id 207, OS thread handle 140239876904704, query id 721 localhost root updating delete from t1_deadlock03 where cnt='abc-130-sz' *** (1) WAITING FOR THIS LOCK TO BE GRANTED: RECORD LOCKS space id 44 page no 4 n bits 72 index idx_cnt of table `hello`.`t1_deadlock03` trx id 2428 lock_mode X waiting Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 32  0: len 10; hex 6162632d3133302d737a; asc abc-130-sz;;  1: len 4; hex 80000004; asc     ;; *** (2) TRANSACTION: TRANSACTION 2427, ACTIVE 8 sec inserting mysql tables in use 1, locked 1 4 lock struct(s), heap size 1136, 3 row lock(s), undo log entries 2 MySQL thread id 208, OS thread handle 140240010802944, query id 722 localhost root update insert into t1_deadlock03(cnt) values ('abc-130-sz') *** (2) HOLDS THE LOCK(S): RECORD LOCKS space id 44 page no 4 n bits 72 index idx_cnt of table `hello`.`t1_deadlock03` trx id 2427 lock_mode X locks rec but not gap Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 32  0: len 10; hex 6162632d3133302d737a; asc abc-130-sz;;  1: len 4; hex 80000004; asc     ;; *** (2) WAITING FOR THIS LOCK TO BE GRANTED: RECORD LOCKS space id 44 page no 4 n bits 72 index idx_cnt of table `hello`.`t1_deadlock03` trx id 2427 lock mode S waiting Record lock, heap no 2 PHYSICAL RECORD: n_fields 2; compact format; info bits 32  0: len 10; hex 6162632d3133302d737a; asc abc-130-sz;;  1: len 4; hex 80000004; asc     ;; *** WE ROLL BACK TRANSACTION (1) ``
 
 ## 6.2 如何避免死锁？
 
 Mysql默认会主动探知死锁，并回滚某一个影响最小的事务，等另一个事务执行完成之后，再重新执行该事务。
 
 1. 注意程序的逻辑：根本的原因是程序逻辑的顺序交叠，最常见的是交叉更新
-2. 保持事务的轻量：越是轻量的事务，占有越少的资源，这样发生死锁的几率越小
-3. 提高运行的速度：避免使用子查询，尽量使用主键等
-4. 尽量快提交事务，减少持有锁的时间：越早提交事务，锁就越早释放
+1. 保持事务的轻量：越是轻量的事务，占有越少的资源，这样发生死锁的几率越小
+1. 提高运行的速度：避免使用子查询，尽量使用主键等
+1. 尽量快提交事务，减少持有锁的时间：越早提交事务，锁就越早释放
 
-  
-
-作者：Aaron学习之路  
-链接：https://juejin.cn/post/7368375416929239092  
-来源：稀土掘金  
+作者：Aaron学习之路\
+链接：https://juejin.cn/post/7368375416929239092\
+来源：稀土掘金\
 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。

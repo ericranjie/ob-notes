@@ -1,25 +1,34 @@
 方志朋
- _2022年03月20日 21:31_
+_2022年03月20日 21:31_
 _欢迎关注方志朋的博客，回复”666“获面试宝典_
 
 # 一、Nginx安装
+
 ##### 1、去官网http://nginx.org/下载对应的nginx包，推荐使用稳定版本
+
 ##### 2、上传nginx到linux系统
+
 ##### 3、安装依赖环境
 
-（1) 安装gcc环境  
-yum install gcc-c++  
+（1) 安装gcc环境\
+yum install gcc-c++\
 (2)安装PCRE库，用于解析正则表达式
-yum install -y pcre pcre-devel  
+yum install -y pcre pcre-devel\
 (3)zlib压缩和解压缩依赖
-yum install -y zlib zlib-devel  
+yum install -y zlib zlib-devel\
 (4)SSL 安全的加密的套接字协议层，用于HTTP安全传输，也就是https
-yum install -y openssl openssl-devel  
+yum install -y openssl openssl-devel
+
 ##### 4、解压，需要注意，解压后得到的是源码，源码需要编译后才能安装
-tar -zxvf nginx-1.16.1.tar.gz  
+
+tar -zxvf nginx-1.16.1.tar.gz
+
 ##### 5、编译之前，先创建nginx临时目录，如果不创建，在启动nginx的过程中会报错
-mkdir /var/temp/nginx -p  
+
+mkdir /var/temp/nginx -p
+
 ##### 6、在nginx目录，输入如下命令进行配置，目的是为了创建makefile文件
+
 ```cpp
 ./configure \     
 --prefix=/usr/local/nginx \      
@@ -34,19 +43,26 @@ mkdir /var/temp/nginx -p
 --http-uwsgi-temp-path=/var/temp/nginx/uwsgi \      
 --http-scgi-temp-path=/var/temp/nginx/scgi  
 ```
+
 注：代表在命令行中换行，用于提高可读性配置命令：
-![[Pasted image 20241006101910.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006101910.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 7、make编译&安装
-make  
-make install  
+
+make\
+make install
+
 ##### 8、进入sbin目录启动nginx
-启动：nginx  
-停止：./nginx -s stop  
-重新加载：./nginx -s reload  
+
+启动：nginx\
+停止：./nginx -s stop\
+重新加载：./nginx -s reload
+
 # 二、配置反向代理
+
 1、配置upstream
+
 ```cpp
 upstream [proxyName] {  
     server 192.168.1.173:8080;  
@@ -54,7 +70,9 @@ upstream [proxyName] {
     server 192.168.1.175:8080;  
 }  
 ```
+
 2、配置server
+
 ```cpp
 server {  
     listem  80;  
@@ -65,11 +83,13 @@ server {
     }  
 }  
 ```
+
 # 三、配置负载均衡
 
 nginx默认采用轮训的方式进行负载均衡
 
 1、使用加权轮询
+
 ```cpp
 upstream [proxyName] {  
     server 192.168.1.173:8080 weight=1;  
@@ -77,7 +97,9 @@ upstream [proxyName] {
     server 192.168.1.175:8080 weight=2;  
 }  
 ```
+
 2、hash负载均衡
+
 ```cpp
 upstream [proxyName] {  
     ip_hash  
@@ -87,12 +109,15 @@ upstream [proxyName] {
     server 192.168.1.175:8080;  
 }  
 ```
+
 hash算法实际上只会计算 192.168.1这段做哈希
 
 使用ip_hash的注意点：
+
 - 不能把后台服务器直接移除，只能标记down.
-    
+
 3、url hash负载均衡
+
 ```cpp
 upstream [proxyName] {  
     hash $request_url;  
@@ -102,7 +127,9 @@ upstream [proxyName] {
     server 192.168.1.175:8080;  
 }  
 ```
+
 4、最小连接负载均衡
+
 ```cpp
 upstream [proxyName] {  
     least_conn;  
@@ -112,7 +139,9 @@ upstream [proxyName] {
     server 192.168.1.175:8080;  
 }  
 ```
+
 # 四、upstream指令参数
+
 `max_conns`：限制最大同时连接数 1.11.5之前只能用于商业版
 `slow_start`：单位秒，权重在指定时间内从1上升到指定值，不适用与hash负载均衡、随机负载均衡 如果在 upstream 中只有一台 server，则该参数失效（商业版才有）
 `down`：禁止访问
@@ -121,6 +150,7 @@ upstream [proxyName] {
 `fail_timeout`：表示失败的重试时间 默认值10
 
 1、keepalived
+
 ```cpp
 upstream [proxyName] {  
     server 192.168.1.173:8080 weight=1;  
@@ -141,7 +171,9 @@ server {
     }  
 }  
 ```
+
 2、控制浏览器缓存
+
 ```cpp
 server {  
     listem  80;  
@@ -158,7 +190,9 @@ server {
     }  
 }  
 ```
+
 3、反向代理缓存
+
 ```cpp
 upstream [proxyName] {  
     server 192.168.1.173:8080 weight=1;  
@@ -186,12 +220,15 @@ server {
     }  
 }  
 ```
+
 # 五、配置ssl证书提供https访问
 
 ##### 1. 安装SSL模块
+
 要在nginx中配置https，就必须安装ssl模块，也就是: `http_ssl_module`。
 进入到nginx的解压目录：`/home/software/nginx-1.16.1`
 新增ssl模块(原来的那些模块需要保留)
+
 ```cpp
 ./configure \  
 --prefix=/usr/local/nginx \  
@@ -207,13 +244,16 @@ server {
 --http-scgi-temp-path=/var/temp/nginx/scgi  \  
 --with-http_ssl_module  
 ```
+
 编译和安装
-make  
-make install  
+make\
+make install
+
 ##### 2、配置HTTPS
 
 把ssl证书 `*.crt` 和 私钥 `*.key` 拷贝到`/usr/local/nginx/conf`目录中。
 新增 server 监听 443 端口：
+
 ```cpp
 server {  
     listen       443;  
@@ -239,43 +279,56 @@ server {
     }  
 }  
 ```
+
 # 六、配置ha nginx
 
 ##### 1、安装keepalived
+
 (1)下载
-https://www.keepalived.org/download.html  
+https://www.keepalived.org/download.html\
 (2)解压
-tar -zxvf keepalived-2.0.18.tar.gz  
+tar -zxvf keepalived-2.0.18.tar.gz\
 (3)使用configure命令配置安装目录与核心配置文件所在位置：
+
 ```cpp
 ./configure --prefix=/usr/local/keepalived --sysconf=/etc  
 ```
+
 - **prefix**：keepalived安装的位置sysconf：keepalived核心配置文件所在位置，固定位置，改成其他位置则keepalived启动不了，`/var/log/messages`中会报错
 - **sysconf**：keepalived核心配置文件所在位置，固定位置，改成其他位置则keepalived启动不了，`/var/log/messages`中会报错
 
 配置过程中可能会出现警告信息，如下所示：
 
-*** WARNING - this build will not support IPVS with IPv6. Please install libnl/libnl-3 dev libraries to support IPv6 with IPVS.  
-  
-# 安装libnl/libnl-3依赖  
+\*\*\* WARNING - this build will not support IPVS with IPv6. Please install libnl/libnl-3 dev libraries to support IPv6 with IPVS.
+
+# 安装libnl/libnl-3依赖
+
 ```cpp
 yum -y install libnl libnl-devel  
 ```
+
 (4)安装keepalived
+
 ```cpp
 make && make install  
 ```
+
 (5)配置文件 在`/etc/keepalived/keepalived.conf`
 (6)忘记安装配置的目录，则通过如下命令找到：
+
 ```cpp
 whereis keepalived  
 ```
+
 (7)启动keepalived
 
 进入sbin目录
-./keepalived  
+./keepalived
+
 ##### 2、配置keepalived 主机
+
 (1)通过命令 `vim keepalived.conf` 打开配置文件
+
 ```cpp
 global_defs {   
     # 路由id：当前安装keepalived的节点主机标识符，保证全局唯一   
@@ -304,30 +357,39 @@ vrrp_instance VI_1 { 
     }  
 }  
 ```
+
 附：查看网卡信息命令
+
 ```cpp
 ip addr  
 ```
+
 (2)启动keepalived
 (3)查看进程
+
 ```cpp
 ps -ef | grep keepalived  
 ```
+
 (4)查看vip(虚拟ip)
 
 在网卡ens33下，多了一个`192.168.1.161`，这个就是虚拟ip
 
 ##### 3、把keepalived注册为系统服务
+
 (1)拷贝配置文件
+
 - 将keepalived目录下`etc/init.d/keepalived`拷贝到`/etc/init.d/`下
 - 将keepalived目录下`etc/sysconfig/keepalived`拷贝到`/etc/sysconfig/`下
-    
 
 (2)刷新systemctl
+
 ```cpp
 systemctl daemon-reload  
 ```
+
 (3)启动、停止、重启keepalived
+
 ```cpp
 #启动  
 systemctl start keepalived.service  
@@ -336,11 +398,14 @@ systemctl stop keepalived.service
 #重启  
 systemctl restart keepalived.service  
 ```
+
 ##### 4、实现双机主备高可用
-![[Pasted image 20241006102326.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20241006102326.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (1)修改备机配置
+
 ```cpp
 global_defs {   
     router_id keep_172   
@@ -362,31 +427,36 @@ vrrp_instance VI_1 { 
     }   
 }  
 ```
+
 (2) 启动 Keepalived
 (3) 访问vip即可访问主机，当主机失效时访问vip就会访问到备机
+
 ##### 5、keepalived配置nginx自动重启
 
 (1)编写脚本
 
 在`/etc/keepalived/`下创建脚本`check_nginx_alive_or_not`
 
-#!/bin/bash   
-A=`ps -C nginx --no-header |wc -l`   
-# 判断nginx是否宕机，如果宕机了，尝试重启   
-if [ $A -eq 0 ];then   
-    /usr/local/nginx/sbin/nginx   
-    # 等待一小会再次检查nginx，如果没有启动成功，则停止keepalived，使其启动备用机   
-    sleep 3   
-        if [ `ps -C nginx --no-header |wc -l` -eq 0 ];then   
-            killall keepalived   
-        fi   
-fi  
+#!/bin/bash \
+A=`ps -C nginx --no-header |wc -l` \
+# 判断nginx是否宕机，如果宕机了，尝试重启 \
+if \[ $A -eq 0 \];then \
+/usr/local/nginx/sbin/nginx \
+# 等待一小会再次检查nginx，如果没有启动成功，则停止keepalived，使其启动备用机 \
+sleep 3 \
+if \[ `ps -C nginx --no-header |wc -l` -eq 0 \];then \
+killall keepalived \
+fi \
+fi
 
 (2)添加运行权限
+
 ```cpp
 chmod +x /etc/keepalived/check_nginx_alive_or_not.sh  
 ```
+
 (3)配置keepalived监听nginx脚本
+
 ```cpp
 vrrp_script check_nginx_alive {   
     script "/etc/keepalived/check_nginx_alive_or_not.sh"   
@@ -394,22 +464,28 @@ vrrp_script check_nginx_alive { 
     weight 10 # 如果脚本运行失败，则升级权重+10   
 }  
 ```
+
 (4)在vrrp_instance中新增监控的脚本
+
 ```cpp
 track_script {   
     check_nginx_alive # 追踪 nginx 脚本  
 }  
 ```
+
 (5)重启Keepalived使得配置文件生效
+
 ```cpp
 systemctl restart keepalived  
 ```
+
 ##### 6、keepalived双主热备
 
 (1)配置DNS轮询
 在同一个域名下配置两个ip，自行百度
 
 (2)配置第一台主机
+
 ```cpp
 global_defs {  
     router_id keep_171   
@@ -444,7 +520,9 @@ vrrp_instance VI_2  {
     }  
 }  
 ```
+
 (3)配置第二台主机
+
 ```cpp
 global_defs {  
     router_id keep_172   
@@ -479,30 +557,37 @@ vrrp_instance VI_2 {
     }  
 }  
 ```
+
 (4)重启两台Keepalived
+
 ```cpp
 systemctl restart keepalived  
 ```
+
 ### 七、LVS（Linux Virtual Server）实现高可用负载均衡
 
 ##### 1、为什么要使用LVS+Nginx
+
 - lvs基于四层负载均衡，工作效率较Nginx的七层负载更高，使用LVS搭建Nginx集群，可以提高性能
 - 四层负载均衡无法对信息处理，只能通过ip+端口的形式转发，所以需要七成负载进行数据的处理
 - Nginx接收请求来回，LVS可以只接受不响应
-    
+
 ##### 2、LVS的三种模式
+
 (1)NAT模式
+
 - 客户端将请求发往LVS，LVS会选择一台服务器响应请求，服务器将结果返回给LVS，LVS再返回给客户端。
 - 在NAT模式中，服务器的网关必须指向LVS，否则报文无法送达客户端
 - NAT 技术将请求的报文和响应的报文都需要通过LVS进行地址改写，因此网站访问量比较大的时候负载均衡调度器有比较大的瓶颈，一般要求最多之能 10-20 台节点
 - NAT 模式支持对 IP 地址和端口进行转换。即用户请求的端口和真实服务器的端口可以不一致
 
 (2)TUN模式
+
 - 客户端将请求发往LVS，LVS会选择一台服务器响应请求，在客户端与服务器之间建立隧道，返回结果的时候直接由服务器返回响应，不在经过LVS。
 - TUN模式必须所有的服务器上都绑定VIP的IP地址，所有的服务器都必须有网卡。
 - TUN模式走隧道运维难度大，并且会直接暴露服务器地址
 - 服务器将应答包直接发给用户。所以，减少了负载均衡器的大量数据流动，负载均衡器不再是系统的瓶颈，就能处理很巨大的请求量，这种方式，一台负载均衡器能够为很多服务器进行分发。而且跑在公网上就能进行不同地域的分发
-    
+
 (3)DR模式
 
 - 客户端将请求发往LVS，LVS会选择一台服务器响应请求，返回结果的时候通过统一的路由进行返回，不在经过LVS。
@@ -512,20 +597,24 @@ systemctl restart keepalived
 ##### 3、搭建LVS-DR模式
 
 先关闭掉服务器上网络配置管理器，避免网络接口冲突
+
 ```cpp
 systemctl stop NetworkManager  
 systemctl disable NetworkManager  
 ```
+
 (1)创建子接口（创建LVS的虚拟ip）
 
 进入网卡配置目录`/etc/sysconfig/network-scripts/`,找到网卡配置文件，这里以`ifcfg-ens33`为例，拷贝并创建子接口
+
 ```cpp
 cp ifcfg-ens33 ifcfg-ens33:1  
 ```
+
 修改子接口配置如下
 
 - 配置中的 192.168.1.150 就是vip，是提供给外网用户访问的ip地址
-    
+
 ```cpp
 DEVICE="ens33:1"  
 ONBOOT="yes"  
@@ -533,27 +622,34 @@ IPADDR=192.168.1.150
 NETMASK=255.255.255.0  
 BOOTPROTO=static  
 ```
+
 - 重启网络服务
-    
+
 ```cpp
 service network restart  
 ```
+
 重启成功后，ip addr 查看一下，你会发现多了一个ip，也就是虚拟ip（vip）
 
 > 注意：阿里云不支持配置网卡，需要购买相应的负载均衡服务，腾讯云支持配置网卡，但需要购买网卡支持，一个网卡支持10个虚拟ip配置
 
 (2)安装ipvsadm
 如今的centos都集成了LVS，所以ipvs是自带的，我们只需要安装ipvsadm即可（ipvsadm是管理集群的工具，通过ipvs可以管理集群，查看集群等操作）
+
 ```cpp
 yum install ipvsadm  
 ```
+
 (3)配置服务器（RS）的虚拟ip
 
 进入网卡配置目录`/etc/sysconfig/network-scripts/`,找到`ifcfg-lo`，拷贝并创建子接口
+
 ```cpp
 cp ifcfg-lo ifcfg-lo:1  
 ```
+
 修改子接口配置如下
+
 ```cpp
 DEVICE="lo:1"  
 IPADDR=192.168.1.150  
@@ -563,24 +659,28 @@ BROADCAST=127.255.255.255
 ONBOOT="yes"  
 NAME=loopback  
 ```
+
 重启网络服务成功后，`ip addr` 查看一下，你会发现多了一个ip，也就是虚拟ip（vip）
 
 (4)为服务器（RS）配置arp
 
 ARP响应级别与通告行为参数说明
 
-arp-ignore：ARP响应级别（处理请求）  
-    0：只要本机配置了ip，就能响应请求  
-    1：请求的目标地址到达对应的网络接口，才会响应请求  
-arp-announce：ARP通告行为（返回响应）  
-    0：本机上任何网络接口都向外通告，所有的网卡都能接受到通告  
-    1：尽可能避免本网卡与不匹配的目标进行通告2：只在本网卡通告  
+arp-ignore：ARP响应级别（处理请求）\
+0：只要本机配置了ip，就能响应请求\
+1：请求的目标地址到达对应的网络接口，才会响应请求\
+arp-announce：ARP通告行为（返回响应）\
+0：本机上任何网络接口都向外通告，所有的网卡都能接受到通告\
+1：尽可能避免本网卡与不匹配的目标进行通告2：只在本网卡通告
 
 打开sysctl.conf:
+
 ```cpp
 vim /etc/sysctl.conf  
 ```
+
 配置所有网卡、默认网卡以及虚拟网卡的arp响应级别和通告行为，分别对应：all，default，lo
+
 ```cpp
 # configration for lvs   
 net.ipv4.conf.all.arp_ignore = 1   
@@ -591,52 +691,68 @@ net.ipv4.conf.all.arp_announce = 2 
 net.ipv4.conf.default.arp_announce = 2   
 net.ipv4.conf.lo.arp_announce = 2  
 ```
+
 刷新配置文件
+
 ```cpp
 sysctl -p  
 ```
+
 增加一个网关，用于接收数据报文，当有请求到本机后，会交给lo去处理
+
 ```cpp
 route add -host 192.168.1.150 dev lo:1  
 ```
+
 将网关添加至开机启动
+
 ```cpp
 echo "route add -host 192.168.1.150 dev lo:1" >> /etc/rc.local  
 ```
+
 (4)使用ipvsadm配置集群规则
 创建LVS节点，用户访问的集群调度者
+
 ```cpp
 ipvsadm -A -t 192.168.1.150:80 -s rr -p 5  
 ```
+
 - -A：添加集群
 - -t：tcp协议ip地址：设定集群的访问
 - ip：也就是LVS的虚拟ip
 - -s：设置负载均衡的算法，
 - rr：表示轮询
 - -p：设置连接持久化的时间,在指定时间内同一个用户的请求会访问到同一个服务器中
-    
+
 创建多台RS真实服务器
+
 ```cpp
 ipvsadm -a -t 192.168.1.150:80 -r 192.168.1.171:80 -g   
 ipvsadm -a -t 192.168.1.150:80 -r 192.168.1.172:80 -g  
 ```
+
 - -a：添加真实服务器
 - -t：tcp协议
 - -r：真实服务器的ip地址
 - -g：设定DR模式
 
 保存到规则库，否则重启失效
+
 ```cpp
 ipvsadm -S  
 ```
+
 检查集群
+
 ```cpp
 #查看集群列表  
 ipvsadm -Ln  
 #查看集群状态  
 ipvsadm -Ln --stats  
 ```
+
 一些其他命令
+
 ```cpp
  # 重启ipvsadm，重启后需要重新配置   
  service ipvsadm restart   
@@ -649,7 +765,9 @@ ipvsadm -Ln --stats
  # 查看过期时间   
  ipvsadm -Ln --timeout
 ```
+
 (5)访问虚拟ip，完成LVS搭建
+
 # 附：LVS的负载均衡算法
 
 ## (1)静态算法
@@ -659,6 +777,7 @@ ipvsadm -Ln --stats
 加权轮询（Weight Round Robin 简写’wrr’）：安装权重比例分配用户请求。权重越高，被分配到处理的请求越多。（同Nginx的权重）
 源地址散列（Source Hash 简写’sh’）：同一个用户ip的请求，会由同一个RS来处理。（同Nginx的ip_hash）
 目标地址散列（Destination Hash 简写’dh’）：根据url的不同，请求到不同的RS。（同Nginx的url_hash）
+
 ## (2)动态算法
 
 动态：会根据流量的不同，或者服务器的压力不同来分配用户请求，这是动态计算的。
@@ -671,18 +790,23 @@ ipvsadm -Ln --stats
 - C：（1+3）/3=4/3
 
 最终结果，会把这个请求交给得出运算结果最小的服务器。最少队列调度（Never Queue 简写’nq’）：永不使用队列。如果有Real Server的连接数等于0，则直接把这个请求分配过去，不需要在排队等待运算了（sed运算）。
+
 # 八、搭建Keepalived+Lvs+Nginx高可用集群负载均衡
 
 如果原先服务器上配置了LVS+nginx需要清空ipvsadm中的配置
+
 ```cpp
 ipvsadm -C  
 ```
+
 如果配置了`Keepalived+Nginx`双主集群也需要去除掉Keepalived中原先的配置，按照的后文进行配置
+
 ## (1)使用keepalived配置Master LVS
 
 在LVS的机器上安装keepalived，安装过程参考上文
 
 (1)修改keepalived的配置
+
 ```cpp
 global_defs {  
     router_id keep_151   
@@ -742,13 +866,17 @@ virtual_server 192.168.1.150 80{
     }  
 }  
 ```
+
 (2)启动/重启keepalived
+
 ```cpp
 systemctl restart keepalived  
 ```
+
 ##### (2)使用keepalived配置Backup LVS
 
 配置在备用机上
+
 ```cpp
 global_defs {  
     router_id keep_152   
@@ -808,23 +936,20 @@ virtual_server 192.168.1.150 80{
     }  
 }
 ```
+
 热门内容：
 
 - [牛啊，又一份牛逼笔记面世了](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524585&idx=1&sn=147fd4ac58781cd45e6472bc0eea5e7a&chksm=9bee419bac99c88d8901d8fe2b7b4891615121942893971f504fcd685d750b4fdacd65aa731f&scene=21#wechat_redirect)
-    
-- [新来的同事问我 where 1=1 是什么意思](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524507&idx=1&sn=23342872fd5860fdc504550bfcdb7707&chksm=9bee41e9ac99c8ffec71b4ef7bb76f2885896fa764c266c421648c82a6708b34af5734dced7c&scene=21#wechat_redirect)  
-    
+
+- [新来的同事问我 where 1=1 是什么意思](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524507&idx=1&sn=23342872fd5860fdc504550bfcdb7707&chksm=9bee41e9ac99c8ffec71b4ef7bb76f2885896fa764c266c421648c82a6708b34af5734dced7c&scene=21#wechat_redirect)
 
 - [注意！你的 Navicat 可能被投毒了...](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524407&idx=1&sn=00494a626569b6315e8ffd89e810a0a9&chksm=9bee4145ac99c8535a618165d143eb935c34e05482543af60aa8c4700c71a09da42c1fa616ae&scene=21#wechat_redirect)
-    
-- [IT界惊现文豪！华为领导及阿里P10遭吐槽](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524345&idx=1&sn=30797b08343bf8143e7bf384a441a312&chksm=9beebe8bac99379da69ff1bcfab0c6ab88fd78e999568ac0ed44f4da12c02f820834743f4dcc&scene=21#wechat_redirect)  
-    
-- [一个 Mybatis 开发神器：Fast MyBatis 超好用](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524289&idx=1&sn=d8c8978b79d382e881f1ac9bfc1d6053&chksm=9beebeb3ac9937a53970d09f7e613c0982d212f6a32b11c4fc8d24b19d3321a05ff248b5e064&scene=21#wechat_redirect)
-    
-      
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- [IT界惊现文豪！华为领导及阿里P10遭吐槽](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524345&idx=1&sn=30797b08343bf8143e7bf384a441a312&chksm=9beebe8bac99379da69ff1bcfab0c6ab88fd78e999568ac0ed44f4da12c02f820834743f4dcc&scene=21#wechat_redirect)
+
+- [一个 Mybatis 开发神器：Fast MyBatis 超好用](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247524289&idx=1&sn=d8c8978b79d382e881f1ac9bfc1d6053&chksm=9beebeb3ac9937a53970d09f7e613c0982d212f6a32b11c4fc8d24b19d3321a05ff248b5e064&scene=21#wechat_redirect)
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最近面试BAT，整理一份面试资料《**Java面试BAT通关手册**》，覆盖了Java核心技术、JVM、Java并发、SSM、微服务、数据库、数据结构等等。
 

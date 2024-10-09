@@ -1,6 +1,6 @@
 PIG-007 看雪学苑
- _2021年12月23日 18:14_
-本文为看雪论坛优秀文章  
+_2021年12月23日 18:14_
+本文为看雪论坛优秀文章\
 看雪论坛作者ID：PIG-007
 
 一 **简介**
@@ -25,16 +25,20 @@ static char *buffer_var; static struct class *devClass;
 // Global variable for the device class 
 static struct cdev cdev; static dev_t stack_dev_no;     static ssize_t stack_read(struct file *filp, char __user *buf, size_t count,         loff_t *f_pos);   static ssize_t stack_write(struct file *filp, const char __user *buf, size_t len, loff_t *f_pos);   static long stack_ioctl(struct file *filp, unsigned int cmd, unsigned long arg);   // static int stack_open(struct inode *i, struct file *f) // { //   printk(KERN_INFO "[i] Module vuln: open()\n"); //   return 0; // }   // static int stack_close(struct inode *i, struct file *f) // { //   printk(KERN_INFO "[i] Module vuln: close()\n"); //   return 0; // }   static struct file_operations stack_fops =         {                 .owner = THIS_MODULE,                 // .open = stack_open,                 // .release = stack_close,                 .write = stack_write,                 .read = stack_read         };   // 设备驱动模块加载函数 static int __init stack_init(void) {     buffer_var=kmalloc(100,GFP_DMA);     printk(KERN_INFO "[i] Module stack registered");     if (alloc_chrdev_region(&stack_dev_no, 0, 1, "stack") < 0)     {         return -1;     }     if ((devClass = class_create(THIS_MODULE, "chardrv")) == NULL)     {         unregister_chrdev_region(stack_dev_no, 1);         return -1;     }     if (device_create(devClass, NULL, stack_dev_no, NULL, "stack") == NULL)     {         printk(KERN_INFO "[i] Module stack error");         class_destroy(devClass);         unregister_chrdev_region(stack_dev_no, 1);         return -1;     }     cdev_init(&cdev, &stack_fops);     if (cdev_add(&cdev, stack_dev_no, 1) == -1)     {         device_destroy(devClass, stack_dev_no);         class_destroy(devClass);         unregister_chrdev_region(stack_dev_no, 1);         return -1;     }       printk(KERN_INFO "[i] <Major, Minor>: <%d, %d>\n", MAJOR(stack_dev_no), MINOR(stack_dev_no));     return 0;   }   // 设备驱动模块卸载函数 static void __exit stack_exit(void) {     // 释放占用的设备号     unregister_chrdev_region(stack_dev_no, 1);     cdev_del(&cdev); }     // 读设备 ssize_t stack_read(struct file *filp, char __user *buf, size_t count,         loff_t *f_pos) {     printk(KERN_INFO "Stack_read function" );     if(strlen(buffer_var)>0) {         printk(KERN_INFO "[i] Module vuln read: %s\n", buffer_var);         kfree(buffer_var);         buffer_var=kmalloc(100,GFP_DMA);         return 0;     } else {         return 1;     } }   // 写设备 ssize_t stack_write(struct file *filp, const char __user *buf, size_t len, loff_t *f_pos) {     printk(KERN_INFO "Stack_write function" );     char buffer[100]={0};     if (_copy_from_user(buffer, buf, len))         return -EFAULT;     buffer[len-1]='\0';     printk("[i] Module stack write: %s\n", buffer);     strncpy(buffer_var,buffer,len);     return len; }       // ioctl函数命令控制 long stack_ioctl(struct file *filp, unsigned int cmd, unsigned long arg) {     switch (cmd) {         case 1:             break;         case 2:             break;         default:             // 不支持的命令             return -ENOTTY;     }     return 0; }     module_init(stack_init); module_exit(stack_exit);   MODULE_LICENSE("GPL"); // MODULE_AUTHOR("blackndoor"); // MODULE_DESCRIPTION("Module vuln overflow");
 ```
-#   二 **利用Cred结构体提权**
-##   1、正常UAF
+
+# 二 **利用Cred结构体提权**
+
+## 1、正常UAF
+
 ### 前置知识
+
 由于是UAF漏洞，所以直接尝试再重启一个进程，这样新进程启动时就会申请一个Cred结构体(这里大小为0xa8)。而如果此时申请的结构体恰好落在我们释放过的堆块上，那么我们就可以利用UAF漏洞修改Cred结构体，将其uid和gid改为0，再利用该进程原地起shell，就能获得root权限的shell了。
 
 这里同样需要一点前置知识，之前也写过类似的，其实就相当于修改某个进程的cred结构体中的uid和gid就能将该进程提权了，之后利用提权后的进程起shell得到的shell就是提权后的shell。
 
 比较简单，这里直接给：
 
-###   
+### 
 
 ### POC
 
@@ -42,25 +46,19 @@ static struct cdev cdev; static dev_t stack_dev_no;     static ssize_t stack_rea
 #include <sys/types.h>
 ```
 
-  
-
 这里还需要说明的是，cred结构体大小在我编译的4.4.72中为0xa8，在不同内核版本可能不同，通常可以查看对应版本的Linux内核源码或者写个简便的C程序运行一下即可知道。
-
-  
 
 ## 2、伪条件竞争造成的UAF(多进程)
 
-###   
+### 
 
 ### 前置知识
-
-  
 
 前面我们的UAF是正常的指针未置空的UAF，但如果在程序中是add函数申请chunk，只有在关闭设备时才会释放chunk。那么这样当我们对一个设备进行操作时，只有在关闭设备时才能释放chunk，这就无法显著地造成UAF。但是如果能够对同一个设备打开两次 (操作符分别为fd1、fd2) ，申请一个堆块后，关闭掉第一个设备fd1后，就能释放该堆块。之后利用fd2继续对设备进行写操作，就能够继续修改释放掉的堆块了，这样就造成了一个UAF漏洞。同样也是利用cred结构体进行提权。
 
 同样直接给出poc即可。
 
-###   
+### 
 
 ### POC
 
@@ -68,41 +66,31 @@ static struct cdev cdev; static dev_t stack_dev_no;     static ssize_t stack_rea
 #include <sys/types.h>
 ```
 
-#   
-
-  
+# 
 
 三
 
-  
-
 **劫持tty_struct结构体**
-
-  
 
 这个真是调了我无敌久。
 
-##   
+## 
 
 ## 原理
 
-###   
+### 
 
 ### 1、函数调用链
 
-  
-
 entry_SYSCALL_64->SyS_write->SYSC_write->vfs_write
 
-->__vfs_write->tty_write->do_tty_write->n_tty_write->pty_write
+->\_\_vfs_write->tty_write->do_tty_write->n_tty_write->pty_write
 
 这里我们需要的就是劫持某个结构体，从而使得原本通过该结构体调用pty_write函数指针变为调用我们的ROP链条。
 
-###   
+### 
 
 ### 2、劫持栈
-
-  
 
 由于用户空间和内核空间得返回进入需要用到栈，所以一般需要进行栈劫持，这里我们可以看到当通过ptmx进入其write函数时，rax为从tty_struct中获取的operations ops指针，而此时该指针已经被我们劫持了，所以如果有类似于mov rsp、rax之类的gadget就能将栈劫持到我们可控的operations ops指针指向的内存处，那么之后就很容易进行内核和用户空间的转换。
 
@@ -110,13 +98,9 @@ entry_SYSCALL_64->SyS_write->SYSC_write->vfs_write
 
 movRspRax_decEbx_ret
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 3、结构体
-
-  
 
 这个之前也是讲过的。
 
@@ -124,73 +108,53 @@ movRspRax_decEbx_ret
 struct tty_struct {
 ```
 
-  
+当我们打开ptmx设备时，会使用kmalloc申请这个tty_struct结构，如果存在一个UAF漏洞，那么就可以将该tty_struct申请为我们释放掉的一个chunk，其中重要的是int magic;和const struct tty_operations \*ops;这两个结构体成员。
 
-当我们打开ptmx设备时，会使用kmalloc申请这个tty_struct结构，如果存在一个UAF漏洞，那么就可以将该tty_struct申请为我们释放掉的一个chunk，其中重要的是int magic;和const struct tty_operations *ops;这两个结构体成员。
-
-####   
+#### 
 
 #### magic成员
 
-  
-
 这个在网上很多人都直接将其设置为0，但是在某些版本中，如果直接设置为0，通常可能出现以下的错误：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 也就是magic number检测错误，这个经过调试可以发现，实际申请结构体之后是不变的：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以得到如下的数值：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个在后面的数值设置中可以用到，需要我们来调试才可以，不然其实如果直接设置为0也容易出错。
 
-另外其中的driver可以设置为0，所以一般直接设置tty_struct[3]和tty_struct[0]即可。
+另外其中的driver可以设置为0，所以一般直接设置tty_struct\[3\]和tty_struct\[0\]即可。
 
-####   
+#### 
 
 #### ops成员
 
-  
-
-这个const struct tty_operations *ops结构体指针在该做法里被劫持为我们设置fake_operations指针，有如下结构体，设置fake_operations中的write函数指针为ROP链条，就可以通过调用ptmx设备中的write函数，从而调用到我们设置的ROP链条。
+这个const struct tty_operations \*ops结构体指针在该做法里被劫持为我们设置fake_operations指针，有如下结构体，设置fake_operations中的write函数指针为ROP链条，就可以通过调用ptmx设备中的write函数，从而调用到我们设置的ROP链条。
 
 ```
 struct tty_operations {
 ```
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 4、最终结构
 
-####   
+#### 
 
 #### fake_tty_struct结构体
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### fake_tty_operation结构体
 
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## POC
 
@@ -198,21 +162,15 @@ struct tty_operations {
 #include <sys/types.h>
 ```
 
-##   
+## 
 
 ## 执行流程
-
-  
 
 这里还得说一下执行流程，比较不好调试。
 
 即先是依据write函数跳转到我们最开始设置的gadget，也就是movRspRax_decEbx_ret，然后将栈劫持为fake_tty_operations。之后再跳转到pop_rax_rbx_r12_r13_rbp_ret，将ROP赋值给rax，再ret到movRspRax_decEbx_ret，再将栈劫持为ROP，之后就ret到ROP链条中的pop_rdi_ret了，之后执行流可控。
 
-  
-
 # ▲注意事项：
-
-  
 
 swapgs;ret没有时，可以用加上pop的，只要最后ret到iretq即可。同样的gadget可以相互转换。
 
@@ -222,37 +180,23 @@ iretq类似于ret，直接一个指令即可。
 
 堆块申请时的规则需要是GFP_KERNEL才行，至少GFP_DMA不行。
 
-‍  
+‍
 
-  
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) 
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **看雪ID：PIG-007**
 
 https://bbs.pediy.com/user-home-904686.htm
 
-*本文由看雪论坛 PIG-007 原创，转载请注明来自看雪社区
+\*本文由看雪论坛 PIG-007 原创，转载请注明来自看雪社区
 
-  
+[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458410583&idx=1&sn=fdb990e6485358004e86955cafd40a1c&chksm=b18f6edd86f8e7cb8e16efc6222fa50bfd7db02e40213370743bac836e8ca6112d30fcc5393a&scene=21#wechat_redirect)
 
-  
-
-[![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458410583&idx=1&sn=fdb990e6485358004e86955cafd40a1c&chksm=b18f6edd86f8e7cb8e16efc6222fa50bfd7db02e40213370743bac836e8ca6112d30fcc5393a&scene=21#wechat_redirect)
-
-  
-
-[![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458409596&idx=3&sn=658012a9debc76c73efed03342d41358&chksm=b18f6af686f8e3e09180522b243def309e265532cfadfdbf5becd7d9ec90f4505136959ebdfe&scene=21#wechat_redirect)  
-
-  
+[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458409596&idx=3&sn=658012a9debc76c73efed03342d41358&chksm=b18f6af686f8e3e09180522b243def309e265532cfadfdbf5becd7d9ec90f4505136959ebdfe&scene=21#wechat_redirect)
 
 **#** **往期推荐**
 
-1.[强网拟态线上mobile的两道wp](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458410675&idx=1&sn=e015ec78d467a2afdb3ccad3f868e6ec&chksm=b18f6e3986f8e72f921a3fc3113de57766fd66b2c46fa587fa5f5139f698b86166f0fd42c2c0&scene=21#wechat_redirect)  
+1.[强网拟态线上mobile的两道wp](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458410675&idx=1&sn=e015ec78d467a2afdb3ccad3f868e6ec&chksm=b18f6e3986f8e72f921a3fc3113de57766fd66b2c46fa587fa5f5139f698b86166f0fd42c2c0&scene=21#wechat_redirect)
 
 2.[某钱包转账付款算法分析篇](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458410651&idx=1&sn=070a3637c7f9d78e188d2b4ca7e52c81&chksm=b18f6e1186f8e707496c08a09c6c8dd7685ef81eaca6d7e9a54305779281aca232a981e7f207&scene=21#wechat_redirect)
 
@@ -264,35 +208,21 @@ https://bbs.pediy.com/user-home-904686.htm
 
 6.[侠盗猎车 — 玩转固定码](http://mp.weixin.qq.com/s?__biz=MjM5NTc2MDYxMw==&mid=2458410583&idx=2&sn=f51e5e6a81fbf6961727b6a90de730e2&chksm=b18f6edd86f8e7cb1be072459aad2f9aaafe82ef1a49a228cbaf0beca87186f58ed0e6a39f0e&scene=21#wechat_redirect)
 
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **球分享**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **球点赞**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **球在看**
 
-  
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 点击“阅读原文”，了解更多！
 

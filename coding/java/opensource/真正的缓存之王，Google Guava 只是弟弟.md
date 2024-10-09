@@ -2,7 +2,7 @@
 
 大明哥聊 Java
 
- _2021年11月27日 15:21_
+_2021年11月27日 15:21_
 
 来源:https://blog.csdn.net/a953713428/article/details/92159746
 
@@ -15,11 +15,10 @@
 说到优化，Caffine Cache到底优化了什么呢？我们刚提到过LRU，常见的缓存淘汰算法还有FIFO，LFU：
 
 1. FIFO：先进先出，在这种淘汰算法中，先进入缓存的会先被淘汰，会导致命中率很低。
-    
-2. LRU：最近最少使用算法，每次访问数据都会将其放在我们的队尾，如果需要淘汰数据，就只需要淘汰队首即可。仍然有个问题，如果有个数据在 1 分钟访问了 1000次，再后 1 分钟没有访问这个数据，但是有其他的数据访问，就导致了我们这个热点数据被淘汰。
-    
-3. LFU：最近最少频率使用，利用额外的空间记录每个数据的使用频率，然后选出频率最低进行淘汰。这样就避免了 LRU 不能处理时间段的问题。
-    
+
+1. LRU：最近最少使用算法，每次访问数据都会将其放在我们的队尾，如果需要淘汰数据，就只需要淘汰队首即可。仍然有个问题，如果有个数据在 1 分钟访问了 1000次，再后 1 分钟没有访问这个数据，但是有其他的数据访问，就导致了我们这个热点数据被淘汰。
+
+1. LFU：最近最少频率使用，利用额外的空间记录每个数据的使用频率，然后选出频率最低进行淘汰。这样就避免了 LRU 不能处理时间段的问题。
 
 上面三种策略各有利弊，实现的成本也是一个比一个高，同时命中率也是一个比一个好。Guava Cache虽然有这么多的功能，但是本质上还是对LRU的封装，如果有更优良的算法，并且也能提供这么多功能，相比之下就相形见绌了。
 
@@ -30,11 +29,11 @@
 在现有算法的局限性下，会导致缓存数据的命中率或多或少的受损，而命中略又是缓存的重要指标。HighScalability网站刊登了一篇文章，由前Google工程师发明的W-TinyLFU——一种现代的缓存 。Caffine Cache就是基于此算法而研发。Caffeine 因使用 **Window TinyLfu** 回收策略，提供了一个 **近乎最佳的命中率** 。
 
 > 当数据的访问模式不随时间变化的时候，LFU的策略能够带来最佳的缓存命中率。然而LFU有两个缺点：
-> 
+>
 > 首先，它需要给每个记录项维护频率信息，每次访问都需要更新，这是个巨大的开销；
-> 
+>
 > 其次，如果数据访问模式随时间有变，LFU的频率信息无法随之变化，因此早先频繁访问的记录可能会占据缓存，而后期访问较多的记录则无法被命中。
-> 
+>
 > 因此，大多数的缓存设计都是基于LRU或者其变种来进行的。相比之下，LRU并不需要维护昂贵的缓存记录元信息，同时也能够反应随时间变化的数据访问模式。然而，在许多负载之下，LRU依然需要更多的空间才能做到跟LFU一致的缓存命中率。因此，一个“现代”的缓存，应当能够综合两者的长处。
 
 TinyLFU维护了近期访问记录的频率信息，作为一个过滤器，当新记录来时，只有满足TinyLFU要求的记录才可以被插入缓存。如前所述，作为现代的缓存，它需要解决两个挑战：
@@ -51,11 +50,11 @@ W-TinyLFU主要用来解决一些稀疏的突发访问元素。在一些数目�
 
 在W-TinyLFU中使用Count-Min Sketch记录我们的访问频率，而这个也是布隆过滤器的一种变种。如下图所示:
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 202111271504460601.png
 
-如果需要记录一个值，那我们需要通过多种Hash算法对其进行处理hash，然后在对应的hash算法的记录中+1，为什么需要多种hash算法呢？由于这是一个压缩算法必定会出现冲突，比如我们建立一个byte的数组，通过计算出每个数据的hash的位置。比如张三和李四，他们两有可能hash值都是相同，比如都是1那byte[1]这个位置就会增加相应的频率，张三访问1万次，李四访问1次那byte[1]这个位置就是1万零1，如果取李四的访问评率的时候就会取出是1万零1，但是李四命名只访问了1次啊，为了解决这个问题，所以用了多个hash算法可以理解为long[][]二维数组的一个概念，比如在第一个算法张三和李四冲突了，但是在第二个，第三个中很大的概率不冲突，比如一个算法大概有1%的概率冲突，那四个算法一起冲突的概率是1%的四次方。通过这个模式我们取李四的访问率的时候取所有算法中，李四访问最低频率的次数。所以他的名字叫Count-Min Sketch。
+如果需要记录一个值，那我们需要通过多种Hash算法对其进行处理hash，然后在对应的hash算法的记录中+1，为什么需要多种hash算法呢？由于这是一个压缩算法必定会出现冲突，比如我们建立一个byte的数组，通过计算出每个数据的hash的位置。比如张三和李四，他们两有可能hash值都是相同，比如都是1那byte\[1\]这个位置就会增加相应的频率，张三访问1万次，李四访问1次那byte\[1\]这个位置就是1万零1，如果取李四的访问评率的时候就会取出是1万零1，但是李四命名只访问了1次啊，为了解决这个问题，所以用了多个hash算法可以理解为long\[\]\[\]二维数组的一个概念，比如在第一个算法张三和李四冲突了，但是在第二个，第三个中很大的概率不冲突，比如一个算法大概有1%的概率冲突，那四个算法一起冲突的概率是1%的四次方。通过这个模式我们取李四的访问率的时候取所有算法中，李四访问最低频率的次数。所以他的名字叫Count-Min Sketch。
 
 ### 2. 使用
 
@@ -111,9 +110,9 @@ maximumWeight与maximumSize不可以同时使用。
 
 Caffeine提供了三种定时驱逐策略：
 
-expireAfterAccess(long, TimeUnit):在最后一次访问或者写入后开始计时，在指定的时间后过期。假如一直有请求访问该key，那么这个缓存将一直不会过期。  
-expireAfterWrite(long, TimeUnit): 在最后一次写入缓存后开始计时，在指定的时间后过期。  
-expireAfter(Expiry): 自定义策略，过期时间由Expiry实现独自计算。  
+expireAfterAccess(long, TimeUnit):在最后一次访问或者写入后开始计时，在指定的时间后过期。假如一直有请求访问该key，那么这个缓存将一直不会过期。\
+expireAfterWrite(long, TimeUnit): 在最后一次写入缓存后开始计时，在指定的时间后过期。\
+expireAfter(Expiry): 自定义策略，过期时间由Expiry实现独自计算。\
 缓存的删除策略使用的是惰性删除和定时删除。这两个删除策略的时间复杂度都是O(1)。
 
 ##### 3. 基于引用的过期方式
@@ -207,7 +206,7 @@ properties文件
     spring:      cache:        type: caffeine        cache-names:        - userCache        caffeine:          spec: maximumSize=1024,refreshAfterWrite=60s
 ```
 
-如果使用refreshAfterWrite配置,必须指定一个CacheLoader.不用该配置则无需这个bean,如上所述,该CacheLoader将关联被该缓存管理器管理的所有缓存，所以必须定义为CacheLoader<Object, Object>，自动配置将忽略所有泛型类型。
+如果使用refreshAfterWrite配置,必须指定一个CacheLoader.不用该配置则无需这个bean,如上所述,该CacheLoader将关联被该缓存管理器管理的所有缓存，所以必须定义为CacheLoader\<Object, Object>，自动配置将忽略所有泛型类型。
 
 ```
     import com.github.benmanes.caffeine.cache.CacheLoader;    import org.springframework.context.annotation.Bean;    import org.springframework.context.annotation.Configuration;        /**     * @author: rickiyang     * @date: 2019/6/15     * @description:     */    @Configuration    public class CacheConfig {            /**         * 相当于在构建LoadingCache对象的时候 build()方法中指定过期之后的加载策略方法         * 必须要指定这个Bean，refreshAfterWrite=60s属性才生效         * @return         */        @Bean        public CacheLoader<String, Object> cacheLoader() {            CacheLoader<String, Object> cacheLoader = new CacheLoader<String, Object>() {                @Override                public Object load(String key) throws Exception {                    return null;                }                // 重写这个方法将oldValue值返回回去，进而刷新缓存                @Override                public Object reload(String key, Object oldValue) throws Exception {                    return oldValue;                }            };            return cacheLoader;        }    }
@@ -238,15 +237,14 @@ properties文件
 cache方面的注解主要有以下5个：
 
 - @Cacheable 触发缓存入口（这里一般放在创建和获取的方法上，`@Cacheable`注解会先查询是否已经有缓存，有会使用缓存，没有则会执行方法并缓存）
-    
+
 - @CacheEvict 触发缓存的eviction（用于删除的方法上）
-    
+
 - @CachePut 更新缓存且不影响方法执行（用于修改的方法上，该注解下的方法始终会被执行）
-    
+
 - @Caching 将多个缓存组合在一个方法上（该注解可以允许一个方法同时设置多个注解）
-    
+
 - @CacheConfig 在类级别设置一些缓存相关的共同配置（与其它缓存配合使用）
-    
 
 说一下`@Cacheable` 和 `@CachePut`的区别：
 
@@ -276,8 +274,8 @@ cache方面的注解主要有以下5个：
 |method|root对象|当前被调用的方法|#root.method.name|
 |target|root对象|当前被调用的目标对象实例|#root.target|
 |targetClass|root对象|当前被调用的目标对象的类|#root.targetClass|
-|args|root对象|当前被调用的方法的参数列表|#root.args[0]|
-|caches|root对象|当前方法调用使用的缓存列表|#root.caches[0].name|
+|args|root对象|当前被调用的方法的参数列表|#root.args\[0\]|
+|caches|root对象|当前方法调用使用的缓存列表|#root.caches\[0\].name|
 |ArgumentName|执行上下文|当前被调用的方法的参数，如findArtisan(Artisanartisan),可以通过#artsian.id获得参数|#artsian.id|
 |result|执行上下文|方法执行后的返回值（仅当方法执行后的判断有效，如unlesscacheEvict的beforeInvocation=false）|#result|
 
@@ -299,14 +297,12 @@ cache方面的注解主要有以下5个：
 
 |类型|运算符|
 |---|---|
-|关系|<，>，<=，>=，==，!=，lt，gt，le，ge，eq，ne|
-|算术|+，-，*，/，%，^|
+|关系|\<，>，\<=，>=，==，!=，lt，gt，le，ge，eq，ne|
+|算术|+，-，\*，/，%，^|
 |逻辑|&&，|
 |条件|?:(ternary)，?:(elvis)|
 |正则表达式|matches|
-|其他类型|?.，?[…]，![…]，^[…]，$[…]|
-
-  
+|其他类型|?.，?\[…\]，!\[…\]，^\[…\]，$\[…\]|
 
 阅读 2848
 

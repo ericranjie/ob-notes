@@ -2,7 +2,7 @@
 
 原创 bin的技术小屋 bin的技术小屋
 
- _2022年02月23日 09:37_
+_2022年02月23日 09:37_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/sOIZXFW0vUZ9qpdibKBrYASLXXicypdMcnlrAGcicnHQyWYNZvic3C5OpgEicMDGsAcibZTKiaNECcNXDKJiaIBr2XGTow/300?wx_fmt=png&wxfrom=19)
 
@@ -24,7 +24,7 @@
 
 在前边的系列文章中，我们从内核如何收发网络数据开始以一个C10K的问题作为主线详细从内核角度阐述了网络IO模型的演变，最终在此基础上引出了Netty的网络IO模型如下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 netty中的reactor.png
 
@@ -32,7 +32,7 @@ netty中的reactor.png
 
 后续我们又围绕着Netty的主从Reactor网络IO线程模型，在[?《Reactor模型在Netty中的实现》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247483907&idx=1&sn=084c470a8fe6234c2c9461b5f713ff30&chksm=ce77c444f9004d52e7c6244bee83479070effb0bc59236df071f4d62e91e25f01715fca53696&scene=21#wechat_redirect)一文中详细阐述了Netty的主从Reactor模型的创建，以及介绍了Reactor模型的关键组件。搭建了Netty的核心骨架如下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 主从Reactor线程组.png
 
@@ -44,13 +44,13 @@ Reactor启动后的结构.png
 
 随后紧接着我们在[?《Netty如何高效接收网络连接》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247484184&idx=1&sn=726877ce28cf6e5d2ac3225fae687f19&chksm=ce77c55ff9004c493b592288819dc4d4664b5949ee97fed977b6558bc517dad0e1f73fab0f46&scene=21#wechat_redirect)一文中详细介绍了Netty高效接收客户端网络连接的全流程，在这里Netty的核心重要组件NioServerSocketChannel开始正是登场，在NioServerSocketChannel中我们创建了客户端连接NioSocketChannel，并详细介绍了NioSocketChannel的初始化过程，随后通过在NioServerSocketChannel的pipeline中触发ChannelRead事件，并最终在ServerBootstrapAcceptor中将客户端连接NioSocketChannel注册到Sub Reactor中开始监听客户端连接上的OP_READ事件，准备接收客户端发送的网络数据也就是本文的主题内容。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 自此Netty的核心组件全部就绪并启动完毕，开始起飞~~~
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 主从Reactor组完整结构.png
 
@@ -78,7 +78,7 @@ OP_READ事件处理.png
 
 开头通过`ch.unsafe()`获取到的NioUnsafe操作类正是NioSocketChannel中对底层JDK NIO SocketChannel的Unsafe底层操作类。实现类型为`NioByteUnsafe`定义在下图继承结构中的`AbstractNioByteChannel`父类中。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -88,7 +88,7 @@ image.png
 
 我们直接按照老规矩，先从整体上把整个OP_READ事件的逻辑处理框架提取出来，让大家先总体俯视下流程全貌，然后在针对每个核心点位进行各个击破。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Netty接收网络数据流程.png
 
@@ -104,7 +104,7 @@ NioSocketChannel在接收网络数据的过程处理中，也是通过在一个`
 
 `ServerBootstrap b = new ServerBootstrap();   b.group(bossGroup, workerGroup)     .channel(NioServerSocketChannel.class)     .option(ChannelOption.MAX_MESSAGES_PER_READ, 自定义次数)   `
 
-**Netty这里为什么非得限制read loop的最大读取次数呢？**为什么不在read loop中一次性把数据读取完呢？
+\*\*Netty这里为什么非得限制read loop的最大读取次数呢？\*\*为什么不在read loop中一次性把数据读取完呢？
 
 这时候就是考验我们大局观的时候了，在前边的文章介绍中我们提到Netty的IO模型为主从Reactor线程组模型，在Sub Reactor Group中包含了多个Sub Reactor专门用于监听处理客户端连接上的IO事件。
 
@@ -112,7 +112,7 @@ NioSocketChannel在接收网络数据的过程处理中，也是通过在一个`
 
 其中一个Channel只能分配给一个固定的Reactor。一个Reactor负责处理多个Channel上的IO就绪事件，Reactor与Channel之间的对应关系如下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -131,13 +131,12 @@ image.png
 `public abstract class MaxMessageHandle implements ExtendedHandle {               //本次read loop读取到的字节数           private int lastBytesRead;           //整个read loop循环总共读取的字节数           private int totalBytesRead;              @Override           public void lastBytesRead(int bytes) {               lastBytesRead = bytes;               if (bytes > 0) {                   totalBytesRead += bytes;               }           }   }   `
 
 - `lastBytesRead < 0`：表示客户端主动发起了连接关闭流程，Netty开始连接关闭处理流程。这个和本文的主旨无关，我们先不用管。后面笔者会专门用一篇文章来详解关闭流程。
-    
-- `lastBytesRead = 0`：表示当前NioSocketChannel上的数据已经全部读取完毕，没有数据可读了。本次OP_READ事件圆满处理完毕，可以开开心心的退出read loop。
-    
-- 当`lastBytesRead > 0`：表示在本次read loop中从NioSocketChannel中读取到了数据，会在NioSocketChannel的pipeline中触发ChannelRead事件。进而在pipeline中负责IO处理的ChannelHandelr中响应，处理网络请求。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- `lastBytesRead = 0`：表示当前NioSocketChannel上的数据已经全部读取完毕，没有数据可读了。本次OP_READ事件圆满处理完毕，可以开开心心的退出read loop。
+
+- 当`lastBytesRead > 0`：表示在本次read loop中从NioSocketChannel中读取到了数据，会在NioSocketChannel的pipeline中触发ChannelRead事件。进而在pipeline中负责IO处理的ChannelHandelr中响应，处理网络请求。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 fireChannelRread.png
 
@@ -148,17 +147,16 @@ fireChannelRread.png
 总体上在NioSocketChannel中读取网络数据的read loop循环结束条件需要满足以下几点：
 
 - 当前NioSocketChannel中的数据已经全部读取完毕，则退出循环。
-    
+
 - 本轮read loop如果没有读到任何数据，则退出循环。
-    
+
 - read loop的读取次数达到16次，退出循环。
-    
 
 当满足这里的read loop退出条件之后，Sub Reactor线程就会退出循环，随后会调用`allocHandle.readComplete()`方法根据本轮read loop总共读取到的字节数`totalBytesRead`来决定是否对用于接收下一轮OP_READ事件数据的ByteBuffer进行扩容或者缩容。
 
 最后在NioSocketChannel的pipeline中触发`ChannelReadComplete事件`，通知ChannelHandler本次OP_READ事件已经处理完毕。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 fireChannelReadComplete.png
 
@@ -177,31 +175,30 @@ fireChannelReadComplete.png
 Netty服务端对于一次OP_READ事件的处理，会在一个`do{}while()`循环read loop中分多次从客户端NioSocketChannel中读取网络数据。每次读取我们分配的ByteBuffer容量大小，初始容量为2048。
 
 - `ChanneRead事件`：一次循环读取一次数据，就触发一次`ChannelRead事件`。本次最多读取在read loop循环开始分配的DirectByteBuffer容量大小。这个容量会动态调整，文章后续笔者会详细介绍。
-    
+
 - `ChannelReadComplete事件`：当读取不到数据或者不满足`continueReading`的任意一个条件就会退出read loop，这时就会触发`ChannelReadComplete事件`。表示本次`OP_READ事件`处理完毕。
-    
 
 > **这里需要特别注意下**触发`ChannelReadComplete事件`并不代表NioSocketChannel中的数据已经读取完了，只能说明本次`OP_READ事件`处理完毕。因为有可能是客户端发送的数据太多，Netty读了`16次`还没读完，那就只能等到下次`OP_READ事件`到来的时候在进行读取了。
 
----
+______________________________________________________________________
 
 以上内容就是Netty在接收客户端发送网络数据的全部核心逻辑。目前为止我们还未涉及到这部分的主干核心源码，笔者想的是先给大家把核心逻辑讲解清楚之后，这样理解起来核心主干源码会更加清晰透彻。
 
 经过前边对网络数据接收的核心逻辑介绍，笔者在把这张流程图放出来，大家可以结合这张图在来回想下主干核心逻辑。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Netty接收网络数据流程.png
 
 下面笔者会结合这张流程图，给大家把这部分的核心主干源码框架展现出来，大家可以将我们介绍过的核心逻辑与主干源码做个一一对应，还是那句老话，我们要从主干框架层面把握整体处理流程，不需要读懂每一行代码，文章后续笔者会将这个过程中涉及到的核心点位给大家拆开来各个击破！！
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 ## 3. 源码核心框架总览
 
-        `@Override           public final void read() {               final ChannelConfig config = config();                  ...............处理半关闭相关代码省略...............               //获取NioSocketChannel的pipeline               final ChannelPipeline pipeline = pipeline();               //PooledByteBufAllocator 具体用于实际分配ByteBuf的分配器               final ByteBufAllocator allocator = config.getAllocator();               //自适应ByteBuf分配器 AdaptiveRecvByteBufAllocator ,用于动态调节ByteBuf容量               //需要与具体的ByteBuf分配器配合使用 比如这里的PooledByteBufAllocator               final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();               //allocHandler用于统计每次读取数据的大小，方便下次分配合适大小的ByteBuf               //重置清除上次的统计指标               allocHandle.reset(config);                  ByteBuf byteBuf = null;               boolean close = false;               try {                   do {                       //利用PooledByteBufAllocator分配合适大小的byteBuf 初始大小为2048                       byteBuf = allocHandle.allocate(allocator);                       //记录本次读取了多少字节数                       allocHandle.lastBytesRead(doReadBytes(byteBuf));                       //如果本次没有读取到任何字节，则退出循环 进行下一轮事件轮询                       if (allocHandle.lastBytesRead() <= 0) {                           // nothing was read. release the buffer.                           byteBuf.release();                           byteBuf = null;                           close = allocHandle.lastBytesRead() < 0;                           if (close) {                               ......表示客户端发起连接关闭.....                           }                           break;                       }                          //read loop读取数据次数+1                       allocHandle.incMessagesRead(1);                       //客户端NioSocketChannel的pipeline中触发ChannelRead事件                       pipeline.fireChannelRead(byteBuf);                       //解除本次读取数据分配的ByteBuffer引用，方便下一轮read loop分配                       byteBuf = null;                   } while (allocHandle.continueReading());//判断是否应该继续read loop                      //根据本次read loop总共读取的字节数，决定下次是否扩容或者缩容                   allocHandle.readComplete();                   //在NioSocketChannel的pipeline中触发ChannelReadComplete事件，表示一次read事件处理完毕                   //但这并不表示 客户端发送来的数据已经全部读完，因为如果数据太多的话，这里只会读取16次，剩下的会等到下次read事件到来后在处理                   pipeline.fireChannelReadComplete();                      .........省略连接关闭流程处理.........               } catch (Throwable t) {                   ...............省略...............               } finally {                  ...............省略...............               }           }       }`
+`@Override           public final void read() {               final ChannelConfig config = config();                  ...............处理半关闭相关代码省略...............               //获取NioSocketChannel的pipeline               final ChannelPipeline pipeline = pipeline();               //PooledByteBufAllocator 具体用于实际分配ByteBuf的分配器               final ByteBufAllocator allocator = config.getAllocator();               //自适应ByteBuf分配器 AdaptiveRecvByteBufAllocator ,用于动态调节ByteBuf容量               //需要与具体的ByteBuf分配器配合使用 比如这里的PooledByteBufAllocator               final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();               //allocHandler用于统计每次读取数据的大小，方便下次分配合适大小的ByteBuf               //重置清除上次的统计指标               allocHandle.reset(config);                  ByteBuf byteBuf = null;               boolean close = false;               try {                   do {                       //利用PooledByteBufAllocator分配合适大小的byteBuf 初始大小为2048                       byteBuf = allocHandle.allocate(allocator);                       //记录本次读取了多少字节数                       allocHandle.lastBytesRead(doReadBytes(byteBuf));                       //如果本次没有读取到任何字节，则退出循环 进行下一轮事件轮询                       if (allocHandle.lastBytesRead() <= 0) {                           // nothing was read. release the buffer.                           byteBuf.release();                           byteBuf = null;                           close = allocHandle.lastBytesRead() < 0;                           if (close) {                               ......表示客户端发起连接关闭.....                           }                           break;                       }                          //read loop读取数据次数+1                       allocHandle.incMessagesRead(1);                       //客户端NioSocketChannel的pipeline中触发ChannelRead事件                       pipeline.fireChannelRead(byteBuf);                       //解除本次读取数据分配的ByteBuffer引用，方便下一轮read loop分配                       byteBuf = null;                   } while (allocHandle.continueReading());//判断是否应该继续read loop                      //根据本次read loop总共读取的字节数，决定下次是否扩容或者缩容                   allocHandle.readComplete();                   //在NioSocketChannel的pipeline中触发ChannelReadComplete事件，表示一次read事件处理完毕                   //但这并不表示 客户端发送来的数据已经全部读完，因为如果数据太多的话，这里只会读取16次，剩下的会等到下次read事件到来后在处理                   pipeline.fireChannelReadComplete();                      .........省略连接关闭流程处理.........               } catch (Throwable t) {                   ...............省略...............               } finally {                  ...............省略...............               }           }       }`
 
 > 这里再次强调下当前执行线程为Sub Reactor线程，处理连接数据读取逻辑是在NioSocketChannel中。
 
@@ -209,7 +206,7 @@ image.png
 
 通过`pipeline()`获取NioSocketChannel的pipeline。我们在[?《详细图解Netty Reactor启动全流程》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247484005&idx=1&sn=52f51269902a58f40d33208421109bc3&chksm=ce77c422f9004d340e5b385ef6ba24dfba1f802076ace80ad6390e934173a10401e64e13eaeb&token=1943348780&lang=zh_CN&scene=21#wechat_redirect)一文中提到的Netty服务端模板所举的示例中，NioSocketChannelde pipeline中只有一个EchoChannelHandler。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 客户端channel pipeline结构.png
 
@@ -219,7 +216,7 @@ Sub Reactor在接收NioSocketChannel上的IO数据时，都会分配一个ByteBu
 
 这里大家可能觉得比较奇怪，为什么在NioSocketChannel接收数据这里会有两个ByteBuffer分配器呢？一个是ByteBufAllocator，另一个是RecvByteBufAllocator。
 
-    `final ByteBufAllocator allocator = config.getAllocator();       final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();`
+`final ByteBufAllocator allocator = config.getAllocator();       final RecvByteBufAllocator.Handle allocHandle = recvBufAllocHandle();`
 
 **这两个ByteBuffer又有什么区别和联系呢？**
 
@@ -227,7 +224,7 @@ Sub Reactor在接收NioSocketChannel上的IO数据时，都会分配一个ByteBu
 
 在上篇文章提到的NioServerSocketChannelConfig中，这里的RecvByteBufAllocator类型为ServerChannelRecvByteBufAllocator。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -235,7 +232,7 @@ image.png
 
 而在本文中NioSocketChannelConfig中的RecvByteBufAllocator类型为AdaptiveRecvByteBufAllocator。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -259,52 +256,49 @@ AdaptiveRecvByteBufAllocator中的allocHandle在上篇文章中我们也介绍�
 
 在MaxMessageHandle中包含了用于动态调整ByteBuffer容量的统计指标。
 
-   `public abstract class MaxMessageHandle implements ExtendedHandle {           private ChannelConfig config;              //用于控制每次read loop里最大可以循环读取的次数，默认为16次           //可在启动配置类ServerBootstrap中通过ChannelOption.MAX_MESSAGES_PER_READ选项设置。           private int maxMessagePerRead;              //用于统计read loop中总共接收的连接个数，NioSocketChannel中表示读取数据的次数           //每次read loop循环后会调用allocHandle.incMessagesRead增加记录接收到的连接个数           private int totalMessages;              //用于统计在read loop中总共接收到客户端连接上的数据大小           private int totalBytesRead;              //表示本次read loop 尝试读取多少字节，byteBuffer剩余可写的字节数           private int attemptedBytesRead;              //本次read loop读取到的字节数           private int lastBytesRead;                      //预计下一次分配buffer的容量，初始：2048           private int nextReceiveBufferSize;           ...........省略.............   }`
+`public abstract class MaxMessageHandle implements ExtendedHandle {           private ChannelConfig config;              //用于控制每次read loop里最大可以循环读取的次数，默认为16次           //可在启动配置类ServerBootstrap中通过ChannelOption.MAX_MESSAGES_PER_READ选项设置。           private int maxMessagePerRead;              //用于统计read loop中总共接收的连接个数，NioSocketChannel中表示读取数据的次数           //每次read loop循环后会调用allocHandle.incMessagesRead增加记录接收到的连接个数           private int totalMessages;              //用于统计在read loop中总共接收到客户端连接上的数据大小           private int totalBytesRead;              //表示本次read loop 尝试读取多少字节，byteBuffer剩余可写的字节数           private int attemptedBytesRead;              //本次read loop读取到的字节数           private int lastBytesRead;                      //预计下一次分配buffer的容量，初始：2048           private int nextReceiveBufferSize;           ...........省略.............   }`
 
 在每轮read loop开始之前，都会调用`allocHandle.reset(config)`重置清空上一轮read loop的统计指标。
 
-        `@Override           public void reset(ChannelConfig config) {               this.config = config;               //默认每次最多读取16次               maxMessagePerRead = maxMessagesPerRead();               totalMessages = totalBytesRead = 0;           }`
+`@Override           public void reset(ChannelConfig config) {               this.config = config;               //默认每次最多读取16次               maxMessagePerRead = maxMessagesPerRead();               totalMessages = totalBytesRead = 0;           }`
 
 在每次开始从NioSocketChannel中读取数据之前，需要利用`PooledByteBufAllocator`在内存池中为ByteBuffer分配内存，默认初始化大小为`2048`，这个容量由`guess()方法`决定。
 
-        `byteBuf = allocHandle.allocate(allocator);`
+`byteBuf = allocHandle.allocate(allocator);`
 
-        `@Override           public ByteBuf allocate(ByteBufAllocator alloc) {               return alloc.ioBuffer(guess());           }              @Override           public int guess() {               //预计下一次分配buffer的容量，一开始为2048               return nextReceiveBufferSize;           }`
+`@Override           public ByteBuf allocate(ByteBufAllocator alloc) {               return alloc.ioBuffer(guess());           }              @Override           public int guess() {               //预计下一次分配buffer的容量，一开始为2048               return nextReceiveBufferSize;           }`
 
 在每次通过`doReadBytes`从NioSocketChannel中读取到数据后，都会调用`allocHandle.lastBytesRead(doReadBytes(byteBuf))`记录本次读取了多少字节数据，并统计本轮read loop目前总共读取了多少字节。
 
-        `@Override           public void lastBytesRead(int bytes) {               lastBytesRead = bytes;               if (bytes > 0) {                   totalBytesRead += bytes;               }           }`
+`@Override           public void lastBytesRead(int bytes) {               lastBytesRead = bytes;               if (bytes > 0) {                   totalBytesRead += bytes;               }           }`
 
 每次循环从NioSocketChannel中读取数据之后，都会调用`allocHandle.incMessagesRead(1)`。统计当前已经读取了多少次。如果超过了最大读取限制此时16次，就需要退出read loop。去处理其他NioSocketChannel上的IO事件。
 
-        `@Override           public final void incMessagesRead(int amt) {               totalMessages += amt;           }`
+`@Override           public final void incMessagesRead(int amt) {               totalMessages += amt;           }`
 
 在每次read loop循环的末尾都需要通过调用`allocHandle.continueReading()`来判断是否继续read loop循环读取NioSocketChannel中的数据。
 
-        `@Override           public boolean continueReading() {               return continueReading(defaultMaybeMoreSupplier);           }              private final UncheckedBooleanSupplier defaultMaybeMoreSupplier = new UncheckedBooleanSupplier() {               @Override               public boolean get() {                   //判断本次读取byteBuffer是否满载而归                   return attemptedBytesRead == lastBytesRead;               }           };              @Override           public boolean continueReading(UncheckedBooleanSupplier maybeMoreDataSupplier) {               return config.isAutoRead() &&                      (!respectMaybeMoreData || maybeMoreDataSupplier.get()) &&                      totalMessages < maxMessagePerRead &&                      totalBytesRead > 0;           }`
+`@Override           public boolean continueReading() {               return continueReading(defaultMaybeMoreSupplier);           }              private final UncheckedBooleanSupplier defaultMaybeMoreSupplier = new UncheckedBooleanSupplier() {               @Override               public boolean get() {                   //判断本次读取byteBuffer是否满载而归                   return attemptedBytesRead == lastBytesRead;               }           };              @Override           public boolean continueReading(UncheckedBooleanSupplier maybeMoreDataSupplier) {               return config.isAutoRead() &&                      (!respectMaybeMoreData || maybeMoreDataSupplier.get()) &&                      totalMessages < maxMessagePerRead &&                      totalBytesRead > 0;           }`
 
 - `attemptedBytesRead :`表示当前ByteBuffer预计尝试要写入的字节数。
-    
+
 - `lastBytesRead :`表示本次read loop真实读取到了多少个字节。
-    
 
 `defaultMaybeMoreSupplier`用于判断经过本次read loop读取数据后，ByteBuffer是否满载而归。如果是满载而归的话（attemptedBytesRead == lastBytesRead），表明可能NioSocketChannel里还有数据。如果不是满载而归，表明NioSocketChannel里没有数据了已经。
 
 是否继续进行read loop需要**同时**满足以下几个条件：
 
 - `totalMessages < maxMessagePerRead` 当前读取次数是否已经超过`16次`，如果超过，就退出`do(...)while()`循环。进行下一轮`OP_READ事件`的轮询。因为每个Sub Reactor管理了多个NioSocketChannel，不能在一个NioSocketChannel上占用太多时间，要将机会均匀地分配给Sub Reactor所管理的所有NioSocketChannel。
-    
+
 - `totalBytesRead > 0` 本次`OP_READ事件`处理是否读取到了数据，如果已经没有数据可读了，那么就直接退出read loop。
-    
+
 - `!respectMaybeMoreData || maybeMoreDataSupplier.get()` 这个条件比较复杂，它其实就是通过`respectMaybeMoreData`字段来控制NioSocketChannel中可能还有数据可读的情况下该如何处理。
-    
 
 - `maybeMoreDataSupplier.get()`：true表示本次读取从NioSocketChannel中读取数据，ByteBuffer满载而归。说明可能NioSocketChannel中还有数据没读完。fasle表示ByteBuffer还没有装满，说明NioSocketChannel中已经没有数据可读了。
-    
-- `respectMaybeMoreData = true`表示要对可能还有更多数据进行处理的这种情况要`respect`认真对待,如果本次循环读取到的数据已经装满`ByteBuffer`，表示后面可能还有数据，那么就要进行读取。如果`ByteBuffer`还没装满表示已经没有数据可读了那么就退出循环。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+- `respectMaybeMoreData = true`表示要对可能还有更多数据进行处理的这种情况要`respect`认真对待,如果本次循环读取到的数据已经装满`ByteBuffer`，表示后面可能还有数据，那么就要进行读取。如果`ByteBuffer`还没装满表示已经没有数据可读了那么就退出循环。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 - `respectMaybeMoreData = false`表示对可能还有更多数据的这种情况不认真对待 `not respect`。不管本次循环读取数据`ByteBuffer`是否满载而归，都要继续进行读取，直到读取不到数据在退出循环，属于无脑读取。
-    
 
 同时满足以上三个条件，那么read loop继续进行。继续从NioSocketChannel中读取数据，直到读取不到或者不满足三个条件中的任意一个为止。
 
@@ -318,7 +312,7 @@ AdaptiveRecvByteBufAllocator中的allocHandle在上篇文章中我们也介绍�
 
 由于我们一开始并不知道客户端会发送多大的网络数据，所以这里先利用`PooledByteBufAllocator`分配一个初始容量为`2048`的DirectByteBuffer用于接收数据。
 
-  `byteBuf = allocHandle.allocate(allocator);`
+`byteBuf = allocHandle.allocate(allocator);`
 
 这就好比我们需要拿着一个桶去排队装水，但是第一次去装的时候，我们并不知道管理员会给我们分配多少水，桶拿大了也不合适拿小了也不合适，于是我们就先预估一个差不多容量大小的桶，如果分配的多了，我们下次就拿更大一点的桶，如果分配少了，下次我们就拿一个小点的桶。
 
@@ -330,7 +324,7 @@ AdaptiveRecvByteBufAllocator中的allocHandle在上篇文章中我们也介绍�
 
 在前文[?《Netty是如何高效接收网络连接》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247484184&idx=1&sn=726877ce28cf6e5d2ac3225fae687f19&chksm=ce77c55ff9004c493b592288819dc4d4664b5949ee97fed977b6558bc517dad0e1f73fab0f46&scene=21&cur_album_id=2217816582418956300#wechat_redirect)中我们提到，当Main Reactor监听到OP_ACCPET事件活跃后，会在NioServerSocketChannel中accept完成三次握手的客户端连接。并创建NioSocketChannel，伴随着NioSocketChannel的创建其对应的配置类NioSocketChannelConfig类也会随之创建。
 
-    `public NioSocketChannel(Channel parent, SocketChannel socket) {           super(parent, socket);           config = new NioSocketChannelConfig(this, socket.socket());       }`
+`public NioSocketChannel(Channel parent, SocketChannel socket) {           super(parent, socket);           config = new NioSocketChannelConfig(this, socket.socket());       }`
 
 最终会在NioSocketChannelConfig的父类`DefaultChannelConfig`的构造器中创建`AdaptiveRecvByteBufAllocator`。并保存在`RecvByteBufAllocator rcvBufAllocator`字段中。
 
@@ -355,16 +349,14 @@ Netty中定义了一个`int型`的数组`SIZE_TABLE`来存储每个扩容单位�
 从源码中我们可以看出`SIZE_TABLE`的初始化分为两个部分：
 
 - 当索引容量小于`512`时，`SIZE_TABLE`中定义的容量索引是从`16开始`按`16`递增。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 - 当索引容量大于`512`时，`SIZE_TABLE`中定义的容量索引是按前一个索引容量的2倍递增。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -396,22 +388,21 @@ image.png
 
 > 扩容步长`INDEX_INCREMENT = 4`，缩容步长`INDEX_DECREMENT = 1`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 #### 4.4.1 缩容
 
-- 如果本次`OP_READ事件`实际读取到的总字节数`actualReadBytes`在SIZE_TABLE[index - INDEX_DECREMENT]与SIZE_TABLE[index]之间的话，也就是如果本轮read loop结束之后总共读取的字节数在`[1024,2048]`之间。说明此时分配的`ByteBuffer`容量正好，不需要进行缩容也不需要进行扩容。比如本次`actualReadBytes = 2000`，正好处在`1024`与`2048`之间。说明`2048`的容量正好。
-    
-- 如果`actualReadBytes` 小于等于 SIZE_TABLE[index - INDEX_DECREMENT]，也就是如果本轮read loop结束之后总共读取的字节数小于等于`1024`。表示本次读取到的字节数比当前ByteBuffer容量的下一级容量还要小，说明当前ByteBuffer的容量分配的有些大了，设置缩容标识`decreaseNow = true`。当下次`OP_READ事件`继续满足缩容条件的时候，开始真正的进行缩容。缩容后的容量为SIZE_TABLE[index - INDEX_DECREMENT]，但不能小于SIZE_TABLE[minIndex]。
-    
+- 如果本次`OP_READ事件`实际读取到的总字节数`actualReadBytes`在SIZE_TABLE\[index - INDEX_DECREMENT\]与SIZE_TABLE\[index\]之间的话，也就是如果本轮read loop结束之后总共读取的字节数在`[1024,2048]`之间。说明此时分配的`ByteBuffer`容量正好，不需要进行缩容也不需要进行扩容。比如本次`actualReadBytes = 2000`，正好处在`1024`与`2048`之间。说明`2048`的容量正好。
+
+- 如果`actualReadBytes` 小于等于 SIZE_TABLE\[index - INDEX_DECREMENT\]，也就是如果本轮read loop结束之后总共读取的字节数小于等于`1024`。表示本次读取到的字节数比当前ByteBuffer容量的下一级容量还要小，说明当前ByteBuffer的容量分配的有些大了，设置缩容标识`decreaseNow = true`。当下次`OP_READ事件`继续满足缩容条件的时候，开始真正的进行缩容。缩容后的容量为SIZE_TABLE\[index - INDEX_DECREMENT\]，但不能小于SIZE_TABLE\[minIndex\]。
 
 > 注意需要满足两次缩容条件才会进行缩容，且缩容步长为1，缩容比较谨慎
 
 #### 4.4.2 扩容
 
-如果本次`OP_READ事件`处理总共读取的字节数`actualReadBytes` 大于等于 当前ByteBuffer容量(nextReceiveBufferSize)时，说明ByteBuffer分配的容量有点小了，需要进行扩容。扩容后的容量为SIZE_TABLE[index + INDEX_INCREMENT]，但不能超过SIZE_TABLE[maxIndex]。
+如果本次`OP_READ事件`处理总共读取的字节数`actualReadBytes` 大于等于 当前ByteBuffer容量(nextReceiveBufferSize)时，说明ByteBuffer分配的容量有点小了，需要进行扩容。扩容后的容量为SIZE_TABLE\[index + INDEX_INCREMENT\]，但不能超过SIZE_TABLE\[maxIndex\]。
 
 > 满足一次扩容条件就进行扩容，并且扩容步长为4， 扩容比较奔放
 
@@ -422,11 +413,10 @@ AdaptiveRecvByteBufAllocator类的实例化主要是确定ByteBuffer的初始容
 AdaptiveRecvByteBufAllocator定义了三个关于ByteBuffer容量的字段：
 
 - `DEFAULT_MINIMUM` ：表示ByteBuffer最小的容量，默认为`64`，也就是无论ByteBuffer在怎么缩容，容量也不会低于`64`。
-    
+
 - `DEFAULT_INITIAL`：表示ByteBuffer的初始化容量。默认为`2048`。
-    
+
 - `DEFAULT_MAXIMUM` ：表示ByteBuffer的最大容量，默认为`65536`，也就是无论ByteBuffer在怎么扩容，容量也不会超过`65536`。
-    
 
 `public class AdaptiveRecvByteBufAllocator extends DefaultMaxMessagesRecvByteBufAllocator {          static final int DEFAULT_MINIMUM = 64;       static final int DEFAULT_INITIAL = 2048;       static final int DEFAULT_MAXIMUM = 65536;          public AdaptiveRecvByteBufAllocator() {           this(DEFAULT_MINIMUM, DEFAULT_INITIAL, DEFAULT_MAXIMUM);       }          public AdaptiveRecvByteBufAllocator(int minimum, int initial, int maximum) {                      .................省略异常检查逻辑.............              //计算minIndex maxIndex           //在SIZE_TABLE中二分查找最小 >= minimum的容量索引 ：3           int minIndex = getSizeTableIndex(minimum);           if (SIZE_TABLE[minIndex] < minimum) {               this.minIndex = minIndex + 1;           } else {               this.minIndex = minIndex;           }              //在SIZE_TABLE中二分查找最大 <= maximum的容量索引 ：38           int maxIndex = getSizeTableIndex(maximum);           if (SIZE_TABLE[maxIndex] > maximum) {               this.maxIndex = maxIndex - 1;           } else {               this.maxIndex = maxIndex;           }              this.initial = initial;       }   }   `
 
@@ -442,7 +432,7 @@ AdaptiveRecvByteBufAllocator定义了三个关于ByteBuffer容量的字段：
 
 #### 4.5.1 二分查找容量索引下标
 
-    `private static int getSizeTableIndex(final int size) {           for (int low = 0, high = SIZE_TABLE.length - 1;;) {               if (high < low) {                   return low;               }               if (high == low) {                   return high;               }                  int mid = low + high >>> 1;//无符号右移，高位始终补0               int a = SIZE_TABLE[mid];               int b = SIZE_TABLE[mid + 1];               if (size > b) {                   low = mid + 1;               } else if (size < a) {                   high = mid - 1;               } else if (size == a) {                   return mid;               } else {                   return mid + 1;               }           }       }`
+`private static int getSizeTableIndex(final int size) {           for (int low = 0, high = SIZE_TABLE.length - 1;;) {               if (high < low) {                   return low;               }               if (high == low) {                   return high;               }                  int mid = low + high >>> 1;//无符号右移，高位始终补0               int a = SIZE_TABLE[mid];               int b = SIZE_TABLE[mid + 1];               if (size > b) {                   low = mid + 1;               } else if (size < a) {                   high = mid - 1;               } else if (size == a) {                   return mid;               } else {                   return mid + 1;               }           }       }`
 
 > 经常刷LeetCode的小伙伴肯定一眼就看出这个是**二分查找的模板**了。
 
@@ -463,15 +453,14 @@ AdaptiveRecvByteBufAllocator定义了三个关于ByteBuffer容量的字段：
 下面我们来介绍下`HandleImpl`中的核心字段，它们都和ByteBuffer的容量有关：
 
 - `minIndex` ：最小容量在扩缩容索引表`SIZE_TABE`中的index。默认是`3`。
-    
+
 - `maxIndex` ：最大容量在扩缩容索引表`SIZE_TABE`中的index。默认是`38`。
-    
+
 - `index` ：当前容量在扩缩容索引表`SIZE_TABE`中的index。初始是`33`。
-    
+
 - `nextReceiveBufferSize` ：预计下一次分配buffer的容量，初始为`2048`。在每次申请内存分配ByteBuffer的时候，采用`nextReceiveBufferSize`的值指定容量。
-    
+
 - `decreaseNow ：` 是否需要进行缩容。
-    
 
 ## 5. 使用堆外内存为ByteBuffer分配内存
 
@@ -493,23 +482,21 @@ AdaptiveRecvByteBufAllocator类只是负责动态调整ByteBuffer的容量，而
 
 因为JVM的内存布局和操作系统分配的内存是不一样的，操作系统不可能按照JVM规范来读写数据，所以就需要`第三次拷贝`中间做个转换将堆外内存中的数据拷贝到JVM堆中。
 
----
+______________________________________________________________________
 
 所以基于上述内容，在使用JVM堆内内存时会产生以下两点性能影响：
 
 1. JVM在垃圾回收堆内内存时，会发生`stop the world`导致应用程序卡顿。
-    
-2. 在进行IO操作的时候，会多产生一次由堆外内存到堆内内存的拷贝。
-    
+
+1. 在进行IO操作的时候，会多产生一次由堆外内存到堆内内存的拷贝。
 
 **基于以上两点使用`JVM堆内内存`对性能造成的影响**，于是对性能有卓越追求的Netty采用`堆外内存`也就是`DirectBuffer`来为ByteBuffer分配内存空间。
 
 采用堆外内存为ByteBuffer分配内存的好处就是：
 
 - 堆外内存直接受操作系统的管理，不会受JVM的管理，所以JVM垃圾回收对应用程序的性能影响就没有了。
-    
+
 - 网络数据到达之后直接在`堆外内存`上接收，进程读取网络数据时直接在堆外内存中读取，所以就避免了`第三次内存拷贝`。
-    
 
 所以Netty在进行 I/O 操作时都是使用的堆外内存，可以避免数据从 JVM 堆内存到堆外内存的拷贝。但是由于堆外内存不受JVM的管理，所以就需要额外关注对内存的使用和释放，稍有不慎就会造成内存泄露，于是Netty就引入了**内存池**对`堆外内存`进行统一管理。
 
@@ -534,15 +521,14 @@ AdaptiveRecvByteBufAllocator类只是负责动态调整ByteBuffer的容量，而
 从ByteBufUtil类的初始化过程我们可以看出，在为ByteBuffer分配内存的时候是否使用内存池在Netty中是可以配置的。
 
 - 通过系统变量`-D io.netty.allocator.type` 可以配置是否使用内存池为ByteBuffer分配内存。默认情况下是需要使用内存池的。但是在安卓系统中默认是不使用内存池的。
-    
-- 通过`PooledByteBufAllocator.DEFAULT`获取**内存池ByteBuffer分配器**。
-    
 
-   `public static final PooledByteBufAllocator DEFAULT =               new PooledByteBufAllocator(PlatformDependent.directBufferPreferred());`
+- 通过`PooledByteBufAllocator.DEFAULT`获取**内存池ByteBuffer分配器**。
+
+`public static final PooledByteBufAllocator DEFAULT =               new PooledByteBufAllocator(PlatformDependent.directBufferPreferred());`
 
 > 由于本文的主线是介绍Sub Reactor处理`OP_READ事件`的完整过程，所以这里只介绍主线相关的内容，这里只是简单介绍下在接收数据的时候为什么会用`PooledByteBufAllocator`来为`ByteBuffer`分配内存。而内存池的架构设计比较复杂，所以笔者后面会单独写一篇关于Netty内存管理的文章。
 
----
+______________________________________________________________________
 
 ## 总结
 
@@ -555,9 +541,8 @@ AdaptiveRecvByteBufAllocator类只是负责动态调整ByteBuffer的容量，而
 Netty在这里也遵循了这条军规，首先两个类设计的都是单一的功能。
 
 - AdaptiveRecvByteBufAllocator类只负责动态的调整ByteBuffer容量，并不管具体的内存分配。
-    
+
 - PooledByteBufAllocator类负责具体的内存分配，用内存池的方式。
-    
 
 这样设计的就比较灵活，具体内存分配的工作交给具体的`ByteBufAllocator`,可以使用内存池的分配方式`PooledByteBufAllocator`，也可以不使用内存池的分配方式`UnpooledByteBufAllocator`。具体的内存可以采用JVM堆内内存（HeapBuffer），也可以使用堆外内存（DirectBuffer）。
 
@@ -569,8 +554,6 @@ Netty在这里也遵循了这条军规，首先两个类设计的都是单一的
 
 好了，今天的内容就到这里，我们下篇文章见~~~~
 
-  
-
 ![](http://mmbiz.qpic.cn/mmbiz_png/sOIZXFW0vUZ9qpdibKBrYASLXXicypdMcnlrAGcicnHQyWYNZvic3C5OpgEicMDGsAcibZTKiaNECcNXDKJiaIBr2XGTow/300?wx_fmt=png&wxfrom=19)
 
 **bin的技术小屋**
@@ -581,13 +564,11 @@ Netty在这里也遵循了这条军规，首先两个类设计的都是单一的
 
 公众号
 
-  
-
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/ZgMuHNwbpX4TOrXq2bEVVOPfGjaVfrOv7P8iaZC3GicBPGsLjSzYOthibcnonl9YShwvMsgrPL5JLvs6nfqCRW6EA/0?wx_fmt=jpeg)
 
 bin的技术小屋
 
- 让本该造火箭的我们，不再拧螺丝 
+让本该造火箭的我们，不再拧螺丝
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247484244&idx=1&sn=831060fc38caa201d69f87305de7f86a&chksm=ce77c513f9004c05b48f849ff99997d6d7252453135ae856a029137b88aa70b8e046013d596e&mpshare=1&scene=24&srcid=0223fnbVJQeWDObJ1nkKeOST&sharer_sharetime=1645582886730&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d088ae246169e24e25cad490577f8cd549e8dc1e3d2efcd2cecb6340f938469a35df791d7ade3cb5f85121557eb506d54bd71f7fda8238952d15c51cc4397965238aa94d7ec2a2c943a347eebe0c7509bbee54f35d1c65ea39face2a09bc94db48172c0dac1b98a8b70a6af9cbaef75b1791b51649de4ec2f0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQELJK7wsbDSibsbbMs2%2FFHhLVAQIE97dBBAEAAAAAAF8fOMKL6RAAAAAOpnltbLcz9gKNyK89dVj0cdilluaohPIxhgfoP9atKiM1NVWVaPOtugzosFLYkg1XXecGBPIDkcm2SmwngXe%2B31L%2F2j0MbzrUFrATC0c4JUm4pEqt8ubaGJaGekk8xdHCA9PE467CgovpvPyo2n3EMSvMiB3Jyu5Mj37rhhjO4XYobx%2BK2D8c%2FvN3Vu%2FgR%2B5WJxwnsLx0BmHEHnaNUZLQOvxLhHKhaqv9HgiDtraXPuc%2Bikh51YcEdAYtLrgLWA%3D%3D&acctmode=0&pass_ticket=OE4jBHnpyk%2Briyw2cZA5wdnp6bQYEscfMUEg1olVVY8BHALt2Abm2ao92h%2BlIoQm&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 

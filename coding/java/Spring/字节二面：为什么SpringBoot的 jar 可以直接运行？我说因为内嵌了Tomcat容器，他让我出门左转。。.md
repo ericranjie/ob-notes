@@ -1,5 +1,3 @@
-
-
 [](https://juejin.cn/user/1204720475840791/posts)
 
 2024-04-0460,670阅读11分钟
@@ -85,8 +83,8 @@ Spring Boot的启动器类加载器`LaunchedURLClassLoader`首先会读取MANIFE
 启动类加载器工作流程如下：
 
 1. 当启动器类加载器启动时，它会根据MANIFEST.MF中的信息来组织类路径，保证所有内部的依赖库都能正确地被加载。
-2. 加载器会区分出 `BOOT-INF/classes`中的应用程序类和 `BOOT-INF/lib` 下的依赖库，分别处理并加入到类加载器的搜索路径中。
-3. 加载器加载并执行实际的`Start-Class`，即应用的主类，触发Spring Boot框架的初始化和应用的启动流程。比如示例中的应用主类：`com.springboot.base.SpringBootBaseApplication`
+1. 加载器会区分出 `BOOT-INF/classes`中的应用程序类和 `BOOT-INF/lib` 下的依赖库，分别处理并加入到类加载器的搜索路径中。
+1. 加载器加载并执行实际的`Start-Class`，即应用的主类，触发Spring Boot框架的初始化和应用的启动流程。比如示例中的应用主类：`com.springboot.base.SpringBootBaseApplication`
 
 Spring Boot的启动器和加载器机制有效地实现了对自包含jar包的管理和执行，我们无需关心复杂的类路径配置和依赖加载，只需通过一个简单的命令即可启动一个完整、独立运行的应用程序。
 
@@ -121,10 +119,10 @@ Spring Boot的核心特性之一就是其强大的自动配置能力，它允许
 Spring Boot 应用程序被打包成的jar包之所以可以直接通过 `java -jar` 命令运行，是因为Spring Boot在构建过程中做了一些特殊的设计和配置。具体原因：
 
 1. **Fat/Uber JAR**: Spring Boot使用maven插件`spring-boot-maven-plugin`（或Gradle对应的插件）将项目及其所有依赖项打包成一个单一的、自包含的jar文件，通常称为“Fat JAR”或“Uber JAR”。这意味着不仅包含了自己的类文件，还包含了运行应用所需的所有第三方库。
-2. **Manifest.MF**: 在打包过程中，此插件会修改MANIFEST.MF文件，这是jar包中的一个元数据文件。在MANIFEST.MF中，特别指定了`Main-Class`属性，该属性指向Spring Boot的一个内置的启动类（如`org.springframework.boot.loader.JarLauncher`），这个启动器类知道如何正确启动Spring Boot应用程序。
-3. **嵌入式Servlet容器**：Spring Boot默认集成了诸如Tomcat、Jetty或Undertow等嵌入式Web容器，使得无需外部服务器环境也能运行Web应用。
-4. **启动器类加载器**：当通过`java -jar`运行Spring Boot应用时，JVM会根据MANIFEST.MF中的`Main-Class`找到并运行指定的启动器类。这个启动器类加载器能够解压并加载内部的依赖库，并定位到实际的应用主类（在`spring-boot-starter-parent`或`@SpringBootApplication`注解标记的类），进而执行其`main`方法。
-5. **类路径扫描和自动配置**：Spring Boot应用通过特定的类路径扫描机制和自动配置功能，能够在启动时识别出应用所依赖的服务和组件，并自动配置它们，大大简化了传统Java应用的配置和部署过程。
+1. **Manifest.MF**: 在打包过程中，此插件会修改MANIFEST.MF文件，这是jar包中的一个元数据文件。在MANIFEST.MF中，特别指定了`Main-Class`属性，该属性指向Spring Boot的一个内置的启动类（如`org.springframework.boot.loader.JarLauncher`），这个启动器类知道如何正确启动Spring Boot应用程序。
+1. **嵌入式Servlet容器**：Spring Boot默认集成了诸如Tomcat、Jetty或Undertow等嵌入式Web容器，使得无需外部服务器环境也能运行Web应用。
+1. **启动器类加载器**：当通过`java -jar`运行Spring Boot应用时，JVM会根据MANIFEST.MF中的`Main-Class`找到并运行指定的启动器类。这个启动器类加载器能够解压并加载内部的依赖库，并定位到实际的应用主类（在`spring-boot-starter-parent`或`@SpringBootApplication`注解标记的类），进而执行其`main`方法。
+1. **类路径扫描和自动配置**：Spring Boot应用通过特定的类路径扫描机制和自动配置功能，能够在启动时识别出应用所依赖的服务和组件，并自动配置它们，大大简化了传统Java应用的配置和部署过程。
 
 Spring Boot通过精心设计的打包流程和启动器类，使得生成的jar包可以直接作为一个独立的应用程序运行，极大地简化了部署和运维复杂度。
 

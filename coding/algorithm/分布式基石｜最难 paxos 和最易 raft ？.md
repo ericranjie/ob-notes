@@ -2,7 +2,7 @@
 
 原创 奇伢 奇伢云存储
 
- _2021年10月21日 07:46_
+_2021年10月21日 07:46_
 
 ![](https://res.wx.qq.com/op_res/NN_GToMiIjsXzgPzF9-74ZzwR3cA9-fv3o9eWo8f5gQWqx71CmGlY8kFxuIxZaG0TB1bFeMCmh1DGN_pWMRg0A)
 
@@ -16,17 +16,11 @@
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/4UtmXsuLoNehKKVuWjgbttMN2icYEzYNtJAuEtXNiaP9IA0BEs7DSoM5OSekPBK5zuQjIhOG9tOqb3p3iafxpN0VA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
-  
-
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/gBJOYg4SEEUvEqC5oO30octlCXHubelsesdolc6YJHWRf1C8UTPs3scrsXWFoCHYsntUfbpKFrDicJ5tFbLPxBw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 什么是一致性协议？
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/gBJOYg4SEEUvEqC5oO30octlCXHubelsl8Q8jryjW8fJDBj8r4A48RcHDMj7ibJfRRhRWSJUUWNTqiaibDr9dmstQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 > 注意，今天是大白话随便聊聊，目的是直白的了解 raft 是什么，不用太抠理论定义。
 
@@ -42,26 +36,21 @@
 
 有两个最出名的一致性协议：**paxos 和 raft** 。数学上已经严格证明了 paxos 的正确性，只要严格遵守它协议的约束，就能保证在分布式的恶劣环境下多副本数据的一致。我们来看一下吧！
 
-  
-
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/gBJOYg4SEEUvEqC5oO30octlCXHubelsesdolc6YJHWRf1C8UTPs3scrsXWFoCHYsntUfbpKFrDicJ5tFbLPxBw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 paxos 协议
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/gBJOYg4SEEUvEqC5oO30octlCXHubelsl8Q8jryjW8fJDBj8r4A48RcHDMj7ibJfRRhRWSJUUWNTqiaibDr9dmstQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
-paxos 是 Leslie Lamport 大神于 1990 年提出的一致性协议。它解决的问题是一个分布式系统如何就某个值（决议）达成一致。  
+paxos 是 Leslie Lamport 大神于 1990 年提出的一致性协议。它解决的问题是一个分布式系统如何就某个值（决议）达成一致。
 
 **划重点：paxos 协议本质是确定一个值。**
 
 论文《The part-time parliarment》提到的 paxos 里面有两个重要角色：
 
 - Proposer：提议发起者
-    
+
 - Acceptor：提议接受者
-    
 
 它们的操作对象就是：提议（ Proposal ） = 提议的值 + 提议编号。里面有三大"定律"，满足这三大约束条件，那么就能保证一致性：
 
@@ -69,15 +58,15 @@ paxos 是 Leslie Lamport 大神于 1990 年提出的一致性协议。它解决�
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/4UtmXsuLoNehKKVuWjgbttMN2icYEzYNt9wCn7FiciclbSJQdhoWia0pMlyy3INhibTxBYMXSicjLzHx80k3pvP4yzAg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-**第二定律：投票满足多数才算成功**（并且如果任意两次投票都存在多数派，则多数派的交集不为空）；  
+**第二定律：投票满足多数才算成功**（并且如果任意两次投票都存在多数派，则多数派的交集不为空）；
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/4UtmXsuLoNehKKVuWjgbttMN2icYEzYNtTzyKKY1e0b5tzXbIPdURJqibS9TU7uI6ibOnbo08vR4xsLjcJEJ6icRibg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-**第三定律：如果一轮编号为 Bbal 的投票，多数派中任意一位成员曾投过 Bbal 编号小的票（B'），那么 Bdec == B'dec**；  
+**第三定律：如果一轮编号为 Bbal 的投票，多数派中任意一位成员曾投过 Bbal 编号小的票（B'），那么 Bdec == B'dec**；
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/4UtmXsuLoNehKKVuWjgbttMN2icYEzYNttf3nPGUI6YY3yADXDwC6iawznMlbKibUCLVDibZuicmcx14VS0HuesrnJQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-上面就是 paxos 最核心的内容，但是说实话，每一个字都看得懂，但是连起来就不知道啥意思？  
+上面就是 paxos 最核心的内容，但是说实话，每一个字都看得懂，但是连起来就不知道啥意思？
 
 paxos 到底能做啥？这个我们存储系统有啥关系？它为啥那么难懂？
 
@@ -89,23 +78,15 @@ paxos 难就难在于它没告诉大家，这个东西能用来做啥，映射�
 
 **确定一个不能变的值**有啥用？
 
-  
-
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/gBJOYg4SEEUvEqC5oO30octlCXHubelsesdolc6YJHWRf1C8UTPs3scrsXWFoCHYsntUfbpKFrDicJ5tFbLPxBw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 paxos 的工程化
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/gBJOYg4SEEUvEqC5oO30octlCXHubelsl8Q8jryjW8fJDBj8r4A48RcHDMj7ibJfRRhRWSJUUWNTqiaibDr9dmstQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 我们下面尝试将 paxos 工程化，将它具现化到现实的工程实现。
 
-  
-
- **1**   **确定一个值，有啥用？**
-
-  
+**1**   **确定一个值，有啥用？**
 
 回到最开始的问题，**确定一个值**对我们有啥用？
 
@@ -113,25 +94,17 @@ paxos 的工程化
 
 paxos 本质：确定一个值，现在把这里面参与的角色打包起来，Proposer，Acceptor，Proposal 等等组成的抽象的集合：paxos instance，称为 paxos 实例：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **划重点：每个实例必须是完全独立，投票互不干涉，即可。**
 
 **一个 instance 确定一个值**，**多个 instance 确定多个值**。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这些值不断的被确定（永不更改），形成了一个值序列，这有啥用？
 
-  
-
- **2**   **确定多个值有啥用？**
-
-  
+**2**   **确定多个值有啥用？**
 
 接着上面，我们现在有了一系列**永远无法被修改了值序列**，有啥用？存储服务的基本特点是允许存储任何数据，并且能够增删改。
 
@@ -145,11 +118,7 @@ paxos 本质：确定一个值，现在把这里面参与的角色打包起来�
 
 状态机嘛。
 
-  
-
- **3**   **加个状态机就起飞了**
-
-  
+**3**   **加个状态机就起飞了**
 
 什么是状态机？
 
@@ -163,11 +132,7 @@ paxos 本质：确定一个值，现在把这里面参与的角色打包起来�
 
 通过不停的确定一个个值，形成一个有序的操作系列，配合状态机的应用，这，就是 paxos 的工程化方向。
 
-  
-
- **4**   **活锁的问题怎么解决？**
-
-  
+**4**   **活锁的问题怎么解决？**
 
 对于 paxos 来说，Proposer 和 Acceptor 角色是可以重叠的，每个节点既可以是 Proposer，也可以是 Acceptor ，或者两者都是。
 
@@ -179,34 +144,27 @@ paxos 本质：确定一个值，现在把这里面参与的角色打包起来�
 
 问题根因在于可以提案的点太多，大家都是平等的。那么统一声音才能解决这个问题。于是**Leader** 就应运而生。通过某种方法指定一个节点为 Leader ，只有一个节点能递交提案，这样就解决了混乱问题，效率提随之提升（这就是 Multi-Paxos ）。
 
-  
-
- **5**   **paxos 工程化小结**
-
-  
+**5**   **paxos 工程化小结**
 
 小结一下，如果要将一个 paxos 工程化落地，衍生了哪些东西：
 
 1. paxos 本质是确定一个值，把参与确定这个值的角色打包称为一组实例（ paxos instance ）；2.不同实例之间决议互不干扰。多组 paxos 实例确定多个值，形成一组操作序列，也是就**日志** ；
-    
-2. 日志 + **状态机** 可以成为任何有意义的工程系统；
-    
-3. 为了解决递交提案混乱可能引发的效率问题（比如活锁），可以通过指定 Leader 角色来解决；
-    
+
+1. 日志 + **状态机** 可以成为任何有意义的工程系统；
+
+1. 为了解决递交提案混乱可能引发的效率问题（比如活锁），可以通过指定 Leader 角色来解决；
 
 慢着，这个工程化方向咋这么眼熟呢？
 
 **这不就是 raft ！**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 raft 协议
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
-终于到了 raft 协议，raft 的论文开篇就是这么一段话：  
+终于到了 raft 协议，raft 的论文开篇就是这么一段话：
 
 > Raft is a consensus algorithm for managing a replicated log. It produces a result equivalent to (multi-)Paxos, and it is as efficient as Paxos, but its structure is different from Paxos;
 
@@ -218,29 +176,25 @@ raft 证明和 paxos 等价，raft 是一种日志复制的一致性算法。
 
 如下图：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图里交代了关键模块：
 
 1. 客户端（ Client ）：就是用户嘛，写入数据的就是它喽；
-    
-2. 一致性模块（ Consensus Module ）：负责写入 log，并且把 log 复制到其他节点；
-    
-3. 状态机（ State Machine ）：输入 log ，推进变更系统状态；
-    
+
+1. 一致性模块（ Consensus Module ）：负责写入 log，并且把 log 复制到其他节点；
+
+1. 状态机（ State Machine ）：输入 log ，推进变更系统状态；
 
 raft 确实比 paxos 简单啊，因为它已经把实现程序交互的样子都画出来了。
 
 在 raft 论文里面直接把几个因素交代清楚了：
 
 1. raft 就是管理日志复制的算法；
-    
-2. 日志 + 状态机 就能落地一个一致性的系统应用；
-    
-3. 集群角色有分类，Leader 作为唯一的写入点，所有日志复制是 Leader 到 Follower 单项传输；
-    
+
+1. 日志 + 状态机 就能落地一个一致性的系统应用；
+
+1. 集群角色有分类，Leader 作为唯一的写入点，所有日志复制是 Leader 到 Follower 单项传输；
 
 说实话，上面的这些知识点都是我们对 paxos 工程化的长时间推导才想明白的。
 
@@ -249,50 +203,40 @@ raft 确实比 paxos 简单啊，因为它已经把实现程序交互的样子�
 raft 把一致性归纳成三个核心问题：
 
 1. Leader 的选举；
-    
-2. 日志的复制；
-    
-3. 正确性的保证（约束条件）；
-    
+
+1. 日志的复制；
+
+1. 正确性的保证（约束条件）；
 
 其实真正要做的就两个，第三个问题贯穿前两个事情：
 
 1. 选出一个 Leader ；
-    
-2. 把 Leader 的日志复制分发到 Follower 节点；
-    
+
+1. 把 Leader 的日志复制分发到 Follower 节点；
 
 我们下面来看下这两个事情是怎么做的。
 
 而用户则只好奇两个事情：
 
 1. 数据怎么读写？
-    
-2. 节点扩缩容怎么搞？
-    
 
-  
+1. 节点扩缩容怎么搞？
 
- **1**   **Leader 选举**
-
-  
+**1**   **Leader 选举**
 
 **角色转变**：
 
 简单看下 raft 协议中关于 Leader 选举的部分。下面是角色转化图，非常清晰：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图里至少能得到这么几点知识点：
 
 1. 系统开始每个节点都是从 Follower 角色开始；
-    
-2. 定时器超时之后，角色转变为 Candidate ，开始竞选 Leader；
-    
-3. Candidate 如果获得多数人的支持，那么选举成功，角色转变为 Leader 。如果选举失败，那么退为 Follower ；
-    
+
+1. 定时器超时之后，角色转变为 Candidate ，开始竞选 Leader；
+
+1. Candidate 如果获得多数人的支持，那么选举成功，角色转变为 Leader 。如果选举失败，那么退为 Follower ；
 
 Leader 选举成功之后则可以对外提供服务。
 
@@ -302,14 +246,11 @@ Leader 选举成功之后则可以对外提供服务。
 
 从时间线来看，可以分为两部分时间（如下图）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. 无 Leader 状态（选举中）；
-    
-2. 正常状态（ Leader ）；
-    
+
+1. 正常状态（ Leader ）；
 
 每个 Leader 都有自己的任期，注意：无 Leader 的状态是停服状态。
 
@@ -324,9 +265,8 @@ Leader 选举成功之后则可以对外提供服务。
 这就是 raft 协议里安全性的内容。投票发起者（ Candidate ）要告诉对方两个东西：
 
 1. 任期编号；
-    
-2. 当前日志的最新位置；
-    
+
+1. 当前日志的最新位置；
 
 其他节点（ Follower ）收到这两个信息会决定要投它一票，还是拒绝它？
 
@@ -335,22 +275,16 @@ Leader 选举成功之后则可以对外提供服务。
 **那怎么判断谁更新（全）呢？**
 
 1. 先比 term ，谁更大谁就新;
-    
 
 - 举个例子，Follower 节点保存的任期是 4，Candidate 发过来的是 3 ，这种就直接拒绝了；
-    
 
 3. 如果任期相同，那么就比较 index ，index 谁更大就新;
-    
 
 - 举个例子，对面发过来的 index 是 7，我本地是的 8 ，那么就多说了，拒绝；
-    
 
 我们看一眼下图，我们知道 raft 的操作对象就是**日志**。在 raft 协议中，每个日志都有唯一的编号：index ，代表了它唯一的槽位。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 题外话：这里可以类比上面 paxos 章节说的 instance 概念。其实每一个日志槽位和其他模块对象结合其他就是**单独的 instance** ，这一系列的日志对象就类似于 paxos 多实例 instance **确定的值**。
 
@@ -358,20 +292,15 @@ Leader 选举成功之后则可以对外提供服务。
 
 从完备的数据来看 committed 的位置在 index：7 这个位置。那么第一个节点、第三个节点、第五个节点都具备完备的数据，但是按照协议跑起来，只有第一个节点和第三个节点才有可能会成为 Leader 。因为它们两个节点有最新的数据（虽然是没有 commited 的），第五个节点找它们投票的时候，会被拒绝（它虽然有完备的数据，但是不够新）。
 
-  
-
- **2**   **日志复制**
-
-  
+**2**   **日志复制**
 
 日志复制有几个特点：
 
 1. 日志传输为**单向**传输，Leader 到 Follower ；
-    
-2. Leader **永远不会改写或者删除自己的日志**，永远只做 Append ；
-    
-3. 日志内容一切以 Leader 为主，哪怕是**强制覆盖** ；
-    
+
+1. Leader **永远不会改写或者删除自己的日志**，永远只做 Append ；
+
+1. 日志内容一切以 Leader 为主，哪怕是**强制覆盖** ；
 
 和 paxos 类似，每个日志槽位的值一旦确定就无法更改，无论怎么投票，怎么运转，这个值不再变更。raft 就这样连续的确定值就能形成一个的日志序列，给到状态机使用。
 
@@ -379,16 +308,13 @@ Leader 选举成功之后则可以对外提供服务。
 
 以这个图为例，在不切主的情况下，数据从节点（1）向其他节点发送，补齐数据。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 经过状态机应用，所有的节点最终系统状态一致：
 
 - x = 4
-    
+
 - y = 7
-    
 
 思考一个问题：如果用户写失败了，系统提供了什么结果语义？
 
@@ -408,22 +334,19 @@ Leader 选举成功之后则可以对外提供服务。
 
 看一个 raft 论文中的简单的例子：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这是一个时间序列，从 a -> b -> c -> d -> e ：
 
 1. a 时刻：Leader 为 S1（ 黑框的为 Leader ），它有着最新的日志 index:2 ，虽然最新的 index:2 并没有 committed（复制到多数），只复制到了 S2 ；
-    
-2. b 时刻：S1 挂了，S5 被选举为 Leader ，任期为 3 ，并且 Client 还递交了一个写入；
-    
-3. c 时刻：S5 挂了，S1 被重新选举为 Leader ，任期为 4，这个时候它复制日志，把 index:2 的日志复制给了 S1，S2，S3 ，这是满足了 quorum （但注意了，这个系统千万不能认为 commit 了，且往后看）。并且 Client 还递交了一个写入在 index:3 的位置；
-    
-4. d 时刻：S1 挂了，S5 被重新选举为 Leader（S2，S3，S4 都会投票），于是把 index:2 的日志强制覆盖到所有节点；
-    
-5. e 时刻：这个时刻是一种假设，假设说，S1 在 c 时刻的时候在挂掉之前把任期 4，index:3 的日志复制到多数节点，那结果又不一样了。这种场景系统可以认为 index:3 被 commit 了，index:2 则是被间接 commit 了；
-    
+
+1. b 时刻：S1 挂了，S5 被选举为 Leader ，任期为 3 ，并且 Client 还递交了一个写入；
+
+1. c 时刻：S5 挂了，S1 被重新选举为 Leader ，任期为 4，这个时候它复制日志，把 index:2 的日志复制给了 S1，S2，S3 ，这是满足了 quorum （但注意了，这个系统千万不能认为 commit 了，且往后看）。并且 Client 还递交了一个写入在 index:3 的位置；
+
+1. d 时刻：S1 挂了，S5 被重新选举为 Leader（S2，S3，S4 都会投票），于是把 index:2 的日志强制覆盖到所有节点；
+
+1. e 时刻：这个时刻是一种假设，假设说，S1 在 c 时刻的时候在挂掉之前把任期 4，index:3 的日志复制到多数节点，那结果又不一样了。这种场景系统可以认为 index:3 被 commit 了，index:2 则是被间接 commit 了；
 
 看到了吗？
 
@@ -443,17 +366,11 @@ Leader 选举成功之后则可以对外提供服务。
 
 题外话：etcd 在每次选举出 Leader 的第一件事就是广播一条空白消息，原因就在这里。**目的是为了间接 commit 掉前任的日志**。
 
-  
-
- **3**   **状态机**
-
-  
+**3**   **状态机**
 
 这部分其实是最简单的，状态机做的事情我们叫做 apply 。apply 的内容则是各个业务自行解释，举个例子，如下的日志，这是一个典型的 kv 系统的样子：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 日志 apply 完之后，系统状态为：
 
@@ -461,9 +378,7 @@ Leader 选举成功之后则可以对外提供服务。
 
 **划重点：日志里面的内容由业务自行解释，raft 只保证日志复制是完全一致的。**
 
- **4**   **Propose 递交**
-
-  
+**4**   **Propose 递交**
 
 用户的入口就是从递交 Propose 开始，由 Leader 接收用户请求，然后封装成日志的样子，经过了 commit（ 确定这个值 ）之后就能对外承诺。
 
@@ -473,16 +388,13 @@ Leader 选举成功之后则可以对外提供服务。
 
 **划重点：还是那句话，只由 Leader 来发起，就算发给了 Follower ，请求也会转发 Leader。**
 
- **5**   **成员变更**
-
-  
+**5**   **成员变更**
 
 成员变更一般分为两种场景：
 
 1. 单节点变更
-    
-2. 多节点变更
-    
+
+1. 多节点变更
 
 **场景一：单节点变更**
 
@@ -492,7 +404,7 @@ Leader 选举成功之后则可以对外提供服务。
 
 举个栗子：
 
-原始集群 （S1，S2，S3），现在扩容一台 S4 ，只需要封装一条 < add S4 > 这样的日志消息，广播到集群里就可以，等这条消息 commit 了，就可以变更配置了。
+原始集群 （S1，S2，S3），现在扩容一台 S4 ，只需要封装一条 \< add S4 > 这样的日志消息，广播到集群里就可以，等这条消息 commit 了，就可以变更配置了。
 
 **场景二：多节点变更**
 
@@ -500,16 +412,13 @@ Leader 选举成功之后则可以对外提供服务。
 
 因为怕一次性来的人太多，直接威胁到原有 Leader 的权威。如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 比如说，原有集群 （ S1，S3，S3 ），一次性来了两个 （ S4，S5 ），这就可能导致某个时刻出现两个 Leader 的情况：
 
 1. S1，S2 认为 S1 是 Leader，在原有 3 节点的集群中，满足多数，**合法** ；
-    
-2. S3，S4，S5 认为 S3 是 Leader ，在新的 5 节点集群中满足多数，**合法**；
-    
+
+1. S3，S4，S5 认为 S3 是 Leader ，在新的 5 节点集群中满足多数，**合法**；
 
 那这可不行，这不就脑裂了嘛。一个集群只能有一个 Leader ，不然就会出现数据混乱的情况。
 
@@ -517,111 +426,77 @@ Leader 选举成功之后则可以对外提供服务。
 
 通用的做法是 joint consensus 算法。其实这个算法很简单，就是加一个中间过程，集群配置搞成两阶段切换，过程中**要满足新集群和老集群的同时的 quorum 投票**。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个图怎么看不懂？我举个栗子：
 
 1. 最开始集群配置（ S1，S2，S3 ），我们暂且叫做 C_old ；
-    
-2. 递交两条集群变更的日志，Add S4，Add S5 ，Leader 向所有 S1，S2，S3 广播日志；
-    
-3. 所有节点（ S1，S2，S3 ）收到这两条日志，则代表这两条日志被 commit 了，于是 apply 这两条日志，apply 的行为：集群配置变更为（ S1，S2，S3，S4，S5 ）&（ S1，S2，S3 ），俗称 C_old,new ；
-    
+
+1. 递交两条集群变更的日志，Add S4，Add S5 ，Leader 向所有 S1，S2，S3 广播日志；
+
+1. 所有节点（ S1，S2，S3 ）收到这两条日志，则代表这两条日志被 commit 了，于是 apply 这两条日志，apply 的行为：集群配置变更为（ S1，S2，S3，S4，S5 ）&（ S1，S2，S3 ），俗称 C_old,new ；
 
 1. 在 etcd 中，对应  enter joint 的操作；
-    
 
-5. 开始递交一个切换配置的日志消息（ etcd 里面叫做 ConfChangeV2 ），并且广播这条配置；
-    
-6. 所有节点（ S1，S2，S3，S4，S5 ）收到这条日志则代表这条日志被 commit，于是可以 apply 这条日志，apply 的行为：集群配置变更为（ S1，S2，S3，S4，S5 ），这个配置就是 C_new，至此，配置变更结束；
-    
+1. 开始递交一个切换配置的日志消息（ etcd 里面叫做 ConfChangeV2 ），并且广播这条配置；
+
+1. 所有节点（ S1，S2，S3，S4，S5 ）收到这条日志则代表这条日志被 commit，于是可以 apply 这条日志，apply 的行为：集群配置变更为（ S1，S2，S3，S4，S5 ），这个配置就是 C_new，至此，配置变更结束；
 
 **重点提一下：在 C_old，C_new 阶段如果收到写请求，需要满足两份配置的 quorum 同意才能 commit 。**
 
 这样就解决了双 Leader 的问题。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 总结
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1. paxos 协议的本质是**确定一个值**，不同的 instance 确定多个值就成了日志序列；
-    
-2. **日志 + 状态机**就能实现任何系统，存储服务只是其一；
-    
-3. raft 协议和 paxos 等价，它**天然就是 paxos 工程化的一种样子**；
-    
-4. Leader 选举，日志复制，Leader 的安全性约束是 **raft 的三大核心问题**；
-    
-5. raft 的日志里面可以是任何内容，里面的**含义由业务 apply 的时候自行解析**；
-    
-6. raft 单节点变更可以随意搞，**多节点变更**需要用 joint consensus 算法走两阶段变更，才能防止多 Leader 的脑裂情况；
-    
 
-  
+1. **日志 + 状态机**就能实现任何系统，存储服务只是其一；
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. raft 协议和 paxos 等价，它**天然就是 paxos 工程化的一种样子**；
+
+1. Leader 选举，日志复制，Leader 的安全性约束是 **raft 的三大核心问题**；
+
+1. raft 的日志里面可以是任何内容，里面的**含义由业务 apply 的时候自行解析**；
+
+1. raft 单节点变更可以随意搞，**多节点变更**需要用 joint consensus 算法走两阶段变更，才能防止多 Leader 的脑裂情况；
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 后记
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从 paxos 到 raft ，简单聊聊，为后面 etcd 的一些分享做铺垫。**点赞、在看** 是对奇伢最大的支持。
 
 ~完～
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 往期推荐
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 往期推荐
 
-  
-
-  
-
-[
+\[
 
 云原生 etcd 系列｜Leader 是怎么选举出来的？
 
+\](http://mp.weixin.qq.com/s?\_\_biz=Mzg3NTU3OTgxOA==&mid=2247494951&idx=1&sn=b6193f082416ebda21046afce0be0be1&chksm=cf3dfde2f84a74f403ec88949b28bc03c7f3bfcd28697007a2b11f064b4caf0624005ec46b8a&scene=21#wechat_redirect)
 
-
-](http://mp.weixin.qq.com/s?__biz=Mzg3NTU3OTgxOA==&mid=2247494951&idx=1&sn=b6193f082416ebda21046afce0be0be1&chksm=cf3dfde2f84a74f403ec88949b28bc03c7f3bfcd28697007a2b11f064b4caf0624005ec46b8a&scene=21#wechat_redirect)
-
-[
+\[
 
 云原生 etcd 系列｜为什么值得学习？
 
-
-
-](http://mp.weixin.qq.com/s?__biz=Mzg3NTU3OTgxOA==&mid=2247494899&idx=1&sn=0e2831e181a8c6a2306e399b07180517&chksm=cf3dfc36f84a752006be9e30892ab7b19dea74985a9babae4ecf051362ce7853a4d620c1dfb6&scene=21#wechat_redirect)
-
-  
-
-  
+\](http://mp.weixin.qq.com/s?\_\_biz=Mzg3NTU3OTgxOA==&mid=2247494899&idx=1&sn=0e2831e181a8c6a2306e399b07180517&chksm=cf3dfc36f84a752006be9e30892ab7b19dea74985a9babae4ecf051362ce7853a4d620c1dfb6&scene=21#wechat_redirect)
 
 坚持思考，方向比努力更重要。**关注我：奇伢云存储。欢迎加我好友，技术交流。**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **欢迎加我好友，技术交流。**
 
@@ -637,7 +512,7 @@ Leader 选举成功之后则可以对外提供服务。
 
 奇伢
 
- 你的支持，是我创作的动力。 
+你的支持，是我创作的动力。
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzkyOTU5MTc3NQ==&mid=2247499242&idx=1&sn=1c57f4425c4c450e8408f655d637fd97&source=41&key=daf9bdc5abc4e8d06af8627fc9f10f7dd76579993e2b8bf7dd0610b2fa82ff3825029ca7e0cd2897a126310426c22a983e1f8db5ef0eb74cff4941c0003a181ba4a460e89e2d63760e813f7c8b249fc16c61d144b96ce1bb81803a2642ad6a599a8c24f83ebb8bce0713ef8ab4de7742545ca6e95a9172b227b43b743fa3cfe9&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQrCqUQ%2Bd1gVPtlSrOTX%2BeThLmAQIE97dBBAEAAAAAACYwGfXNHJsAAAAOpnltbLcz9gKNyK89dVj0N4tJx4WiHRpQtSGKh5%2FV2gUbPf2WBrWr0KZFwioI8kZ8llSXWoPcXOR1OGzJ7RMWV5OznelNf6BDqk8UsaqR3HnVVjQnO8ZvJEGvs7outrhN13juFY9dE5MPL3%2FS121X21ZOAiq1l%2FWGCVpMLLH6RnWyvVoYEiWIUgnfWjAoGhZITxCiTt1ORRyLfnQjjhdmjEYOBMipdNRtr3oTP9Wg3i3Gek3WU%2B%2BSr7wPNXsde5CX3MuYxFTW2%2FbE1oWvrz5C&acctmode=0&pass_ticket=PREk8NpjF0PARRA0YBrKN1Zno7vqEHjgjAP8RvziBdYJ4L52S3r98CgrHNGQBuNW&wx_header=1)喜欢作者
 
@@ -660,103 +535,102 @@ Leader 选举成功之后则可以对外提供服务。
 **留言 12**
 
 - 奇伢
-    
-    2021年10月21日
-    
-    赞5
-    
-    etcd 之前先科普一波 raft。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 点赞，在看就是最好的支持。加我微信： liqingqiya2019，拉你进群，讨论 Go 编程细节。
-    
-    置顶
-    
+
+  2021年10月21日
+
+  赞5
+
+  etcd 之前先科普一波 raft。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 点赞，在看就是最好的支持。加我微信： liqingqiya2019，拉你进群，讨论 Go 编程细节。
+
+  置顶
+
 - 奇伢
-    
-    2021年10月21日
-    
-    赞4
-    
-    上次有个朋友留言想看一篇 raft 的分享，这就来了哦。
-    
+
+  2021年10月21日
+
+  赞4
+
+  上次有个朋友留言想看一篇 raft 的分享，这就来了哦。
+
 - WinyMu
-    
-    2021年11月26日
-    
-    赞
-    
-    Leader 永远不能 commit 非自己任期的日志。对于这个例子有个疑惑：为什么c时刻s1重新选举leader后term变成了4，但d时刻s5重新选举成leader后term依然是3，为什么term没有+1操作呢？
-    
-    奇伢云存储
-    
-    作者2021年11月27日
-    
-    赞1
-    
-    重新选举的话任期是会加1的。 你提到文章里说d时刻任期依然是3，不是的哈。可能是理解错了。 d 时刻 index 3的地方确实是任期3，但并不是说当前leader 任期是3哈。
-    
+
+  2021年11月26日
+
+  赞
+
+  Leader 永远不能 commit 非自己任期的日志。对于这个例子有个疑惑：为什么c时刻s1重新选举leader后term变成了4，但d时刻s5重新选举成leader后term依然是3，为什么term没有+1操作呢？
+
+  奇伢云存储
+
+  作者2021年11月27日
+
+  赞1
+
+  重新选举的话任期是会加1的。 你提到文章里说d时刻任期依然是3，不是的哈。可能是理解错了。 d 时刻 index 3的地方确实是任期3，但并不是说当前leader 任期是3哈。
+
 - Tom哥
-    
-    2021年10月21日
-    
-    赞1
-    
-    硬核
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞1
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 哈哈。感谢。其实想写篇水文的。水的不是很明显。
-    
+
+  2021年10月21日
+
+  赞1
+
+  硬核
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞1
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 哈哈。感谢。其实想写篇水文的。水的不是很明显。
+
 - 平淡
-    
-    2021年10月21日
-    
-    赞
-    
-    博主可否科普一篇SSD存储的相关文章
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞
-    
-    嗯后续有机会安排上。![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月21日
+
+  赞
+
+  博主可否科普一篇SSD存储的相关文章
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞
+
+  嗯后续有机会安排上。![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - MageByte
-    
-    2021年10月21日
-    
-    赞
-    
-    好文章
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞
-    
-    谢谢码哥![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月21日
+
+  赞
+
+  好文章
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞
+
+  谢谢码哥![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 捡田螺的小男孩
-    
-    2021年10月21日
-    
-    赞
-    
-    好文
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 感谢
-    
+
+  2021年10月21日
+
+  赞
+
+  好文
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 感谢
 
 已无更多数据
 
@@ -775,102 +649,101 @@ Leader 选举成功之后则可以对外提供服务。
 **留言 12**
 
 - 奇伢
-    
-    2021年10月21日
-    
-    赞5
-    
-    etcd 之前先科普一波 raft。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 点赞，在看就是最好的支持。加我微信： liqingqiya2019，拉你进群，讨论 Go 编程细节。
-    
-    置顶
-    
+
+  2021年10月21日
+
+  赞5
+
+  etcd 之前先科普一波 raft。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 点赞，在看就是最好的支持。加我微信： liqingqiya2019，拉你进群，讨论 Go 编程细节。
+
+  置顶
+
 - 奇伢
-    
-    2021年10月21日
-    
-    赞4
-    
-    上次有个朋友留言想看一篇 raft 的分享，这就来了哦。
-    
+
+  2021年10月21日
+
+  赞4
+
+  上次有个朋友留言想看一篇 raft 的分享，这就来了哦。
+
 - WinyMu
-    
-    2021年11月26日
-    
-    赞
-    
-    Leader 永远不能 commit 非自己任期的日志。对于这个例子有个疑惑：为什么c时刻s1重新选举leader后term变成了4，但d时刻s5重新选举成leader后term依然是3，为什么term没有+1操作呢？
-    
-    奇伢云存储
-    
-    作者2021年11月27日
-    
-    赞1
-    
-    重新选举的话任期是会加1的。 你提到文章里说d时刻任期依然是3，不是的哈。可能是理解错了。 d 时刻 index 3的地方确实是任期3，但并不是说当前leader 任期是3哈。
-    
+
+  2021年11月26日
+
+  赞
+
+  Leader 永远不能 commit 非自己任期的日志。对于这个例子有个疑惑：为什么c时刻s1重新选举leader后term变成了4，但d时刻s5重新选举成leader后term依然是3，为什么term没有+1操作呢？
+
+  奇伢云存储
+
+  作者2021年11月27日
+
+  赞1
+
+  重新选举的话任期是会加1的。 你提到文章里说d时刻任期依然是3，不是的哈。可能是理解错了。 d 时刻 index 3的地方确实是任期3，但并不是说当前leader 任期是3哈。
+
 - Tom哥
-    
-    2021年10月21日
-    
-    赞1
-    
-    硬核
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞1
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 哈哈。感谢。其实想写篇水文的。水的不是很明显。
-    
+
+  2021年10月21日
+
+  赞1
+
+  硬核
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞1
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 哈哈。感谢。其实想写篇水文的。水的不是很明显。
+
 - 平淡
-    
-    2021年10月21日
-    
-    赞
-    
-    博主可否科普一篇SSD存储的相关文章
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞
-    
-    嗯后续有机会安排上。![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月21日
+
+  赞
+
+  博主可否科普一篇SSD存储的相关文章
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞
+
+  嗯后续有机会安排上。![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - MageByte
-    
-    2021年10月21日
-    
-    赞
-    
-    好文章
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞
-    
-    谢谢码哥![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月21日
+
+  赞
+
+  好文章
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞
+
+  谢谢码哥![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 捡田螺的小男孩
-    
-    2021年10月21日
-    
-    赞
-    
-    好文
-    
-    奇伢云存储
-    
-    作者2021年10月21日
-    
-    赞
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 感谢
-    
+
+  2021年10月21日
+
+  赞
+
+  好文
+
+  奇伢云存储
+
+  作者2021年10月21日
+
+  赞
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 感谢
 
 已无更多数据

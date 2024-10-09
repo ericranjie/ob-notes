@@ -2,15 +2,15 @@
 
 openGauss
 
- _2021年10月20日 18:01_
+_2021年10月20日 18:01_
 
 现代社会信息数据爆炸式增长，工业界业务需求纷繁复杂。数据存储的数据量，建表数量也都不断增长。openGauss通用的普通表，每个数据表对应一个逻辑逻辑上的大文件（最大32T），该逻辑文件又按照固定的大小划分多个实际文件存在对应的数据库目录下面。所以，每张数据表随着数据量的增多，底层的数据存储所需文件数量会逐渐增多。同时，openGauss对外提供hashbucket表、大分区表等特性，每张数据表会被拆分为若干个子表，底层所需文件数量更是成倍增长。由此，这种存储管理模式存在以下问题：
 
 1. 对文件系统依赖大，无法进行细粒度的控制提升可维护性；
 
-2. 大数据量下文件句柄过多，目前只能依赖虚拟句柄来解决，影响系统性能；
+1. 大数据量下文件句柄过多，目前只能依赖虚拟句柄来解决，影响系统性能；
 
-3. 小文件数量过多会导致全量build、全量备份等场景下的随机IO问题，影响性能；
+1. 小文件数量过多会导致全量build、全量备份等场景下的随机IO问题，影响性能；
 
 为了解决以上问题，openGauss引入段页式存储管理机制，类似于操作系统的段页式内存管理，但是在实现机制上区别很大。
 
@@ -33,10 +33,10 @@ openGauss
 |   |   |   |   |   |   |
 |---|---|---|---|---|---|
 |Group|Extent size|Extent page count|Extent count range|Total page count|Total size|
-|1|64K|8|[1, 16]|128|1M|
-|2|1M|128|[17, 143]|16K|128M|
-|3|8M|1024|[144, 255]|128K|1G|
-|4|64M|8192|[256, …]|…|…|
+|1|64K|8|\[1, 16\]|128|1M|
+|2|1M|128|\[17, 143\]|16K|128M|
+|3|8M|1024|\[144, 255\]|128K|1G|
+|4|64M|8192|\[256, …\]|…|…|
 
 **二、 段页式表使用指导**
 
@@ -61,7 +61,6 @@ create table t1(a int, b int, PRIMARY KEY(a,b)) with(hashbucket=on);
 为了让用户更好使用段页式功能，openGauss提供了两个built in的系统函数，显示extent的使用情况。用户可以使用这两个视图，决定是否回收和回收哪一部分的数据。
 
 - pg_stat_segment_space_info(Oid tablespace, Oid database); 参数是tablespace和database的Oid，输出位于该表空间下所有ExtentGroup的使用信息。
-    
 
 表 2  pg_stat_segment_space_info视图字段信息
 
@@ -77,8 +76,7 @@ create table t1(a int, b int, PRIMARY KEY(a,b)) with(hashbucket=on);
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/SX6wqnysYmrHvTa1MDhk4ic79yxQBVddLBO6V8HNetjzuOurqZ8GlobKsSk4P5LhMbtpibq4iaZGXBVyYN49wsGsg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-- pg_stat_segment_extent_usage(Oid tablespace, Oid databse, uint32 extent_type); 每次返回一个ExtentGroup中，每个被分配出去的extent的使用情况。extent_type表示ExtentGroup的类型，合理取值为[1,5]的int值。在此范围外的会报error。
-    
+- pg_stat_segment_extent_usage(Oid tablespace, Oid databse, uint32 extent_type); 每次返回一个ExtentGroup中，每个被分配出去的extent的使用情况。extent_type表示ExtentGroup的类型，合理取值为\[1,5\]的int值。在此范围外的会报error。
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/SX6wqnysYmrHvTa1MDhk4ic79yxQBVddLyw8JvQKPR4HSnqZSIHHf0uXvKJafFgeTA037RMTLbyvY9w9d9q0BLg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -95,22 +93,15 @@ create table t1(a int, b int, PRIMARY KEY(a,b)) with(hashbucket=on);
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/SX6wqnysYmrHvTa1MDhk4ic79yxQBVddLyw8JvQKPR4HSnqZSIHHf0uXvKJafFgeTA037RMTLbyvY9w9d9q0BLg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 - gs_spc_shrink(Oid tablespace, Oid database, uint32 extent_type);每次清理一个ExtentGroup。Shrink的目标大小是自动计算出来的，为active的数据量 + 128MB，然后向上取整和128MB对齐。
-    
 
 **三、 总结**
 
 openGauss为了解决hashbucket表、大分区表数量较多时，底层文件句柄过多的问题，提供了段页式解决方案。段页式对外将表对应逻辑上的一个段(segment)，底层不同的segment存储在一个物理文件上，大大减少了底层物理文件的句柄。即使在大数据量下，也避免了普通表那种文件句柄过多的场景，提升了系统可维护性。同时，对于全量build、全量备份等场景，减少小文件数量过多引起的随机IO，可以提升系统IO性能。同时可以看到当前段页式表相关的参数都是固定的，未来openGauss可以探索利用AI技术，对段页式存储机制进行参数自动调参，从而可以为用户提供更智能，性能更优的段页式存储策略。
 
-  
-
 **◆ 相关推荐◆**
 
-  
-
-[
+\[
 
 一文汇总全密态数据库的基本使用方法
 
@@ -118,9 +109,9 @@ openGauss为了解决hashbucket表、大分区表数量较多时，底层文件�
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SX6wqnysYmqrhnes7EiaibkWjMOTa3Nkns4NC9fxslcaGibWBUxmgicgYGP62pmuZDud1zqXgKXgicMY9JvicYj9FbIg/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-](http://mp.weixin.qq.com/s?__biz=MzIyMDE3ODk1Nw==&mid=2247496684&idx=1&sn=23b4836a188534b3a49e3bb240ade863&chksm=97cd4c8ea0bac598f8b6423d00d8a861ffe4be2d8d5308226a0d1138406563c61e687dd565d2&scene=21#wechat_redirect)
+\](http://mp.weixin.qq.com/s?\_\_biz=MzIyMDE3ODk1Nw==&mid=2247496684&idx=1&sn=23b4836a188534b3a49e3bb240ade863&chksm=97cd4c8ea0bac598f8b6423d00d8a861ffe4be2d8d5308226a0d1138406563c61e687dd565d2&scene=21#wechat_redirect)
 
-[
+\[
 
 全密态黑科技再升级，无感知加解密原理剖析
 
@@ -128,9 +119,9 @@ openGauss为了解决hashbucket表、大分区表数量较多时，底层文件�
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SX6wqnysYmp8L81iceWtSBLZPiaozaJUGVdILxnqOUPGZMeXyWMc7VXC12I1HicS9arTH6o9YibxzxFDEXCc6Lgvkw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-](http://mp.weixin.qq.com/s?__biz=MzIyMDE3ODk1Nw==&mid=2247496609&idx=1&sn=dc272194522f35aa29ae2d12bf3d468f&chksm=97cd4cc3a0bac5d521c6c25a66c782d61cb738fa02615ca76c0d79ce12e1e50640308a07dad2&scene=21#wechat_redirect)
+\](http://mp.weixin.qq.com/s?\_\_biz=MzIyMDE3ODk1Nw==&mid=2247496609&idx=1&sn=dc272194522f35aa29ae2d12bf3d468f&chksm=97cd4cc3a0bac5d521c6c25a66c782d61cb738fa02615ca76c0d79ce12e1e50640308a07dad2&scene=21#wechat_redirect)
 
-[
+\[
 
 Ustore在openGauss闪亮登场，重构openGauss数据存储的灵魂
 
@@ -138,9 +129,9 @@ Ustore在openGauss闪亮登场，重构openGauss数据存储的灵魂
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SX6wqnysYmpicvib9KwfjvtP3btLSiaggXiauiaNN4T5mNu1GyTlnV9t5E0aWQDttpw8qDTabS8hDoKQRyS0NQwLSqw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-](http://mp.weixin.qq.com/s?__biz=MzIyMDE3ODk1Nw==&mid=2247496361&idx=1&sn=2f5d03e4eeb68f1196ab79712ad70181&chksm=97cd4dcba0bac4dd37de0668686c8f4e93be1bc13d49ad6f1175cd27b83a61d3631939e9629c&scene=21#wechat_redirect)
+\](http://mp.weixin.qq.com/s?\_\_biz=MzIyMDE3ODk1Nw==&mid=2247496361&idx=1&sn=2f5d03e4eeb68f1196ab79712ad70181&chksm=97cd4dcba0bac4dd37de0668686c8f4e93be1bc13d49ad6f1175cd27b83a61d3631939e9629c&scene=21#wechat_redirect)
 
-[
+\[
 
 深度干货！openGauss日志共识框架大揭秘
 
@@ -148,9 +139,9 @@ Ustore在openGauss闪亮登场，重构openGauss数据存储的灵魂
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SX6wqnysYmofFoPZUV1V3NdIY8h3ymRbhVnTPN54m8otiaEonhVUnp8VT5jf6S5oCOc5XU0aF7uia1Libf3pDUCMg/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-](http://mp.weixin.qq.com/s?__biz=MzIyMDE3ODk1Nw==&mid=2247496231&idx=1&sn=d5a389efa29c629498ec38b49e06a7f2&chksm=97cd4d45a0bac45312214ac3532238fd5accc9dcd93bb81d16c3ae0ac107b8221f3d97c1bf03&scene=21#wechat_redirect)
+\](http://mp.weixin.qq.com/s?\_\_biz=MzIyMDE3ODk1Nw==&mid=2247496231&idx=1&sn=d5a389efa29c629498ec38b49e06a7f2&chksm=97cd4d45a0bac45312214ac3532238fd5accc9dcd93bb81d16c3ae0ac107b8221f3d97c1bf03&scene=21#wechat_redirect)
 
-[
+\[
 
 DB4AI：使能数据库原生AI计算，助力数据湖场景业务成功
 
@@ -158,9 +149,9 @@ DB4AI：使能数据库原生AI计算，助力数据湖场景业务成功
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SX6wqnysYmp9gZ1RcLuJzPAURbVAjfFL8taSvH629EWVxR619KNbFALHtPVCaxA7uw7djA6V5TDPdCme5SibCfw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-](http://mp.weixin.qq.com/s?__biz=MzIyMDE3ODk1Nw==&mid=2247496212&idx=1&sn=86b3623d08c218d8043706540ef0d7e4&chksm=97cd4d76a0bac4604c0937386c0e4b2ad4953f28c5b6af80b00e02e9f5ca6cc73cdc666a68d5&scene=21#wechat_redirect)
+\](http://mp.weixin.qq.com/s?\_\_biz=MzIyMDE3ODk1Nw==&mid=2247496212&idx=1&sn=86b3623d08c218d8043706540ef0d7e4&chksm=97cd4d76a0bac4604c0937386c0e4b2ad4953f28c5b6af80b00e02e9f5ca6cc73cdc666a68d5&scene=21#wechat_redirect)
 
-[
+\[
 
 解密openGauss DB4AI框架的内部机理
 
@@ -168,7 +159,7 @@ DB4AI：使能数据库原生AI计算，助力数据湖场景业务成功
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SX6wqnysYmpFgd4ktLw8oOZ63y6XK28TKrCFjXo1dKAMATicqZ9adiap0Vz6PqFX0uPibQALxMlcuaSTSYRPXjuMQ/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-](http://mp.weixin.qq.com/s?__biz=MzIyMDE3ODk1Nw==&mid=2247496108&idx=1&sn=2e2bf19585bbe0366d58ea6fb18e1fa9&chksm=97cd4ecea0bac7d88ef086e8e2d995432226177e0fd28a71374c163bd3dfad30a28de0f06369&scene=21#wechat_redirect)
+\](http://mp.weixin.qq.com/s?\_\_biz=MzIyMDE3ODk1Nw==&mid=2247496108&idx=1&sn=2e2bf19585bbe0366d58ea6fb18e1fa9&chksm=97cd4ecea0bac7d88ef086e8e2d995432226177e0fd28a71374c163bd3dfad30a28de0f06369&scene=21#wechat_redirect)
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/SX6wqnysYmqI2wl74q492VQlNWzLR1kdGibOhic3KXoB1iaJYBMUNo3YF23kOxhdA0GUalaXTib8uwTibKFDUw21wwQ/300?wx_fmt=png&wxfrom=19)
 

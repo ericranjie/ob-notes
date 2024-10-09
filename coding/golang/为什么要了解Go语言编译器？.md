@@ -1,7 +1,8 @@
 # 
+
 博文视点 博文视点Broadview
 
- _2021年09月18日 15:30_
+_2021年09月18日 15:30_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/PW0wIHxgg3nr1VNxfeqxVOw2nPJHVH4xeZibzPY5F4ibOuOZLMsUMrzIibGB6KMw7EurSKv6DkrtLzuhYdBa30A9Q/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -21,27 +22,17 @@ Go语言编译器的阶段
 
 Go语言编译器一般缩写为小写的gc（go compiler），需要和大写的GC（垃圾回收）进行区分。Go语言编译器的执行流程可细化为多个阶段，包括词法解析、语法解析、抽象语法树构建、类型检查、变量捕获、函数内联、逃逸分析、闭包重写、遍历函数、SSA生成、机器码生成，如图1-2所示。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图1-2  Go语言编译器执行流程
-
-  
 
 词法解析
 
 和Go语言编译器有关的代码主要位于src/cmd/compile/internal目录下，在后面分析中给出的文件路径均默认位于该目录中。在词法解析阶段，Go语言编译器会扫描输入的Go源文件，并将其符号（token）化。例如“+”和“-”操作符会被转换为_IncOp，赋值符号“:= ”会被转换为_Define。这些token实质上是用iota声明的整数，定义在syntax/tokens.go中。符号化保留了Go语言中定义的符号，可以识别出错误的拼写。同时，字符串被转换为整数后，在后续的阶段中能够被更加高效地处理。图1-3为一个示例，展现了将表达式a:=b + c(12)符号化之后的情形。代码中声明的标识符、关键字、运算符和分隔符等字符串都可以转化为对应的符号。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图1-3  Go语言编译器词法解析示例
-
-  
 
 Go语言标准库go/scanner、go/token也提供了许多接口用于扫描源代码。在下例中，我们将使用这些接口模拟对Go文本文件的扫描。
 
@@ -49,15 +40,11 @@ Go语言标准库go/scanner、go/token也提供了许多接口用于扫描源代
 package main
 ```
 
-  
-
 在上例中，src为进行词法扫描的表达式，可以将其模拟为一个文件并调用scanner.Scanner词法，扫描后分别打印出token的位置、符号及其字符串字面量。每个标识符与运算符都被特定的token代替，例如2i被识别为复数IMAG，注释被识别为COMMENT。
 
 ```
 1:1     IDENT   "cos"
 ```
-
-  
 
 语法解析
 
@@ -65,11 +52,7 @@ package main
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/4YNr10rzF0wmibpyQvFDhcsZpDpNuQr9pzjleMx02t5K8Kuzjwibo1c0Vw4eSeXEqNm1ZoqwCPNeN7Q8XMq8JHyw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 图1-4  Go语言编译器对文件进行语法解析的示意图
-
-  
 
 源文件中的每一种声明都有对应的语法，递归下降通过识别初始的标识符，例如_const，采用对应的语法进行解析。这种方式能够较快地解析并识别可能出现的语法错误。每一种声明语法在Go语言规范中都有定义
 
@@ -83,17 +66,11 @@ package main
 AssignStmt struct {
 ```
 
-  
-
 语法解析丢弃了一些不重要的标识符，例如括号“ (”，并将语义存储到了对应的结构体中。语法声明的结构体拥有对应的层次结构，这是构建抽象语法树的基础。图1-5为a := b + c(12)语句被语法解析后转换为对应的syntax.AssignStmt结构体之后的情形。最顶层的Op操作符为token.Def（:= ）。Lhs表达式类型为标识符syntax.Name，值为标识符“a”。Rhs表达式为syntax.Operator加法运算。加法运算左边为标识符“b”，右边为函数调用表达式，类型为CallExpr。其中，函数名c的类型为syntax.Name，参数为常量类型syntax.BasicLit，代表数字12。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图1-5  特定表达式的语法解析示例
-
-  
 
 Go语言可执行文件的生成离不开编译器所做的复杂工作，如果不理解Go语言的编译器，那么对Go语言的理解是不完整的。Go语言的编译器、运行时，本身就是用Go语言写出的既复杂又精巧的程序；探究语言设计、语法特性，本身就是学习程序设计与架构、数据结构与算法等知识的绝佳途径。学习底层原理能够帮助我们更好地了解Go语言的语法，做出合理的性能优化，设计科学的程序架构，监控程序的运行状态，排查复杂的程序异常问题，开发出检查协程泄露、语法等问题的高级工具，理解Go语言的局限性，从而在不同场景下做出合理抉择。
 
@@ -101,7 +78,7 @@ Go语言可执行文件的生成离不开编译器所做的复杂工作，如果
 
 目前市面上鲜有系统介绍Go语言底层实现原理的书籍，如果你想系统了解学习更多，今天给大家推荐这本新书书，书中系统性地介绍Go语言在编译时、运行时以及语法特性等层面的底层原理和更好的使用方法。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 本书语言通俗易懂，书中有系统权威的知识解构、精美的示意图，并对照源码和参考文献字斟句酌，在一线大规模系统中提炼出设计哲学与避坑方法，对于编译时、运行时及垃圾回收的精彩讲解弥补了国内的多项缺陷，这本罕见的诚意之作必将陪伴读者实现最艰苦的能力跨越，你想要的都会到来……
 
@@ -110,21 +87,18 @@ Go语言可执行文件的生成离不开编译器所做的复杂工作，如果
 **本书由21章组成，这21章可以分为6部分。**
 
 - **第1～8章**为第1部分，介绍Go语言的基础——编译时及类型系统。包括浮点数、切片、哈希表等类型以及类型转换的原理。
-    
+
 - **第9～11章**为第2部分，介绍程序运行重要的组成部分——函数与栈。包括栈帧布局、栈扩容、栈调试的原理，并介绍了延迟调用、异常与异常捕获的原理。
-    
+
 - **第12、13章**为第3部分，介绍Go语言程序设计的关键——接口。包括如何正确合理地使用接口构建程序、接口的实现原理和可能遇到的问题，并探讨了接口之上的反射原理。
-    
+
 - **第14～17章**为第4部分，介绍Go语言并发的核心——协程与通道。详细论述了协程的本质以及运行时调度器的调度时机与策略。介绍了通过通信来共享内存的通道本质以及通道的多路复用原理，并探讨了并发控制、数据争用问题的解决办法及锁的本质。
-    
+
 - **第18～20章**为第5部分，介绍Go语言运行时最复杂的模块——内存管理与垃圾回收。详细论述了Go语言中实现内存管理方法及垃圾回收的详细步骤。
-    
+
 - **第21章**为第6部分，介绍Go语言可视化工具——pprof与trace。详细论述了通过工具排查问题、观察系统运行状态的方法与实现原理。
-    
 
 **本书作者**
-
-  
 
 郑建勋
 
@@ -132,48 +106,33 @@ Golang contributor（Go语言垃圾回收模块代码贡献者）、Go语言精�
 
 微信公众号“gopher梦工厂”作者，知名go语言原创博主，51CTO学堂高级讲师、极客时间“每日一课”讲师。有丰富的教育经验，想读者之所想。相信这部系统且深入浅出的作品，会是读者打怪升级的最佳辅助。
 
-  
-
-  
-
 **专家力荐**
 
 这是一本Go语言的初学者和进阶学者都可以受益的书。它不仅仅介绍了Go的语言特性，还深入这些特性背后的设计考量、编译器及语言实现的细节。授人以鱼和授人以渔在本书里面一起得到了体现。更难得的是，本书并没有粘贴大段的代码，而是以图文的形式将复杂的概念解释清楚，降低了阅读和理解的难度，使得读者不会望“底层”和“深入”二词而却步。
 
- **——叶绍志博士  Shopee技术委员会主席、顺丰速运前CTO、Google前主任工程师**
+**——叶绍志博士  Shopee技术委员会主席、顺丰速运前CTO、Google前主任工程师**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) 
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果喜欢本文
 
 欢迎 **在看**丨**留言**丨**分享至朋友圈** 三连
 
-  
+**热文推荐**
 
- **热文推荐**  
+- [书单 | 有这10本书，不怕黑客攻击了！](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136491&idx=1&sn=8de968bc9dae5dc4fc6764343529059e&chksm=bd014bc18a76c2d75ca271d22075df2d4a6225711af17e5d1d5e2c7602d5faaf4e25ef88dcc4&scene=21#wechat_redirect)
 
-  
+- [分布式系统中协调和复制技术的原理](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136417&idx=1&sn=2828875002bad2885963d429d4d0b031&chksm=bd014b8b8a76c29de2e2d7d453bde77279dca3eeb336a0e430e8e83b003d4c3f09066d2cc426&scene=21#wechat_redirect)
 
-- [书单 | 有这10本书，不怕黑客攻击了！](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136491&idx=1&sn=8de968bc9dae5dc4fc6764343529059e&chksm=bd014bc18a76c2d75ca271d22075df2d4a6225711af17e5d1d5e2c7602d5faaf4e25ef88dcc4&scene=21#wechat_redirect)  
-    
-- [分布式系统中协调和复制技术的原理](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136417&idx=1&sn=2828875002bad2885963d429d4d0b031&chksm=bd014b8b8a76c29de2e2d7d453bde77279dca3eeb336a0e430e8e83b003d4c3f09066d2cc426&scene=21#wechat_redirect)  
-    
-- [QQ浏览器背后的推荐AI中台 | AICon](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136374&idx=1&sn=4fdd600cabef5a6c9b025fb3238156d4&chksm=bd014b5c8a76c24a7a0af409e3496c03133042290d6ab1484f3d1944dcb13c097044c7637126&scene=21#wechat_redirect)  
-    
-- [数据中台建设的9大误区，你中了几条？](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136372&idx=1&sn=df8dff1431ccaf1ca620d8d69ea39e00&chksm=bd014b5e8a76c248c8d560ee11517ea6d43abe8dc5e4ffc40b3e74f4a59a2f618247825c86e1&scene=21#wechat_redirect)  
-    
+- [QQ浏览器背后的推荐AI中台 | AICon](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136374&idx=1&sn=4fdd600cabef5a6c9b025fb3238156d4&chksm=bd014b5c8a76c24a7a0af409e3496c03133042290d6ab1484f3d1944dcb13c097044c7637126&scene=21#wechat_redirect)
 
-  
+- [数据中台建设的9大误区，你中了几条？](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651136372&idx=1&sn=df8dff1431ccaf1ca620d8d69ea39e00&chksm=bd014b5e8a76c248c8d560ee11517ea6d43abe8dc5e4ffc40b3e74f4a59a2f618247825c86e1&scene=21#wechat_redirect)
 
----
+______________________________________________________________________
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ▼点击阅读原文，查看本书详情~
 

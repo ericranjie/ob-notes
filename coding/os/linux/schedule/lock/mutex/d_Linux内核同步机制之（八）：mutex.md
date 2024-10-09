@@ -1,19 +1,14 @@
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-5-10 5:55 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
-一、Mutex锁简介
+# 一、Mutex锁简介
 
 在linux内核中，互斥量（mutex，即mutual exclusion）是一种保证串行化的睡眠锁机制。和spinlock的语义类似，都是允许一个执行线索进入临界区，不同的是当无法获得锁的时候，spinlock原地自旋，而mutex则是选择挂起当前线程，进入阻塞状态。正因为如此，mutex无法在中断上下文使用。和mutex更类似的机制（无法获得锁时都会阻塞）是binary semaphores，当然，mutex有更严格的使用规则：
 
 1、只有mutex的owner可以才可以释放锁
-
 2、不可以多次释放同一把锁
-
 3、不允许重复获取同一把锁，否则会死锁
-
 4、必须使用mutex初始化API来完成锁的初始化，不能使用类似memset或者memcp之类的函数进行mutex初始化
-
 5、不可以多次重复对mutex锁进行初始化
-
 6、线程退出后必须释放自己持有的所有mutex锁
 
 当配置了DEBUG_MUTEXES的时候，内核会对上面的规则进行检查，防止用户误用mutex，产生各种问题。
@@ -25,10 +20,8 @@
 传统的mutex只需要一个状态标记和一个等待队列就OK了，等待队列中是一个个阻塞的线程，thread owner当前持有mutex，当它离开临界区释放锁的时候，会唤醒等待队列中第一个线程（top waiter），这时候top waiter会去竞争持锁，如果成功，那么从等待队列中摘下，成为owner。如果失败，继续保持阻塞状态，等待owner释放锁的时候唤醒它。在owner task持锁过程中，如果有新的任务来竞争mutex，那么就会进入阻塞状态并插入等待队列的尾部。
 
 相对于传统的mutex，linux内核进行了一些乐观自旋的优化，也就是说当线程持锁失败的时候，可以选择在mutex状态标记上自旋，等待owner释放锁，也可以选择进入阻塞状态并挂入等待队列。具体如何选择是在自旋等待的时间开销和进程上下文切换的开销之间进行平衡。此外为了防止多个线程自旋带来的性能问题，mutex的乐观自旋机制还引入了MCS锁，后面章节我们会详细描述。
-
-二、数据结构
-
-1、互斥量对象
+# 二、数据结构
+## 1、互斥量对象
 
 互斥量对象用struct mutex来抽象，其成员描述如下：
 
@@ -49,8 +42,7 @@
 字如其名，Optimistic spin queue就是乐观自旋队列的意思，也就是形成一组处于自旋状态的任务队列。和等待队列不一样，这个队列中的任务都是当前正在执行的任务。Osq并没有直接将这些任务的task struct形成队列结构，而是把per-CPU的mcs lock对象串联形成队列。Mcs lock中有cpu number，通过这些cpu number可以定位到指定cpu上的current thread，也就定位到了自旋的任务。
 
 虽然都是自旋，但是自旋方式并不一样。Osq队列中的头部节点是持有osq锁的，只有该任务处于对mutex的owner进行乐观自旋的状态（我们称之mutex乐观自旋）。Osq队列中的其他节点都是自旋在自己的mcs lock上（我们称之mcs乐观自旋）。当头部的mcs lock释放掉后（结束mutex乐观自旋，持有了mutex锁），它会将mcs lock传递给下一个节点，从而让spinner队列上的任务一个个的按顺序进入mutex的乐观自旋，从而避免了cache-line bouncing带来的性能开销。
-
-2、等待任务对象
+## 2、等待任务对象
 
 由于是sleep lock，我们需要把等待的任务挂入队列。在内核中，Struct mutex_waiter用来抽象等待mutex的任务，其成员描述如下：
 
@@ -73,7 +65,7 @@
 |int locked|MCS lock的状态，1表示持锁，0表示未持锁|
 |int cpu|MCS lock是per cpu的，这个成员表示该MCS 锁对应的cpu id|
 
-三、外部接口
+# 三、外部接口
 
 Mutex模块的外部接口API如下：
 
@@ -98,7 +90,7 @@ Mutex模块的外部接口API如下：
 |获取mutex锁状态的API|
 |mutex_is_locked|判断当前mutex锁的状态，如果已经被其他线程持有，那么返回true，否则返回false。|
 
-四、尝试获取锁
+# 四、尝试获取锁
 
 和mutex_lock不一样，mutex_trylock只是尝试获取锁，如果成功，那么自然是好的，直接返回true，如果失败，也不会阻塞，只是返回false就可以了。代码主逻辑在__mutex_trylock_or_owner函数中，如下：
 
@@ -115,8 +107,7 @@ C、如果task等于current thread，而且设置了MUTEX_FLAG_PICKUP的标记�
 D、有两种情况会走到这里的时候，一种情况是task为空，说明该mutex锁处于unlocked状态。另外一种情况是task非空，等于current thread，并且mutex发生了handoff，该锁被转交给当前试图持锁的线程。无论哪种情况，都可以去执行持锁操作了。
 
 E、调用atomic_long_cmpxchg_acquire尝试获取锁，如果成功获取了锁（没有其他线程插入修改owner这个原子变量），返回NULL。如果owner发生了变化，说明中间有其他线程插入，那么重新来过。
-
-五、获取mutex锁
+# 五、获取mutex锁
 
     mutex_lock代码如下：
 

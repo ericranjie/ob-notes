@@ -2,11 +2,11 @@
 
 原创 苏三呀 苏三说技术
 
- _2021年09月24日 08:20_
+_2021年09月24日 08:20_
 
 ## 大家好，我是苏三，又跟大家见面了。
 
-## 前言  
+## 前言
 
 在分布式系统中，由于redis分布式锁相对于更简单和高效，成为了分布式锁的首先，被我们用到了很多实际业务场景当中。
 
@@ -45,15 +45,14 @@
 其中：
 
 - `lockKey`：锁的标识
-    
+
 - `requestId`：请求id
-    
+
 - `NX`：只在键不存在时，才对键进行设置操作。
-    
+
 - `PX`：设置键的过期时间为 millisecond 毫秒。
-    
+
 - `expireTime`：过期时间
-    
 
 `set`命令是原子操作，加锁和设置超时时间，一个命令就能轻松搞定。
 
@@ -64,19 +63,18 @@ nice
 分布式锁更合理的用法是：
 
 1. 手动加锁
-    
-2. 业务操作
-    
-3. 手动释放锁
-    
-4. 如果手动释放锁失败了，则达到超时时间，redis会自动释放锁。
-    
+
+1. 业务操作
+
+1. 手动释放锁
+
+1. 如果手动释放锁失败了，则达到超时时间，redis会自动释放锁。
 
 大致流程图如下：![图片](https://mmbiz.qpic.cn/mmbiz_png/uL371281oDFpywBzMdt5EHAekqHT61dCdnxwfwf8JSPb4ycN3CcdRbX7QFMV01L31c4Fpxxs63Glt8gAuvDuUA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)那么问题来了，如何释放锁呢？
 
 伪代码如下：
 
-`try{     String result = jedis.set(lockKey, requestId, "NX", "PX", expireTime);     if ("OK".equals(result)) {         return true;     }     return false;   } finally {       unlock(lockKey);   }`  
+`try{     String result = jedis.set(lockKey, requestId, "NX", "PX", expireTime);     if ("OK".equals(result)) {         return true;     }     return false;   } finally {       unlock(lockKey);   }`
 
 需要捕获业务代码的异常，然后在`finally`中释放锁。换句话说就是：无论代码执行成功或失败了，都需要释放锁。
 
@@ -160,7 +158,7 @@ lua脚本能保证查询锁是否存在和删除锁是原子操作，用它来�
 
 主要流程图如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)显然第二个请求，肯定是不能返回失败的，如果返回失败了，这个问题还是没有被解决。如果文件还没有上传成功，直接返回成功会有更大的问题。头疼，到底该如何解决呢？
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)显然第二个请求，肯定是不能返回失败的，如果返回失败了，这个问题还是没有被解决。如果文件还没有上传成功，直接返回成功会有更大的问题。头疼，到底该如何解决呢？
 
 答：使用`自旋锁`。
 
@@ -224,32 +222,29 @@ lua脚本能保证查询锁是否存在和删除锁是原子操作，用它来�
 
 其中：
 
-- KEYS[1]：锁名
-    
-- ARGV[1]：过期时间
-    
-- ARGV[2]：uuid + ":" + threadId，可认为是requestId
-    
+- KEYS\[1\]：锁名
+
+- ARGV\[1\]：过期时间
+
+- ARGV\[2\]：uuid + ":" + threadId，可认为是requestId
 
 1. 先判断如果锁名不存在，则加锁。
-    
-2. 接下来，判断如果锁名和requestId值都存在，则使用hincrby命令给该锁名和requestId值计数，每次都加1。注意一下，这里就是重入锁的关键，锁重入一次值就加1。
-    
-3. 如果锁名存在，但值不是requestId，则返回过期时间。
-    
+
+1. 接下来，判断如果锁名和requestId值都存在，则使用hincrby命令给该锁名和requestId值计数，每次都加1。注意一下，这里就是重入锁的关键，锁重入一次值就加1。
+
+1. 如果锁名存在，但值不是requestId，则返回过期时间。
 
 释放锁主要是通过以下脚本实现的：
 
 `if (redis.call('hexists', KEYS[1], ARGV[3]) == 0)    then      return nil   end   local counter = redis.call('hincrby', KEYS[1], ARGV[3], -1);   if (counter > 0)    then        redis.call('pexpire', KEYS[1], ARGV[2]);        return 0;     else       redis.call('del', KEYS[1]);       redis.call('publish', KEYS[2], ARGV[1]);       return 1;    end;    return nil   `
 
 1. 先判断如果锁名和requestId值不存在，则直接返回。
-    
-2. 如果锁名和requestId值存在，则重入锁减1。
-    
-3. 如果减1后，重入锁的value值还大于0，说明还有引用，则重试设置过期时间。
-    
-4. 如果减1后，重入锁的value值还等于0，则可以删除锁，然后发消息通知等待线程抢锁。
-    
+
+1. 如果锁名和requestId值存在，则重入锁减1。
+
+1. 如果减1后，重入锁的value值还大于0，说明还有引用，则重试设置过期时间。
+
+1. 如果减1后，重入锁的value值还等于0，则可以删除锁，然后发消息通知等待线程抢锁。
 
 > 再次强调一下，如果你们系统可以容忍数据暂时不一致，有些场景不加锁也行，我在这里只是举个例子，本节内容并不适用于所有场景。
 
@@ -284,11 +279,10 @@ lua脚本能保证查询锁是否存在和删除锁是原子操作，用它来�
 下面总结一个读写锁的特点：
 
 - 读与读是共享的，不互斥
-    
+
 - 读与写互斥
-    
+
 - 写与写互斥
-    
 
 ### 6.2 锁分段
 
@@ -304,7 +298,7 @@ lua脚本能保证查询锁是否存在和删除锁是原子操作，用它来�
 
 在秒杀的过程中，先把用户id获取hash值，然后除以100取模。模为1的用户访问第1段库存，模为2的用户访问第2段库存，模为3的用户访问第3段库存，后面以此类推，到最后模为100的用户访问第100段库存。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)如此一来，在多线程环境中，可以大大的减少锁的冲突。以前多个线程只能同时竞争1把锁，尤其在秒杀的场景中，竞争太激烈了，简直可以用惨绝人寰来形容，其后果是导致绝大数线程在锁等待。现在多个线程同时竞争100把锁，等待的线程变少了，从而系统吞吐量也就提升了。
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)如此一来，在多线程环境中，可以大大的减少锁的冲突。以前多个线程只能同时竞争1把锁，尤其在秒杀的场景中，竞争太激烈了，简直可以用惨绝人寰来形容，其后果是导致绝大数线程在锁等待。现在多个线程同时竞争100把锁，等待的线程变少了，从而系统吞吐量也就提升了。
 
 > 需要注意的地方是：将锁分段虽说可以提升系统的性能，但它也会让系统的复杂度提升不少。因为它需要引入额外的路由算法，跨段统计等功能。我们在实际业务场景中，需要综合考虑，不是说一定要将锁分段。
 
@@ -324,9 +318,9 @@ lua脚本能保证查询锁是否存在和删除锁是原子操作，用它来�
 
 做了这么多铺垫，现在回到正题。
 
-假设线程A加redis分布式锁的代码，包含代码1和代码2两段代码。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)由于该线程要执行的业务操作非常耗时，程序在执行完代码1的时，已经到了设置的超时时间，redis自动释放了锁。而代码2还没来得及执行。
+假设线程A加redis分布式锁的代码，包含代码1和代码2两段代码。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)由于该线程要执行的业务操作非常耗时，程序在执行完代码1的时，已经到了设置的超时时间，redis自动释放了锁。而代码2还没来得及执行。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此时，代码2相当于裸奔的状态，无法保证互斥性。假如它里面访问了临界资源，并且其他线程也访问了该资源，可能就会出现数据异常的情况。（PS：我说的访问临界资源，不单单指读取，还包含写入）
 
@@ -336,7 +330,7 @@ lua脚本能保证查询锁是否存在和删除锁是原子操作，用它来�
 
 我们可以使用`TimerTask`类，来实现自动续期的功能：
 
-`Timer timer = new Timer();    timer.schedule(new TimerTask() {       @Override       public void run(Timeout timeout) throws Exception {         //自动续期逻辑       }   }, 10000, TimeUnit.MILLISECONDS);`        
+`Timer timer = new Timer();    timer.schedule(new TimerTask() {       @Override       public void run(Timeout timeout) throws Exception {         //自动续期逻辑       }   }, 10000, TimeUnit.MILLISECONDS);`
 
 获取锁之后，自动开启一个定时任务，每隔10秒钟，自动刷新一次过期时间。这种机制在redisson框架中，有个比较霸气的名字：`watch dog`，即传说中的`看门狗`。
 
@@ -356,13 +350,13 @@ but，如果redis存在多个实例。比如：做了主从，或者使用了哨
 
 具体是什么问题？
 
-假设redis现在用的主从模式，1个master节点，3个slave节点。master节点负责写数据，slave节点负责读数据。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)本来是和谐共处，相安无事的。redis加锁操作，都在master上进行，加锁成功后，再异步同步给所有的slave。
+假设redis现在用的主从模式，1个master节点，3个slave节点。master节点负责写数据，slave节点负责读数据。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)本来是和谐共处，相安无事的。redis加锁操作，都在master上进行，加锁成功后，再异步同步给所有的slave。
 
 突然有一天，master节点由于某些不可逆的原因，挂掉了。
 
 这样需要找一个slave升级为新的master节点，假如slave1被选举出来了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)如果有个锁A比较悲催，刚加锁成功master就挂了，还没来得及同步到slave1。
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)如果有个锁A比较悲催，刚加锁成功master就挂了，还没来得及同步到slave1。
 
 这样会导致新master节点中的锁A丢失了。后面，如果有新的线程，使用锁A加锁，依然可以成功，分布式锁失效了。
 
@@ -373,48 +367,44 @@ but，如果redis存在多个实例。比如：做了主从，或者使用了哨
 RedissonRedLock解决问题的思路如下：
 
 1. 需要搭建几套相互独立的redis环境，假如我们在这里搭建了5套。
-    
-2. 每套环境都有一个redisson node节点。
-    
-3. 多个redisson node节点组成了RedissonRedLock。
-    
-4. 环境包含：单机、主从、哨兵和集群模式，可以是一种或者多种混合。
-    
 
-在这里我们以主从为例，架构图如下：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 每套环境都有一个redisson node节点。
+
+1. 多个redisson node节点组成了RedissonRedLock。
+
+1. 环境包含：单机、主从、哨兵和集群模式，可以是一种或者多种混合。
+
+在这里我们以主从为例，架构图如下：!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 RedissonRedLock加锁过程如下：
 
 1. 获取所有的redisson node节点信息，循环向所有的redisson node节点加锁，假设节点数为N，例子中N等于5。
-    
-2. 如果在N个节点当中，有N/2 + 1个节点加锁成功了，那么整个RedissonRedLock加锁是成功的。
-    
-3. 如果在N个节点当中，小于N/2 + 1个节点加锁成功，那么整个RedissonRedLock加锁是失败的。
-    
-4. 如果中途发现各个节点加锁的总耗时，大于等于设置的最大等待时间，则直接返回失败。
-    
+
+1. 如果在N个节点当中，有N/2 + 1个节点加锁成功了，那么整个RedissonRedLock加锁是成功的。
+
+1. 如果在N个节点当中，小于N/2 + 1个节点加锁成功，那么整个RedissonRedLock加锁是失败的。
+
+1. 如果中途发现各个节点加锁的总耗时，大于等于设置的最大等待时间，则直接返回失败。
 
 从上面可以看出，使用Redlock算法，确实能解决多实例场景中，假如master节点挂了，导致分布式锁失效的问题。
 
 但也引出了一些新问题，比如：
 
 1. 需要额外搭建多套环境，申请更多的资源，需要评估一下成本和性价比。
-    
-2. 如果有N个redisson node节点，需要加锁N次，最少也需要加锁N/2+1次，才知道redlock加锁是否成功。显然，增加了额外的时间成本，有点得不偿失。
-    
+
+1. 如果有N个redisson node节点，需要加锁N次，最少也需要加锁N/2+1次，才知道redlock加锁是否成功。显然，增加了额外的时间成本，有点得不偿失。
 
 由此可见，在实际业务场景，尤其是高并发业务中，RedissonRedLock其实使用的并不多。
 
 在分布式环境中，CAP是绕不过去的。
 
 > CAP指的是在一个分布式系统中：
-> 
+>
 > - 一致性（Consistency）
->     
+>
 > - 可用性（Availability）
->     
+>
 > - 分区容错性（Partition tolerance）
->     
 
 > 这三个要素最多只能同时实现两点，不可能三者兼顾。
 
@@ -423,8 +413,6 @@ RedissonRedLock加锁过程如下：
 如果你的实际业务场景，更需要的是保证数据高可用性。那么请使用AP类型的分布式锁，比如：redis，它是基于内存的，性能比较好，但有丢失数据的风险。
 
 > 其实，在我们绝大多数分布式业务场景中，使用redis分布式锁就够了，真的别太较真。因为数据不一致问题，可以通过最终一致性方案解决。但如果系统不可用了，对用户来说是暴击一万点伤害。
-
-  
 
 ### 最后说一句(求关注，别白嫖我)
 
@@ -440,13 +428,13 @@ RedissonRedLock加锁过程如下：
 
 公众号
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/vIUyCpqbpOIqQ06cDNQHYWxD6xmRrHS4BdVmgyMITxXQhWFAWhqAN83fKDVr6PAiaRP59jHibdHedicphUOQYibLgA/0?wx_fmt=jpeg)
 
 苏三呀
 
- 谢谢你的鼓励 
+谢谢你的鼓励
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247490430&idx=1&sn=a1f42f9a981a8f161941a6472f317b10&source=41&key=daf9bdc5abc4e8d0677f42b98c4ae06c55fe4c66bf1713689b773300a448825754600fb172bfb7674b50f92fba2a81fe19021c09cfd9f95f8560930c3d4bdf4fe6506e9730ce42f7024e7d09ca2e6d759283660c05eff6ce38dab3807db0f5f8cd64c56f07e46cef32a7ece551fb400dee28eb824be6a531f5cfac829359ff0e&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQwgRK5ziaiWVOu3QcHHQeNBLdAQIE97dBBAEAAAAAAHstOJUM%2BzQAAAAOpnltbLcz9gKNyK89dVj0zpZ12KbT9aLI7Kqm%2BZSJp%2BTRoXW%2FEwzCWpYaItL0yWAwIFt2hS8OuSi%2F23mfp9jqgPrdjpY68DOhkEL8rS%2Fc4sbMesT6JyGg4216rNVgmnu%2BwehuUOtJeV1cLB2CNorAEXSluuC1sBQGVsg1Pw%2FPfxaRjtn0MTBuXTbHwGfYFxoPoJWLwi5yd4wpKjjSyZZLtB7X%2FO0FtMmophO0O79mDezMj32diVxDssM17BoS83%2BOS%2BYRfsbq&acctmode=0&pass_ticket=OOoAYFbySKohfBDbiLZHxREjlYC3cTotUA2txMQLGbJmg0jFJwLwcfPrSXsrGFH7&wx_header=1)喜欢作者
 

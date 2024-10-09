@@ -1,8 +1,6 @@
-
-
 不才陈某 码猿技术专栏
 
- _2024年02月17日 14:08_ _浙江_
+_2024年02月17日 14:08_ _浙江_
 
 大家好，我是不才陈某~
 
@@ -43,11 +41,10 @@ Reactor 模型由于是基于事件处理的，所以一旦有事件被触发，
 所以在此模型中，有两个最重要的参与者，列举如下：
 
 - Reactor：主要用来将 IO 事件派发到相对应的 handler 中，可以将其想象为打电话时候的分发总机，你先打电话到总机号码，然后通过总机，你可以分拨到各个分机号码。
-    
-- Handlers：主要用来处理 IO 事件相关的具体业务，可以将其想象为拨通分机号码后，实际上为你处理事件的员工。
-    
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- Handlers：主要用来处理 IO 事件相关的具体业务，可以将其想象为拨通分机号码后，实际上为你处理事件的员工。
+
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图为 Reactor 模型的描述图，具体来说一下：
 
@@ -71,17 +68,17 @@ Event Handler 这里，其实就是具体的事件操作了。其内部针对不
 
 由于 Doug Lea 写过一篇关于 NIO 的文章，整体总结的极好，所以这里我们就结合他的文章来详细分析一下 Reactor 模型的演化过程。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图模型为单线程 Reator 模型，Reactor 模型会利用给定的 selectionKeys 进行派发操作，派发到给定的 handler。
 
 之后当有客户端连接上来的时候，acceptor 会进行 accept 接收操作，之后将接收到的连接和之前派发的 handler 进行组合并启动。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图模型为池化 Reactor 模型，此模型将读操作和写操作解耦了出来，当有数据过来的时候，将 handler 的系列操作扔到线程池中来进行，极大的提到了整体的吞吐量和处理速度。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图模型为多 Reactor 模型，此模型中，将原本单个 Reactor 一分为二，分别为 mainReactor 和 subReactor。
 
@@ -89,7 +86,7 @@ Event Handler 这里，其实就是具体的事件操作了。其内部针对不
 
 这种模型的好处就是整体职责更加明确，同时对于多 CPU 的机器，系统资源的利用更加高一些。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从 Netty 写的 server 端，就可以看出，boss worker group 对应的正是主副 Reactor。
 
@@ -129,7 +126,7 @@ JNI，全称为Java Native Interface，翻译过来就是 Java 本地接口，�
 
 编译完毕之后，可以看到当前目录出现了如下几个文件：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中 DataSynchronizer.h 是生成的头文件，这个文件尽量不要修改，整体内容如下：
 
@@ -141,11 +138,11 @@ JNI，全称为Java Native Interface，翻译过来就是 Java 本地接口，�
 
 `#include <jni.h>   #include <stdio.h>   #include "DataSynchronizer.h"      JNIEXPORT jstring JNICALL Java_DataSynchronizer_syncData(JNIEnv *env, jobject obj, jstring str) {      // Step 1: Convert the JNI String (jstring) into C-String (char*)      const char *inCStr = (*env)->GetStringUTFChars(env, str, NULL);      if (NULL == inCStr) {           return NULL;       }         // Step 2: Perform its intended operations      printf("In C, the received string is: %s\n", inCStr);      (*env)->ReleaseStringUTFChars(env, str, inCStr);  // release resources         // Prompt user for a C-string      char outCStr[128];      printf("Enter a String: ");      scanf("%s", outCStr);         // Step 3: Convert the C-string (char*) into JNI String (jstring) and return      return (*env)->NewStringUTF(env, outCStr);   }   `
 
-其中需要注意的是，JNIEnv* 变量，实际上指的是当前的 JNI 环境。而 jobject 变量则类似 Java 中的 this 关键字。
+其中需要注意的是，JNIEnv\* 变量，实际上指的是当前的 JNI 环境。而 jobject 变量则类似 Java 中的 this 关键字。
 
 jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。整体对应如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最后，我们来编译一下：
 
@@ -153,7 +150,7 @@ jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。�
 
 编译完毕后，可以看到当前目录下又多了一个 libsynchronizer.so 文件（这个文件类似 Windows 上编译后生成的 .dll 类库文件）：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此时我们可以运行了，运行如下命令进行运行：
 
@@ -169,7 +166,7 @@ jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。�
 
 感兴趣的同学可以扒拉下 Netty 源码，在 transport-native-epoll 模块中，就可以见到具体的实现方法了。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## IO 多路复用模型
 
@@ -183,7 +180,7 @@ jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。�
 
 所以可以这么说，一切皆文件。来看一下系统定义的文件描述符说明：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从上面的列表可以看到，文件描述符 0，1，2 都已经被系统占用了，当系统启动的时候，这三个描述符就存在了。
 
@@ -206,26 +203,24 @@ jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。�
 这里解释下其具体参数：
 
 - 参数一：nfds，也即 maxfd，最大的文件描述符递增一。这里之所以传最大描述符，为的就是在遍历 fd_set 的时候，限定遍历范围。
-    
+
 - 参数二：readfds，可读文件描述符集合。
-    
+
 - 参数三：writefds，可写文件描述符集合。
-    
+
 - 参数四：errorfds，异常文件描述符集合。
-    
+
 - 参数五：timeout，超时时间。在这段时间内没有检测到描述符被触发，则返回。
-    
 
 下面的宏处理，可以对 fd_set 集合（准确的说是 bitmap，一个描述符有变更，则会在描述符对应的索引处置 1）进行操作：
 
-- FD_CLR(inr fd,fd_set* set) ：用来清除描述词组 set 中相关 fd 的位，即 bitmap 结构中索引值为 fd 的值置为 0。
-    
-- FD_ISSET(int fd,fd_set *set)：用来测试描述词组 set 中相关 fd 的位是否为真，即 bitmap 结构中某一位是否为 1。
-    
-- FD_SET（int fd,fd_set*set）：用来设置描述词组 set 中相关 fd 的位，即将 bitmap 结构中某一位设置为 1，索引值为 fd。
-    
-- FD_ZERO（fd_set *set）：用来清除描述词组 set 的全部位，即将 bitmap 结构全部清零。
-    
+- FD_CLR(inr fd,fd_set\* set) ：用来清除描述词组 set 中相关 fd 的位，即 bitmap 结构中索引值为 fd 的值置为 0。
+
+- FD_ISSET(int fd,fd_set \*set)：用来测试描述词组 set 中相关 fd 的位是否为真，即 bitmap 结构中某一位是否为 1。
+
+- FD_SET（int fd,fd_set\*set）：用来设置描述词组 set 中相关 fd 的位，即将 bitmap 结构中某一位设置为 1，索引值为 fd。
+
+- FD_ZERO（fd_set \*set）：用来清除描述词组 set 的全部位，即将 bitmap 结构全部清零。
 
 首先来看一段服务端采用了 select 模型的示例代码：
 
@@ -234,11 +229,10 @@ jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。�
 上面的代码我加了比较详细的注释了，大家应该很容易看明白，说白了大概流程其实如下：
 
 - 首先，创建 socket 套接字，创建完毕后，会获取到此套接字的文件描述符。
-    
+
 - 然后，bind 到指定的地址进行监听 listen。这样，服务端就在特定的端口启动起来并进行监听了。
-    
+
 - 之后，利用开启 accept 方法来监听客户端的连接请求。一旦有客户端连接，则将获取到当前客户端连接的 connection 文件描述符。
-    
 
 双方建立连接之后，就可以进行数据互传了。需要注意的是，在循环开始的时候，务必每次都要重新设置当前 connection 的文件描述符，是因为文件描描述符表在内核中被修改过，如果不重置，将会导致异常的情况。
 
@@ -254,24 +248,23 @@ jstring 则是 C 语言层面上的字符串，相当于 Java 中的 String。�
 
 由于 read_fds 文件描述符的长度为 1024 位，所以最多允许 1024 个连接。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 而在 select 的时候，涉及到用户态和内核态的转换，所以整体转换方式如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 所以，综合起来，select 整体还是比较高效和稳定的，但是呈现出来的问题也不少。
 
 这些问题进一步限制了其性能发挥：
 
 - 文件描述符表为 bitmap 结构，且有长度为 1024 的限制。
-    
+
 - fdset 无法做到重用，每次循环必须重新创建。
-    
+
 - 频繁的用户态和内核态拷贝，性能开销较大。
-    
+
 - 需要对文件描述符表进行遍历，O(n) 的轮询时间复杂度。
-    
 
 ## poll 模型
 
@@ -297,24 +290,23 @@ pollfd 结构内容如下：
 
 events 事件列表如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 revents 事件列表如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从列表中可以看出，revents 是包含 events 的。接下来结合示例来看一下：
 
- `//创建server端套接字，获取文件描述符       int listenfd = socket(PF_INET,SOCK_STREAM,0);       if(listenfd < 0) return -1;          //绑定服务器       bind(listenfd,(struct sockaddr*)&address,sizeof(address));       //监听服务器       listen(listenfd,5);           struct pollfd pollfds[1];       socklen_t addr_len = sizeof(client);          //接收客户端连接       int connfd = accept(listenfd,(struct sockaddr*)&client,&addr_len);          //放入fd数组       pollfds[0].fd = connfd;       pollfds[0].events = POLLIN;          //读缓冲区       char buff[1024];           //读文件操作符       fd_set read_fds;            while(1)       {           memset(buff,0,sizeof(buff));              /**            ** SELECT模型专用            ** 注意：每次调用select之前都要重新设置文件描述符connfd，因为文件描述符表会在内核中被修改            ** FD_ZERO(&read_fds);            ** FD_SET(connfd,&read_fds);           ** 注意：select会将用户态中的文件描述符表放到内核中进行修改，内核修改完毕后再返回给用户态，开销较大           ** ret = select(connfd+1,&read_fds,NULL,NULL,NULL);           **/              ret = poll(pollfds, 1, 1000);           if(ret < 0)           {               printf("Fail to poll!\n");               return -1;           }              /**            ** SELECT模型专用            ** 检测文件描述符表中相关请求是否可读            ** if(FD_ISSET(connfd, &read_fds))            ** {            **   ret = recv(connfd,buff,sizeof(buff)-1,0);            **   printf("receive %d bytes from client: %s \n",ret,buff);            ** }            **/           //检测文件描述符数组中相关请求           if(pollfds[0].revents & POLLIN){               pollfds[0].revents = 0;               ret = recv(connfd,buff,sizeof(buff)-1,0);               printf("receive %d bytes from client: %s \n",ret,buff);           }       }`
+`//创建server端套接字，获取文件描述符       int listenfd = socket(PF_INET,SOCK_STREAM,0);       if(listenfd < 0) return -1;          //绑定服务器       bind(listenfd,(struct sockaddr*)&address,sizeof(address));       //监听服务器       listen(listenfd,5);           struct pollfd pollfds[1];       socklen_t addr_len = sizeof(client);          //接收客户端连接       int connfd = accept(listenfd,(struct sockaddr*)&client,&addr_len);          //放入fd数组       pollfds[0].fd = connfd;       pollfds[0].events = POLLIN;          //读缓冲区       char buff[1024];           //读文件操作符       fd_set read_fds;            while(1)       {           memset(buff,0,sizeof(buff));              /**            ** SELECT模型专用            ** 注意：每次调用select之前都要重新设置文件描述符connfd，因为文件描述符表会在内核中被修改            ** FD_ZERO(&read_fds);            ** FD_SET(connfd,&read_fds);           ** 注意：select会将用户态中的文件描述符表放到内核中进行修改，内核修改完毕后再返回给用户态，开销较大           ** ret = select(connfd+1,&read_fds,NULL,NULL,NULL);           **/              ret = poll(pollfds, 1, 1000);           if(ret < 0)           {               printf("Fail to poll!\n");               return -1;           }              /**            ** SELECT模型专用            ** 检测文件描述符表中相关请求是否可读            ** if(FD_ISSET(connfd, &read_fds))            ** {            **   ret = recv(connfd,buff,sizeof(buff)-1,0);            **   printf("receive %d bytes from client: %s \n",ret,buff);            ** }            **/           //检测文件描述符数组中相关请求           if(pollfds[0].revents & POLLIN){               pollfds[0].revents = 0;               ret = recv(connfd,buff,sizeof(buff)-1,0);               printf("receive %d bytes from client: %s \n",ret,buff);           }       }`
 
 由于源码中，我做了比较详细的注释，同时将和 select 模型不一样的地方都列了出来，这里就不再详细解释了。
 
 总体说来，poll 模型比 select 模型要好用一些，去掉了一些限制，但是仍然避免不了如下的问题：
 
 - 用户态和内核态仍需要频繁切换，因为 revents 的赋值是在内核态进行的，然后再推送到用户态，和 select 类似，整体开销较大。
-    
+
 - 仍需要遍历数组，时间复杂度为 O（N）。
-    
 
 ## epoll 模型
 
@@ -336,7 +328,7 @@ revents 事件列表如下：
 
 其简化工作机制如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 说道 epoll_ctl 函数，其作用则是对 epoll 实例进行增删改查操作。有些类似我们常用的 CRUD 操作。
 
@@ -350,7 +342,7 @@ revents 事件列表如下：
 
 其简化工作机制如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 说道 epoll_wait 函数，其作用就是扫描 ready list，处理准备就绪的 client IO，其返回结果即为准备好进行 IO 的 client 的个数。通过遍历这些准备好的 client，就可以轻松进行 IO 处理了。
 
@@ -366,7 +358,7 @@ revents 事件列表如下：
 
 简化流程如下：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 数据存储这块解决了，那么针对连接上来的客户端 socket，该用什么数据结构保存进来呢？
 
@@ -383,13 +375,12 @@ revents 事件列表如下：
 整体的操作流程为：
 
 - 首先，利用 epoll_create 在内核中创建一个 epoll 对象。其实这个 epoll 对象，就是一个可以存储客户端连接的数据结构。
-    
+
 - 然后，客户端 socket 连接上来，会通过 epoll_ctl 操作将结果添加到 epoll 对象的红黑树数据结构中。
-    
+
 - 然后，一旦有 socket 有事件发生，则会通过回调函数将其添加到 ready list 双向链表中。
-    
+
 - 最后，epoll_wait 会遍历链表来处理已经准备好的 socket，然后通过预先设置的水平触发或者边缘触发来进行数据的感知操作。
-    
 
 从上面的细节可以看出，由于 epoll 内部监控的是底层的文件描述符信息，可以将变更的描述符直接加入到 ready list，无需用户将所有的描述符再进行传入。
 
@@ -403,7 +394,7 @@ revents 事件列表如下：
 
 比如我们可以这样认为：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果将上图中的方块看做是 buffer 的话，那么理解起来则就更加容易了，比如针对水平触发，buffer 只要是一直有数据，则一直通知；而边缘触发，则 buffer 容量发生变化的时候，才会通知。
 
@@ -415,25 +406,25 @@ revents 事件列表如下：
 
 buffer 由空变为非空，意即有数据进来的时候，此过程会触发通知：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 buffer 原本有些数据，这时候又有新数据进来的时候，数据变多，此过程会触发通知：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 buffer 中有数据，此时用户对操作的 fd 注册 EPOLL_CTL_MOD 事件的时候，会触发通知：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 针对写操作，也就是当前 fd 处于 EPOLLOUT 模式下，即可写。此时意味着缓冲区可以写了，以下 buffer 都指发送缓冲区：
 
 buffer 满了，这时候发送出去一些数据，数据变少，此过程会触发通知：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 buffer 原本有些数据，这时候又发送出去一些数据，数据变少，此过程会触发通知：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里就是 ET 这种模式触发的几种情形，可以看出，基本上都是围绕着接收缓冲区或者发送缓冲区的状态变化来进行的。
 
@@ -459,11 +450,11 @@ buffer 原本有些数据，这时候又发送出去一些数据，数据变少�
 
 当接收缓冲区不为空的时候，有数据可读，则读事件会一直触发：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当发送缓冲区未满的时候，可以继续写入数据，则写事件一直会触发：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 同样的，为了使表达更清晰，我们也来举个栗子，按照上述入输入方式来进行。
 
@@ -528,26 +519,24 @@ buffer 原本有些数据，这时候又发送出去一些数据，数据变少�
 _参考资料：_
 
 - _https://www3.ntu.edu.sg/home/ehchua/programming/java/JavaNativeInterface.html_
-    
+
 - _https://copyconstruct.medium.com/the-method-to-epolls-madness-d9d2d6378642_
-    
 
 ## 推荐阅读（求关注，别白嫖！）
 
 1. [微服务最重要的10个设计模式](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247517905&idx=1&sn=3d33a3fa39e9fa8276f83c6783f5a6d6&chksm=fcf7591ccb80d00a37f65928c2c2c636b3e7aa3d295cc1df00926633029221384ba7396dc92d&token=123612753&lang=zh_CN&scene=21#wechat_redirect)
-    
-2. [如何用 ELK 搭建 TB 级的日志监控系统？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247517680&idx=1&sn=57ce7829078aad1dd748244a47039612&chksm=fcf75a3dcb80d32ba66b8fd562c45df1d3fb395c0875030aecbfd5471ff2583cadcac6952295&token=154658036&lang=zh_CN&scene=21#wechat_redirect)
-    
-3. [实战干货！Spring Cloud Gateway 整合 OAuth2.0 实现分布式统一认证授权！](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247503249&idx=1&sn=b33ae3ff70a08b17ee0779d6ccb30b53&chksm=fcf7125ccb809b4aa4985da09e620e06c606754e6a72681c93dcc88bdc9aa7ba0cb64f52dbc3&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
-    
-4. [从实现原理来讲，Nacos 为什么这么强？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247514933&idx=1&sn=374da0ea32321baf6938ff2e611d8fce&chksm=fcf764f8cb80edee2a0c493f58570b1502fb093ccd38fd498de1f6c1213e24e0355d8bcd713f&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
-    
-5. [阿里限流神器Sentinel夺命连环 17 问？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247498039&idx=1&sn=3a3caee655ff015b46249bd51aa4dc79&chksm=fcf726facb80afecea4d48faf94a9940b80ba21b325510cf4be6f7c7bce2f3c73266857f65d1&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
-    
-6. [openFeign夺命连环9问，这谁受得了？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247496653&idx=1&sn=7185077b3bdc1d094aef645d677ec472&chksm=fcf72c00cb80a516a8d1bc3b89400e202f2cbc1fd465e6c51e84a9a3543ec1c8bcfe8edeaec2&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
-    
-7. [Spring Cloud Gateway夺命连环10问？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247499894&idx=1&sn=f1606e4c00fd15292269afe052f5bca2&chksm=fcf71fbbcb8096ad349e6da50b0b9141964c2084d0a38eba977fe8baa3fbe8af3b20c7591110&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
-    
+
+1. [如何用 ELK 搭建 TB 级的日志监控系统？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247517680&idx=1&sn=57ce7829078aad1dd748244a47039612&chksm=fcf75a3dcb80d32ba66b8fd562c45df1d3fb395c0875030aecbfd5471ff2583cadcac6952295&token=154658036&lang=zh_CN&scene=21#wechat_redirect)
+
+1. [实战干货！Spring Cloud Gateway 整合 OAuth2.0 实现分布式统一认证授权！](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247503249&idx=1&sn=b33ae3ff70a08b17ee0779d6ccb30b53&chksm=fcf7125ccb809b4aa4985da09e620e06c606754e6a72681c93dcc88bdc9aa7ba0cb64f52dbc3&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
+
+1. [从实现原理来讲，Nacos 为什么这么强？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247514933&idx=1&sn=374da0ea32321baf6938ff2e611d8fce&chksm=fcf764f8cb80edee2a0c493f58570b1502fb093ccd38fd498de1f6c1213e24e0355d8bcd713f&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
+
+1. [阿里限流神器Sentinel夺命连环 17 问？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247498039&idx=1&sn=3a3caee655ff015b46249bd51aa4dc79&chksm=fcf726facb80afecea4d48faf94a9940b80ba21b325510cf4be6f7c7bce2f3c73266857f65d1&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
+
+1. [openFeign夺命连环9问，这谁受得了？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247496653&idx=1&sn=7185077b3bdc1d094aef645d677ec472&chksm=fcf72c00cb80a516a8d1bc3b89400e202f2cbc1fd465e6c51e84a9a3543ec1c8bcfe8edeaec2&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
+
+1. [Spring Cloud Gateway夺命连环10问？](https://mp.weixin.qq.com/s?__biz=MzU3MDAzNDg1MA==&mid=2247499894&idx=1&sn=f1606e4c00fd15292269afe052f5bca2&chksm=fcf71fbbcb8096ad349e6da50b0b9141964c2084d0a38eba977fe8baa3fbe8af3b20c7591110&scene=21&cur_album_id=2042874937312346114#wechat_redirect)
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/19cc2hfD2rA07Je2pY1o0ic2KcPRn44icO8GVcKRdwiaYvrE6bNeTbWPicyV7c7jWmSyzsiaWASjjckzBcsJMJw06pA/300?wx_fmt=png&wxfrom=19)
 

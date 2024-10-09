@@ -1,6 +1,6 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-9-4 16:59 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
-一、前言
+# 一、前言
 
 GIC（Generic Interrupt Controller）是ARM公司提供的一个通用的中断控制器，其architecture specification目前有四个版本，V1～V4(V2最多支持8个ARM core，V3/V4支持更多的ARM core，主要用于ARM64服务器系统结构）。目前在ARM官方网站只能下载到Version 2的GIC architecture specification，因此，本文主要描述符合V2规范的GIC硬件及其驱动。
 
@@ -11,31 +11,22 @@ GIC（Generic Interrupt Controller）是ARM公司提供的一个通用的中断�
 本文主要分析了linux kernel中GIC中断控制器的驱动代码（位于drivers/irqchip/irq-gic.c和irq-gic-common.c）。 irq-gic-common.c中是GIC V2和V3的通用代码，而irq-gic.c是V2 specific的代码，irq-gic-v3.c是V3 specific的代码，不在本文的描述范围。本文主要分成三个部分：第二章描述了GIC V2的硬件；第三章描述了GIC V2的初始化过程；第四章描述了底层的硬件call back函数。
 
 注：具体的linux kernel的版本是linux-3.17-rc3。
-
-二、GIC-V2的硬件描述
-
-1、GIC-V2的输入和输出信号
-
-（1）GIC-V2的输入和输出信号示意图
+# 二、GIC-V2的硬件描述
+## 1、GIC-V2的输入和输出信号
+### （1）GIC-V2的输入和输出信号示意图
 
 要想理解一个building block（无论软件还是硬件），我们都可以先把它当成黑盒子，只是研究其input，output。GIC-V2的输入和输出信号的示意图如下（注：我们以GIC-400为例，同时省略了clock，config等信号）：
-
-[![gic-400](http://www.wowotech.net/content/uploadfile/201409/27eba98d637e10c5f8d6e0b4aebd5c4820140904115850.gif "gic-400")](http://www.wowotech.net/content/uploadfile/201409/645b571aed74ae33aca449e3b57420b820140904115848.gif) 
+![[Pasted image 20241009100741.png]]
 
 （2）输入信号
 
 上图中左边就是来自外设的interrupt source输入信号。分成两种类型，分别是PPI（Private Peripheral Interrupt）和SPI（Shared Peripheral Interrupt）。其实从名字就可以看出来两种类型中断信号的特点，PPI中断信号是CPU私有的，每个CPU都有其特定的PPI信号线。而SPI是所有CPU之间共享的。通过寄存器GICD_TYPER可以配置SPI的个数（最多480个）。GIC-400支持多少个SPI中断，其输入信号线就有多少个SPI interrupt request signal。同样的，通过寄存器GICD_TYPER也可以配置CPU interface的个数（最多8个），GIC-400支持多少个CPU interface，其输入信号线就提供多少组PPI中断信号线。一组PPI中断信号线包括6个实际的signal：
 
 （a）nLEGACYIRQ信号线。对应interrupt ID 31，在bypass mode下（这里的bypass是指bypass GIC functionality，直接连接到某个processor上），nLEGACYIRQ可以直接连到对应CPU的nIRQCPU信号线上。在这样的设置下，该CPU不参与其他属于该CPU的PPI以及SPI中断的响应，而是特别为这一根中断线服务。
-
 （b）nCNTPNSIRQ信号线。来自Non-secure physical timer的中断事件，对应interrupt ID 30。
-
 （c）nCNTPSIRQ信号线。来自secure physical timer的中断事件，对应interrupt ID 29。
-
 （d）nLEGACYFIQ信号线。对应interrupt ID 28。概念同nLEGACYIRQ信号线，不再描述。
-
 （e）nCNTVIRQ信号线。对应interrupt ID 27。Virtual Timer Event，和虚拟化相关，这里不与描述。
-
 （f）nCNTHPIRQ信号线。对应interrupt ID 26。Hypervisor Timer Event，和虚拟化相关，这里不与描述。
 
 对于Cortex A15的GIC实现，其PPI中断信号线除了上面的6个，还有一个叫做Virtual Maintenance Interrupt，对应interrupt ID 25。
@@ -43,9 +34,7 @@ GIC（Generic Interrupt Controller）是ARM公司提供的一个通用的中断�
 对于Cortex A9的GIC实现，其PPI中断信号线包括5根：
 
 （a）nLEGACYIRQ信号线和nLEGACYFIQ信号线。对应interrupt ID 31和interrupt ID 28。这部分和上面一致。
-
 （b）由于Cortext A9的每个处理器都有自己的Private timer和watch dog timer，这两个HW block分别使用了ID 29和ID 30
-
 （c）Cortext A9内嵌一个global timer为系统内的所有processor共享，对应interrupt ID 27
 
 关于private timer和global timer的描述，请参考时间子系统的相关文档。
@@ -93,13 +82,9 @@ GIC可以清晰的划分成两个block，一个block是Distributor（上图的�
 Distributor的主要的作用是检测各个interrupt source的状态，控制各个interrupt source的行为，分发各个interrupt source产生的中断事件分发到指定的一个或者多个CPU interface上。虽然Distributor可以管理多个interrupt source，但是它总是把优先级最高的那个interrupt请求送往CPU interface。Distributor对中断的控制包括：
 
 （1）中断enable或者disable的控制。Distributor对中断的控制分成两个级别。一个是全局中断的控制（GIC_DIST_CTRL）。一旦disable了全局的中断，那么任何的interrupt source产生的interrupt event都不会被传递到CPU interface。另外一个级别是对针对各个interrupt source进行控制（GIC_DIST_ENABLE_CLEAR），disable某一个interrupt source会导致该interrupt event不会分发到CPU interface，但不影响其他interrupt source产生interrupt event的分发。
-
 （2）控制将当前优先级最高的中断事件分发到一个或者一组CPU interface。当一个中断事件分发到多个CPU interface的时候，GIC的内部逻辑应该保证只assert 一个CPU。
-
 （3）优先级控制。
-
 （4）interrupt属性设定。例如是level-sensitive还是edge-triggered
-
 （5）interrupt group的设定
 
 Distributor可以管理若干个interrupt source，这些interrupt source用ID来标识，我们称之interrupt ID。
@@ -131,11 +116,8 @@ CPU interface这个block主要用于和process进行接口。该block的主要�
 首先给出前提条件：
 
 （a）N和M用来标识两个外设中断，N的优先级大于M
-
 （b）两个中断都是SPI类型，level trigger，active-high
-
 （c）两个中断被配置为去同一个CPU
-
 （d）都被配置成group 0，通过FIQ触发中断
 
 下面的表格按照时间轴来描述交互过程：
@@ -157,7 +139,7 @@ CPU interface这个block主要用于和process进行接口。该block的主要�
 |T146时刻|大约15个clock之后，Distributor向CPU interface报告当前pending且优先级最高的interrupt source，也就是M了。漫长的pending之后，M终于迎来了春天。CPU interface拉低nFIQCPU信号线，向CPU报告M外设的中断请求。这时候，CPU interface的ack寄存器（GICC_IAR）的内容会修改成M interrupt source对应的ID|
 |T211时刻|CPU ack M中断（通过读GICC_IAR寄存器），开始处理低优先级的中断。|
 
-三、GIC-V2 irq chip driver的初始化过程
+# 三、GIC-V2 irq chip driver的初始化过程
 
 在linux-3.17-rc3\drivers\irqchip目录下保存在各种不同的中断控制器的驱动代码，这个版本的内核支持了GICV3。irq-gic-common.c是通用的GIC的驱动代码，可以被各个版本的GIC使用。irq-gic.c是用于V2版本的GIC controller，而irq-gic-v3.c是用于V3版本的GIC controller。
 
@@ -166,27 +148,27 @@ CPU interface这个block主要用于和process进行接口。该block的主要�
 （1）irq chip driver中的声明
 
 在linux-3.17-rc3\drivers\irqchip目录下的irqchip.h文件中定义了IRQCHIP_DECLARE宏如下：
+```cpp
+#define IRQCHIP_DECLARE(name, compat, fn) OF_DECLARE_2(irqchip, name, compat, fn)
 
-> #define IRQCHIP_DECLARE(name, compat, fn) OF_DECLARE_2(irqchip, name, compat, fn)
-> 
-> #define OF_DECLARE_2(table, name, compat, fn) \  
->         _OF_DECLARE(table, name, compat, fn, of_init_fn_2)
-> 
-> #define _OF_DECLARE(table, name, compat, fn, fn_type)            \  
->     static const struct of_device_id __of_table_##name        \  
->         __used __section(__##table##_of_table)            \  
->          = { .compatible = compat,                \  
->              .data = (fn == (fn_type)NULL) ? fn : fn  }
+#define OF_DECLARE_2(table, name, compat, fn) \  
+OF_DECLARE(table, name, compat, fn, of_init_fn_2)
 
+#define _OF_DECLARE(table, name, compat, fn, fn_type)            \  
+static const struct of_device_id of_table##name        \  
+__used __section(##table##of_table)            \  
+= { .compatible = compat,                \  
+.data = (fn == (fn_type)NULL) ? fn : fn  }
+```
 这个宏其实就是初始化了一个struct of_device_id的静态常量，并放置在__irqchip_of_table section中。irq-gic.c文件中使用IRQCHIP_DECLARE来定义了若干个静态的struct of_device_id常量，如下：
-
-> IRQCHIP_DECLARE(gic_400, "arm,gic-400", gic_of_init);  
-> IRQCHIP_DECLARE(cortex_a15_gic, "arm,cortex-a15-gic", gic_of_init);  
-> IRQCHIP_DECLARE(cortex_a9_gic, "arm,cortex-a9-gic", gic_of_init);  
-> IRQCHIP_DECLARE(cortex_a7_gic, "arm,cortex-a7-gic", gic_of_init);  
-> IRQCHIP_DECLARE(msm_8660_qgic, "qcom,msm-8660-qgic", gic_of_init);  
-> IRQCHIP_DECLARE(msm_qgic2, "qcom,msm-qgic2", gic_of_init);
-
+```cpp
+IRQCHIP_DECLARE(gic_400, "arm,gic-400", gic_of_init);  
+IRQCHIP_DECLARE(cortex_a15_gic, "arm,cortex-a15-gic", gic_of_init);  
+IRQCHIP_DECLARE(cortex_a9_gic, "arm,cortex-a9-gic", gic_of_init);  
+IRQCHIP_DECLARE(cortex_a7_gic, "arm,cortex-a7-gic", gic_of_init);  
+IRQCHIP_DECLARE(msm_8660_qgic, "qcom,msm-8660-qgic", gic_of_init);  
+IRQCHIP_DECLARE(msm_qgic2, "qcom,msm-qgic2", gic_of_init);
+```
 兼容GIC-V2的GIC实现有很多，不过其初始化函数都是一个。在linux kernel编译的时候，你可以配置多个irq chip进入内核，编译系统会把所有的IRQCHIP_DECLARE宏定义的数据放入到一个特殊的section中（section name是__irqchip_of_table），我们称这个特殊的section叫做irq chip table。这个table也就保存了kernel支持的所有的中断控制器的ID信息（最重要的是驱动代码初始化函数和DT compatible string）。我们来看看struct of_device_id的定义：
 
 > struct of_device_id  
@@ -219,13 +201,12 @@ CPU interface这个block主要用于和process进行接口。该block的主要�
 （3）device node和irq chip driver的匹配
 
 在machine driver初始化的时候会调用irqchip_init函数进行irq chip driver的初始化。在driver/irqchip/irqchip.c文件中定义了irqchip_init函数，如下：
-
-> void __init irqchip_init(void)  
-> {  
->     of_irq_init(__irqchip_begin);  
-> }
-
-__irqchip_begin就是内核irq chip table的首地址，这个table也就保存了kernel支持的所有的中断控制器的ID信息（用于和device node的匹配）。of_irq_init函数执行之前，系统已经完成了device tree的初始化，因此系统中的所有的设备节点都已经形成了一个树状结构，每个节点代表一个设备的device node。of_irq_init是在所有的device node中寻找中断控制器节点，形成树状结构（系统可以有多个interrupt controller，之所以形成中断控制器的树状结构，是为了让系统中所有的中断控制器驱动按照一定的顺序进行初始化）。之后，从root interrupt controller节点开始，对于每一个interrupt controller的device node，扫描irq chip table，进行匹配，一旦匹配到，就调用该interrupt controller的初始化函数，并把该中断控制器的device node以及parent中断控制器的device node作为参数传递给irq chip driver。。具体的匹配过程的代码属于Device Tree模块的内容，更详细的信息可以参考[Device Tree代码分析文档](http://www.wowotech.net/linux_kenrel/dt-code-analysis.html)。
+```cpp
+void init irqchip_init(void) {  
+of_irq_init(__irqchip_begin);  
+}
+```
+`__irqchip_begin` 就是内核irq chip table的首地址，这个table也就保存了kernel支持的所有的中断控制器的ID信息（用于和device node的匹配）。of_irq_init函数执行之前，系统已经完成了device tree的初始化，因此系统中的所有的设备节点都已经形成了一个树状结构，每个节点代表一个设备的device node。of_irq_init是在所有的device node中寻找中断控制器节点，形成树状结构（系统可以有多个interrupt controller，之所以形成中断控制器的树状结构，是为了让系统中所有的中断控制器驱动按照一定的顺序进行初始化）。之后，从root interrupt controller节点开始，对于每一个interrupt controller的device node，扫描irq chip table，进行匹配，一旦匹配到，就调用该interrupt controller的初始化函数，并把该中断控制器的device node以及parent中断控制器的device node作为参数传递给irq chip driver。。具体的匹配过程的代码属于Device Tree模块的内容，更详细的信息可以参考[Device Tree代码分析文档](http://www.wowotech.net/linux_kenrel/dt-code-analysis.html)。
 
 2、GIC driver初始化代码分析
 
@@ -392,8 +373,7 @@ irq domain的概念是一个通用中断子系统的概念，在具体的irq chi
 （g） 一个函数名字是否起的好足可以看出工程师的功力。set_smp_cross_call这个函数看名字也知道它的含义，就是设定一个多个CPU直接通信的callback函数。当一个CPU core上的软件控制行为需要传递到其他的CPU上的时候（例如在某一个CPU上运行的进程调用了系统调用进行reboot），就会调用这个callback函数。对于GIC，这个callback定义为gic_raise_softirq。这个函数名字起的不好，直观上以为是和softirq相关，实际上其实是触发了IPI中断。
 
 （h）在multi processor环境下，当processor状态发送变化的时候（例如online，offline），需要把这些事件通知到GIC。而GIC driver在收到来自CPU的事件后会对cpu interface进行相应的设定。
-
-3、GIC硬件初始化
+# 3、GIC硬件初始化
 
 （1）Distributor初始化，代码如下：
 
@@ -447,31 +427,28 @@ GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW 
 当然，由于GIC-400只支持8个CPU，因此CPU mask值只需要8bit，但是寄存器GIC_DIST_TARGETn返回32个bit的值，怎么对应？很简单，cpu mask重复四次就OK了。了解了这些知识，回头看代码就很简单了。
 
 （c）step （b）中获取了8个bit的cpu mask值，通过简单的copy，扩充为32个bit，每8个bit都是cpu mask的值，这么做是为了下一步设定所有IRQ（对于GIC而言就是SPI类型的中断）的CPU mask。
-
 （d）设定每个SPI类型的中断都是只送达该CPU。
-
 （e）配置GIC distributor的其他寄存器，代码如下：
+```cpp
+void init gic_dist_config(void __iomem base, int gic_irqs,  void (*sync_access)(void)) {  
+unsigned int i;
 
-> void __init gic_dist_config(void __iomem *base, int gic_irqs,  void (*sync_access)(void))  
-> {  
->     unsigned int i;
-> 
->     /* Set all global interrupts to be level triggered, active low.    */  
->     for (i = 32; i < gic_irqs; i += 16)  
->         writel_relaxed(0, base + GIC_DIST_CONFIG + i / 4);
-> 
->     /* Set priority on all global interrupts.   */  
->     for (i = 32; i < gic_irqs; i += 4)  
->         writel_relaxed(0xa0a0a0a0, base + GIC_DIST_PRI + i);
-> 
->     /* Disable all interrupts.  Leave the PPI and SGIs alone as they are enabled by redistributor registers.    */  
->     for (i = 32; i < gic_irqs; i += 32)  
->         writel_relaxed(0xffffffff, base + GIC_DIST_ENABLE_CLEAR + i / 8);
-> 
->     if (sync_access)  
->         sync_access();  
-> }
+/* Set all global interrupts to be level triggered, active low.    */  
+for (i = 32; i < gic_irqs; i += 16)  
+writel_relaxed(0, base + GIC_DIST_CONFIG + i / 4);
 
+/ Set priority on all global interrupts.   /  
+for (i = 32; i < gic_irqs; i += 4)  
+writel_relaxed(0xa0a0a0a0, base + GIC_DIST_PRI + i);
+
+/ Disable all interrupts.  Leave the PPI and SGIs alone as they are enabled by redistributor registers.    /  
+for (i = 32; i < gic_irqs; i += 32)  
+writel_relaxed(0xffffffff, base + GIC_DIST_ENABLE_CLEAR + i / 8);
+
+if (sync_access)  
+sync_access();  
+}
+```
 程序的注释已经非常清楚了，这里就不细述了。需要注意的是：这里设定的都是缺省值，实际上，在各种driver的初始化过程中，还是有可能改动这些设置的（例如触发方式）。
 
 （2）CPU interface初始化，代码如下：
@@ -540,8 +517,7 @@ GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW 
 > }
 
 这段代码前面主要是分配两个per cpu的内存。这些内存在系统进入sleep状态的时候保存PPI的寄存器状态信息，在resume的时候，写回寄存器。对于root GIC，需要注册一个和电源管理的事件通知callback函数。不得不吐槽一下gic_notifier_block和gic_notifier这两个符号的命名，看不出来和电源管理有任何关系。更优雅的名字应该包括pm这样的符号，以便让其他工程师看到名字就立刻知道是和电源管理相关的。
-
-四、GIC callback函数分析
+# 四、GIC callback函数分析
 
 1、irq domain相关callback函数分析
 

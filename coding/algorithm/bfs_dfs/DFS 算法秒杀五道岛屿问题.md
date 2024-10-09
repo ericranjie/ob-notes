@@ -2,13 +2,13 @@
 
 原创 labuladong labuladong
 
- _2021年10月18日 08:16_
+_2021年10月18日 08:16_
 
 ![](http://mmbiz.qpic.cn/sz_mmbiz_png/gibkIz0MVqdG7UtZh6kBicXeoTkjLGOJnF62iaJkOwBWZ19xJToiaaSv5QBRCU7n3VIFoeJunOjQxd6ao862DAAkeQ/0?wx_fmt=png)labuladong推荐搜索
 
 二叉树动态规划详解学习指南
 
-读完本文，可以去力扣解决如下题目：  
+读完本文，可以去力扣解决如下题目：
 
 200.岛屿数量（中等）
 
@@ -58,7 +58,7 @@ int numIslands(char[][] grid);
 
 比如说题目给你输入下面这个`grid`有四片岛屿，算法应该返回 4：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 思路很简单，关键在于如何寻找并标记「岛屿」，这就要 DFS 算法发挥作用了，我们直接看解法代码：
 
@@ -92,7 +92,7 @@ int closedIsland(int[][] grid)
 
 比如题目给你输入如下这个二维矩阵：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 算法返回 2，只有图中灰色部分的`0`是四周全都被海水包围着的「封闭岛屿」。
 
@@ -128,7 +128,7 @@ int maxAreaOfIsland(int[][] grid)
 
 比如题目给你输入如下一个二维矩阵：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中面积最大的是橘红色的岛屿，算法返回它的面积 6。
 
@@ -146,7 +146,7 @@ int maxAreaOfIsland(int[][] grid) {    // 记录岛屿的最大面积 �
 
 如果说前面的题目都是模板题，那么力扣第 1905 题「统计子岛屿」可能得动动脑子了：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **这道题的关键在于，如何快速判断子岛屿**？肯定可以借助 [Union Find 并查集算法](https://mp.weixin.qq.com/s?__biz=MzAxODQxMDM0Mw==&mid=2247484751&idx=1&sn=a873c1f51d601bac17f5078c408cc3f6&scene=21#wechat_redirect) 来判断，不过本文重点在 DFS 算法，就不展开并查集算法了。
 
@@ -178,7 +178,7 @@ int numDistinctIslands(int[][] grid)
 
 比如题目输入下面这个二维矩阵：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中有四个岛屿，但是左下角和右上角的岛屿形状相同，所以不同的岛屿共有三个，算法返回 3。
 
@@ -196,7 +196,7 @@ void dfs(int[][] grid, int i, int j) {    // 递归顺序：    
 
 所以，遍历顺序从某种意义上说就可以用来描述岛屿的形状，比如下图这两个岛屿：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 假设它们的遍历顺序是：
 
@@ -224,13 +224,11 @@ int numDistinctIslands(int[][] grid) {    int m = grid.length, n = 
 
 这样，这道题就解决了，至于为什么初始调用`dfs`函数时的`dir`参数可以随意写，这里涉及 DFS 和回溯算法的一个细微差别，前文 [图算法基础](https://mp.weixin.qq.com/s?__biz=MzAxODQxMDM0Mw==&mid=2247491039&idx=1&sn=860d8418b3c955c1d5075cf02ee2907d&scene=21#wechat_redirect) 有写，这里就不展开了。
 
-以上就是全部岛屿系列问题的解题思路，也许前面的题目大部分人会做，但是最后两题还是比较巧妙的，希望本文对你有帮助。 
+以上就是全部岛屿系列问题的解题思路，也许前面的题目大部分人会做，但是最后两题还是比较巧妙的，希望本文对你有帮助。
 
 最后，公众号后台回复「微信」可加我好友，回复「目录」可获取精选文章分类。关注我的视频号，每周直播分享：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 手撕力扣高频面试题61
 
@@ -253,261 +251,260 @@ int numDistinctIslands(int[][] grid) {    int m = grid.length, n = 
 **留言 32**
 
 - 豪
-    
-    2021年10月18日
-    
-    赞18
-    
-    刷题速度，赶不上大佬写题解的速度
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞5
-    
-    加油刷
-    
+
+  2021年10月18日
+
+  赞18
+
+  刷题速度，赶不上大佬写题解的速度
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞5
+
+  加油刷
+
 - RainInNorth
-    
-    2021年10月18日
-    
-    赞8
-    
-    每天看大佬文章然后意念刷题
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞2
-    
-    哈哈哈
-    
+
+  2021年10月18日
+
+  赞8
+
+  每天看大佬文章然后意念刷题
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞2
+
+  哈哈哈
+
 - 璐画
-    
-    2022年3月16日
-    
-    赞2
-    
-    看了东哥的算法框架，感觉自己又行了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    labuladong
-    
-    作者2022年3月16日
-    
-    赞
-    
-    你行的
-    
+
+  2022年3月16日
+
+  赞2
+
+  看了东哥的算法框架，感觉自己又行了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  labuladong
+
+  作者2022年3月16日
+
+  赞
+
+  你行的
+
 - 而我马中仁。。
-    
-    2021年10月24日
-    
-    赞2
-    
-    只会算法能进大厂吗
-    
-    labuladong
-    
-    作者2021年10月25日
-    
-    赞
-    
-    还要有其他基础知识
-    
+
+  2021年10月24日
+
+  赞2
+
+  只会算法能进大厂吗
+
+  labuladong
+
+  作者2021年10月25日
+
+  赞
+
+  还要有其他基础知识
+
 - 草哥🐻
-    
-    2021年10月18日
-    
-    赞2
-    
-    先收藏再说![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  赞2
+
+  先收藏再说![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 波波
-    
-    2021年10月18日
-    
-    赞1
-    
-    唯一一篇我完全会的![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，哈哈哈哈哈
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞2
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  赞1
+
+  唯一一篇我完全会的![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，哈哈哈哈哈
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞2
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Neal
-    
-    2021年12月31日
-    
-    赞1
-    
-    我现在看这片居然不卡，还很爽![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥牛逼
-    
-    labuladong
-    
-    作者2021年12月31日
-    
-    赞1
-    
-    ![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月31日
+
+  赞1
+
+  我现在看这片居然不卡，还很爽![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥牛逼
+
+  labuladong
+
+  作者2021年12月31日
+
+  赞1
+
+  ![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 行者
-    
-    2021年11月19日
-    
-    赞1
-    
-    妙呀
-    
+
+  2021年11月19日
+
+  赞1
+
+  妙呀
+
 - 站在巨人的肩膀上
-    
-    2021年10月24日
-    
-    赞
-    
-    你们都是进了大厂的吗？这些题都得会？
-    
-    labuladong
-    
-    作者2021年10月25日
-    
-    赞1
-    
-    得会
-    
+
+  2021年10月24日
+
+  赞
+
+  你们都是进了大厂的吗？这些题都得会？
+
+  labuladong
+
+  作者2021年10月25日
+
+  赞1
+
+  得会
+
 - Yuanshun@灰树
-    
-    2021年10月21日
-    
-    赞
-    
-    东哥终于更新了 等好苦 秋招一直看你的文章 收获很多
-    
-    labuladong
-    
-    作者2021年10月21日
-    
-    赞1
-    
-    哈哈，祝你找到好工作～
-    
+
+  2021年10月21日
+
+  赞
+
+  东哥终于更新了 等好苦 秋招一直看你的文章 收获很多
+
+  labuladong
+
+  作者2021年10月21日
+
+  赞1
+
+  哈哈，祝你找到好工作～
+
 - 阿巴阿巴
-    
-    2021年10月18日
-    
-    赞
-    
-    完了，看了两遍不会，是不是可以告别算法了。
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞1
-    
-    没关系，多思考思考，自己动手做下
-    
+
+  2021年10月18日
+
+  赞
+
+  完了，看了两遍不会，是不是可以告别算法了。
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞1
+
+  没关系，多思考思考，自己动手做下
+
 - 被讨厌的勇气
-    
-    2021年10月18日
-    
-    赞1
-    
-    ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥要不要讲讲并差集做法
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞
-    
-    看下历史文章，有讲过的
-    
+
+  2021年10月18日
+
+  赞1
+
+  ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥要不要讲讲并差集做法
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞
+
+  看下历史文章，有讲过的
+
 - 仕宜
-    
-    2021年10月18日
-    
-    赞1
-    
-    东哥出品，必属精品。爱了爱了
-    
+
+  2021年10月18日
+
+  赞1
+
+  东哥出品，必属精品。爱了爱了
+
 - 北小辰
-    
-    四川2023年3月19日
-    
-    赞
-    
-    太厉害了，没想到回溯可以用来搜索图的路径![[憨笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  四川2023年3月19日
+
+  赞
+
+  太厉害了，没想到回溯可以用来搜索图的路径![[憨笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - A-InY
-    
-    2022年7月6日
-    
-    赞
-    
-    岛屿数量上面的代码方向for循环里面少了个参数
-    
-    labuladong
-    
-    作者2022年7月6日
-    
-    赞
-    
-    收到
-    
+
+  2022年7月6日
+
+  赞
+
+  岛屿数量上面的代码方向for循环里面少了个参数
+
+  labuladong
+
+  作者2022年7月6日
+
+  赞
+
+  收到
+
 - zoevon
-    
-    2022年1月8日
-    
-    赞
-    
-    最后一题，为啥离开岛屿的时候要弄成减号呀？有没有高手帮我解答一下![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    labuladong
-    
-    作者2022年1月8日
-    
-    赞
-    
-    你在历史文章搜下回溯算法就知道了
-    
+
+  2022年1月8日
+
+  赞
+
+  最后一题，为啥离开岛屿的时候要弄成减号呀？有没有高手帮我解答一下![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  labuladong
+
+  作者2022年1月8日
+
+  赞
+
+  你在历史文章搜下回溯算法就知道了
+
 - Robin
-    
-    2021年10月18日
-    
-    赞
-    
-    这种题是不是也能并查集
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞
-    
-    是的
-    
+
+  2021年10月18日
+
+  赞
+
+  这种题是不是也能并查集
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞
+
+  是的
+
 - bkpp
-    
-    2021年10月18日
-    
-    赞
-    
-    东哥这个用并查集做好还是用DFS好
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞
-    
-    对这类题，DFS 更方便些
-    
+
+  2021年10月18日
+
+  赞
+
+  东哥这个用并查集做好还是用DFS好
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞
+
+  对这类题，DFS 更方便些
 
 已无更多数据
 
@@ -526,260 +523,259 @@ labuladong
 **留言 32**
 
 - 豪
-    
-    2021年10月18日
-    
-    赞18
-    
-    刷题速度，赶不上大佬写题解的速度
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞5
-    
-    加油刷
-    
+
+  2021年10月18日
+
+  赞18
+
+  刷题速度，赶不上大佬写题解的速度
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞5
+
+  加油刷
+
 - RainInNorth
-    
-    2021年10月18日
-    
-    赞8
-    
-    每天看大佬文章然后意念刷题
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞2
-    
-    哈哈哈
-    
+
+  2021年10月18日
+
+  赞8
+
+  每天看大佬文章然后意念刷题
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞2
+
+  哈哈哈
+
 - 璐画
-    
-    2022年3月16日
-    
-    赞2
-    
-    看了东哥的算法框架，感觉自己又行了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    labuladong
-    
-    作者2022年3月16日
-    
-    赞
-    
-    你行的
-    
+
+  2022年3月16日
+
+  赞2
+
+  看了东哥的算法框架，感觉自己又行了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  labuladong
+
+  作者2022年3月16日
+
+  赞
+
+  你行的
+
 - 而我马中仁。。
-    
-    2021年10月24日
-    
-    赞2
-    
-    只会算法能进大厂吗
-    
-    labuladong
-    
-    作者2021年10月25日
-    
-    赞
-    
-    还要有其他基础知识
-    
+
+  2021年10月24日
+
+  赞2
+
+  只会算法能进大厂吗
+
+  labuladong
+
+  作者2021年10月25日
+
+  赞
+
+  还要有其他基础知识
+
 - 草哥🐻
-    
-    2021年10月18日
-    
-    赞2
-    
-    先收藏再说![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  赞2
+
+  先收藏再说![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 波波
-    
-    2021年10月18日
-    
-    赞1
-    
-    唯一一篇我完全会的![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，哈哈哈哈哈
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞2
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年10月18日
+
+  赞1
+
+  唯一一篇我完全会的![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，哈哈哈哈哈
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞2
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Neal
-    
-    2021年12月31日
-    
-    赞1
-    
-    我现在看这片居然不卡，还很爽![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥牛逼
-    
-    labuladong
-    
-    作者2021年12月31日
-    
-    赞1
-    
-    ![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月31日
+
+  赞1
+
+  我现在看这片居然不卡，还很爽![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥牛逼
+
+  labuladong
+
+  作者2021年12月31日
+
+  赞1
+
+  ![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 行者
-    
-    2021年11月19日
-    
-    赞1
-    
-    妙呀
-    
+
+  2021年11月19日
+
+  赞1
+
+  妙呀
+
 - 站在巨人的肩膀上
-    
-    2021年10月24日
-    
-    赞
-    
-    你们都是进了大厂的吗？这些题都得会？
-    
-    labuladong
-    
-    作者2021年10月25日
-    
-    赞1
-    
-    得会
-    
+
+  2021年10月24日
+
+  赞
+
+  你们都是进了大厂的吗？这些题都得会？
+
+  labuladong
+
+  作者2021年10月25日
+
+  赞1
+
+  得会
+
 - Yuanshun@灰树
-    
-    2021年10月21日
-    
-    赞
-    
-    东哥终于更新了 等好苦 秋招一直看你的文章 收获很多
-    
-    labuladong
-    
-    作者2021年10月21日
-    
-    赞1
-    
-    哈哈，祝你找到好工作～
-    
+
+  2021年10月21日
+
+  赞
+
+  东哥终于更新了 等好苦 秋招一直看你的文章 收获很多
+
+  labuladong
+
+  作者2021年10月21日
+
+  赞1
+
+  哈哈，祝你找到好工作～
+
 - 阿巴阿巴
-    
-    2021年10月18日
-    
-    赞
-    
-    完了，看了两遍不会，是不是可以告别算法了。
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞1
-    
-    没关系，多思考思考，自己动手做下
-    
+
+  2021年10月18日
+
+  赞
+
+  完了，看了两遍不会，是不是可以告别算法了。
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞1
+
+  没关系，多思考思考，自己动手做下
+
 - 被讨厌的勇气
-    
-    2021年10月18日
-    
-    赞1
-    
-    ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥要不要讲讲并差集做法
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞
-    
-    看下历史文章，有讲过的
-    
+
+  2021年10月18日
+
+  赞1
+
+  ![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)东哥要不要讲讲并差集做法
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞
+
+  看下历史文章，有讲过的
+
 - 仕宜
-    
-    2021年10月18日
-    
-    赞1
-    
-    东哥出品，必属精品。爱了爱了
-    
+
+  2021年10月18日
+
+  赞1
+
+  东哥出品，必属精品。爱了爱了
+
 - 北小辰
-    
-    四川2023年3月19日
-    
-    赞
-    
-    太厉害了，没想到回溯可以用来搜索图的路径![[憨笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  四川2023年3月19日
+
+  赞
+
+  太厉害了，没想到回溯可以用来搜索图的路径![[憨笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - A-InY
-    
-    2022年7月6日
-    
-    赞
-    
-    岛屿数量上面的代码方向for循环里面少了个参数
-    
-    labuladong
-    
-    作者2022年7月6日
-    
-    赞
-    
-    收到
-    
+
+  2022年7月6日
+
+  赞
+
+  岛屿数量上面的代码方向for循环里面少了个参数
+
+  labuladong
+
+  作者2022年7月6日
+
+  赞
+
+  收到
+
 - zoevon
-    
-    2022年1月8日
-    
-    赞
-    
-    最后一题，为啥离开岛屿的时候要弄成减号呀？有没有高手帮我解答一下![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    labuladong
-    
-    作者2022年1月8日
-    
-    赞
-    
-    你在历史文章搜下回溯算法就知道了
-    
+
+  2022年1月8日
+
+  赞
+
+  最后一题，为啥离开岛屿的时候要弄成减号呀？有没有高手帮我解答一下![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  labuladong
+
+  作者2022年1月8日
+
+  赞
+
+  你在历史文章搜下回溯算法就知道了
+
 - Robin
-    
-    2021年10月18日
-    
-    赞
-    
-    这种题是不是也能并查集
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞
-    
-    是的
-    
+
+  2021年10月18日
+
+  赞
+
+  这种题是不是也能并查集
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞
+
+  是的
+
 - bkpp
-    
-    2021年10月18日
-    
-    赞
-    
-    东哥这个用并查集做好还是用DFS好
-    
-    labuladong
-    
-    作者2021年10月18日
-    
-    赞
-    
-    对这类题，DFS 更方便些
-    
+
+  2021年10月18日
+
+  赞
+
+  东哥这个用并查集做好还是用DFS好
+
+  labuladong
+
+  作者2021年10月18日
+
+  赞
+
+  对这类题，DFS 更方便些
 
 已无更多数据

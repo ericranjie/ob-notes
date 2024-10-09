@@ -2,131 +2,123 @@
 
 原创 小土 Go招聘
 
- _2022年05月06日 11:50_ _北京_
+_2022年05月06日 11:50_ _北京_
 
 > 我是一只可爱的土拨鼠，专注于分享 Go 职场、招聘和求职，解 Gopher 之忧！欢迎关注我。
-> 
+>
 > 欢迎大家加入[Go招聘交流群](http://mp.weixin.qq.com/s?__biz=MzI4NDM0MzIyMg==&mid=2247486230&idx=1&sn=f3f7b11280d29f77c550cd0cfce0e6c9&chksm=ebfda5cfdc8a2cd9d8901bc92589e40e939ebb6e32a362f394c37f93b026b9c233eb21e62174&scene=21#wechat_redirect)，来这里找志同道合的小伙伴！跟土拨鼠们一起交流学习。
 
 最近小土阅读了《生产微服务》这本书，摘录了生产就绪check列表和评估你微服务的清单。一个服务从0-1的生产过程。很值得参考。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 生产就绪检查列表
 
 ### 一个生产就绪的微服务是稳定且可靠的
 
 - 它有一个**标准化的开发周期**。
-    
+
 - 它的代码需要经过**初步检查、单元测试、集成测试以及端到端的测试**。
-    
+
 - 它的**测试、打包、构建和发布流程是自动化**的。
-    
+
 - 它有**标准化的部署管道**，包括staging阶段、canary阶段和生产阶段。
-    
+
 - 它的**客户端是已知的**。
-    
+
 - 它的**依赖项是已知的**，而且是有备份的，还有可选的回退方案以及缓存，以防出 现依赖项失效。
-    
+
 - 它有**稳定可靠的路由和服务发现机制**。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**一个生产就绪的微服务是可伸缩且高性能的**  
+**一个生产就绪的微服务是可伸缩且高性能的**
 
 - 明确的质的增长规模和量的增长规模。
-    
+
 - 高效地使用硬件资源。
-    
+
 - 已识别出资源的瓶颈和需求。
-    
+
 - 容量规划自动化，并通过调度作业来执行。
-    
+
 - 依赖项也会随之伸缩。
-    
+
 - 可以**随着客户端的伸缩而伸缩**。
-    
+
 - 业务流量模式有章可循。
-    
+
 - 在**发生故障时，业务流量可以被重新路由**。
-    
+
 - 使用支持伸缩性和高性能的编程语言来实现。
-    
+
 - 以高性能的方式处理任务。
-    
+
 - 以可伸缩和高性能的方式处理和存储数据 。
-    
 
 ### 一个具备容错和灾备能力的生产就绪的微服务
 
 - **没有故障点**。
-    
+
 - **所有可能的故障场景都已被识别出来** 。
-    
+
 - 已经通过**代码测试、负载测试和混沌测试**，保证了微服务的弹性 。
-    
+
 - **自动化的故障检测和挽救措施 。**
-    
+
 - 微服务开发团队和整个组织具有**标准化的事故和中断处理流程** 。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**一个得到恰当监控的生产就绪的微服务**  
+**一个得到恰当监控的生产就绪的微服务**
 
 - 它的关键性度量指标在主机级别、基础设施级别和微服务级别得到识别和监控 。
-    
+
 - 它有能够反映**微服务过去状态的日志**。
-    
 
 - 它的**仪表盘包含了所有的关键性度量指标**，而且很容易读懂 。
-    
+
 - 它的告警具有可操作性，并且定义了**阈值** 。
-    
+
 - 有一个**专门的轮班待命机制**负责监控微服务，并对事故和中断做出响应 。
-    
+
 - 有一个**清晰的、良好定义的标准待命流程**，用于处理事故和中断 。
-    
 
 ### 一个生产就绪的微服务具有良好的文档并且为人 所理解
 
 - 它有**详尽的文档** 。
-    
+
 - 它的**文档会定期更新**。
-    
+
 - 它的文档包含了如下内容:
-    
 
 - **微服务描述**
-    
+
 - **架构图**
-    
+
 - **待命人员的信息**
-    
+
 - **重要信息的链接**
-    
+
 - **开发上手指南**
-    
+
 - **服务请求消息流**
-    
+
 - **端点的信息**
-    
+
 - **依赖项的信息**
-    
+
 - **运行手册，以及常见问题答疑** 。
-    
 
 - 它为开发人员、团队和组织所理解 。
-    
+
 - 它符合生产就绪标准并且满足相关要求 。
-    
+
 - 它的**架构经过了反复的评审** 。
-    
 
 ## 评估你的微服务
 
@@ -135,322 +127,292 @@
 #### 开发周期
 
 - 是否有一个可以存放所有代码的**中心代码仓库**?
-    
+
 - 开发人员所在的**开发环境是否准确反映了产品状态**(例如，是否准确反映了实际情况)?
-    
+
 - 是否有代码检查、单元测试、集成测试和端到端的测试?是否有**代码审查流程和策略**?
-    
+
 - 是否具有**自动化的测试、打包、构建和发布流程**?
-    
 
 #### 部署管道
 
 - 微服务生态系统是否有一个**标准化的部署管道**?
-    
+
 - 部署管道里是否有 full staging 或 partial staging 阶段?
-    
+
 - staging 环境对生产环境有怎样的访问权限?
-    
+
 - 部署管道里是否有 canary 阶段?
-    
 
 - canary 阶段是否有足够的时间来捕捉所有的缺陷?
-    
+
 - canary 阶段是否准确地模拟了生产环境的业务流量?
-    
+
 - canary和生产环境的服务端口是一样的吗?
-    
+
 - 生产环境的部署是一步到位还是循序渐进的?
-    
+
 - 对于紧急情况，是否存在直接跳过 staging 和 canary 阶段的情况?
-    
 
 #### 服务依赖
 
 - 微服务的**依赖项**都有哪些?
-    
+
 - 微服务的**客户端**都有哪些?
-    
+
 - 微服务如何缓解依赖失效所带来的影响?
-    
+
 - 对于每个依赖项，是否都有**备份、替代服务、回退方案或防御性缓存**?
-    
 
 #### 路由和服务发现
 
 - 微服务的**健康检测可靠**吗?
-    
+
 - 健康检测是否准确地反映微服务的健康状态?
-    
+
 - 健康检测是否运行在独立的通道上?
-    
+
 - 是否使用了**回路断路器**来防止不健康的微服务发出请求?
-    
+
 - 是否使用了回路断路器来防止生产环境的业务流量被发送到不健康的 主机或服务上?
-    
 
 #### 服务和端点的解除
 
 - 是否有解除微服务的相关流程?
-    
+
 - 是否有解除微服务 API 端点的相关流程?
-    
 
 ### 伸缩性和高性能
 
 #### 增长规模
 
 - 微服务的**质的增长规模**是怎样的?
-    
+
 - 微服务的**量的增长规模**是怎样的?
-    
 
 #### 资源的有效利用
 
 - 微服务是运行在专门的硬件上还是共享的硬件上?
-    
+
 - 是否使用了资源隔离技术?
-    
 
 #### 资源感知
 
 - 微服务的资源需求是怎样的( CPU、内存，等)?
-    
+
 - 每个微服务实例能够处理多少流量?
-    
+
 - 每个微服务实例需要多少 CPU?
-    
+
 - 每个微服务实例需要多少内存?
-    
+
 - 微服务还需要其他的资源吗?
-    
+
 - 微服务的**资源瓶颈**在哪里?
-    
+
 - 微服务是否需要被横向或纵向扩展，或者两者兼顾?
-    
 
 #### 容量规划
 
 - 容量规划是否基于调度进行?
-    
+
 - 新硬件多久能够到位?
-    
+
 - 申请硬件的频率是怎么样的?
-    
+
 - 是否根据优先级为微服务分配硬件?
-    
+
 - 容量规划是自动化还是手工操作的?
-    
 
 #### 依赖项的伸缩
 
 - 微服务的**依赖项**有哪些?
-    
+
 - 这些依赖项是否具备了伸缩性和高性能?
-    
+
 - 依赖项能否随着微服务进行伸缩?
-    
+
 - 依赖项的所有者是否做好随微服务进行伸缩的准备?
-    
 
 #### 流量管理
 
 - 是否很好地了解了微服务的流量模式?
-    
+
 - 是否根据流量模式来安排服务的变更?
-    
+
 - 流量模式的急剧变化(特别是**流量爆发**)是否被小心地处理了?
-    
+
 - 在服务失效以后，流量是否能够被恰当地**重新路由**到其他数据中心?
-    
 
 #### 任务处理
 
 - 微服务所使用的编程语言是否具备伸缩性和高性能?
-    
+
 - 微服务在处理请求时是否存在**伸缩性和性能**方面的限制?
-    
+
 - 微服务在处理任务时是否存在伸缩性和性能方面的限制?
-    
+
 - 微服务团队的开发人员**是否了解他们的服务是如何处理任务**的，**处理任务的效率**是怎样的，以及**当任务和请求数量增加时他们的服务将会如何应对**?
-    
 
 #### 可伸缩的数据存储
 
 - 微服务是否以可伸缩和高性能的方式处理数据?
-    
+
 - 微服务需要存储什么类型的数据?
-    
+
 - 微服务的数据需要怎样的 schema?
-    
+
 - 每秒需要处理多少个事务?
-    
 
 - 微服务需要更高的读写性能吗?
-    
+
 - 微服务是**读密集、写密集还是两者兼顾**?
-    
+
 - 微服务的数据库可以横向或纵向扩展吗?它是可复制或者可分区的吗?
-    
+
 - 微服务使用的是专门的还是共 享 的数据库? 微服务是如何存储和处理测试数据的?
-    
 
 ### 容错和灾备
 
 #### 避免故障点
 
 - 是否存在**单点故障**?
-    
+
 - 是否存在**多点故障**?
-    
+
 - 故障点是否能够被移除，或者需要对它们进行缓解吗?
-    
 
 #### 故障场景
 
 - 是否**所有可能的故障场景都已被识别出来**?
-    
+
 - 有哪些横跨整个生态系统的常见故障?
-    
+
 - 硬件层有哪些故障会影响到这个微服务?
-    
+
 - 通信层和应用平台层有哪些故障会影响到这个微服务?
-    
+
 - 哪些依赖项故障会影响到这个微服务?
-    
+
 - 哪些内部故障会拖垮这个微服务?
-    
 
 #### 弹性测试
 
 - 这个微服务是否通过了适当的 **lint 测试、单元测试、集成测试和端到端的测试**?
-    
+
 - 这个微服务是否经过**合格的负载测试**?
-    
+
 - 是否通过混沌测试对所有可能的故障场景进行了测试?
-    
 
 #### 故障检测和修复
 
 - 在组织里是否有**标准化的事故处理流程**?
-    
-- 这个微服务的故障是如何影响业务的?
-    
-- 是否对**故障进行了清晰的分级**?
-    
-- 是否有**清晰的缓解策略**?
-    
-- 当发生事故时，团队是否**遵循事故处理的五个步骤**?
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- 这个微服务的故障是如何影响业务的?
+
+- 是否对**故障进行了清晰的分级**?
+
+- 是否有**清晰的缓解策略**?
+
+- 当发生事故时，团队是否**遵循事故处理的五个步骤**?
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 监控
 
 #### 关键性的度量指标
 
 - 这个微服务有哪些**关键性的度量指标**?
-    
+
 - 有哪些主机级别和基础设施级别的度量指标?
-    
+
 - 有哪些**微服务级别的度量指标**?
-    
+
 - 这些关键性度量指标都被监控起来了吗?
-    
 
 #### 日志
 
 - 这个微服务需要把哪些信息记录到日志里?
-    
+
 - 这个微服务**是否记录了重要的请求消息**?
-    
+
 - 日志是否准确地反映了微服务在各个时间点的状态?
-    
+
 - 这个日志方案是否具有伸缩性和高性价比?
-    
 
 #### 仪表盘
 
 - 这个**微服务是否有仪表盘**?
-    
+
 - 仪表盘是否简单易懂?是否所有的关键性度量指标都展示在了仪表盘上?
-    
+
 - 是否能够从仪表盘上看出这个微服务是否运行正常?
-    
 
 #### 告警
 
 - 是否每个度量指标都设有告警?
-    
+
 - 是否所有告警都设置了合适的阈值?
-    
+
 - 告警阈值设置是否恰当，以便在发生中断之前触发告警?
-    
+
 - 告警是否具有可操作性?
-    
+
 - 运行手册里是否包含了用于诊断、缓解和解决问题的排查步骤?
-    
 
 #### 轮班待命
 
 - 是否有 一个专门的轮班待命机制用于微服务的监控?
-    
+
 - 每次待命排班是否有至少两个开发人员参与?
-    
+
 - 这个待命流程是否在整个工程组织内进行标准化?
-    
 
 ### 文档化和理解
 
 #### 微服务文档
 
 - 微服务的文档是否被集中存放在一个公开的、人们容易访问到的地方?
-    
+
 - 文档是否方便搜索?
-    
+
 - 微服务发生重要变更时，文档是否也得到了相应的更新?
-    
+
 - 文档是否包含了微服务的描述?
-    
+
 - 文档是否包含了架构图?
-    
+
 - 文档是否包含了待命信息?
-    
+
 - 文档是否包含了重要信息的链接?
-    
+
 - 文档是否包含了开发上手指南?
-    
+
 - 文档是否包含了微服务请求消息流、端点和依赖项的信息?
-    
+
 - 文档是否包含了运行手册?
-    
+
 - 文档是否包含了问答章节?
-    
 
 #### 微服务理解
 
 - 团队里的每个开发人员是否都能回答与他们的微服务的生产就绪相关的问题?
-    
+
 - 微服务是否遵循了 一 系列原则和标准?
-    
+
 - 对于新的微服务，是否有RFC 流程?
-    
+
 - 已有的微服务是否经常得到评审和审计?
-    
+
 - 是否每个微服务团队都举行架构评审?
-    
+
 - 是否有生产就绪的审计流程?
-    
+
 - 是否有生产就绪路线图用于把微服务带向生产就绪的状态?
-    
+
 - 生产就绪标准是否推动了组织的 OKR? 生产就绪流程是自动化的吗?
-    
-      
-    
 
----
-
-  
+______________________________________________________________________
 
 欢迎关注Go招聘公众号，获取**Go专题**、**大厂内推**、**面经**、**简历**、**股文**等相关资料可回复和点击**导航**查阅。
 

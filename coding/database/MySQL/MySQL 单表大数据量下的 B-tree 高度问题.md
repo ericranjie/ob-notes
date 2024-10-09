@@ -2,7 +2,7 @@
 
 Original ba0tiao MySQL内核剖析
 
- _2024年09月02日 10:00_ _浙江_
+_2024年09月02日 10:00_ _浙江_
 
 有一些老的DBA 还记得在很早的时候, 坊间流传的是在MySQL里面单表不要超过500万行，单表超过 500 万必须要做分库分表.  有很多 DBA 同学担心MySQL 表大了以后, Btree 高度会变得非常大, 从而影响实例性能.
 
@@ -20,7 +20,7 @@ Leaf Page 格式如下, 每一个 Record 主要由 Record Header + Record Body �
 
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/y7l9KJ42n2yibAOUZuspovoosibgKUxwFuCtdicGlLTcrQUevqgbNlibs5Qs58tXvKD9AhriaeiaZJjubewTQAeEqzow/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 16KB page 里面sysbench 这样的表, Leaf Page 一个表里面可以存差不多存储的行数是:
 
@@ -28,7 +28,7 @@ Leaf Page 格式如下, 每一个 Record 主要由 Record Header + Record Body �
 
 Non-leaf Page 格式如下:
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 因为 sysbench primary key id 是 int 是 4 个字节, 那么 16KB page 可以存的行数就是
 
@@ -115,13 +115,11 @@ Non-Leaf Page 存的 record number:
 
 PolarDB 在线上支持了非常多的大表实例, 10+TB 的大表其实非常多, 我也看到之前很多大厂 DBA 朋友的实际分享, 比如微博6B(billion) 哥, 讲述微博的某一张单表 60 亿行数据等等, NineData 创始人斗佛公众号大圣聊数据库讲述海外类似微信业务单表几十亿都是运行的挺好的. 所以其实如果业务表结构设计合理, 其实大表是完全没问题的, 不用被现在的数据库厂商强行引导.
 
-  
-
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/Szib8ySqErWJoO5FQJNtEXPh2LwjV2ydlEZUH0ZqYuKjIV5KPzOic7n4ZOXiap6LyEsB04JUsRAuAyuhqgBk0mhBg/0?wx_fmt=jpeg)
 
 ba0tiao
 
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzI0NzAxMTgxNg==&mid=2456161111&idx=1&sn=f89cf9fea82e85997b075ac15f8a7b6c&chksm=ff3897177b528af7bf8401a8663d2c6c892f9bdf2db877388df361ced3f3c20b01cdcd290c83&mpshare=1&scene=24&srcid=0902OhKtUWq6FN1t8HcczLfT&sharer_shareinfo=2e2c4cbd525e71874ae30064efaba388&sharer_shareinfo_first=2e2c4cbd525e71874ae30064efaba388&key=daf9bdc5abc4e8d06269c7a1c696e13575ec5d1bbc63a2d5b436063176210018fdedef97640cf7d416d62c92f3899d6f3aef5cfcf1e0639f86abc5eda815ff8a1f32cd6ef491d938d2b37b8641b496d7401273a7cffc4db91f15958b7b0302110ab674b026ef2331175f01e8516416e68086f57c53de88bbaa99716ab55e2b54&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_100244b4ffe5&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQvYu7suRLiXDGD%2BVa0B2tCRKUAgIE97dBBAEAAAAAAI9FILuWhPUAAAAOpnltbLcz9gKNyK89dVj0aE2aTHVdQL2z4RkELiL22GLHXIR3w93spGwfNnBKfxpnbMJWTRAd4sr9X0ISfkrtri6SuG1e%2B7FjVBfSqxrMJ%2BVgmykS1W63od0GMZXnWID3ZNWYsCBq%2F0qTEBIDHO3krfMU3a9%2BCVHzmZOfLau103kUsWvOXF%2FrH%2B9daJ%2Bi9LmJEDl%2BCxeem7FXhifffzXjqswjeGjlCEkLIgfPmvk7UDtxDzi3D4VWYz3OXEWycW9IVRltywT8%2FIpbjVx0XFLzK14%2BHt9lPd1tZkayN8Y9JnjHEntpEwf%2Fa5%2BRDIxGP2Szwct0%2B2hcCK6oKoFWBA%3D%3D&acctmode=0&pass_ticket=QbUHUDXtM7ZeAK4rv%2BbpJXIKQu2oQXcSiFjmZMVGYhgI7hmWosHlQRqo%2FgponEUX&wx_header=0)Like the Author
+![赞赏二维码](<https://mp.weixin.qq.com/s?__biz=MzI0NzAxMTgxNg==&mid=2456161111&idx=1&sn=f89cf9fea82e85997b075ac15f8a7b6c&chksm=ff3897177b528af7bf8401a8663d2c6c892f9bdf2db877388df361ced3f3c20b01cdcd290c83&mpshare=1&scene=24&srcid=0902OhKtUWq6FN1t8HcczLfT&sharer_shareinfo=2e2c4cbd525e71874ae30064efaba388&sharer_shareinfo_first=2e2c4cbd525e71874ae30064efaba388&key=daf9bdc5abc4e8d06269c7a1c696e13575ec5d1bbc63a2d5b436063176210018fdedef97640cf7d416d62c92f3899d6f3aef5cfcf1e0639f86abc5eda815ff8a1f32cd6ef491d938d2b37b8641b496d7401273a7cffc4db91f15958b7b0302110ab674b026ef2331175f01e8516416e68086f57c53de88bbaa99716ab55e2b54&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_100244b4ffe5&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQvYu7suRLiXDGD%2BVa0B2tCRKUAgIE97dBBAEAAAAAAI9FILuWhPUAAAAOpnltbLcz9gKNyK89dVj0aE2aTHVdQL2z4RkELiL22GLHXIR3w93spGwfNnBKfxpnbMJWTRAd4sr9X0ISfkrtri6SuG1e%2B7FjVBfSqxrMJ%2BVgmykS1W63od0GMZXnWID3ZNWYsCBq%2F0qTEBIDHO3krfMU3a9%2BCVHzmZOfLau103kUsWvOXF%2FrH%2B9daJ%2Bi9LmJEDl%2BCxeem7FXhifffzXjqswjeGjlCEkLIgfPmvk7UDtxDzi3D4VWYz3OXEWycW9IVRltywT8%2FIpbjVx0XFLzK14%2BHt9lPd1tZkayN8Y9JnjHEntpEwf%2Fa5%2BRDIxGP2Szwct0%2B2hcCK6oKoFWBA%3D%3D&acctmode=0&pass_ticket=QbUHUDXtM7ZeAK4rv%2BbpJXIKQu2oQXcSiFjmZMVGYhgI7hmWosHlQRqo%2FgponEUX&wx_header=0>)Like the Author
 
 Read more
 

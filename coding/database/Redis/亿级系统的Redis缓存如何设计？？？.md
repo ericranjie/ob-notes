@@ -1,11 +1,10 @@
-
 中间件兴趣圈
 
- _2021年11月18日 08:32_
+_2021年11月18日 08:32_
 
 以下文章来源于微观技术 ，作者TomGE
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7L66ozz42yd6zv9V1aibw0t1NQ4mQABZX773o30X179dA/0)
 
@@ -13,45 +12,41 @@
 
 前阿里技术专家，拿过 鹅厂、百度、华为 等6家大厂offer，博客专家，出过专利。负责过电商交易、社区团购、流量营销等业务
 
-](https://mp.weixin.qq.com/s?__biz=MzIzNzgyMjYxOQ==&mid=2247488170&idx=1&sn=268627ac88d49c17005d9b629f16037f&chksm=e8c3e55edfb46c48c5545c8193ea01f866dd3925b657ade431e005f8fe9c8a558a1cb36d3791&mpshare=1&scene=24&srcid=11180PRUjhZjr8cP6PLzCI4J&sharer_sharetime=1637200187351&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d074855fc66ed130143aa58733cdb0e79e4550277ac6777398511628c05d07fbaf1920fe329dd08399069b1266abc84f33caa76a607f4f2ad780d7f2a4ff3b5c317da97ba5e5a686661be03f6492aa2b90e43be850c99a837f02ea1281087789027ee43fae7f91c8d1d99b7a4890257f8138d54621ddee6093&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ4bx6vcWInPj37iVVJ%2FwyfRLmAQIE97dBBAEAAAAAAFblCNx40ssAAAAOpnltbLcz9gKNyK89dVj0ipE9fwn0xtuu0XU26CCzbc07X0iHF%2FszOhZWpJnvX1zmQOqm7y8yOeMziizwGe%2B%2BkZDTHSlSuuDOdI5qbG5W1i6JNcH8K7vwQtzNhhwzsqidG1fLy4lqWIWsCvXRuYoy81FQpxpI7PczisoqWSQ7wf4V%2FjQ%2BFFbONz9qn8dxA86RfD0o9K0CFkwVjpdgYQFFPSzkOS5Sb9%2FGL2y13VbRvdiPzgh2PCQHW9YpUuvHVejkBQ%2F8XK0MiGfdaUv7lqoM&acctmode=0&pass_ticket=8tfqLqMyR366TBykIPKLsVVqJkPzT0f8QqG3jqmEBNXGqRVYg6DQdx4pQkSjiApq&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzIzNzgyMjYxOQ==&mid=2247488170&idx=1&sn=268627ac88d49c17005d9b629f16037f&chksm=e8c3e55edfb46c48c5545c8193ea01f866dd3925b657ade431e005f8fe9c8a558a1cb36d3791&mpshare=1&scene=24&srcid=11180PRUjhZjr8cP6PLzCI4J&sharer_sharetime=1637200187351&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d074855fc66ed130143aa58733cdb0e79e4550277ac6777398511628c05d07fbaf1920fe329dd08399069b1266abc84f33caa76a607f4f2ad780d7f2a4ff3b5c317da97ba5e5a686661be03f6492aa2b90e43be850c99a837f02ea1281087789027ee43fae7f91c8d1d99b7a4890257f8138d54621ddee6093&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ4bx6vcWInPj37iVVJ%2FwyfRLmAQIE97dBBAEAAAAAAFblCNx40ssAAAAOpnltbLcz9gKNyK89dVj0ipE9fwn0xtuu0XU26CCzbc07X0iHF%2FszOhZWpJnvX1zmQOqm7y8yOeMziizwGe%2B%2BkZDTHSlSuuDOdI5qbG5W1i6JNcH8K7vwQtzNhhwzsqidG1fLy4lqWIWsCvXRuYoy81FQpxpI7PczisoqWSQ7wf4V%2FjQ%2BFFbONz9qn8dxA86RfD0o9K0CFkwVjpdgYQFFPSzkOS5Sb9%2FGL2y13VbRvdiPzgh2PCQHW9YpUuvHVejkBQ%2F8XK0MiGfdaUv7lqoM&acctmode=0&pass_ticket=8tfqLqMyR366TBykIPKLsVVqJkPzT0f8QqG3jqmEBNXGqRVYg6DQdx4pQkSjiApq&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 > 阅读本文大约需要 15 分钟。
 
 缓存设计可谓老生常谈了，早些时候都是采用`memcache`，现在大家更多倾向使用`redis`，除了知晓常用的数据存储类型，结合业务场景有针对性选择，好像其他也没有什么大的难点。
 
-工程中引入`Redis Client`二方包，初始化一个Bean实例`RedisTemplate` ，一切搞定，so easy。  
+工程中引入`Redis Client`二方包，初始化一个Bean实例`RedisTemplate` ，一切搞定，so easy。
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/2KTof9YshwdmOC0H6kaQlnh3rvWF2hPpQZpRaN9mzRiccFfFfMqv6WARDspS4nEleGQ11fUhrHalunFhbxsBuMg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 如果是几十、几百并发的业务场景，`缓存设计`可能并不需要考虑那么多，但如果是亿级的系统呢？
 
-  
-
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/2KTof9YshwdmOC0H6kaQlnh3rvWF2hPpOjIk3a3RsCTHSGicpgzmI5FXOn4TxhPFEd2Ticjj4Bh9220SLAMHGAmQ/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
 ## 首先，先了解缓存知识图谱
 
-早期的缓存用于加速CPU数据交换的RAM。随着互联网的快速发展，缓存的应用更加宽泛，用于数据高速交换的存储介质都称之为缓存。  
+早期的缓存用于加速CPU数据交换的RAM。随着互联网的快速发展，缓存的应用更加宽泛，用于数据高速交换的存储介质都称之为缓存。
 
 使用缓存时，我们要关注哪些指标？缓存有哪些应用模式？以及缓存设计时有哪些Tip技巧？一图胜千言，如下：
 
-![[Pasted image 20240905162630.png]]
+!\[\[Pasted image 20240905162630.png\]\]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 七大经典问题
 
 ## 缓存在使用过程不可避免会遇到一些问题，对于高频的问题我们大概归为了7类。具体内容下面我们一一道来
 
-## 1、缓存集中失效  
+## 1、缓存集中失效
 
-当业务系统查询数据时，首先会查询缓存，如果缓存中数据不存在，然后查询DB再将数据预热到`Cache`中，并返回。**缓存的性能比 DB 高 50~100 倍以上。**  
+当业务系统查询数据时，首先会查询缓存，如果缓存中数据不存在，然后查询DB再将数据预热到`Cache`中，并返回。**缓存的性能比 DB 高 50~100 倍以上。**
 
-![[Pasted image 20240905162641.png]]
+!\[\[Pasted image 20240905162641.png\]\]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 很多业务场景，如：秒杀商品、微博热搜排行、或者一些活动数据，都是通过跑任务方式，将DB数据批量、集中预热到缓存中，缓存数据有着近乎相同的`过期时间`。
 
@@ -74,9 +69,8 @@
 **解决方案：**
 
 - 方案一：查存DB 时，如果数据不存在，预热一个`特殊空值`到缓存中。这样，后续查询都会命中缓存，但是要对特殊值，解析处理。
-    
+
 - 方案二：构造一个`BloomFilter`过滤器，初始化全量数据，当接到请求时，在`BloomFilter`中判断这个key是否存在，如果不存在，直接返回即可，无需再查询`缓存和DB`
-    
 
 ### 3、缓存雪崩
 
@@ -87,30 +81,24 @@
 **解决方案：**
 
 - 方案一：增加实时监控，及时预警。通过机器替换、各种故障自动转移策略，快速恢复缓存对外的服务能力
-    
+
 - 方案二：缓存增加多个副本，当缓存异常时，再读取其他缓存副本。为了保证副本的可用性，尽量将多个缓存副本部署在不同机架上，降低风险。
-    
 
 ### 4、缓存热点
 
 对于突发事件，大量用户同时去访问热点信息，这个突发热点信息所在的缓存节点就很容易出现过载和卡顿现象，甚至 Crash，我们称之为缓存热点。
 
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-这个在新浪微博经常遇到，某大V明星出轨、结婚、离婚，瞬间引发数百千万的吃瓜群众围观，访问同一个key，流量集中打在一个缓存节点机器，很容易打爆网卡、带宽、CPU的上限，最终导致缓存不可用。  
+这个在新浪微博经常遇到，某大V明星出轨、结婚、离婚，瞬间引发数百千万的吃瓜群众围观，访问同一个key，流量集中打在一个缓存节点机器，很容易打爆网卡、带宽、CPU的上限，最终导致缓存不可用。
 
 **解决方案：**
 
 - 首先能先找到这个`热key`来，比如通过`Spark`实时流分析，及时发现新的热点key。
-    
+
 - 将集中化流量打散，避免一个缓存节点过载。由于只有一个key，我们可以在key的后面拼上`有序编号`，比如`key#01`、`key#02`。。。`key#10`多个副本，这些加工后的key位于多个缓存节点上。
-    
+
 - 每次请求时，客户端随机访问一个即可
-    
 
 > 可以设计一个缓存服务治理管理后台，实时监控缓存的SLA，并打通分布式配置中心，对于一些`hot key`可以快速、动态扩容。
 
@@ -123,36 +111,34 @@
 **解决方案：**
 
 - 方案一：设置一个阈值，当value的长度超过阈值时，对内容启动压缩，降低kv的大小
-    
+
 - 方案二：评估`大key`所占的比例，由于很多框架采用`池化技术`，如：Memcache，可以预先分配大对象空间。真正业务请求时，直接拿来即用。
-    
+
 - 方案三：颗粒划分，将大key拆分为多个小key，独立维护，成本会降低不少
-    
+
 - 方案四：大key要设置合理的过期时间，尽量不淘汰那些大key
-    
 
 ### 6、缓存数据一致性
 
 缓存是用来加速的，一般不会持久化储存。所以，一份数据通常会存在`DB`和`缓存`中，由此会带来一个问题，如何保证这两者的数据一致性。另外，缓存热点问题会引入多个副本备份，也可能会发生不一致现象。
 
-![[Pasted image 20240905162702.png]]
+!\[\[Pasted image 20240905162702.png\]\]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**解决方案：**  
+**解决方案：**
 
 - 方案一：当缓存更新失败后，进行重试，如果重试失败，将失败的key写入MQ消息队列，通过异步任务补偿缓存，保证数据的一致性。
-    
+
 - 方案二：设置一个较短的过期时间，通过自修复的方式，在缓存过期后，缓存重新加载最新的数据
-    
 
 ### 7、数据并发竞争预热
 
 互联网系统典型的特点就是流量大，一旦缓存中的数据过期、或因某些原因被删除等，导致缓存中的数据为空，大量的并发线程请求（查询同一个key）就会一起并发查询`数据库`，数据库的压力陡然增加。
 
-![[Pasted image 20240905162711.png]]  
+!\[\[Pasted image 20240905162711.png\]\]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果请求量非常大，全部压在数据库，可能把数据库压垮，进而导致整个系统的服务不可用。
 
@@ -160,16 +146,15 @@
 
 - 方案一：引入一把`全局锁`，当缓存未命中时，先尝试获取全局锁，如果拿到锁，才有资格去查询`DB`，并将数据预热到缓存中。虽然，client端发起的请求非常多，但是由于拿不到锁，只能处于等待状态，当缓存中的数据预热成功后，再从缓存中获取
 
-![[Pasted image 20240905162722.png]]
+!\[\[Pasted image 20240905162722.png\]\]
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 为了便于理解，简单画了个流程图。这里面特别注意一个点，由于有一个并发时间差，所以会有一个二次check缓存是否有值的校验，防止缓存预热重复覆盖。
 
 - 方案二：缓存数据创建多个备份，当一个过期失效后，可以访问其他备份。
-    
 
-## 写在最后  
+## 写在最后
 
 缓存设计时，有很多技巧，优化手段也是千变万化，但是我们要抓住核心要素。那就是，让访问尽量命中缓存，同时保持数据的一致性。
 

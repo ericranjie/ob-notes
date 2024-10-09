@@ -2,11 +2,9 @@
 
 luozhiyun 腾讯技术工程
 
- _2022年02月21日 18:00_
+_2022年02月21日 18:00_
 
 ![](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
 
 作者：bearluo，腾讯 IEG 运营开发工程师
 
@@ -21,64 +19,58 @@ luozhiyun 腾讯技术工程
 其实上面的这个划分只是简单的将功能分了一下包，在项目实践的过程中还是有很多问题。比如：
 
 - 对于功能实现我是通过 function 的参数传递还是通过结构体的变量传递？
-    
+
 - 使用一个数据库的全局变量引用传递是否安全？是否存在过度耦合？
-    
+
 - 在代码实现过程中几乎全部都是依赖于实现，而不是依赖于接口，那么将 MySQL 切换为 MongDB 是不是要修改所有的实现？
-    
 
 所以现在在我们工作中随着代码越来越多，代码中各种 init，function，struct，全局变量感觉也越来越乱。每个模块不独立，看似按逻辑分了模块，但没有明确的上下层关系，每个模块里可能都存在配置读取，外部服务调用，协议转换等。久而久之服务不同包函数之间的调用慢慢演变成网状结构，数据流的流向和逻辑的梳理变得越来越复杂，很难不看代码调用的情况下搞清楚数据流向。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 不过就像《重构》中所说：先让代码工作起来-如果代码不能工作，就不能产生价值；然后再试图将它变好-通过对代码进行重构，让我们自己和其他人更好地理解代码，并能按照需求不断地修改代码。
 
 所以我觉得是时候自我改变一下。
-
-  
 
 ### The Clean Architecture
 
 在简洁架构里面对我们的项目提出了几点要求：
 
 1. 独立于框架。该架构不依赖于某些功能丰富的软件库的存在。这允许你把这些框架作为工具来使用，而不是把你的系统塞进它们有限的约束中。
-    
-2. 可测试。业务规则可以在没有 UI、数据库、Web 服务器或任何其他外部元素的情况下被测试。
-    
-3. 独立于用户界面。UI 可以很容易地改变，而不用改变系统的其他部分。例如，一个 Web UI 可以被替换成一个控制台 UI，而不改变业务规则。
-    
-4. 独立于数据库。你可以把 Oracle 或 SQL Server 换成 Mongo、BigTable、CouchDB 或其他东西。你的业务规则不受数据库的约束。
-    
-5. 独立于任何外部机构。事实上，你的业务规则根本不知道外部世界的任何情况。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 可测试。业务规则可以在没有 UI、数据库、Web 服务器或任何其他外部元素的情况下被测试。
+
+1. 独立于用户界面。UI 可以很容易地改变，而不用改变系统的其他部分。例如，一个 Web UI 可以被替换成一个控制台 UI，而不改变业务规则。
+
+1. 独立于数据库。你可以把 Oracle 或 SQL Server 换成 Mongo、BigTable、CouchDB 或其他东西。你的业务规则不受数据库的约束。
+
+1. 独立于任何外部机构。事实上，你的业务规则根本不知道外部世界的任何情况。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图中同心圆代表各种不同领域的软件。一般来说，越深入代表你的软件层次越高。外圆是战术实现机制，内圆的是战略核心策略。对于我们的项目来说，代码依赖应该由外向内，单向单层依赖，这种依赖包含代码名称，或类的函数，变量或任何其他命名软件实体。
 
 对于简洁架构来说分为了四层：
 
 - Entities：实体
-    
+
 - Usecase：表达应用业务规则，对应的是应用层，它封装和实现系统的所有用例；
-    
+
 - Interface Adapters：这一层的软件基本都是一些适配器，主要用于将用例和实体中的数据转换为外部系统如数据库或 Web 使用的数据；
-    
+
 - Framework & Driver：最外面一圈通常是由一些框架和工具组成，如数据库 Database, Web 框架等；
-    
 
 那么对于我的项目来说，也分为了四层：
 
 - models
-    
-- repo
-    
-- service
-    
-- api
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- repo
+
+- service
+
+- api
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 代码分层
 
@@ -103,8 +95,6 @@ import "time"type Article struct { ID        int64     `json:"
 #### api
 
 这里是接收外部请求的代码，如：gin 对应的 handler、gRPC、其他 REST API 框架接入层等等。
-
-  
 
 ### 面向接口编程
 
@@ -173,13 +163,12 @@ func main() { server := InitServer() server.Start()}
 在上面我们定义好了每一层应该做什么，那么对于每一层我们应该都是可单独测试的，即使另外一层不存在。
 
 - models 层：这一层就很简单了，由于没有依赖任何其他代码，所以可以直接用 go 的单测框架直接测试即可；
-    
+
 - repo 层：对于这一层来说，由于我们使用了 mysql 数据库，那么我们需要 mock mysql，这样即使不用连 mysql 也可以正常测试，我这里使用 github.com/DATA-DOG/go-sqlmock 这个库来 mock 我们的数据库；
-    
+
 - service 层：因为 service 层依赖了 repo 层，因为它们之间是通过接口来关联，所以我这里使用 github.com/golang/mock/gomock 来 mock repo 层；
-    
+
 - api 层：这一层依赖 service 层，并且它们之间是通过接口来关联，所以这里也可以使用 gomock 来 mock service 层。不过这里稍微麻烦了一点，因为我们接入层用的是 gin，所以还需要在单测的时候模拟发送请求；
-    
 
 由于我们是通过 github.com/golang/mock/gomock 来进行 mock ，所以需要执行一下代码生成，生成的 mock 代码我们放入到 mock 包中：
 
@@ -231,8 +220,6 @@ https://medium.com/hackernoon/golang-clean-archithecture-efd6d7c43047
 
 https://farer.org/2021/04/21/go-dependency-injection-wire/
 
-  
-
 阅读 1.1万
 
 ​
@@ -242,55 +229,54 @@ https://farer.org/2021/04/21/go-dependency-injection-wire/
 **留言 6**
 
 - 鹅厂程序员
-    
-    2022年4月14日
-    
-    赞2
-    
-    文章部分参考了《Golang微服务简洁架构实战》，作者：杨帅 腾讯VATeam
-    
-    置顶
-    
+
+  2022年4月14日
+
+  赞2
+
+  文章部分参考了《Golang微服务简洁架构实战》，作者：杨帅 腾讯VATeam
+
+  置顶
+
 - 云生海
-    
-    2022年2月22日
-    
-    赞4
-    
-    一看就是从资深java开发转的golang开发，工程化思想理解的很深厚![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月22日
+
+  赞4
+
+  一看就是从资深java开发转的golang开发，工程化思想理解的很深厚![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Foo
-    
-    2022年2月21日
-    
-    赞2
-    
-    腾讯出品 质量真高![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月21日
+
+  赞2
+
+  腾讯出品 质量真高![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 代志富
-    
-    2022年2月22日
-    
-    赞1
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月22日
+
+  赞1
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 年年
-    
-    2022年2月21日
-    
-    赞1
-    
-    牛逼，看看大佬的写法
-    
+
+  2022年2月21日
+
+  赞1
+
+  牛逼，看看大佬的写法
+
 - LY文库
-    
-    2022年2月21日
-    
-    赞
-    
-    感谢分享！
-    
+
+  2022年2月21日
+
+  赞
+
+  感谢分享！
 
 已无更多数据
 
@@ -309,54 +295,53 @@ https://farer.org/2021/04/21/go-dependency-injection-wire/
 **留言 6**
 
 - 鹅厂程序员
-    
-    2022年4月14日
-    
-    赞2
-    
-    文章部分参考了《Golang微服务简洁架构实战》，作者：杨帅 腾讯VATeam
-    
-    置顶
-    
+
+  2022年4月14日
+
+  赞2
+
+  文章部分参考了《Golang微服务简洁架构实战》，作者：杨帅 腾讯VATeam
+
+  置顶
+
 - 云生海
-    
-    2022年2月22日
-    
-    赞4
-    
-    一看就是从资深java开发转的golang开发，工程化思想理解的很深厚![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月22日
+
+  赞4
+
+  一看就是从资深java开发转的golang开发，工程化思想理解的很深厚![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Foo
-    
-    2022年2月21日
-    
-    赞2
-    
-    腾讯出品 质量真高![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月21日
+
+  赞2
+
+  腾讯出品 质量真高![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 代志富
-    
-    2022年2月22日
-    
-    赞1
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月22日
+
+  赞1
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 年年
-    
-    2022年2月21日
-    
-    赞1
-    
-    牛逼，看看大佬的写法
-    
+
+  2022年2月21日
+
+  赞1
+
+  牛逼，看看大佬的写法
+
 - LY文库
-    
-    2022年2月21日
-    
-    赞
-    
-    感谢分享！
-    
+
+  2022年2月21日
+
+  赞
+
+  感谢分享！
 
 已无更多数据

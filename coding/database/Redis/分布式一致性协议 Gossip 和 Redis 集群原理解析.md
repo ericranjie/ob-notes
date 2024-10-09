@@ -1,7 +1,6 @@
-
 黎杜
 
- _2022年02月07日 17:07_
+_2022年02月07日 17:07_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/IJUXwBNpKlgztKib65xpYc1d7GQjKgbz1nxkQRwUCyCd41cRGkPLDS53ghYkgU3yz58H9bdGxB44lmYMUD1AClQ/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
@@ -23,7 +22,7 @@ img
 
 Redis 单机模式下，即便是“1主 N 备”结构，当主节点故障时，备节点也无法自动升主，即无法自动故障转移（Failover）。**故障转移需要 哨兵Sentinel 辅助，Sentinel 是 Redis 高可用的解决方案，由一个或者多个 Sentinel 实例组成的系统可以监视 Redis 主节点及其从节点，当检测到 Redis 主节点下线时，会根据特定的选举规则从该主节点对应的所有从节点中选举出一个“最优”的从节点升主，然后由升主的新主节点处理请求**。具有 Sentinel 系统的单机模式示意图如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
@@ -46,21 +45,20 @@ Redis 使用单线程的 IO 复用模型，对于单纯的 IO 操作来说，单
 Redis Cluster 具有以下特点：
 
 - **节点互通**：所有的 Redis 节点彼此互联（PING-PONG机制），内部使用二进制协议优化传输速度和带宽；
-    
+
 - **去中心化**：**Redis Cluster 不存在中心节点，每个节点都记录有集群的状态信息，并且通过 Gossip 协议，使每个节点记录的信息实现最终一致性；**
-    
+
 - 客户端直连：客户端与 Redis 节点直连，不需要中间 Proxy 层，客户端不需要连接集群所有节点，连接集群中任何一个可用节点即可；
-    
+
 - **数据分片**：Redis Cluster 的键空间被分割为 16384 个 Slot，这些 Slot 被分别指派给主节点，**当存储 Key-Value 时，根据 CRC16(key) Mod 16384的值，决定将一个 Key-Value 放到哪个 Slot 中**；
-    
+
 - 多数派原则：对于集群中的任何一个节点，需要超过半数的节点检测到它失效（pFail），才会将其判定为失效（Fail）；
-    
+
 - **自动故障转移Failover**：**当集群中某个主节点故障后（Fail），其它主节点会从故障主节点的从节点中选举一个“最佳”从节点升主，替代故障的主节点**；
-    
+
 - 功能弱化：集群模式下，由于数据分布在多个节点，不支持单机模式下的集合操作，也不支持多数据库功能，集群只能使用默认的0号数据库；
-    
+
 - 集群规模：官方推荐的最大节点数量为 1000 个左右，这是因为当集群规模过大时，Gossip 协议的效率会显著下降，通信成本剧增。
-    
 
 #### 2.2 Redis-Cluster 实现基础：分片
 
@@ -68,7 +66,7 @@ Redis 集群实现的基础是分片，即将数据集有机的分割为多个�
 
 **基于分片的思想，Redis 提出了 Hash Slot。Redis Cluster 把所有的物理节点映射到预先分好的16384个 Slot 上，当需要在 Redis 集群中放置一个 Key-Value 时，根据 CRC16(key) Mod 16384的值，决定将一个 Key 放到哪个 Slot 中**。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
@@ -76,19 +74,19 @@ img
 
 客户端直连 Redis 服务，进行读写操作时，Key 对应的 Slot 可能并不在当前直连的节点上，经过“重定向”才能转发到正确的节点。如下图所示，我们直接登录 `127.0.0.1:6379` 客户端，进行 Set 操作，当 Key 对应的 Slot 不在当前节点时（如 key-test)，客户端会报错并返回正确节点的 IP 和端口。Set 成功则返回 OK。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
 以集群模式登录 `127.0.0.1:6379` 客户端（注意命令的差别：`-c` 表示集群模式)，则可以清楚的看到“重定向”的信息，并且客户端也发生了切换：“6379” -> “6381”。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
 以三节点为例，上述操作的路由查询流程示意图如下所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
@@ -131,18 +129,16 @@ Gossip 是一个带冗余的容错算法，更进一步，Gossip 是一个最终
 Redis Cluster 中使用 Gossip 主要有两大作用：
 
 - 去中心化，以实现分布式和弹性扩展；
-    
+
 - 失败检测，以实现高可用；
-    
 
 #### 3.3 节点通信基础
 
 Redis Cluster 中的每个 Redis 实例监听两个 TCP 端口，6379（默认）用于服务客户端查询，16379（默认服务端口+10000）用于集群内部通信。集群中节点通信方式如下：
 
 - 每个节点在固定周期内通过特定规则选择几个节点发送 Ping 消息；
-    
+
 - 接收到 Ping 消息的节点用 Pong 消息作为响应。
-    
 
 集群中每个节点通过一定规则挑选要通信的节点，每个节点可能知道全部节点，也可能仅知道部分节点，只要这些节点彼此可以正常通信，最终它们会达到一致的状态。当节点故障、新节点加入、主从关系变化、槽信息变更等事件发生时，通过不断的 Ping/Pong 消息通信，经过一段时间后所有的节点都会知道集群全部节点的最新状态，从而达到集群状态同步的目的。
 
@@ -151,13 +147,12 @@ Redis Cluster 中的每个 Redis 实例监听两个 TCP 端口，6379（默认�
 Gossip 协议的主要职责就是信息交换。信息交换的载体就是节点彼此发送的Gossip 消息，常用的 Gossip 消息可分为：Ping 消息、Pong 消息、Meet 消息、Fail 消息。
 
 - Meet 消息：用于通知新节点加入。消息发送者通知接收者加入到当前集群，Meet 消息通信正常完成后，接收节点会加入到集群中并进行周期性的 Ping、Pong 消息交换；
-    
+
 - Ping 消息：集群内交换最频繁的消息，集群内每个节点每秒向多个其它节点发送 Ping 消息，用于检测节点是否在线和交换彼此状态信息。Ping 消息发送封装了自身节点和部分其它节点的状态数据；
-    
+
 - Pong 消息：当接收到 Ping、Meet 消息时，作为响应消息回复给发送方确认消息正常通信。Pong 消息内部封装了自身状态数据。节点也可以向集群内广播自身的 Pong 消息来通知整个集群对自身状态进行更新；
-    
+
 - Fail 消息：当节点判定集群内另一个节点下线时，会向集群内广播一个 Fail 消息，其他节点接收到 Fail 消息之后把对应节点更新为下线状态。
-    
 
 ### 4. Redis Cluster 节点通信：成本与效率的权衡
 
@@ -167,7 +162,7 @@ Gossip 协议的主要职责就是信息交换。信息交换的载体就是节�
 
 Redis 节点启动之后，会每间隔 100ms 执行一次集群的周期性函数 `clusterCron()`。在 Redis 源码 `server.c` 中可见：
 
- `/* Run the Redis Cluster cron. */       run_with_period(100) {           if (server.cluster_enabled) clusterCron();       }`
+`/* Run the Redis Cluster cron. */       run_with_period(100) {           if (server.cluster_enabled) clusterCron();       }`
 
 而 `clusterCron()` 中又会调用 `clusterSendPing()` 函数，该函数用于将随机选择的节点的信息加入到 Ping 消息体中，然后发送出去。部分源码如下：
 
@@ -176,19 +171,18 @@ Redis 节点启动之后，会每间隔 100ms 执行一次集群的周期性函�
 根据上述代码，相信读者可以明确以下两点：
 
 1. 当前节点向另一个节点发送 Ping 消息时，携带的其它节点的消息数量至少为3，最大等于集群节点总数-2；
-    
-2. 为 Ping 消息体中选择携带的其它节点的信息时，采用的是混合选择模式：随机选择+偏好性选择，这样不仅可以保证 Gossip 协议随机传播的原则，还可以尽量将当前节点掌握的其它节点的故障信息传播出去。
-    
+
+1. 为 Ping 消息体中选择携带的其它节点的信息时，采用的是混合选择模式：随机选择+偏好性选择，这样不仅可以保证 Gossip 协议随机传播的原则，还可以尽量将当前节点掌握的其它节点的故障信息传播出去。
 
 #### 4.2 如何保证消息传播的效率？
 
 前面已经提到，集群的周期性函数 `clusterCron()` 执行周期是 100ms，为了保证传播效率，每10个周期，也就是 1s，每个节点都会随机选择5个其它节点，并从中选择一个最久没有通信的节点发送 ing消息，源码如下：
 
-![img](data:image/svg+xml;utf8,)
+!\[img\](data:image/svg+xml;utf8,)
 
 当然，这样还是没法保证效率，毕竟5个节点是随机选出来的，其中最久没有通信的节点不一定是全局“最久”。因此，对哪些长时间没有“被” 随机到的节点进行特殊照顾：每个周期（100ms）内扫描一次本地节点列表，如果发现节点最近一次接受 Pong 消息的时间大于 `cluster_node_timeout/2`，则立刻发送 Ping 消息，防止该节点信息太长时间未更新。源码如下：
 
-![img](data:image/svg+xml;utf8,)
+!\[img\](data:image/svg+xml;utf8,)
 
 #### 4.3 规模效应——无法忽略的成本问题
 
@@ -283,20 +277,18 @@ Redis Cluster 的故障转移可划分为三大步骤：故障检测、从节点
 比如，当前有一台物理机 A，构建了一个包含3个 Redis 实例的集群；扩容时，我们新增一台物理机 B，拉起一个 Redis 实例并加入物理机 A 的集群；B 上 Redis 实例对 A 上的一个主节点进行复制，然后进行主备倒换；如此，Redis 集群还是3个主节点，只不过变成了 A2-B1 的结构，将一部分请求压力分担到了新增的节点上，同时物理容量上限也会增加，主要步骤如下：
 
 1. 将新增节点加入集群；
-    
-2. 将新增节点设置为某个主节点的从节点，进而对其进行复制；
-    
-3. 进行主备倒换，将新增的节点调整为主。
-    
+
+1. 将新增节点设置为某个主节点的从节点，进而对其进行复制；
+
+1. 进行主备倒换，将新增的节点调整为主。
 
 **方式2：增加主节点数量。**
 
 不增加主节点数量的方式扩容比较简单，但是，从负载均衡的角度来看，并不是很好的选择。例如，如果主节点数量较少，那么单个节点所负责的 Slot 的数量必然较多，很容易出现大量 Key 的读写集中于少数节点的现象，而增加主节点的数量，可以更有效的分摊访问压力，充分利用资源。主要步骤如下：
 
 1. 将新增节点加入集群；
-    
-2. 将集群中的部分 Slot 迁移至新增的节点。
-    
+
+1. 将集群中的部分 Slot 迁移至新增的节点。
 
 ### 7. 其它分布式 Redis 方案
 
@@ -314,16 +306,15 @@ Redis Cluster 的故障转移可划分为三大步骤：故障检测、从节点
 
 > hash(key)%N = 目标节点编号， 其中 N 为 Redis 主节点的数量，哈希取余的方式会将不同的 Key 分发到不同的 Redis 主节点上。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
 但是，Hash 算法有很多缺陷：
 
 1. 不支持动态增加节点：当业务量增加，需要增加服务器节点后，上面的计算公式变为：`hash(key)%(N+1)`，那么，对于同一个 Key-Value，增加节点前后，对应的 Redis 节点可能是完全不同的，可能导致大量之前存储的数据失效；为了解决这个问题，需要将所有数据重新计算 Hash 值，再写入 Redis 服务器。
-    
-2. 不支持动态减少节点，原理同上。
-    
+
+1. 不支持动态减少节点，原理同上。
 
 鉴于 Hash 算法的不足，在实际应用中一般采用“一致性哈希”算法，在增删节点的时候，可以保证尽可能多的缓存数据不失效。关于一致性哈希算法，网上文章很多，读者可自行研读。
 
@@ -337,7 +328,7 @@ img
 
 基本原理如下图所示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
@@ -349,7 +340,7 @@ Codis 是一个分布式 Redis 解决方案，对于上层的应用来说，连�
 
 架构图如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
@@ -358,61 +349,58 @@ img
 从 Codis 的官方架构图可以看出，Codis 主要由四部分组成：
 
 - Codis Proxy（`codis-proxy`）：是客户端连接的 Redis 代理服务，它本身实现了 Redis 协议，表现得和一个原生的 Redis 没什么区别 （就像 Twemproxy）。对于一个业务来说，可以部署多个 Codis Proxy，Codis Proxy 本身是无状态的。
-    
+
 - Codis Manager（`codis-config`）：是 Codis 的管理工具，支持添加/删除 Redis 节点，添加/删除 Proxy 节点，发起数据迁移等操作。本身还自带了一个 HTTP Server，会启动一个 Dashboard，用户可以直接在浏览器上观察 Codis 集群的运行状态。
-    
+
 - Codis Redis（`codis-server`）：是 Codis 项目维护的一个 Redis 分支，基于 2.8.13 开发，加入了对 Slot 的支持和原子的数据迁移指令。Codis 上层的 `codis-proxy` 和 `codis-config` 只有和这个版本的 Redis 交互才能正常运行。
-    
+
 - ZooKeeper：Codis 依赖 ZooKeeper 来存放数据路由表和 `codis-proxy` 节点的元信息，`codis-config` 发起的命令都会通过 ZooKeeper 同步到各个存活的 `codis-proxy`。
-    
 
 **Codis 特点**
 
 Codis 出现在 Redis Cluster 之前，事实上，正是由于 Redis 官方推出 Redis Cluster 太晚，IT 巨头们又都是急性子，只好自力更生，搞大生产运动，才诞生了众多定制化或开源的分布式 Redis 方案。Codis 作为其中的代表，具有以下特点：
 
 - 自动平衡；
-    
+
 - 使用非常简单；
-    
+
 - 图形化的面板和管理工具；
-    
+
 - 支持绝大多数 Redis 命令，完全兼容 Twemproxy；
-    
+
 - 支持 Redis 原生客户端；
-    
+
 - 安全而且透明的数据移植，可根据需要轻松添加和删除节点；
-    
+
 - 提供命令行接口，支持 RESTful APIs。
-    
 
 #### 7.3 类 Codis 架构：Proxy + Redis-Server
 
 在上面曾提到，实现 Redis 分布式的基础是分片。目前，主流的分片方案有三种，即 Redis Cluster、客户端分片、代理分片。除了官方推出的 Redis Cluster，大多数 IT 公司采用的都是基于代理的分片模式，即：Proxy + Redis-Server，这与 Codis 的原理类似，因此也称为“类 Codis”架构，其架构图如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 img
 
 该架构有以下特点：
 
 - 分片算法：基于代理的分片原理，将物理节点映射到 Slot（Codis Slot 数为1024，其它方案一般为16384），对 Key-Value 进行读写操作时，采用一致性 Hash 算法或其它算法（如 Redis Cluster采用的 CRC16），计算 Key 对应的 Slot 编号，根据 Slot 编号转发到对应的物理节点；
-    
+
 - 分片实例之间相互独立，每组一个 Master 实例和多个 Slave，其本质就是“1主 N 从”的单机模式；
-    
+
 - 路由信息存放依赖第三方存储组件，如 ZooKeeper 或 Etcd；
-    
+
 - High Availability：Redis 单机模式不支持自动故障倒换，为了保证高可用，需要类似“哨兵系统”的 HA组件来支持高可用。
-    
 
 ### 8. 总结
 
 一个有追求研发者，对开源软件绝不能停留在“知道怎么用”的层面，知其然更要知其所以然，如是，才能举一反三。基于此，本文以极为浓重的笔墨详细解读了 Redis Cluster 的原理，读完本文，相信读者可以真正理解了为什么 Redis Cluster 不适合超大规模商用场景，以及为什么 IT 巨头都更倾向于使用 Proxy+Redis-Server 架构方案。
 
-**![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
+**!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
 
-1.[Mysql完结汇总篇（18W字送给大家），完结撒花](http://mp.weixin.qq.com/s?__biz=MzU1MzE4OTU0OQ==&mid=2247489147&idx=1&sn=51d7ca2857e230d84b477adfdc6afece&chksm=fbf7ffb9cc8076afdac1ecdeb598c816a0b7a4afd65d43a51486b1943d958f903f107263e81f&scene=21#wechat_redirect)  
+1.[Mysql完结汇总篇（18W字送给大家），完结撒花](http://mp.weixin.qq.com/s?__biz=MzU1MzE4OTU0OQ==&mid=2247489147&idx=1&sn=51d7ca2857e230d84b477adfdc6afece&chksm=fbf7ffb9cc8076afdac1ecdeb598c816a0b7a4afd65d43a51486b1943d958f903f107263e81f&scene=21#wechat_redirect)
 
-2.[如何啃下JVM这座大山，完结撒花（完结篇）](http://mp.weixin.qq.com/s?__biz=MzU1MzE4OTU0OQ==&mid=2247489013&idx=1&sn=c605a4295d989243b7ed0abe18d11c6a&chksm=fbf7fc37cc807521b0c3965602291350416ccd20e88d31ad53c7e7fd802b11af17a3575fe7db&scene=21#wechat_redirect)  
+2.[如何啃下JVM这座大山，完结撒花（完结篇）](http://mp.weixin.qq.com/s?__biz=MzU1MzE4OTU0OQ==&mid=2247489013&idx=1&sn=c605a4295d989243b7ed0abe18d11c6a&chksm=fbf7fc37cc807521b0c3965602291350416ccd20e88d31ad53c7e7fd802b11af17a3575fe7db&scene=21#wechat_redirect)
 
 3.[最全的八股文线程池总结（臭不要脸）](http://mp.weixin.qq.com/s?__biz=MzU1MzE4OTU0OQ==&mid=2247489181&idx=1&sn=a28c43eb38cdd912336280b5d7dc130e&chksm=fbf7ff5fcc807649a70958cc440cedf900d91956e7d12f80f0271ef7393bbd244e6fa61d5fe3&scene=21#wechat_redirect)
 

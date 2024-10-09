@@ -4,22 +4,21 @@
 
 The following article is from 小白debug Author 小白
 
-[
+\[
 
-](https://mp.weixin.qq.com/s?src=11&timestamp=1725944987&ver=5497&signature=lCa9I0icvny5D*EQzKFAAMa0GVqbDMgqsslr0nZp7PITRsoc-jdDfNVJbLnTgwc0W4CvMl2C3rZS8v6UHopWnmtEr74ixIsOR5ZJjWmDyEzPj88ME*kki8qlQCHs6UXi&new=1#)
+\](https://mp.weixin.qq.com/s?src=11&timestamp=1725944987&ver=5497&signature=lCa9I0icvny5D*EQzKFAAMa0GVqbDMgqsslr0nZp7PITRsoc-jdDfNVJbLnTgwc0W4CvMl2C3rZS8v6UHopWnmtEr74ixIsOR5ZJjWmDyEzPj88ME*kki8qlQCHs6UXi&new=1#)
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZclQSAM41A1ZnFukibKNKGiapfQQZJOKziaehj1pZzNHTicFkDKBMhTBzjZjys2GHM2nWd3LWt5SA7y0A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 图解网站：https://xiaolincoding.com/
 
-之前出过几篇 MySQL B+ 树的文章：  
+之前出过几篇 MySQL B+ 树的文章：
 
-- [换一个角度看 B+ 树](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247502059&idx=1&sn=ccbee22bda8c3d6a98237be769a7c89c&chksm=f98d8c41cefa055749b3e8228325e1afd6e82ee4f4c8a2fbbd2232235f6ecf9468cbefaf10c4&scene=21#wechat_redirect)  
-    
-- [女朋友问我：为什么 MySQL 喜欢 B+ 树？我笑着画了 20 张图](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247502168&idx=1&sn=ff63afcea1e8835fca3fe7a97e6922b4&chksm=f98d8df2cefa04e470a65a823256659128e84088e7d249bb0800f8d2a74ef59bf1c411b57110&scene=21#wechat_redirect)  
-    
+- [换一个角度看 B+ 树](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247502059&idx=1&sn=ccbee22bda8c3d6a98237be769a7c89c&chksm=f98d8c41cefa055749b3e8228325e1afd6e82ee4f4c8a2fbbd2232235f6ecf9468cbefaf10c4&scene=21#wechat_redirect)
 
-可能很多同学好奇**为什么 B+ 树三层高可以支持千万级的数据，这个数值是怎么计算的？**这个问题面试时，可能也会被问到。
+- [女朋友问我：为什么 MySQL 喜欢 B+ 树？我笑着画了 20 张图](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247502168&idx=1&sn=ff63afcea1e8835fca3fe7a97e6922b4&chksm=f98d8df2cefa04e470a65a823256659128e84088e7d249bb0800f8d2a74ef59bf1c411b57110&scene=21#wechat_redirect)
+
+可能很多同学好奇\*\*为什么 B+ 树三层高可以支持千万级的数据，这个数值是怎么计算的？\*\*这个问题面试时，可能也会被问到。
 
 今天就跟大家聊聊这个问题。
 
@@ -59,7 +58,7 @@ The following article is from 小白debug Author 小白
 
 建表的SQL是这么写的，
 
-``CREATE TABLE `user` (     `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',     `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名字',     `age` int(11) NOT NULL DEFAULT '0' COMMENT '年龄',     PRIMARY KEY (`id`),     KEY `idx_age` (`age`)   ) ENGINE=InnoDB AUTO_INCREMENT=100037 DEFAULT CHARSET=utf8;   ``
+`` CREATE TABLE `user` (     `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',     `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名字',     `age` int(11) NOT NULL DEFAULT '0' COMMENT '年龄',     PRIMARY KEY (`id`),     KEY `idx_age` (`age`)   ) ENGINE=InnoDB AUTO_INCREMENT=100037 DEFAULT CHARSET=utf8;    ``
 
 其中id就是主键。主键本身唯一，也就是说主键的大小可以限制表的上限。
 
@@ -71,11 +70,11 @@ The following article is from 小白debug Author 小白
 
 如果我把主键声明为 `tinyint`，一个字节，8位，最大2^8-1，也就是`255`。
 
-``CREATE TABLE `user` (     `id` tinyint(2) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',     `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名字',     `age` int(11) NOT NULL DEFAULT '0' COMMENT '年龄',     PRIMARY KEY (`id`),     KEY `idx_age` (`age`)   ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;   ``
+`` CREATE TABLE `user` (     `id` tinyint(2) unsigned NOT NULL AUTO_INCREMENT COMMENT '主键',     `name` varchar(100) NOT NULL DEFAULT '' COMMENT '名字',     `age` int(11) NOT NULL DEFAULT '0' COMMENT '年龄',     PRIMARY KEY (`id`),     KEY `idx_age` (`age`)   ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8;    ``
 
 如果我想插入一个id=256的数据，那**就会报错**。
 
-``mysql> INSERT INTO `tmp` (`id`, `name`, `age`) VALUES (256, '', 60);   ERROR 1264 (22003): Out of range value for column 'id' at row 1   ``
+`` mysql> INSERT INTO `tmp` (`id`, `name`, `age`) VALUES (256, '', 60);   ERROR 1264 (22003): Out of range value for column 'id' at row 1    ``
 
 也就是说，`tinyint`主键限制表内最多255条数据。
 
@@ -170,18 +169,16 @@ B+树查询过程
 同样一个16k的页，非叶子节点里每一条数据都指向一个新的页，而新的页有两种可能。
 
 - 如果是末级叶子节点的话，那么里面放的就是一行行record数据。
-    
+
 - 如果是非叶子节点，那么就会循环继续指向新的数据页。
-    
 
 假设
 
 - 非叶子结点内指向其他内存页的指针数量为`x`
-    
+
 - 叶子节点内能容纳的record数量为`y`
-    
+
 - B+树的层数为`z`
-    
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/AnAgeMhDIiandvicKNoFbEtJibZ97kqPWvkPzbuItrzCmkKKERFNNIeLOpbByNP3EniaRQmYicpec9YDhTRusPpEib9g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -223,7 +220,7 @@ B+树查询过程
 
 假设B+树是**三层**，那`z=3`。则是`(1280 ^ (3-1)) * 15 ≈ 2.5kw`
 
-**这个2.5kw，就是我们常说的单表建议最大行数2kw的由来。**毕竟再加一层，数据就大得有点离谱了。三层数据页对应最多三次磁盘IO，也比较合理。
+\*\*这个2.5kw，就是我们常说的单表建议最大行数2kw的由来。\*\*毕竟再加一层，数据就大得有点离谱了。三层数据页对应最多三次磁盘IO，也比较合理。
 
 ## 行数超一亿就慢了吗？
 
@@ -274,27 +271,22 @@ B树将行数据都存在非叶子节点上，假设每个数据页还是16kb，
 ## 总结
 
 - B+树叶子和非叶子结点的数据页都是16k，且数据结构一致，区别在于叶子节点放的是真实的行数据，而非叶子结点放的是主键和下一个页的地址。
-    
-- B+树一般有两到三层，由于其高扇出，三层就能支持2kw以上的数据，且一次查询最多1~3次磁盘IO，性能也还行。
-    
-- 存储同样量级的数据，B树比B+树层级更高，因此磁盘IO也更多，所以B+树更适合成为mysql索引。
-    
-- 索引结构不会影响单表最大行数，2kw也只是推荐值，超过了这个值可能会导致B+树层级更高，影响查询性能。
-    
-- 单表最大值还受主键大小和磁盘大小限制。
-    
 
-  
+- B+树一般有两到三层，由于其高扇出，三层就能支持2kw以上的数据，且一次查询最多1~3次磁盘IO，性能也还行。
+
+- 存储同样量级的数据，B树比B+树层级更高，因此磁盘IO也更多，所以B+树更适合成为mysql索引。
+
+- 索引结构不会影响单表最大行数，2kw也只是推荐值，超过了这个值可能会导致B+树层级更高，影响查询性能。
+
+- 单表最大值还受主键大小和磁盘大小限制。
 
 **图解系列文章：**
 
 [小林的网站上线啦！](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247507000&idx=1&sn=c045101b45dd70ec37f9b81361b09f14&chksm=f98d9892cefa1184ac8e278e468a8a225cd5a6f4c3dfba83ed223c5da69421041961bfb945cc&scene=21#wechat_redirect)
 
-[小林的图解系统，大曝光！](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247492900&idx=1&sn=2c1d06a667b1e17e6d8caabff2bbb85b&chksm=f98da18ecefa28986109f13d28c1a06f304cb4d897eb2e931e79dc82d0b054ef6a9f7e1e4e91&scene=21#wechat_redirect)  
+[小林的图解系统，大曝光！](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247492900&idx=1&sn=2c1d06a667b1e17e6d8caabff2bbb85b&chksm=f98da18ecefa28986109f13d28c1a06f304cb4d897eb2e931e79dc82d0b054ef6a9f7e1e4e91&scene=21#wechat_redirect)
 
 [不鸽了，小林的「图解网络 3.0 」发布！](http://mp.weixin.qq.com/s?__biz=MzUxODAzNDg4NQ==&mid=2247491944&idx=1&sn=b90deba780ae3840668e21127e467b83&chksm=f98da5c2cefa2cd456045e9b2ed92837ed10e4a2c650f463b29ef5d7f8f4d01014d92225acad&scene=21#wechat_redirect)
-
-  
 
 ​
 

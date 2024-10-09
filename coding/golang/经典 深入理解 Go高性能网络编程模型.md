@@ -2,11 +2,11 @@
 
 极客重生
 
- _2021年12月13日 12:10_
+_2021年12月13日 12:10_
 
 以下文章来源于远赴星辰 ，作者妖道
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7kh1PBl3m1ibtn6hb20DfHTvPnDzZN8bKl1BQAdEFpztg/0)
 
@@ -14,72 +14,57 @@
 
 风雪兼程，赶赴一场星辰。
 
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247563604&idx=1&sn=8d45bf1b55dda09c289bc2e4ec4a65e8&chksm=c1850e05f6f287130632cb2cd8d1177e0e4761dc4a9e80aaa6d4dbfe1444ba4e2761e9718331&mpshare=1&scene=24&srcid=1213v8zmA9Oj5rAnU8f5sG4X&sharer_sharetime=1639379101543&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b98854cfd7d0afaa32523d6742aa91a2fa3caf7366cebda383c897aeb37d2011a080b9e13b60d08f8cf12d5eaac5b54aa266a849e44fb915af0272672bf2a7b5085203f8d56faec85bf317ee35348f08d1bd4332c7de0d5ed089ef56beec780bf043e8e86ee7e1810dad8b34a07b1c54f76d64d80f5a712c&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQdI04CHjgbGOMhdrIAfNi0hLmAQIE97dBBAEAAAAAADq3FNJKYY8AAAAOpnltbLcz9gKNyK89dVj0FU9l7rs%2Bp0DcFAZjjX08uqIOwsVeZLR66yO4hQXwoarobRpr3KAJOG2dxBBKq8bRFIHWfjFus6kbcDSbc6BL4fRHEUXCRyvXaq8t6RPo4KlkiSofOLyIoDJpw8p8A4TJ4S1x2gi0EDs9XtTj5DYFsw3waDq%2B4cRwS8QwRO%2B1ECy5UbDCWnkfVl579GRBe23laFjyFL7y4w%2Fc%2Bi6i3zQ3dvVwUVmJFgVr9SJbTWBYh9iythjZT6lpWfTWiiul6tWP&acctmode=0&pass_ticket=avHcbDOp5aR2eEwUTUr8nb8FghHhygnkNBsJ%2BLGXiozE56lqmuyo%2FTX1E7K43QZ2&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
-
-  
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247563604&idx=1&sn=8d45bf1b55dda09c289bc2e4ec4a65e8&chksm=c1850e05f6f287130632cb2cd8d1177e0e4761dc4a9e80aaa6d4dbfe1444ba4e2761e9718331&mpshare=1&scene=24&srcid=1213v8zmA9Oj5rAnU8f5sG4X&sharer_sharetime=1639379101543&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b98854cfd7d0afaa32523d6742aa91a2fa3caf7366cebda383c897aeb37d2011a080b9e13b60d08f8cf12d5eaac5b54aa266a849e44fb915af0272672bf2a7b5085203f8d56faec85bf317ee35348f08d1bd4332c7de0d5ed089ef56beec780bf043e8e86ee7e1810dad8b34a07b1c54f76d64d80f5a712c&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQdI04CHjgbGOMhdrIAfNi0hLmAQIE97dBBAEAAAAAADq3FNJKYY8AAAAOpnltbLcz9gKNyK89dVj0FU9l7rs%2Bp0DcFAZjjX08uqIOwsVeZLR66yO4hQXwoarobRpr3KAJOG2dxBBKq8bRFIHWfjFus6kbcDSbc6BL4fRHEUXCRyvXaq8t6RPo4KlkiSofOLyIoDJpw8p8A4TJ4S1x2gi0EDs9XtTj5DYFsw3waDq%2B4cRwS8QwRO%2B1ECy5UbDCWnkfVl579GRBe23laFjyFL7y4w%2Fc%2Bi6i3zQ3dvVwUVmJFgVr9SJbTWBYh9iythjZT6lpWfTWiiul6tWP&acctmode=0&pass_ticket=avHcbDOp5aR2eEwUTUr8nb8FghHhygnkNBsJ%2BLGXiozE56lqmuyo%2FTX1E7K43QZ2&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/dZbLsg7Jh6022vHfk7GpcP97TxE1wfCM32ykKEHzX4XbiasJFezXyiaZH2GQEM13d6NgGaMiaNyjlyLanzjtTb7fA/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
-  
-
 - 导言
-    
+
 - 用户空间与内核空间
-    
+
 - I/O 模型
-    
 
 - Non-blocking I/O
-    
 
 - I/O 多路复用
-    
 
 - select & poll
-    
+
 - epoll
-    
 
 - Go netpoller 核心
-    
+
 - 数据结构
-    
 
 - netFD
-    
+
 - pollDesc
-    
 
 - 实现原理
-    
 
 - net.Listen
-    
+
 - Listener.Accept()
-    
+
 - Conn.Read/Conn.Write
-    
+
 - pollDesc.waitRead/pollDesc.waitWrite
-    
+
 - netpoll
-    
 
 - Go netpoller 的价值
-    
+
 - Goroutine 的调度
-    
+
 - Go netpoller 的问题
-    
+
 - Reactor 网络模型
-    
+
 - gnet
-    
 
 - 🚀 功能
-    
 
 - 参考&延伸阅读
-    
 
 ## 导言
 
@@ -95,7 +80,7 @@ Go netpoller 在不同的操作系统，其底层使用的 I/O 多路复用技�
 
 现代操作系统都是采用虚拟存储器，那么对 32 位操作系统而言，它的寻址空间（虚拟存储空间）为 4G（2 的 32 次方）。操作系统的核心是内核，独立于普通的应用程序，可以访问受保护的内存空间，也有访问底层硬件设备的所有权限。为了保证用户进程不能直接操作内核（kernel），保证内核的安全，操心系统将虚拟空间划分为两部分，一部分为内核空间，一部分为用户空间。针对 Linux 操作系统而言，将最高的 1G 字节（从虚拟地址 0xC0000000 到 0xFFFFFFFF），供内核使用，称为内核空间，而将较低的 3G 字节（从虚拟地址 0x00000000 到 0xBFFFFFFF），供各个进程使用，称为用户空间。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 现代的网络服务的主流已经完成从 CPU 密集型到 IO 密集型的转变，所以服务端程序对 I/O 的处理必不可少，而一旦操作 I/O 则必定要在用户态和内核态之间来回切换。
 
@@ -104,30 +89,26 @@ Go netpoller 在不同的操作系统，其底层使用的 I/O 多路复用技�
 在神作《UNIX 网络编程》里，总结归纳了 5 种 I/O 模型，包括同步和异步 I/O：
 
 - 阻塞 I/O (Blocking I/O)
-    
+
 - 非阻塞 I/O (Nonblocking I/O)
-    
+
 - I/O 多路复用 (I/O multiplexing)
-    
+
 - 信号驱动 I/O (Signal driven I/O)
-    
+
 - 异步 I/O (Asynchronous I/O)
-    
 
 操作系统上的 I/O 是用户空间和内核空间的数据交互，因此 I/O 操作通常包含以下两个步骤：
 
 1. 等待网络数据到达网卡(读就绪)/等待网卡可写(写就绪) –> 读取/写入到内核缓冲区
-    
-2. 从内核缓冲区复制数据 –> 用户空间(读)/从用户空间复制数据 -> 内核缓冲区(写)
-    
+
+1. 从内核缓冲区复制数据 –> 用户空间(读)/从用户空间复制数据 -> 内核缓冲区(写)
 
 而判定一个 I/O 模型是同步还是异步，主要看第二步：数据在用户和内核空间之间复制的时候是不是会阻塞当前进程，如果会，则是同步 I/O，否则，就是异步 I/O。基于这个原则，这 5 种 I/O 模型中只有一种异步 I/O 模型：Asynchronous I/O，其余都是同步 I/O 模型。
 
 这 5 种 I/O 模型的对比如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### Non-blocking I/O
 
@@ -135,7 +116,7 @@ Go netpoller 在不同的操作系统，其底层使用的 I/O 多路复用技�
 
 Linux 下，我们可以通过 `fcntl` 系统调用来设置 `O_NONBLOCK` 标志位，从而把 socket 设置成 Non-blocking。当对一个 Non-blocking socket 执行读操作时，流程是这个样子：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当用户进程发出 read 操作时，如果 kernel 中的数据还没有准备好，那么它并不会 block 用户进程，而是立刻返回一个 EAGAIN error。从用户进程角度讲 ，它发起一个 read 操作后，并不需要等待，而是马上就得到了一个结果。用户进程判断结果是一个 error 时，它就知道数据还没有准备好，于是它可以再次发送 read 操作。一旦 kernel 中的数据准备好了，并且又再次收到了用户进程的 system call，那么它马上就将数据拷贝到了用户内存，然后返回。
 
@@ -156,33 +137,30 @@ select 是 epoll 之前 Linux 使用的 I/O 事件驱动技术。
 理解 select 的关键在于理解 fd_set，为说明方便，取 fd_set 长度为 1 字节，fd_set 中的每一 bit 可以对应一个文件描述符 fd，则 1 字节长的 fd_set 最大可以对应 8 个 fd。select 的调用过程如下：
 
 1. 执行 FD_ZERO(&set), 则 set 用位表示是 `0000,0000`
-    
-2. 若 fd＝5, 执行 FD_SET(fd, &set); 后 set 变为 0001,0000(第 5 位置为 1)
-    
-3. 再加入 fd＝2, fd=1，则 set 变为 `0001,0011`
-    
-4. 执行 select(6, &set, 0, 0, 0) 阻塞等待
-    
-5. 若 fd=1, fd=2 上都发生可读事件，则 select 返回，此时 set 变为 `0000,0011` (注意：没有事件发生的 fd=5 被清空)
-    
+
+1. 若 fd＝5, 执行 FD_SET(fd, &set); 后 set 变为 0001,0000(第 5 位置为 1)
+
+1. 再加入 fd＝2, fd=1，则 set 变为 `0001,0011`
+
+1. 执行 select(6, &set, 0, 0, 0) 阻塞等待
+
+1. 若 fd=1, fd=2 上都发生可读事件，则 select 返回，此时 set 变为 `0000,0011` (注意：没有事件发生的 fd=5 被清空)
 
 基于上面的调用过程，可以得出 select 的特点：
 
-- 可监控的文件描述符个数取决于 sizeof(fd_set) 的值。假设服务器上 sizeof(fd_set)＝512，每 bit 表示一个文件描述符，则服务器上支持的最大文件描述符是 512*8=4096。fd_set 的大小调整可参考 【原创】技术系列之 网络模型（二） 中的模型 2，可以有效突破 select 可监控的文件描述符上限
-    
+- 可监控的文件描述符个数取决于 sizeof(fd_set) 的值。假设服务器上 sizeof(fd_set)＝512，每 bit 表示一个文件描述符，则服务器上支持的最大文件描述符是 512\*8=4096。fd_set 的大小调整可参考 【原创】技术系列之 网络模型（二） 中的模型 2，可以有效突破 select 可监控的文件描述符上限
+
 - 将 fd 加入 select 监控集的同时，还要再使用一个数据结构 array 保存放到 select 监控集中的 fd，一是用于在 select 返回后，array 作为源数据和 fd_set 进行 FD_ISSET 判断。二是 select 返回后会把以前加入的但并无事件发生的 fd 清空，则每次开始 select 前都要重新从 array 取得 fd 逐一加入（FD_ZERO 最先），扫描 array 的同时取得 fd 最大值 maxfd，用于 select 的第一个参数
-    
+
 - 可见 select 模型必须在 select 前循环 array（加 fd，取 maxfd），select 返回后循环 array（FD_ISSET 判断是否有事件发生）
-    
 
 所以，select 有如下的缺点：
 
-1. 最大并发数限制：使用 32 个整数的 32 位，即 32*32=1024 来标识 fd，虽然可修改，但是有以下第 2, 3 点的瓶颈
-    
-2. 每次调用 select，都需要把 fd 集合从用户态拷贝到内核态，这个开销在 fd 很多时会很大
-    
-3. 性能衰减严重：每次 kernel 都需要线性扫描整个 fd_set，所以随着监控的描述符 fd 数量增长，其 I/O 性能会线性下降
-    
+1. 最大并发数限制：使用 32 个整数的 32 位，即 32\*32=1024 来标识 fd，虽然可修改，但是有以下第 2, 3 点的瓶颈
+
+1. 每次调用 select，都需要把 fd 集合从用户态拷贝到内核态，这个开销在 fd 很多时会很大
+
+1. 性能衰减严重：每次 kernel 都需要线性扫描整个 fd_set，所以随着监控的描述符 fd 数量增长，其 I/O 性能会线性下降
 
 poll 的实现和 select 非常相似，只是描述 fd 集合的方式不同，poll 使用 pollfd 结构而不是 select 的 fd_set 结构，poll 解决了最大文件描述符数量限制的问题，但是同样需要从用户态拷贝所有的 fd 到内核态，也需要线性遍历所有的 fd 集合，所以它和 select 只是实现细节上的区分，并没有本质上的区别。
 
@@ -206,7 +184,7 @@ epoll 的 API 非常简洁，涉及到的只有 3 个系统调用：
 
 epoll 的工作原理如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 与 select&poll 相比，epoll 分清了高频调用和低频调用。例如，epoll_ctl 相对来说就是非频繁调用的，而 epoll_wait 则是会被高频调用的。所以 epoll 利用 epoll_ctl 来插入或者删除一个 fd，实现用户态到内核态的数据拷贝，这确保了每一个 fd 在其生命周期只需要被拷贝一次，而不是每次调用 epoll_wait 的时候都拷贝一次。epoll_wait 则被设计成几乎没有入参的调用，相比 select&poll 需要把全部监听的 fd 集合从用户态拷贝至内核态的做法，epoll 的效率就高出了一大截。
 
@@ -237,25 +215,24 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int�
 **「Go netpoller 基本原理」**
 
 > ❝
-> 
+>
 > Go netpoller 通过在底层对 epoll/kqueue/iocp 的封装，从而实现了使用同步编程模式达到异步执行的效果。总结来说，所有的网络操作都以网络描述符 netFD 为中心实现。netFD 与底层 PollDesc 结构绑定，当在一个 netFD 上读写遇到 EAGAIN 错误时，就将当前 goroutine 存储到这个 netFD 对应的 PollDesc 中，同时调用 gopark 把当前 goroutine 给 park 住，直到这个 netFD 上再次发生读写事件，才将此 goroutine 给 ready 激活重新运行。显然，在底层通知 goroutine 再次发生读写等事件的方式就是 epoll/kqueue/iocp 等事件驱动机制。
-> 
+>
 > ❞
 
 总所周知，Go 是一门跨平台的编程语言，而不同平台针对特定的功能有不用的实现，这当然也包括了 I/O 多路复用技术，比如 Linux 里的 I/O 多路复用有 `select`、`poll` 和 `epoll`，而 freeBSD 或者 MacOS 里则是 `kqueue`，而 Windows 里则是基于异步 I/O 实现的 `iocp`，等等；因此，Go 为了实现底层 I/O 多路复用的跨平台，分别基于上述的这些不同平台的系统调用实现了多版本的 netpollers，具体的源码路径如下：
 
 - `src/runtime/netpoll_epoll.go`
-    
+
 - `src/runtime/netpoll_kqueue.go`
-    
+
 - `src/runtime/netpoll_solaris.go`
-    
+
 - `src/runtime/netpoll_windows.go`
-    
+
 - `src/runtime/netpoll_aix.go`
-    
+
 - `src/runtime/netpoll_fake.go`
-    
 
 本文的解析基于 `epoll` 版本，如果读者对其他平台的 netpoller 底层实现感兴趣，可以在阅读完本文后自行翻阅其他 netpoller 源码，所有实现版本的机制和原理基本类似，所以了解了 `epoll` 版本的实现后再去学习其他版本实现应该没什么障碍。
 
@@ -265,7 +242,7 @@ int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int�
 
 ### netFD
 
-`net.Listen("tcp", ":8888")` 方法返回了一个 *TCPListener，它是一个实现了 `net.Listener` 接口的 struct，而通过 `listener.Accept()` 接收的新连接 *TCPConn 则是一个实现了 `net.Conn` 接口的 struct，它内嵌了 `net.conn` struct。仔细阅读上面的源码可以发现，不管是 Listener 的 Accept 还是 Conn 的 Read/Write 方法，都是基于一个 `netFD` 的数据结构的操作， `netFD` 是一个网络描述符，类似于 Linux 的文件描述符的概念，netFD 中包含一个 poll.FD 数据结构，而 poll.FD 中包含两个重要的数据结构 Sysfd 和 pollDesc，前者是真正的系统文件描述符，后者对是底层事件驱动的封装，所有的读写超时等操作都是通过调用后者的对应方法实现的。
+`net.Listen("tcp", ":8888")` 方法返回了一个 \*TCPListener，它是一个实现了 `net.Listener` 接口的 struct，而通过 `listener.Accept()` 接收的新连接 \*TCPConn 则是一个实现了 `net.Conn` 接口的 struct，它内嵌了 `net.conn` struct。仔细阅读上面的源码可以发现，不管是 Listener 的 Accept 还是 Conn 的 Read/Write 方法，都是基于一个 `netFD` 的数据结构的操作， `netFD` 是一个网络描述符，类似于 Linux 的文件描述符的概念，netFD 中包含一个 poll.FD 数据结构，而 poll.FD 中包含两个重要的数据结构 Sysfd 和 pollDesc，前者是真正的系统文件描述符，后者对是底层事件驱动的封装，所有的读写超时等操作都是通过调用后者的对应方法实现的。
 
 `netFD` 和 `poll.FD` 的源码：
 
@@ -323,7 +300,7 @@ package mainimport ( "log" "net")func main() { listen, err := net.List
 
 Go 的这种同步模式的网络服务器的基本架构通常如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上面的示例代码中相关的在源码里的几个数据结构和方法：
 
@@ -336,11 +313,10 @@ Go 的这种同步模式的网络服务器的基本架构通常如下：
 调用 `net.Listen` 之后，底层会通过 Linux 的系统调用 `socket` 方法创建一个 fd 分配给 listener，并用以来初始化 listener 的 `netFD` ，接着调用 netFD 的 `listenStream` 方法完成对 socket 的 bind&listen 操作以及对 `netFD` 的初始化（主要是对 netFD 里的 pollDesc 的初始化），调用链是 `runtime.runtime_pollServerInit` --> `runtime.poll_runtime_pollServerInit` --> `runtime.netpollGenericInit`，主要做的事情是：
 
 1. 调用 `epollcreate1` 创建一个 epoll 实例 `epfd`，作为整个 runtime 的唯一 event-loop 使用；
-    
-2. 调用 `runtime.nonblockingPipe` 创建一个用于和 epoll 实例通信的管道，这里为什么不用更新且更轻量的 eventfd 呢？我个人猜测是为了兼容更多以及更老的系统版本；
-    
-3. 将 `netpollBreakRd` 通知信号量封装成 `epollevent` 事件结构体注册进 epoll 实例。
-    
+
+1. 调用 `runtime.nonblockingPipe` 创建一个用于和 epoll 实例通信的管道，这里为什么不用更新且更轻量的 eventfd 呢？我个人猜测是为了兼容更多以及更老的系统版本；
+
+1. 将 `netpollBreakRd` 通知信号量封装成 `epollevent` 事件结构体注册进 epoll 实例。
 
 相关源码如下：
 
@@ -361,11 +337,10 @@ netFD 就是通过这三个封装来对 epoll 进行创建实例、注册 fd 和
 `netpoll` accept socket 的工作流程如下：
 
 1. 服务端的 netFD 在 `listen` 时会创建 epoll 的实例，并将 listenerFD 加入 epoll 的事件队列
-    
-2. netFD 在 `accept` 时将返回的 connFD 也加入 epoll 的事件队列
-    
-3. netFD 在读写时出现 `syscall.EAGAIN` 错误，通过 pollDesc 的 `waitRead` 方法将当前的 goroutine park 住，直到 ready，从 pollDesc 的 `waitRead` 中返回
-    
+
+1. netFD 在 `accept` 时将返回的 connFD 也加入 epoll 的事件队列
+
+1. netFD 在读写时出现 `syscall.EAGAIN` 错误，通过 pollDesc 的 `waitRead` 方法将当前的 goroutine park 住，直到 ready，从 pollDesc 的 `waitRead` 中返回
 
 `Listener.Accept()` 接收来自客户端的新连接，具体还是调用 `netFD.accept` 方法来完成这个功能：
 
@@ -415,24 +390,23 @@ var serverInit sync.Oncefunc (pd *pollDesc) init(fd *FD) error { server
 
 所以我们现在可以来从整体的层面来概括 Go 的网络业务 goroutine 是如何被规划调度的了：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > ❝
-> 
+>
 > 首先，client 连接 server 的时候，listener 通过 accept 调用接收新 connection，每一个新 connection 都启动一个 goroutine 处理，accept 调用会把该 connection 的 fd 连带所在的 goroutine 上下文信息封装注册到 epoll 的监听列表里去，当 goroutine 调用 `conn.Read` 或者 `conn.Write` 等需要阻塞等待的函数时，会被 `gopark` 给封存起来并使之休眠，让 P 去执行本地调度队列里的下一个可执行的 goroutine，往后 Go scheduler 会在循环调度的 `runtime.schedule()` 函数以及 sysmon 监控线程中调用 `runtime.nepoll` 以获取可运行的 goroutine 列表并通过调用 injectglist 把剩下的 g 放入全局调度队列或者当前 P 本地调度队列去重新执行。
-> 
+>
 > 那么当 I/O 事件发生之后，netpoller 是通过什么方式唤醒那些在 I/O wait 的 goroutine 的？答案是通过 `runtime.netpoll`。
-> 
+>
 > ❞
 
 `runtime.netpoll` 的核心逻辑是：
 
 1. 根据调用方的入参 delay，设置对应的调用 `epollwait` 的 timeout 值；
-    
-2. 调用 `epollwait` 等待发生了可读/可写事件的 fd；
-    
-3. 循环 `epollwait` 返回的事件列表，处理对应的事件类型， 组装可运行的 goroutine 链表并返回。
-    
+
+1. 调用 `epollwait` 等待发生了可读/可写事件的 fd；
+
+1. 循环 `epollwait` 返回的事件列表，处理对应的事件类型， 组装可运行的 goroutine 链表并返回。
 
 ```
 // netpoll checks for ready network connections.// Returns list of goroutines that become runnable.// delay < 0: blocks indefinitely// delay == 0: does not block, just polls// delay > 0: block for up to that many nanosecondsfunc netpoll(delay int64) gList { if epfd == -1 {  return gList{} } // 根据特定的规则把 delay 值转换为 epollwait 的 timeout 值 var waitms int32 if delay < 0 {  waitms = -1 } else if delay == 0 {  waitms = 0 } else if delay < 1e6 {  waitms = 1 } else if delay < 1e15 {  waitms = int32(delay / 1e6) } else {  // An arbitrary cap on how long to wait for a timer.  // 1e9 ms == ~11.5 days.  waitms = 1e9 } var events [128]epolleventretry: // 超时等待就绪的 fd 读写事件 n := epollwait(epfd, &events[0], int32(len(events)), waitms) if n < 0 {  if n != -_EINTR {   println("runtime: epollwait on fd", epfd, "failed with", -n)   throw("runtime: netpoll failed")  }  // If a timed sleep was interrupted, just return to  // recalculate how long we should sleep now.  if waitms > 0 {   return gList{}  }  goto retry } // toRun 是一个 g 的链表，存储要恢复的 goroutines，最后返回给调用方 var toRun gList for i := int32(0); i < n; i++ {  ev := &events[i]  if ev.events == 0 {   continue  }  // Go scheduler 在调用 findrunnable() 寻找 goroutine 去执行的时候，  // 在调用 netpoll 之时会检查当前是否有其他线程同步阻塞在 netpoll，  // 若是，则调用 netpollBreak 来唤醒那个线程，避免它长时间阻塞  if *(**uintptr)(unsafe.Pointer(&ev.data)) == &netpollBreakRd {   if ev.events != _EPOLLIN {    println("runtime: netpoll: break fd ready for", ev.events)    throw("runtime: netpoll: break fd ready for something unexpected")   }   if delay != 0 {    // netpollBreak could be picked up by a    // nonblocking poll. Only read the byte    // if blocking.    var tmp [16]byte    read(int32(netpollBreakRd), noescape(unsafe.Pointer(&tmp[0])), int32(len(tmp)))    atomic.Store(&netpollWakeSig, 0)   }   continue  }  // 判断发生的事件类型，读类型或者写类型等，然后给 mode 复制相应的值，    // mode 用来决定从 pollDesc 里的 rg 还是 wg 里取出 goroutine  var mode int32  if ev.events&(_EPOLLIN|_EPOLLRDHUP|_EPOLLHUP|_EPOLLERR) != 0 {   mode += 'r'  }  if ev.events&(_EPOLLOUT|_EPOLLHUP|_EPOLLERR) != 0 {   mode += 'w'  }  if mode != 0 {   // 取出保存在 epollevent 里的 pollDesc   pd := *(**pollDesc)(unsafe.Pointer(&ev.data))   pd.everr = false   if ev.events == _EPOLLERR {    pd.everr = true   }   // 调用 netpollready，传入就绪 fd 的 pollDesc，   // 把 fd 对应的 goroutine 添加到链表 toRun 中   netpollready(&toRun, pd, mode)  } } return toRun}// netpollready 调用 netpollunblock 返回就绪 fd 对应的 goroutine 的抽象数据结构 gfunc netpollready(toRun *gList, pd *pollDesc, mode int32) { var rg, wg *g if mode == 'r' || mode == 'r'+'w' {  rg = netpollunblock(pd, 'r', true) } if mode == 'w' || mode == 'r'+'w' {  wg = netpollunblock(pd, 'w', true) } if rg != nil {  toRun.push(rg) } if wg != nil {  toRun.push(wg) }}// netpollunblock 会依据传入的 mode 决定从 pollDesc 的 rg 或者 wg 取出当时 gopark 之时存入的// goroutine 抽象数据结构 g 并返回func netpollunblock(pd *pollDesc, mode int32, ioready bool) *g { // mode == 'r' 代表当时 gopark 是为了等待读事件，而 mode == 'w' 则代表是等待写事件 gpp := &pd.rg if mode == 'w' {  gpp = &pd.wg } for {  // 取出 gpp 存储的 g  old := *gpp  if old == pdReady {   return nil  }  if old == 0 && !ioready {   // Only set READY for ioready. runtime_pollWait   // will check for timeout/cancel before waiting.   return nil  }  var new uintptr  if ioready {   new = pdReady  }  // 重置 pollDesc 的 rg 或者 wg  if atomic.Casuintptr(gpp, old, new) {      // 如果该 goroutine 还是必须等待，则返回 nil   if old == pdWait {    old = 0   }   // 通过万能指针还原成 g 并返回   return (*g)(unsafe.Pointer(old))  } }}// netpollBreak 往通信管道里写入信号去唤醒 epollwaitfunc netpollBreak() { // 通过 CAS 避免重复的唤醒信号被写入管道， // 从而减少系统调用并节省一些系统资源 if atomic.Cas(&netpollWakeSig, 0, 1) {  for {   var b byte   n := write(netpollBreakWr, unsafe.Pointer(&b), 1)   if n == 1 {    break   }   if n == -_EINTR {    continue   }   if n == -_EAGAIN {    return   }   println("runtime: netpollBreak write failed with", -n)   throw("runtime: netpollBreak write failed")  } }}
@@ -457,9 +431,8 @@ Go 在多种场景下都可能会调用 `netpoll` 检查文件描述符状态�
 Go runtime 在程序启动的时候会创建一个独立的 M 作为监控线程，叫 `sysmon` ，这个线程为系统级的 daemon 线程，无需 P 即可运行， `sysmon` 每 20us~10ms 运行一次。`sysmon` 中以轮询的方式执行以下操作（如上面的代码所示）：
 
 1. 以非阻塞的方式调用 `runtime.netpoll` ，从中找出能从网络 I/O 中唤醒的 g 列表，并通过调用 injectglist 把 g 列表放入全局调度队列或者当前 P 本地调度队列等待被执行，调度触发时，有可能从这个全局 runnable 调度队列获取 g。然后再循环调用 `startm` ，直到所有 P 都不处于 `_Pidle` 状态。
-    
-2. 调用 `retake` ，抢占长时间处于 `_Psyscall` 状态的 P。
-    
+
+1. 调用 `retake` ，抢占长时间处于 `_Psyscall` 状态的 P。
 
 综上，Go 借助于 epoll/kqueue/iocp 和 runtime scheduler 等的帮助，设计出了自己的 I/O 多路复用 netpoller，成功地让 `Listener.Accept` / `conn.Read` / `conn.Write` 等方法从开发者的角度看来是同步模式。
 
@@ -467,7 +440,7 @@ Go runtime 在程序启动的时候会创建一个独立的 M 作为监控线程
 
 通过前面对源码的分析，我们现在知道 Go netpoller 依托于 runtime scheduler，为开发者提供了一种强大的同步网络编程模式；然而，Go netpoller 存在的意义却远不止于此，Go netpoller I/O 多路复用搭配 Non-blocking I/O 而打造出来的这个原生网络模型，它最大的价值是把网络 I/O 的控制权牢牢掌握在 Go 自己的 runtime 里，关于这一点我们需要从 Go 的 runtime scheduler 说起，Go 的 G-P-M 调度模型如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 G 在运行过程中如果被阻塞在某个 system call 操作上，那么不光 G 会阻塞，执行该 G 的 M 也会解绑 P(实质是被 sysmon 抢走了)，与 G 一起进入 sleep 状态。如果此时有 idle 的 M，则 P 与其绑定继续执行其他 G；如果没有 idle M，但仍然有其他 G 要去执行，那么就会创建一个新的 M。当阻塞在 system call 上的 G 完成 syscall 调用后，G 会去尝试获取一个可用的 P，如果没有可用的 P，那么 G 会被标记为 `_Grunnable` 并把它放入全局的 runqueue 中等待调度，之前的那个 sleep 的 M 将再次进入 sleep。
 
@@ -486,11 +459,11 @@ runtime.schedule --> runtime.execute --> runtime.gogo --> goroutine code�
 ```
 
 > ❝
-> 
+>
 > Go scheduler 会不断循环调用 `runtime.schedule()` 去调度 goroutines，而每个 goroutine 执行完成并退出之后，会再次调用 `runtime.schedule()`，使得调度器回到调度循环去执行其他的 goroutine，不断循环，永不停歇。
-> 
+>
 > 当我们使用 `go` 关键字启动一个新 goroutine 时，最终会调用 `runtime.newproc` --> `runtime.newproc1`，来得到 g，`runtime.newproc1` 会先从 P 的 `gfree` 缓存链表中查找可用的 g，若缓存未生效，则会新创建 g 给当前的业务函数，最后这个 g 会被传给 `runtime.gogo` 去真正执行。
-> 
+>
 > ❞
 
 这里首先需要了解一个 gobuf 的结构体，它用来保存 goroutine 的调度信息，是 `runtime.gogo` 的入参：
@@ -508,11 +481,10 @@ func execute(gp *g, inheritTime bool) { _g_ := getg() // Assign gp.m�
 这里还需要了解一个概念：g0，Go G-P-M 调度模型中，g 代表 goroutine，而实际上一共有三种 g：
 
 1. 执行用户代码的 g；
-    
-2. 执行调度器代码的 g，也即是 g0；
-    
-3. 执行 `runtime.main` 初始化工作的 main goroutine；
-    
+
+1. 执行调度器代码的 g，也即是 g0；
+
+1. 执行 `runtime.main` 初始化工作的 main goroutine；
 
 第一种 g 就是使用 `go` 关键字启动的 goroutine，也是我们接触最多的一类 g；第三种 g 是调度器启动之后用来执行的一系列初始化工作的，包括但不限于启动 `sysmon` 监控线程、内存初始化和启动 GC 等等工作；第二种 g 叫 g0，用来执行调度器代码，g0 在底层和其他 g 是一样的数据结构，但是性质上有很大的区别，首先 g0 的栈大小是固定的，比如在 Linux 或者其他 Unix-like 的系统上一般是固定 8MB，不能动态伸缩，而普通的 g 初始栈大小是 2KB，可按需扩展，g0 其实就是线程栈，我们知道每个线程被创建出来之时都需要操作系统为之分配一个初始固定的线程栈，就是前面说的 8MB 大小的栈，g0 栈就代表了这个线程栈，因此每一个 m 都需要绑定一个 g0 来执行调度器代码，然后跳转到执行用户代码的地方。
 
@@ -561,15 +533,14 @@ func goexit0(gp *g) { _g_ := getg() casgstatus(gp, _Grunning, _Gdead) 
 `runtime.goexit0` 的主要工作是就是
 
 1. 利用 CAS 操作把 g 的状态从 `_Grunning` 更新为 `_Gdead`；
-    
-2. 对 g 做一些清理操作，把一些字段值置空；
-    
-3. 调用 `runtime.dropg` 解绑 g 和 m；
-    
-4. 把 g 放入 p 存储 g 的 `gfree` 链表作为缓存，后续如果需要启动新的 goroutine 则可以直接从链表里取而不用重新初始化分配内存。
-    
-5. 最后，调用 `runtime.schedule()` 再次进入调度循环去调度新的 goroutines，永不停歇。
-    
+
+1. 对 g 做一些清理操作，把一些字段值置空；
+
+1. 调用 `runtime.dropg` 解绑 g 和 m；
+
+1. 把 g 放入 p 存储 g 的 `gfree` 链表作为缓存，后续如果需要启动新的 goroutine 则可以直接从链表里取而不用重新初始化分配内存。
+
+1. 最后，调用 `runtime.schedule()` 再次进入调度循环去调度新的 goroutines，永不停歇。
 
 另一方面，如果 goroutine 处于 I/O 不可用状态，我们前面已经分析过 netpoller 利用非阻塞 I/O + I/O 多路复用避免了陷入系统调用，所以此时会调用 `runtime.gopark` 并把 goroutine 暂时封存在用户态空间，并休眠当前的 goroutine，因此不会阻塞 `runtime.gogo` 的汇编执行，而是通过 `runtime.mcall` 调用 `runtime.park_m`：
 
@@ -596,23 +567,22 @@ Reactor 模式本质上指的是使用 `I/O 多路复用(I/O multiplexing) + �
 Reactor 模式的基本工作流程如下：
 
 - Server 端完成在 `bind&listen` 之后，将 listenfd 注册到 epollfd 中，最后进入 event-loop 事件循环。循环过程中会调用 `select/poll/epoll_wait` 阻塞等待，若有在 listenfd 上的新连接事件则解除阻塞返回，并调用 `socket.accept` 接收新连接 connfd，并将 connfd 加入到 epollfd 的 I/O 复用（监听）队列。
-    
+
 - 当 connfd 上发生可读/可写事件也会解除 `select/poll/epoll_wait` 的阻塞等待，然后进行 I/O 读写操作，这里读写 I/O 都是非阻塞 I/O，这样才不会阻塞 event-loop 的下一个循环。然而，这样容易割裂业务逻辑，不易理解和维护。
-    
+
 - 调用 `read` 读取数据之后进行解码并放入队列中，等待工作线程处理。
-    
+
 - 工作线程处理完数据之后，返回到 event-loop 线程，由这个线程负责调用 `write` 把数据写回 client。
-    
 
 accept 连接以及 conn 上的读写操作若是在主线程完成，则要求是非阻塞 I/O，因为 Reactor 模式一条最重要的原则就是：I/O 操作不能阻塞 event-loop 事件循环。**「实际上 event loop 可能也可以是多线程的，只是一个线程里只有一个 select/poll/epoll_wait」**。
 
 上面提到了 Go netpoller 在某些场景下可能因为创建太多的 goroutine 而过多地消耗系统资源，而在现实世界的网络业务中，服务器持有的海量连接中在极短的时间窗口内只有极少数是 active 而大多数则是 idle，就像这样（非真实数据，仅仅是为了比喻）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么为每一个连接指派一个 goroutine 就显得太过奢侈了，而 Reactor 模式这种利用 I/O 多路复用进而只需要使用少量线程即可管理海量连接的设计就可以在这样网络业务中大显身手了：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在绝大部分应用场景下，我推荐大家还是遵循 Go 的 best practices，使用原生的 Go 网络库来构建自己的网络应用。然而，在某些极度追求性能、压榨系统资源以及技术栈必须是原生 Go （不考虑 C/C++ 写中间层而 Go 写业务层）的业务场景下，我们可以考虑自己构建 Reactor 网络模型。
 
@@ -630,157 +600,115 @@ gnet，在某些极端的网络业务场景，比如海量连接、高频短连�
 
 `gnet` 已经实现了 `Multi-Reactors` 和 `Multi-Reactors + Goroutine Pool` 两种网络模型，也得益于这些网络模型，使得 `gnet` 成为一个高性能和低损耗的 Go 网络框架：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-主从 Reactors 模型  
+主从 Reactors 模型
 
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-主从 Reactors + Goroutine Pool 模型  
+主从 Reactors + Goroutine Pool 模型
 
 ### 🚀 功能
 
-- [x] 高性能的基于多线程/Go程网络模型的 event-loop 事件驱动
-    
-- [x] 内置 goroutine 池，由开源库 ants 提供支持
-    
-- [x] 内置 bytes 内存池，由开源库 bytebufferpool 提供支持
-    
-- [x] 整个生命周期是无锁的
-    
-- [x] 简单易用的 APIs
-    
-- [x] 基于 Ring-Buffer 的高效且可重用的内存 buffer
-    
-- [x] 支持多种网络协议/IPC 机制：`TCP`、`UDP` 和 `Unix Domain Socket`
-    
-- [x] 支持多种负载均衡算法：`Round-Robin(轮询)`、`Source-Addr-Hash(源地址哈希)` 和 `Least-Connections(最少连接数)`
-    
-- [x] 支持两种事件驱动机制：**「Linux」** 里的 `epoll` 以及 **「FreeBSD/DragonFly/Darwin」** 里的 `kqueue`
-    
-- [x] 支持异步写操作
-    
-- [x] 灵活的事件定时器
-    
-- [x] SO_REUSEPORT 端口重用
-    
-- [x] 内置多种编解码器，支持对 TCP 数据流分包：LineBasedFrameCodec, DelimiterBasedFrameCodec, FixedLengthFrameCodec 和 LengthFieldBasedFrameCodec，参考自 netty codec，而且支持自定制编解码器
-    
-- [x] 支持 Windows 平台，基于 IOCP 事件驱动机制 Go 标准网络库
-    
-- [ ] 实现 `gnet` 客户端
-    
+- \[x\] 高性能的基于多线程/Go程网络模型的 event-loop 事件驱动
+
+- \[x\] 内置 goroutine 池，由开源库 ants 提供支持
+
+- \[x\] 内置 bytes 内存池，由开源库 bytebufferpool 提供支持
+
+- \[x\] 整个生命周期是无锁的
+
+- \[x\] 简单易用的 APIs
+
+- \[x\] 基于 Ring-Buffer 的高效且可重用的内存 buffer
+
+- \[x\] 支持多种网络协议/IPC 机制：`TCP`、`UDP` 和 `Unix Domain Socket`
+
+- \[x\] 支持多种负载均衡算法：`Round-Robin(轮询)`、`Source-Addr-Hash(源地址哈希)` 和 `Least-Connections(最少连接数)`
+
+- \[x\] 支持两种事件驱动机制：**「Linux」** 里的 `epoll` 以及 **「FreeBSD/DragonFly/Darwin」** 里的 `kqueue`
+
+- \[x\] 支持异步写操作
+
+- \[x\] 灵活的事件定时器
+
+- \[x\] SO_REUSEPORT 端口重用
+
+- \[x\] 内置多种编解码器，支持对 TCP 数据流分包：LineBasedFrameCodec, DelimiterBasedFrameCodec, FixedLengthFrameCodec 和 LengthFieldBasedFrameCodec，参考自 netty codec，而且支持自定制编解码器
+
+- \[x\] 支持 Windows 平台，基于 IOCP 事件驱动机制 Go 标准网络库
+
+- \[ \] 实现 `gnet` 客户端
 
 ## 参考&延伸阅读
 
 - The Go netpoller
-    
+
 - Nonblocking I/O
-    
+
 - epoll(7) — Linux manual page
-    
+
 - I/O Multiplexing: The `select` and `poll` Functions
-    
+
 - The method to epoll’s madness
-    
+
 - Scalable Go Scheduler Design Doc
-    
+
 - Scheduling In Go : Part I - OS Scheduler
-    
+
 - Scheduling In Go : Part II - Go Scheduler
-    
+
 - Scheduling In Go : Part III - Concurrency
-    
+
 - Goroutines, Nonblocking I/O, And Memory Usage
-    
+
 - IO多路复用与Go网络库的实现
-    
+
 - 关于select函数中timeval和fd_set重新设置的问题
-    
+
 - A Million WebSockets and Go
-    
+
 - Going Infinite, handling 1M websockets connections in Go
-    
+
 - 字节跳动在 Go 网络库上的实践
-    
-
-  
-
-  
 
 - END -
 
----
+______________________________________________________________________
 
-  
+**看完一键三连****在看****，**转发****，点赞\*\*\*\*
 
-**看完一键三连****在看****，**转发****，点赞****
-
-**是对文章最大的赞赏，极客重生感谢你****![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
-
-  
+**是对文章最大的赞赏，极客重生感谢你**\*\*!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)\*\*
 
 推荐阅读
 
-  
+\[
 
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 五个半小时
 
+\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247563566&idx=1&sn=26156d79dffb3f0f10b6a26931f993cc&chksm=c1850e7ff6f28769b6ff3358366e917d3d54fc0f0563131422da4bed201768c958262b5d5a99&scene=21#wechat_redirect)
 
+\[
 
-
-
-
-
-](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247563566&idx=1&sn=26156d79dffb3f0f10b6a26931f993cc&chksm=c1850e7ff6f28769b6ff3358366e917d3d54fc0f0563131422da4bed201768c958262b5d5a99&scene=21#wechat_redirect)
-
-  
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 深入理解Linux异步I/O框架 io_uring
 
+\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247562787&idx=1&sn=471a0956249ca789afad774978522717&chksm=c1850172f6f28864474f9832bfc61f723b5f54e174417d570a6b1e3f9f04bda7b539662c0bed&scene=21#wechat_redirect)
 
+\[
 
-
-
-
-
-](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247562787&idx=1&sn=471a0956249ca789afad774978522717&chksm=c1850172f6f28864474f9832bfc61f723b5f54e174417d570a6b1e3f9f04bda7b539662c0bed&scene=21#wechat_redirect)
-
-  
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 深入理解高并发服务器性能优化
 
+\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247553077&idx=1&sn=a7dc6b8d1f2306881f0ebdecb23c54aa&chksm=c184e764f6f36e720152f50071abb4fc6a9f6c6222f929a522d6fa541fbfdfcdfee745c81dff&scene=21#wechat_redirect)
 
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-
-
-
-
-](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247553077&idx=1&sn=a7dc6b8d1f2306881f0ebdecb23c54aa&chksm=c184e764f6f36e720152f50071abb4fc6a9f6c6222f929a522d6fa541fbfdfcdfee745c81dff&scene=21#wechat_redirect)
-
-  
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-                                                      求点赞，在看，分享三连![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+求点赞，在看，分享三连!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 2287
 
@@ -791,45 +719,44 @@ gnet，在某些极端的网络业务场景，比如海量连接、高频短连�
 **留言 5**
 
 - Alex
-    
-    2021年12月13日
-    
-    赞5
-    
-    五万雄文值得慢慢深入理解![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，值得一键三连![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月13日
+
+  赞5
+
+  五万雄文值得慢慢深入理解![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，值得一键三连![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 志伟
-    
-    2021年12月13日
-    
-    赞
-    
-    最近重温了一遍，gnet 的实现和 muduo 的一样吧
-    
-    极客重生
-    
-    作者2021年12月13日
-    
-    赞1
-    
-    每个库都有自己设计思想和性能优化点。但底层核心还是基于epoll上实现的（目前）
-    
+
+  2021年12月13日
+
+  赞
+
+  最近重温了一遍，gnet 的实现和 muduo 的一样吧
+
+  极客重生
+
+  作者2021年12月13日
+
+  赞1
+
+  每个库都有自己设计思想和性能优化点。但底层核心还是基于epoll上实现的（目前）
+
 - 海阔天空
-    
-    2021年12月13日
-    
-    赞
-    
-    敬你5万字技术贴，肝还好吗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月13日
+
+  赞
+
+  敬你5万字技术贴，肝还好吗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 小罗罗
-    
-    2021年12月13日
-    
-    赞
-    
-    ![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月13日
+
+  赞
+
+  ![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据
 
@@ -848,44 +775,43 @@ gnet，在某些极端的网络业务场景，比如海量连接、高频短连�
 **留言 5**
 
 - Alex
-    
-    2021年12月13日
-    
-    赞5
-    
-    五万雄文值得慢慢深入理解![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，值得一键三连![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月13日
+
+  赞5
+
+  五万雄文值得慢慢深入理解![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，值得一键三连![[玫瑰]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 志伟
-    
-    2021年12月13日
-    
-    赞
-    
-    最近重温了一遍，gnet 的实现和 muduo 的一样吧
-    
-    极客重生
-    
-    作者2021年12月13日
-    
-    赞1
-    
-    每个库都有自己设计思想和性能优化点。但底层核心还是基于epoll上实现的（目前）
-    
+
+  2021年12月13日
+
+  赞
+
+  最近重温了一遍，gnet 的实现和 muduo 的一样吧
+
+  极客重生
+
+  作者2021年12月13日
+
+  赞1
+
+  每个库都有自己设计思想和性能优化点。但底层核心还是基于epoll上实现的（目前）
+
 - 海阔天空
-    
-    2021年12月13日
-    
-    赞
-    
-    敬你5万字技术贴，肝还好吗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月13日
+
+  赞
+
+  敬你5万字技术贴，肝还好吗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 小罗罗
-    
-    2021年12月13日
-    
-    赞
-    
-    ![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月13日
+
+  赞
+
+  ![[社会社会]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据

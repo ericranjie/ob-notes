@@ -4,9 +4,9 @@
 
 The following article is from 小林coding Author 小林coding
 
-[
+\[
 
-](https://mp.weixin.qq.com/s?src=11&timestamp=1725524865&ver=5487&signature=vi2iNPSeE0WUuxd-dxUv*XXALqm*cieMCKF2UQjyZAGOfQVpTlrY0SyQ5uBD9JlOJB4hr8VDohEmogW8csSrchBpPur0Xmo-mFiOnLIkmE1DmhuIGpUMt5sdOdQ6s9lk&new=1#)
+\](https://mp.weixin.qq.com/s?src=11&timestamp=1725524865&ver=5487&signature=vi2iNPSeE0WUuxd-dxUv*XXALqm*cieMCKF2UQjyZAGOfQVpTlrY0SyQ5uBD9JlOJB4hr8VDohEmogW8csSrchBpPur0Xmo-mFiOnLIkmE1DmhuIGpUMt5sdOdQ6s9lk&new=1#)
 
 > **来自公众号：小林coding**
 
@@ -14,7 +14,7 @@ The following article is from 小林coding Author 小林coding
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZc0xXMUofrwAVS3mR0DxcWCoYtmiad8NmXE1MQab2XJW1SbKykIhoVQeEV5pRGrlCp2ibcMPZoHQ5Dw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
----
+______________________________________________________________________
 
 ## 正文
 
@@ -33,9 +33,8 @@ The following article is from 小林coding Author 小林coding
 可以看到，Redis 数据类型的底层数据结构随着版本的更新也有所不同，比如：
 
 - 在 Redis 3.0 版本中 List 对象的底层数据结构由「双向链表」或「压缩表列表」实现，但是在 3.2 版本之后，List 数据类型底层数据结构是由 quicklist 实现的；
-    
+
 - 在最新的 Redis 代码（还未发布正式版本）中，压缩列表数据结构已经废弃了，交由 listpack 数据结构来实现了。
-    
 
 **这次，小林把新旧版本的数据结构说图解一遍，共有 9 种数据结构：SDS、双向链表、压缩列表、哈希表、跳表、整数集合、quicklist、listpack。**
 
@@ -58,11 +57,10 @@ Redis 的键值对中的 key 就是字符串对象，而 **value 可以是字�
 这些命令代表着：
 
 - 第一条命令：name 是一个**字符串键**，因为键的**值是一个字符串对象**；
-    
+
 - 第二条命令：person 是一个**哈希表键**，因为键的**值是一个包含两个键值对的哈希表对象**；
-    
+
 - 第三条命令：stu 是一个**列表键**，因为键的**值是一个包含两个元素的列表对象**；
-    
 
 这些键值对是如何保存在 Redis 中的呢？
 
@@ -70,7 +68,7 @@ Redis 是使用了一个「哈希表」保存所有键值对，哈希表的最�
 
 Redis 的哈希桶是怎么保存键值对数据的呢？
 
-哈希桶存放的是指向键值对数据的指针（dictEntry*），这样通过指针就能找到键值对数据，然后因为键值对的值可以保存字符串对象和集合数据类型的对象，所以键值对的数据结构中并不是直接保存值本身，而是保存了 void * key 和 void * value 指针，分别指向了实际的键对象和值对象，这样一来，即使值是集合数据，也可以通过 void * value 指针找到。
+哈希桶存放的是指向键值对数据的指针（dictEntry\*），这样通过指针就能找到键值对数据，然后因为键值对的值可以保存字符串对象和集合数据类型的对象，所以键值对的数据结构中并不是直接保存值本身，而是保存了 void * key 和 void * value 指针，分别指向了实际的键对象和值对象，这样一来，即使值是集合数据，也可以通过 void * value 指针找到。
 
 我这里画了一张 Redis 保存键值对所涉及到的数据结构。
 
@@ -79,13 +77,12 @@ Redis 的哈希桶是怎么保存键值对数据的呢？
 这些数据结构的内部细节，我先不展开讲，后面在讲哈希表数据结构的时候，在详细的说说，因为用到的数据结构是一样的。这里先大概说下图中涉及到的数据结构的名字和用途：
 
 - redisDb 结构，表示 Redis 数据库的结构，结构体里存放了指向了 dict 结构的指针；
-    
+
 - dict 结构，结构体里存放了 2 个哈希表，正常情况下都是用「哈希表1」，「哈希表2」只有在 rehash 的时候才用，具体什么是 rehash，我在本文的哈希表数据结构会讲；
-    
+
 - ditctht 结构，表示哈希表的结构，结构里存放了哈希表数组，数组中的每个元素都是指向一个哈希表节点结构（dictEntry）的指针；
-    
-- dictEntry 结构，表示哈希表节点的结构，结构里存放了 **void * key 和 void * value 指针， *key 指向的是 String 对象，而 *value 则可以指向 String 对象，也可以指向集合类型的对象，比如 List 对象、Hash 对象、Set 对象和 Zset 对象**。
-    
+
+- dictEntry 结构，表示哈希表节点的结构，结构里存放了 \*\*void * key 和 void * value 指针， *key 指向的是 String 对象，而 *value 则可以指向 String 对象，也可以指向集合类型的对象，比如 List 对象、Hash 对象、Set 对象和 Zset 对象**。
 
 特别说明下，void * key 和 void * value 指针指向的是 **Redis 对象**，Redis 中的每个对象都由 redisObject 结构表示，如下图：
 
@@ -94,11 +91,10 @@ Redis 的哈希桶是怎么保存键值对数据的呢？
 对象结构里包含的成员变量：
 
 - type，标识该对象是什么类型的对象（String 对象、 List 对象、Hash 对象、Set 对象和 Zset 对象）；
-    
+
 - encoding，标识该对象使用了哪种底层的数据结构；
-    
+
 - **ptr，指向底层数据结构的指针**。
-    
 
 我画了一张 Redis 键值对数据库的全景图，你就能清晰知道 Redis 对象和数据结构的关系了：
 
@@ -110,37 +106,37 @@ Redis 的哈希桶是怎么保存键值对数据的呢？
 
 字符串在 Redis 中是很常用的，键值对中的键是字符串类型，值有时也是字符串类型。
 
-Redis 是用 C 语言实现的，但是它没有直接使用 C 语言的 char* 字符数组来实现字符串，而是自己封装了一个名为简单动态字符串（simple dynamic string，SDS） 的数据结构来表示字符串，也就是 Redis 的 String 数据类型的底层数据结构是 SDS。
+Redis 是用 C 语言实现的，但是它没有直接使用 C 语言的 char\* 字符数组来实现字符串，而是自己封装了一个名为简单动态字符串（simple dynamic string，SDS） 的数据结构来表示字符串，也就是 Redis 的 String 数据类型的底层数据结构是 SDS。
 
-既然 Redis 设计了 SDS 结构来表示字符串，肯定是 C 语言的 char* 字符数组存在一些缺陷。
+既然 Redis 设计了 SDS 结构来表示字符串，肯定是 C 语言的 char\* 字符数组存在一些缺陷。
 
-要了解这一点，得先来看看 char* 字符数组的结构。
+要了解这一点，得先来看看 char\* 字符数组的结构。
 
 #### C 语言字符串的缺陷
 
 C 语言的字符串其实就是一个字符数组，即数组中每个元素是字符串中的一个字符。
 
-比如，下图就是字符串“xiaolin”的 char* 字符数组的结构：
+比如，下图就是字符串“xiaolin”的 char\* 字符数组的结构：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZc0xXMUofrwAVS3mR0DxcWCTfz2JdrHw2TJxSm5M5icNLOiayicCasMEkJNw2Vr4HUJ3YAr4Ek66WIcw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-没学过 C 语言的同学，可能会好奇为什么最后一个字符是“\0”？
+没学过 C 语言的同学，可能会好奇为什么最后一个字符是“\\0”？
 
-在 C 语言里，对字符串操作时，char * 指针只是指向字符数组的起始位置，而**字符数组的结尾位置就用“\0”表示，意思是指字符串的结束**。
+在 C 语言里，对字符串操作时，char * 指针只是指向字符数组的起始位置，而**字符数组的结尾位置就用“\\0”表示，意思是指字符串的结束**。
 
-因此，C 语言标准库中的字符串操作函数就通过判断字符是不是 “\0” 来决定要不要停止操作，如果当前字符不是 “\0” ，说明字符串还没结束，可以继续操作，如果当前字符是 “\0”  是则说明字符串结束了，就要停止操作。
+因此，C 语言标准库中的字符串操作函数就通过判断字符是不是 “\\0” 来决定要不要停止操作，如果当前字符不是 “\\0” ，说明字符串还没结束，可以继续操作，如果当前字符是 “\\0”  是则说明字符串结束了，就要停止操作。
 
-举个例子，C 语言获取字符串长度的函数 `strlen`，就是通过字符数组中的每一个字符，并进行计数，等遇到字符为 “\0” 后，就会停止遍历，然后返回已经统计到的字符个数，即为字符串长度。下图显示了 strlen 函数的执行流程：
+举个例子，C 语言获取字符串长度的函数 `strlen`，就是通过字符数组中的每一个字符，并进行计数，等遇到字符为 “\\0” 后，就会停止遍历，然后返回已经统计到的字符个数，即为字符串长度。下图显示了 strlen 函数的执行流程：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZc0xXMUofrwAVS3mR0DxcWClibZUCa1ScYQSuke6uwNpFYSYYOiciahoABOESy9fKIb56LOpWkGe2rGw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 很明显，**C 语言获取字符串长度的时间复杂度是 O（N）（_这是一个可以改进的地方_**）
 
-C 语言字符串用 “\0” 字符作为结尾标记有个缺陷。假设有个字符串中有个 “\0” 字符，这时在操作这个字符串时就会**提早结束**，比如 “xiao\0lin” 字符串，计算字符串长度的时候则会是 4，如下图：
+C 语言字符串用 “\\0” 字符作为结尾标记有个缺陷。假设有个字符串中有个 “\\0” 字符，这时在操作这个字符串时就会**提早结束**，比如 “xiao\\0lin” 字符串，计算字符串长度的时候则会是 4，如下图：
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZc0xXMUofrwAVS3mR0DxcWC5WKTJuWSsR0YVXRicOzQuL7CcAe6L9SZzJ13zsUS5LQlSEp6xaMwamg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-因此，除了字符串的末尾之外，**字符串里面不能含有 “\0” 字符**，否则最先被程序读入的 “\0” 字符将被误认为是字符串结尾，这个限制使得 C 语言的字符串只能保存文本数据，**不能保存像图片、音频、视频文化这样的二进制数据（_这也是一个可以改进的地方_）**
+因此，除了字符串的末尾之外，**字符串里面不能含有 “\\0” 字符**，否则最先被程序读入的 “\\0” 字符将被误认为是字符串结尾，这个限制使得 C 语言的字符串只能保存文本数据，**不能保存像图片、音频、视频文化这样的二进制数据（_这也是一个可以改进的地方_）**
 
 另外， C 语言标准库中字符串的操作函数是很不安全的，对程序员很不友好，稍微一不注意，就会导致缓冲区溢出。
 
@@ -152,16 +148,15 @@ C 语言字符串用 “\0” 字符作为结尾标记有个缺陷。假设有�
 
 **C 语言的字符串是不会记录自身的缓冲区大小的**，所以 strcat 函数假定程序员在执行这个函数时，已经为 dest 分配了足够多的内存，可以容纳 src 字符串中的所有内容，而**一旦这个假定不成立，就会发生缓冲区溢出将可能会造成程序运行终止，（这是一个可以改进的地方**）。
 
-而且，strcat 函数和 strlen 函数类似，时间复杂度也很高，也都需要先通过遍历字符串才能得到目标字符串的末尾。然后对于 strcat 函数来说，还要再遍历源字符串才能完成追加，**对字符串的操作效率不高**。  
+而且，strcat 函数和 strlen 函数类似，时间复杂度也很高，也都需要先通过遍历字符串才能得到目标字符串的末尾。然后对于 strcat 函数来说，还要再遍历源字符串才能完成追加，**对字符串的操作效率不高**。
 
 好了， 通过以上的分析，我们可以得知 C 语言的字符串不足之处以及可以改进的地方：
 
 - 获取字符串长度的时间复杂度为  O（N）；
-    
-- 字符串的结尾是以 “\0” 字符标识，字符串里面不能包含有 “\0” 字符，因此不能保存二进制数据；
-    
+
+- 字符串的结尾是以 “\\0” 字符标识，字符串里面不能包含有 “\\0” 字符，因此不能保存二进制数据；
+
 - 字符串操作函数不高效且不安全，比如有缓冲区溢出的风险，有可能会造成程序运行终止；
-    
 
 Redis 实现的 SDS 的结构就把上面这些问题解决了，接下来我们一起看看 Redis 是如何解决的。
 
@@ -174,13 +169,12 @@ Redis 实现的 SDS 的结构就把上面这些问题解决了，接下来我们
 结构中的每个成员变量分别介绍下：
 
 - **len，记录了字符串长度**。这样获取字符串长度的时候，只需要返回这个成员变量值就行，时间复杂度只需要 O（1）。
-    
+
 - **alloc，分配给字符数组的空间长度**。这样在修改字符串的时候，可以通过 `alloc - len` 计算出剩余的空间大小，可以用来判断空间是否满足修改需求，如果不满足的话，就会自动将 SDS  的空间扩展至执行修改所需的大小，然后才执行实际的修改操作，所以使用 SDS 既不需要手动修改 SDS 的空间大小，也不会出现前面所说的缓冲区溢出的问题。
-    
+
 - **flags，用来表示不同类型的 SDS**。一共设计了 5 种类型，分别是 sdshdr5、sdshdr8、sdshdr16、sdshdr32 和 sdshdr64，后面在说明区别之处。
-    
-- **buf[]，字符数组，用来保存实际数据**。不仅可以保存字符串，也可以保存二进制数据。
-    
+
+- **buf\[\]，字符数组，用来保存实际数据**。不仅可以保存字符串，也可以保存二进制数据。
 
 总的来说，Redis 的 SDS 结构在原本字符数组之上，增加了三个元数据：len、alloc、flags，用来解决 C 语言字符串的缺陷。
 
@@ -192,9 +186,9 @@ C 语言的字符串长度获取 strlen 函数，需要通过遍历的方式来�
 
 ##### 二进制安全
 
-因为 SDS 不需要用 “\0” 字符来标识字符串结尾了，而是**有个专门的 len 成员变量来记录长度，所以可存储包含 “\0” 的数据**。但是 SDS 为了兼容部分 C 语言标准库的函数， SDS 字符串结尾还是会加上 “\0” 字符。
+因为 SDS 不需要用 “\\0” 字符来标识字符串结尾了，而是**有个专门的 len 成员变量来记录长度，所以可存储包含 “\\0” 的数据**。但是 SDS 为了兼容部分 C 语言标准库的函数， SDS 字符串结尾还是会加上 “\\0” 字符。
 
-因此， SDS 的 API 都是以处理二进制的方式来处理 SDS 存放在 buf[] 里的数据，程序不会对其中的数据做任何限制，数据写入的时候时什么样的，它被读取时就是什么样的。
+因此， SDS 的 API 都是以处理二进制的方式来处理 SDS 存放在 buf\[\] 里的数据，程序不会对其中的数据做任何限制，数据写入的时候时什么样的，它被读取时就是什么样的。
 
 通过使用二进制安全的 SDS，而不是 C 字符串，使得 Redis 不仅可以保存文本数据，也可以保存任意格式的二进制数据。
 
@@ -229,9 +223,8 @@ struct __attribute__ ((__packed__)) sdshdr16 {    uint16_t len;    
 可以看到：
 
 - sdshdr16 类型的 len 和 alloc 的数据类型都是 uint16_t，表示字符数组长度和分配空间大小不能超过 2 的 16 次方。
-    
+
 - sdshdr32 则都是 uint32_t，表示表示字符数组长度和分配空间大小不能超过 2 的 32 次方。
-    
 
 **之所以 SDS 设计不同类型的结构体，是为了能灵活保存不同大小的字符串，从而有效节省内存空间**。比如，在保存小字符串时，结构头占用空间也比较少。
 
@@ -265,7 +258,7 @@ struct __attribute__ ((__packed__)) sdshdr16 {    uint16_t len;    
 
 可以看得出，这是按照实际占用字节数进行分配内存的，这样可以节省内存空间。
 
----
+______________________________________________________________________
 
 ### 链表
 
@@ -283,7 +276,7 @@ typedef struct listNode {    //前置节点    struct listNode *pre
 
 有前置节点和后置节点，可以看的出，这个是一个双向链表。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 链表结构设计
 
@@ -297,27 +290,25 @@ list 结构为链表提供了链表头指针 head、链表尾节点 tail、链�
 
 举个例子，下面是由 list 结构和 3 个 listNode 结构组成的链表。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 链表的优势与缺陷
 
 Redis 的链表实现优点如下：
 
 - listNode 链表节点的结构里带有 prev 和 next 指针，**获取某个节点的前置节点或后置节点的时间复杂度只需O(1)，而且这两个指针都可以指向 NULL，所以链表是无环链表**；
-    
+
 - list 结构因为提供了表头指针 head 和表尾节点 tail，所以**获取链表的表头节点和表尾节点的时间复杂度只需O(1)**；
-    
+
 - list 结构因为提供了链表节点数量 len，所以**获取链表中的节点数量的时间复杂度只需O(1)**；
-    
-- listNode 链表节使用 void* 指针保存节点值，并且可以通过 list 结构的 dup、free、match 函数指针为节点设置该节点类型特定的函数，因此**链表节点可以保存各种不同类型的值**；
-    
+
+- listNode 链表节使用 void\* 指针保存节点值，并且可以通过 list 结构的 dup、free、match 函数指针为节点设置该节点类型特定的函数，因此**链表节点可以保存各种不同类型的值**；
 
 链表的缺陷也是有的：
 
 - 链表每个节点之间的内存都是不连续的，意味着**无法很好利用 CPU 缓存**。能很好利用 CPU 缓存的数据结构就是数组，因为数组的内存是连续的，这样就可以充分利用 CPU 缓存来加速访问。
-    
+
 - 还有一点，保存一个链表节点的值都需要一个链表节点结构头的分配，**内存开销较大**。
-    
 
 因此，Redis 3.0 的 List 对象在数据量比较少的情况下，会采用「压缩列表」作为底层数据结构的实现，它的优势是节省内存空间，并且是内存紧凑型的数据结构。
 
@@ -325,7 +316,7 @@ Redis 的链表实现优点如下：
 
 然后在  Redis 5.0 设计了新的数据结构 listpack，沿用了压缩列表紧凑型的内存布局，最终在最新的 Redis 版本，将 Hash 对象和 Zset 对象的底层数据结构实现之一的压缩列表，替换成由  listpack 实现。
 
----
+______________________________________________________________________
 
 ### 压缩列表
 
@@ -334,9 +325,8 @@ Redis 的链表实现优点如下：
 但是，压缩列表的缺陷也是有的：
 
 - 不能保存过多的元素，否则查询效率就会降低；
-    
+
 - 新增或修改某个元素时，压缩列表占用的内存空间需要重新分配，甚至可能引发连锁更新的问题。
-    
 
 因此，Redis 对象（List 对象、Hash 对象、Zset 对象）包含的元素数量较少，或者元素值不大的情况才会使用压缩列表作为底层数据结构。
 
@@ -346,33 +336,31 @@ Redis 的链表实现优点如下：
 
 压缩列表是 Redis 为了节约内存而开发的，它是**由连续内存块组成的顺序型数据结构**，有点类似于数组。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 压缩列表在表头有三个字段：
 
 - **_zlbytes_**，记录整个压缩列表占用对内存字节数；
-    
+
 - **_zltail_**，记录压缩列表「尾部」节点距离起始地址由多少字节，也就是列表尾的偏移量；
-    
+
 - **_zllen_**，记录压缩列表包含的节点数量；
-    
+
 - **_zlend_**，标记压缩列表的结束点，固定值 0xFF（十进制255）。
-    
 
 在压缩列表中，如果我们要查找定位第一个元素和最后一个元素，可以通过表头三个字段的长度直接定位，复杂度是 O(1)。而**查找其他元素时，就没有这么高效了，只能逐个查找，此时的复杂度就是 O(N) 了，因此压缩列表不适合保存过多的元素**。
 
 另外，压缩列表节点（entry）的构成如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 压缩列表节点包含三部分内容：
 
 - **_prevlen_**，记录了「前一个节点」的长度；
-    
+
 - **_encoding_**，记录了当前节点实际数据的类型以及长度；
-    
+
 - **_data_**，记录了当前节点的实际数据；
-    
 
 当我们往压缩列表中插入数据时，压缩列表就会根据数据是字符串还是整数，以及数据的大小，会使用不同空间大小的 prevlen 和 encoding 这两个元素里保存的信息，**这种根据数据大小和类型进行不同的空间大小分配的设计思想，正是 Redis 为了节省内存而采用的**。
 
@@ -381,16 +369,14 @@ Redis 的链表实现优点如下：
 压缩列表里的每个节点中的  prevlen 属性都记录了「前一个节点的长度」，而且 prevlen 属性的空间大小跟前一个节点长度值有关，比如：
 
 - 如果**前一个节点的长度小于 254 字节**，那么 prevlen 属性需要用 **1 字节的空间**来保存这个长度值；
-    
+
 - 如果**前一个节点的长度大于等于 254 字节**，那么 prevlen 属性需要用 **5 字节的空间**来保存这个长度值；
-    
 
 encoding 属性的空间大小跟数据是字符串还是整数，以及字符串的长度有关：
 
 - 如果**当前节点的数据是整数**，则 encoding 会使用 **1 字节的空间**进行编码。
-    
+
 - 如果**当前节点的数据是字符串，根据字符串的长度大小**，encoding 会使用 **1 字节/2字节/5字节的空间**进行编码。
-    
 
 #### 连锁更新
 
@@ -401,9 +387,8 @@ encoding 属性的空间大小跟数据是字符串还是整数，以及字符�
 前面提到，压缩列表节点的 prevlen 属性会根据前一个节点的长度进行不同的空间大小分配：
 
 - 如果前一个**节点的长度小于 254 字节**，那么 prevlen 属性需要用 **1 字节的空间**来保存这个长度值；
-    
+
 - 如果前一个**节点的长度大于等于 254 字节**，那么 prevlen 属性需要用 **5 字节的空间**来保存这个长度值；
-    
 
 现在假设一个压缩列表中有多个连续的、长度在 250～253 之间的节点，如下图：
 
@@ -463,7 +448,7 @@ Redis 的哈希表结构如下：
 typedef struct dictht {    //哈希表数组    dictEntry **table;    //哈希表大小    unsigned long size;      //哈希表大小掩码，用于计算索引值    unsigned long sizemask;    //该哈希表已有的节点数量    unsigned long used;} dictht;
 ```
 
-可以看到，哈希表是一个数组（dictEntry **table），数组的每个元素是一个指向「哈希表节点（dictEntry）」的指针。
+可以看到，哈希表是一个数组（dictEntry \*\*table），数组的每个元素是一个指向「哈希表节点（dictEntry）」的指针。
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZc0xXMUofrwAVS3mR0DxcWCWn0QXo4LelAFp8vMWN94o2mQhn6icdO6UpQA7ZbNvUfmz5ngw5nAwrw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -487,7 +472,7 @@ dictEntry 结构里不仅包含指向键和值的指针，还包含了指向下�
 
 举个例子，有一个可以存放 8 个哈希桶的哈希表。key1 经过哈希函数计算后，再将「哈希值 % 8 」进行取模计算，结果值为 1，那么就对应哈希桶 1，类似的，key9 和 key10 分别对应哈希桶 1 和桶 6。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此时，key1 和 key9 对应到了相同的哈希桶中，这就发生了哈希冲突。
 
@@ -513,7 +498,7 @@ Redis 采用了「**链式哈希**」的方法来解决哈希冲突。
 
 #### rehash
 
-哈希表结构设计的这一小节，我给大家介绍了 Redis 使用 dictht 结构体表示哈希表。不过，在实际使用哈希表时，Redis 定义一个 dict 结构体，这个结构体里定义了**两个哈希表（ht[2]）**。
+哈希表结构设计的这一小节，我给大家介绍了 Redis 使用 dictht 结构体表示哈希表。不过，在实际使用哈希表时，Redis 定义一个 dict 结构体，这个结构体里定义了**两个哈希表（ht\[2\]）**。
 
 ```
 typedef struct dict {    …    //两个Hash表，交替使用，用于rehash操作    dictht ht[2];     …} dict;
@@ -528,15 +513,14 @@ typedef struct dict {    …    //两个Hash表，交替使用，用�
 随着数据逐步增多，触发了 rehash 操作，这个过程分为三步：
 
 - 给「哈希表 2」 分配空间，一般会比「哈希表 1」 大 2 倍；
-    
+
 - 将「哈希表 1 」的数据迁移到「哈希表 2」 中；
-    
+
 - 迁移完成后，「哈希表 1 」的空间会被释放，并把「哈希表 2」 设置为「哈希表 1」，然后在「哈希表 2」 新创建一个空白的哈希表，为下次 rehash 做准备。
-    
 
 为了方便你理解，我把 rehash 这三个过程画在了下面这张图：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个过程看起来简单，但是其实第二步很有问题，**如果「哈希表 1 」的数据量非常大，那么在迁移至「哈希表 2 」的时候，因为会涉及大量的数据拷贝，此时可能会对 Redis 造成阻塞，无法服务其他请求**。
 
@@ -547,11 +531,10 @@ typedef struct dict {    …    //两个Hash表，交替使用，用�
 渐进式 rehash 步骤如下：
 
 - 给「哈希表 2」 分配空间；
-    
+
 - **在 rehash 进行期间，每次哈希表元素进行新增、删除、查找或者更新操作时，Redis 除了会执行对应的操作之外，还会顺序将「哈希表 1 」中索引位置上的所有 key-value 迁移到「哈希表 2」 上**；
-    
+
 - 随着处理客户端发起的哈希表操作请求数量越多，最终在某个时间嗲呢，会把「哈希表 1 」的所有 key-value 迁移到「哈希表 2」，从而完成 rehash 操作。
-    
 
 这样就巧妙地把一次性大量数据迁移工作的开销，分摊到了多次处理请求的过程中，避免了一次性 rehash 的耗时操作。
 
@@ -565,18 +548,17 @@ typedef struct dict {    …    //两个Hash表，交替使用，用�
 
 介绍了 rehash 那么多，还没说什么时情况下会触发 rehash 操作呢？
 
-rehash 的触发条件跟**负载因子（load factor）**有关系。
+rehash 的触发条件跟\*\*负载因子（load factor）\*\*有关系。
 
 负载因子可以通过下面这个公式计算：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 触发 rehash 操作的条件，主要有两个：
 
 - **当负载因子大于等于 1 ，并且 Redis 没有在执行 bgsave 命令或者 bgrewiteaof 命令，也就是没有执行 RDB 快照或没有进行 AOF 重写的时候，就会进行 rehash 操作。**
-    
+
 - **当负载因子大于等于 5 时，此时说明哈希冲突非常严重了，不管有没有有在执行 RDB 快照或 AOF 重写，都会强制进行 rehash 操作。**
-    
 
 ### 整数集合
 
@@ -593,11 +575,10 @@ typedef struct intset {    //编码方式    uint32_t encoding;  �
 可以看到，保存元素的容器是一个 contents 数组，虽然 contents 被声明为 int8_t 类型的数组，但是实际上 contents 数组并不保存任何 int8_t 类型的元素，contents 数组的真正类型取决于 intset 结构体里的 encoding 属性的值。比如：
 
 - 如果 encoding 属性值为 INTSET_ENC_INT16，那么 contents 就是一个 int16_t 类型的数组，数组中每一个元素的类型都是 int16_t；
-    
+
 - 如果 encoding 属性值为 INTSET_ENC_INT32，那么 contents 就是一个 int32_t 类型的数组，数组中每一个元素的类型都是 int32_t；
-    
+
 - 如果 encoding 属性值为 INTSET_ENC_INT64，那么 contents 就是一个 int64_t 类型的数组，数组中每一个元素的类型都是 int64_t；
-    
 
 不同类型的 contents 数组，意味着数组的大小也会不同。
 
@@ -609,15 +590,15 @@ typedef struct intset {    //编码方式    uint32_t encoding;  �
 
 举个例子，假设有一个整数集合里有 3 个类型为 int16_t 的元素。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 现在，往这个整数集合中加入一个新元素 65535，这个新元素需要用 int32_t 类型来保存，所以整数集合要进行升级操作，首先需要为 contents 数组扩容，**在原本空间的大小之上再扩容多 80 位（4x32-3x16=80），这样就能保存下 4 个类型为 int32_t 的元素**。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 扩容完 contents 数组空间大小后，需要将之前的三个元素转换为 int32_t 类型，并将转换后的元素放置到正确的位上面，并且需要维持底层数组的有序性不变，整个转换过程如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 整数集合升级有什么好处呢？
 
@@ -631,7 +612,7 @@ typedef struct intset {    //编码方式    uint32_t encoding;  �
 
 **不支持降级操作**，一旦对数组进行了升级，就会一直保持升级后的状态。比如前面的升级操作的例子，如果删除了 65535 元素，整数集合的数组还是 int32_t 类型的，并不会因此降级为 int16_t 类型。
 
----
+______________________________________________________________________
 
 ### 跳表
 
@@ -653,16 +634,15 @@ Zset 对象能支持范围查询（如 ZRANGEBYSCORE 操作），这是因为它
 
 那跳表长什么样呢？我这里举个例子，下图展示了一个层级为 3 的跳表。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图中头节点有 L0~L2 三个头指针，分别指向了不同层级的节点，然后每个层级的节点都通过指针连接起来：
 
 - L0 层级共有 5 个节点，分别是节点1、2、3、4、5；
-    
+
 - L1 层级共有 3 个节点，分别是节点 2、3、5；
-    
+
 - L2 层级只有 1 个节点，也就是节点 3 。
-    
 
 如果我们要在链表中查找节点 4 这个元素，只能从头开始遍历链表，需要查找 4 次，而使用了跳表后，只需要查找 2 次就能定位到节点 4，因为可以在头节点直接从 L2 层级跳到节点 3，然后再往前遍历找到节点 4。
 
@@ -678,11 +658,11 @@ Zset 对象要同时保存元素和元素的权重，对应到跳表节点结构
 
 跳表是一个带有层级关系的链表，而且每一层级可以包含多个节点，每一个节点通过指针连接起来，实现这一特性就是靠跳表节点结构体中的**zskiplistLevel 结构体类型的 level 数组**。
 
-level 数组中的每一个元素代表跳表的一层，也就是由 zskiplistLevel 结构体表示，比如 leve[0] 就表示第一层，leve[1] 就表示第二层。zskiplistLevel 结构体里定义了「指向下一个跳表节点的指针」和「跨度」，跨度时用来记录两个节点之间的距离。
+level 数组中的每一个元素代表跳表的一层，也就是由 zskiplistLevel 结构体表示，比如 leve\[0\] 就表示第一层，leve\[1\] 就表示第二层。zskiplistLevel 结构体里定义了「指向下一个跳表节点的指针」和「跨度」，跨度时用来记录两个节点之间的距离。
 
 比如，下面这张图，展示了各个节点的跨度。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 第一眼看到跨度的时候，以为是遍历操作有关，实际上并没有任何关系，遍历操作只需要用前向指针就可以完成了。
 
@@ -701,20 +681,18 @@ typedef struct zskiplist {    struct zskiplistNode *header, *tail;  
 跳表结构里包含了：
 
 - 跳表的头尾节点，便于在O(1)时间复杂度内访问跳表的头节点和尾节点；
-    
+
 - 跳表的长度，便于在O(1)时间复杂度获取跳表节点的数量；
-    
+
 - 跳表的最大层数，便于在O(1)时间复杂度获取跳表中层高最大的那个节点的层数量；
-    
 
 #### 跳表节点查询过程
 
 查找一个跳表节点的过程时，跳表会从头节点的最高层开始，逐一遍历每一层。在遍历某一层的跳表节点时，会用跳表节点中的 SDS 类型的元素和元素的权重来进行判断，共有两个判断条件：
 
 - 如果当前节点的权重「小于」要查找的权重时，跳表就会访问该层上的下一个节点。
-    
+
 - 如果当前节点的权重「等于」要查找的权重时，并且当前节点的 SDS 类型数据「小于」要查找的数据时，跳表就会访问该层上的下一个节点。
-    
 
 如果上面两个条件都不满足，或者下一个节点为空时，跳表就会使用目前遍历到的节点的 level 数组里的下一层指针，然后沿着下一层指针继续查找，这就相当于跳到了下一层接着查找。
 
@@ -725,13 +703,12 @@ typedef struct zskiplist {    struct zskiplistNode *header, *tail;  
 如果要查找「元素：abcd，权重：4」的节点，查找的过程是这样的：
 
 - 先从头节点的最高层开始，L2 指向了「元素：abc，权重：3」节点，这个节点的权重比要查找节点的小，所以要访问该层上的下一个节点；
-    
-- 但是该层上的下一个节点是空节点，于是就会跳到「元素：abc，权重：3」节点的下一层去找，也就是 leve[1];
-    
-- 「元素：abc，权重：3」节点的  leve[1] 的下一个指针指向了「元素：abcde，权重：4」的节点，然后将其和要查找的节点比较。虽然「元素：abcde，权重：4」的节点的权重和要查找的权重相同，但是当前节点的 SDS 类型数据「大于」要查找的数据，所以会继续跳到「元素：abc，权重：3」节点的下一层去找，也就是 leve[0]；
-    
-- 「元素：abc，权重：3」节点的 leve[0] 的下一个指针指向了「元素：abcd，权重：4」的节点，该节点正是要查找的节点，查询结束。
-    
+
+- 但是该层上的下一个节点是空节点，于是就会跳到「元素：abc，权重：3」节点的下一层去找，也就是 leve\[1\];
+
+- 「元素：abc，权重：3」节点的  leve\[1\] 的下一个指针指向了「元素：abcde，权重：4」的节点，然后将其和要查找的节点比较。虽然「元素：abcde，权重：4」的节点的权重和要查找的权重相同，但是当前节点的 SDS 类型数据「大于」要查找的数据，所以会继续跳到「元素：abc，权重：3」节点的下一层去找，也就是 leve\[0\]；
+
+- 「元素：abc，权重：3」节点的 leve\[0\] 的下一个指针指向了「元素：abcd，权重：4」的节点，该节点正是要查找的节点，查询结束。
 
 #### 跳表节点层数设置
 
@@ -747,7 +724,7 @@ typedef struct zskiplist {    struct zskiplistNode *header, *tail;  
 
 下图的跳表就是，相邻两层的节点数量的比例是 2 : 1。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 那怎样才能维持相邻两层的节点数量的比例为 2 : 1  呢？
 
@@ -755,7 +732,7 @@ typedef struct zskiplist {    struct zskiplistNode *header, *tail;  
 
 Redis 则采用一种巧妙的方法是，**跳表在创建节点的时候，随机生成每个节点的层数**，并没有严格维持相邻两层的节点数量比例为 2 : 1 的情况。
 
-具体的做法是，**跳表在创建节点时候，会生成范围为[0-1]的一个随机数，如果这个随机数小于 0.25（相当于概率 25%），那么层数就增加 1 层，然后继续生成下一个随机数，直到随机数的结果大于 0.25 结束，最终确定该节点的层数**。
+具体的做法是，**跳表在创建节点时候，会生成范围为\[0-1\]的一个随机数，如果这个随机数小于 0.25（相当于概率 25%），那么层数就增加 1 层，然后继续生成下一个随机数，直到随机数的结果大于 0.25 结束，最终确定该节点的层数**。
 
 这样的做法，相当于每增加一层的概率不超过 25%，层数越高，概率越低，层高最大限制是 64。
 
@@ -783,7 +760,7 @@ typedef struct quicklist {    //quicklist的链表头    quicklistNod
 typedef struct quicklistNode {    //前一个quicklistNode    struct quicklistNode *prev;     //前一个quicklistNode    //下一个quicklistNode    struct quicklistNode *next;     //后一个quicklistNode    //quicklistNode指向的压缩列表    unsigned char *zl;                  //压缩列表的的字节大小    unsigned int sz;                    //压缩列表的元素个数    unsigned int count : 16;        //ziplist中的元素个数     ....} quicklistNode;
 ```
 
-可以看到，quicklistNode 结构体里包含了前一个节点和下一个节点指针，这样每个 quicklistNode 形成了一个双向链表。但是链表节点的元素不再是单纯保存元素值，而是保存了一个压缩列表，所以 quicklistNode 结构体里有个指向压缩列表的指针 *zl。
+可以看到，quicklistNode 结构体里包含了前一个节点和下一个节点指针，这样每个 quicklistNode 形成了一个双向链表。但是链表节点的元素不再是单纯保存元素值，而是保存了一个压缩列表，所以 quicklistNode 结构体里有个指向压缩列表的指针 \*zl。
 
 我画了一张图，方便你理解 quicklist 数据结构。
 
@@ -820,24 +797,22 @@ listpack 头包含两个属性，分别记录了 listpack 总字节数和元素�
 主要包含三个方面内容：
 
 - encoding，定义该元素的编码类型，会对不同长度的整数和字符串进行编码；
-    
+
 - data，实际存放的数据；
-    
+
 - len，encoding+data的总长度；
-    
 
 可以看到，**listpack 没有压缩列表中记录前一个节点长度的字段了，listpack 只记录当前节点的长度，当我们向 listpack 加入一个新元素的时候，不会影响其他节点的长度字段的变化，从而避免了压缩列表的连锁更新问题**。
 
----
+______________________________________________________________________
 
 ###### 参考资料：
 
 - 《Redis设计与实现》
-    
-- 《Redis 源码剖析与实战》
-    
 
----
+- 《Redis 源码剖析与实战》
+
+______________________________________________________________________
 
 ### 总结
 
@@ -849,9 +824,7 @@ listpack 头包含两个属性，分别记录了 listpack 总字节数和元素�
 
 我是小林，我们下次再见。
 
---- EOF ---  
-
-  
+--- EOF ---
 
 **推荐↓↓↓**
 

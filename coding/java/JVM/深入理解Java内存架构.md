@@ -2,22 +2,19 @@
 
 极客重生
 
- _2022年03月04日 19:01_
+_2022年03月04日 19:01_
 
 以下文章来源于bin的技术小屋 ，作者bin的技术小屋
-
 
 **bin的技术小屋**.
 
 专注源码解析系列原创技术文章，分享自己的技术感悟。谈笑有鸿儒，往来无白丁。无丝竹之乱耳，无案牍之劳形。斯是陋室，惟吾德馨。
 
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247573329&idx=1&sn=08a34c3f670e7f7e2736090c41f2c1f4&chksm=c1852800f6f2a116091c03637bf2e8c4d992c1f857953c8c0c00a951494a969802dec70183cb&mpshare=1&scene=24&srcid=0305tafstLm88UXPvyEyyrpY&sharer_sharetime=1646463847310&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d05445b4b5841a70ff8781c8c043d865a711f32d610e6ca2db43c03f7674f51a045593cd0d47e5ba062c004feee651be935206a8691f6c4d6768fa4c97c890f3a1ebc95ee940bef47019427d2aebd59bbf304cb7e72237111ef1f8f5a98a96c3c93b04c1bb0a9a7b9d02d06ae3a48361eaff1f1c9423d3d589&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQXWL20ZYBZJZda1bJeYthqhLmAQIE97dBBAEAAAAAAA8dGJx3rq4AAAAOpnltbLcz9gKNyK89dVj0bioy27fot5%2B%2FU%2BvmjRR4KwO6mnUL9f1bYoTsdSrPZj4T4ey0D8UIhXcgZmWxKCHgU2IxVazWj1dCVg3znEzrNRAWe1UscmpEd7urtZ5a88vy%2BLMGrWVfXGrbPiqS4fsw19DLMS34X7uNhbylpeJySr3t8PGiv7kq1c2ETbEAd%2FTGs%2Bmj9I6jpKSRk0V%2FjlU7CNF3CfMex7cOa4tZnbkAoY2L8BraQa5ErBrw8lDyPM0ZYfXAggt1z%2BgxIEPCwly0&acctmode=0&pass_ticket=W3Nr%2BHYUf7GTTJOWloWSh2wyDyKOBsgccyaFz2JLTXk5GSlavUbnd2gD8kBvxqCG&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247573329&idx=1&sn=08a34c3f670e7f7e2736090c41f2c1f4&chksm=c1852800f6f2a116091c03637bf2e8c4d992c1f857953c8c0c00a951494a969802dec70183cb&mpshare=1&scene=24&srcid=0305tafstLm88UXPvyEyyrpY&sharer_sharetime=1646463847310&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d05445b4b5841a70ff8781c8c043d865a711f32d610e6ca2db43c03f7674f51a045593cd0d47e5ba062c004feee651be935206a8691f6c4d6768fa4c97c890f3a1ebc95ee940bef47019427d2aebd59bbf304cb7e72237111ef1f8f5a98a96c3c93b04c1bb0a9a7b9d02d06ae3a48361eaff1f1c9423d3d589&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQXWL20ZYBZJZda1bJeYthqhLmAQIE97dBBAEAAAAAAA8dGJx3rq4AAAAOpnltbLcz9gKNyK89dVj0bioy27fot5%2B%2FU%2BvmjRR4KwO6mnUL9f1bYoTsdSrPZj4T4ey0D8UIhXcgZmWxKCHgU2IxVazWj1dCVg3znEzrNRAWe1UscmpEd7urtZ5a88vy%2BLMGrWVfXGrbPiqS4fsw19DLMS34X7uNhbylpeJySr3t8PGiv7kq1c2ETbEAd%2FTGs%2Bmj9I6jpKSRk0V%2FjlU7CNF3CfMex7cOa4tZnbkAoY2L8BraQa5ErBrw8lDyPM0ZYfXAggt1z%2BgxIEPCwly0&acctmode=0&pass_ticket=W3Nr%2BHYUf7GTTJOWloWSh2wyDyKOBsgccyaFz2JLTXk5GSlavUbnd2gD8kBvxqCG&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/cYSwmJQric6lMjStnHJ7fj3S3JuMDrKX1TqRj3K4qw1XDCy851P1nVKbPJr1iabwdPM6Wib3LRru1s3SsUfQDvGqw/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
-  
-
-hi，大家周末好，今天给大家带来一篇硬核的技术文章，本文我们将从计算机组成原理的角度详细阐述对象在JVM内存中是如何布局的，以及什么是内存对齐，如果我们头比较铁，就是不进行内存对齐会造成什么样的后果，最后引出压缩指针的原理和应用。同时我们还介绍了在高并发场景下，False Sharing产生的原因以及带来的性能影响。  
+hi，大家周末好，今天给大家带来一篇硬核的技术文章，本文我们将从计算机组成原理的角度详细阐述对象在JVM内存中是如何布局的，以及什么是内存对齐，如果我们头比较铁，就是不进行内存对齐会造成什么样的后果，最后引出压缩指针的原理和应用。同时我们还介绍了在高并发场景下，False Sharing产生的原因以及带来的性能影响。
 
 相信大家看完本文后，一定会收获很多，话不多说，下面我们正式开始本文的内容~~
 
@@ -37,7 +34,7 @@ hi，大家周末好，今天给大家带来一篇硬核的技术文章，本文
 
 ## 1. Java对象的内存布局
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Java对象的内存布局.png
 
@@ -48,17 +45,14 @@ Java对象的内存布局.png
 每个Java对象都包含一个对象头，对象头中包含了两类信息：
 
 - `MarkWord`：在JVM中用`markOopDesc` 结构表示用于存储对象自身运行时的数据。比如：hashcode，GC分代年龄，锁状态标志，线程持有的锁，偏向线程Id，偏向时间戳等。在32位操作系统和64位操作系统中`MarkWord`分别占用4B和8B大小的内存。
-    
+
 - `类型指针`：JVM中的类型指针封装在`klassOopDesc` 结构中，类型指针指向了`InstanceKclass对象`，Java类在JVM中是用InstanceKclass对象封装的，里边包含了Java类的元信息，比如：继承结构，方法，静态变量，构造函数等。
-    
 
 - 在不开启指针压缩的情况下(-XX:-UseCompressedOops)。在32位操作系统和64位操作系统中类型指针分别占用4B和8B大小的内存。
-    
+
 - 在开启指针压缩的情况下(-XX:+UseCompressedOops)。在32位操作系统和64位操作系统中类型指针分别占用4B和4B大小的内存。
-    
 
 - 如果Java对象是一个数组类型的话，那么在数组对象的对象头中还会包含一个4B大小的用于记录数组长度的属性。
-    
 
 > 由于在对象头中用于记录数组长度大小的属性只占4B的内存，所以Java数组可以申请的最大长度为：`2^32`。
 
@@ -69,24 +63,20 @@ Java对象在内存中的实例数据区用来存储Java类中定义的实例字
 Java对象中的字段类型分为两大类：
 
 - 基础类型：Java类中实例字段定义的基础类型在实例数据区的内存占用如下：
-    
 
 - long | double占用8个字节。
-    
+
 - int | float占用4个字节。
-    
+
 - short | char占用2个字节。
-    
+
 - byte | boolean占用1个字节。
-    
 
 - 引用类型：Java类中实例字段的引用类型在实例数据区内存占用分为两种情况：
-    
 
 - 不开启指针压缩(-XX:-UseCompressedOops)：在32位操作系统中引用类型的内存占用为4个字节。在64位操作系统中引用类型的内存占用为8个字节。
-    
+
 - 开启指针压缩(-XX:+UseCompressedOops)：在64为操作系统下，引用类型内存占用则变为为4个字节，32位操作系统中引用类型的内存占用继续为4个字节。
-    
 
 **为什么32位操作系统的引用类型占4个字节，而64位操作系统引用类型占8字节？**
 
@@ -105,14 +95,12 @@ Java对象中的字段类型分为两大类：
 JVM重新分配字段的排列顺序受`-XX:FieldsAllocationStyle`参数的影响，默认值为`1`，实例字段的重新分配策略遵循以下规则：
 
 1. 如果一个字段占用`X`个字节，那么这个字段的偏移量`OFFSET`需要对齐至`NX`
-    
 
 > 偏移量是指字段的内存地址与Java对象的起始内存地址之间的差值。比如long类型的字段，它内存占用8个字节，那么它的OFFSET应该是8的倍数8N。不足8N的需要填充字节。
 
 2. 在开启了压缩指针的64位JVM中，Java类中的第一个字段的OFFSET需要对齐至4N，在关闭压缩指针的情况下类中第一个字段的OFFSET需要对齐至8N。
-    
-3. JVM默认分配字段的顺序为：long / double，int / float，short / char，byte / boolean，oops(Ordianry Object Point 引用类型指针)，**并且父类中定义的实例变量会出现在子类实例变量之前**。当设置JVM参数`-XX +CompactFields` 时（默认），占用内存小于long / double 的字段会允许被插入到对象中第一个 long / double字段之前的间隙中，以避免不必要的内存填充。
-    
+
+1. JVM默认分配字段的顺序为：long / double，int / float，short / char，byte / boolean，oops(Ordianry Object Point 引用类型指针)，**并且父类中定义的实例变量会出现在子类实例变量之前**。当设置JVM参数`-XX +CompactFields` 时（默认），占用内存小于long / double 的字段会允许被插入到对象中第一个 long / double字段之前的间隙中，以避免不必要的内存填充。
 
 > CompactFields选项参数在JDK14中以被标记为过期了，并在将来的版本中很可能被删除。详细细节可查看issue：https://bugs.openjdk.java.net/browse/JDK-8228750
 
@@ -123,31 +111,28 @@ JVM重新分配字段的排列顺序受`-XX:FieldsAllocationStyle`参数的影�
 `    public class Parent {       long l;       int i;   }      public class Child extends Parent {       long l;       int i;   }    `
 
 - 根据上面介绍的`规则3`我们知道父类中的变量是出现在子类变量之前的，并且字段分配顺序应该是long型字段l，应该在int型字段i之前。
-    
 
 > 如果JVM开启了`-XX +CompactFields`时，int型字段是可以插入对象中的第一个long型字段（也就是Parent.l字段）之前的空隙中的。如果JVM设置了`-XX -CompactFields`则int型字段的这种插入行为是不被允许的。
 
 - 根据`规则1`我们知道long型字段在实例数据区的OFFSET需要对齐至8N，而int型字段的OFFSET需要对齐至4N。
-    
+
 - 根据`规则2`我们知道如果开启压缩指针`-XX:+UseCompressedOops`，Child对象的第一个字段的OFFSET需要对齐至4N，关闭压缩指针时`-XX:-UseCompressedOops`，Child对象的第一个字段的OFFSET需要对齐至8N。
-    
 
 由于JVM参数`UseCompressedOops` 和`CompactFields` 的存在，导致Child对象在实例数据区字段的排列顺序分为四种情况，下面我们结合前边提炼出的这三点规则来看下字段排列顺序在这四种情况下的表现。
 
 ### 2.1 -XX:+UseCompressedOops  -XX -CompactFields 开启压缩指针，关闭字段压缩
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 - 偏移量OFFSET = 8的位置存放的是类型指针，由于开启了压缩指针所以占用4个字节。对象头总共占用12个字节：MarkWord(8字节) + 类型指针(4字节)。
-    
+
 - 根据`规则3：`父类Parent中的字段是要出现在子类Child的字段之前的并且long型字段在int型字段之前。
-    
+
 - `根据规则2：`在开启压缩指针的情况下，Child对象中的第一个字段需要对齐至4N。这里Parent.l字段的OFFSET可以是12也可以是16。
-    
+
 - `根据规则1：`long型字段在实例数据区的OFFSET需要对齐至8N，所以这里Parent.l字段的OFFSET只能是16，因此OFFSET = 12的位置就需要被填充。Child.l字段只能在OFFSET = 32处存储，不能够使用OFFSET = 28位置，因为28的位置不是8的倍数无法对齐8N，因此OFFSET = 28的位置被填充了4个字节。
-    
 
 > 规则1也规定了int型字段的OFFSET需要对齐至4N，所以Parent.i与Child.i分别存储以OFFSET = 24和OFFSET = 40的位置。
 
@@ -157,16 +142,15 @@ image.png
 
 ### 2.2  -XX:+UseCompressedOops  -XX +CompactFields 开启压缩指针，开启字段压缩
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 - 在第一种情况的分析基础上，我们开启了`-XX +CompactFields`压缩字段，所以导致int型的Parent.i字段可以插入到OFFSET = 12的位置处，以避免不必要的字节填充。
-    
+
 - 根据`规则2：`Child对象的第一个字段需要对齐至4N，这里我们看到`int型`的Parent.i字段是符合这个规则的。
-    
+
 - 根据`规则1：`Child对象的所有long型字段都对齐至8N，所有的int型字段都对齐至4N。
-    
 
 最终得到Child对象大小为36字节，由于Java对象与对象之间的内存地址需要对齐至8N，所以最后Child对象的末尾又被填充了4个字节最终变为40字节。
 
@@ -174,16 +158,15 @@ image.png
 
 ### 2.3 -XX:-UseCompressedOops  -XX -CompactFields 关闭压缩指针，关闭字段压缩
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 首先在关闭压缩指针`-UseCompressedOops`的情况下，对象头中的类型指针占用字节变成了8字节。导致对象头的大小在这种情况下变为了16字节。
 
 - 根据`规则1：`long型的变量OFFSET需要对齐至8N。根据`规则2：`在关闭压缩指针的情况下，Child对象的第一个字段Parent.l需要对齐至8N。所以这里的Parent.l字段的OFFSET  = 16。
-    
+
 - 由于long型的变量OFFSET需要对齐至8N，所以Child.l字段的OFFSET 需要是32，因此OFFSET = 28的位置被填充了4个字节。
-    
 
 这样计算出来的Child对象大小为44字节，但是考虑到Java对象与对象的内存地址需要对齐至8N，于是又在对象末尾处填充了4个字节，最终Child对象的内存占用为48字节。
 
@@ -191,7 +174,7 @@ image.png
 
 在第三种情况的分析基础上，我们来看下第四种情况的字段排列情况：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -209,7 +192,7 @@ image.png
 
 比如前边提到的字段重排列的第一种情况`-XX:+UseCompressedOops -XX -CompactFields`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -241,7 +224,7 @@ Java 虚拟机堆中对象之间的内存地址需要对齐至8N（8的倍数）
 
 为了弥补CPU与内存之间巨大的速度差异，提高CPU的处理效率和吞吐，于是人们引入了`L1,L2,L3`高速缓存集成到CPU中。当然还有`L0`也就是寄存器，寄存器离CPU最近，访问速度也最快，基本没有时延。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 CPU缓存结构.png
 
@@ -267,7 +250,7 @@ L1Cache离CPU是最近的，它的访问速度最快，容量也最小。
 
 我们可以通过`cd /sys/devices/system/cpu/`来查看linux机器上的CPU信息。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -279,28 +262,27 @@ image.png
 
 CPU缓存的情况在`/sys/devices/system/cpu/cpu0/cache`目录下查看：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 `index0`描述的是L1Cache中DataCache的情况：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 - `level`：表示该cache信息属于哪一级，1表示L1Cache。
-    
+
 - `type`：表示属于L1Cache的DataCache。
-    
+
 - `size`：表示DataCache的大小为32K。
-    
+
 - `shared_cpu_list`：之前我们提到L1Cache和L2Cache是CPU物理核所私有的，而由物理核模拟出来的逻辑核是**共享L1Cache和L2Cache的**，`/sys/devices/system/cpu/`目录下描述的信息是逻辑核。shared_cpu_list描述的正是哪些逻辑核共享这个物理核。
-    
 
 `index1`描述的是L1Cache中Instruction Cache的情况：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -310,7 +292,7 @@ image.png
 
 L2Cache的信息存储在`index2`目录下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -320,7 +302,7 @@ L2Cache的大小为256K，比L1Cache要大些。
 
 L3Cache的信息存储在`index3`目录下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -340,7 +322,7 @@ image.png
 
 CPU高速缓存中存取数据的基本单位叫做缓存行`cache line`。缓存行存取字节的大小为2的倍数，在不同的机器上，缓存行的大小范围在32字节到128字节之间。目前所有主流的处理器中缓存行的大小均为`64字节`（**注意：这里的单位是字节**）。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -366,7 +348,7 @@ image.png
 
 FalseSharding类中字段之间的内存布局如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -374,7 +356,7 @@ FalseSharding类中的字段a,b在内存中是相邻存储，分别占用8个字
 
 如果恰好字段a，b被CPU读进了同一个缓存行，而此时有两个线程，线程a用来修改字段a，同时线程b用来读取字段b。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 falsesharding1.png
 
@@ -383,20 +365,18 @@ falsesharding1.png
 我们知道声明了`volatile关键字`的变量可以在多线程处理环境下，确保内存的可见性。计算机硬件层会保证对被volatile关键字修饰的共享变量进行写操作后的内存可见性，而这种内存可见性是由`Lock前缀指令`以及`缓存一致性协议（MESI控制协议）`共同保证的。
 
 - Lock前缀指令可以使修改线程所在的处理器中的相应缓存行数据被修改后立马刷新回内存中，并同时`锁定`所有处理器核心中缓存了该修改变量的缓存行，防止多个处理器核心并发修改同一缓存行。
-    
+
 - 缓存一致性协议主要是用来维护多个处理器核心之间的CPU缓存一致性以及与内存数据的一致性。每个处理器会在总线上嗅探其他处理器准备写入的内存地址，如果这个内存地址在自己的处理器中被缓存的话，就会将自己处理器中对应的缓存行置为`无效`，下次需要读取的该缓存行中的数据的时候，就需要访问内存获取。
-    
 
 **基于以上volatile关键字原则，我们首先来看第一种影响**：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 falsesharding2.png
 
 - 当线程a在处理器core0中对字段a进行修改时，`Lock前缀指令`会将所有处理器中缓存了字段a的对应缓存行进行`锁定`，**这样就会导致线程b在处理器core1中无法读取和修改自己缓存行的字段b**。
-    
+
 - 处理器core0将修改后的字段a所在的缓存行刷新回内存中。
-    
 
 从图中我们可以看到此时字段a的值在处理器core0的缓存行中以及在内存中已经发生变化了。但是处理器core1中字段a的值还没有变化，并且core1中字段a所在的缓存行处于`锁定状态`，无法读取也无法写入字段b。
 
@@ -404,7 +384,7 @@ falsesharding2.png
 
 **第二种影响**：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 faslesharding3.png
 
@@ -438,7 +418,7 @@ faslesharding3.png
 
 修改后的对象在内存中布局如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -448,7 +428,7 @@ image.png
 
 **这里笔者想强调的是在我们日常工作中**，我们不能因为自己手里拿着锤子，就满眼都是钉子，看到任何钉子都想上去锤两下。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -473,11 +453,10 @@ Java8中通过引入@Contended注解帮我们解决了这个问题，我们不�
 @Contended注解可以标注在类上也可以标注在类中的字段上，被@Contended标注的对象会独占缓存行，不会和任何变量或者对象共享缓存行。
 
 - @Contended标注在类上表示该类对象中的`实例数据整体`需要独占缓存行。不能与其他实例数据共享缓存行。
-    
+
 - @Contended标注在类中的字段上表示该字段需要独占缓存行。
-    
+
 - 除此之外@Contended还提供了分组的概念，注解中的value属性表示`contention group` 。属于统一分组下的变量，它们在内存中是连续存放的，可以允许共享缓存行。不同分组之间不允许共享缓存行。
-    
 
 下面我们来分别看下@Contended注解在这三种使用场景下是怎样影响字段之间的排列的。
 
@@ -489,7 +468,7 @@ Java8中通过引入@Contended注解帮我们解决了这个问题，我们不�
 
 这种情况下的内存布局：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -502,12 +481,10 @@ image.png
 其实这里的原因有两个：
 
 1. 首先第一个原因，我们之前也已经提到过了，目前大部分主流的CPU缓存行是64字节，但是也有部分CPU缓存行是32字节或者128字节，如果只填充64字节的话，在缓存行大小为32字节和64字节的CPU中是可以做到独占缓存行从而避免FalseSharding的，但在缓存行大小为`128字节`的CPU中还是会出现FalseSharding问题，这里Java采用了悲观的一种做法，默认都是填充`128字节`，虽然对于大部分情况下比较浪费，但是屏蔽了底层硬件的差异。
-    
 
 > 不过@Contended注解填充字节的大小我们可以通过JVM参数`-XX:ContendedPaddingWidth`指定，有效值范围`0 - 8192`，默认为`128`。
 
 - 第二个原因其实是最为核心的一个原因，主要是为了防止CPU Adjacent Sector Prefetch（CPU相邻扇区预取）特性所带来的FalseSharding问题。
-    
 
 > CPU Adjacent Sector Prefetch：https://www.techarp.com/bios-guide/cpu-adjacent-sector-prefetch/
 
@@ -521,7 +498,7 @@ image.png
 
 `public class FalseSharding {          @Contended       volatile long a;       @Contended       volatile long b;          volatile int c;       volatile long d;   }   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -533,7 +510,7 @@ image.png
 
 `public class FalseSharding {          @Contended("group1")       volatile int a;       @Contended("group1")       volatile long b;          @Contended("group2")       volatile long  c;       @Contended("group2")       volatile long d;   }   `
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -554,9 +531,8 @@ image.png
 那么在本小节中笔者将为大家介绍什么是内存对齐，在本节的内容开始之前笔者先来抛出两个问题：
 
 - 为什么要进行内存对齐？如果就是头比较铁，就是不内存对齐，会产生什么样的后果？
-    
+
 - Java 虚拟机堆中对象的起始地址为什么需要对齐至 `8`的倍数？为什么不对齐至4的倍数或16的倍数或32的倍数呢？
-    
 
 带着这两个问题，下面我们正式开始本节的内容~~~
 
@@ -565,25 +541,24 @@ image.png
 我们平时所称的内存也叫随机访问存储器（random-access memory）也叫RAM。而RAM分为两类：
 
 - 一类是静态RAM（`SRAM`），这类SRAM用于前边介绍的CPU高速缓存L1Cache，L2Cache，L3Cache。其特点是访问速度快，访问速度为`1 - 30个`时钟周期，但是容量小，造价高。
-    
+
 - 另一类则是动态RAM(`DRAM`)，这类DRAM用于我们常说的主存上，其特点的是访问速度慢（相对高速缓存），访问速度为`50 - 200个`时钟周期，但是容量大，造价便宜些（相对高速缓存）。
-    
 
-内存由一个一个的存储器模块（memory module）组成，它们插在主板的扩展槽上。常见的存储器模块通常以**64位为单位（8个字节）**传输数据到存储控制器上或者从存储控制器传出数据。
+内存由一个一个的存储器模块（memory module）组成，它们插在主板的扩展槽上。常见的存储器模块通常以\*\*64位为单位（8个字节）\*\*传输数据到存储控制器上或者从存储控制器传出数据。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
 如图所示内存条上黑色的元器件就是存储器模块（memory module）。多个存储器模块连接到存储控制器上，就聚合成了主存。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 内存结构.png
 
 而前边介绍到的`DRAM芯片`就包装在存储器模块中，每个存储器模块中包含`8个DRAM芯片`，依次编号为`0 - 7`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 存储器模块.png
 
@@ -593,7 +568,7 @@ image.png
 
 下图中的supercell的RAS = 2，CAS = 2。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 DRAM结构.png
 
@@ -607,18 +582,17 @@ DRAM结构.png
 
 我们现在就以读取上图中坐标地址为（2，2）的supercell为例，来说明访问DRAM芯片的过程。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 DRAM芯片访问.png
 
 1. 首先存储控制器将行地址`RAS = 2`通过地址引脚发送给`DRAM芯片`。
-    
-2. DRAM芯片根据`RAS = 2`将二维矩阵中的第二行的全部内容拷贝到`内部行缓冲区`中。
-    
-3. 接下来存储控制器会通过地址引脚发送`CAS = 2`到DRAM芯片中。
-    
-4. DRAM芯片从内部行缓冲区中根据`CAS = 2`拷贝出第二列的supercell并通过数据引脚发送给存储控制器。
-    
+
+1. DRAM芯片根据`RAS = 2`将二维矩阵中的第二行的全部内容拷贝到`内部行缓冲区`中。
+
+1. 接下来存储控制器会通过地址引脚发送`CAS = 2`到DRAM芯片中。
+
+1. DRAM芯片从内部行缓冲区中根据`CAS = 2`拷贝出第二列的supercell并通过数据引脚发送给存储控制器。
 
 > DRAM芯片的IO单位为一个supercell，也就是一个字节(8 bit)。
 
@@ -628,7 +602,7 @@ DRAM芯片访问.png
 
 本小节我们来介绍下CPU是如何访问内存的。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 CPU与内存之间的总线结构.png
 
@@ -643,11 +617,10 @@ CPU与内存之间的数据交互是通过总线（bus）完成的，而数据�
 总线上传输的信号包括：地址信号，数据信号，控制信号。其中控制总线上传输的控制信号可以同步事务，并能够标识出当前正在被执行的事务信息：
 
 - 当前这个事务是到内存的？还是到磁盘的？或者是到其他IO设备的？
-    
+
 - 这个事务是读还是写？
-    
+
 - 总线上传输的地址信号（`内存地址`），还是数据信号（`数据`）？。
-    
 
 > 还记得我们前边讲到的MESI缓存一致性协议吗？当core0修改字段a的值时，其他CPU核心会在总线上`嗅探`字段a的内存地址，如果嗅探到总线上出现字段a的内存地址，说明有人在修改字段a，这样其他CPU核心就会`失效`自己缓存字段a所在的`cache line`。
 
@@ -659,22 +632,21 @@ CPU与内存之间的数据交互是通过总线（bus）完成的，而数据�
 
 假设CPU现在要将内存地址为`A`的内容加载到寄存器中进行运算。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 CPU读取内存.png
 
 首先CPU芯片中的`总线接口`会在总线上发起读事务（`read transaction`）。该读事务分为以下步骤进行：
 
 1. CPU将内存地址A放到系统总线上。随后`IO bridge`将信号传递到存储总线上。
-    
-2. 主存感受到存储总线上的`地址信号`并通过存储控制器将存储总线上的内存地址A读取出来。
-    
-3. 存储控制器通过内存地址A定位到具体的存储器模块，从`DRAM芯片`中取出内存地址A对应的`数据X`。
-    
-4. 存储控制器将读取到的`数据X`放到存储总线上，随后IO bridge将`存储总线`上的数据信号转换为`系统总线`上的数据信号，然后继续沿着系统总线传递。
-    
-5. CPU芯片感受到系统总线上的数据信号，将数据从系统总线上读取出来并拷贝到寄存器中。
-    
+
+1. 主存感受到存储总线上的`地址信号`并通过存储控制器将存储总线上的内存地址A读取出来。
+
+1. 存储控制器通过内存地址A定位到具体的存储器模块，从`DRAM芯片`中取出内存地址A对应的`数据X`。
+
+1. 存储控制器将读取到的`数据X`放到存储总线上，随后IO bridge将`存储总线`上的数据信号转换为`系统总线`上的数据信号，然后继续沿着系统总线传递。
+
+1. CPU芯片感受到系统总线上的数据信号，将数据从系统总线上读取出来并拷贝到寄存器中。
 
 以上就是CPU读取内存数据到寄存器中的完整过程。
 
@@ -688,19 +660,19 @@ CPU读取内存.png
 
 随后会通过内存地址定位到具体的存储器模块。还记得内存结构中的存储器模块吗？？
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 内存结构.png
 
 而每个存储器模块中包含了8个DRAM芯片，编号从`0 - 7`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 存储器模块.png
 
 存储控制器会将内存地址转换为DRAM芯片中supercell在二维矩阵中的坐标地址(`RAS`，`CAS`)。并将这个坐标地址发送给对应的存储器模块。随后存储器模块会将`RAS`和`CAS`广播到存储器模块中的所有`DRAM芯片`。依次通过(`RAS`，`CAS`)从DRAM0到DRAM7读取到相应的supercell。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 DRAM芯片访问.png
 
@@ -714,7 +686,7 @@ DRAM芯片访问.png
 
 > **内存一次读取和写入的单位是8个字节。而且在程序员眼里连续的内存地址实际上在物理上是不连续的**。因为这连续的`8个字节`其实是存储于不同的`DRAM芯片`上的。每个DRAM芯片存储一个字节（supercell）。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 读取存储器模块数据.png
 
@@ -723,17 +695,16 @@ DRAM芯片访问.png
 我们现在假设CPU要将寄存器中的数据X写到内存地址A中。同样的道理，CPU芯片中的总线接口会向总线发起写事务（`write transaction`）。写事务步骤如下：
 
 1. CPU将要写入的内存地址A放入系统总线上。
-    
-2. 通过`IO bridge`的信号转换，将内存地址A传递到存储总线上。
-    
-3. 存储控制器感受到存储总线上的地址信号，将内存地址A从存储总线上读取出来，并等待数据的到达。
-    
-4. CPU将寄存器中的数据拷贝到系统总线上，通过`IO bridge`的信号转换，将数据传递到存储总线上。
-    
-5. 存储控制器感受到存储总线上的数据信号，将数据从存储总线上读取出来。
-    
-6. 存储控制器通过内存地址A定位到具体的存储器模块，最后将数据写入存储器模块中的8个DRAM芯片中。
-    
+
+1. 通过`IO bridge`的信号转换，将内存地址A传递到存储总线上。
+
+1. 存储控制器感受到存储总线上的地址信号，将内存地址A从存储总线上读取出来，并等待数据的到达。
+
+1. CPU将寄存器中的数据拷贝到系统总线上，通过`IO bridge`的信号转换，将数据传递到存储总线上。
+
+1. 存储控制器感受到存储总线上的数据信号，将数据从存储总线上读取出来。
+
+1. 存储控制器通过内存地址A定位到具体的存储器模块，最后将数据写入存储器模块中的8个DRAM芯片中。
 
 ## 6. 为什么要内存对齐
 
@@ -747,25 +718,23 @@ CPU读取数据的单位是根据`word size`来的，在64位处理器中`word s
 
 在64位内存中，内存IO单位为`8个字节`，我们前边也提到内存结构中的存储器模块通常以64位为单位（8个字节）传输数据到存储控制器上或者从存储控制器传出数据。因为每次内存IO读取数据都是从数据所在具体的存储器模块中包含的这8个DRAM芯片中以相同的(`RAM`,`CAS`)依次读取一个字节，然后在存储控制器中聚合成`8个字节`返回给CPU。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 读取存储器模块数据.png
 
 **由于存储器模块中这种由8个DRAM芯片组成的物理存储结构的限制，内存读取数据只能是按照地址顺序8个字节的依次读取----8个字节8个字节地来读取数据。**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 内存IO单位.png
 
 - 假设我们现在读取`0x0000 - 0x0007`这段连续内存地址上的8个字节。由于内存读取是按照`8个字节`为单位依次顺序读取的，**而我们要读取的这段内存地址的起始地址是0（8的倍数）**，所以0x0000 - 0x0007中每个地址的坐标都是相同的（`RAS`,`CAS`）。所以他可以在8个DRAM芯片中通过相同的（`RAS`,`CAS`）一次性读取出来。
-    
+
 - 如果我们现在读取`0x0008 - 0x0015`这段连续内存上的8个字节也是一样的，**因为内存段起始地址为8（8的倍数）**，所以这段内存上的每个内存地址在DREAM芯片中的坐标地址（`RAS`,`CAS`）也是相同的，我们也可以一次性读取出来。
-    
 
 > 注意：`0x0000 - 0x0007`内存段中的坐标地址（RAS,CAS）与`0x0008 - 0x0015`内存段中的坐标地址（RAS,CAS）是不相同的。
 
 - 但如果我们现在读取`0x0007 - 0x0014`这段连续内存上的8个字节情况就不一样了，由于起始地址`0x0007`在DRAM芯片中的（RAS,CAS）与后边地址`0x0008 - 0x0014`的（RAS,CAS）不相同，所以CPU只能先从`0x0000 - 0x0007`读取8个字节出来先放入`结果寄存器`中并左移7个字节（目的是只获取`0x0007`），然后CPU在从`0x0008 - 0x0015`读取8个字节出来放入临时寄存器中并右移1个字节（目的是获取`0x0008 - 0x0014`）最后与结果寄存器`或运算`。最终得到`0x0007 - 0x0014`地址段上的8个字节。
-    
 
 从以上分析过程来看，当CPU访问内存对齐的地址时，比如`0x0000`和`0x0008`这两个起始地址都是对齐至`8的倍数`。CPU可以通过一次read transaction读取出来。
 
@@ -819,7 +788,7 @@ CPU可以原子地操作一个对齐的word size memory。64位处理器中`word
 
 当寻址的时候，JVM将这32位的对象引用`左移3位`（后三位补0）。这就导致了在开启压缩指针的情况下，我们原本32位的内存寻址空间一下变成了`35位`。可寻址的内存空间变为2^32 * 2^3 = 32G。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 压缩指针.png
 
@@ -851,7 +820,7 @@ CPU可以原子地操作一个对齐的word size memory。64位处理器中`word
 
 ### 8.1 基本类型数组的内存布局
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 基本类型数组内存布局.png
 
@@ -865,7 +834,7 @@ CPU可以原子地操作一个对齐的word size memory。64位处理器中`word
 
 #### 开启指针压缩 -XX:+UseCompressedOops
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -875,7 +844,7 @@ image.png
 
 #### 关闭指针压缩  -XX:-UseCompressedOops
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -886,15 +855,14 @@ image.png
 我们前边在字段重排列小节介绍了三种字段排列规则在这里继续适用：
 
 - `规则1`：如果一个字段占用`X`个字节，那么这个字段的偏移量OFFSET需要对齐至`NX`。
-    
+
 - `规则2`：在开启了压缩指针的64位JVM中，Java类中的第一个字段的OFFSET需要对齐至`4N`，在关闭压缩指针的情况下类中第一个字段的OFFSET需要对齐至`8N`。
-    
 
 这里基本数组类型的实例数据区中是long型，在关闭指针压缩的情况下，根据规则1和规则2需要对齐至8的倍数，所以要在其与对象头之间填充4个字节，达到内存对齐的目的，起始地址变为`24`。
 
 ### 8.2 引用类型数组的内存布局
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 引用类型数组的内存布局.png
 
@@ -908,7 +876,7 @@ image.png
 
 #### 开启指针压缩 -XX:+UseCompressedOops
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -918,7 +886,7 @@ image.png
 
 #### 关闭指针压缩 -XX:-UseCompressedOops
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -926,7 +894,7 @@ image.png
 
 根据字段重排列规则2，在引用数组类型对象头与实例数据区中间需要填充`4个字节`以保证内存对齐的目的。
 
----
+______________________________________________________________________
 
 ## 总结
 
@@ -939,113 +907,68 @@ image.png
 最后又由内存对齐引出了压缩指针的工作原理。由此我们知道进行内存对齐的四个原因：
 
 - `CPU访问性能`：当CPU访问内存对齐的地址时，可以通过一个read transaction读取一个字长（word size）大小的数据出来。否则就需要两个read transaction。
-    
+
 - `原子性`：CPU可以原子地操作一个对齐的word size memory。
-    
+
 - `尽可能利用CPU缓存`：内存对齐可以使对象或者字段尽可能的被分配到一个缓存行中，避免跨缓存行存储，导致CPU执行效率减半。
-    
+
 - `提升压缩指针的内存寻址空间：` 对象与对象之间的内存对齐，可以使我们在64位系统中利用32位对象引用将内存寻址空间提升至32G。既降低了对象引用的内存占用，又提升了内存寻址空间。
-    
 
 在本文中我们顺带还介绍了和内存布局相关的几个JVM参数：-XX:+UseCompressedOops`,` -XX +CompactFields `,`-XX:-RestrictContended `,`-XX:ContendedPaddingWidth`,` -XX:ObjectAlignmentInBytes。
 
 最后感谢大家能看到这里，我们下篇文章再见~~~
 
-  
-
 - END -
 
----
+______________________________________________________________________
 
-  
+**看完一键三连********在看******\*\*，**转发**\*\*，\*\*\*\*****点赞****
 
-**看完一键三连********在看********，**转发****，********点赞****
-
-**是对文章最大的赞赏，极客重生感谢你****![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
-
-  
+**是对文章最大的赞赏，极客重生感谢你**\*\*!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)\*\*
 
 推荐阅读
 
-  
+\[
 
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 定个目标｜建立自己的技术知识体系
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247570933&idx=1&sn=04bf666a7a402ed65b83020dc28dd543&chksm=c18522a4f6f2abb27ca1d09eaf646cc7eca2feea9c7f39618d3048b87634695955a8831992a9&scene=21#wechat_redirect)
 
+\[
 
-
-
-
-
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247570933&idx=1&sn=04bf666a7a402ed65b83020dc28dd543&chksm=c18522a4f6f2abb27ca1d09eaf646cc7eca2feea9c7f39618d3048b87634695955a8831992a9&scene=21#wechat_redirect)
-
-  
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 大厂后台开发基本功修炼路线和经典资料
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247566986&idx=1&sn=40c3846a5a328ba18b73a16d329b756f&chksm=c18531dbf6f2b8cd4a93bd9aa5cad4020daf8da7a54156f754f5c2b403c58b02b40a79ed79f4&scene=21#wechat_redirect)
 
+\[
 
-
-
-
-
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247566986&idx=1&sn=40c3846a5a328ba18b73a16d329b756f&chksm=c18531dbf6f2b8cd4a93bd9aa5cad4020daf8da7a54156f754f5c2b403c58b02b40a79ed79f4&scene=21#wechat_redirect)
-
-  
-
-  
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一文搞懂JAVA与GO垃圾回收
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247525171&idx=1&sn=0acea29afcfe6046eb2fd87b36a35249&chksm=c1849462f6f31d743a6e47410fa66c34116500902dd54b09704589c5c74550aa9aa51465102f&scene=21#wechat_redirect)
 
+\[
 
-
-
-
-
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247525171&idx=1&sn=0acea29afcfe6046eb2fd87b36a35249&chksm=c1849462f6f31d743a6e47410fa66c34116500902dd54b09704589c5c74550aa9aa51465102f&scene=21#wechat_redirect)
-
-[
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 JVM底层原理解析
 
-
-
-
-
-
-
-](https://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247519277&idx=1&sn=48fd7efeb54950ddb35fac8d23f7a8ce&chksm=c1847b7cf6f3f26aeb41dd9a89f1d5dbf2d82d9c05c95bcfbace5d0e78dd8e231bd30c540f55&scene=21#wechat_redirect)
-
-  
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247519277&idx=1&sn=48fd7efeb54950ddb35fac8d23f7a8ce&chksm=c1847b7cf6f3f26aeb41dd9a89f1d5dbf2d82d9c05c95bcfbace5d0e78dd8e231bd30c540f55&scene=21#wechat_redirect)
 
 你好，这里是极客重生，我是阿荣，大家都叫我荣哥，从华为->外企->到互联网大厂，目前是大厂资深工程师，多次获得五星员工，多年职场经验，技术扎实，专业后端开发和后台架构设计，热爱底层技术，丰富的实战经验，分享技术的本质原理，希望帮助更多人蜕变重生，拿BAT大厂offer，培养高级工程师能力，成为技术专家，实现高薪梦想，期待你的关注！[**点击蓝字查看我的成长之路**。](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247564006&idx=1&sn=8c88b0d7222ce0e310a012e90bff961f&chksm=c1850db7f6f284a133be27ad27ecd965c3c942583f69bd1a26c34ebf179b4cd6ceb3d7e787b4&scene=21#wechat_redirect)
 
-  
-
-校招/社招/简历/面试技巧/大厂技术栈分析/后端开发进阶/优秀开源项目/直播分享/技术视野/实战高手等, [极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247568828&idx=1&sn=ec346110ca42539f5d797f94eee57e9a&chksm=c1853aedf6f2b3fbf80600f4f71059ce2eddcb7c3e900953014764a3d16d2fd77f8190303898&scene=21#wechat_redirect)希望成为最有技术价值星球，尽最大努力为星球的同学提供技术和成长帮助！详情查看->[极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247568828&idx=1&sn=ec346110ca42539f5d797f94eee57e9a&chksm=c1853aedf6f2b3fbf80600f4f71059ce2eddcb7c3e900953014764a3d16d2fd77f8190303898&scene=21#wechat_redirect)  
-
-  
+校招/社招/简历/面试技巧/大厂技术栈分析/后端开发进阶/优秀开源项目/直播分享/技术视野/实战高手等, [极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247568828&idx=1&sn=ec346110ca42539f5d797f94eee57e9a&chksm=c1853aedf6f2b3fbf80600f4f71059ce2eddcb7c3e900953014764a3d16d2fd77f8190303898&scene=21#wechat_redirect)希望成为最有技术价值星球，尽最大努力为星球的同学提供技术和成长帮助！详情查看->[极客星球](http://mp.weixin.qq.com/s?__biz=MzkyMTIzMTkzNA==&mid=2247568828&idx=1&sn=ec346110ca42539f5d797f94eee57e9a&chksm=c1853aedf6f2b3fbf80600f4f71059ce2eddcb7c3e900953014764a3d16d2fd77f8190303898&scene=21#wechat_redirect)
 
 ![](https://res.wx.qq.com/t/fed_upload/b39ef69e-c4d6-4169-8612-5f00a84860e7/wx-avatar-default.svg)
 
 公众号
 
-                                                                求点赞，在看，分享三连![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+求点赞，在看，分享三连!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 1261
 

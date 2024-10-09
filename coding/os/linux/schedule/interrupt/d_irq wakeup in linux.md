@@ -60,40 +60,26 @@ GIC可以被关闭电源，也可以不关闭电源，这个在SOC设计阶段�
     
 2. GIC在可以断电的power domain中，这样在休眠时一般都会对gic进行断电，这种状况下，系统需要soc特定的实现来进行唤醒。  
     具体实现各家SOC都不相同，在此不做讨论，只需要知道这个唤醒功能和GIC没有关系，完全由SOC厂商在设计时实现。  
-    
-
 ### CPU Power Down
 
 下面是ARM Crotext A55 CPU的下电流程，CPU有寄存器CPUPWRCTLR来控制电源控制相关功能，当CPUPWRCTLR.CORE_PWRDN_EN置1时，就是代表CPU在下次执行WFI指令时要进入掉电状态。[2](http://www.wowotech.net/admin/#fn.2)
 
 > The Cortex-A55 core uses the following power down sequence.
-> 
 > To power down a core, perform the following programming sequence:
-> 
 > 1. Save all architectural state.  
->     
 > 2. Configure the GIC distributor to disable or reroute interrupts away from this core.  
->     
 > 3. Set the CPUPWRCTLR.CORE_PWRDN_EN bit to 1 to indicate to the power controller that a powerdown is requested.  
->     
 > 4. Execute an Instruction Synchronization Barrier (ISB) instruction.  
->     
 > 5. Execute a WFI instruction.  
->     
-> 
 > After executing WFI and then receiving a powerdown request from the power controller, the hardware performs the following:
-> 
 > • Disabling and flushing of caches (L1 and L2).
-> 
 > • Removal of the core from coherency.
 
 从上面的掉电流程可知，A55在下电时，还需要SOC内部power controller的支持，不同的SOC厂商实现的方式千奇百怪，并且设计泄密在此不做深入。
-
 ### CPU Power Up
 
 从上边Power Down的流程可知，系统在进入Power Down之后需要进行reset才可以将CPU重新启动，具体的过程也是SOC厂商自己定义的行为，没有太大分析的必要。  
 Reset之后，CPU需要从RVBAR寄存器所显示的地址来重新启动。RVBAR寄存器是通过CPU的外部信号线进行输入的。
-
 #### RESET的执行地址
 
 ![2021-03-05_13-40-42_screenshot.png](https://schspa.tk/2020/07/10/assets/2021-03-05_13-40-42_screenshot.png)
@@ -125,7 +111,7 @@ Mask non wake irqs in the suspend path
 
 Skip chip.irq_set_wake(), for this irq chip  
 由以下patch引入，提交说明已经很明确
-
+```cpp
 60f96b41f71d2a13d1c0a457b8b77958f77142d1
 Author:     Santosh Shilimkar <santosh.shilimkar@ti.com>
 AuthorDate: Fri Sep 9 13:59:35 2011 +0530
@@ -146,6 +132,7 @@ the flag in set_irq_wake_real() and return success when set.
 
 Signed-off-by: Santosh Shilimkar <santosh.shilimkar@ti.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>
+```
 ### arm-gic
 
 在arm gic的实现中，既没有提供IRQCHIP_SKIP_SET_WAKE的flag，也没有实现set_irq_wake的实现。这是因为Linux内核认为gic不处理休眠唤醒的问题，这些应该由平台来基于stacked irqchip来实现。[4](http://www.wowotech.net/admin/#fn.4)  

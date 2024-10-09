@@ -2,7 +2,7 @@
 
 方志朋
 
- _2021年11月28日 17:39_
+_2021年11月28日 17:39_
 
 ## _欢迎关注方志朋的博客，回复”666“获面试宝典_
 
@@ -19,18 +19,16 @@
 在开发中，往往会遇到一些关于延时任务的需求。例如
 
 - 生成订单30分钟未支付，则自动取消
-    
+
 - 生成订单60秒后,给用户发短信
-    
 
 对上述的任务，我们给一个专业的名字来形容，那就是延时任务。那么这里就会产生一个问题，这个延时任务和定时任务的区别究竟在哪里呢？一共有如下几点区别
 
 - 定时任务有明确的触发时间，延时任务没有
-    
+
 - 定时任务有执行周期，而延时任务在某事件触发后一段时间内执行，没有执行周期
-    
+
 - 定时任务一般执行的是批处理操作是多个任务，而延时任务一般是单个任务
-    
 
 下面，我们以判断订单是否超时为例，进行方案分析
 
@@ -69,16 +67,14 @@ package com.rjzheng.delay1;import org.quartz.Job;import org.quartz.JobBuilder
 **优点:**
 
 - 简单易行，支持集群操作
-    
 
 **缺点:**
 
 - 对服务器内存消耗大
-    
+
 - 存在延迟，比如你每隔3分钟扫描一次，那最坏的延迟时间就是3分钟
-    
+
 - 假设你的订单有几千万条，每隔几分钟这样扫描一次，数据库损耗极大
-    
 
 ### (2)JDK的延迟队列
 
@@ -88,14 +84,13 @@ package com.rjzheng.delay1;import org.quartz.Job;import org.quartz.JobBuilder
 
 DelayedQueue实现工作流程如下图所示
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中
 
 - `Poll()`:获取并移除队列的超时元素，没有则返回空
-    
+
 - `take()`:获取并移除队列的超时元素，如果没有则wait当前线程，直到有元素满足超时条件，返回结果。
-    
 
 **实现**
 
@@ -124,18 +119,16 @@ package com.rjzheng.delay2;import java.util.ArrayList;import java.util.List;i
 **优点:**
 
 - 效率高,任务触发时间延迟低。
-    
 
 **缺点:**
 
 - 服务器重启后，数据全部消失，怕宕机
-    
+
 - 集群扩展相当麻烦
-    
+
 - 因为内存条件限制的原因，比如下单未付款的订单数太多，那么很容易就出现OOM异常
-    
+
 - 代码复杂度较高
-    
 
 ### (3)时间轮算法
 
@@ -143,7 +136,7 @@ package com.rjzheng.delay2;import java.util.ArrayList;import java.util.List;i
 
 先上一张时间轮的图(这图到处都是啦)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 时间轮算法可以类比于时钟，如上图箭头（指针）按某一个方向按固定频率轮动，每一次跳动称为一个 tick。这样可以看出定时轮由个3个重要的属性参数，ticksPerWheel（一轮的tick数），tickDuration（一个tick的持续时间）以及 timeUnit（时间单位），例如当ticksPerWheel=60，tickDuration=1，timeUnit=秒，这就和现实中的始终的秒针走动完全类似了。
 
@@ -176,16 +169,14 @@ package com.rjzheng.delay3;import io.netty.util.HashedWheelTimer;import io.ne
 **优点:**
 
 - 效率高,任务触发时间延迟时间比delayQueue低，代码复杂度比delayQueue低。
-    
 
 **缺点:**
 
 - 服务器重启后，数据全部消失，怕宕机
-    
+
 - 集群扩展相当麻烦
-    
+
 - 因为内存条件限制的原因，比如下单未付款的订单数太多，那么很容易就出现OOM异常
-    
 
 ### (4)redis缓存
 
@@ -194,13 +185,12 @@ package com.rjzheng.delay3;import io.netty.util.HashedWheelTimer;import io.ne
 利用redis的zset,zset是一个有序集合，每一个元素(member)都关联了一个score,通过score排序来取集合中的值
 
 - 添加元素:`ZADD key score member [[score member] [score member] …]`
-    
+
 - 按顺序查询元素:`ZRANGE key start stop [WITHSCORES]`
-    
+
 - 查询元素：`score:ZSCORE key member`
-    
+
 - 移除元素:`ZREM key member [member …]`
-    
 
 测试如下
 
@@ -210,7 +200,7 @@ package com.rjzheng.delay3;import io.netty.util.HashedWheelTimer;import io.ne
 
 那么如何实现呢？我们将订单超时时间戳与订单号分别设置为score和member,系统扫描第一个元素判断是否超时，具体如下图所示
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **实现一**
 
@@ -220,9 +210,9 @@ package com.rjzheng.delay4;import java.util.Calendar;import java.util.Set;imp
 
 此时对应输出如下
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-可以看到，几乎都是3秒之后，消费订单。[](http://mp.weixin.qq.com/s?__biz=MzU2MTI4MjI0MQ==&mid=2247506972&idx=2&sn=790959d9ee2b74e0d0c8a0a5395bc665&chksm=fc79b1b2cb0e38a498933a034926df45b51524b044762583488d498ae2112c06cf35d412fb3b&scene=21#wechat_redirect)  
+可以看到，几乎都是3秒之后，消费订单。[](http://mp.weixin.qq.com/s?__biz=MzU2MTI4MjI0MQ==&mid=2247506972&idx=2&sn=790959d9ee2b74e0d0c8a0a5395bc665&chksm=fc79b1b2cb0e38a498933a034926df45b51524b044762583488d498ae2112c06cf35d412fb3b&scene=21#wechat_redirect)
 
 然而，这一版存在一个致命的硬伤，在高并发条件下，多消费者会取到同一个订单号，我们上测试代码ThreadTest
 
@@ -232,9 +222,9 @@ package com.rjzheng.delay4;import java.util.concurrent.CountDownLatch;public 
 
 输出如下所示
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-显然，出现了多个线程消费同一个资源的情况。  
+显然，出现了多个线程消费同一个资源的情况。
 
 **解决方案**
 
@@ -274,9 +264,9 @@ package com.rjzheng.delay5;import redis.clients.jedis.Jedis;import redis.clie
 
 输出如下
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-可以明显看到3秒过后，订单取消了  
+可以明显看到3秒过后，订单取消了
 
 ps:redis的pub/sub机制存在一个硬伤，官网内容如下
 
@@ -295,16 +285,14 @@ ps:redis的pub/sub机制存在一个硬伤，官网内容如下
 优点:
 
 - 由于使用Redis作为消息通道，消息都存储在Redis中。如果发送程序或者任务处理程序挂了，重启之后，还有重新处理数据的可能性。
-    
+
 - 做集群扩展相当方便
-    
+
 - 时间准确度高
-    
 
 缺点:
 
 - 需要额外进行redis维护
-    
 
 ### (5)使用消息队列
 
@@ -321,34 +309,26 @@ lRabbitMQ的Queue可以配置`x-dead-letter-exchange` 和`x-dead-letter-routing
 优点:
 
 - 高效,可以利用rabbitmq的分布式特性轻易的进行横向扩展,消息支持持久化增加了可靠性。
-    
 
 缺点：
 
 - 本身的易用度要依赖于rabbitMq的运维.因为要引用rabbitMq,所以复杂度和成本变高
-    
 
-  
-
-热门内容：  
+热门内容：
 
 - [抗住双11超高并发，今年排第一的调优方案，没有之一！](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518862&idx=1&sn=641248e8b70eac7a8b75e2f870bb3d38&chksm=9beeabfcac9922ea120e1cce78bb511db5f6b0bc6978b1db0f7f9391a4e5ec7b03a10a834f93&scene=21#wechat_redirect)
-    
-- [妙用Java 8中的 Function接口 消灭if...else（非常新颖的写法）](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518811&idx=1&sn=52db5ca8cfe213105e2c3263729e7a28&chksm=9beeab29ac99223fe9021108418feb9dc1f48eb15611144258a1bfcc098123624cafc8ce73e6&scene=21#wechat_redirect)  
-    
-- [阿里二面：现针对一个请求量10000次/s的秒杀系统，说说你的优化思路](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518751&idx=1&sn=2fe482eedb19cb472e98e165216548d6&chksm=9beeab6dac99227b29bd9960483fc93271d4d66ff6206293d26a43ebb480207500072c53c7cd&scene=21#wechat_redirect)  
-    
+
+- [妙用Java 8中的 Function接口 消灭if...else（非常新颖的写法）](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518811&idx=1&sn=52db5ca8cfe213105e2c3263729e7a28&chksm=9beeab29ac99223fe9021108418feb9dc1f48eb15611144258a1bfcc098123624cafc8ce73e6&scene=21#wechat_redirect)
+
+- [阿里二面：现针对一个请求量10000次/s的秒杀系统，说说你的优化思路](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518751&idx=1&sn=2fe482eedb19cb472e98e165216548d6&chksm=9beeab6dac99227b29bd9960483fc93271d4d66ff6206293d26a43ebb480207500072c53c7cd&scene=21#wechat_redirect)
+
 - [阿里3大编程语言，Java没上榜！](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518704&idx=1&sn=6b22549bab19a94a28653b7da6834058&chksm=9beea882ac99219405ed51a38d2dc5402d0e750caa694229ee85e435fc1b8e0c4b9ba16f0f4b&scene=21#wechat_redirect)
-    
-- [在部队当程序员是什么体验？](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518659&idx=1&sn=75a59eed8f46bedf78b5de03555c1832&chksm=9beea8b1ac9921a7f01bc582100c751dc505d065e83508a66c52639f4318d78cab20e0548a23&scene=21#wechat_redirect)  
-    
+
+- [在部队当程序员是什么体验？](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518659&idx=1&sn=75a59eed8f46bedf78b5de03555c1832&chksm=9beea8b1ac9921a7f01bc582100c751dc505d065e83508a66c52639f4318d78cab20e0548a23&scene=21#wechat_redirect)
 
 - [mybatis-plus团队新作：mybatis-mate 轻松搞定数据权限](http://mp.weixin.qq.com/s?__biz=MzAxNjk4ODE4OQ==&mid=2247518624&idx=1&sn=342c7d95a2d6351805afa4b4b820a3b9&chksm=9beea8d2ac9921c4fe609c72a544ec298ae292a113c78fa685bae3b0714e84420e581bb7f645&scene=21#wechat_redirect)
-    
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最近面试BAT，整理一份面试资料《**Java面试BAT通关手册**》，覆盖了Java核心技术、JVM、Java并发、SSM、微服务、数据库、数据结构等等。
 

@@ -2,7 +2,7 @@
 
 Linux爱好者
 
- _2021年10月27日 11:50_
+_2021年10月27日 11:50_
 
 ↓推荐关注↓
 
@@ -81,13 +81,10 @@ func f(i int) func() int {    return func() int {        i++
 ## 小结
 
 1. Go语言支持闭包
-    
-2. Go语言能通过escape analyze识别出变量的作用域，自动将变量在堆上分配。将闭包环境变量在堆上分配是Go实现闭包的基础。
-    
-3. 返回闭包时并不是单纯返回一个函数，而是返回了一个结构体，记录下函数返回地址和引用的环境中的变量地址。
-    
 
-  
+1. Go语言能通过escape analyze识别出变量的作用域，自动将变量在堆上分配。将闭包环境变量在堆上分配是Go实现闭包的基础。
+
+1. 返回闭包时并不是单纯返回一个函数，而是返回了一个结构体，记录下函数返回地址和引用的环境中的变量地址。
 
 > tiancaiamao.gitbooks.io/go-internals/content/zh/03.6.html
 
@@ -101,9 +98,7 @@ func f(i int) func() int {    return func() int {        i++
 
 3、[GO 语言 RSA 加密解密](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666556780&idx=3&sn=bd32e00daa832e93afeaff6fddbf1c85&chksm=80dca9c7b7ab20d110bebf3fe0689d56ed7b56fb6c9796d27591ee3c91451ccb768475904989&scene=21#wechat_redirect)
 
-  
-
-看完本文有收获？请分享给更多人  
+看完本文有收获？请分享给更多人
 
 推荐关注「Linux 爱好者」，提升Linux技能
 

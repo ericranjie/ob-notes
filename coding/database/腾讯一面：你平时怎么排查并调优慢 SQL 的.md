@@ -16,21 +16,18 @@ MySQL 中与慢 SQL 有关的几个重要系统变量如下：
 SHOW VARIABLES LIKE '%slow_query_log%';
 ```
 
-  
-
-  
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5Xousl5PWI0aJKdD544WvSGvwJ4o1VhC5KPCF6k3WgOoW8M76WwDCmd33zQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
 可以看到，我这里是已经开启了的。如果你的没有开启，可以使用如下两种方式来开启慢查询。
 
 ### 2.1 修改配置文件
 
-修改配置文件 `vim /etc/my.cnf`，在 [mysqld] 段落在加入如下配置：
+修改配置文件 `vim /etc/my.cnf`，在 \[mysqld\] 段落在加入如下配置：
 
-> [mysqld]  
-> slow_query_log=1  
-> slow_query_log_file=/var/lib/mysql/data/slow.log  
-> long_query_time=3  
+> \[mysqld\]\
+> slow_query_log=1\
+> slow_query_log_file=/var/lib/mysql/data/slow.log\
+> long_query_time=3\
 > log_output=FILE,TABLE
 
 需要重启 MySQL 才可以生效，命令为 `service mysqld restart`
@@ -39,9 +36,9 @@ SHOW VARIABLES LIKE '%slow_query_log%';
 
 如下打开慢查询日志，设置超时时间为 3 秒，并且将日志记录到文件以及 mysql.show_log 表中。
 
-> SET GLOBAL slow_query_log = 1;  
-> SET GLOBAL slow_query_log_file='/var/lib/mysql/data/slow.log';  
-> SET GLOBAL long_query_time=3;  
+> SET GLOBAL slow_query_log = 1;\
+> SET GLOBAL slow_query_log_file='/var/lib/mysql/data/slow.log';\
+> SET GLOBAL long_query_time=3;\
 > SET GLOBAL log_output='FILE,TABLE';
 
 想要永久生效得用上面那个配置文件里配置，否则数据库重启后，这些配置失效。
@@ -55,8 +52,6 @@ SHOW VARIABLES LIKE '%slow_query_log%';
 ```
 SHOW GLOBAL STATUS LIKE '%Slow_queries%';
 ```
-
-  
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5XousZcF3aoAtq24LFacnlBvINSABXX6vz1hOEEvecljsyhyMmoic0Sw5GIA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
@@ -72,9 +67,6 @@ select sleep(5);
 cat /var/lib/mysql/data/slow.log
 ```
 
-  
-
-  
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5XousF1L342lYVpErPosfVBXF8ghw7XLFS8xvIjNOnSXJCmY6GTvnRa6KLA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
 ### 3.2 mysqldumpslow
@@ -82,8 +74,6 @@ cat /var/lib/mysql/data/slow.log
 MySQL 内置了 mysqldumpslow 这个工具来帮我们分析慢查询日志。
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5XousHF3QSGXgib4XDF31zo8dyJYibhB7xWO4xjHvcFNicphGsNSKd7jiap2zbA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
-
-  
 
 ```
 #得到返回记录集最多的10个SQL
@@ -111,7 +101,6 @@ Show Profile 也可以分析慢 SQL，比 explain 获取的信息更详细，比
 -- 开启SET profiling = ON;-- 查看SHOW VARIABLES LIKE 'profiling%';
 ```
 
-  
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5XousgEa9Lyj4k20pBxdc2YqYMjS10DTxyTNicoiaaOlXuvQpUlnvQU8WUgHw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
 ### 5.2 SHOW profiles 查看 SQL 的耗时
@@ -126,22 +115,17 @@ Show Profile 也可以分析慢 SQL，比 explain 获取的信息更详细，比
 SHOW profile CPU, BLOCK IO FOR QUERY 4;
 ```
 
-  
-
-  
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5Xous3xJ516D9MAal16PVoOUGbMKEauDMxWIQWSCLqIibUYAOnNpN2dMwfkg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
-
-> 可用参数 type:  
-> ALL # 显示所有的开销信息  
-> BLOCK IO # 显示块IO相关开销  
-> CONTEXT SWITCHES # 上下文切换相关开销  
-> CPU # 显示CPU相关开销信息  
-> IPC # 显示发送和接收相关开销信息  
-> MEMORY # 显示内存相关开销信息  
-> PAGE FAULTS # 显示页面错误相关开销信息  
-> SOURCE # 显示和 Source_function，Source_file，Source_line 相关的开销信息  
+> 可用参数 type:\
+> ALL # 显示所有的开销信息\
+> BLOCK IO # 显示块IO相关开销\
+> CONTEXT SWITCHES # 上下文切换相关开销\
+> CPU # 显示CPU相关开销信息\
+> IPC # 显示发送和接收相关开销信息\
+> MEMORY # 显示内存相关开销信息\
+> PAGE FAULTS # 显示页面错误相关开销信息\
+> SOURCE # 显示和 Source_function，Source_file，Source_line 相关的开销信息\
 > SWAPS # 显示交换次数相关开销的信息
 
 ### 5.4 危险状态
@@ -154,15 +138,13 @@ GROUP BY 可能创建了临时表
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/80icw67Ot0qK3Vdlx1ibmHSoWvakf5XouswkcrjBgptUDFzF5NC8XFyUQzicdDnL2iaegcNqdx3KWWficV9El5X8Qcw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1 "在这里插入图片描述")
 
-  
-
-> converting HEAP to MyISAM # 查询结果太大，内存不够用了，在往磁盘上搬。  
-> Creating tmp table # 创建了临时表，回先把数据拷贝到临时表，用完后再删除临时表。  
-> Copying to tmp table on disk # 把内存中临时表复制到磁盘  
+> converting HEAP to MyISAM # 查询结果太大，内存不够用了，在往磁盘上搬。\
+> Creating tmp table # 创建了临时表，回先把数据拷贝到临时表，用完后再删除临时表。\
+> Copying to tmp table on disk # 把内存中临时表复制到磁盘\
 > locked # 记录被锁了
 
 看到这些危险状态可以进行相应的调优，然后我们线上也会针对慢 SQL 进行监控，存在慢 SQL 的话会触发告警机制，通知相应的人员快速定位慢 SQL 并优化。
 
----
+______________________________________________________________________
 
 欢迎大家关注我的公众号【老周聊架构】，Java后端主流技术栈的原理、源码分析、架构以及各种互联网高并发、高性能、高可用的解决方案。

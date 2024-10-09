@@ -1,7 +1,7 @@
-
 # 八股文相关网络资源   Stereotyped-Writing
 
 ## Github
+
 https://github.com/datawhalechina/daily-interview/
 Datawhale总结的八股文github主页。
 似乎3年前停止了更新，但它其中有一句话说得好：
@@ -19,8 +19,4 @@ https://github.com/flycash/interview-baguwen
 
 ## CSDN
 
-
 ## 牛客网
-
-
-

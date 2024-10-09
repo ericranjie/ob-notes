@@ -1,19 +1,22 @@
 深度Linux
- _2023年11月21日 21:27_ _湖南_
+_2023年11月21日 21:27_ _湖南_
 
 Skynet 是一个基于C跟lua的开源服务端并发框架，这个框架是单进程多线程Actor模型。是一个轻量级的为在线游戏服务器打造的框架。
+
 ## 一、skynet介绍
+
 ### 1.1简介
 
 这个系统是单进程多线程模型。每个服务都是严格的被动的消息驱动的，以一个统一的 callback 函数的形式交给框架。框架从消息队列里调度出接收的服务模块，找到 callback 函数入口，调用它。服务本身在没有被调度时，是不占用任何 CPU 的。
 
 skynet虽然支持集群，但是作者云风主张能用一个节点完成尽量用一个节点，因为多节点通信方面的开销太大，如果一共有 100 个 skynet 节点，在它们启动完毕后，会建立起 9900条通讯通道。
+
 ### 1.2特点
 
 Skynet框架做两个必要的保证：
 
 1. 一个服务的 callback 函数永远不会被并发。
-2. 一个服务向另一个服务发送的消息的次序是严格保证的。
+1. 一个服务向另一个服务发送的消息的次序是严格保证的。
 
 用多线程模型来实现它。底层有一个线程消息队列，消息由三部分构成：源地址、目的地址、以及数据块。框架启动固定的多条线程，每条工作线程不断从消息队列取到消息，调用服务的 callback 函数。
 
@@ -24,6 +27,7 @@ Skynet框架做两个必要的保证：
 做为核心功能，Skynet 仅解决一个问题：
 
 把一个符合规范的 C 模块，从动态库（so 文件）中启动起来，绑定一个永不重复（即使模块退出）的数字 id 做为其 handle 。模块被称为服务（Service），服务间可以自由发送消息。每个模块可以向 Skynet 框架注册一个 callback 函数，用来接收发给它的消息。每个服务都是被一个个消息包驱动，当没有包到来的时候，它们就会处于挂起状态，对 CPU 资源零消耗。如果需要自主逻辑，则可以利用 Skynet 系统提供的 timeout 消息，定期触发。
+
 ### 1.3Actor模型
 
 Actor模型内部的状态由它自己维护即它内部数据只能由它自己修改(通过消息传递来进行状态修改)，所以使用Actors模型进行并发编程可以很好地避免这些问题，Actor由状态(state)、行为(Behavior)和邮箱(mailBox)三部分组成：
@@ -37,14 +41,16 @@ Actor的基础就是消息传递，skynet中每个服务就是一个LUA虚拟机
 Actor模型好处
 
 1. 事件模型驱动： Actor之间的通信是异步的，即使Actor在发送消息后也无需阻塞或者等待就能够处理其他事情。
-2. 强隔离性： Actor中的方法不能由外部直接调用，所有的一切都通过消息传递进行的，从而避免了Actor之间的数据共享，想要观察到另一个Actor的状态变化只能通过消息传递进行询问。
-3. 位置透明： 无论Actor地址是在本地还是在远程机上对于代码来说都是一样的。
-4. 轻量性：Actor是非常轻量的计算单机，只需少量内存就能达到高并发。
+1. 强隔离性： Actor中的方法不能由外部直接调用，所有的一切都通过消息传递进行的，从而避免了Actor之间的数据共享，想要观察到另一个Actor的状态变化只能通过消息传递进行询问。
+1. 位置透明： 无论Actor地址是在本地还是在远程机上对于代码来说都是一样的。
+1. 轻量性：Actor是非常轻量的计算单机，只需少量内存就能达到高并发。
+
 ## 二、skynet原理
 
 ### 2.1消息队列
-![[Pasted image 20241007172635.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20241007172635.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图摘自Actor模型解析，每个Actor都有一个专用的MailBox来接收消息，这也是Actor实现异步的基础。当一个Actor实例向另外一个Actor发消息的时候，并非直接调用Actor的方法，而是把消息传递到对应的MailBox里，就好像邮递员，并不是把邮件直接送到收信人手里，而是放进每家的邮箱，这样邮递员就可以快速的进行下一项工作。所以在Actor系统里，Actor发送一条消息是非常快的。
 
@@ -54,11 +60,11 @@ struct message_queue {    struct spinlock lock;    uint32_t handle;    int cap; 
 
 struct spinlock是自旋锁，用来解决并发问题的。
 
-skynet也实现了Actor模型，每个服务都有一个专用的MailBox用来接收消息，这个队列即struct message_queue结构，skynet有两种消息队列，每个服务有一个刚刚谈到的被称为次级消息队列，skynet还有一个全局消息队列即static struct global_queue *Q = NULL;，头尾指针分别指向一个次级队列，在skynet启动时初始化全局队列。
-![[Pasted image 20241007172643.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+skynet也实现了Actor模型，每个服务都有一个专用的MailBox用来接收消息，这个队列即struct message_queue结构，skynet有两种消息队列，每个服务有一个刚刚谈到的被称为次级消息队列，skynet还有一个全局消息队列即static struct global_queue \*Q = NULL;，头尾指针分别指向一个次级队列，在skynet启动时初始化全局队列。
+!\[\[Pasted image 20241007172643.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-struct message_queue结构体种有一个struct skynet_message *queue这个就是每个服务的次级消息队列，是来自其他服务需要本服务处理的消息，这是一个数组实现的队列，在往队列push消息的时候会检查队列是否已满，满了会扩容一倍，跟vector有点类似。
+struct message_queue结构体种有一个struct skynet_message \*queue这个就是每个服务的次级消息队列，是来自其他服务需要本服务处理的消息，这是一个数组实现的队列，在往队列push消息的时候会检查队列是否已满，满了会扩容一倍，跟vector有点类似。
 
 配置文件中有个配置是thread = 8，这个就是worker线程的个数，worker线程每次会从global_mq中pop一条次级消息队列（每条次级消息对应特定服务），并根据线程权重和次级消息队列的回调函数，对次级消息队列中的消息进行消费。处理完毕后，会从global_mq中再pop一条次级消息队列供下次调用，同时将本次使用的次级消息队列push回global_mq的尾部。
 
@@ -68,20 +74,19 @@ struct message_queue结构体种有一个struct skynet_message *queue这个就�
 struct modules {    int count;    struct spinlock lock;    const char * path;// 用c编写的服务编译后so库路经，不配置默认是./cservice/?.so    struct skynet_module m[MAX_MODULE_TYPE]; //存放服务模块的数组};static struct modules * M = NULL;struct skynet_module { //单个模块结构    const char * name; //c服务名称，一般是指c服务的文件名    void * module; //访问so库的dl句柄，通过dlopen获得该句柄    skynet_dl_create create; //通过dlsym绑定so库中的xxx_create函数，调用create即调用xxx_create接口    skynet_dl_init init; //绑定xxx_init接口    skynet_dl_release release; //绑定xxx_release接口    skynet_dl_signal signal; //绑定xxx_signal接口};
 ```
 
-M->path在初始化(skynet_module_init)时赋值，对应配置文件的cpath，不配置默认是./cservice/?.so。  
-用c编写的服务编译成so库后放在cpath目录下，当创建一个ctx时(skynet_context_new)，通过名称在skynet_module里找对应的module(skynet_module_query)，如果M->m存有同名称的module，返回即可。  
+M->path在初始化(skynet_module_init)时赋值，对应配置文件的cpath，不配置默认是./cservice/?.so。\
+用c编写的服务编译成so库后放在cpath目录下，当创建一个ctx时(skynet_context_new)，通过名称在skynet_module里找对应的module(skynet_module_query)，如果M->m存有同名称的module，返回即可。\
 如果第一次创建该名称的服务，先找到该名称对应的so库的路径，然后通过dlopen函数获取so库的访问句柄dl(try_open)，再通过dlsym函数获取so库中xxx_create, xxx_init,xxx_release, xxx_signal4个函数地址(open_sym)，将这些地址赋值给skynet_module->create, skynet_module->init, skynet_module->release, skynet_module->signal。
 
 通常一个c服务需要提供这4个接口，定义这些接口时一定要以服务名称为前缀，通过下划线和函数名称连接起来：
 
 - xxx_create：创建ctx过程中调用，通常是申请内存。返回该服务的实例inst，设置ctx->instance=inst，之后init，release，signal都需要用到该实例
-    
+
 - xxx_init：创建ctx期间调用，除了初始化，最主要的工作是向ctx注册callback函数（skynet_callback），之后ctx才能正确的处理收到的消息（调用callback函数）
-    
+
 - xxx_release：释放ctx时调用(skynet_context_release)
-    
+
 - xxx_signal：ctx收到信号时调用
-    
 
 最后将skynet_module保存到M->m里，之后创建同名称ctx就不用获取so库的访问句柄了。
 
@@ -90,9 +95,8 @@ M->path在初始化(skynet_module_init)时赋值，对应配置文件的cpath，
 kynet是以服务为主体进行运作的，服务称作为skynet_context(简称ctx)，是一个c结构，是skynet里最重要的结构，整个skynet的运作都是围绕ctx进行的。skynet_server提供的api主要分两大类：
 
 - 1.对ctx的一系列操作，比如创建，删除ctx等
-    
+
 - 2.如何发送消息和处理自身的消息
-    
 
 ctx的结构如下，创建一个服务时，会构建一个skynet上下文skynet_context，然后把该ctx存放到handle_storage(skynet_handle.c)里。ctx有一个引用计数（ctx->ref）控制其生命周期，当引用计数为0，删除ctx，释放内存。
 
@@ -133,9 +137,8 @@ int snlua_init(struct snlua *l, struct skynet_context *ctx, const char * args) {
 这个初始化函数主要完成了两件事：
 
 - 给当前服务实例注册绑定了一个回调函数 launch_cb；
-    
+
 - 给本服务发送一条消息，内容就是之前传入的参数 bootstrap 。
-    
 
 当此服务的消息队列被push进全局的消息队列后，本服务收到的第一条消息就是上述在初始化中给自己发送的那条消息，此时便会调用回调函数launch_cb并执行处理逻辑：
 
@@ -190,8 +193,9 @@ $ sudo apt-get install build-essential libssl-dev libcurl4-gnutls-dev libexpat1-
 ```
 
 ### 3.2skynet代码目录结构
-![[Pasted image 20241007172721.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20241007172721.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ```
 3rd         #第三方支持库，包括LUA虚拟机，jmalloc等lualib      #lua语言封装的常用库，包括http、md5lualib-src  #将c语言实现的插件捆绑成lua库，例如数据库驱动、bson、加密算法等service     #使用lua写的Skynet的服务模块service-src #使用C写的Skynet的服务模块skynet-src  #skynet核心代码目录test        #使用lua写的一些测试代码examples    #示例代码Makefile    #编译规则文件，用于编译platform.mk #编译与平台相关的设置
@@ -266,14 +270,14 @@ $ cd examples$ ../skynet configtry open logger failed : ./cservice/logger.so: ca
 ```
 
 以上出现找不到logger.so的情况，其实不仅仅是这个模块找不到，所有的模块都找不到了，因为在config包含的路劲conf.path中，所有的模块路劲的引入全部依靠着相对路劲。一旦执行skynet程序的位置不一样了，相对路劲也会不一样。
-![[Pasted image 20241007172731.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241007172731.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (4)添加自己的LUA脚本路劲
 
 例如：添加my_workspace目录，则只需在luaservice值的基础上再添加一个`root.."my_workspace/？.lua;"`,注意：各个路劲通过一个`;` 隔开。
-![[Pasted image 20241007172737.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241007172737.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 把我们的刚才写的test.lua丢到my_workspace中
 
@@ -312,13 +316,12 @@ $ ./skynet examples/config   [:01000001] LAUNCH logger    [:01000002] LAUNCH snl
 ### 4.3环境变量
 
 - 1、预先加载的环境变量是在conf中配置的，加载完成后，所有的service都能去获取这些变量。
-    
+
 - 2、也可以去设置环境变量，但是不能修改已经存在的环境变量。
-    
+
 - 3、环境变量设置完成后，当前节点上的所有服务都能访问的到。
-    
+
 - 4、环境变量设置完成后，及时服务退出了，环境变量依然存在，所以不要滥用环境变量。
-    
 
 例如在conf中添加：
 
@@ -389,16 +392,14 @@ $ ./skynet examples/config  #默认启动main.lua服务testnewservice          #
 全局唯一的服务等同于单例，即不管调用多少次创建接口，最后都只会创建一个此类型的服务实例，且全局唯一。
 
 - 创建接口：
-    
 
 ```
 skynet.uniqueservice(servicename, ...) skynet.uniqueservice(true, servicename, ...) 
 ```
 
 - 当带参数 `true` 时，则表示此服务在所有节点之间是唯一的。第一次创建唯一服，返回服务地址，第二次创建的时候不会正常创建服务，只是返回第一次创建的服务地址。
-    
+
 - 查询接口： 假如不清楚当前创建了此全局服务没有，可以通过以下接口来查询：
-    
 
 ```
 skynet.queryservice(servicename, ...) skynet.queryservice(true, servicename, ...) 
@@ -521,17 +522,14 @@ testunique true uniqueservice[:0100000e] LAUNCH snlua testunique true uniqueserv
 在skynet中，服务别名可以分为两种：
 
 - 一种是本地别名，本地别名只能在当前skynet节点使用，本地别名必须使用`.` 开头，例如：`.testalias`
-    
+
 - 一种是全局别名，全局别名可以在所有skynet中使用，全局别名不能以`.` 开头， 例如：`testalias`
-    
 
 ### 6.2别名注册与查询接口
 
 ```
 ------------------------------[[取别名]]--------------------------local skynet = require "skynet"require "skynet.manager"--给当前服务定一个别名，可以是全局别名，也可以是本地别名skynet.register(aliasname)--给指定servicehandler的服务定一个别名，可以是全局别名，也可以是本地别名skynet.name(aliasname, servicehandler)-------------------------------------------------------------------
 ```
-
-  
 
 ```
 ----------------------[[查询别名]]--------------------------------查询本地别名为aliasname的服务，返回servicehandler，不存在就返回nilskynet.localname(aliasname)--[[查询别名为aliasname的服务,可以是全局别名也可以是本地别名，1、当查询本地别名时，返回servicehandler，不存在就返回nil2、当查询全局别名时，返回servicehandler，不存在就阻塞等待到该服务初始化完成]]--local skynet = require "skynet.harbor"harbor.queryname(aliasname)-------------------------------------------------------------------
@@ -582,21 +580,18 @@ $ ./skynet examples/config                                             testalias
 启动两个skynet节点，在节点1取别名，节点2查询别名：
 
 - 节点1，testaliasname.lua
-    
 
 ```
 local skynet = require "skynet" require "skynet.manager"local harbor = require "skynet.harbor"skynet.start(function()    local handle = skynet.newservice("test")    skynet.name(".testalias", handle)   --给服务起一个本地别名    skynet.name("testalias", handle)    --给服务起一个全局别名end)
 ```
 
 - 节点2, testaliasquery.lua
-    
 
 ```
 local skynet = require "skynet" require "skynet.manager"local harbor = require "skynet.harbor"skynet.start(function()        handle = skynet.localname(".testalias")                  skynet.error("localname .testalias handle", skynet.address(handle))        handle = skynet.localname("testalias")                   skynet.error("localname testalias handle", skynet.address(handle))        handle = harbor.queryname(".testalias")                 skynet.error("queryname .testalias handle", skynet.address(handle))        handle = harbor.queryname("testalias")                   skynet.error("queryname testalias handle", skynet.address(handle))end)
 ```
 
 - 先启动节点1运行testaliasname.lua，再启动节点2运行
-    
 
 ```
 testaliasquery[:0200000a] LAUNCH snlua testaliasquery[:0200000a] localname .testalias handle nil[:0200000a] localname testalias handle nil[:0200000a] queryname .testalias handle nil[:0200000a] queryname testalias handle :0100000b --查询到节点1创建的服务
@@ -789,6 +784,7 @@ local skynet = require "skynet"function task()    skynet.error("task", coroutine
 ```
 testtimeout[:0100000a] LAUNCH snlua testtimeout[:0100000a] start thread: 0x7f525b16a048 false  #start函数也执行完，这个协程就空闲下来了[:0100000a] task thread: 0x7f525b16a128 false   #当前服务的协程池中只有两个协程，所以是交替使用[:0100000a] task thread: 0x7f525b16a048 false[:0100000a] task thread: 0x7f525b16a128 false[:0100000a] task thread: 0x7f525b16a048 false
 ```
+
 ### 7.7获取时间
 
 示例代码：testtime.lua

@@ -1,10 +1,9 @@
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2021-5-8 9:03 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
-# 关于migrate_swap() 和 active_balance()之间的hardlock
+# 关于migrate_swap() 和 active_balance()之间的hardlock
 
-## 背景：这个是在3.10.0-957.el7.x86_64 遇到的一例crash
-
-### 下面列一下我们是怎么排查并解这个问题的。
+背景：这个是在3.10.0-957.el7.x86_64 遇到的一例crash
+下面列一下我们是怎么排查并解这个问题的。
 
   
 

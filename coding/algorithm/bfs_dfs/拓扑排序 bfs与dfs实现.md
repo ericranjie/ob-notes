@@ -1,9 +1,6 @@
-
 原创 lightcity 光城
 
- _2022年01月08日 12:07_
-
-  
+_2022年01月08日 12:07_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mdEgG339CmT1EHgnaeA6eWto2IVqJNLqrVn033UFXKAnplTycPh7qQVRUia5MpC5kUTnPj44UibFKew/300?wx_fmt=png&wxfrom=19)
 
@@ -29,9 +26,9 @@
 
 你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。
 
-在选修某些课程之前需要一些先修课程。先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
+在选修某些课程之前需要一些先修课程。先修课程按数组 prerequisites 给出，其中 prerequisites\[i\] = \[ai, bi\] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
 
-例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
+例如，先修课程对 \[0, 1\] 表示：想要学习课程 0 ，你需要先完成课程 1 。请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
 
 ```
 示例 1：输入：numCourses = 2, prerequisites = [[1,0]]输出：true解释：总共有 2 门课程。学习课程 1 之前，你需要完成课程 0 。这是可能的。
@@ -59,9 +56,9 @@ class Solution {public:    map<int, vector<int>> g_;    bool canFin
 
 题目：
 
-现在你总共有 numCourses 门课需要选，记为 0 到 numCourses - 1。给你一个数组 prerequisites ，其中 prerequisites[i] = [ai, bi] ，表示在选修课程 ai 前 必须 先选修 bi 。
+现在你总共有 numCourses 门课需要选，记为 0 到 numCourses - 1。给你一个数组 prerequisites ，其中 prerequisites\[i\] = \[ai, bi\] ，表示在选修课程 ai 前 必须 先选修 bi 。
 
-例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示：[0,1] 。返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 任意一种 就可以了。如果不可能完成所有课程，返回 一个空数组 。
+例如，想要学习课程 0 ，你需要先完成课程 1 ，我们用一个匹配来表示：\[0,1\] 。返回你为了学完所有课程所安排的学习顺序。可能会有多个正确的顺序，你只要返回 任意一种 就可以了。如果不可能完成所有课程，返回 一个空数组 。
 
 ```
 示例 1：输入：numCourses = 2, prerequisites = [[1,0]]输出：[0,1]解释：总共有 2 门课程。要学习课程 1，你需要先完成课程 0。因此，正确的课程顺序为 [0,1] 。
@@ -91,7 +88,7 @@ class Solution {public:    map<int, vector<int>> g_;    vector<int>�
 
 员工编号为 0 到 n - 1 。每位员工都有一位 喜欢 的员工，每位员工 当且仅当 他被安排在喜欢员工的旁边，他才会参加会议。每位员工喜欢的员工 不会 是他自己。
 
-给你一个下标从 0 开始的整数数组 favorite ，其中 favorite[i] 表示第 i 位员工喜欢的员工。请你返回参加会议的 最多员工数目 。
+给你一个下标从 0 开始的整数数组 favorite ，其中 favorite\[i\] 表示第 i 位员工喜欢的员工。请你返回参加会议的 最多员工数目 。
 
 ```
 示例 1：输入：favorite = [2,2,1,2]输出：3解释：上图展示了公司邀请员工 0，1 和 2 参加会议以及他们在圆桌上的座位。没办法邀请所有员工参与会议，因为员工 2 没办法同时坐在 0，1 和 3 员工的旁边。注意，公司也可以邀请员工 1，2 和 3 参加会议。所以最多参加会议的员工数目为 3 。
@@ -113,13 +110,11 @@ class Solution {public:    int maximumInvitations(vector<int>& g) {  
 
 > 本节完~
 
-  
-
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/xdatVaX8ek3UwLBhWibBLb3ATy7p1W9S5APibicPPGTu4NQK4aP7Uf8IOe0Q0EhaRYzb6U22FOYuIIDgwXHlogiblg/0?wx_fmt=jpeg)
 
 lightcity
 
- 坚持原创 
+坚持原创
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzI2NjYwOTAyMg==&mid=2247487515&idx=1&sn=1f0fc247003eba84ccf2b30952031bf4&chksm=ea8ad80addfd511c2db16f48566cf87f5c77abc4f29ca3e9ec50dd020f21c420de4d1c084173&mpshare=1&scene=24&srcid=0108wVlcoOW1rTFPf0Gz0q8N&sharer_sharetime=1641652313611&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d08e85f55df2b0faf841495d37f997c530147361541cc3105913dca445cd9c179983375868f39a781bcdfe6635b27641e8e021d5240cb1a62c113002421aa988fab815d92a7fbefa5ad97dece2ad7cedfc537d02512928fb372f14d69f22a5b66fd01259cb19dbb4963a650e01d233f3881eab9fcf3639c828&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQv1mYVLKgEfJKy%2FyypxuwShLmAQIE97dBBAEAAAAAACSSBWP5vtQAAAAOpnltbLcz9gKNyK89dVj0UVZBx4OJ%2F6sWBdt9%2F6PvJv%2B5nUYDldtCcUg0Wt%2FYomhEG5Ofhl98WU26jw2a0cgZllenJy0POwSNyFtKwQqS1NEcbbUD7OZKf%2Fi7iA%2BSRzrWl2hZnwbDzfyKjN0e%2FNGDvYAXqb2jXq%2B3NYHq6LvXoNSTq25bHzLrXXsO9GZ8jitrcvWxSzb2o5TzrkCN%2B31nLlQUVz32aEcrLINbSZScp%2BniB%2FTociVKIBmi5sCYvu11UqZlb8PcTdfHP5Q%2B8dsj&acctmode=0&pass_ticket=kdBZNmTNXlvUppJWBIWgBOBJCxssAZ4pwYD8stBjAZ%2FkYiR2HLF9H9UKDwjD9Qa9&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 

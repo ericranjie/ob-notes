@@ -2,19 +2,17 @@
 
 原创 邀你一起加入 Linux中国
 
- _2021年12月02日 18:54_
+_2021年12月02日 18:54_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/W9DqKgFsc6ibtlcfxD56leKE6Vwv0GAQTic7uiaJKZ5xvSicRnFAeun0l5Y0NbKm4ibN8ICPR9icB4zWV0zT9ZaBeKtQ/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
-**导读：**在这篇文章中，我们将深入了解它们，并在根据一些基准对它们进行比较。　 　 　 　 　 　 　 　 　 　 　 　
+\*\*导读：\*\*在这篇文章中，我们将深入了解它们，并在根据一些基准对它们进行比较。
 
 本文字数：2939，阅读时长大约：4分钟
 
-  
-
-https://linux.cn/article-14041-1.html  
-作者：Ankush Das  
-译者：Xingyu.Wang  
+https://linux.cn/article-14041-1.html\
+作者：Ankush Das\
+译者：Xingyu.Wang
 
 Chrome 浏览器是最流行的网页浏览器。无论你是否喜欢使用它，Chrome 都能提供良好的用户体验。
 
@@ -70,14 +68,12 @@ Chromium 是完全开源的，这意味着任何人都可以（根据许可证�
 
 不仅如此，由于 Chromium 是开源的，你可能会注意到一些不便之处。别担心，我将在下面指出其中的关键差异。
 
-< 如显示不全，请左右滑动 >
+\< 如显示不全，请左右滑动 >
 
 |Chrome|Chromium|
 |---|---|
 |有签到和同步功能|无签到和同步功能|
 |支持媒体编解码器以使用 Netflix|需要手动安装编解码器|
-
-  
 
 对于初学者来说，在 Chromium 中不再能使用由谷歌支持的登录/同步功能。它曾经支持签到和同步，直到谷歌决定将其从开源项目中删除。
 
@@ -159,7 +155,7 @@ Chrome 对大多数用户来说应该足够好了。但是，如果你担心你�
 
 这就是我在比较 Chrome 和 Chromium 时的全部看法。我愿意接受你的意见。评论区都是你的。
 
----
+______________________________________________________________________
 
 via: [https://itsfoss.com/chrome-vs-chromium/](https://mp.weixin.qq.com/s?__biz=MjM5NjQ4MjYwMQ==&mid=2664644767&idx=1&sn=cf99efd18541099c036ed5f926b6e89e&chksm=bdcf7bd98ab8f2cf336c1510f2c9fe23e3d88cc57b94f447ae43462e8a56fd55285ac13f4ded&mpshare=1&scene=24&srcid=1202bTKblG6fbI1a7NHJgJu7&sharer_sharetime=1638446710466&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e2570a54ca374ee94b84d69202d351abae508d76835bf08ab4da43d705d93f3c00aa16ddb0649de09e78627d053d029e131b1044a8be3172fc43e48c57a8ea6fc6056d58f484326014a2be5b4c7602809f5e7b560ce5124c70faf60983b0fda72863087cd6d131bdc6a02b78a712b7863270c7381918992f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQLgfWzV5%2BJtocN%2FySqNGrNhLmAQIE97dBBAEAAAAAAHZSM%2FZYcR0AAAAOpnltbLcz9gKNyK89dVj0WO%2Brkm2rzi3nlmtXL1BxXGl7f0%2BGH08x%2FJyPjQ6rTrDlhrCS%2Bb2V21p608EXShmzc%2BQrcvVdPRgdmYaeOd8HOdqDtRya6rKr6JCoCKOr5gVDCH1W3hinC7c9%2BycvuIK%2BAbfpvGP9qg0ymxjkBNE0%2Fo8zYlom7JVs9Nz5XITdZ07SAHC8ULERqBtleZAC4D2Ef5bpinE%2FofZ%2FGUaeWI%2FVvNzGpIN9EgYNMyHgZnKQ0B4IAC%2FdcU0isBPqMoA2Lhqz&acctmode=0&pass_ticket=DWbgtL2634T3yphRGTprw6MCQ%2BHuQ3JF%2FCVezwdJ%2FtMUD9enMKTnaNU9esfCwOn3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1)
 
@@ -167,7 +163,7 @@ via: [https://itsfoss.com/chrome-vs-chromium/](https://mp.weixin.qq.com/s?__biz
 
 本文由 [LCTT](https://mp.weixin.qq.com/s?__biz=MjM5NjQ4MjYwMQ==&mid=2664644767&idx=1&sn=cf99efd18541099c036ed5f926b6e89e&chksm=bdcf7bd98ab8f2cf336c1510f2c9fe23e3d88cc57b94f447ae43462e8a56fd55285ac13f4ded&mpshare=1&scene=24&srcid=1202bTKblG6fbI1a7NHJgJu7&sharer_sharetime=1638446710466&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e2570a54ca374ee94b84d69202d351abae508d76835bf08ab4da43d705d93f3c00aa16ddb0649de09e78627d053d029e131b1044a8be3172fc43e48c57a8ea6fc6056d58f484326014a2be5b4c7602809f5e7b560ce5124c70faf60983b0fda72863087cd6d131bdc6a02b78a712b7863270c7381918992f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQLgfWzV5%2BJtocN%2FySqNGrNhLmAQIE97dBBAEAAAAAAHZSM%2FZYcR0AAAAOpnltbLcz9gKNyK89dVj0WO%2Brkm2rzi3nlmtXL1BxXGl7f0%2BGH08x%2FJyPjQ6rTrDlhrCS%2Bb2V21p608EXShmzc%2BQrcvVdPRgdmYaeOd8HOdqDtRya6rKr6JCoCKOr5gVDCH1W3hinC7c9%2BycvuIK%2BAbfpvGP9qg0ymxjkBNE0%2Fo8zYlom7JVs9Nz5XITdZ07SAHC8ULERqBtleZAC4D2Ef5bpinE%2FofZ%2FGUaeWI%2FVvNzGpIN9EgYNMyHgZnKQ0B4IAC%2FdcU0isBPqMoA2Lhqz&acctmode=0&pass_ticket=DWbgtL2634T3yphRGTprw6MCQ%2BHuQ3JF%2FCVezwdJ%2FtMUD9enMKTnaNU9esfCwOn3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1) 原创编译，[Linux中国](https://mp.weixin.qq.com/s?__biz=MjM5NjQ4MjYwMQ==&mid=2664644767&idx=1&sn=cf99efd18541099c036ed5f926b6e89e&chksm=bdcf7bd98ab8f2cf336c1510f2c9fe23e3d88cc57b94f447ae43462e8a56fd55285ac13f4ded&mpshare=1&scene=24&srcid=1202bTKblG6fbI1a7NHJgJu7&sharer_sharetime=1638446710466&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e2570a54ca374ee94b84d69202d351abae508d76835bf08ab4da43d705d93f3c00aa16ddb0649de09e78627d053d029e131b1044a8be3172fc43e48c57a8ea6fc6056d58f484326014a2be5b4c7602809f5e7b560ce5124c70faf60983b0fda72863087cd6d131bdc6a02b78a712b7863270c7381918992f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQLgfWzV5%2BJtocN%2FySqNGrNhLmAQIE97dBBAEAAAAAAHZSM%2FZYcR0AAAAOpnltbLcz9gKNyK89dVj0WO%2Brkm2rzi3nlmtXL1BxXGl7f0%2BGH08x%2FJyPjQ6rTrDlhrCS%2Bb2V21p608EXShmzc%2BQrcvVdPRgdmYaeOd8HOdqDtRya6rKr6JCoCKOr5gVDCH1W3hinC7c9%2BycvuIK%2BAbfpvGP9qg0ymxjkBNE0%2Fo8zYlom7JVs9Nz5XITdZ07SAHC8ULERqBtleZAC4D2Ef5bpinE%2FofZ%2FGUaeWI%2FVvNzGpIN9EgYNMyHgZnKQ0B4IAC%2FdcU0isBPqMoA2Lhqz&acctmode=0&pass_ticket=DWbgtL2634T3yphRGTprw6MCQ%2BHuQ3JF%2FCVezwdJ%2FtMUD9enMKTnaNU9esfCwOn3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1) 荣誉推出
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 欢迎遵照 CC-BY-NC-SA 协议规定转载，
 
@@ -175,15 +171,13 @@ via: [https://itsfoss.com/chrome-vs-chromium/](https://mp.weixin.qq.com/s?__biz
 
 我们将为您添加白名单，授权“转载文章时可以修改”。
 
-[![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=MjM5NjQ4MjYwMQ==&mid=2664637017&idx=1&sn=418656faabf31e5a8ba301425bea0db0&scene=21#wechat_redirect)
-
-  
+[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=MjM5NjQ4MjYwMQ==&mid=2664637017&idx=1&sn=418656faabf31e5a8ba301425bea0db0&scene=21#wechat_redirect)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/yZRNrhmx54GpGjE62ZLfHmcrETibYHEavC3ZiaibOvWLXG3c4w0Lx7dD2sK8sVMHDDsv3emxkk8pL4kJSgPdqusZA/0?wx_fmt=jpeg)
 
 邀你一起加入
 
- 转发一次，亦如同赞赏一元 
+转发一次，亦如同赞赏一元
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MjM5NjQ4MjYwMQ==&mid=2664644767&idx=1&sn=cf99efd18541099c036ed5f926b6e89e&chksm=bdcf7bd98ab8f2cf336c1510f2c9fe23e3d88cc57b94f447ae43462e8a56fd55285ac13f4ded&mpshare=1&scene=24&srcid=1202bTKblG6fbI1a7NHJgJu7&sharer_sharetime=1638446710466&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e2570a54ca374ee94b84d69202d351abae508d76835bf08ab4da43d705d93f3c00aa16ddb0649de09e78627d053d029e131b1044a8be3172fc43e48c57a8ea6fc6056d58f484326014a2be5b4c7602809f5e7b560ce5124c70faf60983b0fda72863087cd6d131bdc6a02b78a712b7863270c7381918992f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQLgfWzV5%2BJtocN%2FySqNGrNhLmAQIE97dBBAEAAAAAAHZSM%2FZYcR0AAAAOpnltbLcz9gKNyK89dVj0WO%2Brkm2rzi3nlmtXL1BxXGl7f0%2BGH08x%2FJyPjQ6rTrDlhrCS%2Bb2V21p608EXShmzc%2BQrcvVdPRgdmYaeOd8HOdqDtRya6rKr6JCoCKOr5gVDCH1W3hinC7c9%2BycvuIK%2BAbfpvGP9qg0ymxjkBNE0%2Fo8zYlom7JVs9Nz5XITdZ07SAHC8ULERqBtleZAC4D2Ef5bpinE%2FofZ%2FGUaeWI%2FVvNzGpIN9EgYNMyHgZnKQ0B4IAC%2FdcU0isBPqMoA2Lhqz&acctmode=0&pass_ticket=DWbgtL2634T3yphRGTprw6MCQ%2BHuQ3JF%2FCVezwdJ%2FtMUD9enMKTnaNU9esfCwOn3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 
@@ -251,111 +245,110 @@ CGroad
 **留言 13**
 
 - CZ
-    
-    2021年12月2日
-    
-    赞29
-    
-    开头点题，支持Firefox。 Chromium名义上是开源的，但实际上Google在Chromium上投入的人力和带来的项目复杂度远超过开源社区的其他参与者。这就导致开源社区在实际上很难跟上Google在Chromium代码更新上的脚步，更难在其中发现Google隐藏的后门。目前大多Chromium的分支也都是在Chromium之上再包一层外壳，不管是界面还是功能方面，因为很难深入到Chromium内部调整。 实际上Chromium本身代码不仅迭代快，而且也很臃肿。Google的逻辑就是信息洪水，“我都开放给你，但其实你根本看不过来“。Ungoogled Chromium的开发者就曾经表达过，Chromium更新太快了，根本来不及跟上其脚步做去Google化的调整。Ungoogled Chromium的用户也反映过，如果不跟进最新版本，他们很担心旧版本源码中的漏洞问题。 Google并非真心对待开源社区，而只是在把开源社区当一个牌坊和一个免费众包薅羊毛。 最后，支持Firefox。
-    
-    置顶
-    
-    Linux中国
-    
-    作者2021年12月2日
-    
-    赞11
-    
-    必须置顶
-    
+
+  2021年12月2日
+
+  赞29
+
+  开头点题，支持Firefox。 Chromium名义上是开源的，但实际上Google在Chromium上投入的人力和带来的项目复杂度远超过开源社区的其他参与者。这就导致开源社区在实际上很难跟上Google在Chromium代码更新上的脚步，更难在其中发现Google隐藏的后门。目前大多Chromium的分支也都是在Chromium之上再包一层外壳，不管是界面还是功能方面，因为很难深入到Chromium内部调整。 实际上Chromium本身代码不仅迭代快，而且也很臃肿。Google的逻辑就是信息洪水，“我都开放给你，但其实你根本看不过来“。Ungoogled Chromium的开发者就曾经表达过，Chromium更新太快了，根本来不及跟上其脚步做去Google化的调整。Ungoogled Chromium的用户也反映过，如果不跟进最新版本，他们很担心旧版本源码中的漏洞问题。 Google并非真心对待开源社区，而只是在把开源社区当一个牌坊和一个免费众包薅羊毛。 最后，支持Firefox。
+
+  置顶
+
+  Linux中国
+
+  作者2021年12月2日
+
+  赞11
+
+  必须置顶
+
 - ![[爱心]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    2021年12月2日
-    
-    赞8
-    
-    vivaldi银河系最好的浏览器 没有之一
-    
+
+  2021年12月2日
+
+  赞8
+
+  vivaldi银河系最好的浏览器 没有之一
+
 - LZN
-    
-    2021年12月2日
-    
-    赞6
-    
-    感觉签到（sign-in）翻译成登录更合适。
-    
+
+  2021年12月2日
+
+  赞6
+
+  感觉签到（sign-in）翻译成登录更合适。
+
 - 澄みわたる朝色
-    
-    2021年12月2日
-    
-    赞4
-    
-    vivaldi也不完全开源，还是firefox
-    
+
+  2021年12月2日
+
+  赞4
+
+  vivaldi也不完全开源，还是firefox
+
 - SamLukeYes
-    
-    2021年12月2日
-    
-    赞3
-    
-    只有你 uuu 的 chromium 要用 snap 装![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月2日
+
+  赞3
+
+  只有你 uuu 的 chromium 要用 snap 装![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Lin
-    
-    2021年12月2日
-    
-    赞2
-    
-    Chrome 和 edge 两个痛核的浏览器，让电脑变得更卡
-    
+
+  2021年12月2日
+
+  赞2
+
+  Chrome 和 edge 两个痛核的浏览器，让电脑变得更卡
+
 - MOSS
-    
-    2021年12月3日
-    
-    赞1
-    
-    把开源社区当免费劳动力而已，跟以前的苹果一样，以前苹果的darwin也是，开源了一阵子后来把基于intel架构的darwin闭源了。安卓也是玩了个花招就牢牢把安卓抓在谷歌手里了，安卓是开源但是控制住安卓的谷歌的相关服务框架，组件，都是不开源的。把linux内核开发者气到了，只好把安卓驱动程序踢出linux内核状态树。
-    
+
+  2021年12月3日
+
+  赞1
+
+  把开源社区当免费劳动力而已，跟以前的苹果一样，以前苹果的darwin也是，开源了一阵子后来把基于intel架构的darwin闭源了。安卓也是玩了个花招就牢牢把安卓抓在谷歌手里了，安卓是开源但是控制住安卓的谷歌的相关服务框架，组件，都是不开源的。把linux内核开发者气到了，只好把安卓驱动程序踢出linux内核状态树。
+
 - 一凡
-    
-    2021年12月3日
-    
-    赞1
-    
-    FF 一定要活下来
-    
+
+  2021年12月3日
+
+  赞1
+
+  FF 一定要活下来
+
 - 任恒
-    
-    2021年12月3日
-    
-    赞1
-    
-    edge也是基于chromium啊！？微软绝了
-    
+
+  2021年12月3日
+
+  赞1
+
+  edge也是基于chromium啊！？微软绝了
+
 - 猎隼
-    
-    2021年12月3日
-    
-    赞1
-    
-    微软放弃IE后的edge简直好用！搞不懂以前咋个做不出来！对于用户来说就是表面的外观和操作！内核谁在乎！
-    
+
+  2021年12月3日
+
+  赞1
+
+  微软放弃IE后的edge简直好用！搞不懂以前咋个做不出来！对于用户来说就是表面的外观和操作！内核谁在乎！
+
 - Ngau¹Lei⁵Hung⁴
-    
-    2021年12月2日
-    
-    赞
-    
-    EDGE用户路过
-    
+
+  2021年12月2日
+
+  赞
+
+  EDGE用户路过
+
 - 响马
-    
-    2021年12月2日
-    
-    赞
-    
-    一直使用chromium,好用啊
-    
+
+  2021年12月2日
+
+  赞
+
+  一直使用chromium,好用啊
 
 已无更多数据
 
@@ -374,110 +367,109 @@ Linux中国
 **留言 13**
 
 - CZ
-    
-    2021年12月2日
-    
-    赞29
-    
-    开头点题，支持Firefox。 Chromium名义上是开源的，但实际上Google在Chromium上投入的人力和带来的项目复杂度远超过开源社区的其他参与者。这就导致开源社区在实际上很难跟上Google在Chromium代码更新上的脚步，更难在其中发现Google隐藏的后门。目前大多Chromium的分支也都是在Chromium之上再包一层外壳，不管是界面还是功能方面，因为很难深入到Chromium内部调整。 实际上Chromium本身代码不仅迭代快，而且也很臃肿。Google的逻辑就是信息洪水，“我都开放给你，但其实你根本看不过来“。Ungoogled Chromium的开发者就曾经表达过，Chromium更新太快了，根本来不及跟上其脚步做去Google化的调整。Ungoogled Chromium的用户也反映过，如果不跟进最新版本，他们很担心旧版本源码中的漏洞问题。 Google并非真心对待开源社区，而只是在把开源社区当一个牌坊和一个免费众包薅羊毛。 最后，支持Firefox。
-    
-    置顶
-    
-    Linux中国
-    
-    作者2021年12月2日
-    
-    赞11
-    
-    必须置顶
-    
+
+  2021年12月2日
+
+  赞29
+
+  开头点题，支持Firefox。 Chromium名义上是开源的，但实际上Google在Chromium上投入的人力和带来的项目复杂度远超过开源社区的其他参与者。这就导致开源社区在实际上很难跟上Google在Chromium代码更新上的脚步，更难在其中发现Google隐藏的后门。目前大多Chromium的分支也都是在Chromium之上再包一层外壳，不管是界面还是功能方面，因为很难深入到Chromium内部调整。 实际上Chromium本身代码不仅迭代快，而且也很臃肿。Google的逻辑就是信息洪水，“我都开放给你，但其实你根本看不过来“。Ungoogled Chromium的开发者就曾经表达过，Chromium更新太快了，根本来不及跟上其脚步做去Google化的调整。Ungoogled Chromium的用户也反映过，如果不跟进最新版本，他们很担心旧版本源码中的漏洞问题。 Google并非真心对待开源社区，而只是在把开源社区当一个牌坊和一个免费众包薅羊毛。 最后，支持Firefox。
+
+  置顶
+
+  Linux中国
+
+  作者2021年12月2日
+
+  赞11
+
+  必须置顶
+
 - ![[爱心]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    2021年12月2日
-    
-    赞8
-    
-    vivaldi银河系最好的浏览器 没有之一
-    
+
+  2021年12月2日
+
+  赞8
+
+  vivaldi银河系最好的浏览器 没有之一
+
 - LZN
-    
-    2021年12月2日
-    
-    赞6
-    
-    感觉签到（sign-in）翻译成登录更合适。
-    
+
+  2021年12月2日
+
+  赞6
+
+  感觉签到（sign-in）翻译成登录更合适。
+
 - 澄みわたる朝色
-    
-    2021年12月2日
-    
-    赞4
-    
-    vivaldi也不完全开源，还是firefox
-    
+
+  2021年12月2日
+
+  赞4
+
+  vivaldi也不完全开源，还是firefox
+
 - SamLukeYes
-    
-    2021年12月2日
-    
-    赞3
-    
-    只有你 uuu 的 chromium 要用 snap 装![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年12月2日
+
+  赞3
+
+  只有你 uuu 的 chromium 要用 snap 装![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Lin
-    
-    2021年12月2日
-    
-    赞2
-    
-    Chrome 和 edge 两个痛核的浏览器，让电脑变得更卡
-    
+
+  2021年12月2日
+
+  赞2
+
+  Chrome 和 edge 两个痛核的浏览器，让电脑变得更卡
+
 - MOSS
-    
-    2021年12月3日
-    
-    赞1
-    
-    把开源社区当免费劳动力而已，跟以前的苹果一样，以前苹果的darwin也是，开源了一阵子后来把基于intel架构的darwin闭源了。安卓也是玩了个花招就牢牢把安卓抓在谷歌手里了，安卓是开源但是控制住安卓的谷歌的相关服务框架，组件，都是不开源的。把linux内核开发者气到了，只好把安卓驱动程序踢出linux内核状态树。
-    
+
+  2021年12月3日
+
+  赞1
+
+  把开源社区当免费劳动力而已，跟以前的苹果一样，以前苹果的darwin也是，开源了一阵子后来把基于intel架构的darwin闭源了。安卓也是玩了个花招就牢牢把安卓抓在谷歌手里了，安卓是开源但是控制住安卓的谷歌的相关服务框架，组件，都是不开源的。把linux内核开发者气到了，只好把安卓驱动程序踢出linux内核状态树。
+
 - 一凡
-    
-    2021年12月3日
-    
-    赞1
-    
-    FF 一定要活下来
-    
+
+  2021年12月3日
+
+  赞1
+
+  FF 一定要活下来
+
 - 任恒
-    
-    2021年12月3日
-    
-    赞1
-    
-    edge也是基于chromium啊！？微软绝了
-    
+
+  2021年12月3日
+
+  赞1
+
+  edge也是基于chromium啊！？微软绝了
+
 - 猎隼
-    
-    2021年12月3日
-    
-    赞1
-    
-    微软放弃IE后的edge简直好用！搞不懂以前咋个做不出来！对于用户来说就是表面的外观和操作！内核谁在乎！
-    
+
+  2021年12月3日
+
+  赞1
+
+  微软放弃IE后的edge简直好用！搞不懂以前咋个做不出来！对于用户来说就是表面的外观和操作！内核谁在乎！
+
 - Ngau¹Lei⁵Hung⁴
-    
-    2021年12月2日
-    
-    赞
-    
-    EDGE用户路过
-    
+
+  2021年12月2日
+
+  赞
+
+  EDGE用户路过
+
 - 响马
-    
-    2021年12月2日
-    
-    赞
-    
-    一直使用chromium,好用啊
-    
+
+  2021年12月2日
+
+  赞
+
+  一直使用chromium,好用啊
 
 已无更多数据
