@@ -1,19 +1,19 @@
 原创 TrickBoy CodeTrap
- _2024年03月30日 00:00_ _江苏_
+_2024年03月30日 00:00_ _江苏_
 
-在Linux内核中，IPI(Inter-Processor Interrupt, 核间中断)是在多处理器系统下，一种常用的CPU间的通信机制。  
+在Linux内核中，IPI(Inter-Processor Interrupt, 核间中断)是在多处理器系统下，一种常用的CPU间的通信机制。
 
 该机制允许一个CPU向其余一个或多个CPU发送中断，从而触发目标CPU上相应的处理函数。
 
-本文将从**为什么要使用IPI**，**如何使用IPI**以及**IPI的实现原理**来分析Linux中的IPI机制。  
+本文将从**为什么要使用IPI**，**如何使用IPI**以及**IPI的实现原理**来分析Linux中的IPI机制。
 
-**为什么要使用IPI**  
+**为什么要使用IPI**
 
-昨天，有个朋友问了我这样一个问题：  
+昨天，有个朋友问了我这样一个问题：
 
-他有个任务，需要使用一个内核模块定时去获取某个CPU上的curr进程信息，应该怎么去实现代码呢？  
+他有个任务，需要使用一个内核模块定时去获取某个CPU上的curr进程信息，应该怎么去实现代码呢？
 
-我的**第一个想法**是：直接去遍历进程链表，依据task_struct的on_cpu字段去进行判断，不就OK了吗？  
+我的**第一个想法**是：直接去遍历进程链表，依据task_struct的on_cpu字段去进行判断，不就OK了吗？
 
 代码大致是这样：
 
@@ -21,13 +21,13 @@
 typedef struct {     char comm[TASK_COMM_LEN];     int pid;     int cpu;     int exist; } task_info_t;  static int __init my_init(void) {     int cpu, cpu_nums;     struct task_struct *task;     task_info_t *task_array, *task_info_pos;      cpu_nums = num_possible_cpus();      task_array = kzalloc(sizeof(task_info_t) * cpu_nums, GFP_KERNEL);     if (!task_array) {         printk(KERN_ERR "alloc task array failed!");         return -ENOMEM;     }      for_each_process(task) {         if (task->on_cpu) {             cpu = task_cpu(task);              task_info_pos = &task_array[cpu];              memcpy(&task_info_pos->comm, task->comm, TASK_COMM_LEN);             task_info_pos->pid = task->pid;             task_info_pos->cpu = cpu;             task_info_pos->exist = 1;         }     }      for (cpu = 0; cpu < cpu_nums; cpu++) {         task_info_pos = &task_array[cpu];          if (!task_info_pos->exist)             continue;                  printk(KERN_INFO "cpu %d pid %d comm: %s\n", cpu, task_info_pos->pid, task_info_pos->comm);     }    kfree(task_array);    return 0; }
 ```
 
-输出结果如下：  
-![[Pasted image 20240906122829.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+输出结果如下：\
+!\[\[Pasted image 20240906122829.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-1. 为什么只有3个CPU上的curr信息？  
+1. 为什么只有3个CPU上的curr信息？
 
-因为0号进程（idle进程）不在进程链表中。其余CPU都处于idle状态，因此无法通过进程链表找到它们的curr进程信息。  
+因为0号进程（idle进程）不在进程链表中。其余CPU都处于idle状态，因此无法通过进程链表找到它们的curr进程信息。
 
 2. 为什么判断依据是task_struct的on_cpu成员，而非是task->state == TASK_RUNNING呢？
 
@@ -37,43 +37,43 @@ typedef struct {     char comm[TASK_COMM_LEN];     int pid;     int cpu;     int
 
 1. 每次都需要完整地去遍历一遍进程链表，即该任务的性能表现是与系统中的进程数量强相关的。
 
-2. on_cpu字段的更新机制可能会导致出现在遍历时发现一个CPU上有两个task_struct的on_cpu字段皆为1的情况。
+1. on_cpu字段的更新机制可能会导致出现在遍历时发现一个CPU上有两个task_struct的on_cpu字段皆为1的情况。
 
 因此，**第二个想法**是去找一找内核里面现有的API可以做到这个事情吗？（指定CPU，返回CPU上当前运行的进程）
 
-的确是有这样的函数：  
+的确是有这样的函数：
 
 ```c
 DECLARE_PER_CPU_SHARED_ALIGNED(struct rq, runqueues);  #define cpu_rq(cpu)    (&per_cpu(runqueues, (cpu))) #define this_rq()    this_cpu_ptr(&runqueues) #define task_rq(p)    cpu_rq(task_cpu(p)) #define cpu_curr(cpu)    (cpu_rq(cpu)->curr) #define raw_rq()    raw_cpu_ptr(&runqueues)
 ```
 
-但这些函数的定义是在/kernel/sched/sched.h中的，没有办法被内核模块引用到。  
+但这些函数的定义是在/kernel/sched/sched.h中的，没有办法被内核模块引用到。
 
-**第三个想法**是一个“骚操作”，写一个kprobe函数，默认是disable的，当需要去获得信息的时候再enable这个kprobe，获取到信息后再enable它。  
+**第三个想法**是一个“骚操作”，写一个kprobe函数，默认是disable的，当需要去获得信息的时候再enable这个kprobe，获取到信息后再enable它。
 
-代码大致是这样：  
+代码大致是这样：
 
 ```c
 static atomic_t cpu_get_num;  static int my_kprobe_handler(struct kprobe *p, struct pt_regs *regs) {     int cpu = smp_processor_id();      task_info_t *task_info_pos = &per_cpu(task_array, cpu);      if (task_info_pos->exist)         return 0;      memcpy(&task_info_pos->comm, current->comm, TASK_COMM_LEN);     task_info_pos->pid = current->pid;     task_info_pos->cpu = cpu;     task_info_pos->exist = 1;      atomic_inc(&cpu_get_num);      return 0; }  static struct kprobe my_kprobe = {     .symbol_name = "__schedule",     .pre_handler = my_kprobe_handler,     .flags = KPROBE_FLAG_DISABLED, };  static int __init my_init(void) {     int ret, cpu, cpu_nums, timeout = 0;     task_info_t *task_info_pos;      ret = register_kprobe(&my_kprobe);     if (ret < 0) {         printk(KERN_ERR "register_kprobe failed, ret %d\n", ret);         return -EINVAL;     }      cpu_nums = num_possible_cpus();      for (cpu = 0; cpu < cpu_nums; cpu++) {         task_info_pos = &per_cpu(task_array, cpu);         task_info_pos->exist = 0;     }     atomic_set(&cpu_get_num, 0);      ret = enable_kprobe(&my_kprobe);     if (ret) {       printk(KERN_ERR "enable_kprobe failed, ret %d\n", ret);     }          while (atomic_read(&cpu_get_num) < cpu_nums) {       timeout++;        if (timeout > 100)         goto out;     }     disable_kprobe(&my_kprobe);      for (cpu = 0; cpu < cpu_nums; cpu++) {         task_info_pos = &per_cpu(task_array, cpu);         printk(KERN_INFO "cpu: %d pid: %d comm: %s\n", task_info_pos->cpu, task_info_pos->pid, task_info_pos->comm);     }  out:     unregister_kprobe(&my_kprobe);     return 0; }
 ```
 
-输出结果如下：  
-![[Pasted image 20240906122913.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+输出结果如下：\
+!\[\[Pasted image 20240906122913.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 但这种实现的问题是：
 
 1. 注册完kprobe函数后，实际内核text中挂载函数的地址的指令已经被替换。虽然刚开始是enable的，但仍然会有跳转的开销。
 
-2. 获得各个CPU上进程的信息的时机依赖于挂载点的选择，如果目标函数很久都没有触发，则无疑会增加等待的时间。
+1. 获得各个CPU上进程的信息的时机依赖于挂载点的选择，如果目标函数很久都没有触发，则无疑会增加等待的时间。
 
 这时候突然想到，kprobe方式是被动等待其余CPU触发int3中断，这种被动的方式是带来这么多问题的根本原因。所以，与其被动挨打，不如主动出击。我完全可以使用主动触发其余CPU的中断，来让它们将自己的curr信息进行报告。
 
-因此，IPI不失为一个好选择。  
+因此，IPI不失为一个好选择。
 
-**如何使用IPI**  
+**如何使用IPI**
 
-IPI机制在很多驱动以及内核逻辑的实现上被应用很多。比如在DVFS的驱动中，一个CPU上的任务要去调整其余CPU的频率，就会使用IPI机制。又或者一个高优先级的任务加入运行队列，这时候需要使用IPI机制来通知对应CPU上的任务下处理器。  
+IPI机制在很多驱动以及内核逻辑的实现上被应用很多。比如在DVFS的驱动中，一个CPU上的任务要去调整其余CPU的频率，就会使用IPI机制。又或者一个高优先级的任务加入运行队列，这时候需要使用IPI机制来通知对应CPU上的任务下处理器。
 
 依旧按照前面的需求来完成代码：
 
@@ -81,9 +81,9 @@ IPI机制在很多驱动以及内核逻辑的实现上被应用很多。比如�
 static void do_get_cpu_current(void *args) {   int cpu = smp_processor_id();   struct task_struct **task_array = (struct task_struct **)args;    task_array[cpu] = get_task_struct(current);    return; }  static int __init my_init(void) {   int cpu, current_cpu, cpu_nums;   struct task_struct *task;   struct task_struct **task_array;    cpu_nums = num_possible_cpus();   current_cpu = smp_processor_id();    task_array = kmalloc(sizeof(struct task_struct *) * cpu_nums, GFP_KERNEL);    smp_call_function(do_get_cpu_current, task_array, 1);   smp_mb();    for (cpu = 0; cpu < cpu_nums; cpu++) {     if (cpu == current_cpu)       continue;      task = task_array[cpu];      if (!task) {       printk(KERN_ERR "no task in task_array");       continue;     }      printk(KERN_INFO "cpu: %d pid: %d comm: %s\n", cpu, task->pid, task->comm);     put_task_struct(task);   }    kfree(task_array);    return 0;  } 
 ```
 
-输出结果如下：  
-![[Pasted image 20240906122939.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+输出结果如下：\
+!\[\[Pasted image 20240906122939.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里忽略掉当前内核模块所在的CPU，输出了其余CPU上的curr信息。向其它CPU发送IPI中断使用了smp_call_function这个函数。
 
@@ -95,13 +95,13 @@ static void do_get_cpu_current(void *args) {   int cpu = smp_processor_id();   s
 
 smp_call_function()：在除自身之外的所有CPU上运行一个函数。
 
-func：目标函数  
+func：目标函数
 
-info：目标函数的参数  
+info：目标函数的参数
 
-wait：是否等待其余CPU上的任务完成  
+wait：是否等待其余CPU上的任务完成
 
-注意：只能用于进程上下文。  
+注意：只能用于进程上下文。
 
 当然除了这个API外，还有其余的API，譬如：
 
@@ -117,7 +117,7 @@ smp_call_function_single_async——在指定某个CPU上运行一个异步函�
 
 知道了IPI有哪些接口，现在分析一下IPI的实现原理。
 
-直接看一次广播给多个CPU的函数的实现：smp_call_function_many。  
+直接看一次广播给多个CPU的函数的实现：smp_call_function_many。
 
 ```c
 /**  * smp_call_function_many(): Run a function on a set of CPUs.  * @mask: The set of cpus to run on (only runs on online subset).  * @func: The function to run. This must be fast and non-blocking.  * @info: An arbitrary pointer to pass to the function.  * @wait: Bitmask that controls the operation. If %SCF_WAIT is set, wait  *        (atomically) until function has completed on other CPUs. If  *        %SCF_RUN_LOCAL is set, the function will also be run locally  *        if the local CPU is set in the @cpumask.  *  * If @wait is true, then returns once @func has returned.  *  * You must not call this function with disabled interrupts or from a  * hardware interrupt handler or from a bottom half handler. Preemption  * must be disabled when calling this function.  */ void smp_call_function_many(const struct cpumask *mask,           smp_call_func_t func, void *info, bool wait) {   smp_call_function_many_cond(mask, func, info, wait * SCF_WAIT, NULL); } EXPORT_SYMBOL(smp_call_function_many);
@@ -129,7 +129,7 @@ smp_call_function_single_async——在指定某个CPU上运行一个异步函�
 static void smp_call_function_many_cond(const struct cpumask *mask,           smp_call_func_t func, void *info,           unsigned int scf_flags,           smp_cond_func_t cond_func) {   int cpu, last_cpu, this_cpu = smp_processor_id();   struct call_function_data *cfd;   bool wait = scf_flags & SCF_WAIT;   bool run_remote = false;   bool run_local = false;   int nr_cpus = 0;    lockdep_assert_preemption_disabled();    /*    * Can deadlock when called with interrupts disabled.    * We allow cpu's that are not yet online though, as no one else can    * send smp call function interrupt to this cpu and as such deadlocks    * can't happen.    */   if (cpu_online(this_cpu) && !oops_in_progress &&       !early_boot_irqs_disabled)     lockdep_assert_irqs_enabled();    /*    * When @wait we can deadlock when we interrupt between llist_add() and    * arch_send_call_function_ipi*(); when !@wait we can deadlock due to    * csd_lock() on because the interrupt context uses the same csd    * storage.    */   WARN_ON_ONCE(!in_task());    /* Check if we need local execution. */   if ((scf_flags & SCF_RUN_LOCAL) && cpumask_test_cpu(this_cpu, mask))     run_local = true;    /* Check if we need remote execution, i.e., any CPU excluding this one. */   cpu = cpumask_first_and(mask, cpu_online_mask);   if (cpu == this_cpu)     cpu = cpumask_next_and(cpu, mask, cpu_online_mask);   if (cpu < nr_cpu_ids)     run_remote = true;    if (run_remote) {     cfd = this_cpu_ptr(&cfd_data);     cpumask_and(cfd->cpumask, mask, cpu_online_mask);     __cpumask_clear_cpu(this_cpu, cfd->cpumask);      cpumask_clear(cfd->cpumask_ipi);     for_each_cpu(cpu, cfd->cpumask) {       struct cfd_percpu *pcpu = per_cpu_ptr(cfd->pcpu, cpu);       call_single_data_t *csd = &pcpu->csd;        if (cond_func && !cond_func(cpu, info))         continue;        csd_lock(csd);       if (wait)         csd->node.u_flags |= CSD_TYPE_SYNC;       csd->func = func;       csd->info = info; #ifdef CONFIG_CSD_LOCK_WAIT_DEBUG       csd->node.src = smp_processor_id();       csd->node.dst = cpu; #endif       cfd_seq_store(pcpu->seq_queue, this_cpu, cpu, CFD_SEQ_QUEUE);       if (llist_add(&csd->node.llist, &per_cpu(call_single_queue, cpu))) {         __cpumask_set_cpu(cpu, cfd->cpumask_ipi);         nr_cpus++;         last_cpu = cpu;          cfd_seq_store(pcpu->seq_ipi, this_cpu, cpu, CFD_SEQ_IPI);       } else {         cfd_seq_store(pcpu->seq_noipi, this_cpu, cpu, CFD_SEQ_NOIPI);       }     }      cfd_seq_store(this_cpu_ptr(&cfd_seq_local)->ping, this_cpu, CFD_SEQ_NOCPU, CFD_SEQ_PING);      /*      * Choose the most efficient way to send an IPI. Note that the      * number of CPUs might be zero due to concurrent changes to the      * provided mask.      */     if (nr_cpus == 1)       send_call_function_single_ipi(last_cpu);     else if (likely(nr_cpus > 1))       arch_send_call_function_ipi_mask(cfd->cpumask_ipi);      cfd_seq_store(this_cpu_ptr(&cfd_seq_local)->pinged, this_cpu, CFD_SEQ_NOCPU, CFD_SEQ_PINGED);   }    if (run_local && (!cond_func || cond_func(this_cpu, info))) {     unsigned long flags;      local_irq_save(flags);     func(info);     local_irq_restore(flags);   }    if (run_remote && wait) {     for_each_cpu(cpu, cfd->cpumask) {       call_single_data_t *csd;        csd = &per_cpu_ptr(cfd->pcpu, cpu)->csd;       csd_lock_wait(csd);     }   } }
 ```
 
-实际调用的核心部分是这一部分：  
+实际调用的核心部分是这一部分：
 
 ```c
        if (nr_cpus == 1)       send_call_function_single_ipi(last_cpu);     else if (likely(nr_cpus > 1))       arch_send_call_function_ipi_mask(cfd->cpumask_ipi);
@@ -139,15 +139,15 @@ static void smp_call_function_many_cond(const struct cpumask *mask,           sm
 
 1. 设置当前CPU的per_cpu变量cfd->cpumask为目标CPU的mask
 
-2. 依次遍历目标CPU的mask，找到对应CPU的per_cpu变量cfd->pcpu->csd，更新csd的信息存放目标函数和参数，之后将当前csd加入到对应CPU的call_single_queue队列中
+1. 依次遍历目标CPU的mask，找到对应CPU的per_cpu变量cfd->pcpu->csd，更新csd的信息存放目标函数和参数，之后将当前csd加入到对应CPU的call_single_queue队列中
 
-至于，wait的实现，则是在下发任务前csd_lock()函数中设置csd->node.u_flags的CSD_FLAG_LOCK标记位。  
+至于，wait的实现，则是在下发任务前csd_lock()函数中设置csd->node.u_flags的CSD_FLAG_LOCK标记位。
 
 ```c
 csd->node.u_flags |= CSD_FLAG_LOCK;
 ```
 
-在任务下发之后，去检查对应的CSD_FLAG_LOCK是否被清理掉。  
+在任务下发之后，去检查对应的CSD_FLAG_LOCK是否被清理掉。
 
 ```c
 smp_cond_load_acquire(&csd->node.u_flags, !(VAL & CSD_FLAG_LOCK));
@@ -161,7 +161,7 @@ smp_cond_load_acquire(&csd->node.u_flags, !(VAL & CSD_FLAG_LOCK));
 arch_send_call_function_ipi_mask->   smp_ops.send_call_func_ipi(mask)->     native_send_call_func_ipi->    /* apic层支持指定mask, all, allbutself三种send IPI方式 */  void native_send_call_func_ipi(const struct cpumask *mask) {   if (static_branch_likely(&apic_use_ipi_shorthand)) {     unsigned int cpu = smp_processor_id();      if (!cpumask_or_equal(mask, cpumask_of(cpu), cpu_online_mask))       goto sendmask;      if (cpumask_test_cpu(cpu, mask))       apic->send_IPI_all(CALL_FUNCTION_VECTOR);     else if (num_online_cpus() > 1)       apic->send_IPI_allbutself(CALL_FUNCTION_VECTOR);     return;   }  sendmask:   apic->send_IPI_mask(mask, CALL_FUNCTION_VECTOR); }        apic->send_IPI_mask
 ```
 
-这里选择看apic_numachip.c中的代码：  
+这里选择看apic_numachip.c中的代码：
 
 ```c
     .send_IPI      = numachip_send_IPI_one,   .send_IPI_mask      = numachip_send_IPI_mask,   .send_IPI_mask_allbutself  = numachip_send_IPI_mask_allbutself,   .send_IPI_allbutself    = numachip_send_IPI_allbutself,   .send_IPI_all      = numachip_send_IPI_all,   .send_IPI_self      = numachip_send_IPI_self,
@@ -173,7 +173,7 @@ arch_send_call_function_ipi_mask->   smp_ops.send_call_func_ipi(mask)->     nati
 static void numachip_send_IPI_mask(const struct cpumask *mask, int vector) {   unsigned int cpu;    for_each_cpu(cpu, mask)     numachip_send_IPI_one(cpu, vector); }  static void numachip_send_IPI_one(int cpu, int vector) {   int local_apicid, apicid = per_cpu(x86_cpu_to_apicid, cpu);   unsigned int dmode;    preempt_disable();   local_apicid = __this_cpu_read(x86_cpu_to_apicid);    /* Send via local APIC where non-local part matches */   if (!((apicid ^ local_apicid) >> NUMACHIP_LAPIC_BITS)) {     unsigned long flags;      local_irq_save(flags);     __default_send_IPI_dest_field(apicid, vector,       APIC_DEST_PHYSICAL);     local_irq_restore(flags);     preempt_enable();     return;   }   preempt_enable();    dmode = (vector == NMI_VECTOR) ? APIC_DM_NMI : APIC_DM_FIXED;   numachip_apic_icr_write(apicid, dmode | vector); }
 ```
 
-这里也没什么好看的了，就是写特定地址，触发中断。  
+这里也没什么好看的了，就是写特定地址，触发中断。
 
 起码，我看到的这里的代码，没有实现广播写的功能，在最底层还是for循环去写。
 
@@ -183,15 +183,15 @@ static void numachip_send_IPI_mask(const struct cpumask *mask, int vector) {   u
 DEFINE_IDTENTRY_SYSVEC_SIMPLE(sysvec_reschedule_ipi) {   ack_APIC_irq();   trace_reschedule_entry(RESCHEDULE_VECTOR);   inc_irq_stat(irq_resched_count);   scheduler_ipi();   trace_reschedule_exit(RESCHEDULE_VECTOR); }  DEFINE_IDTENTRY_SYSVEC(sysvec_call_function) {   ack_APIC_irq();   trace_call_function_entry(CALL_FUNCTION_VECTOR);   inc_irq_stat(irq_call_count);   generic_smp_call_function_interrupt();   trace_call_function_exit(CALL_FUNCTION_VECTOR); }  DEFINE_IDTENTRY_SYSVEC(sysvec_call_function_single) {   ack_APIC_irq();   trace_call_function_single_entry(CALL_FUNCTION_SINGLE_VECTOR);   inc_irq_stat(irq_call_count);   generic_smp_call_function_single_interrupt();   trace_call_function_single_exit(CALL_FUNCTION_SINGLE_VECTOR); }
 ```
 
-这里看下CALL_FUNCTION_VECTOR的处理函数，generic_smp_call_function_interrupt()。  
+这里看下CALL_FUNCTION_VECTOR的处理函数，generic_smp_call_function_interrupt()。
 
 ```c
 generic_smp_call_function_interrupt()->   generic_smp_call_function_single_interrupt()->     __flush_smp_call_function_queue(true)
 ```
 
-__flush_smp_call_function_queue函数也没有特别，就是在之前添加任务的call_single_queue队列中取出函数指针去执行，很标准的任务列表的代码。
+\_\_flush_smp_call_function_queue函数也没有特别，就是在之前添加任务的call_single_queue队列中取出函数指针去执行，很标准的任务列表的代码。
 
-**最后1个问题**  
+**最后1个问题**
 
 为什么有些接口只可以在进程上下文使用？而那个异步接口却可以在中断上下文使用？
 
@@ -205,11 +205,9 @@ __flush_smp_call_function_queue函数也没有特别，就是在之前添加任�
 int smp_call_function_single_async(int cpu, struct __call_single_data *csd) {   int err = 0;    preempt_disable();    if (csd->node.u_flags & CSD_FLAG_LOCK) {     err = -EBUSY;     goto out;   }    csd->node.u_flags = CSD_FLAG_LOCK;   smp_wmb();    err = generic_exec_single(cpu, csd);  out:   preempt_enable();    return err; } EXPORT_SYMBOL_GPL(smp_call_function_single_async); 
 ```
 
-  
-
 我对IPI的理解也并不算深入。
 
-但对开发者来说，这种手段在特定场景下的效果可能也蛮不错的![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)。
+但对开发者来说，这种手段在特定场景下的效果可能也蛮不错的!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)。
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/TibnEdoonBKJXf2P0sGG5JBWKUIMIjlib4YekFs5IhJyEluzwzPibd7nl2IZjn7nbhEcEov3x4IrWYAoWv6HNziaGQ/0?wx_fmt=jpeg)
 

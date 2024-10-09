@@ -2,11 +2,11 @@
 
 Linux爱好者
 
- _2021年12月12日 20:00_
+_2021年12月12日 20:00_
 
 The following article is from 编程往事 Author 果冻虾仁
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7Hvg7rQmorRljlcVCzwYTttaruhY8OCBSft64AYB32Cg/0)
 
@@ -14,7 +14,7 @@ The following article is from 编程往事 Author 果冻虾仁
 
 C++码农，brpc committer，搜广推在线工程。专注互联网后端技术分享、行业观察以及个人成长！也欢迎关注我的知乎：果冻虾仁
 
-](https://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666559792&idx=3&sn=0fdc384891ff2c21843a490e2f0f5095&chksm=80dcbd9bb7ab348de30537b8718a419fe10a72b80c0b441a3b659b9a6d3b1518d5a7f50073de&mpshare=1&scene=24&srcid=1212UXu2rmgWgHg6OmiXEXsF&sharer_sharetime=1639315798062&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d028237f365b31c5b04ae0575ff675ee2432a9ef936bd93c8e146b8a6bf92f0dc15ecd7e44b336d2942a43e5cbdf34e0b04e530bb722edfc9b2e6623f422d9886081e18fadca3accc443e8e04dd78d49dcc4d2c484ccc3e6a3395282333cd226c8b84be629cee17a5b6be55bd9d0079dac00ede4bd919b6f88&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_9f1efcd6f4ab&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQ48U9W0ttqV5UwYWTWIWSJRKUAgIE97dBBAEAAAAAAArxAHdmoR4AAAAOpnltbLcz9gKNyK89dVj0I%2BlVkXZHbfNH0%2F%2BDGn0C2ooGsUp4jpeQxZyZtx%2FLeqqg6AOMCoKGz%2B8oSXc2GUV1sAeMHPQnG%2FD0%2FLkTKM3KxcEKl9ADLX7vUXNwikrSkXmzHjmpjp8Y4zBcUega7KOk6MrPFvD7bUyTiSA4qNJ1nfcOJeuuanx%2Fo2mq3fTvXrJGXghAsq3hkjsT7%2BAW71iyjHP9dmx7OtTf0FsXwePJ%2FUwooVFGC0XDpIfWffvKilTudNWi2O2V7dt20psyHgWa3Foogb2HLVsR1X%2F%2FFFwiVfjGGL9wQi9FK7Au9lM%2BXgRtFIZT5%2B40GwGUVToq2A%3D%3D&acctmode=0&pass_ticket=Vxrz4OoOX%2F5vwS3XtsdfdVOagkR%2F2K0OhqP6JCJFeL75eeqHuiRGR1qaZ2z4rOWj&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzAxODI5ODMwOA==&mid=2666559792&idx=3&sn=0fdc384891ff2c21843a490e2f0f5095&chksm=80dcbd9bb7ab348de30537b8718a419fe10a72b80c0b441a3b659b9a6d3b1518d5a7f50073de&mpshare=1&scene=24&srcid=1212UXu2rmgWgHg6OmiXEXsF&sharer_sharetime=1639315798062&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d028237f365b31c5b04ae0575ff675ee2432a9ef936bd93c8e146b8a6bf92f0dc15ecd7e44b336d2942a43e5cbdf34e0b04e530bb722edfc9b2e6623f422d9886081e18fadca3accc443e8e04dd78d49dcc4d2c484ccc3e6a3395282333cd226c8b84be629cee17a5b6be55bd9d0079dac00ede4bd919b6f88&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_9f1efcd6f4ab&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQ48U9W0ttqV5UwYWTWIWSJRKUAgIE97dBBAEAAAAAAArxAHdmoR4AAAAOpnltbLcz9gKNyK89dVj0I%2BlVkXZHbfNH0%2F%2BDGn0C2ooGsUp4jpeQxZyZtx%2FLeqqg6AOMCoKGz%2B8oSXc2GUV1sAeMHPQnG%2FD0%2FLkTKM3KxcEKl9ADLX7vUXNwikrSkXmzHjmpjp8Y4zBcUega7KOk6MrPFvD7bUyTiSA4qNJ1nfcOJeuuanx%2Fo2mq3fTvXrJGXghAsq3hkjsT7%2BAW71iyjHP9dmx7OtTf0FsXwePJ%2FUwooVFGC0XDpIfWffvKilTudNWi2O2V7dt20psyHgWa3Foogb2HLVsR1X%2F%2FFFwiVfjGGL9wQi9FK7Au9lM%2BXgRtFIZT5%2B40GwGUVToq2A%3D%3D&acctmode=0&pass_ticket=Vxrz4OoOX%2F5vwS3XtsdfdVOagkR%2F2K0OhqP6JCJFeL75eeqHuiRGR1qaZ2z4rOWj&wx_header=0#)
 
 # 故事的开始
 
@@ -31,9 +31,8 @@ C++码农，brpc committer，搜广推在线工程。专注互联网后端技术
 我内心万马奔腾：
 
 > - 如果我们是C++98，说这个意见，或许还能理解。但现在是2021年，项目用的C++版本是C++11，这个修改却并不正确！
->     
+>
 > - 即便是C++98，编译器其实也对此有`NRVO`、`RVO`的优化，避免拷贝，只要你不去主动关闭优化，基本都能享受到。
->     
 
 类似的问题在StackOverflow上早有讨论。
 
@@ -115,8 +114,6 @@ C++码农，brpc committer，搜广推在线工程。专注互联网后端技术
 
 `// It's OK in C++11!   vector<string> foo(Context* context) {       vector<string> v;       ... // 给v赋值       return v;   }   `
 
-  
-
 - EOF -
 
 推荐阅读  点击标题可跳转
@@ -127,9 +124,7 @@ C++码农，brpc committer，搜广推在线工程。专注互联网后端技术
 
 3、[为什么腾讯/阿里不去开发被卡脖子的工业软件？](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666559138&idx=1&sn=fa0dca517b897bce61ea77194d4292e9&chksm=80dcb209b7ab3b1fc8e5cdb88c85f4d59f9867edbd45a1183116af87c86b8604341765eb9272&scene=21#wechat_redirect)
 
-  
-
-看完本文有收获？请分享给更多人  
+看完本文有收获？请分享给更多人
 
 推荐关注「Linux 爱好者」，提升Linux技能
 

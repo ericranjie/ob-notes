@@ -2,11 +2,11 @@
 
 云巅论剑
 
- _2021年12月02日 20:00_
+_2021年12月02日 20:00_
 
 以下文章来源于OpenAnolis龙蜥 ，作者李光水、毛文安
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4bZCboj0qz7G2rqBCKMh4iblVGkMN9XKUxiaECBVF6nj1g/0)
 
@@ -14,9 +14,9 @@
 
 龙蜥社区（OpenAnolis）是立足中国面向国际的 Linux 服务器操作系统开源根社区及创新平台。
 
-](https://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486692&idx=1&sn=c82230b7611e9e9b33a1d012bd2f2e1c&chksm=f9aa3e3dceddb72b4d15345c6d4f6139fed7735f522e5bd4d71d7f37d1f1dba03789a80addbc&mpshare=1&scene=24&srcid=1202q8pDUW6wZWzoio9d6Rdv&sharer_sharetime=1638446727189&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04789e970ff79682ec977325c54793dfacbe24ae3b4fb8959bb1b315e0fa33f40d63a4ce737cc5b2ab3871f5adddec18333e67f078d563be124afcd9e204dce7dcc53f220ced61acdea106ab005ba7e963ce4bd2575567e5073c980c43ffe25cc94d698232824e647c62304c0a62272daaf147cd7a76cdc75&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ4rEFUnxkzAJuUlWE0Grn7hLbAQIE97dBBAEAAAAAAAyFMlvbMI8AAAAOpnltbLcz9gKNyK89dVj0bCF5ouRek50Xxj2HtuU9Nf0a4%2FytFsCNgoVDk%2BkfuKoX4io8zlyqXAm%2F5%2FioyxnISFd%2FqYkrAHLr%2FxFP3v%2FFfXzAfFCsOKfyGUp6i1L5jjDgcS9Y4nllN58uV87Hl9DRoJUNzkZnRC6gBz9nAdFZ%2FqIAF73zveDCzalVuFZVeTwtLnmI0cENDkb80pfNg77gQvkA7B8Lmv%2BQQ3moMfe9SbDMY%2F8qSXfln2qcIeGdUxF73fwYpw%3D%3D&acctmode=0&pass_ticket=uhDtJfYrSkyY%2FeQQwkqcGt3fQmILzsYnwmLyvq5xM2mXVOu5oeT4biFv38In5BNO&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzUxNjE3MTcwMg==&mid=2247486692&idx=1&sn=c82230b7611e9e9b33a1d012bd2f2e1c&chksm=f9aa3e3dceddb72b4d15345c6d4f6139fed7735f522e5bd4d71d7f37d1f1dba03789a80addbc&mpshare=1&scene=24&srcid=1202q8pDUW6wZWzoio9d6Rdv&sharer_sharetime=1638446727189&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04789e970ff79682ec977325c54793dfacbe24ae3b4fb8959bb1b315e0fa33f40d63a4ce737cc5b2ab3871f5adddec18333e67f078d563be124afcd9e204dce7dcc53f220ced61acdea106ab005ba7e963ce4bd2575567e5073c980c43ffe25cc94d698232824e647c62304c0a62272daaf147cd7a76cdc75&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ4rEFUnxkzAJuUlWE0Grn7hLbAQIE97dBBAEAAAAAAAyFMlvbMI8AAAAOpnltbLcz9gKNyK89dVj0bCF5ouRek50Xxj2HtuU9Nf0a4%2FytFsCNgoVDk%2BkfuKoX4io8zlyqXAm%2F5%2FioyxnISFd%2FqYkrAHLr%2FxFP3v%2FFfXzAfFCsOKfyGUp6i1L5jjDgcS9Y4nllN58uV87Hl9DRoJUNzkZnRC6gBz9nAdFZ%2FqIAF73zveDCzalVuFZVeTwtLnmI0cENDkb80pfNg77gQvkA7B8Lmv%2BQQ3moMfe9SbDMY%2F8qSXfln2qcIeGdUxF73fwYpw%3D%3D&acctmode=0&pass_ticket=uhDtJfYrSkyY%2FeQQwkqcGt3fQmILzsYnwmLyvq5xM2mXVOu5oeT4biFv38In5BNO&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
-**编者按：**sysAK（system analyse kit），**是****龙蜥社区（OpenAnolis）系统运维 SIG 下面的一个开源项目**，聚集阿里百万服务器的多年运维经验，针对不同的运维需求提供了一系列工具，形成统一的产品进行服务。作者总结了实际工作中处理的 IO 夯问题的经验，将它梳理成一套理论分析方法并形成 iosdiag 工具，集成到了sysAK 工具集里。本文将由作者带大家一道领略一下 iosdiag 在 IO 夯领域叱咤风云的魅力。本文整理自**[龙蜥大讲堂第三期技术解读](http://mp.weixin.qq.com/s?__biz=Mzg4MTMyMTUwMQ==&mid=2247488486&idx=1&sn=47c066b12244b610fb6136323419af6d&chksm=cf66e094f811698276bf6cc5220559efcdcce9e034b79a90d6e1bab5251b60296ba839065c9d&scene=21#wechat_redirect)，**直播回顾可在龙蜥社区官网查看。
+\*\*编者按：**sysAK（system analyse kit），**是\*\*\*\*龙蜥社区（OpenAnolis）系统运维 SIG 下面的一个开源项目**，聚集阿里百万服务器的多年运维经验，针对不同的运维需求提供了一系列工具，形成统一的产品进行服务。作者总结了实际工作中处理的 IO 夯问题的经验，将它梳理成一套理论分析方法并形成 iosdiag 工具，集成到了sysAK 工具集里。本文将由作者带大家一道领略一下 iosdiag 在 IO 夯领域叱咤风云的魅力。本文整理自**[龙蜥大讲堂第三期技术解读](http://mp.weixin.qq.com/s?__biz=Mzg4MTMyMTUwMQ==&mid=2247488486&idx=1&sn=47c066b12244b610fb6136323419af6d&chksm=cf66e094f811698276bf6cc5220559efcdcce9e034b79a90d6e1bab5251b60296ba839065c9d&scene=21#wechat_redirect)，\*\*直播回顾可在龙蜥社区官网查看。
 
 作者：李光水（君然）系统运维SIG核心成员、 毛文安（品文）系统运维SIG负责人。
 
@@ -32,7 +32,7 @@
 
 “因为出现了 IO 夯问题...”
 
-曾几何时，听到 IO 夯，作者会有点头皮发麻，为啥呢？因为没有有效手段去定位这个问题，或者就算是有手段，也得经历山路十八弯，成不成还的看运气，若是幸运，还能分析点啥出来，若是不幸运，把机器整挂掉，得不偿失。时至今日，遇到 IO 夯问题再也不虚了，因为作者现在手里有可以**分析 IO 夯问题的利器****——sysak iosdiag**。
+曾几何时，听到 IO 夯，作者会有点头皮发麻，为啥呢？因为没有有效手段去定位这个问题，或者就算是有手段，也得经历山路十八弯，成不成还的看运气，若是幸运，还能分析点啥出来，若是不幸运，把机器整挂掉，得不偿失。时至今日，遇到 IO 夯问题再也不虚了，因为作者现在手里有可以**分析 IO 夯问题的利器\*\*\*\*——sysak iosdiag**。
 
 先来看看这个栈，500 多个进程是因为在内核下等待某个磁盘的块设备互斥锁而进入 D 状态，如图 1-1 所示：
 
@@ -65,23 +65,22 @@
 图 2-1
 
 1. **假设我们以一次用户态程序的写 IO 为例**，那么在调用 write 时候会传入一个数据 buf，这个 buf 在内核层面也是有对应page的。在默认情况下，IO 会以 buffer io 方式往下走；
-    
-2. **假设以 buffer io 方式往下走**，走到文件系统层，会将 1 中 buf 里面的数据拷贝到内核 page cache 中，然后把这些 page 置脏，如果此时系统的脏页水位还没有达到系统所设置的阈值，这里就返回了，对用户而言这次 IO 结束了；如果此时脏页水位达到系统所设置的阈值，那么就会启动刷脏流程，这里根据脏页水位具体达到的不同阈值，对用户进程会有不同的处理策略，如短暂休眠或不休眠，在此之后依旧会返回，用户一次 IO 结束；
-    
-3. **刷脏是通过 writeback 机制进行**，这一流程的触发，可能是通过定期触发，或者如 2 所说水位已经超过系统所设定的阈值了，又或者是用户执行了同步命令或者调用了 sync/fsync 之类的 api 等等。writeback 机制将脏页回写包装成一个个 work，然后这些 work 由系统的 worker 进程，也就是内核的 kworker 进程来执行。刷脏的过程以一个个 inode 为单位，然后将其中的脏页进一步包装成 bio 结构（bio 结构中，会有一个 bio_vec 来描述被包装的脏页 page，简单理解就是会有一个 page 指针指向这个脏页），之后将 bio 提交到 block 层；当然如果此次 IO 涉及到文件系统元数据的变更，中途内核进程 jbd 也会往 block 层提交 bio；
-    
-4. **bio 进入 block 层之后会经历一系列的限制性的处理**，如这个 bio 所包装的数据长度是否过大，有或者是否已经触发到 IO 限流，因为这些机制有点小复杂，就不在图上展示了。在此之后，会尝试与已有的 IO 请求进行合并，具体合并则根据 bio 所描述磁盘上起始扇区和长度与 IO 请求中 bio 描述的磁盘地址是否连续来进行合并。如能合并就不再往下，直接返回了；
-    
-5. **如不能合并，则申请一个新的 IO 请求**，在多队列架构中，根据磁盘的队列个数和队列深度，在磁盘初始化阶段，在内存上对每条硬件队列已经预先分配了一个 request 集合，同时会有对应的 bitmap 来表示每个请求是否已经被申请。当没有请求可以被申请到时，说明此队列上的 IO 请求已经满了，申请的进程将进入深度休眠等待队列上的 IO 请求已经成功刷到磁盘并释放 IO 请求，才能申请到；
-    
-6. **申请到之后，将 bio 包装成 IO 请求——request**，将 IO 请求添加到进程的 plug 队列中，当积蓄到一定量的 IO 请求之后，一把“泄洪”到派发队列上；（补充说明：plug队列“蓄流”机制属内核行为，用户无法控制，plug 队列能积累的 IO 请求数也是有限制的；触发“泄洪”，有可能是 plug 队列满了自己触发的，也有可能是提交完一段数据之后，主动调用的内核接口触发）；
-    
-7. **request 进入派发队列之后**，会被派发到驱动层，上图以 virtio blk 为例，request 会被封装成一个个 sg，这些 sg 里面有描述数据 page 的物理地址、本次 IO 访问的磁盘起始扇区、数据长度等信息。之后驱动将 sg 推入到 vring 缓存中，vring缓存在主机上，是主机上 virtio blk 前端和后端磁盘共享的一块可 dma 访问的内存。sg 推入 vring 之后，会 kick 磁盘提取 IO 并通过 dma 完成数据传输，IO 完成之后，磁盘给主机一个中断，virtio blk 驱动从 vring 中取出完成的 request，进入 io cpmplete 路径；
-    
-8. **request 进入 io complete 路径之后**，首先执行在 bio 结构体中设置的回调函数，这些回调函数一般在创建 bio 的的流程中指定，其一般负责唤醒等待进程、释放锁资源的操作；之后会记录 io stat 信息，这些信息也是系统 iostat 工具的指标来源；最后释放掉 request，这个释放并不是将 request 内存清空，而是清除该 reqeust 对应的在硬件队列 request 集合上的 bitmap 位，以便于后来的 IO 可以再去申请使用；
-    
-9. **至此，一个 IO 的生命周期结束**，而对于 direct io 的方式，整个过程会缺少数据buf复制到内核 page cache、脏页回写这个步骤。上面提到的流程可能不是一个完成 IO 生命周期的全部，由于 IO 链路的复杂性，中间也省掉了部分流程，有兴趣的读者可以再去摸索摸索，或者加入我们系统运维 sig 交流群，欢迎一起探讨。
-    
+
+1. **假设以 buffer io 方式往下走**，走到文件系统层，会将 1 中 buf 里面的数据拷贝到内核 page cache 中，然后把这些 page 置脏，如果此时系统的脏页水位还没有达到系统所设置的阈值，这里就返回了，对用户而言这次 IO 结束了；如果此时脏页水位达到系统所设置的阈值，那么就会启动刷脏流程，这里根据脏页水位具体达到的不同阈值，对用户进程会有不同的处理策略，如短暂休眠或不休眠，在此之后依旧会返回，用户一次 IO 结束；
+
+1. **刷脏是通过 writeback 机制进行**，这一流程的触发，可能是通过定期触发，或者如 2 所说水位已经超过系统所设定的阈值了，又或者是用户执行了同步命令或者调用了 sync/fsync 之类的 api 等等。writeback 机制将脏页回写包装成一个个 work，然后这些 work 由系统的 worker 进程，也就是内核的 kworker 进程来执行。刷脏的过程以一个个 inode 为单位，然后将其中的脏页进一步包装成 bio 结构（bio 结构中，会有一个 bio_vec 来描述被包装的脏页 page，简单理解就是会有一个 page 指针指向这个脏页），之后将 bio 提交到 block 层；当然如果此次 IO 涉及到文件系统元数据的变更，中途内核进程 jbd 也会往 block 层提交 bio；
+
+1. **bio 进入 block 层之后会经历一系列的限制性的处理**，如这个 bio 所包装的数据长度是否过大，有或者是否已经触发到 IO 限流，因为这些机制有点小复杂，就不在图上展示了。在此之后，会尝试与已有的 IO 请求进行合并，具体合并则根据 bio 所描述磁盘上起始扇区和长度与 IO 请求中 bio 描述的磁盘地址是否连续来进行合并。如能合并就不再往下，直接返回了；
+
+1. **如不能合并，则申请一个新的 IO 请求**，在多队列架构中，根据磁盘的队列个数和队列深度，在磁盘初始化阶段，在内存上对每条硬件队列已经预先分配了一个 request 集合，同时会有对应的 bitmap 来表示每个请求是否已经被申请。当没有请求可以被申请到时，说明此队列上的 IO 请求已经满了，申请的进程将进入深度休眠等待队列上的 IO 请求已经成功刷到磁盘并释放 IO 请求，才能申请到；
+
+1. **申请到之后，将 bio 包装成 IO 请求——request**，将 IO 请求添加到进程的 plug 队列中，当积蓄到一定量的 IO 请求之后，一把“泄洪”到派发队列上；（补充说明：plug队列“蓄流”机制属内核行为，用户无法控制，plug 队列能积累的 IO 请求数也是有限制的；触发“泄洪”，有可能是 plug 队列满了自己触发的，也有可能是提交完一段数据之后，主动调用的内核接口触发）；
+
+1. **request 进入派发队列之后**，会被派发到驱动层，上图以 virtio blk 为例，request 会被封装成一个个 sg，这些 sg 里面有描述数据 page 的物理地址、本次 IO 访问的磁盘起始扇区、数据长度等信息。之后驱动将 sg 推入到 vring 缓存中，vring缓存在主机上，是主机上 virtio blk 前端和后端磁盘共享的一块可 dma 访问的内存。sg 推入 vring 之后，会 kick 磁盘提取 IO 并通过 dma 完成数据传输，IO 完成之后，磁盘给主机一个中断，virtio blk 驱动从 vring 中取出完成的 request，进入 io cpmplete 路径；
+
+1. **request 进入 io complete 路径之后**，首先执行在 bio 结构体中设置的回调函数，这些回调函数一般在创建 bio 的的流程中指定，其一般负责唤醒等待进程、释放锁资源的操作；之后会记录 io stat 信息，这些信息也是系统 iostat 工具的指标来源；最后释放掉 request，这个释放并不是将 request 内存清空，而是清除该 reqeust 对应的在硬件队列 request 集合上的 bitmap 位，以便于后来的 IO 可以再去申请使用；
+
+1. **至此，一个 IO 的生命周期结束**，而对于 direct io 的方式，整个过程会缺少数据buf复制到内核 page cache、脏页回写这个步骤。上面提到的流程可能不是一个完成 IO 生命周期的全部，由于 IO 链路的复杂性，中间也省掉了部分流程，有兴趣的读者可以再去摸索摸索，或者加入我们系统运维 sig 交流群，欢迎一起探讨。
 
 # **三、臭名昭著的IO夯**
 
@@ -90,14 +89,14 @@
 IO 夯，可简单理解为 IO 路径在一定程度上堵住了，轻则经过特定路径的 IO 不可访问，重则整条 IO 路径堵住不可用，任你多少 IO 丢下来，我就是没反应。为什么 IO 路径会堵住呢，无外乎是在等待资源。
 
 等待资源一般涉及的是 IO 路径上不可重入的临界区，要求进程持有资源进入、释放资源退出，又或者是事物处理型，允许接受有限个进程的事物，但要等待这些进程的事物全部被处理完之后，才能接收新的进程事物，开始处理新一轮的流程。而当处于临界区内的进程，由于内核 bug 或存储介质原因，导致无法顺利完成 IO 后正常退出，最终造成临界区外的进程因为拿不到资源而处于阻塞状态，导致无 IO 可用。由此可见，只要临界区内的进程不退出这种尴尬的状态，整条 IO 路径就不可用。
-![[Pasted image 20240923191615.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923191615.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-1
 
 内核下有条 io complete 的关键路径，这条路径属于可重入路径，其主要职责为对 IO 结束后的收尾工作，一般地，会先执行一个 IO 回调流程，而后更新一些 IO 的stat信息，最后结束生命周期。内核中也有一些特殊类的 IO，在 IO 子系统中的处理方式与一般的 IO 有所差异，如 flush/fua io，而作者曾经碰到过一起 flush/fua io 夯的问题。flush/fua io 在使用日志型的文件系统场景下可能会比较常见，如 ext4 文件系统，为了保证文件系统元数据能够真正的持久化存储到磁盘的日志区域，jbd 线程在提交 commit record 的时候会发起这种 IO，而flush/fua io的处理流程也是比较繁琐的：
-![[Pasted image 20240923191620.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923191620.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-2
 
@@ -112,24 +111,24 @@ IO 夯，可简单理解为 IO 路径在一定程度上堵住了，轻则经过�
 **3.3 IO夯问题分析方法现状**
 
 当遇到 IO 夯问题时，我们通常会分析 dmesg 中 hungtask 调用栈、或者是 iosta 信息、sysfs/debugfs 中的统计信息，再结合以往经验去推测问题可能出在哪。当我们碰到如下图 3-3 所示的 iostat 信息时，根据经验，会怀疑是磁盘侧有 IO 没回，因此怀疑io夯在磁盘上，让存储的同学去排查磁盘侧。但这种经验却不一定靠谱，如果是在磁盘返回到 io complete 之间有内核 bug，iostat 也会出现下图中的信息。
-![[Pasted image 20240923191626.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923191626.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-3
 
-**那如何分析 IO 夯问题是最有效的呢？**答案肯定是要找出来夯住的 IO 请求，然后根据请求里面的信息去分析当前这个请求是处于什么状态、已经走到哪个路径了。但遗憾的是，目前没有实现这个功能的通用工具，唯一能快速实现这一需求的，就只有对问题现场做 crash 分析了，找到夯住的 IO 请求，根据 IO 请求中的信息，再结合代码流程，一步步深入最终找到问题原因，但前提是业务可以容忍这么操作。
+\*\*那如何分析 IO 夯问题是最有效的呢？\*\*答案肯定是要找出来夯住的 IO 请求，然后根据请求里面的信息去分析当前这个请求是处于什么状态、已经走到哪个路径了。但遗憾的是，目前没有实现这个功能的通用工具，唯一能快速实现这一需求的，就只有对问题现场做 crash 分析了，找到夯住的 IO 请求，根据 IO 请求中的信息，再结合代码流程，一步步深入最终找到问题原因，但前提是业务可以容忍这么操作。
 
 **3.4 利器简介——sysak iosdiag**
 
 sysAK iosdiag，是 sysAK 工具平台中的 IO 诊断工具，已具备 IO 时延探测、IO 夯诊断两大功能，其中 IO 夯诊断可用于检测当前系统中 IO 夯事件并确定问题边界。工具的大体架构图 3-4 所示：
-![[Pasted image 20240923191634.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923191634.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-4
 
 首先通过 sysAK 的 iosdiag 功能去使能 IO 夯诊断，这里诊断到 IO 夯之后，会对 IO 进行数据分析，然后形成诊断结论，诊断结论是以 json 的数据格式保存在一个日志文件里面，同时也支持将数据上传到指定的地方，**目前支持 oss 的上传方式**，不上传的话，数据也会存在机器本地，供调用者去查看。
-![[Pasted image 20240923191641.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240923191641.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-5
 
@@ -139,7 +138,7 @@ sysAK iosdiag，是 sysAK 工具平台中的 IO 诊断工具，已具备 IO 时�
 
 iosdiag 诊断结果输出，力求信息准确、结果直观，期望即便不具备内核IO子系统知识的同学也能快速上手。工具会输出一些结论性的信息，如什么时间点，检测到了 IO 事件，这是一个什么样的 IO，从哪个 cpu 发出来的，从哪个磁盘的哪个位置访问多大的数据量，然后这个 IO 夯在哪个路径上，夯住了多久。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3-6
 
@@ -149,17 +148,17 @@ iosdiag 诊断结果输出，力求信息准确、结果直观，期望即便不
 
 **往期精彩推荐**
 
-[1.sysAK（青囊）系统运维工具集：如何实现高效自动化运维？| 龙蜥技术](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486688&idx=1&sn=7333426e446892d013b49593014b086e&chksm=f9aa3e39ceddb72fdf980a8159787d264b922ef28d24ce4ebf18f0d26e45085caf0c338a1002&scene=21#wechat_redirect)  
+[1.sysAK（青囊）系统运维工具集：如何实现高效自动化运维？| 龙蜥技术](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486688&idx=1&sn=7333426e446892d013b49593014b086e&chksm=f9aa3e39ceddb72fdf980a8159787d264b922ef28d24ce4ebf18f0d26e45085caf0c338a1002&scene=21#wechat_redirect)
 
-[2.直播回顾：如何基于Linux内核构建起商用密码基础设施？| 龙蜥技术](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486676&idx=1&sn=bc4027417ab1f1831b6aec9124eddec5&chksm=f9aa3e0dceddb71be9feded1388e2721a896586be080e4a8bb9874522f06f703aecf95a840d9&scene=21#wechat_redirect)  
+[2.直播回顾：如何基于Linux内核构建起商用密码基础设施？| 龙蜥技术](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486676&idx=1&sn=bc4027417ab1f1831b6aec9124eddec5&chksm=f9aa3e0dceddb71be9feded1388e2721a896586be080e4a8bb9874522f06f703aecf95a840d9&scene=21#wechat_redirect)
 
-[3.关于龙蜥，你关心的问题都在这里](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486673&idx=1&sn=a559f89f88d040347b14f7088460b0c6&chksm=f9aa3e08ceddb71ed9a7e791077f071acef5f3cebf5b0bb3b58b49a5fb8df9a3ca1e8eb2e6b2&scene=21#wechat_redirect)  
+[3.关于龙蜥，你关心的问题都在这里](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486673&idx=1&sn=a559f89f88d040347b14f7088460b0c6&chksm=f9aa3e08ceddb71ed9a7e791077f071acef5f3cebf5b0bb3b58b49a5fb8df9a3ca1e8eb2e6b2&scene=21#wechat_redirect)
 
-[4.Arm加入龙蜥社区并成为理事单位，国内开源再添国际新力量](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486657&idx=1&sn=240aa906a7cfcfeaa4e5e506a611ec10&chksm=f9aa3e18ceddb70e72524cd4c54a5ff3cb0150cb528f4347b9d2fdccf9fa685390cffe64618d&scene=21#wechat_redirect)  
+[4.Arm加入龙蜥社区并成为理事单位，国内开源再添国际新力量](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486657&idx=1&sn=240aa906a7cfcfeaa4e5e506a611ec10&chksm=f9aa3e18ceddb70e72524cd4c54a5ff3cb0150cb528f4347b9d2fdccf9fa685390cffe64618d&scene=21#wechat_redirect)
 
 [5.祝贺龙蜥社区理事单位成员入选C++ 标准委员会，首个国内企业代表加入](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486637&idx=1&sn=6382b573e3cb7a57bd35b8929bfaad1f&chksm=f9aa3e74ceddb7622b0cf29c97841ab5e985f5ab4c113f0348bfd536411fc9ebcb7deb6665f0&scene=21#wechat_redirect)
 
-[![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486688&idx=1&sn=7333426e446892d013b49593014b086e&chksm=f9aa3e39ceddb72fdf980a8159787d264b922ef28d24ce4ebf18f0d26e45085caf0c338a1002&scene=21#wechat_redirect)
+[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzUxNjE3MTcwMg==&mid=2247486688&idx=1&sn=7333426e446892d013b49593014b086e&chksm=f9aa3e39ceddb72fdf980a8159787d264b922ef28d24ce4ebf18f0d26e45085caf0c338a1002&scene=21#wechat_redirect)
 
 阅读 630
 

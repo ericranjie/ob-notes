@@ -1,10 +1,8 @@
-
-
 原创 往事敬秋风 深度Linux
 
- _2024年03月29日 21:01_ _湖南_
+_2024年03月29日 21:01_ _湖南_
 
-Vhost / virtio是一种半虚拟化的设备抽象接口规范，已广泛应用于QEMU *和基于内核的虚拟机（KVM）。当它在来宾操作系统中用作前端驱动程序时，通常称为virtio；当在主机中用作后端驱动程序时，则称为vhost。与在主机上进行纯软件输入/输出（I / O）仿真相比，virtio可以实现更好的性能，并广泛用于数据中心。Linux *内核提供了相应的设备驱动程序，分别是virtio-net和vhost-net。
+Vhost / virtio是一种半虚拟化的设备抽象接口规范，已广泛应用于QEMU \*和基于内核的虚拟机（KVM）。当它在来宾操作系统中用作前端驱动程序时，通常称为virtio；当在主机中用作后端驱动程序时，则称为vhost。与在主机上进行纯软件输入/输出（I / O）仿真相比，virtio可以实现更好的性能，并广泛用于数据中心。Linux \*内核提供了相应的设备驱动程序，分别是virtio-net和vhost-net。
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
 
@@ -16,7 +14,7 @@ Vhost / virtio是一种半虚拟化的设备抽象接口规范，已广泛应用
 
 公众号
 
-virtio 是对半虚拟化 hypervisor 中的一组通用模拟设备的抽象。该设置还允许 hypervisor 导出一组通用的模拟设备，并通过一个通用的应用编程接口（API）让它们变得可用。有了半虚拟化 hypervisor 之后，来宾操作系统能够实现一组通用的接口，在一组后端驱动程序之后采用特定的设备模拟。后端驱动程序不需要是通用的，因为它们只实现前端所需的行为。[1]
+virtio 是对半虚拟化 hypervisor 中的一组通用模拟设备的抽象。该设置还允许 hypervisor 导出一组通用的模拟设备，并通过一个通用的应用编程接口（API）让它们变得可用。有了半虚拟化 hypervisor 之后，来宾操作系统能够实现一组通用的接口，在一组后端驱动程序之后采用特定的设备模拟。后端驱动程序不需要是通用的，因为它们只实现前端所需的行为。\[1\]
 
 除了前端驱动程序（在来宾操作系统中实现）和后端驱动程序（在 hypervisor 中实现）之外，virtio 还定义了两个层来支持来宾操作系统到 hypervisor 的通信。在顶级（称为 virtio）的是虚拟队列接口，它在概念上将前 端驱动程序附加到后端驱动程序。驱动程序可以使用 0 个或多个队列，具体数量取决于需求。例如，virtio 网络驱动程序使用两个虚拟队列（一个用于接收，另一个用于发送），而 virtio 块驱动程序仅使用一个虚拟队列。虚拟队列实际上被实现为跨越来宾操作系统和 hypervisor 的衔接点。但这可以通过任意方式实现，前提是来宾操作系统和 hypervisor 以相同的方式实现它。
 
@@ -114,7 +112,7 @@ qdev_device_add接口中，还会调用realize接口，前面的instance_init只
 
 参照VirtIO的Class结构，整个realize的流程整理如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在初始化的过程中，对数据结构进行一一初始化。在pci设备的realize之前插入virtio_pci_dc_realize函数的原因是，如果是modern模式的pci设备必须是pci-express协议，所以需要置位PCIDevice里的pcie-capability标识，强行令pci设备为pcie类型。然后再进行pci层的设备初始化，初始化一个pcie设备。
 
@@ -168,7 +166,7 @@ VIRTIO_PCI_QUEUE_PFN字段是写入queue地址的，对于legacy模式，avail/u
 
 重点关注一下VIRTIO_PCI_STATUS，该位置置位VIRTIO_CONFIG_S_DRIVER_OK，说明前端驱动操作完成，可启动virtio-net设备的数据面操作。所以这个位置很重要，在virtio_set_status()接口中，会启动数据面的一系列操作，包括对VHOST的配置也是由这里触发。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图中就是从pcie---->virtio---->virtio-net----->vhost_net的调用关系。在设备初始化完成后，后续的操作都是由guest操作bar空间来触发，尤其是流程的推动都是对bar空间的写操作触发的。比如VIRTIO_COFNIG_S_DRIVER_OK的写入。
 
@@ -190,15 +188,15 @@ VIRTIO_PCI_QUEUE_PFN字段是写入queue地址的，对于legacy模式，avail/u
 
 所以netdev的设备创建入口就是net_init_netdev函数，在net_init_netdev函数里，根据type=vhost-user类型，执行net_init_vhost_user()接口创建设备。
 
-该接口首先执行net_vhost_claim_chardev()，匹配其依赖的chardev，也就是命令行中的char1，找到相应的Chardev*设备。
+该接口首先执行net_vhost_claim_chardev()，匹配其依赖的chardev，也就是命令行中的char1，找到相应的Chardev\*设备。
 
 然后调用net_vhost_user_init()接口进行真实的初始化操作。最终，vhost-user类型的netdev设备生成的结构实体是什么呢？
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最终NetClientState被挂载到了全局变量net_clients链表中。另外，还有一组数据结构是在检测到vhost后端socket连接之后创建的。socket连接之后会调用上图中的事件处理函数net_vhost_user_event，进而调用vhost_user_start()接口。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 vhost-user的net设备申请的数据结构和框架，其中vhost_net中vhost_dev结构有一个重要的vhost_ops指针，对后端的接口都在这里。前面提到过vhost的后端有用户态和内核态两种，所以VhostOps的实现也有两种，因为我们指定了vhost_user类型的后端，实际vhost_ops会初始化为user_ops。VhostOps是与后端类型相关的不同的处理方式。
 
@@ -210,20 +208,19 @@ qemu与vhost的通信是通过socket的方式。具体的实现都在vhost-user�
 
 VIRTIO_PCI_STATUS标识控制面协商的状态，当VIRTIO_CONFIG_S_DRIVER_OK置位时，说明控制面协商完成，此时启动数据面的传输。所以VHOST层面的交互是从这个状态启动的。而该状态通过virtio_set_status()接口调用到virtio_net_set_status()和virtio_net_vhost_status()，判断是第一次VIRTIO_CONFIG_S_DRIVER_OK标识置位，则此时认为需要启动数据面了，会调用vhost_net_start()接口启动与VHOST后端的交互，对于数据面来说，最主要的是队列相关的信息。如下图示：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其实VhostOps里的每个接口根据名字都可以直观的推断出实现的作用，比如：
 
 - vhost_set_vring_num是设置队列的大小
-    
-- vhost_set_vring_addr是设置ring的基地址（GPA）
-    
-- vhost_set_vring_base设置last_avail_index
-    
-- vhost_set_vring_kick是设置队列kick需要的eventfd信息
-    
 
-vhost_set_mem_table接口，我们知道qemu里获取的guest的地址都是GUEST地址空间的，一般是GPA，那么qemu在创建虚拟机的时候是知道GPA到HVA的映射关系的，所以根据GPA可以轻松获得HVA，进而操作进程地址空间的VA即可。但作为独立的进程，VHOST-USER拥有独立的地址空间，是不可以使用QEMU进程的VA的。所以QEMU需要将自己记录的一组或多组[GPA,HVA,size,memfd]通知给VHOST-USER。VHOST_USER收到这几个信息后将这片内存空间通过mmap映射到本地进程的地址空间，然后一并记录到记录到本地的memory table。
+- vhost_set_vring_addr是设置ring的基地址（GPA）
+
+- vhost_set_vring_base设置last_avail_index
+
+- vhost_set_vring_kick是设置队列kick需要的eventfd信息
+
+vhost_set_mem_table接口，我们知道qemu里获取的guest的地址都是GUEST地址空间的，一般是GPA，那么qemu在创建虚拟机的时候是知道GPA到HVA的映射关系的，所以根据GPA可以轻松获得HVA，进而操作进程地址空间的VA即可。但作为独立的进程，VHOST-USER拥有独立的地址空间，是不可以使用QEMU进程的VA的。所以QEMU需要将自己记录的一组或多组\[GPA,HVA,size,memfd\]通知给VHOST-USER。VHOST_USER收到这几个信息后将这片内存空间通过mmap映射到本地进程的地址空间，然后一并记录到记录到本地的memory table。
 
 ```
 mmap_addr = mmap(NULL, mmap_size, PROT_READ | PROT_WRITE,				 MAP_SHARED | populate, reg->fd, 0);
@@ -263,19 +260,19 @@ VHOST的框架还是比较直接的，整体看起来DPDK的代码框架比QEMU�
 
 VHOST模块初始化流程的关键接口有三个：
 
-1、rte_vhost_driver_register(const char *path, uint64_t flags)
+1、rte_vhost_driver_register(const char \*path, uint64_t flags)
 
 ```
 申请并初始化vhost_user_socket结构，vsocket指针存入全局数组vhost_user.vsockets[]中；打开path对应的socket文件，fd存入vsocket->socket_fd中。
 ```
 
-2、rte_vhost_driver_callback_register(const char *path, struct vhost_device_ops const * const ops)
+2、rte_vhost_driver_callback_register(const char \*path, struct vhost_device_ops const * const ops)
 
 ```
 注册vhost_device_ops到vsocket->ops中。
 ```
 
-3、rte_vhost_driver_start(const char *path)
+3、rte_vhost_driver_start(const char \*path)
 
 根据VHOST是client或者server，选择vhost_user_start_client()/vhost_user_start_server()两种路径，看一下vhost作为client的路径。vhost_user_start_client():
 
@@ -328,13 +325,12 @@ virtio network device是一个虚拟以太网卡，它支持 TX/RX 多队列。�
 Qemu实现virtio-net device的缺点：
 
 1. 性能开销：虚拟化技术本身会引入一定的性能开销。尽管virtio-net是为了提高虚拟网络设备性能而设计的，但与原生网络设备相比仍然会有一些额外的开销。
-    
-2. 虚拟化复杂性：QEMU是一个强大而复杂的虚拟化软件，实现和配置virtio-net设备需要一定的技术和经验。对于不熟悉QEMU或者虚拟化技术的人来说，可能会面临一定的学习曲线和困难。
-    
-3. 驱动兼容性：虽然virtio-net已经得到了广泛支持，并且常见操作系统都提供了对其驱动程序的支持，但仍然可能存在某些情况下驱动程序不完全兼容或出现问题。这可能导致网络功能不稳定或无法正常工作。
-    
-4. 虚拟化依赖：使用virtio-net需要依赖QEMU等虚拟化软件，在某些环境中可能存在限制或约束。例如，在嵌入式系统或特殊硬件平台上，可能无法轻松地部署和运行QEMU。
-    
+
+1. 虚拟化复杂性：QEMU是一个强大而复杂的虚拟化软件，实现和配置virtio-net设备需要一定的技术和经验。对于不熟悉QEMU或者虚拟化技术的人来说，可能会面临一定的学习曲线和困难。
+
+1. 驱动兼容性：虽然virtio-net已经得到了广泛支持，并且常见操作系统都提供了对其驱动程序的支持，但仍然可能存在某些情况下驱动程序不完全兼容或出现问题。这可能导致网络功能不稳定或无法正常工作。
+
+1. 虚拟化依赖：使用virtio-net需要依赖QEMU等虚拟化软件，在某些环境中可能存在限制或约束。例如，在嵌入式系统或特殊硬件平台上，可能无法轻松地部署和运行QEMU。
 
 Vhost协议
 
@@ -367,13 +363,12 @@ Qemu 分配一个eventfd并将其注册到 vhost 和 KVM 以实现通知绕过�
 具体来说，在使用QEMU创建虚拟机时，可以通过以下步骤实现virtio-net网卡：
 
 1. 启动QEMU命令时添加参数 "-device virtio-net" 或者 "-netdev user,id=net0 -device virtio-net,netdev=net0"，其中"net0"为网络设备的名称。
-    
-2. QEMU将会创建一个名为"net0"的virtio-net网卡，并将其与虚拟机关联起来。
-    
-3. 虚拟机内部操作系统会将这个virtio-net网卡识别为一个正常的物理网卡，并加载相应的驱动程序。
-    
-4. 宿主机上运行的QEMU负责处理从虚拟机发送过来的数据包，并转发到宿主机上与该网卡对应的物理网络设备上，或者反向地将从物理网络设备接收到的数据包传递给虚拟机。
-    
+
+1. QEMU将会创建一个名为"net0"的virtio-net网卡，并将其与虚拟机关联起来。
+
+1. 虚拟机内部操作系统会将这个virtio-net网卡识别为一个正常的物理网卡，并加载相应的驱动程序。
+
+1. 宿主机上运行的QEMU负责处理从虚拟机发送过来的数据包，并转发到宿主机上与该网卡对应的物理网络设备上，或者反向地将从物理网络设备接收到的数据包传递给虚拟机。
 
 通过使用virtio-net网卡，可以提供高性能、低延迟和可扩展性好的网络通信，在虚拟化环境中更加有效地利用计算资源，并提供与原生网络设备相当的性能。
 
@@ -395,11 +390,11 @@ qemu-system-x86_64 -netdev user,id=net0 -device virtio-net,netdev=net0
 
 2023年往期回顾
 
-[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)  
+[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)
 
-[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)  
+[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)
 
-[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)  
+[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)
 
 [存储全栈开发：构建高效的数据存储系统](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487696&idx=1&sn=b5ebe830ddb6798ac5bf6db4a8d5d075&chksm=cfb959b9f8ced0af76710c070a6db2677fb359af735e79c6378e82ead570aa1ce5350a146793&scene=21#wechat_redirect)
 

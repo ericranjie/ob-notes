@@ -1,10 +1,8 @@
 原创 云义 阿里云开发者
 
- _2024年07月03日 08:31_ _浙江_
+_2024年07月03日 08:31_ _浙江_
 
 阿里妹导读
-
-  
 
 本文提供一种能充分利用分布式计算资源来计算全局字典索引的方法，以解决在大数据量下使用上诉方式导致所有数据被分发到单个reducer进行单机排序带来的性能瓶颈。
 
@@ -50,11 +48,7 @@ DAG图：
 
 **随需而动：自动弹性，稳定交付**
 
-  
-
 本方案使用应用型负载均衡（ALB）和弹性伸缩（ESS）智能分配网络流量、动态调整服务器资源，提高应用的高可用性和吞吐量，弹性控制资源利用率、缩减资源成本。快**点击阅读原文**查看详情吧～
-
-  
 
 阅读原文
 
@@ -120,29 +114,28 @@ MySQL 8.0：filesort 性能退化的问题分析
 **留言 3**
 
 - FriesW
-    
-    山东7月3日
-    
-    赞1
-    
-    老弟写得非常好![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  山东7月3日
+
+  赞1
+
+  老弟写得非常好![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 简墨成竹
-    
-    北京7月3日
-    
-    赞
-    
-    写的非常好
-    
+
+  北京7月3日
+
+  赞
+
+  写的非常好
+
 - 庞兴华
-    
-    北京7月3日
-    
-    赞
-    
-    思路很好，值得拥有！核心的思路是识别了该业务rownumber只是需要一个唯一id，并不是真的需要全局排序，有序不重复，就可以利用分布式排序优化![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京7月3日
+
+  赞
+
+  思路很好，值得拥有！核心的思路是识别了该业务rownumber只是需要一个唯一id，并不是真的需要全局排序，有序不重复，就可以利用分布式排序优化![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据
 
@@ -161,28 +154,27 @@ MySQL 8.0：filesort 性能退化的问题分析
 **留言 3**
 
 - FriesW
-    
-    山东7月3日
-    
-    赞1
-    
-    老弟写得非常好![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  山东7月3日
+
+  赞1
+
+  老弟写得非常好![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 简墨成竹
-    
-    北京7月3日
-    
-    赞
-    
-    写的非常好
-    
+
+  北京7月3日
+
+  赞
+
+  写的非常好
+
 - 庞兴华
-    
-    北京7月3日
-    
-    赞
-    
-    思路很好，值得拥有！核心的思路是识别了该业务rownumber只是需要一个唯一id，并不是真的需要全局排序，有序不重复，就可以利用分布式排序优化![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京7月3日
+
+  赞
+
+  思路很好，值得拥有！核心的思路是识别了该业务rownumber只是需要一个唯一id，并不是真的需要全局排序，有序不重复，就可以利用分布式排序优化![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
 
 已无更多数据

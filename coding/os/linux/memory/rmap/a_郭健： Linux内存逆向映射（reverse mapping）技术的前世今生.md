@@ -2,35 +2,31 @@
 
 郭健 Jeff Labs
 
- _2021年12月10日 19:00_
+_2021年12月10日 19:00_
 
 本文简介
 
-       关于Linux内存管理逆向映射技术的历史和现在的分析，投稿标题《逆向映射的演进》，后经过小编与郭大侠商议改为《Linux内存逆向映射（reverse mapping）技术的前世今生》。
+关于Linux内存管理逆向映射技术的历史和现在的分析，投稿标题《逆向映射的演进》，后经过小编与郭大侠商议改为《Linux内存逆向映射（reverse mapping）技术的前世今生》。
 
 作者简介
 
-         郭健，一名普通的内核工程师，以钻研Linux内核代码为乐，热衷于技术分享，和朋友一起创建了蜗窝科技的网站，希望能汇集有同样想法的技术人，以蜗牛的心态探讨技术。
-
-  
+郭健，一名普通的内核工程师，以钻研Linux内核代码为乐，热衷于技术分享，和朋友一起创建了蜗窝科技的网站，希望能汇集有同样想法的技术人，以蜗牛的心态探讨技术。
 
 (小编画外音:郭大侠是我最佩服的大侠，他为人低调，技术精湛又虚怀若谷，实为我辈Linuxer之楷模。他的http://www.wowotech.net/网站，有很多精彩的原创文章，已经使得百千万读者获益。侠之大者，为国为民。)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/Ass1lsY6byuU5m0hvJJMTVL2nOq7hSt5kVWFPg04mQhIDepBXXVIxDQcg9Unb99b2X6RkicVGRzFw2h4SxicdkYQ/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
-**稿件征集**  
+**稿件征集**
 
 欢迎您给Linuxer投稿，赢得人民邮电异步社区任意在售技术图书。您随便挑，详情：[Linuxer-"Linux开发者自己的媒体"首月稿件录取和赠书名单](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662089&idx=1&sn=0ddc01757432a9d503e44e0b4e06da92&chksm=810f2fd4b678a6c23608dc9c936b96716998cb73992f3a13e47b4d9f94a910ad87bea013143c&scene=21#wechat_redirect)
 
-[Linuxer-"Linux开发者自己的媒体"第二月稿件录取和赠书名单](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662198&idx=1&sn=67ff825cb0554077ebf5addc22753b4f&chksm=810f2f2bb678a63d74d9d177a9e6d113c44ab61bc3cfe89bdb4acaf63fece9c33ee9f579e2a1&scene=21#wechat_redirect)  
+[Linuxer-"Linux开发者自己的媒体"第二月稿件录取和赠书名单](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662198&idx=1&sn=67ff825cb0554077ebf5addc22753b4f&chksm=810f2f2bb678a63d74d9d177a9e6d113c44ab61bc3cfe89bdb4acaf63fece9c33ee9f579e2a1&scene=21#wechat_redirect)
 
-  
-
-**走过路过，不要错过Linuxer哦，点击二维码关注Linuxer！**  
+**走过路过，不要错过Linuxer哦，点击二维码关注Linuxer！**
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6byuGld2RFKR2D4mOllGkTxX2YicGcaOVd9cBdL9OWlarELcUyK0hqvoI55esMLjJU4Fk8Xahj4PqINw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
----
+______________________________________________________________________
 
 ### **一、前言**
 
@@ -69,8 +65,8 @@ OK，了解了基本原理，现在需要看看如何具体实现：不常使用
 **2、如何对进程地址空间进行扫描？**
 
 下图是一个对进程地址空间进行扫描的示意图：
-![[Pasted image 20240914111427.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111427.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 系统中的所有进程地址空间（memory descriptor）被串成一个链表，链表头就是init_mm，系统中所有的进程地址空间都挂在了这个链表中。所谓scan当然就是沿着这条mm链表进行了。当然，页面回收算法尽量不scan整个系统的全部进程地址空间，毕竟那是一个比较笨的办法。回收算法可以考虑收缩内存cache，也可以遍历inactive_list来试图完成本次reclaim数目的要求（该链表中有些page不和任何进程相关），如果通过这些方法释放了足够多的page frame，那么一切都搞定了，不需要scan进程地址空间。当然，情况并非总是那么美好，有时候，必须启动进程物理页面回收过程才能满足页面回收的要求。
 
@@ -96,13 +92,11 @@ OK，了解了基本原理，现在需要看看如何具体实现：不常使用
 
 时间又回到2002年1月，那时VM大神Rik van Riel遭遇了人生中的一次重大挫折，他的耗费心血维护的代码被一个全新的VM子系统取代了。不过Rik van Riel并没有消沉下去，他在憋大招，也就是传说中的reverse mapping（后文简称rmap）。本章主要描述第一个版本的rmap，代码来自Linux 2.6.0。
 
-  
-
 **1、设计概念**
 
 如何构建rmap？最直观的想法就是针对每一个page frame，我们维护一个链表，保存属于该page的所有PTEs。因此，Rik van Riel给struct page增加了一个pte chain的成员，以便把所有mapping到该page的pte entry指针给串起来。这样想要unmap一个page就易如反掌了，沿着这个pte chain就可以找到所有的mappings。一个基本的示意图如下，下面的小节会给出更详细的解释。
-![[Pasted image 20240914111437.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111437.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **2、对Struct page的修改**
 
@@ -112,33 +106,29 @@ struct page {
 
 ……
 
-        union {
+union {
 
-                 struct pte_chain *chain;
+struct pte_chain \*chain;
 
-                 pte_addr_t direct;
+pte_addr_t direct;
 
-        } pte;
+} pte;
 
 ……
 
 当然，很多页面都不是共享的，只有一个pte entry，因此direct直接指向那个pte entry就OK了。如果存在页面共享的情况，那么chain成员则会指向一个struct pte_chain的链表。
 
-  
-
-**3、定义struct pte_chain** 
+**3、定义struct pte_chain**
 
 struct pte_chain {
 
-        unsigned long next_and_idx;
+unsigned long next_and_idx;
 
-        pte_addr_t ptes[NRPTE];
+pte_addr_t ptes\[NRPTE\];
 
-} ____cacheline_aligned;
+} \_\_\_\_cacheline_aligned;
 
 如果pte_chain只保存一个pte entry的指针那么就太浪费了，比较好的方法是把struct pte_chain对齐在cache line并让整个struct pte_chain占用一个cache line。除了next_and_idx用于指向下一个pte_chain，形成链表之外，其余的空间都用于保存pte entry指针。由于pte entry指针形成了数组，因此我们还需要一个index指示下一个空闲的pte entry pointer的位置，由于pte_chain对齐在cache line，因此next_and_idx的LSB的若干个bit是等于0的，可以复用做index。
-
-  
 
 **4、页面回收算法的修改**
 
@@ -160,53 +150,49 @@ struct pte_chain {
 
 红帽公司的Andrea Arcangeli当时正在做的工作就是让32-bit的Linux运行在配置超过32G内存的公司服务器上。在这些服务器上往往启动大量的进程，共享了大量的物理页帧，消耗了大量的内存。对于Andrea Arcangeli来说，内存消耗的真正元凶是明确的：逆向映射模块，这个模块消耗了太多的low memory，从而导致了系统的各种crash。为了让自己的工作继续推进，他必须解决rmap引入的内存扩展性（memory scalability）问题。
 
-  
-
 **2、file mapped的优化**
 
 并非只有Andrea Arcangeli关注到了rmap的内存问题，在2.5版本的开发过程中，IBM公司的Dave McCracken就已经提交了patch，试图在保证逆向映射功能的基础上，同时又能修正rmap带来的各种问题。
 
 Dave McCracken的方案是一种基于对象的逆向映射机制。在过去，通过rmap，我们可以从struct page直接获取其对应的ptes，objrmap的方法借助其他的数据对象来完成从struct page检索到其对应ptes的过程，这个过程的示意图如下：
-![[Pasted image 20240914111448.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111448.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于objrmap而言，寻找一个page frame的mappings是一个比较长的路径，它借助了VMA（struct vm_area_struct）这个数据对象。我们知道对于某些page frame是有后备文件的，这种类型的页面和某个文件相关，例如进程的正文段和该进程的可执行文件相关。此外，进程可以调用mmap()对某个文件进行mapping。对于这些页帧我们称之file mapped page。
 
 对于这些文件映射页面，其struct page中有一个成员mapping指向一个struct address_space，address_space是和文件相关的，它保存了文件page cache相关的信息。当然，我们这个场景主要关注一个叫做i_mmap的成员。一个文件可能会被映射到多个进程的多个VMA中，所有的这些VMA都被挂入到i_mmap指向的Priority search tree中。
 
 当然，我们最终的目标是PTEs，下面这幅图展示了如何从VMA和struct page中的信息导出该page frame的虚拟地址的：
-![[Pasted image 20240914111454.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111454.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 而在linux kernel中，函数vma_address可以完成这个功能：
 
 static inline unsigned long
 
-vma_address(struct page *page, struct vm_area_struct *vma)
+vma_address(struct page \*page, struct vm_area_struct \*vma)
 
 {
 
-        pgoff_t pgoff = page->index << (PAGE_CACHE_SHIFT - PAGE_SHIFT);
+pgoff_t pgoff = page->index \<\< (PAGE_CACHE_SHIFT - PAGE_SHIFT);
 
-        unsigned long address;
+unsigned long address;
 
-        address = vma->vm_start + ((pgoff - vma->vm_pgoff) << PAGE_SHIFT);
+address = vma->vm_start + ((pgoff - vma->vm_pgoff) \<\< PAGE_SHIFT);
 
-        return address;
+return address;
 
 }
 
 对于file mapped page，page->index表示的是映射到文件内的偏移（Byte为单位），而vma->vm_pgoff表示的是该VMA映射到文件内的偏移（page为单位），因此，通过vma->vm_pgoff和page->index可以得到该page frame在VMA中的地址偏移，再加上vma->vm_start就可以得到该page frame的虚拟地址。有了虚拟地址和地址空间（vma->vm_mm），我们就可以通过各级页表找到该page对应的pte entry。
-
-  
 
 **3、匿名页面的优化**
 
 我们都知道，用户空间进程的页面主要有两种，一种是file mapped page，另外一种是anonymous mapped page。Dave McCracken的objrmap方案虽好，但是只是适用于file mapped page，对于匿名映射页面，这个方案无能为力。因此，我们必须为匿名映射页面也设计一种基于对象的逆向映射机制，最后形成full objrmap方案。
 
 为了解决内存扩展性的问题，Andrea Arcangeli全力工作在full objrmap方案上，不过他还有一个竞争对手，Hugh Dickins，同时也提交了一系列full objrmap补丁，试图并入内核主线，显然，在匿名映射页面上，最后胜出的是Andrea Arcangeli，他的匿名映射方案如下图所示：
-![[Pasted image 20240914111505.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111505.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 和file mapped类似，anonymous page也是通过VMA来寻找page frame对应的pte entry。由于文件映射页面的VMA数量可能非常大，因此我们采用Priority search tree这样的数据结构。对于匿名映射页面，其数量一般不会太大，所以使用链表结构就OK了。
 
@@ -229,12 +215,12 @@ Objrmap虽然完美，不过晴朗的天空中飘着一朵乌云。大神Rik van
 **1、旧anon_vma机制有什么问题？**
 
 我们先一起来看看旧anon_vma机制下，系统是如何运作的。VMA_P是父进程的一个匿名映射的VMA，A和C都已经分配了page frame，而其他的page都还都没有分配物理页面。在fork之后，子进程copy了VMA_P，当然由于采用了COW技术，这时候父子进程的匿名页面会共享，同时在父子进程地址空间对应的pte entry中标注write protect的标记，如下图所示：
-![[Pasted image 20240914111514.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111514.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 按理说不同进程的匿名页面（例如stack、heap）是私有的，不会共享，但是为了节省内存，在父进程fork子进程之后，父子进程对该页面执行写操作之前，父子进程的匿名页是共享的，所以这些page frame指向同一个anon_vma。当然，共享只是短暂的，一旦有write操作就会产生异常，并在异常处理中分配page frame，解除父子进程匿名页面的共享，具体如下图的page A所示：
-![[Pasted image 20240914111519.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111519.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这时候由于写操作，父子进程原本共享的page frame已经不再共享，然而，这两个page却仍然指向同一个anon_vma，不仅如此，对于B这样的页面，一开始就没有在父子进程之间共享，当首次访问的时候（无论是父进程还是子进程），通过do_anonymous_page函数分配的page frame也是同样的指向一个anon_vma。也就是说，父子进程的VMA共享一个anon_vma。
 
@@ -242,21 +228,21 @@ Objrmap虽然完美，不过晴朗的天空中飘着一朵乌云。大神Rik van
 
 这样的系统会导致什么样的问题呢？我们一起来看看try_to_unmap_anon函数，其代码框架如下：
 
-static int try_to_unmap_anon(struct page *page)
+static int try_to_unmap_anon(struct page \*page)
 
 {……
 
-        anon_vma = page_lock_anon_vma(page);
+anon_vma = page_lock_anon_vma(page);
 
-        list_for_each_entry(vma, &anon_vma->head, anon_vma_node) {
+list_for_each_entry(vma, &anon_vma->head, anon_vma_node) {
 
-                 ret = try_to_unmap_one(page, vma);
+ret = try_to_unmap_one(page, vma);
 
-        }
+}
 
-        spin_unlock(&anon_vma->lock);
+spin_unlock(&anon_vma->lock);
 
-        return ret;
+return ret;
 
 }
 
@@ -268,15 +254,15 @@ static int try_to_unmap_anon(struct page *page)
 
 struct anon_vma_chain {
 
-        struct vm_area_struct *vma;――指向该AVC对应的VMA
+struct vm_area_struct \*vma;――指向该AVC对应的VMA
 
-        struct anon_vma *anon_vma;――指向该AVC对应的AV
+struct anon_vma \*anon_vma;――指向该AVC对应的AV
 
-        struct list_head same_vma; ――链接入VMA链表的节点
+struct list_head same_vma; ――链接入VMA链表的节点
 
-        struct rb_node rb;―――链接入AV红黑树的节点
+struct rb_node rb;―――链接入AV红黑树的节点
 
-        unsigned long rb_subtree_last;
+unsigned long rb_subtree_last;
 
 };
 
@@ -284,13 +270,11 @@ AVC是一个神奇的结构，每个AVC都有其对应的VMA和AV。所有指向
 
 这样的描述非常枯燥，估计第一次接触逆向映射的同学是不会明白的，不如我们一起来看看AV、AVC和VMA的“大厦”是如何搭建起来的。
 
-  
-
 **3、当VMA和VA首次相遇**
 
 由于采用了COW技术，子进程和父进程的匿名页面往往是共享的，直到其中之一发起写操作。但是如果子进程执行了exec的系统调用，加载了自己的二进制image，这时候，子进程和父进程的执行环境（包括匿名页面）就分道扬镳了（参考flush_old_exec函数），我们的场景就是从这么一个全新的exec后的进程开始。当该进程的匿名映射VMA通过page fault分配第一个page frame的时候，内核会构建下图所示的数据关系：
-![[Pasted image 20240914111526.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111526.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上图中的AV0就是该进程的anon_vma，由于它是一个顶级结构，因此它的root和parent都是指向了自己。AV这个数据结构当然为了管理VMA了，不过新机制中，这是通过AVC进行中转的。上图中的AVC0搭建了该进程VMA和AV之间的桥梁，分别有指针指向了VMA0和AV0，此外，AVC0插入到AV的红黑树，同时也会插入到VMA的链表中。
 
@@ -299,8 +283,6 @@ AVC是一个神奇的结构，每个AVC都有其对应的VMA和AV。所有指向
 VMA0中随后可能会有若干的page frame被mapping到该VMA的某个虚拟页面，不过上面的结构不会变化，只不过每一个page中的mapping都指向了上图中的AV0。另外，上图中那个虚线绿色block的AVC0其实等于那个绿色实线的AVC0 block，也就是说这时候该VMA只有一个anon_vma_chain，即AVC0，上图只是方便表示该AVC也会被挂入VMA的链表，挂入anon_vma的红黑树而已。
 
 如果想参考相关的代码可以仔细看看do_anonymous_page或者do_cow_fault。
-
-  
 
 **4、在fork的时候，匿名映射的VMA经历了什么？**
 
@@ -319,8 +301,8 @@ VMA0中随后可能会有若干的page frame被mapping到该VMA的某个虚拟�
 （3） 将该AVC加入VA红黑树
 
 我们一开始先别把事情搞得太复杂，先看看一个全新进程fork子进程的场景。这时候，内核会构建下图所示的数据关系：
-![[Pasted image 20240914111532.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111532.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 首先看看如何建立子进程VMA1和父进程AV0的关系，这里需要遍历VMA0的anon_vma_chain链表，当然现在这个链表只有一个AVC0（link到AV0），为了建立和父进程的联系，我们分配了AVC_x01，它是一个桥梁，连接了父子进程。（注：AVC_x01中的x表示连接，01表示连接level 0和level 1）。通过这个桥梁，父进程可以找到子进程的VMA（因为AVC_x01插入AV0的红黑树中），而子进程也可以找到父进程的AV（因为AVC_x01插入VMA1的链表中）。
 
@@ -331,8 +313,8 @@ VMA0中随后可能会有若干的page frame被mapping到该VMA的某个虚拟�
 **5、构建三层大厦**
 
 上一节描述了父进程创建子进程的情况，如果子进程再次fork，那么整个VMA-VA的大厦将形成三层结构，具体如下图所示：
-![[Pasted image 20240914111539.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111539.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 当然，首先要进行的仍然是建立孙进程VMA和“父进程们”VA的关系，这里的“父进程们”其实是泛指孙进程的上层的那些进程们。对于这个场景，“父进程们”指的就是上图中的A进程和B进程。如何建立？在fork的时候，我们进行VMA的拷贝：即分配VMA2并以VMA1为原型copy到VMA2中。Copy是沿着VMA1的AVC链表进行的，该链表有两个元素：AVC1和 AVC_x01，分别和父进程A和子进程B的AV关联。因此，在孙进程C中，我们会分配AVC_x02和AVC_x12两个AVC，并建立level 2层和level 0层以及level 1层之间的关系。
 
@@ -340,19 +322,15 @@ VMA0中随后可能会有若干的page frame被mapping到该VMA的某个虚拟�
 
 AV2中的root指向root AV，也就是进程A的AV。Parent成员指向其B进程（C的父进程）的AV。通过Parent这样的指针，不同level的AV建立了父子关系，而通过root指针，每一个level的AV都可以寻找找到root AV。
 
-  
-
 **6、page frame是如何加入“大厦”中？**
 
 前面几个小节重点讨论了hierarchy AV的结构是如何搭建起来的，也就是描述fork的过程中，父子进程的VMA、AVC和AV是如何联系的。本小节我们将一起来看看父子进程之一访问页面，发生了page fault的处理过程。这个处理过程有两个场景，一个是父子进程都没有page frame，这时候，内核代码会调用do_anonymous_page分配page frame并调用page_add_new_anon_rmap函数建立该page和对应VMA的关系。第二个场景复杂一点，是父子共享匿名页面的场景，当发生write fault的时候，也是分配page frame并调用page_add_new_anon_rmap函数建立该page和对应VMA的关系，具体代码位于do_wp_page函数。无论哪一个场景，最终都是将该page的mapping成员指向了该进程所属的AV结构。
 
-  
-
 **7、为何建立如此复杂的“大厦”？**
 
 如果你能坚持读到这里，那么说明你对枯燥文字的忍受能力还是很强的，哈哈。Page、VMA、VAC、VA组成了如此复杂的层次结构到底是为什么呢？是为了打击你学习内核的兴趣吗？非也，让我们还是用一个实际的场景来说明这个“大厦”的功能。
-![[Pasted image 20240914111546.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914111546.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们通过下面的步骤建立起上图的结构：
 
@@ -374,8 +352,6 @@ AV2中的root指向root AV，也就是进程A的AV。Parent成员指向其B进�
 
 现在我们回头看看AV结构的大厦，实际上是符合上面的需求的。
 
-  
-
 **8、页面回收的时候，如何unmap一个page frame的所有的映射？**
 
 搭建了那么复杂的数据结构大厦就是为了应用，我们一起看看页面回收的场景。这个场景需要通过page frame找到所有映射到该物理页面的VMAs。有了前面的铺垫，这并不复杂，通过struct page中的mapping成员可以找到该page对应的AV，在该AV的红黑树中，包含了所有的可能共享匿名页面的VMAs。遍历该红黑树，对每一个VMA调用try_to_unmap_one函数就可以解除该物理页帧的所有映射。
@@ -383,8 +359,6 @@ AV2中的root指向root AV，也就是进程A的AV。Parent成员指向其B进�
 OK，我们再次回到这一章的开始，看看那个长临界区导致的性能问题。假设我们的服务器上有一个服务进程A，它fork了999个子进程来为世界各地的网友服务，进程A有一个VMA，有1000个page。下面我们就一起来对比新旧机制的处理过程。
 
 首先，百万page共享一个anon_vma的情况在新机制中已经解决，每一个进程都有自己特有的anon_vma对象，每一个进程的page都指向自己特有的anon_vma对象。在旧的机制中，每次unmap一个page都需要扫描1000个VMA，而在新的机制中，只有顶层的父进程A的AV中有1000个VMA，其他的子进程的VMA的数目都只有1个，这大大降低了临界区的长度。
-
-  
 
 **七、后记**
 
@@ -398,27 +372,23 @@ OK，我们再次回到这一章的开始，看看那个长临界区导致的性
 
 精彩文章
 
-[谢宝友：深入理解Linux RCU之一——从硬件说起](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662265&idx=1&sn=4e0ec525316720553666482ec4bd9756&chksm=810f2f64b678a672f9573d0374786f5cb1acbb08fdfe3881fac6275145471ad5fc39aa4bb03e&scene=21#wechat_redirect)  
+[谢宝友：深入理解Linux RCU之一——从硬件说起](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662265&idx=1&sn=4e0ec525316720553666482ec4bd9756&chksm=810f2f64b678a672f9573d0374786f5cb1acbb08fdfe3881fac6275145471ad5fc39aa4bb03e&scene=21#wechat_redirect)
 
-[魏永明：MiniGUI的涅槃重生之路](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662251&idx=1&sn=4bcec79e340a87fcc589262a51473e40&chksm=810f2f76b678a660dd081dede5cfe54f30377385b7291b9ac8fb6821db2b878808772ae355a7&scene=21#wechat_redirect)  
+[魏永明：MiniGUI的涅槃重生之路](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662251&idx=1&sn=4bcec79e340a87fcc589262a51473e40&chksm=810f2f76b678a660dd081dede5cfe54f30377385b7291b9ac8fb6821db2b878808772ae355a7&scene=21#wechat_redirect)
 
 [宋宝华：Linux的任督二脉——进程调度和内存管理](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662197&idx=1&sn=8c75937824893e26ae920ed515a15d4c&chksm=810f2f28b678a63eab7c2b889c2a25967ce0f06719692ff6a29bfa0e843c7d49b59e52fefb96&scene=21#wechat_redirect)
 
-[笨叔叔：我的Linux内核学习经历](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662095&idx=1&sn=aa2360a1650907b1d39c39a8b4dd19c0&chksm=810f2fd2b678a6c4953523c4cd91f9ed56a4403da56f6ab882e3192144eb5a7393c9201cce0f&scene=21#wechat_redirect)  
+[笨叔叔：我的Linux内核学习经历](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652662095&idx=1&sn=aa2360a1650907b1d39c39a8b4dd19c0&chksm=810f2fd2b678a6c4953523c4cd91f9ed56a4403da56f6ab882e3192144eb5a7393c9201cce0f&scene=21#wechat_redirect)
 
 [黄伟亮：ext4文件系统之裸数据的分析实践](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652661979&idx=1&sn=8e6920fcaa27eb5236ac5a44d59755bd&chksm=810f2e46b678a750f4502e83cb269986671c29865fa847a8e58bf2d423014b2f83bdc4c2557b&scene=21#wechat_redirect)
 
 iphone用户打赏
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**(所有打赏会移交作者)**  
+**(所有打赏会移交作者)**
 
 Android用户打赏
-
-  
-
-  
 
 阅读 640
 

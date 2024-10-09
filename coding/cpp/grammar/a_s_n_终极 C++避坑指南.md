@@ -1,25 +1,30 @@
 原创 腾讯程序员 腾讯技术工程
- _2022年09月06日 18:00_ _广东_  
+_2022年09月06日 18:00_ _广东_\
 作者：boreholehu，腾讯 WXG 后台开发工程师
+
 ### 前言
 
 C++是一门古老的语言，但仍然在不间断更新中，不断引用新特性。但与此同时 C++又甩不掉巨大的历史包袱，并且 C++的设计初衷和理念造成了 C++异常复杂，还出现了很多不合理的“缺陷”。
 
 本文主要有 3 个目的：
+
 1. 总结一些 C++晦涩难懂的语法现象，解释其背后原因，作为防踩坑之用；
-2. 和一些其他的编程语言进行比较，列举它们的优劣；
-3. 发表一些我自己作为 C++程序员的看法和感受。
+1. 和一些其他的编程语言进行比较，列举它们的优劣；
+1. 发表一些我自己作为 C++程序员的看法和感受。
 
 ### 来自 C 语言的历史包袱
 
 C++有一个很大的历史包袱，就是 C 语言。C 语言诞生时间很早，并且它是为了编写 OS 而诞生的，语法更加底层。有人说，C 并不是针对程序员友好的语言，而是针对编译期友好的语言。有些场景在 C 语言本身可能并没有什么不合理，但放到 C++当中会“爆炸”，或者说，会迅速变成一种“缺陷”，让人异常费解。
 C++在演变过程中一直在吸收其他语言的优势，不断提供新的语法、工具来进行优化。但为了兼容性（不仅仅是语法的兼容，还有一些设计理念的兼容），还是会留下很多坑。
+
 ### 数组
 
 数组本身其实没有什么问题，这种语法也非常常用，主要是表示连续一组相同的数据构成的集合。但数组类型在待遇上却和其他类型（比如说结构体）非常不一样。
+
 #### 数组的复制
 
 我们知道，结构体类型是可以很轻松的复制的，比如说：
+
 ```cpp
 struct St {
   int m1;
@@ -34,25 +39,30 @@ void demo() {
 ```
 
 但数组却并不可以，比如：
+
 ```cpp
 int arr1[5];   int arr2[5] = arr1; // ERR   
 ```
+
 明明这里 arr2 和 arr1 同为`int[5]`类型，但是并不支持复制。照理说，数组应当比结构体更加适合复制场景，因为需求是很明确的，就是元素按位复制。
 
 #### 数组类型传参
 
 由于数组不可以复制，导致了数组同样不支持传参，因此我们只能采用“首地址+长度”的方式来传递数组：
+
 ```cpp
 void f1(int *arr, size_t size) {}      void demo() {     int arr[5];     f1(arr, 5);   }   
 ```
+
 而为了方便程序员进行这种方式的传参，C 又做了额外的 2 件事：
 
 1. 提供一种隐式类型转换，支持将数组类型转换为首元素指针类型（比如说这里 arr 是`int[5]`类型，传参时自动转换为`int *`类型）
-2. 函数参数的语法糖，如果在函数参数写数组类型，那么会自动转换成元素指针类型，比如说下面这几种写法都完全等价：
-    
+1. 函数参数的语法糖，如果在函数参数写数组类型，那么会自动转换成元素指针类型，比如说下面这几种写法都完全等价：
+
 ```cpp
 void f(int *arr);   void f(int arr[]);   void f(int arr[5]);   void f(int arr[100]);
 ```
+
 所以这里非常容易误导人的就在这个语法糖中，**无论中括号里写多少，或者不写，这个值都是会被忽略的**，要想知道数组的边界，你就必须要通过额外的参数来传递。
 
 但通过参数传递这是一种软约束，你无法保证调用者传的就是数组元素个数，这里的危害详见后面“指针偏移”的章节。
@@ -64,16 +74,20 @@ void f(int *arr);   void f(int arr[]);   void f(int arr[5]);   void f(int
 所以综合考虑，干脆这里就不支持复制，强迫程序员使用指针+长度这种方式来操作数组，反而更加符合数组的实际使用场景。
 
 当然了，在 C++中有了引用语法，我们还是可以把数组类型进行传递的，比如：
+
 ```cpp
 void f1(int (&arr)[5]); // 必须传int[5]类型
 void demo() {     int arr1[5];     int arr2[8];        f1(arr1); // OK   
 f1(arr2); // ERR
 }   
 ```
+
 但绝大多数的场景似乎都不会这样去用。一些新兴语言（比如说 Go）就注意到了这一点，因此将其进行了区分。在 Go 语言中，区分了“数组”和“切片”的概念，数组就是长度固定的，整体来传递；而切片则类似于首地址+长度的方式传递（只不过没有单独用参数，而是用 len 函数来获取）
+
 ```cpp
 func f1(arr [5]int) {   }   func f2(arr []int) {   }
 ```
+
 上面例子里，f1 就必须传递长度是 5 的数组类型，而 f2 则可以传递任意长度的切片类型。
 
 而 C++其实也注意到了这一点，但由于兼容问题，它只能通过 STL 提供容器的方式来解决，`std::array`就是定长数组，而`std::vector`就是变长数组，跟上述 Go 语言中的数组和切片的概念是基本类似的。这也是 C++中更加推荐使用 vector 而不是 C 风格数组的原因。
@@ -90,7 +104,7 @@ C/C++中的类型说明符其实设计得很不合理，除了最简单的变量
 
 `int arr[5]; // 定义一个int[5]类型的变量arr   `
 
-arr 明明是`int[5]`类型，但是这里的 int 和[5]却并没有写到一起，如果这个还不算很容易造成迷惑的话，那来看看下面的：
+arr 明明是`int[5]`类型，但是这里的 int 和\[5\]却并没有写到一起，如果这个还不算很容易造成迷惑的话，那来看看下面的：
 
 `int *a1[5]; // 定义了一个数组   int (*a2)[5]; // 定义了一个指针   `
 
@@ -109,22 +123,27 @@ a2 是`int (*)[5]`类型，是一个指针，指针指向了一个`int[5]`类型
 上面这个例子中，int 和()共同表示了“定义函数”这个意义。也就是说，看到 int 这个关键字，并不一定是表示定义变量，还有可能是定义函数，定义函数时 int 表示了函数的返回值的类型。
 
 正是由于 C/C++中，类型说明符具有多重含义，才造成一些复杂语法简直让人崩溃，比如说定义高阶函数：
+
 ```cpp
 // 输入一个函数，输出这个函数的导函数
 double (*DC(double (*)(double)))(double);
 ```
+
 DC 是一个函数，它有一个参数，是`double (*)(double)`类型的函数指针，它的返回值是一个`double (*)(double)`类型的函数指针。但从直观性上来说，上面的写法完全毫无可读性，如果没有那一行注释，相信大家很难看得出这个语法到底是在做什么。
 
 C++引入了返回值右置的语法，从一定程度上可以解决这个问题：
+
 ```cpp
 auto f1() -> int;
 auto DC(auto (*)(double) -> double) -> auto (*)(double) -> double;
 ```
+
 但用 auto 作为占位符仍然还是有些突兀和晦涩的。
 
 #### 将类型符和动作语义分离的语言
 
 我们来看一看其他语言是如何弥补这个缺陷的，最简单的做法就是把“类型”和“动作”这两件事分开，用不同的关键字来表示。 Go 语言：
+
 ```cpp
 // 定义变量
 var a1 int   var a2 []int   var a3 *int   var a4 []*int // 元素为指针的数组
@@ -133,6 +152,7 @@ var a5 *[]int // 数组的指针
 func f1() {   }   func f2() int {     return 0   }   // 高阶函数   
 func DC(f func(float64)float64) func(float64)float64 {   }
 ```
+
 Swift 语言：
 
 `// 定义变量   var a1: Int   var a2: [Int]      // 定义函数   func f1() {   }      func f2() -> Int {     return 0   }   // 高阶函数   func DC(f: (Double, Double)->Double) -> (Double, Double)->Double {   }   `
@@ -330,9 +350,11 @@ C++保留的`++`和`--`的语义，也是因为它和`+=1`或`-=1`语义并不�
 但 C++中的格式化字符串可以说完全就是 C 的那一套，根本没有任何扩展。换句话说，除了基本数据类型和 0 结尾的字符串以外，其他任何类型都没有用于匹配的格式符。
 
 例如，对于结构体类型、数组、元组类型等等，都没法匹配到格式符：
+
 ```cpp
 `struct Point {     double x, y;   };      void Demo() {     // 打印Point     Point p {1, 2.5};     printf("(%lf,%lf)", p.x, p.y); // 无法直接打印p     // 打印数组     int arr[] = {1, 2, 3};     for (int i = 0; i < 3; i++) {       printf("%d, ", arr[i]); // 无法直接打印整个数组     }     // 打印元组     std::tuple tu(1, 2.5, "abc");     printf("(%d,%lf,%s)", std::get<0>(tu), std::get<1>(tu), std::get<2>(tu)); // 无法直接打印整个元组   }   `
 ```
+
 对于这些组合类型，我们就不得不手动去访问内部成员，或者用循环访问，非常不方便。
 
 针对于字符串，还会有一个严重的潜在问题，比如：
@@ -500,9 +522,8 @@ C++由于保留了 C 当中的`const`关键字，但更希望表达其“不可�
 虽然常量和只读变量是不同的含义，但它们都是用来“读取值”的，也就是用来做右值的，所以，C++引入了“const 引用”的概念来统一这两点。**所谓 const 引用包含了 2 个方面的含义**:
 
 1. 作为只读变量的引用（指针的语法糖）
-    
-2. 作为只读变量
-    
+
+1. 作为只读变量
 
 换言之，const 引用**可能是引用**，也**可能只是个普通变量**，如何理解呢？请看例程：
 
@@ -531,9 +552,8 @@ C++11 的右值引用语法的引入，其实也完全是针对于底层实现�
 右值引用跟 const 引用类似，仍然是同一语法不同意义，并且右值引用的定义强依赖“右值”的定义。根据上一节对“左右值”的定义，我们知道，左右值来源于赋值语句，常量只能做右值，而变量做右值时仅会读取，不会修改。按照这个定义来理解，“右值引用”就是对“右值”的引用了，而右值可能是常量，也可能是变量，那么右值引用自然也是分两种情况来不同处理：
 
 1. 右值引用绑定一个常量
-    
-2. 右值引用绑定一个变量
-    
+
+1. 右值引用绑定一个变量
 
 我们先来看右值引用绑定常量的情况：
 
@@ -790,13 +810,12 @@ C++11 提供了`auto`来自动推导类型，很大程度上提升了代码的�
 笔者在前面章节吐槽了`const`这个命名，也吐槽了“右值引用”这个命名。那么`static`就是笔者下一个要重点吐槽的命名了。`static`这个词本身没有什么问题，其主要的槽点就在于“一词多用”，也就是说，这个词在不同场景下表示的是完全不同的含义。（作者可能是出于节省关键词的目的吧，明明是不同的含义，却没有用不同的关键词）。
 
 1. 在局部变量前的`static`，限定的是变量的生命周期
-    
-2. 在全局变量/函数前的`static`，限定的变量/函数的作用域
-    
-3. 在成员变量前的`static`，限定的是成员变量的生命周期
-    
-4. 在成员函数前的`static`，限定的是成员函数的调用方（或隐藏参数）
-    
+
+1. 在全局变量/函数前的`static`，限定的变量/函数的作用域
+
+1. 在成员变量前的`static`，限定的是成员变量的生命周期
+
+1. 在成员函数前的`static`，限定的是成员函数的调用方（或隐藏参数）
 
 上面是`static`关键字的 4 种不同含义，接下来逐一我会解释。
 
@@ -889,17 +908,14 @@ C++11 提供了`auto`来自动推导类型，很大程度上提升了代码的�
 但是如果我们真的写了，貌似也从来没有遇到过什么问题，程序也不会出现任何 bug 或者异常，甚至下面的几种写法都是在日常开发中经常遇到的，但都不符合这谷歌的这条代码规范。
 
 - 全局字符串
-    
 
 `const std::string ip = "127.0.0.1";   const uint16_t port = 80;      void Demo() {     // 开启某个网络连接     SocketSvr svr{ip, port};     // 记录日志     WriteLog("net linked: ip:port={%s:%hu}", ip.c_str(), port);   }   `
 
 - 静态映射表
-    
 
 `std::string GetDesc(int code) {     static const std::unordered_map<int, std::string> ma {       {0, "SUCCESS"},       {1, "DATA_NOT_FOUND"},       {2, "STYLE_ILLEGEL"},       {-1, "SYSTEM_ERR"}     };     if (auto res = ma.find(code); res != ma.end()) {       return res->second;     }     return "UNKNOWN";   }   `
 
 - 单例模式
-    
 
 `class SingleObj {    public：     SingleObj &GetInstance();        SingleObj(const SingleObj &) = delete;     SingleObj &operator =(const SingleObj &) = delete;    private:      SingleObj();      ~SingleObj();   };      SingleObj &SingleObj::GetInstance() {     static SingleObj single_obj;     return single_obj;   }   `
 
@@ -910,9 +926,8 @@ C++11 提供了`auto`来自动推导类型，很大程度上提升了代码的�
 既然谷歌规范中禁止这种情况，那一定意味着，这种写法存在潜在风险，我们需要搞明白风险点在哪里。 首先明确变量生命周期的问题：
 
 1. 全局变量和静态成员变量在主函数执行前构造，在主函数执行结束后释放；
-    
-2. 静态局部变量在第一次执行到定义位置时构造，在主函数执行后释放。
-    
+
+1. 静态局部变量在第一次执行到定义位置时构造，在主函数执行后释放。
 
 这件事如果在 C 语言中，并没有什么问题，设计也很合理。但是 C++就是这样悲催，很多 C 当中合理的问题在 C++中会变得不合理，并且缺陷会被放大。
 
@@ -965,17 +980,16 @@ main.cc
 “平凡(trivial)”指的是：
 
 1. 拥有默认无参构造函数
-    
-2. 拥有默认析构函数
-    
-3. 拥有默认拷贝构造函数
-    
-4. 拥有默认移动构造函数
-    
-5. 拥有默认拷贝赋值函数
-    
-6. 拥有默认移动赋值函数
-    
+
+1. 拥有默认析构函数
+
+1. 拥有默认拷贝构造函数
+
+1. 拥有默认移动构造函数
+
+1. 拥有默认拷贝赋值函数
+
+1. 拥有默认移动赋值函数
 
 换句话说，六大特殊函数都是默认的。这里要区分 2 个概念，我们要的是“语法上的平凡”还是“实际意义上的平凡”。语法上的平凡就是说能够被编译期识别、认可的平凡。而实际意义上的平凡就是说里面没有额外操作。 比如说：
 
@@ -994,13 +1008,12 @@ C++对“平凡”的定义比较严格，但实际上我们看看如果要做�
 标准内存布局的定义是：
 
 1. 所有成员拥有相同的权限（比如说都`public`，或都`protected`，或都`private`）；
-    
-2. 不含虚基类、虚函数；
-    
-3. 如果含有基类，基类必须都是标准内存布局；
-    
-4. 如果函数成员变量，成员的类型也必须是标准内存布局。
-    
+
+1. 不含虚基类、虚函数；
+
+1. 如果含有基类，基类必须都是标准内存布局；
+
+1. 如果函数成员变量，成员的类型也必须是标准内存布局。
 
 我们同样可以用 STL 中的`std::is_standard_layout`来判断一个类型是否是标准内存布局的。这里的定义比较简单，不在赘述。
 
@@ -1089,13 +1102,12 @@ C++与 java 不同，java 是完全按照 OOP 理论来创建的，因此所谓�
 笔者曾经听有人持有下面这样类似的观点：
 
 - 虚函数都应该是纯虚的
-    
+
 - 含有虚函数的类不应当支持实例化（创建对象）
-    
+
 - 能实例化的类不应当被继承，有子类的类不应当被实例化
-    
+
 - 一个类至多有一个“属性父类”，但可以有多个“协议父类”
-    
 
 等等这些观点，它们其实都有一个共同的前提，那就是“我要用 C++来支持 OOP 范式”。如果我们用 OOP 范式来约束 C++，那么上面这些观点都是非常正确的，否则将不符合 OOP 的理论，例如：
 
@@ -1282,7 +1294,7 @@ C++引入虚拟继承的概念就是为了解决这一问题。但怎么说呢�
 
 `B`的对象模型应该是这样的：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 而如果使用虚拟继承:
 
@@ -1290,7 +1302,7 @@ C++引入虚拟继承的概念就是为了解决这一问题。但怎么说呢�
 
 对象模型是这样的：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 虚拟继承的排布方式就类似于虚函数的排布，子类对象会自动生成一个虚基表来指向虚基类成员的首地址。
 
@@ -1300,7 +1312,7 @@ C++引入虚拟继承的概念就是为了解决这一问题。但怎么说呢�
 
 `D`的对象模型：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 但如果使用虚拟继承，则可以把每个类单独的东西抽出来，重复的内容则用指针来指向：
 
@@ -1308,7 +1320,7 @@ C++引入虚拟继承的概念就是为了解决这一问题。但怎么说呢�
 
 `D`的对象模型将会变成：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 也就是说此时，共有的虚基类只会保存一份，这样就不会有二义性，同时也节省了空间。
 
@@ -1391,10 +1403,12 @@ C++支持隐式构造，自然考虑的是一些场景下代码更简洁，但�
 #### 截断问题
 
 C 风格字符串有一个约定，就是以 0 结尾。它并不会去单独存储数据长度，而是很暴力地从首地址向后查找，找到 0 为止。但`std::string`不同，其内部有统计个数的成员，因此不会受 0 值得影响：
+
 ```cpp
 std::string str1{"123\0abc"}; // 0处会截断
 std::string str2{"123\0abc", 7}; // 不会截断
 ```
+
 截断问题在传参时更加明显，比如说：
 
 `void f(const char *str) {}      void Demo() {     std::string str2{"123\0abc", 7};     // 由于f只支持C风格字符串，因此转化后传入     f(str2.c_str()); // 但其实已经被截断了   }   `
@@ -1498,16 +1512,14 @@ STL 中所有流接收到`char *`或`const char *`时，并不会按指针来解
 上面例子中，`String`就是一个非平凡的类型，它在构造函数中创建了堆空间。如果我们直接通过`malloc`分配一片`String`大小的空间，然后就直接用的话，显然是会出问题的，因为构造函数没有执行，其中`buf`管理的堆空间也是没有进行分配的。 所以，在 C++中，创建一个对象应该分 2 步：
 
 1. 分配内存空间
-    
-2. 调用构造函数
-    
+
+1. 调用构造函数
 
 同样，释放一个对象也应该分 2 步：
 
 3. 调用析构函数
-    
-4. 释放内存空间
-    
+
+1. 释放内存空间
 
 这个理念在 OC 语言中贯彻得非常彻底，OC 中没有默认的构造函数，都是通过实现一个类方法来进行构造的，因此构造前要先分配空间：
 
@@ -1541,7 +1553,7 @@ STL 中所有流接收到`char *`或`const char *`时，并不会按指针来解
 
 这就是`new`和`delete`的神秘面纱，它确实和普通的运算符不一样，除了对应的`operator`函数外，还有对构造、析构的处理。 但也正是由于 C++总是进行一些隐藏操作，才会复杂度激增，有时也会出现一些难以发现的问题，所以我们一定要弄清楚它的本质。
 
-#### new []和 delete []
+#### new \[\]和 delete \[\]
 
 `new []`和`delete []`的语法看起来是“创建/删除数组”的语法。但其实它们也并不特殊，就是封装了一层的`new`和`delete`
 
@@ -1648,6 +1660,7 @@ C 中的解决的办法就是定义宏，又有宏是预编译期进行替换的
 既然，我们已经有`{1, 2}`的构造参数了，能否想办法跳过这一次临时对象，而是直接在`vector`末尾的空间上进行构造呢？这就涉及了就地构造的问题。我们在前面“new 和 delete”的章节介绍过，“分配空间”和“构造对象”的步骤可以拆解开来做。首先对`vector`的`buffer`进行扩容（如果需要的话），确定了要放置新对象的空间以后，直接使用`placement new`进行就地构造。
 
 比如针对`Test`的`vector`我们可以这样写：
+
 ```cpp
 template <>   void vector<Test>::emplace_back(int a, int b) {
   // 需要时扩容
@@ -1655,32 +1668,41 @@ template <>   void vector<Test>::emplace_back(int a, int b) {
   new(new_ptr) Test{a, b};
 }
 ```
+
 STL 中把容器的就地构造方法叫做`emplace`，原理就是通过传递构造参数，直接在对应位置就地构造。所以更加通用的方法应该是：
+
 ```cpp
 template <typename T, typename... Args>   void vector<T>::emplace_back(Args &&...args) {
   // new_ptr表示末尾为新对象分配的空间
   new(new_ptr) T{std::forward<Args>(args)...};
 }
 ```
+
 #### 嵌套就地构造
 
 就地构造确实能在一定程度上解决多余的对象复制问题，但如果是嵌套形式就实则没办法了，举例来说：
+
 ```cpp
 struct Test {     int a, b;   }; 
 void Demo() {     std::vector<std::tuple<int, Test>> ve;     ve.emplace_back(1, Test{1, 2}); // tuple嵌套的Test没法就地构造
 }
 ```
+
 也就是说，我们没法在就地构造对象时对参数再就地构造。
 
 这件事情放在`map`或者`unordered_map`上更加有趣，因为这两个容器的成员都是`std::pair`，所以对它进行`emplace`的时候，就地构造的是`pair`而不是内部的对象：
+
 ```cpp
 struct Test {     int a, b;   };      void Demo() {     std::map<int, Test> ma;     ma.emplace(1, Test{1, 2}); // 这里emplace的对象是pair<int, Test>   
 }
 ```
+
 不过好在，`map`和`unordered_map`提供了`try_emplace`方法，可以在一定程度上解决这个问题，函数原型是：
+
 ```cpp
 template <typename K, typename V, typename... Args>   std::pair<iterator, bool> map<K, V>::try_emplace(const K &key, Args &&...args);
 ```
+
 这里把`key`和`value`拆开了，前者还是只能通过复制的方式传递，但后者可以就地构造。（实际使用时，`value`更需要就地构造，一般来说`key`都是整数、字符串这些。）那么我们可用它代替`emplace`:
 
 `void Demo() {     std::map<int, Test> ma;     ma.try_emplace(1, 1, 2); // 1, 2用于构造Test   }   `
@@ -1694,9 +1716,11 @@ template <typename K, typename V, typename... Args>   std::pair<iterator,�
 `void Demo() {     std::map<int, std::map<int, std::string>> ma;     // 例如想给key为(1, 2)新增value为"abc"的     // 由于无法确定外层key为1是否已经有了，所以要单独判断     if (ma.count(1) == 0) {       ma.emplace(1, std::map<int, std::string>{});     }     ma.at(1).emplace(1, "abc");   }   `
 
 但是利用`try_emplace`就可以更取巧一些：
+
 ```cpp
 void Demo() {     std::map<int, std::map<int, std::string>> ma;     ma.try_emplace(1).first->second.try_emplace(1, "abc");   }
 ```
+
 解释一下，如果`ma`含有`key`为`1`的项，就返回对应迭代器，如果没有的话则会新增（由于没指定后面的参数，所以会构造一个空`map`），并返回迭代器。迭代器在返回值的第一项，所以取`first`得到迭代器，迭代器指向的是`map`内部的`pair`，取`second`得到内部的`map`，再对其进行一次`try_emplace`插入内部的元素。
 
 当然了，这么做确实可读性会下降很多，具体使用时还需要自行取舍。
@@ -1712,7 +1736,6 @@ void Demo() {     std::map<int, std::map<int, std::string>> ma;     ma.
 所以到现在这个时间点，应该说，C++仍然还是我的信仰，我认为 C++将会在将来很长一段时间存在，并且以一个长老的身份发挥其在业界的作用和价值，但同时也会有越来越多新语言的诞生，他们在自己适合的地方发挥着不一样的光彩。我也不再会否认 C++的确有设计不合理的地方，不会否认其存在不擅长的领域，也不会再去鄙视那些吐槽 C++复杂的人。与此同时，我也不会拒绝涉足其他的领域，我认为，只有不断学习比较，不断总结沉淀，才能持续进步。
 
 如果你能读到这里的话，那非常感激你的支持，听我说谢谢你，因为有你……咳咳~。这篇文章作为我学习 C++多年的一个沉淀，也希望借此把我的想法分享给读者，如果你有任何疑问或者建议，欢迎评论区留言！针对更多 C++的特性的用法、编程技巧等内容，请期待我其他系列的文章。
-
 
 腾讯程序员
 

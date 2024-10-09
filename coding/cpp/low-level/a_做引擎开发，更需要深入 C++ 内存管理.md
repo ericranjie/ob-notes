@@ -7,7 +7,8 @@
 在文章的开篇，先对一些基础概念进行简单的介绍，以便能够更好地理解后续的内容。
 
 ### **内存布局**
-![[Pasted image 20241009113121.png]]
+
+!\[\[Pasted image 20241009113121.png\]\]
 
 内存分布（可执行映像）
 
@@ -44,8 +45,7 @@
 ① 函数返回地址
 
 ② 局部变量/CPU寄存器数据备份
-![[Pasted image 20241009113143.png]]
-
+!\[\[Pasted image 20241009113143.png\]\]
 
 函数压栈
 
@@ -83,8 +83,7 @@ int main()
 在硬件设计上，数据读取的处理器只能从地址为k的倍数的内存处开始读取数据。这种读取方式相当于将内存分为了多个"块“，假设内存可以从任意位置开始存放的话，数据很可能会被分散到多个“块”中，处理分散在多个块中的数据需要移除首尾不需要的字节，再进行合并，非常耗时。
 
 为了提高数据读取的效率，程序分配的内存并不是连续存储的，而是按首地址为k的倍数的方式存储；这样就可以一次性读取数据，而不需要额外的操作。
-![[Pasted image 20241009113200.png]]
-
+!\[\[Pasted image 20241009113200.png\]\]
 
 读取非对齐内存的过程示例
 
@@ -118,7 +117,8 @@ int main()
     return 0;
 }
 ```
-![[Pasted image 20241009113221.png]]
+
+!\[\[Pasted image 20241009113221.png\]\]
 
 内存排布示例
 
@@ -129,7 +129,7 @@ int main()
 (1) 内部碎片：系统分配的内存大于实际所需的内存（由于对齐机制）；
 
 (2) 外部碎片：不断分配回收不同大小的内存，由于内存分布散乱，较大内存无法分配；
-![[Pasted image 20241009113253.png]]
+!\[\[Pasted image 20241009113253.png\]\]
 
 内部碎片和外部碎片
 
@@ -156,13 +156,12 @@ vtable中包含当前类的所有虚函数指针。
 ● 大端（big_endian)：高位有效字节存储于较低的内存位置
 
 我们使用的PC开发机默认是小端存储。
-![[Pasted image 20241009113341.png]]
-
+!\[\[Pasted image 20241009113341.png\]\]
 
 大小端排布
 
 一般情况下，多字节量的排列顺序对编码没有影响。但如果要考虑跨平台的一些操作，就有必要考虑到大小端的问题。如下图，ue4引擎使用了PLATFORM_LITTLE_ENDIAN这一宏，在不同平台下对数据做特殊处理（内存排布交换，确保存储时的结果一致）。
-![[Pasted image 20241009113354.png]]
+!\[\[Pasted image 20241009113354.png\]\]
 
 ue4针对大小端对数据做特殊处理（ByteSwap.h)
 
@@ -182,8 +181,7 @@ SIMD，即Single Instruction Multiple Data，用一个指令并行地对多个�
 
 SSE指令采用128位寄存器，我们通常将4个32位浮点值打包到128位寄存器中，单个指令可完成4对浮点数的计算，这对于矩阵/向量操作非常友好（除此之外，还有Neon/FPU等寄存器）
 
-![[Pasted image 20241009113409.png]]
-
+!\[\[Pasted image 20241009113409.png\]\]
 
 SIMD并行计算
 
@@ -193,7 +191,7 @@ SIMD并行计算
 
 当我们把数据加载内存后，要对数据进行一定操作时，会将数据从内存载入CPU寄存器。考虑到CPU读/写主内存速度较慢，处理器使用了高速的缓存（Cache)，作为内存到CPU中间的媒介。
 
-![[Pasted image 20241009113422.png]]
+!\[\[Pasted image 20241009113422.png\]\]
 
 L1缓存和L2缓存
 
@@ -370,13 +368,13 @@ int main()
 
 当我们调用new时，实际上执行了operator new运算符表达式，和其它函数一样，operator new有多种重载，如上文中的placement new，就是operator new以下形式的一个重载：
 
-![[Pasted image 20241009113502.png]]
+!\[\[Pasted image 20241009113502.png\]\]
 
 placement new的定义
 
 新语法（C++17）还支持带对齐的operator new：
 
-![[Pasted image 20241009113451.png]]
+!\[\[Pasted image 20241009113451.png\]\]
 
 aligned new的声明
 
@@ -1027,7 +1025,7 @@ FMallocBinned使用内存池机制，内部包含POOL_COUNT(42)个内存池和2�
 
 **分配策略**
 
-分配内存的函数为void* FMallocBinned::Malloc(SIZE_T Size, uint32 Alignment)。
+分配内存的函数为void\* FMallocBinned::Malloc(SIZE_T Size, uint32 Alignment)。
 
 其中第一个参数为需要分配的内存的大小，第二个参数为对齐的内存数。
 
@@ -1041,7 +1039,7 @@ MallocBinned内部对于不同的内存大小有三种不同的处理：
 
 如果当前内存池已经用尽，下次内存分配时，检测到内存池用尽，会从系统重新申请一块对应大小的内存池。
 
-(2) 分配大块内存 [PAGE_SIZE_LIMIT/2, PAGE_SIZE_LIMIT*3/4]∪(PageSize，PageSize + PAGE_SIZE_LIMIT/2)
+(2) 分配大块内存 \[PAGE_SIZE_LIMIT/2, PAGE_SIZE_LIMIT\*3/4\]∪(PageSize，PageSize + PAGE_SIZE_LIMIT/2)
 
 需要从额外的页内存池分配，分配方式和（1）一样。
 
@@ -1227,7 +1225,7 @@ private:
 
 ```
 
-TRefCountPtr是基于引用计数的共享指针的另一种实现。和TSharedPtr的差异在于它的引用计数并非智能指针类内维护的，而是基于对象的，相当于TRefCountPtr内部只存储了对应的指针信息（ReferencedType* Reference)。基于对象的引用计数，即引用计数存储在对象内部，这是通过从FRefCountBase继承引入的。这也就意味着TRefCountPtr引用的对象必须从FRefCountBase继承，它的使用是有局限性的。
+TRefCountPtr是基于引用计数的共享指针的另一种实现。和TSharedPtr的差异在于它的引用计数并非智能指针类内维护的，而是基于对象的，相当于TRefCountPtr内部只存储了对应的指针信息（ReferencedType\* Reference)。基于对象的引用计数，即引用计数存储在对象内部，这是通过从FRefCountBase继承引入的。这也就意味着TRefCountPtr引用的对象必须从FRefCountBase继承，它的使用是有局限性的。
 
 但是在如统计资源引用而判断资源是否需要卸载的应用场景中，TRefCountPtr可手动添加/释放引用，使用上更友好。
 
@@ -1294,7 +1292,7 @@ GC过程中，首先会收集所有不可到达的对象（无引用）。
 
 合理的内存布局/对齐有利于SIMD的广泛应用，在编写定义基础类型/底层数学算法库时，我们通常有必要考虑到这一点。
 
-我们可以参考ue4中封装的sse初始化、加法、减法、乘法等操作，其中，__m128类型的变量需程序确保为16字节对齐，它适用于浮点数存储，大部分情况下存储于内存中，计算时会在SSE寄存器中运用。
+我们可以参考ue4中封装的sse初始化、加法、减法、乘法等操作，其中，\_\_m128类型的变量需程序确保为16字节对齐，它适用于浮点数存储，大部分情况下存储于内存中，计算时会在SSE寄存器中运用。
 
 ```cpp
 typedef __m128 VectorRegister;

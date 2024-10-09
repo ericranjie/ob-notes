@@ -1,13 +1,14 @@
 人人极客社区
- _2022年03月09日 08:28_
+_2022年03月09日 08:28_
 
-工作中遇到的多核 ARM CPU 越来越多，总结分享一些多核启动的知识，希望能帮助更多小伙伴。  
+工作中遇到的多核 ARM CPU 越来越多，总结分享一些多核启动的知识，希望能帮助更多小伙伴。\
 在 ARM64 架构下如果想要启动多核，有 spin-table 和 psci 两种方式，下面针对这两种启动流程进行分析。
 
 ## 代码版本
+
 - boot-wrapper-aarch64 version : 28932c41e14d730b8b9a7310071384178611fb32
 - linux v5.14
-    
+
 ## 多核 CPU 的启动方式
 
 嵌入式系统的启动的基本流程是先运行 `bootloader` ，然后由 `bootloader` 引导启动 kernel，这里无论启动的是 rt-thread 或者是 linux 原理都是一样的。
@@ -57,7 +58,7 @@
 1psci {2    compatible = "arm,psci-1.0", "arm,psci-0.2", "arm,psci";3    method = "smc";4    cpu_suspend   = <0x84000001>;5    cpu_off          = <0x84000002>;6    cpu_on          = <0x84000003>;7};
 ```
 
-**在 `PSCI` 中的节点详细说明请参考文档：**kernel/Documentation/devicetree/bindings/arm/psci.txt。在此仅说一下 method 字段。该字段有两个可选值：smc 和 hvc。表示调用 PSCI 功能使用什么指令。smc、hvc、svc 这些指令都是由低运行级别向更高级别请求服务的指令。
+\*\*在 `PSCI` 中的节点详细说明请参考文档：\*\*kernel/Documentation/devicetree/bindings/arm/psci.txt。在此仅说一下 method 字段。该字段有两个可选值：smc 和 hvc。表示调用 PSCI 功能使用什么指令。smc、hvc、svc 这些指令都是由低运行级别向更高级别请求服务的指令。
 
 和系统调用一样。调用了该指令，cpu 会进入异常切入更高的权限。异常处理程序根据下面传上来的参数决定给予什么服务，smc 陷入 EL3，hvc 陷入 EL2，svc 陷入EL1。在 ARMv8 里面，EL3 总是是 secure 状态，EL2 是虚拟机管态，EL1 是普通的系统态。
 
@@ -89,15 +90,13 @@ Bootloader 以 `boot-wrapper-aarch64` 作分析，看 psci.c 里的 psci_call 
 
 目前比较主流的多核启动方式是 PSCI，一般正式的产品都有 ATF，通过 PSCI 可以实现 CPU 的开启关闭以及挂起等操作。在实际的移植工作过程中，如果有带有 ATF 的 bootloader 那多核移植就相对容易很多，如果没有的话，也可以采用 spin_table 的方式来启动多核。
 
----
+______________________________________________________________________
 
 公众号
 
-5T技术资源大放送！包括但不限于：C/C++，Arm, Linux，Android，人工智能，单片机，树莓派，等等。在上面的【人人都是极客】公众号内回复「peter」，即可免费获取！！  
+5T技术资源大放送！包括但不限于：C/C++，Arm, Linux，Android，人工智能，单片机，树莓派，等等。在上面的【人人都是极客】公众号内回复「peter」，即可免费获取！！
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) **记得点击****分享****、****赞****和****在看****，给我充点儿电吧**
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) **记得点击****分享****、****赞****和****在看****，给我充点儿电吧**
 
 Linux93
 
@@ -118,85 +117,84 @@ Linux · 目录
 **留言 10**
 
 - 道哥#IOT物联网小镇
-    
-    2022年3月9日
-    
-    赞1
-    
-    眼睛说:我学废了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞1
-    
-    哈哈 扶我起来
-    
+
+  2022年3月9日
+
+  赞1
+
+  眼睛说:我学废了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞1
+
+  哈哈 扶我起来
+
 - 程磊
-    
-    2022年3月9日
-    
-    赞1
-    
-    因为内核只能初始化一次，所以只能先启动一个CPU，然后其他的CPU就可以同时启动了，完成一些CPU相关的初始化工作，然后运行idle进程。
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)大佬
-    
+
+  2022年3月9日
+
+  赞1
+
+  因为内核只能初始化一次，所以只能先启动一个CPU，然后其他的CPU就可以同时启动了，完成一些CPU相关的初始化工作，然后运行idle进程。
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)大佬
+
 - 张贤斌
-    
-    2022年3月9日
-    
-    赞1
-    
-    Arm Trusted Firmware
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月9日
+
+  赞1
+
+  Arm Trusted Firmware
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - NNTD
-    
-    2022年3月28日
-    
-    赞
-    
-    很多时候，原生的dts看不出启动方式，需要uboot在启动内核阶段往dts插入属性
-    
+
+  2022年3月28日
+
+  赞
+
+  很多时候，原生的dts看不出启动方式，需要uboot在启动内核阶段往dts插入属性
+
 - 风二中
-    
-    2022年3月9日
-    
-    赞
-    
-    没太明白，cpu是顺序启动的吗，比如先cpu0，再1，再2…n
-    
+
+  2022年3月9日
+
+  赞
+
+  没太明白，cpu是顺序启动的吗，比如先cpu0，再1，再2…n
+
 - Jarvis
-    
-    2022年3月9日
-    
-    赞
-    
-    ATF？
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞
-    
-    嗯
-    
+
+  2022年3月9日
+
+  赞
+
+  ATF？
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞
+
+  嗯
 
 已无更多数据
 
@@ -215,84 +213,83 @@ Linux · 目录
 **留言 10**
 
 - 道哥#IOT物联网小镇
-    
-    2022年3月9日
-    
-    赞1
-    
-    眼睛说:我学废了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞1
-    
-    哈哈 扶我起来
-    
+
+  2022年3月9日
+
+  赞1
+
+  眼睛说:我学废了![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞1
+
+  哈哈 扶我起来
+
 - 程磊
-    
-    2022年3月9日
-    
-    赞1
-    
-    因为内核只能初始化一次，所以只能先启动一个CPU，然后其他的CPU就可以同时启动了，完成一些CPU相关的初始化工作，然后运行idle进程。
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)大佬
-    
+
+  2022年3月9日
+
+  赞1
+
+  因为内核只能初始化一次，所以只能先启动一个CPU，然后其他的CPU就可以同时启动了，完成一些CPU相关的初始化工作，然后运行idle进程。
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)大佬
+
 - 张贤斌
-    
-    2022年3月9日
-    
-    赞1
-    
-    Arm Trusted Firmware
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月9日
+
+  赞1
+
+  Arm Trusted Firmware
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - NNTD
-    
-    2022年3月28日
-    
-    赞
-    
-    很多时候，原生的dts看不出启动方式，需要uboot在启动内核阶段往dts插入属性
-    
+
+  2022年3月28日
+
+  赞
+
+  很多时候，原生的dts看不出启动方式，需要uboot在启动内核阶段往dts插入属性
+
 - 风二中
-    
-    2022年3月9日
-    
-    赞
-    
-    没太明白，cpu是顺序启动的吗，比如先cpu0，再1，再2…n
-    
+
+  2022年3月9日
+
+  赞
+
+  没太明白，cpu是顺序启动的吗，比如先cpu0，再1，再2…n
+
 - Jarvis
-    
-    2022年3月9日
-    
-    赞
-    
-    ATF？
-    
-    人人极客社区
-    
-    作者2022年3月9日
-    
-    赞
-    
-    嗯
-    
+
+  2022年3月9日
+
+  赞
+
+  ATF？
+
+  人人极客社区
+
+  作者2022年3月9日
+
+  赞
+
+  嗯
 
 已无更多数据

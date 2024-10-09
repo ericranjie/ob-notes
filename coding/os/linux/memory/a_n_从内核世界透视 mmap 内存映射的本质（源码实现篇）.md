@@ -1,4 +1,3 @@
-
 > 本文基于内核 5.4 版本源码讨论
 
 通过上篇文章 [《从内核世界透视 mmap 内存映射的本质（原理篇）》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247488750&idx=1&sn=247a4603299e203793fac8b6c5e61071&chksm=ce77d2a9f9005bbf3b024bc9f9192f2de63a70fd33db1113d9f9c0d8a1ced2099fbeb727a3d7&token=1862605518&lang=zh_CN#rd)的介绍，我们现在已经非常清楚了 mmap 背后的映射原理以及它的使用方法，其核心就是在进程虚拟内存空间中分配一段虚拟内存出来，然后将这段虚拟内存与磁盘文件映射起来，整个 mmap 系统调用就结束了。
@@ -86,9 +85,8 @@ ksys_mmap_pgoff 函数主要是针对 mmap 大页映射的情况进行预处理�
 在内核中，通过 is_file_hugepages 函数来判断映射文件是否由大页支持，我们在用户态使用的大页一般是由两种类型的系统调用来支持的：
 
 1. mmap 系统调用，背后依赖的是 hugetlbfs 文件系统，这种情况下只需要判断映射文件的 struct file 结构中定义的文件操作是否是 hugetlbfs 文件系统相关的操作，这样就可以确定出映射文件是否为 hugetlbfs 文件系统中的文件。
-    
-2. SYSV 标准的系统调用 shmget 和 shmat，背后依赖 shm 文件系统，同理，只需要判断映射文件是否为 shm 文件系统中的文件即可。
-    
+
+1. SYSV 标准的系统调用 shmget 和 shmat，背后依赖 shm 文件系统，同理，只需要判断映射文件是否为 shm 文件系统中的文件即可。
 
 ```c
 static inline bool is_file_hugepages(struct file *file)
@@ -182,7 +180,7 @@ int __mm_populate(unsigned long start, unsigned long len, int ignore_errors)
 }
 ```
 
-populate_vma_page_range 函数则是在 __mm_populate 的处理基础上，为指定地址范围 [start , end] 内的每一个虚拟内存页，通过 __get_user_pages 函数为其分配物理内存。
+populate_vma_page_range 函数则是在 \_\_mm_populate 的处理基础上，为指定地址范围 \[start , end\] 内的每一个虚拟内存页，通过 \_\_get_user_pages 函数为其分配物理内存。
 
 ```c
 long populate_vma_page_range(struct vm_area_struct *vma,
@@ -199,7 +197,7 @@ long populate_vma_page_range(struct vm_area_struct *vma,
 }
 ```
 
-__get_user_pages 会循环遍历 vma 中的每一个虚拟内存页，首先会通过 follow_page_mask 在进程页表中查找该虚拟内存页背后是否有物理内存页与之映射，如果没有则调用 faultin_page，其底层会调用到 handle_mm_fault 进入缺页处理流程，内核在这里会为其分配物理内存页，并在进程页表中建立好映射关系。
+\_\_get_user_pages 会循环遍历 vma 中的每一个虚拟内存页，首先会通过 follow_page_mask 在进程页表中查找该虚拟内存页背后是否有物理内存页与之映射，如果没有则调用 faultin_page，其底层会调用到 handle_mm_fault 进入缺页处理流程，内核在这里会为其分配物理内存页，并在进程页表中建立好映射关系。
 
 ```c
 static long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
@@ -241,8 +239,7 @@ static long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
 do_mmap 是 mmap 系统调用的核心函数，内核会在这里完成内存映射的整个流程，其中最为核心的是如下两个方面的内容：
 
 1. get_unmapped_area 函数用于在进程地址空间中寻找出一段长度为 len，并且还未映射的虚拟内存区域 vma 出来。返回值 addr 表示这段虚拟内存区域的起始地址。
-2. mmap_region 函数是整个内存映射的核心，它首先会为这段选取出来的映射虚拟内存区域分配 vma 结构，并根据映射信息进行初始化，以及建立 vma 与相关映射文件的关系，最后将这段 vma 插入到进程的虚拟内存空间中。
-    
+1. mmap_region 函数是整个内存映射的核心，它首先会为这段选取出来的映射虚拟内存区域分配 vma 结构，并根据映射信息进行初始化，以及建立 vma 与相关映射文件的关系，最后将这段 vma 插入到进程的虚拟内存空间中。
 
 除了这两个核心内容之外，do_mmap 函数还承担了对一些内存映射约束条件的检查，比如：内核规定一个进程虚拟内存空间内所能映射的虚拟内存区域 vma 是有数量限制的，sysctl_max_map_count 规定了进程虚拟内存空间所能包含 VMA 的最大个数，我们可以通过 `/proc/sys/vm/max_map_count` 内核参数来调整 sysctl_max_map_count。
 
@@ -288,7 +285,7 @@ struct vm_area_struct {
 但事实上并非如此，内核会对我们申请的虚拟内存容量进行审计（account），结合当前物理内存容量以及 swap 交换区的大小来综合判断是否允许本次虚拟内存的申请。
 
 内核对虚拟内存使用的审计策略定义在 sysctl_overcommit_memory 中，我们可以通过内核参数 `/proc/sys/vm/overcommit_memory`来调整 。
-  
+
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110010384-1892032126.png)
 
 内核定义了如下三个 overcommit 策略，这里的 commit 意思是需要申请的虚拟内存，overcommit 的意思是向内核申请过量的（远远超过物理内存容量）虚拟内存：
@@ -300,11 +297,10 @@ struct vm_area_struct {
 ```
 
 - OVERCOMMIT_GUESS 是内核的默认 overcommit 策略。在这种模式下，特别激进的，过量的虚拟内存申请将会被拒绝，内核会对虚拟内存能够过量申请多少做出一定的限制，这种策略既不激进也不保守，比较中庸。
-    
+
 - OVERCOMMIT_ALWAYS 是最为激进的 overcommit 策略，无论进程申请多大的虚拟内存，只要不超过整个进程虚拟内存空间的大小，内核总会痛快的答应。但是这种策略下，虚拟内存的申请虽然容易了，但是当进程遇到缺页，内核为其分配物理内存的时候，会非常容易造成 OOM 。
-    
+
 - OVERCOMMIT_NEVER 是最为严格的一种控制虚拟内存 overcommit 的策略，在这种模式下，内核会严格的规定虚拟内存的申请用量。
-    
 
 > 这里我们先对这三种 overcommit 策略做一个简单了解，具体内核在 OVERCOMMIT_GUESS 和 OVERCOMMIT_NEVER 模式下分别能够允许进程 overcommit 多少虚拟内存，笔者在后面相关源码章节在做详细分析。
 
@@ -495,7 +491,7 @@ mmap 系统调用分配虚拟内存的本质其实就是在进程的虚拟内存
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110133685-985245215.png)
 
-在新式布局中，栈的空间大小会被限制，栈最大空间大小保存在 task_struct->signal_struct->rlimp[RLIMIT_STACK] 中，我们可以通过修改 `/etc/security/limits.conf` 文件中 stack 配置项来调整栈最大空间的限制。
+在新式布局中，栈的空间大小会被限制，栈最大空间大小保存在 task_struct->signal_struct->rlimp\[RLIMIT_STACK\] 中，我们可以通过修改 `/etc/security/limits.conf` 文件中 stack 配置项来调整栈最大空间的限制。
 
 由于栈变为有界的了，所以文件映射与匿名映射区可以在栈的下方立即开始，为确保栈与映射区不会冲突，它们中间还设置了 1M 大小的安全间隙 stack_guard_gap。
 
@@ -640,7 +636,7 @@ struct mm_struct {
 }
 ```
 
-在经典布局下，文件映射与匿名映射区的起始地址 mmap_legacy_base 被设置为 __TASK_UNMAPPED_BASE，其值为 task_size 的三分之一，也就是说文件映射与匿名映射区起始于进程虚拟内存空间的三分之一处：
+在经典布局下，文件映射与匿名映射区的起始地址 mmap_legacy_base 被设置为 \_\_TASK_UNMAPPED_BASE，其值为 task_size 的三分之一，也就是说文件映射与匿名映射区起始于进程虚拟内存空间的三分之一处：
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110220709-130070958.png)
 
@@ -738,6 +734,7 @@ static unsigned long mmap_base(unsigned long rnd, unsigned long task_size,
 ```
 
 现在 mmap 的主要工作区域：文件映射与匿名映射区在进程虚拟内存空间中的布局情况，我们已经清楚了。那么接下来，笔者会以 AMD64 体系结构的经典布局为基础，为大家介绍 mmap 是如何分配虚拟内存的。
+
 ### 4.3 虚拟内存的分配
 
 get_unmapped_area 主要的目的就是在具体的映射区布局下，根据布局特点，真正负责划分虚拟内存区域的函数。经过上一小节的介绍我们知道，在经典布局下，mm->get_unmapped_area 指向的函数为 arch_get_unmapped_area。
@@ -852,18 +849,17 @@ unsigned long shmem_get_unmapped_area(struct file *file,
 void* mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset);
 ```
 
-如果在 flags 参数中指定了 `MAP_FIXED`  标志，则意味着我们强制要求内核在我们指定的起始地址 addr 处开始映射 len 长度的虚拟内存区域，无论这段虚拟内存区域 [addr , addr + len] 是否已经存在映射关系，内核都会强行进行映射，如果这块区域已经存在映射关系，那么后续内核会把旧的映射关系覆盖掉。
+如果在 flags 参数中指定了 `MAP_FIXED`  标志，则意味着我们强制要求内核在我们指定的起始地址 addr 处开始映射 len 长度的虚拟内存区域，无论这段虚拟内存区域 \[addr , addr + len\] 是否已经存在映射关系，内核都会强行进行映射，如果这块区域已经存在映射关系，那么后续内核会把旧的映射关系覆盖掉。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110351862-1318180456.png)
 
-如果我们指定了 addr，但是并没有指定 MAP_FIXED，则意味着我们只是建议内核优先考虑从我们指定的 addr 地址处开始映射，但是如果 [addr , addr+len] 这段虚拟内存区域已经存在映射关系，内核则不会按照我们指定的 addr 开始映射，而是会自动查找一段空闲的 len 长度的虚拟内存区域。这一部分的工作由 vm_unmapped_area 函数承担。
+如果我们指定了 addr，但是并没有指定 MAP_FIXED，则意味着我们只是建议内核优先考虑从我们指定的 addr 地址处开始映射，但是如果 \[addr , addr+len\] 这段虚拟内存区域已经存在映射关系，内核则不会按照我们指定的 addr 开始映射，而是会自动查找一段空闲的 len 长度的虚拟内存区域。这一部分的工作由 vm_unmapped_area 函数承担。
 
-如果通过查找发现， [addr , addr+len] 这段虚拟内存地址范围并未存在任何映射关系，那么 addr 就会作为 mmap 映射的起始地址。这里面会分为两种情况：
+如果通过查找发现， \[addr , addr+len\] 这段虚拟内存地址范围并未存在任何映射关系，那么 addr 就会作为 mmap 映射的起始地址。这里面会分为两种情况：
 
-1. 第一种是我们指定的 addr 比较大，addr 位于文件映射与匿名映射区中所有映射区域 vma 的最后面，这样一来，[addr , addr + len] 这段地址范围当然是空闲的了。
-    
-2. 第二种情况是我们指定的 addr 恰好位于一个 vma 和另一个 vma 中间的地址间隙中，并且这个地址间隙刚好大于或者等于我们指定的映射长度 len。内核就可以将这个地址间隙映射起来。
-    
+1. 第一种是我们指定的 addr 比较大，addr 位于文件映射与匿名映射区中所有映射区域 vma 的最后面，这样一来，\[addr , addr + len\] 这段地址范围当然是空闲的了。
+
+1. 第二种情况是我们指定的 addr 恰好位于一个 vma 和另一个 vma 中间的地址间隙中，并且这个地址间隙刚好大于或者等于我们指定的映射长度 len。内核就可以将这个地址间隙映射起来。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110404780-2003818571.png)
 
@@ -934,7 +930,7 @@ struct mm_struct {
 }
 ```
 
-如果不存在这样一个 vma（addr < vma->vm_end），那么内核直接从我们指定的 addr 地址处开始映射就好了，这时 pprev 指向进程地址空间中最后一个 vma。
+如果不存在这样一个 vma（addr \< vma->vm_end），那么内核直接从我们指定的 addr 地址处开始映射就好了，这时 pprev 指向进程地址空间中最后一个 vma。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110439866-1719779576.png)
 
@@ -1022,7 +1018,7 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 }
 ```
 
-如果我们找到的这个 vma 与 [addr , addr +len] 这段虚拟地址范围有重叠的部分，那么内核就不能按照我们指定的 addr 开始映射，内核需要重新在文件映射与匿名映射区中按照地址的增长方向，找到一段 len 大小的空闲虚拟内存区域。这一部分的逻辑由 vm_unmapped_area 函数承担。
+如果我们找到的这个 vma 与 \[addr , addr +len\] 这段虚拟地址范围有重叠的部分，那么内核就不能按照我们指定的 addr 开始映射，内核需要重新在文件映射与匿名映射区中按照地址的增长方向，找到一段 len 大小的空闲虚拟内存区域。这一部分的逻辑由 vm_unmapped_area 函数承担。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110524809-504997577.png)
 
@@ -1086,15 +1082,14 @@ unmapped_area 函数的核心任务就是在管理进程地址空间这些 vma �
 如果我们在左子树中找到了一个地址最低的 vma，并且这个 vma 与其前驱节点vma->vm_prev 之间的地址间隙 gap 符合上述的三个条件：
 
 1. gap 的长度大于等于映射长度 length ： gap_end - gap_start >= length
-    
-2. gap_end >= low_limit + length 。
-    
-3. gap_start <= high_limit - length。
-    
+
+1. gap_end >= low_limit + length 。
+
+1. gap_start \<= high_limit - length。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110637540-478072788.png)
 
-这里内核还有一个小小的优化点，如果我们遍历完了当前 vma 节点的所有子树（包括左子树和右子树）依然无法找到一个 gap 的长度可以满足我们的映射长度： gap_end - gap_start < length。那我们不是白白遍历了整棵树吗？
+这里内核还有一个小小的优化点，如果我们遍历完了当前 vma 节点的所有子树（包括左子树和右子树）依然无法找到一个 gap 的长度可以满足我们的映射长度： gap_end - gap_start \< length。那我们不是白白遍历了整棵树吗？
 
 能否有一种机制，使我们通过当前 vma 就可以知道其子树中的所有 vma 节点与其前驱节点 vma->vm_prev 之间的地址间隙 gap 的最大长度（包括当前 vma）。
 
@@ -1261,13 +1256,13 @@ found:
 
 ## 5. 内存映射的本质
 
-流程走到这里，我们就来到了 mmap 系统调用最为核心的部分了，在之前的内容中，内核已经通过 get_unmapped_area 函数为我们在进程地址空间中挑选出一段地址范围为 [addr , addr + len] 的虚拟内存区域供 mmap 进行映射。
+流程走到这里，我们就来到了 mmap 系统调用最为核心的部分了，在之前的内容中，内核已经通过 get_unmapped_area 函数为我们在进程地址空间中挑选出一段地址范围为 \[addr , addr + len\] 的虚拟内存区域供 mmap 进行映射。
 
 > 注意：这里的 addr 并不一定是我们指定的映射起始地址。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110703945-1487888133.png)
 
-现在我们只是确定了 [addr , addr + len] 这段虚拟内存区域是可以映射的，这段区域只是被内核先划分出来了，但是还未分配出去，在 mmap_region 函数中，需要为这段虚拟内存区域分配 vma 结构，并根据映射方式对 vma 进行初始化，这样这段虚拟内存才算真正的被分配给了进程。
+现在我们只是确定了 \[addr , addr + len\] 这段虚拟内存区域是可以映射的，这段区域只是被内核先划分出来了，但是还未分配出去，在 mmap_region 函数中，需要为这段虚拟内存区域分配 vma 结构，并根据映射方式对 vma 进行初始化，这样这段虚拟内存才算真正的被分配给了进程。
 
 而在进程虚拟内存空间中允许被映射的虚拟内存总量是有限制的，所以在 mmap_region 开始分配虚拟内存之前，内核需要通过 may_expand_vm 检查本次需要映射的虚拟内存页数 len >> PAGE_SHIFT 是否已经超过了进程地址空间中可以被映射的虚拟内存总量限制。
 
@@ -1282,7 +1277,7 @@ void* mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset)
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110720403-2059718112.png)
 
-这样一来，[addr , addr + len] 这段范围的虚拟内存就会有很大的可能与现有虚拟内存映射区 vma（上图中蓝色部分）发生重叠，因为这里我们指定的是强制映射 MAP_FIXED，所以内核会将这部分重叠的部分通过 do_munmap 函数先解除映射，然后建立新的映射关系，效果就是将这部分重叠的虚拟内存覆盖掉了。
+这样一来，\[addr , addr + len\] 这段范围的虚拟内存就会有很大的可能与现有虚拟内存映射区 vma（上图中蓝色部分）发生重叠，因为这里我们指定的是强制映射 MAP_FIXED，所以内核会将这部分重叠的部分通过 do_munmap 函数先解除映射，然后建立新的映射关系，效果就是将这部分重叠的虚拟内存覆盖掉了。
 
 由于这部分重叠的虚拟内存部分是之前已经分配出去的，本次映射不需要再重新申请，所以真实虚拟内存的用量需要减去这部分重叠的部分。
 
@@ -1304,15 +1299,15 @@ void* mmap(void* addr, size_t length, int prot, int flags, int fd, off_t offset)
 
 如果需要对虚拟内存进行审计，那么内核接着会调用 security_vm_enough_memory_mm 函数根据 overcommit_memory 策略判断是否允许进程申请这么多的虚拟内存，如果不通过，则返回 ENOMEM 停止虚拟内存申请流程。如果通过则将虚拟内存分配给进程。
 
-内核为进程分配虚拟内存的本质其实就是在进程的虚拟内存空间中，找出一段未被映射的空闲虚拟内存地址范围 [addr , addr + len]，就像之前介绍的 get_unmapped_area 函数那样。
+内核为进程分配虚拟内存的本质其实就是在进程的虚拟内存空间中，找出一段未被映射的空闲虚拟内存地址范围 \[addr , addr + len\]，就像之前介绍的 get_unmapped_area 函数那样。
 
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010110751056-414553963.png)
 
-然后再 mmap_region 函数中为这段空闲的虚拟内存地址范围 [addr , addr + len]，创建 vma 结构，并初始化 vma 相关的属性。然后将这个 vma 结构插入到进程的虚拟内存空间中。
+然后再 mmap_region 函数中为这段空闲的虚拟内存地址范围 \[addr , addr + len\]，创建 vma 结构，并初始化 vma 相关的属性。然后将这个 vma 结构插入到进程的虚拟内存空间中。
 
-内核为了精细化的控制内存的开销，避免创建没有必要的 vma 结构，内核会本着能省则省的原则，在创建新的 vma 之前，按照最大程度合并的原则，内核会尝试看能不能将当前寻找出来的空闲虚拟内存区域 [addr , addr + len] 与其前一个 vma 以及后一个 vma 进行合并，然后重新调整合并后的 vma 相关属性，比如：vm_start , vm_end , vm_pgoff，以及涉及到相关数据结构的改变。这样一来，内核就不需要为这段空闲虚拟内存创建新的 vma 了。
+内核为了精细化的控制内存的开销，避免创建没有必要的 vma 结构，内核会本着能省则省的原则，在创建新的 vma 之前，按照最大程度合并的原则，内核会尝试看能不能将当前寻找出来的空闲虚拟内存区域 \[addr , addr + len\] 与其前一个 vma 以及后一个 vma 进行合并，然后重新调整合并后的 vma 相关属性，比如：vm_start , vm_end , vm_pgoff，以及涉及到相关数据结构的改变。这样一来，内核就不需要为这段空闲虚拟内存创建新的 vma 了。
 
-如果不能合并，内核则只能从 slab 缓存中拿出一个 vma 结构来描述这段虚拟内存地址范围 [addr , addr + len]。并根据 mmap 映射的这段虚拟内存区域属性初始化 vma 结构中的相关字段。
+如果不能合并，内核则只能从 slab 缓存中拿出一个 vma 结构来描述这段虚拟内存地址范围 \[addr , addr + len\]。并根据 mmap 映射的这段虚拟内存区域属性初始化 vma 结构中的相关字段。
 
 ```c
     vma->vm_start = addr;
@@ -1474,7 +1469,7 @@ static void vma_link(struct mm_struct *mm, struct vm_area_struct *vma,
 }
 ```
 
-除此之外，vma_link 还做了一项重要工作，就是通过 __vma_link_file 函数建立文件与虚拟内存区域 vma （所有进程）的反向映射关系。说起反向映射，笔者在之前的文章 [《一步一图带你深入理解 Linux 物理内存管理》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247486879&idx=1&sn=0bcc59a306d59e5199a11d1ca5313743&chksm=ce77cbd8f90042ce06f5086b1c976d1d2daa57bc5b768bac15f10ee3dc85874bbeddcd649d88&scene=178&cur_album_id=2559805446807928833#rd) 中的 “6.1 匿名页的反向映射” 小节中为大家介绍过关于匿名页的反向映射过程，感兴趣的同学可以回看下。
+除此之外，vma_link 还做了一项重要工作，就是通过 \_\_vma_link_file 函数建立文件与虚拟内存区域 vma （所有进程）的反向映射关系。说起反向映射，笔者在之前的文章 [《一步一图带你深入理解 Linux 物理内存管理》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247486879&idx=1&sn=0bcc59a306d59e5199a11d1ca5313743&chksm=ce77cbd8f90042ce06f5086b1c976d1d2daa57bc5b768bac15f10ee3dc85874bbeddcd649d88&scene=178&cur_album_id=2559805446807928833#rd) 中的 “6.1 匿名页的反向映射” 小节中为大家介绍过关于匿名页的反向映射过程，感兴趣的同学可以回看下。
 
 匿名页的反向映射还是相对比较复杂的，文件页的反向映射就很简单了，在之前的文章中笔者曾介绍过，struct file 结构中的 f_maping 属性指向了一个非常重要的数据结构 struct address_space。
 
@@ -1496,7 +1491,7 @@ struct address_space 结构中有两个非常重要的属性，其中一个是 i
 
 我们知道，一个文件可以被多个进程一起映射，这样一来在每个进程的地址空间 mm_struct 结构中都会有一个 vma 结构来与这个文件进行映射，与该文件发生映射关系的所有进程地址空间中的 vma 就挂在 address_space-> i_mmap 这颗红黑树中，通过它，我们可以找到所有与该文件进行映射的进程。
 
-__vma_link_file 函数建立文件页反向映射的核心其实就是将 mmap 映射出的这个 vma 插入到这颗红黑树中。
+\_\_vma_link_file 函数建立文件页反向映射的核心其实就是将 mmap 映射出的这个 vma 插入到这颗红黑树中。
 
 ```c
 static void __vma_link_file(struct vm_area_struct *vma)
@@ -1634,11 +1629,11 @@ out:
 进程地址空间中对虚拟内存的用量是有限制的，限制分为两个方面：
 
 1. 对进程地址空间中能够映射的虚拟内存页总数做出限制。
-    
-2. 对进程地址空间中数据区的虚拟内存页总数做出限制。
-    
+
+1. 对进程地址空间中数据区的虚拟内存页总数做出限制。
 
 这里的数据区，在内核中定义的是所有私有，可写的虚拟内存区域（栈区除外）：
+
 ```c
 /*
  * Data area - private, writable, not stack
@@ -1787,7 +1782,7 @@ static int meminfo_proc_show(struct seq_file *m, void *v)
 
 现在 account virtual memory 的概念我们清楚了，那么接下来就该来看一下，内核是如何对这部分虚拟内存的申请进行审计的（account）。
 
-如果 accountable_mapping 函数返回值为 true，表示内核需要对当前进程申请的这部分虚拟内存进行审计，审计的逻辑封装在 __vm_enough_memory 函数中，返回 0 表示有足够的虚拟内存，返回 ENOMEM 表示虚拟内存不足。这里正是内核 overcommit 策略的核心实现。
+如果 accountable_mapping 函数返回值为 true，表示内核需要对当前进程申请的这部分虚拟内存进行审计，审计的逻辑封装在 \_\_vm_enough_memory 函数中，返回 0 表示有足够的虚拟内存，返回 ENOMEM 表示虚拟内存不足。这里正是内核 overcommit 策略的核心实现。
 
 我们可以通过内核参数 `/proc/sys/vm/overcommit_memory` 来调整 overcommit 策略 。
 
@@ -1831,9 +1826,8 @@ vm_commit_limit 函数返回值体现在 `/proc/meminfo` 中的 CommitLimit �
 ![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010111039316-283747085.png)
 
 - sysctl_admin_reserve_kbytes 表示当进程拥有 root 权限的时候，内核需要为 root 相关的操作保留一部分内存，这样可以使进程在任何情况下都可以顺利执行 root 权限的相关操作。
-    
+
 - sysctl_user_reserve_kbytes 用于在紧急情况下用户恢复系统。比如系统卡死，用户主动 kill 资源消耗比较大的进程，这个动作需要预留一些 user_reserve 内存。
-    
 
 所以在 OVERCOMMIT_NEVER 策略下，进程可以申请到的虚拟内存容量需要在 CommitLimit 的基础上再减去 sysctl_admin_reserve_kbytes 和 sysctl_user_reserve_kbytes 配置的预留容量。
 
@@ -1936,28 +1930,27 @@ unsigned long vm_commit_limit(void)
 
 ### 5.3 vma_merge 函数解析
 
-经过前面的介绍我们知道，当 mmap 在进程虚拟内存空间中映射出一段 [addr , end] 的虚拟内存区域 area 时，内核需要为这段虚拟内存区域 area 创建一个 vma 结构来描述。
+经过前面的介绍我们知道，当 mmap 在进程虚拟内存空间中映射出一段 \[addr , end\] 的虚拟内存区域 area 时，内核需要为这段虚拟内存区域 area 创建一个 vma 结构来描述。
 
 而在创建新的 vma 结构之前，内核会在这里尝试看能不能将 area 与现有的 vma 进行合并，这样就可以避免创建新的 vma 结构，节省了内存的开销。
 
 内核会本着合并最大化的原则，检查当前映射出来的 area 能否与其前后两个 vma 进行合并，能合并就合并，如果不能合并就只能从 slab 中申请新的 vma 结构了。合并条件如下：
 
 1. area 的 vm_flags 不能设置 VM_SPECIAL 标志，该标志表示 area 区域是不可以被合并的，只能重新创建 vma。
-    
-2. area 的起始地址 addr 必须要与其 prev vma 的结束地址重合，这样，area 才能和它的前一个 vma 进行合并，如果不重合，area 则不能和前一个 vma 进行合并。
-    
-3. area 的结束地址 end 必须要与其 next vma 的起始地址重合，这样，area 才能和它的后一个 vma 进行合并，如果不重合，area 则不能和后一个 vma 进行合并。如果前后都不能合并，那就只能重新创建 vma 结构了。
-    
-4. area 需要与其要合并区域的 vm_flags 必须相同，否则不能合并。
-    
-5. 如果两个合并区域都是文件映射区，那么它们映射的文件必须是同一个。并且他们的文件映射偏移 vm_pgoff 必须是连续的。
-    
-6. 如果两个合并区域都是匿名映射区，那么两个 vma 映射的匿名页 anon_vma 必须是相同的。
-    
-7. 合并区域的 numa policy 必须是相同的。关于 numa policy 的介绍，感兴趣的同学可以查看笔者之前的文章 [《一步一图带你深入理解 Linux 物理内存管理》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247486879&idx=1&sn=0bcc59a306d59e5199a11d1ca5313743&chksm=ce77cbd8f90042ce06f5086b1c976d1d2daa57bc5b768bac15f10ee3dc85874bbeddcd649d88&scene=178&cur_album_id=2559805446807928833#rd) 第 “3.2.1 NUMA 的内存分配策略” 小节的内容。
-    
-8. 要合并的 prev 和 next 虚拟内存区域中，不能包含 close 操作，也就是说 vma->vm_ops 不能设置有 close 函数，如果虚拟内存区域操作支持 close，则不能合并，否则会导致现有虚拟内存区域 prev 和 next 的资源无法释放。
-    
+
+1. area 的起始地址 addr 必须要与其 prev vma 的结束地址重合，这样，area 才能和它的前一个 vma 进行合并，如果不重合，area 则不能和前一个 vma 进行合并。
+
+1. area 的结束地址 end 必须要与其 next vma 的起始地址重合，这样，area 才能和它的后一个 vma 进行合并，如果不重合，area 则不能和后一个 vma 进行合并。如果前后都不能合并，那就只能重新创建 vma 结构了。
+
+1. area 需要与其要合并区域的 vm_flags 必须相同，否则不能合并。
+
+1. 如果两个合并区域都是文件映射区，那么它们映射的文件必须是同一个。并且他们的文件映射偏移 vm_pgoff 必须是连续的。
+
+1. 如果两个合并区域都是匿名映射区，那么两个 vma 映射的匿名页 anon_vma 必须是相同的。
+
+1. 合并区域的 numa policy 必须是相同的。关于 numa policy 的介绍，感兴趣的同学可以查看笔者之前的文章 [《一步一图带你深入理解 Linux 物理内存管理》](https://mp.weixin.qq.com/s?__biz=Mzg2MzU3Mjc3Ng==&mid=2247486879&idx=1&sn=0bcc59a306d59e5199a11d1ca5313743&chksm=ce77cbd8f90042ce06f5086b1c976d1d2daa57bc5b768bac15f10ee3dc85874bbeddcd649d88&scene=178&cur_album_id=2559805446807928833#rd) 第 “3.2.1 NUMA 的内存分配策略” 小节的内容。
+
+1. 要合并的 prev 和 next 虚拟内存区域中，不能包含 close 操作，也就是说 vma->vm_ops 不能设置有 close 函数，如果虚拟内存区域操作支持 close，则不能合并，否则会导致现有虚拟内存区域 prev 和 next 的资源无法释放。
 
 can_vma_merge_after 函数用于判断其参数中指定的 vma 能否与其后一个 vma 进行合并。can_vma_merge_before 的逻辑也是一样，用于判断参数指定的 vma 能否与其前一个 vma 合并。
 
@@ -2030,9 +2023,8 @@ static inline int is_mergeable_vma(struct vm_area_struct *vma,
 下面即将要介绍的这 8 种合并情况从总体上来讲会分为两个大的类别：
 
 1. 第一个类别是 area 的前一个 prev vma 的结束地址与 area 的起始地址 addr 重合，判断条件为：`prev->vm_end == addr`。
-    
-2. 第二个类别是 area 的后一个 next vma 的起始地址与 area 的结束地址 end 重合，判断条件为：`end == next->vm_start` 。
-    
+
+1. 第二个类别是 area 的后一个 next vma 的起始地址与 area 的结束地址 end 重合，判断条件为：`end == next->vm_start` 。
 
 其中这两个大的类别将会分别根据前面两个基本布局展开进行，下面我们来看源码中的 case 1 。
 
@@ -2184,23 +2176,22 @@ struct vm_area_struct *vma_merge(struct mm_struct *mm,
 在原理篇中笔者首先通过五个角度为大家详细介绍了 mmap 的使用方法及其在内核中的实现原理，这五个角度分别是：
 
 1. 私有匿名映射，其主要用于进程申请虚拟内存，以及初始化进程虚拟内存空间中的 BSS 段，堆，栈这些虚拟内存区域。
-    
-2. 私有文件映射，其核心特点是背后映射的文件页在多进程之间是读共享的，但多个进程对各自虚拟内存区的修改只能反应到各自对应的文件页上，而且各自的修改在进程之间是互不可见的，最重要的一点是这些修改均不会回写到磁盘文件中。我们可以利用这些特点来加载二进制可执行文件的 .text , .data section 到进程虚拟内存空间中的代码段和数据段中。
-    
-3. 共享文件映射，多进程之间读写共享（不会发生写时复制），常用于多进程之间共享内存（page cache），多进程之间的通讯。
-    
-4. 共享匿名映射，用于父子进程之间共享内存，父子进程之间的通讯。父子进程之间需要依赖 tmpfs 中的匿名文件来实现共享内存。是一种特殊的共享文件映射。
-    
-5. 大页内存映射，这里我们介绍了标准大页与透明大页两种大页类型的区别与联系，以及他们各自的实现原理和使用方法。
-    
+
+1. 私有文件映射，其核心特点是背后映射的文件页在多进程之间是读共享的，但多个进程对各自虚拟内存区的修改只能反应到各自对应的文件页上，而且各自的修改在进程之间是互不可见的，最重要的一点是这些修改均不会回写到磁盘文件中。我们可以利用这些特点来加载二进制可执行文件的 .text , .data section 到进程虚拟内存空间中的代码段和数据段中。
+
+1. 共享文件映射，多进程之间读写共享（不会发生写时复制），常用于多进程之间共享内存（page cache），多进程之间的通讯。
+
+1. 共享匿名映射，用于父子进程之间共享内存，父子进程之间的通讯。父子进程之间需要依赖 tmpfs 中的匿名文件来实现共享内存。是一种特殊的共享文件映射。
+
+1. 大页内存映射，这里我们介绍了标准大页与透明大页两种大页类型的区别与联系，以及他们各自的实现原理和使用方法。
 
 介绍完原理之后，在本文的源码实现篇中笔者花了大量的篇幅介绍了 mmap 在内核中的源码实现，其中最核心的两个函数是：
 
 1. get_unmapped_area 函数用于在进程虚拟内存空间中为本次 mmap 映射寻找出一段未被映射的空闲虚拟内存地址范围。其中笔者还为大家介绍了文件映射与匿名映射区在进程虚拟内存空间的布局情况。
-    
-2. map_region 函数主要是对这段空闲虚拟内存地址范围进行映射，在映射过程中涉及到的重要内容有：
-    
-    - 内核的 overcommit 策略
-    - vm_merge 合并的流程，其中涉及到 8 种合并场景和 2 中基本布局。
+
+1. map_region 函数主要是对这段空闲虚拟内存地址范围进行映射，在映射过程中涉及到的重要内容有：
+
+   - 内核的 overcommit 策略
+   - vm_merge 合并的流程，其中涉及到 8 种合并场景和 2 中基本布局。
 
 好了，本文的内容到这里就结束了，感谢大家的收看，我们下篇文章见~

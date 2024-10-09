@@ -6,8 +6,8 @@ perfbook是一本值得反复阅读的好书，这一点是毋庸置疑的，不
 
 14.2 Memory Barriers
 
-Causality and sequencing are deeply intuitive, and hackers often tend to have a much stronger grasp of these concepts than does the general population. These intuitions can be extremely powerful tools when writing, analyzing,  
-and debugging both sequential code and parallel code that makes use of standard mutual-exclusion mechanisms,  
+Causality and sequencing are deeply intuitive, and hackers often tend to have a much stronger grasp of these concepts than does the general population. These intuitions can be extremely powerful tools when writing, analyzing,\
+and debugging both sequential code and parallel code that makes use of standard mutual-exclusion mechanisms,\
 such as locking and RCU.
 
 什么是“Causality ”？其实就是因果关系，例如：A事件发生了（因）必然导致B事件（果）的发生，逻辑角度讲，我们称A是B的充分条件（sufficient condition）。如果B事件（果）发生了，必然可以推导出A事件的发生（因），那么我们称A是B的必要条件（necessary condition）。sequencing是定序的意思，简单的讲（这里的定义绝非专业，也许只适合本文的场景）就是定义一系列事件在时间值上的顺序。推导因果关系和事件排序都是非常直觉的东西，黑客往往比我们普通人更好的掌握了这些概念，因此他们可以纵横于江湖，仅留下传说。无论是顺序执行的代码或者并行执行的代码，都会使用标准的互斥机制来进行临界区的保护，比如锁或者RCU。如果我们象黑客那样拥有了对因果关系、事件排序等逻辑分析能力之后，就等于掌握了强大的工具，因而可以在撰写、分析或者调试这些使用互斥机制的代码的时候，做到气定神闲，游刃有余。
@@ -42,8 +42,8 @@ Unfortunately, when a CPU accesses data that is not yet in its cache will result
 
 图中，小企鹅（代表linux kernel）眼神迷茫，因为CPU说的话不是按照顺序表述的。不过没有关系，编译器和同步原语（例如锁或者RCU）可以使用memory barrier（例如linux kernel中的smp_mb()）来保持CPU的代码执行以及内存访问顺序是和program order一致的。这些memory barrier可以是一条CPU的汇编指令，比如在ARM, POWER, Itanium, 和Alpha CPU上都有相关的指令。memory barrier也可以是隐含在其他指令中，例如X86（操作IO port的指令都隐含了memory barrier的功能）。
 
-Since the standard synchronization primitives preserve the illusion of ordering, your path of least resistance is to stop reading this section and simply use these primitives.  
-However, if you need to implement the synchronization primitives themselves, or if you are simply interested in understanding how memory ordering and memory barriers work, read on!  
+Since the standard synchronization primitives preserve the illusion of ordering, your path of least resistance is to stop reading this section and simply use these primitives.\
+However, if you need to implement the synchronization primitives themselves, or if you are simply interested in understanding how memory ordering and memory barriers work, read on!\
 The next sections present counter-intuitive scenarios that you might encounter when using explicit memory barriers.
 
 你也许面对CPU的这种out of order的行为有本能的抵抗，没有关系，放轻松，你的抵抗之路可以到此结束，只要你愿意使用各种同步原语来保护你程序中的共享资源，因为透过这些标准的同步原语，你看到的是一个顺序执行的世界。当然，这会引入一些小小的遗憾：你不知道底层到底是如何把“乱序”变成“有序”的。不过，实现同步原语的那些软件工程师没有这个豁免权，他们必须要深入理解memory order和memory barrier。此外，那些想要“打破沙锅问到底”以及想要“知其然知其所以然”的工程师也可以跟随我们继续。下一节我们将向您展示几个直觉不靠谱的场景。
@@ -56,27 +56,27 @@ Intuitively, thread0() assigns to B after it assigns to A, thread1() waits until
 
 真实CPU上运行的程序逻辑可能会由于Memory ordering和memory barriers 而变得诡异，和我们通常的直觉相悖。例如下面的这个程序片段的执行情况：
 
-> 1 thread0(void)  
-> 2 {  
-> 3 A = 1;  
-> 4 smp_wmb();  
-> 5 B = 1;  
-> 6 }  
-> 7  
-> 8 thread1(void)  
-> 9 {  
-> 10 while (B != 1)  
-> 11 continue;  
-> 12 barrier();  
-> 13 C = 1;  
-> 14 }  
-> 15  
-> 16 thread2(void)  
-> 17 {  
-> 18 while (C != 1)  
-> 19 continue;  
-> 20 barrier();  
-> 21 assert(A != 0);  
+> 1 thread0(void)\
+> 2 {\
+> 3 A = 1;\
+> 4 smp_wmb();\
+> 5 B = 1;\
+> 6 }\
+> 7\
+> 8 thread1(void)\
+> 9 {\
+> 10 while (B != 1)\
+> 11 continue;\
+> 12 barrier();\
+> 13 C = 1;\
+> 14 }\
+> 15\
+> 16 thread2(void)\
+> 17 {\
+> 18 while (C != 1)\
+> 19 continue;\
+> 20 barrier();\
+> 21 assert(A != 0);\
 > 22 }
 
 开始，变量A，B，C的初始值都是0。根据程序逻辑：thread0中，A先于B赋值，thread1中，程序逻辑是一直等到B变量被赋值为1之后，再给C赋值。这里，人类的直觉告诉我们，如果变量C已经被赋值为1的时候（第13行程序），A一定已经被赋值为1了。同样的，在thread2中，第21行程序的assert一定是不会被触发的。
@@ -93,10 +93,10 @@ This line of reasoning, intuitively obvious though it may be, is completely and 
 
 顺便说一句，在翻译这一节中，上面的程序把我搞惨了。我有一本打印版的perfbook，但是是2014.4.3版本（我计算机中的是2015.1.31号的版本，不过我不喜欢看计算机，喜欢看纸版），其中上面的程序片段中的第20行是smp_mb。如果在20行是smp_mb这样的全功能的memory barrier，整个程序的逻辑是不会错的啊，我怎么想都觉得不对劲，整个周末都在想哪里出问题了，我甚至又回头重新阅读了why memory barrier那一章，仍然觉得程序是对的。最终，在星期一，我决定写一封信给Paul E. McKenney，告诉他我的困惑。在写邮件的时候，我从2015.1.31版本perfbook中copy程序片段的时候才发现，新版本已经修正了，呵呵，虚惊一场。
 
-So what should you do? Your best strategy, if possible, is to use existing primitives that incorporate any needed memory barriers, so that you can simply ignore the rest of this chapter.  
+So what should you do? Your best strategy, if possible, is to use existing primitives that incorporate any needed memory barriers, so that you can simply ignore the rest of this chapter.\
 Of course, if you are implementing synchronization primitives, you don’t have this luxury. The following discussion of memory ordering and memory barriers is for you.
 
-肿么办？memory barrier的坑很深呐，你真的想要跳下去吗？也许你最好的选择是使用目前的同步原语（包含你需要的memory barrier操作），这样的话，你就可以忽略掉本章剩余的内容了。当然，如果你的工作就是实现这些同步原语，那么生活没有你想像的那么美好（我儿子最近经常使用这句话，^_^），下面关于memory order和memory barrier的讨论都是为您准备的。
+肿么办？memory barrier的坑很深呐，你真的想要跳下去吗？也许你最好的选择是使用目前的同步原语（包含你需要的memory barrier操作），这样的话，你就可以忽略掉本章剩余的内容了。当然，如果你的工作就是实现这些同步原语，那么生活没有你想像的那么美好（我儿子最近经常使用这句话，^\_^），下面关于memory order和memory barrier的讨论都是为您准备的。
 
 14.2.3 Variables Can Have More Than One Value
 
@@ -106,13 +106,13 @@ To see this, consider the program fragment shown in Figure 14.4. This code fragm
 
 程序员很自然的认为在程序的执行过程中，变量按照一个明确的全局顺序赋一系列明确定义的数值。也许曾经是这样的，但是，现在必须要和美好的过去说byebye了。为了看清这个“残酷”的现实，我们给出一段代码来，如下：
 
-> 1 state.variable = mycpu;  
-> 2 lasttb = oldtb = firsttb = gettb();  
-> 3 while (state.variable == mycpu) {  
-> 4 lasttb = oldtb;  
-> 5 oldtb = gettb();  
-> 6 if (lasttb - firsttb > 1000)  
-> 7 break;  
+> 1 state.variable = mycpu;\
+> 2 lasttb = oldtb = firsttb = gettb();\
+> 3 while (state.variable == mycpu) {\
+> 4 lasttb = oldtb;\
+> 5 oldtb = gettb();\
+> 6 if (lasttb - firsttb > 1000)\
+> 7 break;\
 > 8 }
 
 这段代码被多个cpu并行执行。第一行代码是将自己的CPU ID赋值给一个全局共享变量，第二行用gettb() 这个函数的返回值来初始化几个局部变量，gettb() 这个函数是干什么的呢？一般而言，多核CPU都有一个全局的HW counter（当然，不是所有的CPU arch都支持，反正ARM是有），这个HW counter是所有CPU Core共享的，因此可以做全局的timeline。gettb() 这个函数就是读取这个counter的函数接口，通过读取该counter，每个CPU上的程序都可以获得当前时刻在该timeline上的投影。3～8行的代码用来记录全局变量state.variable维持mycpu这个值的时间长度（在第一行被赋值，但终究会被其他CPU改写）。当然，最后一个CPU会赢得比赛，并且state.variable一直维持其cpu id的值，这时候，通过7～8行的代码可以让该CPU从无限循环中解脱出来（这时候state.variable == mycpu总是成立）。
@@ -135,14 +135,15 @@ We have entered a regime where we must bid a fond farewell to comfortable intuit
 
 14.2.4 What Can You Trust?
 
-You most definitely cannot trust your intuition. What can you trust?  
-It turns out that there are a few reasonably simple rules that allow you to make good use of memory barriers. This section derives those rules, for those who wish to get to the bottom of the memory-barrier story, at least from the viewpoint of portable code. If you just want to be told what the rules are rather than suffering through the actual derivation, please feel free to skip to Section 14.2.6.  
-The exact semantics of memory barriers vary wildly from one CPU to another, so portable code must rely only on the least-common-denominator semantics of memory barriers. Fortunately, all CPUs impose the following rules:  
-1. All accesses by a given CPU will appear to that CPU to have occurred in program order.  
-2. All CPUs’ accesses to a single variable will be consistent with some global ordering of stores to that variable.  
-3. Memory barriers will operate in a pair-wise fashion.  
-4. Operations will be provided from which exclusive locking primitives may be constructed.  
-Therefore, if you need to use memory barriers in portable code, you can rely on all of these properties.1 Each of these properties is described in the following sections.
+You most definitely cannot trust your intuition. What can you trust?\
+It turns out that there are a few reasonably simple rules that allow you to make good use of memory barriers. This section derives those rules, for those who wish to get to the bottom of the memory-barrier story, at least from the viewpoint of portable code. If you just want to be told what the rules are rather than suffering through the actual derivation, please feel free to skip to Section 14.2.6.\
+The exact semantics of memory barriers vary wildly from one CPU to another, so portable code must rely only on the least-common-denominator semantics of memory barriers. Fortunately, all CPUs impose the following rules:
+
+1. All accesses by a given CPU will appear to that CPU to have occurred in program order.
+1. All CPUs’ accesses to a single variable will be consistent with some global ordering of stores to that variable.
+1. Memory barriers will operate in a pair-wise fashion.
+1. Operations will be provided from which exclusive locking primitives may be constructed.\
+   Therefore, if you need to use memory barriers in portable code, you can rely on all of these properties.1 Each of these properties is described in the following sections.
 
 当你不能相信自己的直觉推理的时候，你能信任什么呢？
 
@@ -160,12 +161,12 @@ memory barrier的语义在不同CPU上是不同的，因此，想要实现一个
 
 因此，如果你需要直接使用memory barrier在你的代码中，同时，你希望你的代码是可移植的，你必须依赖这些memory barrier的特性，我们会在下面的各个小节中详细描述每一个特性。
 
-14.2.4.1 Self-References Are Ordered  
+14.2.4.1 Self-References Are Ordered\
 A given CPU will see its own accesses as occurring in “program order”, as if the CPU was executing only one instruction at a time with no reordering or speculation. For older CPUs, this restriction is necessary for binary compatibility, and only secondarily for the sanity of us software types. There have been a few CPUs that violate this rule to a limited extent, but in those cases, the compiler has been responsible for ensuring that ordering is explicitly enforced as needed. Either way, from the programmer’s viewpoint, the CPU sees its own accesses in program order.
 
 某一个具体的CPU看自己的内存访问都是严格服从program order的顺序，就好象CPU在顺序的一次执行一条指令，没有重排指令或者speculation（实在找不到很好的中文描述这个词）。对于比较老的CPU，这个限制主要是为了二进制兼容，其次才是为了软件的正常运行。有几个CPU arch在一定程度上违背了这个规则，在这种情况下，编译器会提供一些手段保证从本cpu上看到memory order符合program order。但是无论如何，从程序员的角度来看，执行代码的CPU看到自己的内存访问顺序是和program order一致的。
 
-14.2.4.2 Single-Variable Memory Consistency  
+14.2.4.2 Single-Variable Memory Consistency\
 Because current commercially available computer systems provide cache coherence, if a group of CPUs all do concurrent non-atomic stores to a single variable, the series of values seen by all CPUs will be consistent with at least one global ordering. For example, in the series of accesses shown in Figure 14.5, CPU 1 sees the sequence {1,2}, CPU 2 sees the sequence {2}, CPU 3 sees the sequence {3,2}, and CPU 4 sees the sequence {4,2}. This is consistent with the global sequence {3,1,4,2}, but also with all five of the other sequences of these four numbers that end in “2”. Thus, there will be agreement on the sequence of values taken on by a single variable, but there might be ambiguity.
 
 目前市面上能够买到的商业计算机系统都是提供cache coherence功能的，如果多个CPU对一个全局变量并发执行非原子的store操作，那么每个CPU观测这个全局变量的值应该是一个序列，而这个序列应该是符合一个全局的顺序。比如我们上图中的例子：cpu 1看到的序列是{1,2}，cpu 2看到的序列是{2}，cpu 3看到的序列是{3,2}，cpu 4看到的序列是{4,2}，所有的cpu看到的顺序都是符合一个全局的顺序{3,1,4,2}，当然也不是说每次都是符合这个全局顺序，也可能和其他5个以2结尾的全局顺序保持一致。因此，所有cpu对一个变量值的认知会符合一个全局序列，该序列的最后那个值是最后胜出CPU的赋值，全局序列的其他中间值是不明确的，具体是和当时系统的硬件环境相关（local cache line的状态什么的）。
@@ -174,11 +175,11 @@ In contrast, had the CPUs used atomic operations (such as the Linux kernel’s a
 
 做为对比，我们来看看使用原子操作（例如linux kernel中的atomic_inc_return原语）而不是简单的赋值操作的情况。在这种情况下，cpu对共享变量值的观测应该是符合一个确定的、一致的全局序列。我们假设一个全局变量A，初始值是0.某个cpu首先执行atomic_inc_return，将值从0变成1（同时获取旧值0），第二个CPU将值从1变成2（同时获取旧值1），然后依次进行。由于是原子操作，各个cpu是按照一个确定的顺序来执行atomic_inc_return，因此，各个cpu读到的全局变量的值也是一个明确的顺序。上一段描述的简单赋值操作的例子不是这样严格按照一个确定的顺序执行的，因此其一致的全局序列中有些中间值是不明确的。之所以这样是因为非原子的赋值操作不会返回之前旧的值，因此带来了不确定性。
 
-Please note well that this section applies only when all CPUs’ accesses are to one single variable. In this single-variable case, cache coherence guarantees the global ordering, at least assuming that some of the more aggressive compiler optimizations are disabled via the Linux kernel’s ACCESS_ONCE() directive or C++11’s relaxed atomics [Bec11]. In contrast, if there are multiple variables, memory barriers are required for the CPUs to consistently agree on the order for current commercially available computer systems.
+Please note well that this section applies only when all CPUs’ accesses are to one single variable. In this single-variable case, cache coherence guarantees the global ordering, at least assuming that some of the more aggressive compiler optimizations are disabled via the Linux kernel’s ACCESS_ONCE() directive or C++11’s relaxed atomics \[Bec11\]. In contrast, if there are multiple variables, memory barriers are required for the CPUs to consistently agree on the order for current commercially available computer systems.
 
 需要注意的是：这一节的结论适用的场景是系统中的多个CPU访问一个变量。在这种情况下，系统中有cache coherence的硬件来保证cache一致性，从而保证了那个一致的全局顺序。当然，程序中需要使用类似linux kernel中的ACCESS_ONCE或者C++11中的“relaxed atomics ”（这时什么鬼我也不知道）来阻止编译器对该变量访问的优化。如果是多个CPU访问多个变量的情况呢？这时候，可以使用memory barrier这个强大工具来确保CPUs之间对多个变量访问顺序的认知。
 
-14.2.4.3 Pair-Wise Memory Barriers  
+14.2.4.3 Pair-Wise Memory Barriers\
 Pair-wise memory barriers provide conditional ordering semantics. For example, in the following set of operations, CPU 1’s access to A does not unconditionally precede its access to B from the viewpoint of an external logic analyzer (see Appendix C for examples). However, if CPU 2’s access to B sees the result of CPU 1’s access to B, then CPU 2’s access to A is guaranteed to see the result of CPU 1’s access to A. Although some CPUs’ memory barriers do in fact provide stronger, unconditional ordering guarantees, portable code may rely only on this weaker if-then conditional ordering guarantee.
 
 成对使用的memory barrier提供了有条件的顺序保证，我们用下面的例子来描述什么是有条件的顺序保证：
@@ -200,7 +201,7 @@ Of course, accesses must be either loads or stores, and these do have different 
 
 不同的组合共计有16个，这些组合又可以分成3个类别：Portable Combinations（通杀所有CPU）、Semi-Portable Combinations（新CPU可以work，但是不适应在比较旧的那些CPU）和Dubious Combinations（基本是不可移植的），下面都会详细介绍。
 
-14.2.4.4 Pair-Wise Memory Barriers: Portable Combinations  
+14.2.4.4 Pair-Wise Memory Barriers: Portable Combinations\
 The following pairings from Table 14.1, enumerate all the combinations of memory barrier pairings that portable software may depend on.
 
 上面的表格枚举了所有的成对使用memory barrier的场景，这些是可移植代码必须要考虑的。
@@ -260,7 +261,7 @@ After both CPUs have completed executing these code sequences, if X==1, then we 
 
 另一方面，如果X等于0，那么memory barrier的条件不存在，在这种情况下，B的值可能是1，也可能是2。
 
-14.2.4.5 Pair-Wise Memory Barriers: Semi-Portable Combinations  
+14.2.4.5 Pair-Wise Memory Barriers: Semi-Portable Combinations\
 The following pairings from Table 14.1 can be used on modern hardware, but might fail on some systems that were produced in the 1900s. However, these can safely be used on all mainstream hardware introduced since the year 2000. So if you think that memory barriers are difficult to deal with, please keep in mind that they used to be a lot harder on some systems!
 
 本节要描述的组合能够使用在现代的CPU上，不过对于一些20世纪的“老家伙”就有可能产生问题（这也是我们为什么成它为Semi-Portable的原因，毕竟不能应用在所有的处理器上）。不过，别担心，对于2000之后的主流的计算机系统，本节的memory barrier对可以放心使用。如果你觉得memory barrier很难搞，其实memory barrier在某些系统中曾经更加难搞，想想过去，骚年，还是勇敢面对吧。
@@ -293,8 +294,8 @@ OK，还是回到表格中的Stores “Pass in the Night”这个条目好了，
 
 CPU1和CPU2都是执行两个store操作，两个store之间有一个memory barrier的操作。如果CPU1先于CPU2执行完代码，那么最后变量的值应该是{A==2,B==2}，如果CPU2先于CPU1执行完代码，那么最后变量的值应该是{A==1,B==1}，如果并发执行，那么可能A和B两个变量都是第二个赋值覆盖了第一个赋值的结果，因此，最后变量的值应该是{A==2,B==1}，但是无论如何，在两个CPU都执行完上面的代码之后，{A==1,B==2} 这种情况不可能发生。
 
-Unfortunately, although this conclusion is correct on 21st-century systems, it does not necessarily hold on all antique 20th-century systems. Suppose that the cache line containing A is initially owned by CPU 2, and that containing B is initially owned by CPU 1. Then, in systems that have invalidation queues and store buffers, it is possible for the first assignments to “pass in the night”, so that the second assignments actually happen first. This strange effect is explained in Appendix C.  
-This same effect can happen in any memory-barrier pairing where each CPU’s memory barrier is preceded by a store, including the “ears to mouths” pairing.  
+Unfortunately, although this conclusion is correct on 21st-century systems, it does not necessarily hold on all antique 20th-century systems. Suppose that the cache line containing A is initially owned by CPU 2, and that containing B is initially owned by CPU 1. Then, in systems that have invalidation queues and store buffers, it is possible for the first assignments to “pass in the night”, so that the second assignments actually happen first. This strange effect is explained in Appendix C.\
+This same effect can happen in any memory-barrier pairing where each CPU’s memory barrier is preceded by a store, including the “ears to mouths” pairing.\
 However, 21st-century hardware does accommodate these ordering intuitions, and do permit this combination to be used safely.
 
 很不幸，这个推论在大部分21世纪的计算机系统中都是正确的，不过对于20世纪的古董系统，这个推论就不正确了，我们来一起看看{A==1,B==2}这种执行结果是如何发生的 。我们假设CPU 2的local cache中有A的值，而B在CPU 1的cacheline中。对于有Invalidate queue和store buffer的系统，CPU1的执行序列是这样的（CPU2是类似的，就不再描述了）：
@@ -322,7 +323,7 @@ However, 21st-century hardware does accommodate these ordering intuitions, and d
 
 不过，对于21世纪的硬件系统而言，硬件工程师已经帮忙解决了上面的问题，因此，软件工程师可以安全的使用Stores “Pass in the Night”。
 
-14.2.4.6 Pair-Wise Memory Barriers: Dubious Combinations  
+14.2.4.6 Pair-Wise Memory Barriers: Dubious Combinations\
 In the following combinations from Table 14.1, the memory barriers have very limited use in portable code, even on 21st-century hardware. However, “limited use” is different than “no use”, so let’s see what can be done! Avid readers will want to write toy programs that rely on each of these combinations in order to fully understand how this works.
 
 本节介绍的这些memory barrier组合，如果想应用在可移植的代码中那么会有些困难，因为即便是在21世纪的那些新的CPU硬件平台上，这些memory barrier组合也不能保证都OK，因此，其应用场景非常受限。当然“应用场景非常受限”并非一无是处，因此，让我们一起看看它们能干什么？热心的读者也可以考虑动手写一些示例程序来加上对这些memory barrier组合的理解。
@@ -331,7 +332,7 @@ Ears to Ears. Since loads do not change the state of memory (ignoring MMIO regis
 
 先分析Ears to Ears这种组合情况。由于load操作不能改变memory的状态（这一刻，再次忽略MMIO），因此，一个CPU上的load是无法感知到另外一侧CPU的load操作的。不过，如果CPU2上的load B操作返回的值比CPU 1上的load B返回的值新的话（即CPU2上load B晚于CPU1的load B执行），那么可以推断CPU2的load A返回的值要么和CPU1上的load A返回值一样新，要么加载更新的值。
 
-Mouth to Mouth, Ear to Ear. One of the variables is only loaded from, and the other is only stored to. Because (once again, ignoring MMIO registers) it is not possible for one load to see the results of the other, it is not possible to detect the conditional ordering provided by the memory barrier.  
+Mouth to Mouth, Ear to Ear. One of the variables is only loaded from, and the other is only stored to. Because (once again, ignoring MMIO registers) it is not possible for one load to see the results of the other, it is not possible to detect the conditional ordering provided by the memory barrier.\
 However, it is possible to determine which store happened last, but this requires an additional load from B. If this additional load from B is executed after both CPUs 1 and 2 complete, and if it turns out that CPU 2’s store to B happened last, then we know that CPU 2’s load from A returned either the same value as CPU 1’s load from A or some later value.
 
 Mouth to Mouth, Ear to Ear这个组合的特点是一个变量只是执行store操作，而另外一个变量只是进行load操作。执行序列如下：
@@ -347,7 +348,7 @@ Mouth to Mouth, Ear to Ear这个组合的特点是一个变量只是执行store�
 
 不过，执行一个额外的load B的操作，我们还是有可能知道store的操作顺序（哪一个最后发生）。在CPU1和CPU2执行完毕上述代码之后，我们再来一个load B，如果是CPU2上的store B最后发生，那么我们作出这样的推论：CPU2的load A返回的值要么和CPU1上的load A返回值一样新，要么加载更新的值（用比较好理解的话是CPU2上的load A后发生，有可能感知更新的值）。
 
-Only One Store. Because there is only one store, only one of the variables permits one CPU to see the results of the other CPU’s access. Therefore, there is no way to detect the conditional ordering provided by the memory barriers.  
+Only One Store. Because there is only one store, only one of the variables permits one CPU to see the results of the other CPU’s access. Therefore, there is no way to detect the conditional ordering provided by the memory barriers.\
 At least not straightforwardly. But suppose that in combination 1 from Table 14.1, CPU 1’s load from A returns the value that CPU 2 stored to A. Then we know that CPU 1’s load from B returned either the same value as CPU 2’s load from A or some later value.
 
 Only One Store这个组合说明在CPU1和CPU2执行的4个memory操作中只有一个是store。由于只有一个store，因此变量A和变量B中必定有一个是两个load操作，一个是load store操作。也就是说只有一个变量的store操作可以被另外的CPU上的load操作观察到。假设执行序列如下：
@@ -361,27 +362,27 @@ Only One Store这个组合说明在CPU1和CPU2执行的4个memory操作中只有
 
 如果在CPU1上运行的load A感知到了在CPU2上对A的赋值，那么，CPU1上的load B必然能观察到和CPU2上load B一样的值或者更新的值。
 
-14.2.4.7 Semantics Sufficient to Implement Locking  
+14.2.4.7 Semantics Sufficient to Implement Locking\
 Suppose we have an exclusive lock (spinlock_t in the Linux kernel, pthread_mutex_t in pthreads code) that guards a number of variables (in other words, these variables are not accessed except from the lock’s critical sections). The following properties must then hold true:
 
 假设我们现在使用互斥锁（例如linux kernel中的spinlock_t或者线程库中的pthread_mutex_t）来保护几个变量（换句话说，这些变量只能在锁保护的临界区内被访问），那么下面这些结论是成立的：
 
 1. A given CPU or thread must see all of its own loads and stores as if they had occurred in program order. 特定的CPU或者线程在观察自己的内存访问情况的时候，其观察到的顺序和program order一致。
 
-2. The lock acquisitions and releases must appear to have executed in a single global order. 从全局来看，持有锁和释放锁的操作顺序应该是一个全局的顺序（所有的CPU观察到的都是那个全局的操作顺序）。
+1. The lock acquisitions and releases must appear to have executed in a single global order. 从全局来看，持有锁和释放锁的操作顺序应该是一个全局的顺序（所有的CPU观察到的都是那个全局的操作顺序）。
 
-3. Suppose a given variable has not yet been stored to in a critical section that is currently executing. Then any load from a given variable performed in that critical section must see the last store to that variable from the last previous critical section that stored to it. 我们假设全局的临界区的操作顺序是C0，C1，C2……（具体在哪一个CPU我们就不纠结了），我们假设在C2临界区中（临界区代码正在执行），但是某一个受保护的变量A还没有执行store的操作。那么我们可以得出这样的结论：在临界区C2中（尚未执行对A的store），任何对A变量的load操作都是能够观察到C1临界区中最后一个store的结果。
+1. Suppose a given variable has not yet been stored to in a critical section that is currently executing. Then any load from a given variable performed in that critical section must see the last store to that variable from the last previous critical section that stored to it. 我们假设全局的临界区的操作顺序是C0，C1，C2……（具体在哪一个CPU我们就不纠结了），我们假设在C2临界区中（临界区代码正在执行），但是某一个受保护的变量A还没有执行store的操作。那么我们可以得出这样的结论：在临界区C2中（尚未执行对A的store），任何对A变量的load操作都是能够观察到C1临界区中最后一个store的结果。
 
-The difference between the last two properties is a bit subtle: the second requires that the lock acquisitions and releases occur in a well-defined order, while the third requires that the critical sections not “bleed out” far enough to cause difficulties for other critical section.  
-Why are these properties necessary?  
+The difference between the last two properties is a bit subtle: the second requires that the lock acquisitions and releases occur in a well-defined order, while the third requires that the critical sections not “bleed out” far enough to cause difficulties for other critical section.\
+Why are these properties necessary?\
 Suppose the first property did not hold. Then the assertion in the following code might well fail!
 
 后面两个锁的特性有一些微妙的差异，第二个特性是要求锁的持有和释放要有一个确定的全局顺序，而第三个特性需要每个临界区之间有清楚的界线。假设全局的临界区的操作顺序是C0，C1，C2……，那么C0中对A变量的store操作，必须在C1临界区的开始的load A指令中体现出来。
 
 为什么规定锁必须要拥有这些特性呢？如果第一条特性不能满足的话，那么下面的代码将会发生assert fail：
 
-> a = 1;  
-> b = 1 + a;  
+> a = 1;\
+> b = 1 + a;\
 > assert(b == 2);
 
 如果第二行代码不能感知第一行代码中对a的store操作，那么b = 1 + a就无法正确的计算b的值从而导致程序逻辑错误。
@@ -390,9 +391,9 @@ Suppose that the second property did not hold. Then the following code might lea
 
 如果第二条特性不能满足的话，那么下面的代码将会发生内存泄露：
 
-> spin_lock(&mylock);  
-> if (p == NULL)  
-> p = kmalloc(sizeof(*p), GFP_KERNEL);  
+> spin_lock(&mylock);\
+> if (p == NULL)\
+> p = kmalloc(sizeof(\*p), GFP_KERNEL);\
 > spin_unlock(&mylock);
 
 上面的代码逻辑中，我们知道，只有第一个临界区可以看到P==NULL，从而分配内存，如果所有的CPU看到的都是一个确定的，依次执行的临界区序列，那么毫无疑问，这里第一个执行的临界区是确定的。如果不同的CPU看到的是不同的临界区执行序列，那么如何确定那个第一个执行的临界区呢？如果两个thread都认为自己是第一个执行的临界区，实际上p执行的memory会分配两次，从而导致了内存泄漏。
@@ -401,8 +402,8 @@ Suppose that the third property did not hold. Then the counter shown in the foll
 
 如果第三条特性不能满足的话，那么下面的代码中累加的ctr变量将会出现数值错误：
 
-> spin_lock(&mylock);  
-> ctr = ctr + 1;  
+> spin_lock(&mylock);\
+> ctr = ctr + 1;\
 > spin_unlock(&mylock);
 
 假设初值是0，那么8个cpu跑这段代码，最终ctr = ctr + 1;被执行了8次，因此代码执行完毕，ctr的值应该是8。在第一条和第二天特性都满足的情况下，所有CPU都认为系统中存在一个确定的临界区执行顺序，也就是说ctr = ctr + 1;被顺序执行。假设临界区C0～C7被CPU0～CPU7依次执行，那么C0执行完毕，CPU0认为ctr的值是1，这个值必须在C1临界区开始的时候，被CPU1观察到。如果观察不到，那么C1执行完毕，本来应该是2的值，现在计算得到1，产生了错误。
@@ -411,22 +412,22 @@ If you are convinced that these rules are necessary, let’s look at how they in
 
 上面的这三条特性可以理解对互斥锁这种机制的需求，如果你确定已经理解了这些需求，并且认为它们是必要的，我们可以继续来看锁的实现。
 
-14.2.5 Review of Locking Implementations  
+14.2.5 Review of Locking Implementations\
 Naive pseudocode for simple lock and unlock operations are shown below. Note that the atomic_xchg() primitive implies a memory barrier both before and after the atomic exchange operation, and that the implicit barrier after the atomic exchange operation eliminates the need for an explicit memory barrier in spin_lock(). Note also that, despite the names, atomic_read() and atomic_set() do not execute any atomic instructions, instead, it merely executes a simple load and store, respectively. This pseudocode follows a number of Linux implementations for the unlock operation, which is a simple non-atomic store following a memory barrier. These minimal implementations must possess all the locking properties laid out in Section 14.2.4.
 
 一个比较朴素的spin lock实现版本如下：
 
-> 1 void spin_lock(spinlock_t *lck)  
-> 2 {  
-> 3 while (atomic_xchg(&lck->a, 1) != 0)  
-> 4 while (atomic_read(&lck->a) != 0)  
-> 5 continue;  
-> 6 }  
-> 7  
-> 8 void spin_unlock(spinlock_t lck)  
-> 9 {  
-> 10 smp_mb();  
-> 11 atomic_set(&lck->a, 0);  
+> 1 void spin_lock(spinlock_t \*lck)\
+> 2 {\
+> 3 while (atomic_xchg(&lck->a, 1) != 0)\
+> 4 while (atomic_read(&lck->a) != 0)\
+> 5 continue;\
+> 6 }\
+> 7\
+> 8 void spin_unlock(spinlock_t lck)\
+> 9 {\
+> 10 smp_mb();\
+> 11 atomic_set(&lck->a, 0);\
 > 12 }
 
 我们首先看看spin_lock的代码：在进入和退出atomic_xchg这个原语的地方实际上都隐含了memory barrier的操作，这个隐含的memory barrier操作可以让spin_lock不需要显式的调用memory barrier的操作。需要注意的是，虽然名字中有atomic，不过atomic_read() 和atomic_set() 都没有执行特定的CPU级别的原子汇编指令（对于ARM处理器，曾经是SWP指令，现在是load store exclusive指令），仅仅是简单的load和store操作。linux中的许多锁的释放操作都是遵循了本伪代码的逻辑：即先是一个memory barrier操作，然后是一个简单的，非原子的store操作。不管哪个锁的实现代码，都必须符合14.2.4小节给出的三点软件需求。
@@ -453,14 +454,14 @@ In this particular case, pairwise memory barriers suffice to keep the two critic
 
 这个表格是否熟悉多了吧，呵呵～～～。成对使用的memory barrier可以有条件的memory order。对应这个场景，在CPU2感知到CPU1 将lck->a 的值修改为0的条件下，临界区X+1可以观察到临界区X的memory操作，即满足了14.2.4小节的特性3。
 
-14.2.6 A Few Simple Rules  
+14.2.6 A Few Simple Rules\
 Probably the easiest way to understand memory barriers is to understand a few simple rules:
 
 也许理解下面几个简单的规则是通往掌握memory barrier最简单的道路了：
 
 1. Each CPU sees its own accesses in order. 每个CPU看自己的内存访问序列都是遵循program order
 
-2. If a single shared variable is loaded and stored by multiple CPUs, then the series of values seen by a given CPU will be consistent with the series seen by the other CPUs, and there will be at least one sequence consisting of all values stored to that variable with which each CPUs series will be consistent.
+1. If a single shared variable is loaded and stored by multiple CPUs, then the series of values seen by a given CPU will be consistent with the series seen by the other CPUs, and there will be at least one sequence consisting of all values stored to that variable with which each CPUs series will be consistent.
 
 如果一个共享变量被多个CPU进行读写的操作，那么某个特定的CPU观察到的该变量的值序列应该是和其他CPU看到的值序列吻合的。当然，这里的“吻合”并不是说每个CPU看到的变量值序列是完全一致的，序列中的每个成员都相同，实际上，有可能不同CPU看到的变量值序列的长度都不一样。这里的“吻合”是指存在一个包括所有写入变量值的序列（我们称之全局序列），每个cpu观察到的变量值序列都是和这个全局序列吻合的。例如：全局序列是{a, b, c, d, e}，那么可能cpu0看到的是{a, d, e}，cpu3看到的是{a, b, c, e}，但是无论是cpu0还是cpu3，其观察到的变量值序列都是和全局序列吻合。
 
@@ -480,7 +481,7 @@ Probably the easiest way to understand memory barriers is to understand a few si
 
 1、英文的原文来自perfbook-1c.2015.01.31a.pdf
 
-2、翻译的过程，参考了《深入理解并行编程V2.0.pdf》，多谢谢宝友/鲁阳/陈渝的辛苦劳动。他们的翻译忠于原著，我的翻译都是满嘴跑舌头，^_^。
+2、翻译的过程，参考了《深入理解并行编程V2.0.pdf》，多谢谢宝友/鲁阳/陈渝的辛苦劳动。他们的翻译忠于原著，我的翻译都是满嘴跑舌头，^\_^。
 
 _原创翻译文章，转发请注明出处。蜗窝科技_
 
@@ -488,211 +489,211 @@ _原创翻译文章，转发请注明出处。蜗窝科技_
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [Linux graphic subsystem(2)_DRI介绍](http://www.wowotech.net/graphic_subsystem/dri_overview.html) | [slub分配器](http://www.wowotech.net/memory_management/247.html)»
+« [Linux graphic subsystem(2)\_DRI介绍](http://www.wowotech.net/graphic_subsystem/dri_overview.html) | [slub分配器](http://www.wowotech.net/memory_management/247.html)»
 
 **评论：**
 
-**李海洲**  
+**李海洲**\
 2020-06-19 16:58
 
-第20行的barrier这个优化屏障不能阻止CPU对A变量的访问，但是，可能由于这时CPU cache操作非常繁忙，A变量的invalidate message还在其invalidate queue中，因此load A得到了旧的值0。  
-  
+第20行的barrier这个优化屏障不能阻止CPU对A变量的访问，但是，可能由于这时CPU cache操作非常繁忙，A变量的invalidate message还在其invalidate queue中，因此load A得到了旧的值0。
+
 ---》这里的barrier是个啥？一个读屏障加在这里可以保证后面读取的是最新的，那这个barrier既然起不到作用，放这里干嘛？
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-8032)
 
-**李海洲**  
+**李海洲**\
 2020-06-17 16:36
 
-对于thread 1，我们假设A在CPU0的local cache中，但是状态是shared  
-  
+对于thread 1，我们假设A在CPU0的local cache中，但是状态是shared
+
 -->这里应该是thread 0吧
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-8028)
 
-**李海洲**  
+**李海洲**\
 2020-06-17 17:02
 
-@李海洲：还有一处  
-这时候，CPU0可以越过write memory barrier，完成对B的赋值  
-  
--->  
-是不是可以这样理解  
-这个时候A虽然被赋值了，但是没有回写到memory，还在store buffer，  
+@李海洲：还有一处\
+这时候，CPU0可以越过write memory barrier，完成对B的赋值
+
+-->\
+是不是可以这样理解\
+这个时候A虽然被赋值了，但是没有回写到memory，还在store buffer，\
 write memory barrier的约束并不是一定要写回到memory才行对吧
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-8030)
 
-**rafal**  
+**rafal**\
 2017-09-08 16:31
 
-"由于存在Invalidate Queue这中东西，因此，CPU 0很快就可以收到来自其他CPU的相应，这时候，CPU0可以越过write memory barrier，完成对B的赋值。因此，对于thread1，很快可以感知B的新值“1”并执行了对C变量的赋值。"  
-  
-hello linuxer,  
+"由于存在Invalidate Queue这中东西，因此，CPU 0很快就可以收到来自其他CPU的相应，这时候，CPU0可以越过write memory barrier，完成对B的赋值。因此，对于thread1，很快可以感知B的新值“1”并执行了对C变量的赋值。"
+
+hello linuxer,\
 上面的分析个人觉得是有问题的，内存屏障保证了cpu0不可能绕过A先对B赋值。个人认为这个问题的原因是20行的优化屏障不能阻止cpu2的乱序执行。假设CPU2 load A在 load C之前执行（此时获取了地址的数据，但指令还没有提交），获取了一个老的值0， 此后极短时间之内，cpu0完成了对A与B的更新，cpu1完成了对C的更新，这时CPU2 load C获取了C的最新值，进而完成提交，接下来load A完成提交，指令执行完毕，但A是旧值0
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-6007)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-09-08 19:14
 
 @rafal：多谢您的回复，不过我暂时想远离memory barrier和RCU，所以.......如果有兴趣，可以加微信群讨论，群里有一些喜欢摆弄memory barrier和RCU的。
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-6008)
 
-**rafal**  
+**rafal**\
 2017-09-09 20:21
 
 @linuxer：@linuxer 能告知微信群号吗，谢谢
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-6011)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-09-11 09:30
 
 @rafal：是“蜗窝内核技术讨论群”。我也不知道是否可以通过直接搜索加群，你可以试一试。如果不行，可以通过QQ群作为跳板。
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-6014)
 
-**RaulXiong**  
+**RaulXiong**\
 2016-11-01 16:04
 
-一个小笔误“在两个CPU都执行完上面的代码之后，如果X等于1，那么我们一定可以得到B等于0。”  
+一个小笔误“在两个CPU都执行完上面的代码之后，如果X等于1，那么我们一定可以得到B等于0。”\
 应该是B等于1.:)
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4827)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-01 23:01
 
-@RaulXiong：多谢！已经修改了。  
+@RaulXiong：多谢！已经修改了。\
 还好有英文原文，不至于误导大家。哈哈
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4834)
 
-**RaulXiong**  
+**RaulXiong**\
 2016-11-01 14:58
 
 请教作者一个问题，文中“当然，要修正这个问题非常简单，修改20行代码为smp_rmb即可。一旦执行了smp_rmb，就会mark invalidate queue中的entry，这时候，CPU执行后续的load操作都必须要等到Invalidate queue中的所有缓存的invalidate message”。请问smp_rmb可以标记非本CPU的invalidate queue吗？如果可以的话看起来这个invalidate queue不是perCPU可见的资源了？
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4824)
 
-**RaulXiong**  
+**RaulXiong**\
 2016-11-01 15:10
 
 @RaulXiong：我先自己回答一下，这里说的应该是C自己的invalidate queue。barrier的操作应该也只能影响本CPU的queue。
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4826)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-01 22:57
 
 @RaulXiong：同意你的看法
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4833)
 
-**温柔海洋**  
+**温柔海洋**\
 2016-10-19 19:26
 
-看完对SMP架构下，内核态并行编程做个总结：  
-  
-如果是多线程共同访问某一变量时，可以用内核中的一些同步原语，如spin_lock, mutex等保证共享变量不被乱序执行，按照自己的意图去执行。  
-  
-但是往往有个场景，比如spin_lock 和spin_unlock等同步原语之间圈起来的不是一个变量，而是多个变量时，这种场景下，多个线程间对这个多个共享变量的读写有可能就会造成乱序，不按照自己设想的顺序去执行。  
-  
-所以smp_mb这些规避的乱序执行的原语，还是大有用武之地。就是说不要以为用了内核态和用户态一些同步API（信号量，锁等），就不用考虑规避乱序执行的CPU行为了。  
-  
+看完对SMP架构下，内核态并行编程做个总结：
+
+如果是多线程共同访问某一变量时，可以用内核中的一些同步原语，如spin_lock, mutex等保证共享变量不被乱序执行，按照自己的意图去执行。
+
+但是往往有个场景，比如spin_lock 和spin_unlock等同步原语之间圈起来的不是一个变量，而是多个变量时，这种场景下，多个线程间对这个多个共享变量的读写有可能就会造成乱序，不按照自己设想的顺序去执行。
+
+所以smp_mb这些规避的乱序执行的原语，还是大有用武之地。就是说不要以为用了内核态和用户态一些同步API（信号量，锁等），就不用考虑规避乱序执行的CPU行为了。
+
 是不是这样理解的，谢谢指点 @Linuxer
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4749)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-20 09:22
 
-@温柔海洋：一年前，我也是信心满满的杀入内核同步的领域，试图深入理解memory order和memory barrier或者RCU等这些高大上的东西，不过，很快就遍体鳞伤，最后，我得出了一个结论：如果工程师没有受虐的倾向，那么就不要触碰这一块。  
-  
+@温柔海洋：一年前，我也是信心满满的杀入内核同步的领域，试图深入理解memory order和memory barrier或者RCU等这些高大上的东西，不过，很快就遍体鳞伤，最后，我得出了一个结论：如果工程师没有受虐的倾向，那么就不要触碰这一块。
+
 所幸的是并非每一个内核工程师都需要理解这些东西，除非你是内核同步机制的维护者，实际上，做为普通的驱动工程师，只要理解如何使用内核同步的原语就OK了，内核同步的原语可以保证只有一个线程进入临界区，这样也就不存在多个线程访问临界区的共享变量了，没有多个线程访问共享变量的场景，也就没有了乱序访问的隐忧了。换一句话说：一旦使用了标准的内核同步原语，那么不考虑cpu的乱序行为了，你看到的将是一个顺序执行的世界。
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4751)
 
-**温柔海洋**  
+**温柔海洋**\
 2016-10-20 13:03
 
-@linuxer：你说的是对的，标准的同步原语我之前只使用过spin_lock,mutex，sem之类的，最近又看了你说的smp_mb,才知道SMP下，CPU会乱序执行。  
-  
-不过要会灵活使用smp_mb的话，还真得在代码中某些场合下要考虑到CPU的乱序执行行为来。现在CPU基本上全是SMP架构，多核时代。  
-列举内核代码树中使用到smp_mb规避乱序执行的场合：  
-1：经典的Documention目录下，一个线程cond-> wake, 另一个线程prepare_to_wait-> if(cond) -> schedule;  
-2:drivers/usb/gadget/f_mtp.c 里面多个线程流会同时访问某个共享变量  
-3：fs/super.c， ext3/4.c 文件系统里面也很多。之前谷歌用ext4取代yaffs2,估计也是因为yaffs文件系统多线程并发情况下支持的不太好。  
-  
+@linuxer：你说的是对的，标准的同步原语我之前只使用过spin_lock,mutex，sem之类的，最近又看了你说的smp_mb,才知道SMP下，CPU会乱序执行。
+
+不过要会灵活使用smp_mb的话，还真得在代码中某些场合下要考虑到CPU的乱序执行行为来。现在CPU基本上全是SMP架构，多核时代。\
+列举内核代码树中使用到smp_mb规避乱序执行的场合：\
+1：经典的Documention目录下，一个线程cond-> wake, 另一个线程prepare_to_wait-> if(cond) -> schedule;\
+2:drivers/usb/gadget/f_mtp.c 里面多个线程流会同时访问某个共享变量\
+3：fs/super.c， ext3/4.c 文件系统里面也很多。之前谷歌用ext4取代yaffs2,估计也是因为yaffs文件系统多线程并发情况下支持的不太好。
+
 我说的意思是多核内核态编程，smp_mb的使用频率也应该不低吧。不是因为用了spin_lock,mutex这些同步原语，就可以把它忘了。你说呢 @Linuxer
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4752)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-20 15:55
 
-@温柔海洋：在内核中smp_mb的使用频率肯定不如spin lock这样的内核同步原语多，呵呵～～～其实大量使用memory barrier的场合就是在内核同步模块的实现代码中。如果想深入理解内核同步机制，了解memory order和memory barrier是必须的。  
-  
-实际上，我永远都持有这样的一个观点：越简单越好，越简单越美。如果软件工程师需要了解过多底层CPU的细节，那么我认为这个设计是失败的，对于memory order问题，其实最好的设计就是软件工程师不需要了解cpu的乱序行为，但是由于性能问题，计算机硬件和软件接口才增加了约束memory order的指令。换句话说，CPU提供mb指令本身就是向性能妥协而已，一点也不优雅。  
-  
+@温柔海洋：在内核中smp_mb的使用频率肯定不如spin lock这样的内核同步原语多，呵呵～～～其实大量使用memory barrier的场合就是在内核同步模块的实现代码中。如果想深入理解内核同步机制，了解memory order和memory barrier是必须的。
+
+实际上，我永远都持有这样的一个观点：越简单越好，越简单越美。如果软件工程师需要了解过多底层CPU的细节，那么我认为这个设计是失败的，对于memory order问题，其实最好的设计就是软件工程师不需要了解cpu的乱序行为，但是由于性能问题，计算机硬件和软件接口才增加了约束memory order的指令。换句话说，CPU提供mb指令本身就是向性能妥协而已，一点也不优雅。
+
 同样的，对于内核而言，memory barrier模块最好能够被内核同步模块封装起来，不被其他模块看到。做为内核工程师，我们也想生活轻松一些啊，干嘛要搞清楚memory order和memory barrier啊，有空喝喝茶，看看电影多好啊。可是，使用内核同步原语可能会造成性能问题，如果你负责的内核模块对性能非常的敏感，那么你可能是需要越过内核同步模块，直接使用memory barrier模块的接口。所以，是否选择忘记memory barrier，就看你想成为什么样的内核工程师了，哈哈～～～
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4754)
 
-**温柔海洋**  
+**温柔海洋**\
 2016-10-18 16:48
 
 英文原版的都是原汁原味的，很诱惑人往下读的。跟谭浩强之类的书是完全两种境界。感谢linuxer.
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4736)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-18 19:12
 
 @温柔海洋：不客气，哈哈。
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-4739)
 
-**[descent](http://www.wowotech.net/)**  
+**[descent](http://www.wowotech.net/)**\
 2015-12-29 10:06
 
 你能忍住中文版的誘惑, 真是不簡單。
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-3298)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-12-29 12:08
 
-@descent：不是能忍住中文版的诱惑，而是一开始根本无法读懂中文版，呵呵～～～不过对我而言读英文也OK，由于中文是母语，你阅读的时候不假思索，因此无法体会其中含义。如果英文足够好，其实英文阅读也很快，存在同样的问题。  
-  
+@descent：不是能忍住中文版的诱惑，而是一开始根本无法读懂中文版，呵呵～～～不过对我而言读英文也OK，由于中文是母语，你阅读的时候不假思索，因此无法体会其中含义。如果英文足够好，其实英文阅读也很快，存在同样的问题。
+
 因此，这里想要强调的是把阅读速度放慢下来，仔细体会文章的意涵。所以，我通过翻译将读英文的速度也降下来，仔细分析英文中的含义，体会作者的意图，从而加深了对memory的理解。当然，现在的理解也比较肤浅，算是在接近真理的路上吧
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-3300)
 
-**chen_chuang**  
+**chen_chuang**\
 2015-12-25 17:30
 
 博主有没有qq群之类的讨论技术的群，想加下学习
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-3289)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-12-25 17:34
 
 @chen_chuang：其实我连QQ都没有，还好老婆给搞了个微信，才让我得以和这个世界接轨......
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-3290)
 
-**[chen_chuang](http://www.wowotech.net/)**  
+**[chen_chuang](http://www.wowotech.net/)**\
 2015-12-25 17:38
 
 @linuxer：我去，博主在专心研究学术的时候，顺便还是和世界接下轨吧，我们这些菜鸟都等着大神指点人生呢，有微信的话也可以建个微信群，如果不会建，可以让嫂子建......
 
 [回复](http://www.wowotech.net/kernel_synchronization/memory-barrier-1.html#comment-3291)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-12-25 19:44
 
 @chen_chuang：我的微信都不是谈论技术的，主要是负责随时被老婆监控，我觉得这个博客网站就可以起到交流作用了，有问题可以在讨论区发，如果有针对文章的意见，可以直接在文章的评论区域表述
@@ -701,152 +702,155 @@ hello linuxer,
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [linux kernel内存回收机制](http://www.wowotech.net/memory_management/233.html)
-    - [linux kernel的中断子系统之（三）：IRQ number和中断描述符](http://www.wowotech.net/irq_subsystem/interrupt_descriptor.html)
-    - [Debian下的WiFi实验（二）：无线网卡自动连接AP](http://www.wowotech.net/linux_application/wifi-test-2.html)
-    - [Linux TTY framework(2)_软件架构](http://www.wowotech.net/tty_framework/tty_architecture.html)
-    - [一个较复杂dcache问题](http://www.wowotech.net/linux_kenrel/484.html)
+
+  - [linux kernel内存回收机制](http://www.wowotech.net/memory_management/233.html)
+  - [linux kernel的中断子系统之（三）：IRQ number和中断描述符](http://www.wowotech.net/irq_subsystem/interrupt_descriptor.html)
+  - [Debian下的WiFi实验（二）：无线网卡自动连接AP](http://www.wowotech.net/linux_application/wifi-test-2.html)
+  - [Linux TTY framework(2)\_软件架构](http://www.wowotech.net/tty_framework/tty_architecture.html)
+  - [一个较复杂dcache问题](http://www.wowotech.net/linux_kenrel/484.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

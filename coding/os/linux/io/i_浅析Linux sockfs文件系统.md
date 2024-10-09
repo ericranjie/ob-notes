@@ -1,7 +1,6 @@
-
 Linux内核之旅
 
- _2021年12月02日 22:28_
+_2021年12月02日 22:28_
 
 Editor's Note
 
@@ -9,19 +8,15 @@ Editor's Note
 
 The following article is from 技术简说 Author 董旭
 
-
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM5b9FrINsvZl3ribRAQicibVs74cJ9zMmiagjpZREkxAeAFuQ/0)
 
 **技术简说**.
 
 主要分享Linux内核、内核网络知识，欢迎大家关注！
 
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664610414&idx=1&sn=81b5f6d60b6a479d82e573392dd83170&chksm=f04d978bc73a1e9de3bdd459ae00de143d5fc53f205a8530fe0f71a9664d5297d6bcc4838655&mpshare=1&scene=24&srcid=1203A6MDynStm9BXW9nxHKgt&sharer_sharetime=1638461219630&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0d0fca404309e8f74e8683dbe7810841a589b95649b9bd6b0a8f323fcf115a6c1dabeb2892276736a77fc17c8418b969ea11a288cd665ae0c75c4e7f40c45e6a9a84192fb1143be020e5ceeaa24efb474132615e537be0128fbd4609cde4829ea35edfebd24cd71e3c2191eb6026588bc359f25af8ba71cbb&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQZhJ3l9xtzJ5Fyzh%2BUToBaxKUAgIE97dBBAEAAAAAAMDCMG7s854AAAAOpnltbLcz9gKNyK89dVj0yWa3vv8WG6Z9pVJBNadIBiVEJNhNwkmZnouuELKuNrvOIEz%2FToAZMCj71258L2VF02beQ1XX%2BQhA0izOd4VOXo%2F2JR7Ep7PYHORRDWmciyHp3%2FNVoXANvdi2oQXJIevWR2W7ZTtJdBP0XxzwVOYQmOkCs5GhWVNpvXKBqFp3zvj8ELlwRXy6vE6h6pBrDXe2SfciO6lz7fe5XTsfSmzv23%2FEKBDbwTLvMhrfHpTdg%2FbR2NqgRtuhZsrHdDnaC%2FoFX71vw%2BugMCkk6NY2xCxjxNYxPatyXEk2Ovbxue4f%2F%2Bxxqz2U6YeNyaLGL3YVkw%3D%3D&acctmode=0&pass_ticket=86p9ryWCa%2BKH%2BVCPHc5wrVimsPhCsoCesu%2BxdkUE9anguaRojus0W45KPdaYlIHa&wx_header=0#)
-
-  
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664610414&idx=1&sn=81b5f6d60b6a479d82e573392dd83170&chksm=f04d978bc73a1e9de3bdd459ae00de143d5fc53f205a8530fe0f71a9664d5297d6bcc4838655&mpshare=1&scene=24&srcid=1203A6MDynStm9BXW9nxHKgt&sharer_sharetime=1638461219630&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0d0fca404309e8f74e8683dbe7810841a589b95649b9bd6b0a8f323fcf115a6c1dabeb2892276736a77fc17c8418b969ea11a288cd665ae0c75c4e7f40c45e6a9a84192fb1143be020e5ceeaa24efb474132615e537be0128fbd4609cde4829ea35edfebd24cd71e3c2191eb6026588bc359f25af8ba71cbb&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQZhJ3l9xtzJ5Fyzh%2BUToBaxKUAgIE97dBBAEAAAAAAMDCMG7s854AAAAOpnltbLcz9gKNyK89dVj0yWa3vv8WG6Z9pVJBNadIBiVEJNhNwkmZnouuELKuNrvOIEz%2FToAZMCj71258L2VF02beQ1XX%2BQhA0izOd4VOXo%2F2JR7Ep7PYHORRDWmciyHp3%2FNVoXANvdi2oQXJIevWR2W7ZTtJdBP0XxzwVOYQmOkCs5GhWVNpvXKBqFp3zvj8ELlwRXy6vE6h6pBrDXe2SfciO6lz7fe5XTsfSmzv23%2FEKBDbwTLvMhrfHpTdg%2FbR2NqgRtuhZsrHdDnaC%2FoFX71vw%2BugMCkk6NY2xCxjxNYxPatyXEk2Ovbxue4f%2F%2Bxxqz2U6YeNyaLGL3YVkw%3D%3D&acctmode=0&pass_ticket=86p9ryWCa%2BKH%2BVCPHc5wrVimsPhCsoCesu%2BxdkUE9anguaRojus0W45KPdaYlIHa&wx_header=0#)
 
 浅析Linux sockfs文件系统
-
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/EjWxxIM2EQI0YHzCpIYYwO0iaqh08EGCibYEjLqIqYm2CXPzmicQTkxqF453q1d9RcSicSLGjjCNyBsjDXdx8oDhcA/300?wx_fmt=png&wxfrom=19)
 
@@ -54,7 +49,7 @@ struct file_system_type { const char *name;  //文件系统的名字 
 						 struct module *owner;//指向实现这个文件系统的模块，通常为THIS_MODULE宏 struct file_system_type * next;//指向文件系统类型链表的下一个文件系统类型 struct hlist_head fs_supers; struct lock_class_key s_lock_key; struct lock_class_key s_umount_key; struct lock_class_key s_vfs_rename_key; struct lock_class_key s_writers_key[SB_FREEZE_LEVELS]; struct lock_class_key i_lock_key; struct lock_class_key i_mutex_key; struct lock_class_key i_mutex_dir_key;};
 ```
 
-如struct file_system_type * next结构体成员，所有文件系统的file_system_type结构形成一个链表，在fs/filesystem.c中有一个全局的文件系统变量  
+如struct file_system_type * next结构体成员，所有文件系统的file_system_type结构形成一个链表，在fs/filesystem.c中有一个全局的文件系统变量
 
 ```c
 /* fs/filesystem.c*/static struct file_system_type *file_systems;
@@ -146,11 +141,7 @@ struct dentry *mount_fs(struct file_system_type *type, int flags, const 
 
 该函数表对sockfs文件系统的节点和目录提供了具体的操作函数，后面涉及到的sockfs文件系统的重要操作均会到该函数表中查找到对应的操作函数，例如Linux内核在创建socket节点时会查找sockfs_ops的alloc_inode函数， 从而调用sock_alloc_indode函数完成socket以及inode节点的创建。
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 END
 
@@ -164,9 +155,9 @@ END
 
 公众号
 
-点个关注，一起学技术！  
+点个关注，一起学技术！
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 您的点赞和关注是我最大的动力
 

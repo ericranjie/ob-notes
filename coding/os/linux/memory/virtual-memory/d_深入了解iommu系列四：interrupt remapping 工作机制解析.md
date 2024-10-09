@@ -1,10 +1,8 @@
-
 Linux阅码场
 
- _2022年03月17日 08:00_
+_2022年03月17日 08:00_
 
 以下文章来源于技不辱你 ，作者技不辱你
-
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6X3nOSmeyKczpEcnpyiazdQYGVoQaALq7sOIp186qibo5Q/0)
 
@@ -12,7 +10,7 @@ Linux阅码场
 
 一位虚拟化and软硬一体化从业者的技术随笔和工作感悟。
 
-](https://mp.weixin.qq.com/s?__biz=Mzg2OTc0ODAzMw==&mid=2247502890&idx=1&sn=334155d2f2454c3dfff07d40997eef76&source=41&key=daf9bdc5abc4e8d0c749c904211e41464adb984e6e34b57a3db3703075b07d44650eb7637be7a746d7d2a50471b77fe643f7a9d672d74df651c75a12869816200be94d90a01997a75cbe5977b1323dbca3cafefbd84a9e509b60f4683605b89ac614f3df340fd0416cf876fb7813cd4a2d44d8f87dc143426bb17ae44f952648&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ3P1YGhX1Yvtbx42NKdmfZBLmAQIE97dBBAEAAAAAAIrxOcUCW0cAAAAOpnltbLcz9gKNyK89dVj0hhCOl5PvDwe%2Fr6w%2FtoB62OLZgmBFT8R7SXYZ%2F2xYBMkjSnKO%2FmmAT1ICdgaiemR4u%2BJ1DGjTPrRRFFq4hgTodgPyQXYayOvAF0I2ed5xmKg7iWyKSUuTHyiB44y8IV1RJY9YDp1T5dZq0ZMqfvauUrFD8KMyacFfqdKkE1XRS06NNCUR%2F7RehOFAHxtAYlGo5Ds0FuOkg6ZiJb4vzUtoP9qSIJjoHIoaUj6%2BhGckUyGy7SJtr2MOeYlC6aj3o1XE&acctmode=0&pass_ticket=f%2FP0CGsAgFcc2n%2Bpdt%2BcVhlZhUULQAFh2llzkWAJ0ABuSTwCDI2Pnm89fRW5sxkI&wx_header=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247502890&idx=1&sn=334155d2f2454c3dfff07d40997eef76&source=41&key=daf9bdc5abc4e8d0c749c904211e41464adb984e6e34b57a3db3703075b07d44650eb7637be7a746d7d2a50471b77fe643f7a9d672d74df651c75a12869816200be94d90a01997a75cbe5977b1323dbca3cafefbd84a9e509b60f4683605b89ac614f3df340fd0416cf876fb7813cd4a2d44d8f87dc143426bb17ae44f952648&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ3P1YGhX1Yvtbx42NKdmfZBLmAQIE97dBBAEAAAAAAIrxOcUCW0cAAAAOpnltbLcz9gKNyK89dVj0hhCOl5PvDwe%2Fr6w%2FtoB62OLZgmBFT8R7SXYZ%2F2xYBMkjSnKO%2FmmAT1ICdgaiemR4u%2BJ1DGjTPrRRFFq4hgTodgPyQXYayOvAF0I2ed5xmKg7iWyKSUuTHyiB44y8IV1RJY9YDp1T5dZq0ZMqfvauUrFD8KMyacFfqdKkE1XRS06NNCUR%2F7RehOFAHxtAYlGo5Ds0FuOkg6ZiJb4vzUtoP9qSIJjoHIoaUj6%2BhGckUyGy7SJtr2MOeYlC6aj3o1XE&acctmode=0&pass_ticket=f%2FP0CGsAgFcc2n%2Bpdt%2BcVhlZhUULQAFh2llzkWAJ0ABuSTwCDI2Pnm89fRW5sxkI&wx_header=1#)
 
 ### 序言
 
@@ -38,26 +36,23 @@ Linux阅码场
 
 我们先看一下`msi_domain_alloc_irqs` 的调用链，然后再一一分析相关函数
 
- `msi_domain_alloc_irqs     ->msi_domain_prepare_irqs     ->__irq_domain_alloc_irqs     ->msi_check_reservation_mode     ....   //省略部分主要是有些分支判断这里先不list出来，后面涉及到的时候会具体介绍`
+`msi_domain_alloc_irqs     ->msi_domain_prepare_irqs     ->__irq_domain_alloc_irqs     ->msi_check_reservation_mode     ....   //省略部分主要是有些分支判断这里先不list出来，后面涉及到的时候会具体介绍`
 
 - msi_domain_prepare_irqs 调用`pci_msi_prepare` 函数做一些初始化的动作设置arg的type，msi_dev, cpumask等
-    
-- 接着遍历这个设备msi_list当中的所有的msi_desc，在调用`__irq_domain_alloc_irqs` 为其分配irq之前先调用`pci_msi_domain_set_desc->pci_msi_domain_calc_hwirq` 为每个msi_desc分配一个全局唯一的初始ID即hwirq(关于它的作用我们后面再说)，接着我们来看一下__irq_domain_alloc_irqs的核心逻辑。我们先看一下这个核心函数的基本调用链，然后我们再对相关的函数一一分析
-    
-      `__irq_domain_alloc_irqs      ->irq_domain_alloc_descs      ->irq_domain_alloc_irq_data      ->irq_domain_alloc_irqs_hierarchy      ->irq_domain_insert_irq`
-    
-            `for (i = 0; i < nr_irqs; i++) {               irq_data = irq_get_irq_data(virq + i);               irq_data->domain = domain;                  for (parent = domain->parent; parent; parent = parent->parent) {                       irq_data = irq_domain_insert_irq_data(parent, irq_data);                       if (!irq_data) {                               irq_domain_free_irq_data(virq, i + 1);                               return -ENOMEM;                       }               }       }`
-    
+
+- 接着遍历这个设备msi_list当中的所有的msi_desc，在调用`__irq_domain_alloc_irqs` 为其分配irq之前先调用`pci_msi_domain_set_desc->pci_msi_domain_calc_hwirq` 为每个msi_desc分配一个全局唯一的初始ID即hwirq(关于它的作用我们后面再说)，接着我们来看一下\_\_irq_domain_alloc_irqs的核心逻辑。我们先看一下这个核心函数的基本调用链，然后我们再对相关的函数一一分析
+
+  `__irq_domain_alloc_irqs      ->irq_domain_alloc_descs      ->irq_domain_alloc_irq_data      ->irq_domain_alloc_irqs_hierarchy      ->irq_domain_insert_irq`
+
+  `for (i = 0; i < nr_irqs; i++) {               irq_data = irq_get_irq_data(virq + i);               irq_data->domain = domain;                  for (parent = domain->parent; parent; parent = parent->parent) {                       irq_data = irq_domain_insert_irq_data(parent, irq_data);                       if (!irq_data) {                               irq_domain_free_irq_data(virq, i + 1);                               return -ENOMEM;                       }               }       }`
 
 - 首先调用 `irq_domain_alloc_descs` 分配irq_desc，其核心逻辑就是从 allocated_irqs这个bitmap里面分配未被使用的irq。
-    
+
 - 接着调用irq_domain_alloc_irq_data，为每个irq的irq_data->domain以及其为所属domain的父亲辈domain，爷爷辈domain 的irq_data作相关数据初始化，逻辑如下：
-    
 
 `static struct irq_data *irq_domain_insert_irq_data(struct irq_domain *domain,                                                      struct irq_data *child)   {           struct irq_data *irq_data;              irq_data = kzalloc_node(sizeof(*irq_data), GFP_KERNEL,                                   irq_data_get_node(child));           if (irq_data) {                   child->parent_data = irq_data;                   irq_data->irq = child->irq;                   irq_data->common = child->common;                   irq_data->domain = domain;           }              return irq_data;   }   `
 
 - 然后调用`irq_domain_alloc_irqs_hierarchy`函数，具体逻辑如下：
-    
 
 `int irq_domain_alloc_irqs_hierarchy(struct irq_domain *domain,                                       unsigned int irq_base,                                       unsigned int nr_irqs, void *arg)   {           return domain->ops->alloc(domain, irq_base, nr_irqs, arg);   }   `
 
@@ -68,30 +63,26 @@ Linux阅码场
 所以其调用的alloc的callback为msi_domain_alloc函数，我们再来看看其具体实现：
 
 - irq_find_mapping(domain, hwirq)，首先通过上面提到的hwirq来判断是否已经在该domain已经进行映射。
-    
+
 - irq_domain_alloc_irqs_parent，先将它parent domain的irq也分配出来。由于ir_msi_domain的父domain为ir_domain其irq_domain_os为`inel_ir_domain_ops`其alloc为`intel_irq_remapping_alloc` 这个函数为中断remapping功能的核心所在，因此我们来仔细看一下这个函数：
-    
 
 - 首先还是继续调用irq_domain_alloc_irqs_parent，而ir_domain的父domain为x86_vector_domain。而`x86_vector_domain`的`alloc` callback函数的核心逻辑就是给相应的irq分配相关cpu lapic 上的中断vector，如果你在alloc_irq的时候指定了irq affinity的cpu_mask则直接从这些cpu的lapic当中分配；如果你没有指定则在系统所有的cpu当中找到合适的cpu lapic然后只是先reserve vector等到irq active的时候才真正去分配。这里面有三个概念一个是irq，一个是hwirq，还有一个就是vector，大家可能有点晕他们之间到底是什么关系？系统通过irq来找到irq_desc和irq_data，hwirq和irq在一个中断domain里面是一一映射的关系，然后vector是lapic最终能识别的东西也是irte表里面的最终要写入的中断number。
-    
+
 - 接着调用alloc_irte函数去分配irte，其核心逻辑就是从上文所说的bitmap当中找到nvec个可用的interrupt remapping entry，同时返回开始位置即初始index
-    
+
 - 接着为每个irq准备irte表即设置subhandle, index，还有就是上文提到irte中的其他field，最后就是设置msi or msi-x信息格式。
-    
 
 - 回到`msi_domain_alloc`函数，接着通过一个loop对irq所对应的irq_data相关信息做初始化
-    
 
-        `for (i = 0; i < nr_irqs; i++) {             //msi_init为msi_domain_ops_init                   ret = ops->msi_init(domain, info, virq + i, hwirq + i, arg);                   if (ret < 0) {                           if (ops->msi_free) {                                   for (i--; i > 0; i--)                                           ops->msi_free(domain, info, virq + i);                           }                           irq_domain_free_irqs_top(domain, virq, nr_irqs);                           return ret;                   }           }`
+`for (i = 0; i < nr_irqs; i++) {             //msi_init为msi_domain_ops_init                   ret = ops->msi_init(domain, info, virq + i, hwirq + i, arg);                   if (ret < 0) {                           if (ops->msi_free) {                                   for (i--; i > 0; i--)                                           ops->msi_free(domain, info, virq + i);                           }                           irq_domain_free_irqs_top(domain, virq, nr_irqs);                           return ret;                   }           }`
 
 这里的`msi_domain_ops_init` 主要调用的函数如下
 
-`msi_domain_ops_init    -> irq_domain_set_hwirq_and_chip //设置irq_data当中的hwirq，chip, chip_data    ->__irq_set_handler     //如果msi_domain_info初始化了handler则进行设置    ->irq_set_handler_data //如果msi_domain_info初始化了handler_data则进行设置          handler and hanadler_data的具体情况如下    ================================       static struct msi_domain_info pci_msi_ir_domain_info = {           .flags          = MSI_FLAG_USE_DEF_DOM_OPS | MSI_FLAG_USE_DEF_CHIP_OPS |                             MSI_FLAG_MULTI_PCI_MSI | MSI_FLAG_PCI_MSIX,           .ops            = &pci_msi_domain_ops,           .chip           = &pci_msi_ir_controller,           .handler        = handle_edge_irq,           .handler_name   = "edge",   };` 
+`msi_domain_ops_init    -> irq_domain_set_hwirq_and_chip //设置irq_data当中的hwirq，chip, chip_data    ->__irq_set_handler     //如果msi_domain_info初始化了handler则进行设置    ->irq_set_handler_data //如果msi_domain_info初始化了handler_data则进行设置          handler and hanadler_data的具体情况如下    ================================       static struct msi_domain_info pci_msi_ir_domain_info = {           .flags          = MSI_FLAG_USE_DEF_DOM_OPS | MSI_FLAG_USE_DEF_CHIP_OPS |                             MSI_FLAG_MULTI_PCI_MSI | MSI_FLAG_PCI_MSIX,           .ops            = &pci_msi_domain_ops,           .chip           = &pci_msi_ir_controller,           .handler        = handle_edge_irq,           .handler_name   = "edge",   };`
 
 - 分析完`msi_domain_alloc` ，至此`irq_domain_alloc_irqs_hierarchy`的逻辑基本看完了，之后接着往下看。
-    
 
-        `for (i = 0; i < nr_irqs; i++)                   irq_domain_insert_irq(virq + i);`
+`for (i = 0; i < nr_irqs; i++)                   irq_domain_insert_irq(virq + i);`
 
 `irq_domain_insert_irq`的核心逻辑就是完成virq跟hwirq在不同层级的irq domain中的mapping。
 
@@ -101,7 +92,7 @@ Linux阅码场
 
 接着往下看
 
-        `for_each_msi_entry(desc, dev) {                   virq = desc->irq;                   if (desc->nvec_used == 1)                           dev_dbg(dev, "irq %d for MSI\n", virq);                   else                           dev_dbg(dev, "irq [%d-%d] for MSI\n",                                   virq, virq + desc->nvec_used - 1);                   /*                    * This flag is set by the PCI layer as we need to activate                    * the MSI entries before the PCI layer enables MSI in the                    * card. Otherwise the card latches a random msi message.                    */        //在创建ir_msi_domain的时候这个flag会被置上                   if (!(info->flags & MSI_FLAG_ACTIVATE_EARLY))                           continue;                      irq_data = irq_domain_get_irq_data(domain, desc->irq);                   if (!can_reserve)                           irqd_clr_can_reserve(irq_data);                   ret = irq_domain_activate_irq(irq_data, can_reserve);                   if (ret)                           goto cleanup;           }`
+`for_each_msi_entry(desc, dev) {                   virq = desc->irq;                   if (desc->nvec_used == 1)                           dev_dbg(dev, "irq %d for MSI\n", virq);                   else                           dev_dbg(dev, "irq [%d-%d] for MSI\n",                                   virq, virq + desc->nvec_used - 1);                   /*                    * This flag is set by the PCI layer as we need to activate                    * the MSI entries before the PCI layer enables MSI in the                    * card. Otherwise the card latches a random msi message.                    */        //在创建ir_msi_domain的时候这个flag会被置上                   if (!(info->flags & MSI_FLAG_ACTIVATE_EARLY))                           continue;                      irq_data = irq_domain_get_irq_data(domain, desc->irq);                   if (!can_reserve)                           irqd_clr_can_reserve(irq_data);                   ret = irq_domain_activate_irq(irq_data, can_reserve);                   if (ret)                           goto cleanup;           }`
 
 上面的核心逻辑在`irq_domain_activate_irq(irq_data, can_reserve)` ，它最终会调到函数`__irq_domain_activate_irq` 它的具体逻辑如下：
 
@@ -127,7 +118,7 @@ Linux阅码场
 
 核心就是通过irq_chip_wirte_msi_msg将msi or msix msg写入到pcie设备的msi cap 的vector table里面。
 
-                `writel(msg->address_lo, base + PCI_MSIX_ENTRY_LOWER_ADDR);                   writel(msg->address_hi, base + PCI_MSIX_ENTRY_UPPER_ADDR);                   writel(msg->data, base + PCI_MSIX_ENTRY_DATA);`
+`writel(msg->address_lo, base + PCI_MSIX_ENTRY_LOWER_ADDR);                   writel(msg->address_hi, base + PCI_MSIX_ENTRY_UPPER_ADDR);                   writel(msg->data, base + PCI_MSIX_ENTRY_DATA);`
 
 至此已经完成了irq的整个分配流程，上面还有一个遗留的问题那就是每个irq所对应的vector并没有真正去分配，那具体什么时候去分配的呢？答案就是在request_irq的时候去分配的，同时会再次调用每个domain的activate函数。
 
@@ -149,7 +140,7 @@ Linux阅码场
 
 注意由于这个时刻vector还是mask状态，所以只会更新后端msix_table的信息。后下面的逻辑当中要与后端进行交互的逻辑如下：
 
-        `/*            * Some devices require MSI-X to be enabled before we can touch the            * MSI-X registers.  We need to mask all the vectors to prevent            * interrupts coming in before they're fully set up.            */           pci_msix_clear_and_set_ctrl(dev, 0,                                   PCI_MSIX_FLAGS_MASKALL | PCI_MSIX_FLAGS_ENABLE);              msix_program_entries(dev, entries);          ...... //略去          pci_msix_clear_and_set_ctrl(dev, PCI_MSIX_FLAGS_MASKALL, 0);`  
+`/*            * Some devices require MSI-X to be enabled before we can touch the            * MSI-X registers.  We need to mask all the vectors to prevent            * interrupts coming in before they're fully set up.            */           pci_msix_clear_and_set_ctrl(dev, 0,                                   PCI_MSIX_FLAGS_MASKALL | PCI_MSIX_FLAGS_ENABLE);              msix_program_entries(dev, entries);          ...... //略去          pci_msix_clear_and_set_ctrl(dev, PCI_MSIX_FLAGS_MASKALL, 0);`
 
 上面的逻辑当中`pci_msix_clear_and_set_ctrl` 这个函数主要是写设备的config_space相对应的后端处理函数为`vfio_pci_write_config`下面截取一下其核心的实现进行相关的分析：
 
@@ -168,15 +159,14 @@ Linux阅码场
 `msix_vector_use_notifier` 调用的callback为`vfio_msix_vector_use`其最终调用的函数为`vfio_msix_vector_do_use` 。下面我们着重看一下这个函数的具体逻辑是什么
 
 - 首先为该vector的interrupt EventNotifier初始化eventfd，然后为这个fd设置handler函数为`vfio_msi_interrupt`
-    
+
 - 接着调用`vfio_add_kvm_msi_virq` ，这个函数里面首先为vector的kvm_interrupt 这个EventNotifier初始化eventfd；接着调用`kvm_irqchip_add_msi_route`在这个函数里面首先在used_gsi_bitmap里找到一个可用的virq，接着为这个vector创建 `kvm_irq_routing_entry`其核心逻辑就是在kvm_state的irq_routes增加一个新的entry，同时把used_gsi_bitmap给更新掉；接着调用`kvm_arch_add_msi_route_post` ，这个函数里面会新建一个`MSIRouteEntry`，然后将其加到全局的`msi_route_list`里面。最后通过`kvm_irqchip_commit_routes`通过`KVM_SET_GSI_ROUTING` 这个ioctl来设置irq routing(注意这里qemu会把kvm_state->irq_routes作为一个整体来提交)，具体的逻辑我们需要到kvm里面看一下相关的逻辑。
-    
-    `setup_routing_entry->kvm_set_routing_entry   `
-    
-    其核心逻辑就是将qemu侧的routing entry 添加到`kvm->irq_routing` 这个irq路由表里面，然后不同类型的路由其对应的表项也是不同的，比如在msi or msix的情况下表项是这样的
-    
-      `e->set = kvm_set_msi; //具体的中断delivery 函数     e->msi.address_lo = ue->u.msi.address_lo;     e->msi.address_hi = ue->u.msi.address_hi;     e->msi.data = ue->u.msi.data;`
-    
+
+  `setup_routing_entry->kvm_set_routing_entry   `
+
+  其核心逻辑就是将qemu侧的routing entry 添加到`kvm->irq_routing` 这个irq路由表里面，然后不同类型的路由其对应的表项也是不同的，比如在msi or msix的情况下表项是这样的
+
+  `e->set = kvm_set_msi; //具体的中断delivery 函数     e->msi.address_lo = ue->u.msi.address_lo;     e->msi.address_hi = ue->u.msi.address_hi;     e->msi.data = ue->u.msi.data;`
 
 然后再回到`vfio_add_kvm_msi_virq` 函数接着调用`kvm_irqchip_add_irqfd_notifier_gsi` 在kvm侧添加irqfd
 
@@ -197,15 +187,14 @@ Linux阅码场
 具体的函数实现我这里就不贴出来了，其主要做的事情有
 
 1. 释放irq bypass 相关数据结构，释放eventfd等
-    
-2. `pci_free_irq_vectors`  disable掉msix，释放为这个设备申请的irq
-    
-3. 将num_ctx清0 然后设置irq_type为`VFIO_PCI_NUM_IRQS`
-    
+
+1. `pci_free_irq_vectors`  disable掉msix，释放为这个设备申请的irq
+
+1. 将num_ctx清0 然后设置irq_type为`VFIO_PCI_NUM_IRQS`
 
 调完disable函数之后，qemu里面紧接着调用`vfio_enable_vectors`，我们把这个函数的重点部分解析一下，首先创建一个irq_set
 
- `struct vfio_irq_set *irq_set;    ........    irq_set = g_malloc0(argsz);       irq_set->argsz = argsz;       irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER;       irq_set->index = msix ? VFIO_PCI_MSIX_IRQ_INDEX : VFIO_PCI_MSI_IRQ_INDEX;       irq_set->start = 0;       irq_set->count = vdev->nr_vectors;       fds = (int32_t *)&irq_set->data;`
+`struct vfio_irq_set *irq_set;    ........    irq_set = g_malloc0(argsz);       irq_set->argsz = argsz;       irq_set->flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER;       irq_set->index = msix ? VFIO_PCI_MSIX_IRQ_INDEX : VFIO_PCI_MSI_IRQ_INDEX;       irq_set->start = 0;       irq_set->count = vdev->nr_vectors;       fds = (int32_t *)&irq_set->data;`
 
 然后接着将目前为止将要和已经enable的vector的fd (每个vector的kvm_interrupt eventfd) 全部添加到fds，接着调用ioctl `VFIO_DEVICE_SET_IRQS` call到vfio，我们接着看vfio当中这一块的逻辑
 

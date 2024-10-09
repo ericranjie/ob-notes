@@ -1,8 +1,6 @@
-
-
 原创 往事敬秋风 深度Linux
 
- _2024年04月17日 13:46_ _湖南_
+_2024年04月17日 13:46_ _湖南_
 
 在C++中实现无锁队列是一个复杂的任务，因为无锁编程涉及到复杂的内存操作和同步机制，需要深入理解并发编程和硬件级别的原子操作。无锁队列的优势在于高并发场景下可以提供更好的性能，因为它避免了传统锁机制带来的线程竞争和上下文切换开销。
 
@@ -29,16 +27,14 @@ C++无锁队列是一种多线程编程技术，它可以在不使用锁的情�
 **优点：**
 
 - 提供了更好的并发性能，避免了互斥操作带来的性能瓶颈。
-    
+
 - 对于高度竞争情况下可以提供更好的可伸缩性。
-    
 
 **缺点：**
 
 - 实现相对复杂，需要考虑并发安全和正确性问题。
-    
+
 - 在高度竞争的情况下可能出现自旋等待导致的性能损失。
-    
 
 ## 二、无锁队列原理
 
@@ -58,19 +54,19 @@ C++无锁队列是一种多线程编程技术，它可以在不使用锁的情�
 
 （1）单生产者——单消费者
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 （2）多生产者——单消费者
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 （3）单生产者——多消费者
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 （4）多生产者——多消费者
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 2.2CAS操作
 
@@ -105,19 +101,18 @@ template< class T >bool atomic_compare_exchange_weak( std::atomic* obj,T* expect
 其它原子操作如下：
 
 - Fetch-And-Add：一般用来对变量做+1的原子操作
-    
+
 - Test-and-set：写值到某个内存位置并传回其旧值
-    
 
 ### 2.3队列数据定长与变长
 
 （1）队列数据定长
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 （2）队列数据变长
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 三、无锁队列方案
 
@@ -126,11 +121,10 @@ template< class T >bool atomic_compare_exchange_weak( std::atomic* obj,T* expect
 boost提供了三种无锁方案，分别适用不同使用场景。
 
 - boost::lockfree::queue是支持多个生产者和多个消费者线程的无锁队列。
-    
+
 - boost::lockfree::stack是支持多个生产者和多个消费者线程的无锁栈。
-    
+
 - boost::lockfree::spsc_queue是仅支持单个生产者和单个消费者线程的无锁队列，比boost::lockfree::queue性能更好。
-    
 
 Boost无锁数据结构的API通过轻量级原子锁实现lock-free，不是真正意义的无锁。
 
@@ -147,11 +141,10 @@ ConcurrentQueue是基于C++实现的工业级无锁队列方案。GitHub：https
 ConcurrentQueue具有以下特点：
 
 - 线程安全：多个线程可以同时对队列进行操作而无需额外加锁。
-    
+
 - 无阻塞：入队和出队操作通常是非阻塞的，并且具有较低的开销。
-    
+
 - 先进先出（FIFO）顺序：元素按照插入顺序排列，在出队时会返回最早入队的元素。
-    
 
 使用ConcurrentQueue可以方便地处理多个线程之间共享数据，并减少由于加锁引起的性能开销。但需要注意，虽然ConcurrentQueue提供了高效、线程安全的并发操作，但在某些特定情况下可能不适合所有应用场景，因此在选择数据结构时需要根据具体需求进行评估。
 
@@ -168,13 +161,12 @@ Disruptor是英国外汇交易公司LMAX基于JAVA开发的一个高性能队列
 主要特点如下：
 
 - 无锁设计：Disruptor使用CAS（Compare-and-Swap）等无锁算法来避免使用传统锁带来的竞争和阻塞。
-    
+
 - 高吞吐量：Disruptor利用环形缓冲区和预分配内存等技术，在保证正确性前提下追求尽可能高的处理速度。
-    
+
 - 低延迟：由于无锁设计和紧凑的内存布局，Disruptor能够实现非常低的消息处理延迟。
-    
+
 - 线程间协调：Disruptor提供了灵活而强大的事件发布、消费者等待及触发机制，可用于实现复杂的线程间通信模式。
-    
 
 使用Disruptor可以有效地解决生产者-消费者模型中数据传递过程中的性能瓶颈，特别适用于高并发、低延迟的应用场景，例如金融交易系统、消息队列等。然而，由于Disruptor对编程模型和理解要求较高，使用时需要仔细考虑，并根据具体需求评估是否适合。
 
@@ -187,9 +179,8 @@ RingBuffer是生产者和消费者模型中常用的数据结构，生产者将�
 如果只有一个生产者和一个消费者，环形缓冲区可以无锁访问，环形缓冲区的写入index只允许生产者访问并修改，只要生产者在更新index前将新的值保存到缓冲区中，则消费者将始终看到一致的数据结构；读取index也只允许消费者访问并修改，消费者只要在取走数据后更新读index，则生产者将始终看到一致的数据结构。
 
 - 空队列时，front与rear相等；当有元素进队，则rear后移；有元素出队，则front后移。
-    
+
 - 空队列时，rear等于front；满队列时，队列尾部空一个位置，因此判断循环队列满时使用(rear-front+maxn)%maxn。
-    
 
 入队操作：
 
@@ -210,9 +201,8 @@ x = data[front];front = (front+1)%maxn;
 线程对write_index和read_index的读写操作如下：
 
 - （1）写操作。先判断队列时否为满，如果队列未满，则先写数据，写完数据后再修改write_index。
-    
+
 - （2）读操作。先判断队列是否为空，如果队列不为空，则先读数据，读完再修改read_index。
-    
 
 多生产者单消费者
 
@@ -247,8 +237,6 @@ LockFreeQueue.hpp:
 ```
 #include <stdio.h>#include <stdlib.h>#include <string.h>#include <unistd.h>#include <fcntl.h>#include <stdbool.h>#include <sys/stat.h>#include <sys/types.h>#include <sys/time.h>#include <sys/mman.h> #define SHM_NAME_LEN 128#define MIN(a, b) ((a) > (b) ? (b) : (a))#define IS_POT(x) ((x) && !((x) & ((x)-1)))#define MEMORY_BARRIER __sync_synchronize() template <class T>class LockFreeQueue{protected:    typedef struct    {        int m_lock;        inline void spinlock_init()        {            m_lock = 0;        }         inline void spinlock_lock()        {            while(!__sync_bool_compare_and_swap(&m_lock, 0, 1)) {}        }         inline void spinlock_unlock()        {            __sync_lock_release(&m_lock);        }    } spinlock_t; public:    // size:队列大小    // name:共享内存key的路径名称，默认为NULL，使用数组作为底层缓冲区。    LockFreeQueue(unsigned int size, const char* name = NULL)    {        memset(shm_name, 0, sizeof(shm_name));        createQueue(name, size);    }     ~LockFreeQueue()    {        if(shm_name[0] == 0)        {            delete [] m_buffer;            m_buffer = NULL;        }        else        {            if (munmap(m_buffer, m_size * sizeof(T)) == -1) {                perror("munmap");            }            if (shm_unlink(shm_name) == -1) {                perror("shm_unlink");            }        }    }     bool isFull()const    {#ifdef USE_POT        return m_head == (m_tail + 1) & (m_size - 1);#else        return m_head == (m_tail + 1) % m_size;#endif    }     bool isEmpty()const    {        return m_head == m_tail;    }     unsigned int front()const    {        return m_head;    }     unsigned int tail()const    {        return m_tail;    }     bool push(const T& value)    {#ifdef USE_LOCK        m_spinLock.spinlock_lock();#endif        if(isFull())        {#ifdef USE_LOCK            m_spinLock.spinlock_unlock();#endif            return false;        }        memcpy(m_buffer + m_tail, &value, sizeof(T));#ifdef USE_MB        MEMORY_BARRIER;#endif #ifdef USE_POT        m_tail = (m_tail + 1) & (m_size - 1);#else        m_tail = (m_tail + 1) % m_size;#endif #ifdef USE_LOCK        m_spinLock.spinlock_unlock();#endif        return true;    }     bool pop(T& value)    {#ifdef USE_LOCK        m_spinLock.spinlock_lock();#endif        if (isEmpty())        {#ifdef USE_LOCK            m_spinLock.spinlock_unlock();#endif            return false;        }        memcpy(&value, m_buffer + m_head, sizeof(T));#ifdef USE_MB        MEMORY_BARRIER;#endif #ifdef USE_POT        m_head = (m_head + 1) & (m_size - 1);#else        m_head = (m_head + 1) % m_size;#endif #ifdef USE_LOCK        m_spinLock.spinlock_unlock();#endif        return true;    } protected:    virtual void createQueue(const char* name, unsigned int size)    {#ifdef USE_POT        if (!IS_POT(size))        {            size = roundup_pow_of_two(size);        }#endif        m_size = size;        m_head = m_tail = 0;        if(name == NULL)        {            m_buffer = new T[m_size];        }        else        {            int shm_fd = shm_open(name, O_CREAT | O_RDWR, 0666);            if (shm_fd < 0)            {                perror("shm_open");            }             if (ftruncate(shm_fd, m_size * sizeof(T)) < 0)            {                perror("ftruncate");                close(shm_fd);            }             void *addr = mmap(0, m_size * sizeof(T), PROT_READ | PROT_WRITE, MAP_SHARED, shm_fd, 0);            if (addr == MAP_FAILED)            {                perror("mmap");                close(shm_fd);            }            if (close(shm_fd) == -1)            {                perror("close");                exit(1);            }             m_buffer = static_cast<T*>(addr);            memcpy(shm_name, name, SHM_NAME_LEN - 1);        }#ifdef USE_LOCK    spinlock_init(m_lock);#endif    }    inline unsigned int roundup_pow_of_two(size_t size)    {        size |= size >> 1;        size |= size >> 2;        size |= size >> 4;        size |= size >> 8;        size |= size >> 16;        size |= size >> 32;        return size + 1;    }protected:    char shm_name[SHM_NAME_LEN];    volatile unsigned int m_head;    volatile unsigned int m_tail;    unsigned int m_size;#ifdef USE_LOCK    spinlock_t m_spinLock;#endif    T* m_buffer;};
 ```
-
-  
 
 ```
 #define USE_LOCK开启spinlock锁，多生产者多消费者场景#define USE_MB开启Memory Barrier#define USE_POT开启队列大小的2的幂对齐
@@ -290,16 +278,15 @@ kfifo代码既然肩负着这么多特性，那我们先一敝它的代码：
 struct kfifo {    unsigned char *buffer;    /* the buffer holding the data */    unsigned int size;    /* the size of the allocated buffer */    unsigned int in;    /* data is added at offset (in % size) */    unsigned int out;    /* data is extracted from off. (out % size) */    spinlock_t *lock;    /* protects concurrent modifications */};
 ```
 
-这是kfifo的数据结构，kfifo主要提供了两个操作，__kfifo_put(入队操作)和__kfifo_get(出队操作)。 它的各个数据成员如下：
+这是kfifo的数据结构，kfifo主要提供了两个操作，\_\_kfifo_put(入队操作)和\_\_kfifo_get(出队操作)。 它的各个数据成员如下：
 
 - buffer: 用于存放数据的缓存
-    
+
 - size: buffer空间的大小，在初化时，将它向上扩展成2的幂（如5，向上扩展 与它最接近的值且是2的n次方的值是2^3，即8)
-    
+
 - lock: 如果使用不能保证任何时间最多只有一个读线程和写线程，需要使用该lock实施同步。
-    
+
 - in, out: 和buffer一起构成一个循环队列。 in指向buffer中队头，而且out指向buffer中的队尾
-    
 
 它的结构如示图如下：
 
@@ -314,9 +301,8 @@ struct kfifo {    unsigned char *buffer;    /* the buffer holding the data */   
 kfifo提供如下对外功能规格
 
 - 只支持一个读者和一个读者并发操作
-    
+
 - 无阻塞的读写操作，如果空间不够，则返回实际访问空间
-    
 
 (1)kfifo_alloc 分配kfifo内存和初始化工作
 
@@ -332,13 +318,13 @@ kfifo->in % kfifo->size 可以转化为 kfifo->in & (kfifo->size – 1)
 
 在kfifo_alloc函数中，使用size & (size – 1)来判断size 是否为2幂，如果条件为真，则表示size不是2的幂，然后调用roundup_pow_of_two将之向上扩展为2的幂。
 
-这都是常用的技巧，只不过大家没有将它们结合起来使用而已，下面要分析的__kfifo_put和__kfifo_get则是将kfifo->size的特点发挥到了极致。
+这都是常用的技巧，只不过大家没有将它们结合起来使用而已，下面要分析的\_\_kfifo_put和\_\_kfifo_get则是将kfifo->size的特点发挥到了极致。
 
-(2)__kfifo_put和__kfifo_get巧妙的入队和出队
+(2)\_\_kfifo_put和\_\_kfifo_get巧妙的入队和出队
 
-__kfifo_put是入队操作，它先将数据放入buffer里面，最后才修改in参数；__kfifo_get是出队操作，它先将数据从buffer中移走，最后才修改out。（确保即使in和out修改失败，也可以再来一遍）
+\_\_kfifo_put是入队操作，它先将数据放入buffer里面，最后才修改in参数；\_\_kfifo_get是出队操作，它先将数据从buffer中移走，最后才修改out。（确保即使in和out修改失败，也可以再来一遍）
 
-你会发现in和out两者各司其职。下面是__kfifo_put和__kfifo_get的代码
+你会发现in和out两者各司其职。下面是\_\_kfifo_put和\_\_kfifo_get的代码
 
 ```
 unsigned int __kfifo_put(struct kfifo *fifo,             unsigned char *buffer, unsigned int len){    unsigned int l;     len = min(len, fifo->size - fifo->in + fifo->out);    /*     * Ensure that we sample the fifo->out index -before- we     * start putting bytes into the kfifo.     */    smp_mb();     /* first put the data starting from fifo->in to buffer end */    l = min(len, fifo->size - (fifo->in & (fifo->size - 1)));    memcpy(fifo->buffer + (fifo->in & (fifo->size - 1)), buffer, l);     /* then put the rest (if any) at the beginning of the buffer */    memcpy(fifo->buffer, buffer + l, len - l);     /*     * Ensure that we add the bytes to the kfifo -before-     * we update the fifo->in index.     */     smp_wmb();     fifo->in += len;     return len;}
@@ -358,7 +344,7 @@ l = kfifo可写空间和预期写入空间的最小值
 
 (3)使用min宏来代if-else分支
 
-__kfifo_get也应用了同样技巧，代码如下：
+\_\_kfifo_get也应用了同样技巧，代码如下：
 
 ```
 unsigned int __kfifo_get(struct kfifo *fifo,             unsigned char *buffer, unsigned int len){    unsigned int l;     len = min(len, fifo->in - fifo->out);    /*     * Ensure that we sample the fifo->in index -before- we     * start removing bytes from the kfifo.     */    smp_rmb();     /* first get the data from fifo->out until the end of the buffer */    l = min(len, fifo->size - (fifo->out & (fifo->size - 1)));    memcpy(buffer, fifo->buffer + (fifo->out & (fifo->size - 1)), l);     /* then get the rest (if any) from the beginning of the buffer */    memcpy(buffer + l, fifo->buffer, len - l);     /*     * Ensure that we remove the bytes from the kfifo -before-     * we update the fifo->out index.     */     smp_mb();     fifo->out += len;     return len;}
@@ -396,8 +382,8 @@ kfifo->in % size + len > size
                                                     kfifo_put（写）空间开始地址                                                    |                                                   \_/                                                    |XXXXXXXXXXXXXXXXXX|                                                    +--------------------------------------------------------------+|                        |<----------data---------->|          |+--------------------------------------------------------------+                         ^                          ^          ^                         |                          |          |                       out%size                   in%size     size        ^        |      写空间结束地址                      
 ```
 
-第一块当然是: [kfifo->in % kfifo->size, kfifo->size]  
-第二块当然是：[0, len - (kfifo->size - kfifo->in % kfifo->size)]
+第一块当然是: \[kfifo->in % kfifo->size, kfifo->size\]\
+第二块当然是：\[0, len - (kfifo->size - kfifo->in % kfifo->size)\]
 
 下面是代码，细细体味吧：
 
@@ -458,55 +444,50 @@ spin_lock_irqsave是基于spin_lock_irq实现的一个辅助接口，在进入�
 如果自旋锁在中断处理函数中被用到，在获取自旋锁前需要关闭本地中断，spin_lock_irqsave实现如下：
 
 - A、保存本地中断状态；
-    
+
 - B、关闭本地中断；
-    
+
 - C、获取自旋锁。
-    
 
 解锁时通过 spin_unlock_irqrestore完成释放锁、恢复本地中断到原来状态等工作。
 
 （3）线性代码结构
 
-代码中没有任何if-else分支来判断是否有足够的空间存放数据，kfifo每次入队或出队只是简单的 +len 判断剩余空间，并没有对kfifo->size 进行取模运算，所以kfifo->in和kfifo->out总是一直增大，直到unsigned in超过最大值时绕回到0这一起始端，但始终满足：kfifo->in - kfifo->out <= kfifo->size。
+代码中没有任何if-else分支来判断是否有足够的空间存放数据，kfifo每次入队或出队只是简单的 +len 判断剩余空间，并没有对kfifo->size 进行取模运算，所以kfifo->in和kfifo->out总是一直增大，直到unsigned in超过最大值时绕回到0这一起始端，但始终满足：kfifo->in - kfifo->out \<= kfifo->size。
 
 （4）使用Memory Barrier
 
 - mb()：适用于多处理器和单处理器的内存屏障。
-    
+
 - rmb()：适用于多处理器和单处理器的读内存屏障。
-    
+
 - wmb()：适用于多处理器和单处理器的写内存屏障。
-    
+
 - smp_mb()：适用于多处理器的内存屏障。
-    
+
 - smp_rmb()：适用于多处理器的读内存屏障。
-    
+
 - smp_wmb()：适用于多处理器的写内存屏障。
-    
 
 Memory Barrier使用场景如下：
 
 - A、实现同步原语（synchronization primitives）
-    
+
 - B、实现无锁数据结构（lock-free data structures）
-    
+
 - C、驱动程序
-    
 
 程序在运行时内存实际访问顺序和程序代码编写的访问顺序不一定一致，即内存乱序访问。内存乱序访问行为出现是为了提升程序运行时的性能。内存乱序访问主要发生在两个阶段：
 
 - A、编译时，编译器优化导致内存乱序访问（指令重排）。
-    
+
 - B、运行时，多CPU间交互引起内存乱序访问。
-    
 
 Memory Barrier能够让CPU或编译器在内存访问上有序。Memory barrier前的内存访问操作必定先于其后的完成。Memory Barrier包括两类：
 
 - A、编译器Memory Barrier。
-    
+
 - B、CPU Memory Barrier。
-    
 
 通常，编译器和CPU引起内存乱序访问不会带来问题，但如果程序逻辑的正确性依赖于内存访问顺序，内存乱序访问会带来逻辑上的错误。
 
@@ -516,11 +497,11 @@ Memory Barrier能够让CPU或编译器在内存访问上有序。Memory barrier�
 
 2023年往期回顾
 
-[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)  
+[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)
 
-[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)  
+[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)
 
-[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)  
+[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)
 
 [存储全栈开发：构建高效的数据存储系统](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487696&idx=1&sn=b5ebe830ddb6798ac5bf6db4a8d5d075&chksm=cfb959b9f8ced0af76710c070a6db2677fb359af735e79c6378e82ead570aa1ce5350a146793&scene=21#wechat_redirect)
 

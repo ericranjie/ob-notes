@@ -1,10 +1,10 @@
 原创 往事敬秋风 深度Linux
- _2024年04月29日 21:04_ _湖南_
+_2024年04月29日 21:04_ _湖南_
 
 内存分页机制是一种操作系统的内存管理技术，将进程的虚拟内存空间划分为固定大小的页面，并在需要时将其映射到物理内存中。操作系统会将辅助存储器（通常是磁盘）中的数据分区成固定大小的区块，称为“页”。当不需要时，将分页由主存（通常是内存）移到辅助存储器；当需要时，再将数据取回，加载主存中。相对于分段，分页允许存储器存储于不连续的区块以维持文件系统的整齐。分页是磁盘和内存间传输数据块的最小单位。
 
-
 分页/虚拟内存能有助“大大地”降低整体及额外非必要的 I/O 次数，提高系统整体运作性能。因为这能有助提高 RAM 的读取命中率，也透过其内部的高效率算法来达到 I/O 数据流的预缓存工作，通过与之相关的等等手段也能很好地提高了 CPU 的使用效率，而拥有大物理内存的用户更可能考虑利用如Ramdisk、Supercache、SoftPerfect RAM Disk等模拟出硬盘分区来同时将虚拟内存/系统临时文件等设置其上以进一步加强系统性能，及达至保障硬盘的措施。分页是虚拟内存技术中的重要部分。
+
 # 一、分页机制介绍
 
 ## (1) 什么是分页机制
@@ -19,7 +19,7 @@
 
 - 当 CR0.PG = 0 时，未开启分页，线性地址等同于物理地址；
 - 当 CR0.PG = 1 时，开启分页。
-    
+
 (3)分页机制线性地址到物理地址转换过程
 
 80x86使用 4K 字节固定大小的页面，每个页面均是 4KB，并且对其于 4K 地址边界处。这表示分页机制把 2^32字节(4GB)的线性地址空间划分成 2^20(1M = 1048576)个页面。分页机制通过把线性地址空间中的页面重新定位到物理地址空间中进行操作。由于 4K 大小的页面作为一个单元进行映射，并且对其于 4K 边界，因此线性地址的低 12 位可做为页内偏移地量直接作为物理地址的低 12 位。分页机制执行的重定向功能可以看作是把线性地址的高 20 位转换到对应物理地址的高 20 位。
@@ -57,6 +57,7 @@
 - 每一个页表项指向一个页框。
 
 因此线性地址因此被分成五个部分，而每一部分的大小与具体的计算机体系结构有关。
+
 ### 1.2不同架构的分页机制
 
 > 对于不同的体系结构，Linux采用的四级页表目录的大小有所不同：对于i386而言，仅采用二级页表，即页上层目录和页中层目录长度为0；对于启用PAE的i386，采用了三级页表，即页上层目录长度为0；对于64位体系结构，可以采用三级或四级页表，具体选择由硬件决定。
@@ -78,6 +79,7 @@
 每一个进程有它自己的页全局目录和自己的页表集。当发生进程切换时，Linux把cr3控制寄存器的内容保存在前一个执行进程的描述符中，然后把下一个要执行进程的描述符的值装入cr3寄存器中。因此，当新进程重新开始在CPU上执行时，分页单元指向一组正确的页表。
 
 把线性地址映射到物理地址虽然有点复杂，但现在已经成了一种机械式的任务。
+
 ## 二、linux中页表处理数据结构
 
 分页转换功能由驻留在内存中的表来描述，该表称为页表，存放在物理地址空间中。页表可以看作是简单的 2^20 物理地址数组。线性到物理地址的映射功能可以简单地看作进行数组查找。线性地址的高 20 位构成这个数组的索引值，用于选择对应页面的物理（基）地址。线性地址的低 12 位给出了页面中的偏移量，加上页面的基地址最终形成对应的物理地址。由于页面基地址对齐在 4K 边界上，因此页面基地址的低 12 为肯定是 0 ，这意味着 高 20 位的页面基地址 和 12 位偏移地址连接组合在一起就能得到对应的物理地址。
@@ -103,7 +105,7 @@ pgprot_t是另一个64位（PAE激活时）或32位（PAE禁用时）的数据�
 ```c
 #ifndef __ASSEMBLY__#include <linux/types.h>/* * These are used to make use of C type-checking.. */typedef unsigned long   pteval_t;typedef unsigned long   pmdval_t;typedef unsigned long   pudval_t;typedef unsigned long   pgdval_t;typedef unsigned long   pgprotval_t;typedef struct { pteval_t pte; } pte_t;#endif  /* !__ASSEMBLY__ */
 ```
-  
+
 (2)pgd_t、pmd_t、pud_t和pte_t
 
 > 参照 /arch/x86/include/asm/pgtable_types.h
@@ -112,11 +114,11 @@ pgprot_t是另一个64位（PAE激活时）或32位（PAE禁用时）的数据�
 typedef struct { pgdval_t pgd; } pgd_t;static inline pgd_t native_make_pgd(pgdval_t val){        return (pgd_t) { val };}static inline pgdval_t native_pgd_val(pgd_t pgd){        return pgd.pgd;}static inline pgdval_t pgd_flags(pgd_t pgd){        return native_pgd_val(pgd) & PTE_FLAGS_MASK;}#if CONFIG_PGTABLE_LEVELS > 3typedef struct { pudval_t pud; } pud_t;static inline pud_t native_make_pud(pmdval_t val){        return (pud_t) { val };}static inline pudval_t native_pud_val(pud_t pud){        return pud.pud;}#else#include <asm-generic/pgtable-nopud.h>static inline pudval_t native_pud_val(pud_t pud){        return native_pgd_val(pud.pgd);}#endif#if CONFIG_PGTABLE_LEVELS > 2typedef struct { pmdval_t pmd; } pmd_t;static inline pmd_t native_make_pmd(pmdval_t val){        return (pmd_t) { val };}static inline pmdval_t native_pmd_val(pmd_t pmd){        return pmd.pmd;}#else#include <asm-generic/pgtable-nopmd.h>static inline pmdval_t native_pmd_val(pmd_t pmd){        return native_pgd_val(pmd.pud.pgd);}#endifstatic inline pudval_t pud_pfn_mask(pud_t pud){        if (native_pud_val(pud) & _PAGE_PSE)                return PHYSICAL_PUD_PAGE_MASK;        else                return PTE_PFN_MASK;}static inline pudval_t pud_flags_mask(pud_t pud){        return ~pud_pfn_mask(pud);}static inline pudval_t pud_flags(pud_t pud){        return native_pud_val(pud) & pud_flags_mask(pud);}static inline pmdval_t pmd_pfn_mask(pmd_t pmd){        if (native_pmd_val(pmd) & _PAGE_PSE)                return PHYSICAL_PMD_PAGE_MASK;        else                return PTE_PFN_MASK;}static inline pmdval_t pmd_flags_mask(pmd_t pmd){        return ~pmd_pfn_mask(pmd);}static inline pmdval_t pmd_flags(pmd_t pmd){        return native_pmd_val(pmd) & pmd_flags_mask(pmd);}static inline pte_t native_make_pte(pteval_t val){        return (pte_t) { .pte = val };}static inline pteval_t native_pte_val(pte_t pte){        return pte.pte;}static inline pteval_t pte_flags(pte_t pte){        return native_pte_val(pte) & PTE_FLAGS_MASK;}
 ```
 
-(3)xxx_val和__xxx
+(3)xxx_val和\_\_xxx
 
 > 参照/arch/x86/include/asm/pgtable.h
 
-五个类型转换宏（_ pte、_ pmd、_ pud、_ pgd和__ pgprot）把一个无符号整数转换成所需的类型。
+五个类型转换宏（\_ pte、\_ pmd、\_ pud、\_ pgd和\_\_ pgprot）把一个无符号整数转换成所需的类型。
 
 另外的五个类型转换宏（pte_val，pmd_val， pud_val， pgd_val和pgprot_val）执行相反的转换，即把上面提到的四种特殊的类型转换成一个无符号整数。
 
@@ -127,7 +129,8 @@ typedef struct { pgdval_t pgd; } pgd_t;static inline pgd_t native_make_pgd(pgdva
 #define pud_val(x)      native_pud_val(x)#define __pud(x)        native_make_pud(x)#endif#ifndef __PAGETABLE_PMD_FOLDED#define pmd_val(x)      native_pmd_val(x)#define __pmd(x)        native_make_pmd(x)#endif#define pte_val(x)      native_pte_val(x)#define __pte(x)        native_make_pte(x)
 ```
 
-这里需要区别指向页表项的指针和页表项所代表的数据。以pgd_t类型为例子，如果已知一个pgd_t类型的指针pgd，那么通过pgd_val(*pgd)即可获得该页表项(也就是一个无符号长整型数据)，这里利用了面向对象的思想。
+这里需要区别指向页表项的指针和页表项所代表的数据。以pgd_t类型为例子，如果已知一个pgd_t类型的指针pgd，那么通过pgd_val(\*pgd)即可获得该页表项(也就是一个无符号长整型数据)，这里利用了面向对象的思想。
+
 ### 2.2页表描述宏
 
 参照arch/x86/include/asm/pgtable_64
@@ -211,25 +214,23 @@ PTRS_PER_PTE, PTRS_PER_PMD, PTRS_PER_PUD以及PTRS_PER_PGD用于计算页表、�
 内核还提供了许多宏和函数用于读或修改页表表项：
 
 - 如果相应的表项值为0，那么，宏pte_none、pmd_none、pud_none和 pgd_none产生的值为1，否则产生的值为0。
-    
+
 - 宏pte_clear、pmd_clear、pud_clear和 pgd_clear清除相应页表的一个表项，由此禁止进程使用由该页表项映射的线性地址。ptep_get_and_clear( )函数清除一个页表项并返回前一个值。
-    
+
 - set_pte，set_pmd，set_pud和set_pgd向一个页表项中写入指定的值。set_pte_atomic与set_pte作用相同，但是当PAE被激活时它同样能保证64位的值能被原子地写入。
-    
+
 - 如果a和b两个页表项指向同一页并且指定相同访问优先级，pte_same(a,b)返回1，否则返回0。
-    
+
 - 如果页中间目录项指向一个大型页（2MB或4MB），pmd_large(e)返回1，否则返回0。
-    
 
 宏pmd_bad由函数使用并通过输入参数传递来检查页中间目录项。如果目录项指向一个不能使用的页表，也就是说，如果至少出现以下条件中的一个，则这个宏产生的值为1：
 
 - 页不在主存中（Present标志被清除）。
-    
+
 - 页只允许读访问(Read/Write标志被清除)。
-    
-- Acessed或者Dirty位被清除（对于每个现有的页表，Linux总是  
-    强制设置这些标志）。
-    
+
+- Acessed或者Dirty位被清除（对于每个现有的页表，Linux总是\
+  强制设置这些标志）。
 
 pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项引用一个不在主存中的页，一个不可写的页或一个根本无法访问的页都是合法的。
 
@@ -246,105 +247,102 @@ pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项�
 下表中列出的函数用来查询页表项中任意一个标志的当前值；除了pte_file()外，其他函数只有在pte_present返回1的时候，才能正常返回页表项中任意一个标志。
 
 - pte_user( )：读 User/Supervisor 标志
-    
+
 - pte_read( )：读 User/Supervisor 标志（表示 80x86 处理器上的页不受读的保护）
-    
+
 - pte_write( )：读 Read/Write 标志
-    
+
 - pte_exec( )：读 User/Supervisor 标志（ 80x86 处理器上的页不受代码执行的保护）
-    
+
 - pte_dirty( )：读 Dirty 标志
-    
+
 - pte_young( )：读 Accessed 标志
-    
+
 - pte_file( )：读 Dirty 标志（当 Present 标志被清除而 Dirty 标志被设置时，页属于一个非线性磁盘文件映射）
-    
 
 (2)设置页表项中各标志的值
 
 下表列出的另一组函数用于设置页表项中各标志的值
 
 - mk_pte_huge( )：设置页表项中的 Page Size 和 Present 标志
-    
+
 - pte_wrprotect( )：清除 Read/Write 标志
-    
+
 - pte_rdprotect( )：清除 User/Supervisor 标志
-    
+
 - pte_exprotect( )：清除 User/Supervisor 标志
-    
+
 - pte_mkwrite( )：设置 Read/Write 标志
-    
+
 - pte_mkread( )：设置 User/Supervisor 标志
-    
+
 - pte_mkexec( )：设置 User/Supervisor 标志
-    
+
 - pte_mkclean( )：清除 Dirty 标志
-    
+
 - pte_mkdirty( )：设置 Dirty 标志
-    
+
 - pte_mkold( )：清除 Accessed 标志（把此页标记为未访问）
-    
+
 - pte_mkyoung( )：设置 Accessed 标志（把此页标记为访问过）
-    
+
 - pte_modify(p,v)：把页表项 p 的所有访问权限设置为指定的值
-    
+
 - ptep_set_wrprotect()：与 pte_wrprotect( ) 类似，但作用于指向页表项的指针
-    
+
 - ptep_set_access_flags( )：如果 Dirty 标志被设置为 1 则将页的访问权设置为指定的值，并调用flush_tlb_page() 函数ptep_mkdirty()与 pte_mkdirty( ) 类似，但作用于指向页表项的指针。
-    
+
 - ptep_test_and_clear_dirty( )：与 pte_mkclean( ) 类似，但作用于指向页表项的指针并返回 Dirty 标志的旧值
-    
+
 - ptep_test_and_clear_young( )：与 pte_mkold( ) 类似，但作用于指向页表项的指针并返回 Accessed标志的旧值
-    
 
 (3)宏函数-把一个页地址和一组保护标志组合成页表项，或者执行相反的操作
 
 现在，我们来讨论下表中列出的宏，它们把一个页地址和一组保护标志组合成页表项，或者执行相反的操作，从一个页表项中提取出页地址。请注意这其中的一些宏对页的引用是通过 “页描述符”的线性地址，而不是通过该页本身的线性地址。
 
 - pgd_index(addr)：找到线性地址 addr 对应的的目录项在页全局目录中的索引（相对位置）
-    
+
 - pgd_offset(mm, addr)：接收内存描述符地址 mm 和线性地址 addr 作为参数。这个宏产生地址addr 在页全局目录中相应表项的线性地址；通过内存描述符 mm 内的一个指针可以找到这个页全局目录pgd_offset_k(addr)产生主内核页全局目录中的某个项的线性地址，该项对应于地址
-    
+
 - addrpgd_page(pgd)：通过页全局目录项 pgd 产生页上级目录所在页框的页描述符地址。在两级或三级分页系统中，该宏等价于 pud_page() ，后者应用于页上级目录项
-    
+
 - pud_offset(pgd, addr)：参数为指向页全局目录项的指针 pgd 和线性地址 addr 。这个宏产生页上级目录中目录项 addr 对应的线性地址。在两级或三级分页系统中，该宏产生 pgd ，即一个页全局目录项的地址
-    
+
 - pud_page(pud)：通过页上级目录项 pud 产生相应的页中间目录的线性地址。在两级分页系统中，该宏等价于 pmd_page() ，后者应用于页中间目录项
-    
+
 - pmd_index(addr)：产生线性地址 addr 在页中间目录中所对应目录项的索引（相对位置）
-    
+
 - pmd_offset(pud, addr)：接收指向页上级目录项的指针 pud 和线性地址 addr 作为参数。这个宏产生目录项 addr 在页中间目录中的偏移地址。在两级或三级分页系统中，它产生 pud ，即页全局目录项的地址
-    
+
 - pmd_page(pmd)：通过页中间目录项 pmd 产生相应页表的页描述符地址。在两级或三级分页系统中， pmd 实际上是页全局目录中的一项mk_pte(p,prot)接收页描述符地址 p 和一组访问权限 prot 作为参数，并创建相应的页表项
-    
+
 - pte_index(addr)：产生线性地址 addr 对应的表项在页表中的索引（相对位置）
-    
+
 - pte_offset_kernel(dir,addr)：线性地址 addr 在页中间目录 dir 中有一个对应的项，该宏就产生这个对应项，即页表的线性地址。另外，该宏只在主内核页表上使用
-    
+
 - pte_offset_map(dir, addr)：接收指向一个页中间目录项的指针 dir 和线性地址 addr 作为参数，它产生与线性地址 addr 相对应的页表项的线性地址。如果页表被保存在高端存储器中，那么内核建立一个临时内核映射，并用 pte_unmap 对它进行释放。pte_offset_map_nested 宏和 pte_unmap_nested 宏是相同的，但它们使用不同的临时内核映射
-    
+
 - pte_page( x )：返回页表项 x 所引用页的描述符地址
-    
+
 - pte_to_pgoff( pte )：从一个页表项的 pte 字段内容中提取出文件偏移量，这个偏移量对应着一个非线性文件内存映射所在的页
-    
+
 - pgoff_to_pte(offset )：为非线性文件内存映射所在的页创建对应页表项的内容
-    
 
 (4)简化页表项的创建和撤消
 
 下面我们罗列最后一组函数来简化页表项的创建和撤消。当使用两级页表时，创建或删除一个页中间目录项是不重要的。如本节前部分所述，页中间目录仅含有一个指向下属页表的目录项。所以，页中间目录项只是页全局目录中的一项而已。然而当处理页表时，创建一个页表项可能很复杂，因为包含页表项的那个页表可能就不存在。在这样的情况下，有必要分配一个新页框，把它填写为 0 ，并把这个表项加入。
 
 如果 PAE 被激活，内核使用三级页表。当内核创建一个新的页全局目录时，同时也分配四个相应的页中间目录；只有当父页全局目录被释放时，这四个页中间目录才得以释放。当使用两级或三级分页时，页上级目录项总是被映射为页全局目录中的一个单独项。与以往一样，下表中列出的函数描述是针对 80x86 构架的。
-![[Pasted image 20240915201541.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240915201541.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 三、线性地址转换
 
 ### 3.1分页模式下的的线性地址转换
 
 线性地址、页表和页表项线性地址不管系统采用多少级分页模型，线性地址本质上都是索引+偏移量的形式，甚至你可以将整个线性地址看作N+1个索引的组合，N是系统采用的分页级数。在四级分页模型下，线性地址被分为5部分，如下图：
-![[Pasted image 20240915201548.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240915201548.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在线性地址中，每个页表索引即代表线性地址在对应级别的页表中中关联的页表项。正是这种索引与页表项的对应关系形成了整个页表映射机制。
 
@@ -355,8 +353,8 @@ pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项�
 (2)页表项
 
 页表项从四种页表项的数据结构可以看出，每个页表项其实就是一个无符号长整型数据。每个页表项分两大类信息：页框基地址和页的属性信息。在x86-32体系结构中，每个页表项的结构图如下：
-![[Pasted image 20240915201554.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240915201554.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个图是一个通用模型，其中页表项的前20位是物理页的基地址。由于32位的系统采用4kb大小的 页，因此每个页表项的后12位均为0。内核将后12位充分利用，每个位都表示对应虚拟页的相关属性。
 
@@ -385,8 +383,8 @@ pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项�
 从线性地址的第五部分中取出物理页内偏移量，与物理页基址相加得到最终的物理地址。
 
 第五次读取内存得到最终要访问的数据。
-![[Pasted image 20240915201600.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240915201600.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 整个过程是比较机械的，每次转换先获取物理页基地址，再从线性地址中获取索引，合成物理地址后再访问内存。不管是页表还是要访问的数据都是以页为单 位存放在主存中的，因此每次访问内存时都要先获得基址，再通过索引(或偏移)在页内访问数据，因此可以将线性地址看作是若干个索引的集合。
 
@@ -403,13 +401,12 @@ PTEs, PMDs和PGDs分别由pte_t, pmd_t 和pgd_t来描述。为了存储保护位
 通过如下几个函数，不断向下索引，就可以从进程的页表中搜索特定地址对应的页面对象：
 
 - pgd_offset根据当前虚拟地址和当前进程的mm_struct获取pgd项
-    
+
 - pud_offset参数为指向页全局目录项的指针 pgd 和线性地址 addr 。这个宏产生页上级目录中目录项 addr 对应的线性地址。在两级或三级分页系统中，该宏产生 pgd ，即一个页全局目录项的地址
-    
+
 - pmd_offset根据通过pgd_offset获取的pgd 项和虚拟地址，获取相关的pmd项(即pte表的起始地址)
-    
+
 - pte_offset根据通过pmd_offset获取的pmd项和虚拟地址，获取相关的pte项(即物理页的起始地址)
-    
 
 根据虚拟地址获取物理页的示例代码详见mm/memory.c中的函数follow_page
 
@@ -429,11 +426,11 @@ unsigned long v2p(int pid unsigned long va){        unsigned long pa = 0;       
 
 2023年往期回顾
 
-[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)  
+[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)
 
-[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)  
+[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)
 
-[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)  
+[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)
 
 [存储全栈开发：构建高效的数据存储系统](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487696&idx=1&sn=b5ebe830ddb6798ac5bf6db4a8d5d075&chksm=cfb959b9f8ced0af76710c070a6db2677fb359af735e79c6378e82ead570aa1ce5350a146793&scene=21#wechat_redirect)
 

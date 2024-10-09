@@ -1,11 +1,10 @@
-
 程序喵大人
 
- _2022年01月28日 08:24_
+_2022年01月28日 08:24_
 
 以下文章来源于编程往事 ，作者果冻虾仁
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7Hvg7rQmorRljlcVCzwYTttaruhY8OCBSft64AYB32Cg/0)
 
@@ -13,7 +12,7 @@
 
 C++码农，brpc committer，搜广推在线工程。专注互联网后端技术分享、行业观察以及个人成长！也欢迎关注我的知乎：果冻虾仁
 
-](https://mp.weixin.qq.com/s?__biz=MzkyODU5MTYxMA==&mid=2247493374&idx=2&sn=08933830ce701f96d1723592685a9470&source=41&key=daf9bdc5abc4e8d0079a30fe3f46078ac6d508ff71e1ef0b8370b94ae43203c0f97a0e5fb1469279e8bb72b25a30d2a0eae7af009c805f9f0c5b89e75bccb29fa0fb11e8040bdcd926017df169b18fbc0fb09dcb64cc771fb9280fcc8c7ea55340458a00b5f6d172ad531709eb209c7cb99a07c8c57bbd579f43e4f92fd374a9&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQZRGz2prnaBJaQibmCOHsoBLmAQIE97dBBAEAAAAAAIBkKogPWS0AAAAOpnltbLcz9gKNyK89dVj0AUbBhIJllpHtIbkKi%2F2MY3W%2FGOpSBfXyXstXV378HiNXgQM13mzboTrshNPnqxRGPbXH93bZaJvOs%2BFiAkf%2B4WB%2BcArZ2Y5BTiV3l2vNXszvHtZCNS6%2F3TKcxn2Rv38KHtewByRNWfjtDylx7bBCGKF3r8PfjMv1KIldxGeYpL5TU5OMrRj5Morlg8%2BOzFTv5sB4PAXNf9pVmcklfwCsuJgr2JvVWBesb32iMTdWZeG6ZQo2Ow4%2FO0WcN9QaMoHv&acctmode=0&pass_ticket=ps%2BZazmgxwIi4ZDTUmyjc4I%2FbIpPoase8X9cSDE8%2FB5aasravIglX%2FgC8ZVtGCW8&wx_header=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODU5MTYxMA==&mid=2247493374&idx=2&sn=08933830ce701f96d1723592685a9470&source=41&key=daf9bdc5abc4e8d0079a30fe3f46078ac6d508ff71e1ef0b8370b94ae43203c0f97a0e5fb1469279e8bb72b25a30d2a0eae7af009c805f9f0c5b89e75bccb29fa0fb11e8040bdcd926017df169b18fbc0fb09dcb64cc771fb9280fcc8c7ea55340458a00b5f6d172ad531709eb209c7cb99a07c8c57bbd579f43e4f92fd374a9&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQZRGz2prnaBJaQibmCOHsoBLmAQIE97dBBAEAAAAAAIBkKogPWS0AAAAOpnltbLcz9gKNyK89dVj0AUbBhIJllpHtIbkKi%2F2MY3W%2FGOpSBfXyXstXV378HiNXgQM13mzboTrshNPnqxRGPbXH93bZaJvOs%2BFiAkf%2B4WB%2BcArZ2Y5BTiV3l2vNXszvHtZCNS6%2F3TKcxn2Rv38KHtewByRNWfjtDylx7bBCGKF3r8PfjMv1KIldxGeYpL5TU5OMrRj5Morlg8%2BOzFTv5sB4PAXNf9pVmcklfwCsuJgr2JvVWBesb32iMTdWZeG6ZQo2Ow4%2FO0WcN9QaMoHv&acctmode=0&pass_ticket=ps%2BZazmgxwIi4ZDTUmyjc4I%2FbIpPoase8X9cSDE8%2FB5aasravIglX%2FgC8ZVtGCW8&wx_header=1#)
 
 ## 开场白
 
@@ -102,21 +101,20 @@ n 为并行节点处理个数，可以理解为 CPU 的核心数。
 **留言 2**
 
 - 攒钱买月亮
-    
-    2022年1月28日
-    
-    赞3
-    
-    那么问题来了，amdahl's law中的a如何计算，作者大佬用了"比如是30%"这样的说法，回避了这个重要的问题，能否请您具体探讨一下如何确定一段待优化的逻辑的占比呢？
-    
-    程序喵大人
-    
-    作者2022年1月28日
-    
-    赞1
-    
-    这个问题，我也只是停留在理论层面![[囧]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月28日
+
+  赞3
+
+  那么问题来了，amdahl's law中的a如何计算，作者大佬用了"比如是30%"这样的说法，回避了这个重要的问题，能否请您具体探讨一下如何确定一段待优化的逻辑的占比呢？
+
+  程序喵大人
+
+  作者2022年1月28日
+
+  赞1
+
+  这个问题，我也只是停留在理论层面![[囧]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
 
 已无更多数据
 
@@ -135,20 +133,19 @@ n 为并行节点处理个数，可以理解为 CPU 的核心数。
 **留言 2**
 
 - 攒钱买月亮
-    
-    2022年1月28日
-    
-    赞3
-    
-    那么问题来了，amdahl's law中的a如何计算，作者大佬用了"比如是30%"这样的说法，回避了这个重要的问题，能否请您具体探讨一下如何确定一段待优化的逻辑的占比呢？
-    
-    程序喵大人
-    
-    作者2022年1月28日
-    
-    赞1
-    
-    这个问题，我也只是停留在理论层面![[囧]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月28日
+
+  赞3
+
+  那么问题来了，amdahl's law中的a如何计算，作者大佬用了"比如是30%"这样的说法，回避了这个重要的问题，能否请您具体探讨一下如何确定一段待优化的逻辑的占比呢？
+
+  程序喵大人
+
+  作者2022年1月28日
+
+  赞1
+
+  这个问题，我也只是停留在理论层面![[囧]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
 
 已无更多数据

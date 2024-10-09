@@ -1,6 +1,5 @@
-
 Original 杨文波 CPP与系统软件联盟
- _2022年04月15日 20:00_
+_2022年04月15日 20:00_
 本文摘录自资深软件架构师杨文波老师「与大师为伍：走进Scott Meyers的C++世界」直播实录。
 
 **01** **前言**
@@ -50,7 +49,7 @@ static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(G
 
 在 LED 一亮一暗的过程中，gpio_num 到底会被检查多少次呢？而 32 又是什么意思？这种检查显然会带来运行期开销，而设计意图在对同一参数的反复而略有不同的检查中也显得有些模糊。
 
-再看 NXP LPC55S6x 中的实现。NXP LPC55S6x 主要目标应用是工业 IoT 及楼宇自动化等，它基于 ARM Cortex M33 并在芯片内集成了 RAM 和 ROM 和常见的外设。我手中刚好有一块第三方 LPC55S69 开发板：OKdo-E1，从链接_(https://www.okdo.com/getting-started/get-started-with-okdo-e1-board/)_ 中可以下载到相关的资料，包括 NXP 官方的 IDE。稍后我也会用它演示用 C++ 为 MMIO 建模。
+再看 NXP LPC55S6x 中的实现。NXP LPC55S6x 主要目标应用是工业 IoT 及楼宇自动化等，它基于 ARM Cortex M33 并在芯片内集成了 RAM 和 ROM 和常见的外设。我手中刚好有一块第三方 LPC55S69 开发板：OKdo-E1，从链接\_(https://www.okdo.com/getting-started/get-started-with-okdo-e1-board/)\_ 中可以下载到相关的资料，包括 NXP 官方的 IDE。稍后我也会用它演示用 C++ 为 MMIO 建模。
 
 `main.c` 的实现方式是类似的:
 
@@ -62,8 +61,6 @@ static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(G
 /*! * @brief Reverses current output logic of the multiple GPIO pins. * * @param base GPIO peripheral base pointer(Typically GPIO) * @param port GPIO port number * @param mask GPIO pin number macro */static inline void GPIO_PortToggle(GPIO_Type *base, uint32_t port, uint32_t mask){    base->NOT[port] = mask;}
 ```
 
-  
-
 这里 `GPIO_PortToggle` 的实现挺直接，在 `GPIO_Type` 类型的指针指向的 `NOT` 这个位置赋个值，就完成了，没有做任何检查。
 
 结合 `GPIO_Type` 结构体的定义：
@@ -74,13 +71,12 @@ static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(G
 
 `port` 的类型是 `uint32_t`，而硬件显然支持不了 4,294,967,296 个端口，实际只能支持到 2。注释中说，`NOT[2]` 对应的硬件的 mask 可以同时支持多个管脚，但对于点灯的应用来说，我们一次只希望反转一个管脚。库不做任何检查，参数相关的行为正确性就只能靠调用方自己来保证。如果调用方“不小心”调用 `GPIO_PortToggle(GPIO, 3, 1u << BOARD_LED_PIN)`，编译也会正常通过，但运行时也许什么都不会发生，也许会发生类似“打开电灯开关，空调会一起开了”这样的事。
 
-
 以上的两段代码，是嵌入式共享库和半导体 SDK 中的常见实现方式，它们作为半导体的库而言是合格的，能完成基本功能，但用于工业级或更高要求的应用，还不够理想。前一种以运行期反复的检查来确保用户代码以各种方式使用库的接口时，不会出现严重的问题。重复的代码造成了运行时间和二进制尺寸的浪费。后一种库不做什么检查，一根指针传下去直接操作寄存器，由调用方来保证正确性。总结一下 C 语言抽象硬件容易出现的问题：
 
 - 一次变化带来多处改动，违背 DRY 原则；
 - 为了保证安全，增加许多重复的检查，牺牲运行速度，增加代码尺寸；
 - 如果减少检查，则将安全风险和责任都交给了调用方，而调用方往往并不具备对硬件的深入细致的认识，难以做好；
-    
+
 在编程实践中，为了弥补语言层面类型系统的不足，我们不得不借助于语言外的工具、框架以及工程师的“细心”，而这些语言外的机制都增加了工程复杂度和维护难度。C 语言在面向对象机制上的欠缺也让我们难以轻松表达一些硬件特性，比如：只写寄存器，硬件是否支持动态配置，模块的供电和时钟等。Linux 内核为了抽象 GPIO，设计了由众多指针和函数指针搭建的结构体作为抽象框架，同时维护了超过 150 种 GPIO，但是在小型嵌入式框架和工程中往往未必负担得起这种大而全的方式。
 
 **03** **C++ 建模 MMIO**
@@ -104,7 +100,7 @@ static esp_err_t gpio_output_enable(gpio_num_t gpio_num){    GPIO_CHECK(G
 
 首先，把控制寄存器写成 `private` 数据成员，这意味着其中的细节，尤其是上文中总结的这段特殊内存的一些特点和细节调用方无需关注。而调用方需要使用的操作抽象为 `public` 成员函数。在点灯的例子中，我们只用到了翻转和读端口的操作，所以暂且只写两个接口。
 
-还有两处细节：特殊内存前面加上了 `volatile` 的限定，正如CP.200所指出的_(https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp200-use-volatile-only-to-talk-to-non-c-memory)_ ，表明这里将会访问不遵循 C++ 内存模型的硬件；另外，所有的函数都内联，所以在速度上会等同于前文 NXP 风格的驱动。
+还有两处细节：特殊内存前面加上了 `volatile` 的限定，正如CP.200所指出的\_(https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#cp200-use-volatile-only-to-talk-to-non-c-memory)\_ ，表明这里将会访问不遵循 C++ 内存模型的硬件；另外，所有的函数都内联，所以在速度上会等同于前文 NXP 风格的驱动。
 
 代码看起来是这样：
 
@@ -131,15 +127,11 @@ void* operator new(std::size_t, void *ptrToMemory){ return ptrToMemory; }
 T *p = new(op new args) T;
 ```
 
-  
-
 后者要这样传参：
 
 ```
 T *p = new T(ctor args);
 ```
-
-  
 
 如果两者都做自然是：
 
@@ -147,15 +139,11 @@ T *p = new T(ctor args);
 T *p = new (op new args) T(ctor args);
 ```
 
-  
-
 我们就能以这个形式在布置 `new` 创建的对象上使用任何构造函数。在 LPC55 blinky 的例子中，这样用它：
 
 ```
 //...#include <new>//...GpioControlReg* const pcr = new(reinterpret_cast<void*>(GPIO_BASE))GpioControlReg{};while (1){   using Port = GpioControlReg::Port_t;   using Pin = GpioControlReg::Pin_t;   using Level = GpioControlReg::Level_t;   /* Delay 1000 ms */   SysTick_DelayTicks(200U);   if (pcr->GPIO_PinRead(Port::PORT1, Pin::PIN9) == Level::HIGH)   {      putchar('.');      //GPIO_PortToggle(GPIO, BOARD_LED_PORT, 1u << BOARD_LED_PIN);      pcr->PortToggle(Port::PORT1, Pin::PIN6);   }}// ...
 ```
-
-  
 
 LPC55 官方 SDK（GNU libstdc++） 的 `new` 实现是这样：
 
@@ -163,11 +151,7 @@ LPC55 官方 SDK（GNU libstdc++） 的 `new` 实现是这样：
 _GLIBCXX_NODISCARD inline void* operator new(std::size_t, void* __p) _GLIBCXX_USE_NOEXCEPT{ return __p; }
 ```
 
-  
-
 从汇编代码的角度，这似乎只是做了一次赋值，但经过了布置 `new` 得到的是有 C++ 类型和语义的 pcr 指针，编译器就可以对它进行约束和检查，调用方就能基于它构建各种更高抽象层次的对象。此外，布置 `new` 还会调用构造函数，其中可以放入 GPIO 初始化相关代码，例如对于时钟和电源域的控制，应用相关的一些检查等。
-
-  
 
 这样的抽象显然还不完整，使用 GPIO 的上层代码不应当知道/记住 GPIO 的端口和管脚。对于一般的应用，上层在初始化的时候设置好这些细节，之后以 LED、按键、阀门等面向对象的方式来使用它们。于是我们可以写出这样的代码：
 
@@ -175,66 +159,39 @@ _GLIBCXX_NODISCARD inline void* operator new(std::size_t, void* __p) _GLI
 class Led {   public:      inline Led(GpioControlReg* cr, GpioControlReg::Port_t port, GpioControlReg::Pin_t pin) :          m_pcr(cr),         m_port(port),         m_pin(pin)   {}      inline void Toggle()      {         m_pcr->PortToggle(m_port, m_pin);  //GpioControlReg::Pin_t::PIN6      }   private:      GpioControlReg* const m_pcr;      const GpioControlReg::Port_t m_port;      const GpioControlReg::Pin_t m_pin;};
 ```
 
-  
-
 这样来调用它：
 
 ```
 Led led(pcr, Port::PORT1, Pin::PIN6);Key key(pcr, Port::PORT1, Pin::PIN9);if (key.Read() == Level::HIGH){   led.Toggle();}
 ```
 
-  
-
 下面我们将这段代码在真实硬件上跑跑看，看看它的行为和开销。在 MCUXpresso IDE 上将优化打到 `-O3`，编译通过后下载到 OKdo-E1 中在调试器中观察。果然，编译器已经领会了我们的意图，`Led` 和 `Key` 的构造函数被完全优化掉了，而 `led.Toggle()` 变成了一行汇编，这没法更短了。所以我们的 GPIO 不但有了更贴切的抽象，也做到了“你不用的东西，你就不需要付出代价；你使用的东西，你手工写代码也不会更好”：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在工程实际中，类的层级和接口会更为复杂，还有许多因素和细节要考虑。比如，如何考虑多个设备共享的内存映射区域的生命周期；如要支持多态，是要通过虚函数和继承的方式，还是通过元编程；如何避免用户的误用，将对象布置到了不是 MMIO 的内存区域；如何进一步通过泛型编程减少重复代码等，这些话题在 Scott Meyers 的课程讲义中会做进一步探讨。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
-欢迎有兴趣的读者到gitee_(https://gitee.com/yangwenboolean/cpp_mmio_example)_下载示例代码并在 OKdo-E1 或者 LPC55 官方 EVK 上进行尝试。现在ARM GCC 以及其他商业编译器都已经广泛支持了现代 C++，更欢迎读者在手头的嵌入式开发板上尝试并分享您的发现。
-
-  
+欢迎有兴趣的读者到gitee\_(https://gitee.com/yangwenboolean/cpp_mmio_example)\_下载示例代码并在 OKdo-E1 或者 LPC55 官方 EVK 上进行尝试。现在ARM GCC 以及其他商业编译器都已经广泛支持了现代 C++，更欢迎读者在手头的嵌入式开发板上尝试并分享您的发现。
 
 **04**
 
 **总结**
 
-  
-
-  
-
-  
-
 blinky 这样一个小例子，折射出 C++ 在嵌入式领域的优势。尝试总结几条：
 
-  
-
 - “语言结构到硬件设备的直接映射”。不仅是映射 CPU 和内存等硬件，直接映射各种外部设备硬件对于嵌入式更有特殊意义。
-    
+
 - “零开销抽象”。同样的业务逻辑，C++ 实现在时空开销上往往能优于于 C。由于语言层面能给编译器更全面的约束信息，有时甚至能做到“负开销”。
-    
+
 - 嵌入式在软件工业中总体上属“后浪”技术，C++ 语言及社区在系统编程领域的积累和优势，能让嵌入式工程师直接利用和借鉴高性能云计算等前沿领域已经验证的技术。
-    
-
-  
-
-  
-
-  
 
 **直播预告**
 
-4月16日晚8点，Boolan 首席软件专家李建忠老师带大家一起探讨**《C++ 系统工程师进阶的“道”和“术”》**：
+4月16日晚8点，Boolan 首席软件专家李建忠老师带大家一起探讨\*\*《C++ 系统工程师进阶的“道”和“术”》\*\*：
 
-1、面对庞大复杂的C++，如何升级打怪？  
+1、面对庞大复杂的C++，如何升级打怪？
 
 2、C++系统工程师进阶的几个关键点是什么？
 
@@ -256,11 +213,11 @@ C++ 系统工程师进阶的“道”和“术”
 
 视频号
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **李建忠**
 
-**Boolan 首席软件专家**  
+**Boolan 首席软件专家**
 
 Boolan首席软件专家，全球C++及系统软件技术大会主席。对面向对象、设计模式、软件架构、技术创新有丰富经验和深入研究。主讲《设计模式纵横谈》，《面向对象设计》等课程，影响近百万软件开发人员，享有盛誉。曾于 2005年-2010年期间担任微软最有价值技术专家，区域技术总监。拥有近二十年软件技术架构与产品经验。
 

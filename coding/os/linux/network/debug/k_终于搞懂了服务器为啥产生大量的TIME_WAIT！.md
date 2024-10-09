@@ -1,25 +1,27 @@
 运维派
- _2021年10月14日 21:50_
+_2021年10月14日 21:50_
 
-写在开头，大概 4 年前，听到运维同学提到 TIME_WAIT 状态的 TCP 连接过多的问题，但是当时没有去细琢磨；最近又听人说起，是一个新手进行压测过程中，遇到的问题，因此，花点时间，细深究一下。 
+写在开头，大概 4 年前，听到运维同学提到 TIME_WAIT 状态的 TCP 连接过多的问题，但是当时没有去细琢磨；最近又听人说起，是一个新手进行压测过程中，遇到的问题，因此，花点时间，细深究一下。
 
 从这几个方面着手：
 问题描述：什么现象？什么影响？
 
 1. 问题分析
-2. 解决方案
-3. 底层原理
+1. 解决方案
+1. 底层原理
+
 ### 1、问题描述
 
 模拟高并发的场景，会出现批量的 TIME_WAIT 的 TCP 连接：
-![[Pasted image 20241008160654.png]]
+!\[\[Pasted image 20241008160654.png\]\]
 
 短时间后，所有的 TIME_WAIT 全都消失，被回收，端口包括服务，均正常。即，在高并发的场景下，TIME_WAIT 连接存在，属于正常现象。
 
 线上场景中，持续的高并发场景：
+
 - 一部分 TIME_WAIT 连接被回收，但新的 TIME_WAIT 连接产生；
 - 一些极端情况下，会出现大量的 TIME_WAIT 连接。
-    
+
 **Think：上述大量的 TIME_WAIT 状态 TCP 连接，有什么业务上的影响吗？**
 
 Nginx 作为反向代理时，大量的短链接，可能导致 Nginx 上的 TCP 连接处于 time_wait 状态：
@@ -32,6 +34,7 @@ Nginx 作为反向代理时，大量的短链接，可能导致 Nginx 上的 TCP
 `// 统计：各种连接的数量      $ netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'      ESTABLISHED 1154      TIME_WAIT 1645   `
 
 **Tips：TCP 本地端口数量，上限为 65535（6.5w），这是因为 TCP 头部使用 16 bit，存储「端口号」，因此约束上限为 65535。**
+
 ### 2、问题分析
 
 大量的 TIME_WAIT 状态 TCP 连接存在，其本质原因是什么？
@@ -46,6 +49,7 @@ TIME_WAIT 状态：
 
 - 1.TCP 连接中，主动关闭连接的一方出现的状态；（收到 FIN 命令，进入 TIME_WAIT 状态，并返回 ACK 命令）
 - 2.保持 2 个 MSL 时间，即，4 分钟；（MSL 为 2 分钟）
+
 ### 3、解决办法
 
 解决上述 time_wait 状态大量存在，导致新连接创建失败的问题，一般解决办法：
@@ -83,8 +87,9 @@ TIME_WAIT 状态：
 - 1.TCP 连接状态的查询
 - 2.MSL 时间
 - 3.TCP 三次握手和四次握手
-    
+
 **附录 A：查询 TCP 连接状态**
+
 ```cpp
 Mac 下，查询 TCP 连接状态的具体命令：   
 // Mac 下，查询 TCP 连接状态
@@ -95,6 +100,7 @@ Proto Recv-Q Send-Q Local Address Foreign Address (state)   tcp4 0 0 1
 // 统计：各种连接的数量   
 $ netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a]}'   ESTABLISHED 1154   TIME_WAIT 1645   
 ```
+
 **附录 B：MSL 时间**MSL，Maximum Segment Lifetime，“报文最大生存时间”
 
 1.任何报文在网络上存在的最长时间，超过这个时间报文将被丢弃。（IP 报文）
@@ -114,8 +120,8 @@ $ netstat -n | awk '/^tcp/ {++S[$NF]} END {for(a in S) print a, S[a
 
 - 1.三次握手，建立连接过程
 - 2.四次挥手，释放连接过程
-    
-![[Pasted image 20241003145358.png]]
+
+!\[\[Pasted image 20241003145358.png\]\]
 
 **几个核心疑问：**
 

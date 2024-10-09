@@ -1,6 +1,6 @@
 Original Clay SRE运维进阶之路
 
- _2024年08月02日 18:08_
+_2024年08月02日 18:08_
 
 ## CPU Throttle 问题详解
 
@@ -10,13 +10,13 @@ Original Clay SRE运维进阶之路
 
 毛刺产生的原因通常是由于应用突发性的 CPU 资源需求（如代码逻辑热点、流量突增等），下面我们用一个具体的例子来描述 CPU Throttle 导致应用性能下降的过程。图中展示了一个CPU Limit = 2 的 Web 服务类容器，在收到请求后（req）各线程（Thread）的 CPU 资源分配情况。假设每个请求的处理时间均为 60 ms，可以看到，即使容器在最近整体的 CPU 利用率较低，由于在 100 ms～200 ms 区间内连续处理了4 个请求，将该内核调度周期内的时间片预算（200ms）全部消耗，Thread 2 需要等待下一个周期才能继续将 req 2 处理完成，该请求的响应时延（RT）就会变长。这种情况在应用负载上升时将更容易发生，导致其 RT 的长尾情况将会变得更为严重。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 为了避免 CPU Throttle 的问题，我们只能将容器的 CPU Limit 值调大。然而，若想彻底解决 CPU Throttle，通常需要将 CPU Limit 调大两三倍，有时甚至五到十倍，问题才会得到明显缓解。而为了降低 CPU Limit 超卖过多的风险，还需降低容器的部署密度，进而导致整体资源成本上升。
 
 ## 调研 CPU Burst 方案
 
-**什么是 CPU Burst：**CPU Burst（CPU 突发）是指在计算机处理器空闲时，允许进程或线程在一段短时间内使用超过其平均 CPU 使用量的额外 CPU 时间。在 CPU 突发期间，进程可以使用比其在限定时间段内被允许的平均 CPU 使用量更多的 CPU 资源，以提高应用程序的响应速度和性能。
+\*\*什么是 CPU Burst：\*\*CPU Burst（CPU 突发）是指在计算机处理器空闲时，允许进程或线程在一段短时间内使用超过其平均 CPU 使用量的额外 CPU 时间。在 CPU 突发期间，进程可以使用比其在限定时间段内被允许的平均 CPU 使用量更多的 CPU 资源，以提高应用程序的响应速度和性能。
 
 **方案对比**
 
@@ -30,33 +30,29 @@ Original Clay SRE运维进阶之路
 
 ## 项目架构
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 StatesInformer
 
 - Node Informer：提供本节点 corev1.Node
-    
+
 - Pod Informer：提供本节点所有 PodMeta 信息，  PodMeta 包括 corev1.Pod 和 CgroupDir
-    
 
 - PLEG：监听 Pod 变化，触发同步
-    
+
 - Kubelet：获取 GetAllPods
-    
 
 - CM Informer：提供全局 CM 指定哪些 Pod ，可以动态调节 cpu.cfs_quota_us
-    
 
 Metric Cache：Prometheus tsdb 存在收集到的指标
 
 MetricCollectors
 
 - Node Info：收集 Node CPU 核数等
-    
+
 - Node Resource：收集 Node CPU 、MEM 使用情况
-    
+
 - Pod Throttled：收集 Pod Throttled 信息，从 cpu.stat 收集
-    
 
 CPU Burst Plugin：发现 Pod Throttled， 动态调整 cpu.cfs_quota_us
 
@@ -104,16 +100,13 @@ Koordinator cpuBurst：https://koordinator.sh/zh-Hans/docs/user-manuals/cpu-burs
 
 我是 Clay，下期见  👋
 
----
+______________________________________________________________________
 
 > - 欢迎订阅我的公众号「SRE运维进阶之路」或关注我的 Github https://github.com/clay-wangzhi/SreGuide  查看最新文章
->     
+>
 > - 欢迎加我微信`sre-k8s-ai`，与我讨论云原生、稳定性相关内容
->     
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 云原生15
 

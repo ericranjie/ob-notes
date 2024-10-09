@@ -1,25 +1,20 @@
 # 
+
 玄姐聊AGI
 
- _2021年10月20日 20:57_
+_2021年10月20日 20:57_
 
 ![](https://res.wx.qq.com/t/fed_upload/b39ef69e-c4d6-4169-8612-5f00a84860e7/wx-avatar-default.svg)
 
 公众号
 
-  
-
 > 原文：
-> 
+>
 > http://kafka.apache.org/documentation/#design
 
-  
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/9TPn66HT930CzevNBb2yMhKjOn9yuJqscN6FicEzJ7iaIdeV8ibJEyVBJNVD6VdujVn2zyicOYIKribkoPEBP1Vb4icQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)  
+![图片](https://mmbiz.qpic.cn/mmbiz_png/9TPn66HT930CzevNBb2yMhKjOn9yuJqscN6FicEzJ7iaIdeV8ibJEyVBJNVD6VdujVn2zyicOYIKribkoPEBP1Vb4icQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 ****-**     **数据持久化：无惧文件系统**    **-****
-
-  
 
 磁盘的读写速度，取决于如何读写。对于线性读写方式，操作系统做了充分的优化：提前读 - 预取若干数据块，滞后写 - 将小的逻辑写操作合并成一个大的物理写操作。
 
@@ -30,11 +25,8 @@
 而且，Kafka 是构建在 JVM 之上的，了解 Java 内存使用方式的人应该都知道：
 
 1. 对象的内存开销非常高，通常是实际数据大小的2倍（甚至更多）
-    
-2. 随着堆上数据量增大，Java 的 GC 表现也会更糟糕
-    
 
-  
+1. 随着堆上数据量增大，Java 的 GC 表现也会更糟糕
 
 因此，使用文件系统并依赖于操作系统内存页缓存，优于在程序中维护一块内存缓存或其它结构。至少操作系统内存页缓存的可用内存翻倍了。另外，如果使用紧凑的字节结构来缓存数据，相比使用对象，可用内存可能还会翻倍。在 32GB 内存的机器上这么搞，缓存可用到 20-30GB，还不会对 GC 造成了什么坏影响。并且，即使服务重启，这块缓存空间也是热的（除非机器重启），用户进程内的内存缓存在服务重启后得重建（10GB的数据缓存可能需要10分钟左右）。
 
@@ -42,11 +34,9 @@
 
 这样一分析，设计就简单了：我们反其道而行之，所有数据都直接写到文件系统上持久化日志文件中，不需要在程序中使用内存缓存，也不必确保将数据刷到磁盘。这实际意味着数据转移到了内核的内存页缓存。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **常亮时间就能搞定**    **-****
-
-  
 
 B 树的 O(log N) 时间复杂度，对于磁盘操作来说，并不能等同于常量时间复杂度。
 
@@ -54,7 +44,7 @@ Kafka 采用日志文件方式，确保读写操作的时间复杂度是 O(1)。
 
 Kafka 不会在消息一被消费就立即删除，而是保留一段时间，这样对于消费者来说也更灵活一些。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **效率**    **-****
 
@@ -69,23 +59,20 @@ broker 维护的消息日志只是一个目录下的一堆文件，文件内容�
 要理解 sendfile 的收益，需要先理解从文件到套接字传输数据的常规代码执行路径：
 
 1. 操作系统从磁盘将数据读到内核空间的内存页缓存（pagecache）
-    
-2. 应用程序从内核空间将数据读到用户空间缓冲区
-    
-3. 应用程序将数据从用户空间缓冲区读到内核空间的套接字缓冲区
-    
-4. 操作系统将数据从套接字缓冲区读到 NIC 缓冲区，网卡从 NIC 缓冲区读取数据通过网络发出去
-    
+
+1. 应用程序从内核空间将数据读到用户空间缓冲区
+
+1. 应用程序将数据从用户空间缓冲区读到内核空间的套接字缓冲区
+
+1. 操作系统将数据从套接字缓冲区读到 NIC 缓冲区，网卡从 NIC 缓冲区读取数据通过网络发出去
 
 这一代码执行路径，涉及 4 次数据拷贝和 2 次系统调用，很显然是低效的。使用 sendfile，可以避免内核空间和用户空间之间一些不必要的数据拷贝，操作系统可以直接将数据从内存页缓存发送到网络。
 
 进一步了解 sendfile 以及 Java 平台如何支持零拷贝，可以阅读这篇文章（https://developer.ibm.com/articles/j-zerocopy/）。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **生产者（The Producer）**    **-****
-
-  
 
 **负载均衡**
 
@@ -93,31 +80,25 @@ broker 维护的消息日志只是一个目录下的一堆文件，文件内容�
 
 所有 Kafka 节点都可以响应元数据请求 - 告知客户端（producer 或 consumer）哪些服务节点还存活以及某个 topic 的各个分区 leader 分别是哪个节点（疑惑：如果某个分区 leader 节点挂掉之后，客户端如何获知？何时可以获知？）
 
-**消息交付语义**  
+**消息交付语义**
 
 producer 和 consumer 之间的消息交付语义，分 3 种：
 
 1. 最多消费一次 - 消息可能会丢失，但不会被重复消费
-    
-2. 最少消费一次 - 消息不会丢，但可能被重复消费
-    
-3. 仅消费一次 - 每个消息都会被消费且仅消费一次
-    
 
-  
+1. 最少消费一次 - 消息不会丢，但可能被重复消费
 
-这个问题可以分成两个阶段的问题：producer 向 broker 发布一个消息时的持久性保证 以及 consumer 消费一个消息时的语义保证 （the durability guarantees for publishing a message and the guarantees when consuming a message）。  
+1. 仅消费一次 - 每个消息都会被消费且仅消费一次
 
-  
+这个问题可以分成两个阶段的问题：producer 向 broker 发布一个消息时的持久性保证 以及 consumer 消费一个消息时的语义保证 （the durability guarantees for publishing a message and the guarantees when consuming a message）。
 
 producer 向 Kafka 集群发消息时，会提供一个请求参数 `acks`：
 
 1. acks=0：表示 producer 不需要等分区 leader broker 返回任何响应，将消息存入套接字缓冲区（socket buffer）就当做消息已经发送成功。所以可靠性是没有保证的。
-    
-2. acks=1：表示 分区 leader broker 将消息写入自己的本地日志文件，就向 producer 响应成功，不必等待分区副本 broker 同步好消息。
-    
-3. acks=-1 或 acks=all：表示 分区 leader broker 需要等待所有同步副本 broker 同步好消息并响应成功，才向 producer 响应成功
-    
+
+1. acks=1：表示 分区 leader broker 将消息写入自己的本地日志文件，就向 producer 响应成功，不必等待分区副本 broker 同步好消息。
+
+1. acks=-1 或 acks=all：表示 分区 leader broker 需要等待所有同步副本 broker 同步好消息并响应成功，才向 producer 响应成功
 
 第 2 种情况，如果分区 leader broker 挂掉/不存活，则副本未来得及同步的消息会丢失。
 
@@ -126,9 +107,8 @@ producer 向 Kafka 集群发消息时，会提供一个请求参数 `acks`：
 如果 leader 被系统判定为不存活，则会从（同步）副本中选举一个新的 leader，那么 Kafka 如何判定一个节点是否存活？存活判定依赖 2 个条件：
 
 1. 节点必须维持与 Zookeeper 的 session 连接（通过 Zookeeper 的心跳机制）
-    
-2. 如果是一个从节点（follower），则必须不断从 leader 节点同步消息数据，且同步进度没有落后太多
-    
+
+1. 如果是一个从节点（follower），则必须不断从 leader 节点同步消息数据，且同步进度没有落后太多
 
 如果 producer 在发送消息的过程中发生网络问题，它没法判定分区 leader 是否收到消息。0.11.0.0 版本之前，producer 只能重发消息，别无他法，因此只能提供“最少消费一次的”交付语义。0.11.0.0 版本之后，Kafka producer 支持一个幂等交付功能选项，可以确保消息重发不会导致 Kafka 的消息日志中出现重复的条目：broker 为每个 producer 分配一个 ID，然后基于消息序号来去重。
 
@@ -137,17 +117,14 @@ producer 向 Kafka 集群发消息时，会提供一个请求参数 `acks`：
 从 consumer 角度来看，同一个分区的所有副本，日志数据相同，消费进度也一样。consumer 可以控制自己对分区日志数据的消费位置。
 
 1. 如果 consumer 读取消息后，先向 kafka 提交消费位置，再处理消息；如果该 consumer 挂掉或重启，会可能导致丢消息，从而只能满足“最多处理一次”交付语义。
-    
-2. 如果 consumer 读取消息后，是先处理，再提交消费位置；如果该 consumer 挂掉或重启，则可能导致重复消费消息，从而只能满足“最少处理一次”交付语义。
-    
+
+1. 如果 consumer 读取消息后，是先处理，再提交消费位置；如果该 consumer 挂掉或重启，则可能导致重复消费消息，从而只能满足“最少处理一次”交付语义。
 
 如何实现“仅处理一次”语义？借助 Producer 的事务能力。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **复制**    **-****
-
-  
 
 复制的粒度/单元是 topic 分区。Kafka 集群中，每个分区都有一个 leader broker 节点，0个或多个从节点（follower）。分区读写都是由 leader broker 处理。
 
@@ -177,22 +154,19 @@ Kafka 选择仲裁成员集（quorum set）的方式与此不同，而不是基�
 
 与 Kafka ISR 模型实际实现最相近的学术论文是微软的 PacificA（http://research.microsoft.com/apps/pubs/default.aspx?id=66814）。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **可用性和持久性保证**    **-****
-
-  
 
 注意：producer 发送消息时设定 `acks=all` 并不是要求所有的副本都确认写入成功，而是在当前同步中副本（ISR）都确认写入成功时，分区 leader 就向 producer 响应成功。例如：某个 topic 被设置为 2 个副本，然后其中一个副本节点挂掉，此时要求 `acks=all` 的写操作也会成功。如果剩下的副本节点也挂了，那么就会丢消息啦。
 
 为了方便用户在 可用性 和 持久性 之间权衡，Kafka 提供两个 topic 级别的配置，用于 持久性 比 可用性 重要的情况：
 
 1. 禁用脏 leader 选举
-    
-2. 指定一个最小 ISR 集大小（`min.insync.replicas` 参数设置）：只有当 ISR 集大小大于设定的最小值，分区 [leader] 才会接受消息写入。这个设置只有当 producer 使用 `acks=all` 时才会生效。（注：在我们生产环境中，分区副本数通常申请为 3（包含 leader），那么 `min.insync.replicas` 应该设定为 2，但默认是 1。使用 1，那么当分区只有一个副本（即 leader），producer 也能写入成功，但如果这个副本又挂了，就会丢数据。）
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+1. 指定一个最小 ISR 集大小（`min.insync.replicas` 参数设置）：只有当 ISR 集大小大于设定的最小值，分区 \[leader\] 才会接受消息写入。这个设置只有当 producer 使用 `acks=all` 时才会生效。（注：在我们生产环境中，分区副本数通常申请为 3（包含 leader），那么 `min.insync.replicas` 应该设定为 2，但默认是 1。使用 1，那么当分区只有一个副本（即 leader），producer 也能写入成功，但如果这个副本又挂了，就会丢数据。）
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **副本管理**    **-****
 
@@ -200,29 +174,27 @@ Kafka 选择仲裁成员集（quorum set）的方式与此不同，而不是基�
 
 另外，在分区 leader 节点之后重新选出 leader 之前，存在一段不可用的时间窗口，为了缩短这个时间窗口，Kafka 会从所有 broker 中选择一个作为“控制器（controller）”，这个控制器会检测 broker 级别的问题（failures），在发现某个 broker 挂掉之后，负责为受影响的分区指定新的 leader，而不是每个分区自己负责重新选主，这样的选主过程更轻量更快。如果控制器节点挂了，还存活的 broker 中的一个会成为新的控制器。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ****-**     **消费者消费进度跟踪**    **-****
 
 Kafka 为每个消费组（consumer group）指定一个 broker 来存储目标 topic 各个分区的消费进度（offsets），这个 broker 称为 组协调器（group coordinator）。这个消费组中的任一消费者实例都应该将消费进度提交到这个组协调器，或者从这个组协调器获取启动之前上次的消费进度。Kafka 基于消费组的名称为消费组分配协调器。消费者可以向任一 broker 发送 FindCoordinatorRequest 请求来查找自己的协调器，并从 FindCoordinatorResponse 响应中获取协调器的详细信息。
 
-在组协调器接收到一个 OffsetCommitRequest 请求后，会将请求数据写到一个特殊的经压实的（compacted）（http://kafka.apache.org/documentation/#compaction） Kafka topic - ___consumer_offsets_。在目标分区的所有副本都确认收到了，协调器才会向消费者发送进度提交成功的响应。这个 topic 的消息日志数据会定期进行压实（compact），因为只需要为每个分区维护最新的消费进度。协调器也会在内存中缓存消费进度，方便快速响应消费进度查询请求。
+在组协调器接收到一个 OffsetCommitRequest 请求后，会将请求数据写到一个特殊的经压实的（compacted）（http://kafka.apache.org/documentation/#compaction） Kafka topic - \_\__consumer_offsets_。在目标分区的所有副本都确认收到了，协调器才会向消费者发送进度提交成功的响应。这个 topic 的消息日志数据会定期进行压实（compact），因为只需要为每个分区维护最新的消费进度。协调器也会在内存中缓存消费进度，方便快速响应消费进度查询请求。
 
-注：如果消费者/消费组特别多（例如：我们广告引擎服务，读取正排消息 topic，一个机器实例就是一个 consumer group，数量在几百到几千不等），那么组协调器的压力会比较大，那么确保组协调器的角色均匀分配到集群的所有 broker，比较关键。另外，___consumer_offsets_ 这个 topic 的分区数量不能太少，最好和 broker 数量相同或者整数倍数量。
-
-  
+注：如果消费者/消费组特别多（例如：我们广告引擎服务，读取正排消息 topic，一个机器实例就是一个 consumer group，数量在几百到几千不等），那么组协调器的压力会比较大，那么确保组协调器的角色均匀分配到集群的所有 broker，比较关键。另外，\_\__consumer_offsets_ 这个 topic 的分区数量不能太少，最好和 broker 数量相同或者整数倍数量。
 
 > 作者：xiayf
-> 
+>
 > 来源：
-> 
+>
 > http://blog.xiayf.cn/2019/10/13/reading-kafka-design/
 
 ![](https://res.wx.qq.com/t/fed_upload/b39ef69e-c4d6-4169-8612-5f00a84860e7/wx-avatar-default.svg)
 
 公众号
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 5233
 

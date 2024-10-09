@@ -1,54 +1,67 @@
 程序员贺同学
- _2021年11月30日 18:00_
+_2021年11月30日 18:00_
 
-](https://mp.weixin.qq.com/s?__biz=MzIzNzg5MDg0OA==&mid=2247489803&idx=2&sn=87012df52ebcd7067a542c8676b3c10c&chksm=e8c0e544dfb76c52f7b38ec26076768922515bfc0915b71a3d18b51c0a16ba7640918867a0ed&mpshare=1&scene=24&srcid=1201XZI4O2RNXTkQM4xpmHnW&sharer_sharetime=1638291363696&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0f0dc7289d73481b1eeaa18706aa9f329fd4717f7c7cc3e9043bf1187aeacd0942b5bf72b62826706f9da0d00f5a3b7498f98fdffd43c4a2f15bda1b40073160aa6ef86e2930c14d22eae2f9b53af5afaaf638fad8df854aa7a6f99d03839a043c7eacfcd85f0df042014c57995d1b0b22606bd350398bfc0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQyWeiY1QBv32WlC1ipAHjsBLmAQIE97dBBAEAAAAAANd3LCBdpKoAAAAOpnltbLcz9gKNyK89dVj0CClYMrfo2IAW12woIcqgRLOnRNuXuKdwJCtbqSij6Up21%2FhNHqr9Q%2F%2Bv9Q6A0JHApWJcpzx0cD7BNeGqVP9KgWbTAp5gm4ONKWFQCIoYgI1QTVx2ZHs7dF0kChpKYIHqpcQvXW0x%2FTBS7r1b0DnpARA07FS%2BIWGJ4dJPqjSIq7yU3PplMv%2FY8WmT7paSuHFEeTenzCWADgQHEmm%2Bw6QQwvioVD9R7RqnwmNkEfuAlOGKP3swl6Av32QlGRQAKlPN&acctmode=0&pass_ticket=DtCoxrbLL2IYlHdRVfcXJyDACEf4T0ystHecsfuVSTzd50i%2F%2FUotZituUa%2BV%2B255&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzIzNzg5MDg0OA==&mid=2247489803&idx=2&sn=87012df52ebcd7067a542c8676b3c10c&chksm=e8c0e544dfb76c52f7b38ec26076768922515bfc0915b71a3d18b51c0a16ba7640918867a0ed&mpshare=1&scene=24&srcid=1201XZI4O2RNXTkQM4xpmHnW&sharer_sharetime=1638291363696&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0f0dc7289d73481b1eeaa18706aa9f329fd4717f7c7cc3e9043bf1187aeacd0942b5bf72b62826706f9da0d00f5a3b7498f98fdffd43c4a2f15bda1b40073160aa6ef86e2930c14d22eae2f9b53af5afaaf638fad8df854aa7a6f99d03839a043c7eacfcd85f0df042014c57995d1b0b22606bd350398bfc0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQyWeiY1QBv32WlC1ipAHjsBLmAQIE97dBBAEAAAAAANd3LCBdpKoAAAAOpnltbLcz9gKNyK89dVj0CClYMrfo2IAW12woIcqgRLOnRNuXuKdwJCtbqSij6Up21%2FhNHqr9Q%2F%2Bv9Q6A0JHApWJcpzx0cD7BNeGqVP9KgWbTAp5gm4ONKWFQCIoYgI1QTVx2ZHs7dF0kChpKYIHqpcQvXW0x%2FTBS7r1b0DnpARA07FS%2BIWGJ4dJPqjSIq7yU3PplMv%2FY8WmT7paSuHFEeTenzCWADgQHEmm%2Bw6QQwvioVD9R7RqnwmNkEfuAlOGKP3swl6Av32QlGRQAKlPN&acctmode=0&pass_ticket=DtCoxrbLL2IYlHdRVfcXJyDACEf4T0ystHecsfuVSTzd50i%2F%2FUotZituUa%2BV%2B255&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 # Part1一、让自己习惯C++
+
 ### 条款01：视C++为**一个语言联邦**
 
 C++并不是一个带有一组守则的一体语言：他是从四个次语言( C、Object-Oriented C++、Template、STL )  组成的联邦政府，每个次语言都有自己的规约。记住这四个次于语言你就会发现C++容易了解得多。
+
 ### 条款02:尽量以const,enum,inline替换 #define
+
 ```cpp
  #define ASPECT_RATIO 1.653
 ```
+
 以上句为例，是通过预处理器处理而不是编译器处理，有可能ASPECT_RATIO 没进入记号表内，于是如果出现了编译错误，那么编译器会提示错误信息是 1.653  而不是 ASPECT_RATIO ，你会感到非常困惑。
 
 解决方法是用常量替换宏
+
 ```cpp
 const double AspectRatio = 1.653
 ```
+
 这样编译器就可以看到ASPECT_RATIO ，而且使用常量会使代码量较小，因为预处理器只会盲目的替换而出现多份 1.653
 
-string对象通常比char* 更好一点
+string对象通常比char\* 更好一点
 
 对于class的专属常量，为了限制作用域在class内,并且防止产生多个实体，最好使用static
 
-    1. 如果你的编译器支持在类内对const static 整数类型声明时获初值，则使用  
-    2. 如果不支持，则在类内定义，在对应的实现文件中赋值  
+1\. 如果你的编译器支持在类内对const static 整数类型声明时获初值，则使用\
+2\. 如果不支持，则在类内定义，在对应的实现文件中赋值
 
 如果你需要在编译器就使用一个class常量值，则应最好改用枚举类型enum，且枚举不能用来取地址，不会为它分配额外的存储空间对于形似函数的宏，最好改用inline的模板函数
+
 ### 条款 03:尽可能使用const
 
-const出现在星号左边目标是指物是常量,出现在星号右边表示指针本身是常量,如果出现在两边，则指针和物都是常量void f1(const Widget* pw)和void f2(Widget const* pw)两种写法意义相同,都表示被指物是常量 对于STL迭代器来说，如果你希望迭代器所指的动科不可改动，你需要的是const_iterator 令函数返回一个常量值，往往可以降低因客户错误而造成的意外(例如把一个值赋值给一个返回值) 将const实施与成员函数的目的是为了明确该成员函数可作用于const对象:
+const出现在星号左边目标是指物是常量,出现在星号右边表示指针本身是常量,如果出现在两边，则指针和物都是常量void f1(const Widget\* pw)和void f2(Widget const\* pw)两种写法意义相同,都表示被指物是常量 对于STL迭代器来说，如果你希望迭代器所指的动科不可改动，你需要的是const_iterator 令函数返回一个常量值，往往可以降低因客户错误而造成的意外(例如把一个值赋值给一个返回值) 将const实施与成员函数的目的是为了明确该成员函数可作用于const对象:
 
 ```
     1. 他们使class接口比较容易理解    2. 他们使得可以操作const对象
 ```
 
 const成员函数和no-const成员函数可重载，即可以同时出现，在传入不同的参数时候会调用不同的版本，但是有时我们需要这样，但是又不想代码重复，我们可以在no-const成员调用const成员函数来处理这个代码重复问题 例如：
+
 ```cpp
 const_cast<char &>( static_cast<const TextBlock&>(*this)[position]);
 ```
+
 ,经过这样里面 先安全转型使得调用的是const版本，外面再去const转型
+
 ### 条款 04:确定对象被使用前已先被初始化
 
 对于内置类型要进行手工初始化构造函数最好使用成员初值列表，不要在构造函数中使用赋值操作来初始化，而且初值列表列出的成员变量次序应该和在class中声明的次序一样，因为声明次序就是C++保证的初始化次序 对于static对象，在跨编译单元之间的初始化次序是不能确定的，因为C++只保证在本文件内使用之前一定被初始化了
 
 举例(使用如下方式可以解决这个问题即以loacl static对象替换non-local static对象)：
+
 ```cpp
 class FileSystem{...};   FileSystem& tfs(){       static FileSystem fs;       return fs;   }   
 ```
+
 # Part2二、构造/析构/赋值运算
+
 ### 条款05:了解C++默默编写并调用了哪些函数
 
 如果你不定义，编译器会自动帮你实习默认的构造函数，析构函数，拷贝赋值运算符和拷贝构造函数，但是如下几种情况不会替你生成默认的拷贝赋值运算符
@@ -56,9 +69,11 @@ class FileSystem{...};   FileSystem& tfs(){       static FileSystem fs; 
 ```
     1. 类中含有**引用**的成员变量    2. 类中含有**const**的成员变量    3. 类的**基类**中的拷贝赋值运算符是**私有**成员函数
 ```
+
 ### 条款06：若不想使用编译器自动生成的函数，就应该明确拒绝
 
 当我们不希望编译器帮我们生成相应的成员函数的时候，我们可以将其声明为private并且不予以实现
+
 ### 条款07：为多态基类声明virtual析构函数
 
 以下情况应该为类声明一个virtual析构函数:
@@ -86,39 +101,49 @@ class Transaction{       publci:        explicit Transaction(const s
 				  private:        static std::string createLogString( parameters );//注意此函数为static函数   
 				  }      
 ```
-### 条款10：令operator= 返回一个reference to *this
+
+### 条款10：令operator= 返回一个reference to \*this
 
 为了实现连锁赋值如内置类型x= y = z =15由于=采用右结合律，所以等价于x = (y = (z = 15)),因此，为了使我们自定义类也实现，所以*重载=,+=,-=,*=使其返回refercence to this
+
 ### 条款11：在operator= 中处理“自我赋值”
 
 在赋值的时候会出现对自我进行赋值的情况，这种情况下我们很容易写出不安全的代码
+
 ```cpp
 Widget::operator=(const Widget& rhs){    delete pb; //把自己释放了    pb = new Bitmap(*rhs.pb);//这就不安全了    return *this;   }   
 ```
+
 因此有三种推荐的做法
 
 1. ##### 先验证是不是相同的，是不是自我赋值
-    
+
 ```cpp
 Widget::operator=(const Widget& rhs){   if(this == &rhs) return *this;//验证是不是相同    delete pb;     pb = new Bitmap(*rhs.pb);    return *this;   }   
 ```
+
 2. ##### 在复制pb所指的东西之前别删除pb
-    
+
 ```cpp
 Widget::operator=(const Widget& rhs){    Bitmap* pOrig = pb;    pb = new Bitmap(*rhs.pb);//让pb指向*pb的一个副本       delete pOrig; //删除原先的pb    return *this;   }   
 ```
+
 3. ##### 使用交换数据的函数
-    
+
 ```cpp
 class Widget{   ...   void swap(Widget& rhs);//交换*this和rhs的数据   ...   };   Widget::operator=(const Widget& rhs){    Widget temp(rhs);//创建一个rhs副本    swap(temp);//交换*this和上面的副本    return *this;   }   
 ```
+
 ### 条款12：复制对象时勿忘其每一个成分
 
 为了确保复制的时候复制对象内的所有成员变量，我们应该在字类的构造和赋值函数中调用父类的构造和赋值函数来完成各自的任务 不要尝试在复制构造函数和赋值函数中相互调用，如果想消除重复代码，请建立一个新的成员函数，并且最好将其设为私有且命名为init
+
 # Part3三、资源管理
+
 ### 条款13：以对象管理资源
 
 为了防止资源泄露，我们应该在构造函数中获取资源，在析构函数中释放资源，这样可以有效的避免资源泄露 使用智能指针是一个好的办法，在C++11中auto_ptr已经被弃用，有三个常用的是unique_ptr,share_ptr和weak_ptr
+
 ### 条款14：在资源管理类中心copying行为
 
 我们在管理RAII(构造函数中获得，析构函数中释放)观念的类时，应该对不同的情况，根据不同的目的进行处理
@@ -135,11 +160,11 @@ class Widget{   ...   void swap(Widget& rhs);//交换*this和rhs的数据   .
 
 ### 条款16：成对使用new和delete时要采用相同形式
 
-不要对数组形式做typedef,因为这样会导致delete的时候调用的是delete ptr而不是delete [] ptr,对内置类型会出现未定义或有害的，对类的类型会导致无法调用剩余的析构函数，导致类中管理的资源无法释放，从而造成内存泄漏 在new 表达式中使用[ ] ,则在相应的delete 表达式中也使用 [ ]
+不要对数组形式做typedef,因为这样会导致delete的时候调用的是delete ptr而不是delete \[\] ptr,对内置类型会出现未定义或有害的，对类的类型会导致无法调用剩余的析构函数，导致类中管理的资源无法释放，从而造成内存泄漏 在new 表达式中使用\[ \] ,则在相应的delete 表达式中也使用 \[ \]
 
 ### 条款17：以独立语句将newed对象置入智能指针
 
-   诸如这样的语句processWidget (std::tr1::shared_ptr(new Widget),priority())
+诸如这样的语句processWidget (std::tr1::shared_ptr(new Widget),priority())
 
 ```
     1. 在先执行new Widget`语句和调用std::tr1::shared_ptr构造函数之间    2. 不能确定priority函数的执行顺序，可能在最前面，也可能在他们的中间
@@ -198,25 +223,18 @@ protected并不比public更具封装性
 旧式转型是C风格的转型，C++中提供四种新式转型：
 
 1. const_cast 通常被用来将对象的常量性转除。它也是唯一有此能力的转型操作符
-    
-2. ##### dynamic_cast 主要用来执行“安全向下转型” ，也就是用来决定对某对象是否归属继承体系中的某个类型。它是唯一无法由旧式语法执行的动作，也是唯一可能耗费重大运行成本的转型动作
-    
-3. ##### reinterpret_cast 意图执行低级转型，实际动作（及结果）可能取决于编译器，这也就表示它不可移植。例如将一个pointer to int转型为一个int。这一类转型在低级代码以外很少见。
-    
-4. ##### static_cast 用来强迫隐式转换，例如将non-const对象转换为const对象，或将int转为double等等，它也可以用来执行上述多种转换的反向转换，例如将void* 指针转为 type 指针，将pointer-to-base 转为 pointer-ro-derived 。但它无法将 const 转为 non-const ——这个只有const_cast才能办到
-    
 
-  
+1. ##### dynamic_cast 主要用来执行“安全向下转型” ，也就是用来决定对某对象是否归属继承体系中的某个类型。它是唯一无法由旧式语法执行的动作，也是唯一可能耗费重大运行成本的转型动作
 
-  
+1. ##### reinterpret_cast 意图执行低级转型，实际动作（及结果）可能取决于编译器，这也就表示它不可移植。例如将一个pointer to int转型为一个int。这一类转型在低级代码以外很少见。
 
-  
+1. ##### static_cast 用来强迫隐式转换，例如将non-const对象转换为const对象，或将int转为double等等，它也可以用来执行上述多种转换的反向转换，例如将void\* 指针转为 type 指针，将pointer-to-base 转为 pointer-ro-derived 。但它无法将 const 转为 non-const ——这个只有const_cast才能办到
 
 ```
 旧式转型使用的时机是，当要调用一个explicit构造函数对一个对象传递给一个函数时，其他尽量用新式转型
 ```
 
-        请记住以下：
+请记住以下：
 
 ```
     1. 如果可以的话，避免dynamic_cast转型，如果实在需要，则可以试着用别的无转型方案代替    2. 如果转型是必要的，那么应该把他隐藏于某个函数背后，客户随后可以调用该函数，而不是需要将转型放进自己的代码里    3. 宁可要新型转型，也不要使用旧式转型
@@ -300,7 +318,7 @@ public继承意味着is-a的关系，即子类是父类的一种特殊化，适�
 
 声明模板参数的时候，class和typename是可以互换的，没什么不一样 但是标识嵌套从属类型名称的时候必须用typename 不得在基类列（继承的时候）或成员初值列（初始化列表）内以它作为基类修饰符
 
-`templete<typename T>   class Derived:public Base<T>::Nested{ //基类列表中不可以加“typename”   public:       explicit Derived(int x): Base<T>::Nested(x){//mem.init.list中不允许“typename”           typename Base<T>::Nested temp; //这个是嵌套从属类型名称           ... //作为一个基类修饰符需要加上typename       }   }`   
+`templete<typename T>   class Derived:public Base<T>::Nested{ //基类列表中不可以加“typename”   public:       explicit Derived(int x): Base<T>::Nested(x){//mem.init.list中不允许“typename”           typename Base<T>::Nested temp; //这个是嵌套从属类型名称           ... //作为一个基类修饰符需要加上typename       }   }`
 
 ### 条款43：学习处理模板化基类内的名称
 
@@ -360,21 +378,19 @@ C++标准程序库的主要机能由STL、iostream、locales组成。并包含C9
 
 Boost是一个社群，也是一个网站。致力于免费、源码开放、同僚复审的C++程序库开发。Boost在C++标准化过程中扮演具有影响力的角色 Boost提供许多TR1组件实现品，以及其他许多程序库
 
----
+______________________________________________________________________
 
-  
 写留言
 
 **留言 1**
 
 - Mints
-    
-    2021年11月30日
-    
-    赞
-    
-    干货满满
-    
+
+  2021年11月30日
+
+  赞
+
+  干货满满
 
 已无更多数据
 
@@ -393,12 +409,11 @@ Boost是一个社群，也是一个网站。致力于免费、源码开放、同
 **留言 1**
 
 - Mints
-    
-    2021年11月30日
-    
-    赞
-    
-    干货满满
-    
+
+  2021年11月30日
+
+  赞
+
+  干货满满
 
 已无更多数据

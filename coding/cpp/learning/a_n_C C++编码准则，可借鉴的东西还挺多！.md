@@ -1,7 +1,7 @@
 C语言与CPP编程
- _2022年01月07日 16:07_
+_2022年01月07日 16:07_
 
-什么是好的程序员？是不是懂得很多技术细节？还是懂底层编程？还是编程速度比较快？我觉得都不是。  
+什么是好的程序员？是不是懂得很多技术细节？还是懂底层编程？还是编程速度比较快？我觉得都不是。\
 对于一些技术细节来说和底层的技术，只要看帮助，查资料就能找到，对于速度快，只要编得多也就熟能生巧了。
 我认为好的程序员应该有以下几方面的素质：
 
@@ -114,11 +114,11 @@ typedef struct _pt_man_t_ {  int numProc; /* Number of processes */ 
 
 好了，说几个注释的技术细节：
 
-i) 对于行注释（“//”）比块注释（“/* */”）要好的说法，我并不是很同意。因为一些老版本的C编译器并不支持行注释，所以为了你的程序的移植性，请你还是尽量使用块注释。
+i) 对于行注释（“//”）比块注释（“/\* \*/”）要好的说法，我并不是很同意。因为一些老版本的C编译器并不支持行注释，所以为了你的程序的移植性，请你还是尽量使用块注释。
 
 ii) 你也许会为块注释的不能嵌套而不爽，那么你可以用预编译来完成这个功能。使用“#if 0”和“#endif”括起来的代码，将不被编译，而且还可以嵌套。
 
-## 4、函数的[in][out]参数
+## 4、函数的\[in\]\[out\]参数
 
 我经常看到这样的程序：
 
@@ -172,7 +172,7 @@ if ( ch < '0' || ch > '9' ){  /* 输出错误信息 */  printf("e
 #ifndef <标识>#define <标识>............#endif
 ```
 
-<标识>在理论上来说可以是自由命名的，但每个头文件的这个“标识”都应该是唯一的。标识的命名规则一般是头文件名全大写，前后加下划线，并把文件名中的“.”也变成下划线，如：stdio.h
+\<标识>在理论上来说可以是自由命名的，但每个头文件的这个“标识”都应该是唯一的。标识的命名规则一般是头文件名全大写，前后加下划线，并把文件名中的“.”也变成下划线，如：stdio.h
 
 ```
 #ifndef _STDIO_H_#define _STDIO_H_......#endif
@@ -217,11 +217,10 @@ char *AllocStrFromHeap(int len){  char *pstr;  if ( len <= 0 ) retu
 对于malloc和free的操作有以下规则：
 
 - 配对使用，有一个malloc，就应该有一个free。（C++中对应为new和delete）
-    
+
 - 尽量在同一层上使用，不要像上面那种，malloc在函数中，而free在函数外。最好在同一调用层上使用这两个函数。
-    
+
 - malloc分配的内存一定要初始化。free后的指针一定要设置为NULL。
-    
 
 注：虽然现在的操作系统（如：UNIX和Win2k/NT）都有进程内存跟踪机制，也就是如果你有没有释放的内存，操作系统会帮你释放。但操作系统依然不会释放你程序中所有产生了Memory Leak的内存，所以，最好还是你自己来做这个工作。（有的时候不知不觉就出现Memory Leak了，而且在几百万行的代码中找无异于海底捞针，Rational有一个工具叫Purify，可能很好的帮你检查程序中的Memory Leak）
 
@@ -230,9 +229,8 @@ char *AllocStrFromHeap(int len){  char *pstr;  if ( len <= 0 ) retu
 接上一条，变量一定要被初始化再使用。C/C++编译器在这个方面不会像JAVA一样帮你初始化，这一切都需要你自己来，如果你使用了没有初始化的变量，结果未知。好的程序员从来都会在使用变量前初始化变量的。如：
 
 - 对malloc分配的内存进行memset清零操作。（可以使用calloc分配一块全零的内存）
-    
+
 - 对一些栈上分配的struct或数组进行初始化。（最好也是清零）
-    
 
 不过话又说回来了，初始化也会造成系统运行时间有一定的开销，所以，也不要对所有的变量做初始化，这个也没有意义。好的程序员知道哪些变量需要初始化，哪些则不需要。如：以下这种情况，则不需要。
 
@@ -272,7 +270,7 @@ char* errmsg[] = {  /* 0 */ "No error",  /* 1 */ "Open file erro
 
 那么这份信息将有5个副本存在于你的执行文件中。如果你的这个errmsg很大的话，而且你用到的函数库更多的话，你的执行文件也会变得很大。
 
-正确的写法应该把它写到C文件中，然后在各个需要用到errmsg的C文件头上加上 extern char* errmsg[]; 的外部声明，让编译器在链接时才去管他，这样一来，就只会有一个errmsg存在于执行文件中，而且，这样做很利于封装。
+正确的写法应该把它写到C文件中，然后在各个需要用到errmsg的C文件头上加上 extern char\* errmsg\[\]; 的外部声明，让编译器在链接时才去管他，这样一来，就只会有一个errmsg存在于执行文件中，而且，这样做很利于封装。
 
 我曾遇到过的最疯狂的事，就是在我的目标文件中，这个errmsg一共有112个副本，执行文件有8M左右。当我把errmsg放到C文件中，并为一千多个C文件加上了extern的声明后，所有的函数库文件尺寸都下降了20%左右，而我的执行文件只有5M了。一下子少了3M啊。
 
@@ -388,9 +386,9 @@ if ( ( ch[0] >= '0' || ch[0] <= '9' ) &&   ( ch[1] >= 'a' || 
 
 ## 18、函数参数中的const
 
-对于一些函数中的指针参数，如果在函数中只读，请将其用const修饰，这样，别人一读到你的函数接口时，就会知道你的意图是这个参数是[in]，如果没有const时，参数表示[in/out]，注意函数接口中的const使用，利于程序的维护和避免犯一些错误。
+对于一些函数中的指针参数，如果在函数中只读，请将其用const修饰，这样，别人一读到你的函数接口时，就会知道你的意图是这个参数是\[in\]，如果没有const时，参数表示\[in/out\]，注意函数接口中的const使用，利于程序的维护和避免犯一些错误。
 
-虽然，const修饰的指针，如：const char* p，在C中一点用也没有，因为不管你的声明是不是const，指针的内容照样能改，因为编译器会强制转换，但是加上这样一个说明，有利于程序的阅读和编译。因为在C中，修改一个const指针所指向的内存时，会报一个Warning。这会引起程序员的注意。
+虽然，const修饰的指针，如：const char\* p，在C中一点用也没有，因为不管你的声明是不是const，指针的内容照样能改，因为编译器会强制转换，但是加上这样一个说明，有利于程序的阅读和编译。因为在C中，修改一个const指针所指向的内存时，会报一个Warning。这会引起程序员的注意。
 
 C++中对const定义的就很严格了，所以C++中要多多的使用const，const的成员函数，const的变量，这样会对让你的代码和你的程序更加完整和易读。（关于C++的const我就不多说了）
 
@@ -586,7 +584,7 @@ express1 && express2
 if ( sum > 100 &&( ( fp=fopen( filename,"a" ) ) != NULL ) {  fprintf(fp, "Warring: it beyond one hundred\n");  ......}fprintf( fp, " sum is %id \n", sum );fclose( fp );
 ```
 
-本来的意图是，如果sum > 100 ，向文件中写一条出错信息，为了方便，把两个条件判断写在一起，于是，如果sum<=100时，打开文件的操作将不会做，最后，fprintf和fclose就会发现未知的结果。
+本来的意图是，如果sum > 100 ，向文件中写一条出错信息，为了方便，把两个条件判断写在一起，于是，如果sum\<=100时，打开文件的操作将不会做，最后，fprintf和fclose就会发现未知的结果。
 
 再比如，如果我想判断一个字符是不是有内容，我得判断这个字符串指针是不为空（NULL）并且其内容不能为空（Empty），一个是空指针，一个是空内容。我也许会这样写：
 
@@ -708,7 +706,7 @@ END
 
 ****来源：https://blog.csdn.net/haoel/article/details/2872/****
 
----
+______________________________________________________________________
 
 版权归原作者所有，如有侵权，请联系删除。
 
@@ -727,55 +725,54 @@ END
 **留言 6**
 
 - AUSTIN
-    
-    2022年1月7日
-    
-    赞
-    
-    今年的C++新人，表示学到了很多！有的知识点上网搜也不知道怎么描述，在这里全部解答了，点赞！![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    置顶
-    
-    C语言与CPP编程
-    
-    作者2022年1月7日
-    
-    赞1
-    
-    有帮助就好，可以星标⭐一下公众号，支持一波
-    
-    AUSTIN
-    
-    2022年1月7日
-    
-    赞
-    
-    ![[OK]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月7日
+
+  赞
+
+  今年的C++新人，表示学到了很多！有的知识点上网搜也不知道怎么描述，在这里全部解答了，点赞！![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  置顶
+
+  C语言与CPP编程
+
+  作者2022年1月7日
+
+  赞1
+
+  有帮助就好，可以星标⭐一下公众号，支持一波
+
+  AUSTIN
+
+  2022年1月7日
+
+  赞
+
+  ![[OK]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Hunter
-    
-    2022年2月15日
-    
-    赞
-    
-    堆内存在程序退出后通常会自动释放，不自动释放的可能是非常老的系统
-    
+
+  2022年2月15日
+
+  赞
+
+  堆内存在程序退出后通常会自动释放，不自动释放的可能是非常老的系统
+
 - 自由人
-    
-    2022年1月7日
-    
-    赞
-    
-    收获很大，赞！
-    
-    C语言与CPP编程
-    
-    作者2022年1月7日
-    
-    赞
-    
-    星标支持一波
-    
+
+  2022年1月7日
+
+  赞
+
+  收获很大，赞！
+
+  C语言与CPP编程
+
+  作者2022年1月7日
+
+  赞
+
+  星标支持一波
 
 已无更多数据
 
@@ -794,54 +791,53 @@ C语言与CPP编程
 **留言 6**
 
 - AUSTIN
-    
-    2022年1月7日
-    
-    赞
-    
-    今年的C++新人，表示学到了很多！有的知识点上网搜也不知道怎么描述，在这里全部解答了，点赞！![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    置顶
-    
-    C语言与CPP编程
-    
-    作者2022年1月7日
-    
-    赞1
-    
-    有帮助就好，可以星标⭐一下公众号，支持一波
-    
-    AUSTIN
-    
-    2022年1月7日
-    
-    赞
-    
-    ![[OK]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月7日
+
+  赞
+
+  今年的C++新人，表示学到了很多！有的知识点上网搜也不知道怎么描述，在这里全部解答了，点赞！![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  置顶
+
+  C语言与CPP编程
+
+  作者2022年1月7日
+
+  赞1
+
+  有帮助就好，可以星标⭐一下公众号，支持一波
+
+  AUSTIN
+
+  2022年1月7日
+
+  赞
+
+  ![[OK]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Hunter
-    
-    2022年2月15日
-    
-    赞
-    
-    堆内存在程序退出后通常会自动释放，不自动释放的可能是非常老的系统
-    
+
+  2022年2月15日
+
+  赞
+
+  堆内存在程序退出后通常会自动释放，不自动释放的可能是非常老的系统
+
 - 自由人
-    
-    2022年1月7日
-    
-    赞
-    
-    收获很大，赞！
-    
-    C语言与CPP编程
-    
-    作者2022年1月7日
-    
-    赞
-    
-    星标支持一波
-    
+
+  2022年1月7日
+
+  赞
+
+  收获很大，赞！
+
+  C语言与CPP编程
+
+  作者2022年1月7日
+
+  赞
+
+  星标支持一波
 
 已无更多数据

@@ -1,5 +1,5 @@
 Linux内核那些事
- _2021年12月03日 11:41_
+_2021年12月03日 11:41_
 
 > 简介：作为一个系统管理程序（hypervisor），Linux 有几个创新，2.6.32 内核中一个有趣的变化是 KSM(Kernel Samepage Merging) 允许这个系统管理程序通过合并内存页面来增加并发虚拟机的数量。本文探索 KSM 背后的理念（比如存储去耦合）、KSM 的实现、以及如何管理 KSM。
 
@@ -25,7 +25,7 @@ Linux内核那些事
 
 ## 其他技术支持
 
-存储技术中的一个称为去耦合（de-duplication）的最 新进展是 Linux 和其他系统管理程序中的内存共享的先驱。去耦合这种技术通过删除冗余数据（基于数据块，或者基于更大的数据片段，比如文件）来减少已存储的数据。公共数据 片段被合并（以一种 copy-on-write [CoW] 方式），释放空间供其他用途。使用这种方法，存储成本更低，最终需要的存储器也更少。鉴于当前的数据增长速度，这个功能显得非常重要。
+存储技术中的一个称为去耦合（de-duplication）的最 新进展是 Linux 和其他系统管理程序中的内存共享的先驱。去耦合这种技术通过删除冗余数据（基于数据块，或者基于更大的数据片段，比如文件）来减少已存储的数据。公共数据 片段被合并（以一种 copy-on-write \[CoW\] 方式），释放空间供其他用途。使用这种方法，存储成本更低，最终需要的存储器也更少。鉴于当前的数据增长速度，这个功能显得非常重要。
 
 ## KSM 操作
 
@@ -55,8 +55,8 @@ int madvise( void *start, size_t length, int advice );
 进程处理一个单一的页面时，第一步是检查是否能够在稳定树中发现该页面。搜索稳定树的过程很有趣，因为每个页面都被视为一个非常大的数字（页面的内容）。
 
 一个 `memcmp`（内存比较）操作将在该页面和相关节点的页面上执行。如果 memcmp 返回 0，则页面相同，发现一个匹配值。反之，如果 `memcmp` 返回 -1，则表示候选页面小于当前节点的页面；如果返回 1，则表示候选页面大于当前节点的页面。尽管比较 4KB 的页面似乎是相当重量级的比较，但是在多数情况下，一旦发现一个差异，memcmp 将提前结束。请参见图 3 查看这个过程的视觉呈现。
-![[Pasted image 20240915164943.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240915164943.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图 3. 搜索树中的页面的搜索过程
 
@@ -79,13 +79,12 @@ KSM 运行时，可以通过 3 个参数（sysfs中的文件）来控制它。sl
 还有 5 个通过 sysfs 导出的可监控文件（均为只读），它们表明 ksmd 的运行情况和效果。full_scans 文件表明已经执行的全区域扫描的次数。剩下的 4 个文件表明 KSM 的页面级统计数据：
 
 - `pages_shared`：KSM 正在使用的不可交换的内核页面的数量。
-    
+
 - `pages_sharing`：一个内存存储指示。
-    
+
 - `pages_unshared`：为合并而重复检查的惟一页面的数量。
-    
+
 - `pages_volatile`：频繁改变的页面的数量。
-    
 
 KSM 作者定义：较高的 `pages_sharing/pages_shared` 比率表明高效的页面共享（反之则表明资源浪费）。
 
@@ -95,9 +94,9 @@ Linux 并不是使用页面共享来改进内存效率的惟一系统管理程�
 
 参考：
 
-_1. http://tech.ddvip.com/2010-05/1273717017153364_2.html  
-__2. http://www.linux-kvm.com/content/using-ksm-kernel-samepage-merging-kvm  
-__3. http://www.linux-kvm.org/page/KSM_
+\_1. http://tech.ddvip.com/2010-05/1273717017153364_2.html\
+\_\_2. http://www.linux-kvm.com/content/using-ksm-kernel-samepage-merging-kvm\
+\__3. http://www.linux-kvm.org/page/KSM_
 
 原文：https://www.bbsmax.com/A/xl56ZklY5r/
 

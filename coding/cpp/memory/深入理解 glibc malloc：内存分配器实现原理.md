@@ -1,14 +1,13 @@
-
 Linux云计算网络
 
- _2022年01月08日 17:25_
+_2022年01月08日 17:25_
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/IsrmVA0RIYNjru15GKiaic6qe5P6PzUR1X9y6EnczNtz7neUVfGAciagDoPJoDOzg1nH6XYKeDU4xPyEuzZpzGamg/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)  
+![图片](https://mmbiz.qpic.cn/mmbiz_jpg/IsrmVA0RIYNjru15GKiaic6qe5P6PzUR1X9y6EnczNtz7neUVfGAciagDoPJoDOzg1nH6XYKeDU4xPyEuzZpzGamg/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
 # 
 
 > 译者：猫科龙
-> 
+>
 > 链接：https://blog.csdn.net/maokelong95/article/details/51989081
 
 ## 前言
@@ -16,30 +15,28 @@ Linux云计算网络
 堆内存（Heap Memory）是一个很有意思的领域。你可能和我一样，也困惑于下述问题很久了：
 
 - 如何从内核申请堆内存？
-    
+
 - 谁管理它？内核、库函数，还是应用本身？
-    
+
 - 内存管理效率怎么这么高？！
-    
+
 - 堆内存的管理效率可以进一步提高吗？
-    
 
 最近，我终于有时间去深入了解这些问题。下面就让我来谈谈我的调研成果。
 
 开源社区公开了很多现成的内存分配器（Memory Allocators，以下简称为**分配器**）：
 
 - dlmalloc – 第一个被广泛使用的通用动态内存分配器；
-    
+
 - ptmalloc2 – glibc 内置分配器的原型；
-    
+
 - jemalloc – FreeBSD ＆ Firefox 所用分配器；
-    
+
 - tcmalloc – Google 贡献的分配器；
-    
+
 - libumem – Solaris 所用分配器；
-    
+
 - …
-    
 
 每一种分配器都宣称自己快（fast）、可拓展（scalable）、效率高（memory efficient）！但是并非所有的分配器都适用于我们的应用。内存吞吐量大（memory hungry）的应用程序，其性能很大程度上取决于分配器的性能。
 
@@ -52,8 +49,8 @@ Linux云计算网络
 我在之前的文章中提到过，`malloc`内部通过`brk`或`mmap`系统调用向内核申请堆区。
 
 > **译者注**：在内存管理领域，我们一般用「堆」指代用于分配动态内存的虚拟地址空间，而用「栈」指代用于分配静态内存的虚拟地址空间。具体到虚拟内存布局（Memory Layout），堆维护在通过`brk`系统调用申请的「Heap」及通过`mmap`系统调用申请的「Memory Mapping Segment」中；而栈维护在通过汇编栈指令动态调整的「Stack」中。在 Glibc 里，「Heap」用于分配较小的内存及主线程使用的内存。
-> 
-> 下图为 Linux 内核 v2.6.7 之后，32 位模式下的虚拟内存布局方式。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+>
+> 下图为 Linux 内核 v2.6.7 之后，32 位模式下的虚拟内存布局方式。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 2. 多线程支持
 
@@ -138,176 +135,160 @@ For 32 bit systems:Number of arena = 2 * number of cores.For 64 bit
 举例而言：让我们来看一个运行在单核计算机上的 32 位操作系统上的多线程应用（4 线程，主线程 + 3 个线程）的例子。这里线程数量（4）> 2 * 核心数（1），所以分配器中可能有 Arena（也即标题所称「multiple arenas」）会被所有线程共享。那么是如何共享的呢？
 
 - 当主线程第一次调用`malloc`时，已经建立的 main arena 会被没有任何竞争地使用；
-    
+
 - 当 thread 1 和 thread 2 第一次调用`malloc`时，一块新的 arena 将被创建，且将被没有任何竞争地使用。此时线程和 arena 之间存在一一映射关系；
-    
+
 - 当 thread3 第一次调用`malloc`时，arena 的数量限制被计算出来，结果显示已超出，因此尝试复用已经存在的 arena（也即 Main arena 或 Arena 1 或 Arena 2）；
-    
+
 - 复用：
-    
 
 - 一旦遍历到可用 arena，就开始自旋申请该 arena 的锁；
-    
+
 - 如果上锁成功（比如说 main arena 上锁成功），就将该 arena 返回用户；
-    
+
 - 如果没找到可用 arena，thread 3 的`malloc`将被阻塞，直到有可用的 arena 为止。
-    
 
 - 当thread 3 调用`malloc`时(第二次了)，分配器会尝试使用上一次使用的 arena（也即，main arena），从而尽量提高缓存命中率。当 main arena 可用时就用，否则 thread 3 就一直阻塞，直至 main arena 空闲。因此现在 main arena 实际上是被 main thread 和 thread 3 所共享。
-    
 
 ### 3.3. Multiple Heaps
 
 在「glibc malloc」中主要有 3 种数据结构：
 
 - heap_info ——Heap Header—— 一个 thread arena 可以维护多个堆。每个堆都有自己的堆 Header（注：也即头部元数据）。什么时候 Thread Arena 会维护多个堆呢？一般情况下，每个 thread arena 都只维护一个堆，但是当这个堆的空间耗尽时，新的堆（而非连续内存区域）就会被`mmap`到这个 aerna 里；
-    
+
 - malloc_state ——Arena header—— 一个 thread arena 可以维护多个堆，这些堆另外共享同一个 arena header。Arena header 描述的信息包括：bins、top chunk、last remainder chunk 等；
-    
+
 - malloc_chunk ——Chunk header—— 根据用户请求，每个堆被分为若干 chunk。每个 chunk 都有自己的 chunk header。
-    
 
 > **注意**：
-> 
+>
 > - Main arena 无需维护多个堆，因此也无需 heap_info。当空间耗尽时，与 thread arena 不同，main arena 可以通过`sbrk`拓展**堆**段，直至堆段「碰」到内存映射段；
->     
+>
 > - 与 thread arena 不同，main arena 的 arena header 不是保存在通过`sbrk`申请的堆段里，而是作为一个全局变量，可以在 libc.so 的数据段中找到。
->     
 
 main arena 和 thread arena 的图示如下（单堆段）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 thread arena 的图示如下（多堆段）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 4. Chunk
 
 堆段中存在的 chunk 类型如下：
 
 - Allocated chunk;
-    
+
 - Free chunk;
-    
+
 - Top chunk;
-    
+
 - Last Remainder chunk.
-    
 
 ### 4.1. Allocated chunk
 
-「**Allocated chunck**」就是已经分配给用户的 chunk，其图示如下：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+「**Allocated chunck**」就是已经分配给用户的 chunk，其图示如下：!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图中左方三个箭头依次表示：
 
 - chunk：该 Allocated chunk 的起始地址；
-    
+
 - mem：该 Allocated chunk 中用户可用区域的起始地址（`= chunk + sizeof(malloc_chunk)`）；
-    
+
 - next_chunk：下一个 chunck（无论类型）的起始地址。
-    
 
 图中结构体内部各字段的含义依次为：
 
 - prev_size：若上一个 chunk 可用，则此字段赋值为上一个 chunk 的大小；否则，此字段被用来存储上一个 chunk 的用户数据；
-    
+
 - size：此字段赋值本 chunk 的大小，其最后三位包含标志信息：
-    
 
 - PREV_INUSE § – 置「1」表示上个 chunk 被分配；
-    
+
 - IS_MMAPPED (M) – 置「1」表示这个 chunk 是通过`mmap`申请的（较大的内存）；
-    
+
 - NON_MAIN_ARENA (N) – 置「1」表示这个 chunk 属于一个 thread arena。
-    
 
 > **注意**：
-> 
+>
 > - malloc_chunk 中的其余结构成员，如 fd、 bk，没有使用的必要而拿来存储用户数据；
->     
+>
 > - 用户请求的大小被转换为内部实际大小，因为需要额外空间存储 malloc_chunk，此外还需要考虑对齐。
->     
 
 ### 4.2. Free chunk
 
 「**Free chunck**」就是用户已释放的 chunk，其图示如下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图中结构体内部各字段的含义依次为：
 
 - prev_size: 两个相邻 free chunk 会被合并成一个，因此该字段总是保存前一个 allocated chunk 的用户数据；
-    
+
 - size: 该字段保存本 free chunk 的大小；
-    
+
 - fd: Forward pointer —— 本字段指向同一 bin 中的下个 free chunk（free chunk 链表的前驱指针）；
-    
+
 - bk: Backward pointer —— 本字段指向同一 bin 中的上个 free chunk（free chunk 链表的后继指针）。
-    
 
 ## 5. Bins
 
 「**bins**」 就是空闲列表数据结构。它们用以保存 free chunks。根据其中 chunk 的大小，bins 被分为如下几种类型：
 
 - Fast bin;
-    
+
 - Unsorted bin;
-    
+
 - Small bin;
-    
+
 - Large bin.
-    
 
 保存这些 bins 的字段为：
 
 - fastbinsY: 这个数组用以保存 fast bins；
-    
+
 - bins: 这个数组用于保存 unsorted bin、small bins 以及 large bins，共计可容纳 126 个，其中：
-    
 
 - Bin 1: unsorted bin;
-    
+
 - Bin 2 - 63: small bins;
-    
+
 - Bin 64 - 126: large bins.
-    
 
 ### 5.1. Fast Bin
 
 大小为 16 ~ 80 字节的 chunk 被称为「**fast chunk**」。在所有的 bins 中，fast bins 路径享有最快的内存分配及释放速度。
 
 - **数量**：10
-    
+
 - 每个 fast bin 都维护着一条 free chunk 的单链表，采用单链表是因为链表中所有 chunk 的大小相等，增删 chunk 发生在链表顶端即可；—— LIFO
-    
+
 - **chunk 大小**：8 字节递增
-    
+
 - fast bins 由一系列所维护 chunk 大小以 8 字节递增的 bins 组成。也即，`fast bin[0]`维护大小为 16 字节的 chunk、`fast bin[1]`维护大小为 24 字节的 chunk。依此类推……
-    
+
 - 指定 fast bin 中所有 chunk 大小相同；
-    
+
 - 在 malloc 初始化过程中，最大的 fast bin 的大小被设置为 64 而非 80 字节。因为默认情况下只有大小 16 ~ 64 的 chunk 被归为 fast chunk 。
-    
+
 - 无需合并 —— 两个相邻 chunk 不会被合并。虽然这可能会加剧内存碎片化，但也大大加速了内存释放的速度！
-    
+
 - `malloc(fast chunk)`
-    
+
 - 初始情况下 fast chunck 最大尺寸以及 fast bin 相应数据结构均未初始化，因此即使用户请求内存大小落在 fast chunk 相应区间，服务用户请求的也将是 small bin 路径而非 fast bin 路径；
-    
+
 - 初始化后，将在计算 fast bin 索引后检索相应 bin；
-    
+
 - 相应 bin 中被检索的第一个 chunk 将被摘除并返回给用户。
-    
+
 - `free(fast chunk)`
-    
 
 - 计算 fast bin 索引以索引相应 bin；
-    
-- `free`掉的 chunk 将被添加到上述 bin 的顶端。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- `free`掉的 chunk 将被添加到上述 bin 的顶端。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 5.2. Unsorted Bin
 
@@ -316,96 +297,82 @@ thread arena 的图示如下（多堆段）：
 > 译者注：经 @kwdecsdn 提醒，这里应补充说明「Unsorted Bin 中的 chunks 何时移至 small/large chunk 中」。在内存分配的时候，在前后检索 fast/small bins 未果之后，在特定条件下，会将 unsorted bin 中的 chunks 转移到合适的 bin 中去，small/large。
 
 - **数量**：1
-    
-- unsorted bin 包括一个用于保存 free chunk 的双向循环链表（又名 binlist）；
-    
-- **chunk 大小**：无限制，任何大小的 chunk 均可添加到这里。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- unsorted bin 包括一个用于保存 free chunk 的双向循环链表（又名 binlist）；
+
+- **chunk 大小**：无限制，任何大小的 chunk 均可添加到这里。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 5.3. Small Bin
 
 大小小于 512 字节的 chunk 被称为 「**small chunk**」，而保存 small chunks 的 bin 被称为 「**small bin**」。在内存分配回收的速度上，small bin 比 large bin 更快。
 
 - **数量**：62
-    
 
 - 每个 small bin 都维护着一条 free chunk 的双向循环链表。采用双向链表的原因是，small bins 中的 chunk 可能会从链表中部摘除。这里新增项放在链表的头部位置，而从链表的尾部位置移除项。—— FIFO
-    
 
 - **chunk 大小**：8 字节递增
-    
 
 - Small bins 由一系列所维护 chunk 大小以 8 字节递增的 bins 组成。举例而言，`small bin[0]`（Bin 2）维护着大小为 16 字节的 chunks、`small bin[1]`（Bin 3）维护着大小为 24 字节的 chunks ，依此类推……
-    
+
 - 指定 small bin 中所有 chunk 大小均相同，因此无需排序；
-    
 
 - 合并 —— 相邻的 free chunk 将被合并，这减缓了内存碎片化，但是减慢了`free`的速度；
-    
+
 - `malloc(small chunk)`
-    
 
 - 初始情况下，small bins 都是 NULL，因此尽管用户请求 small chunk ，提供服务的将是 unsorted bin 路径而不是 small bin 路径；
-    
+
 - 第一次调用`malloc`时，维护在 malloc_state 中的 small bins 和 large bins 将被初始化，它们都会指向自身以表示其为空；
-    
+
 - 此后当 small bin 非空，相应的 bin 会摘除其中最后一个 chunk 并返回给用户；
-    
 
 - `free(small chunk)`
-    
 
 - `free`chunk 的时候，检查其前后的 chunk 是否空闲，若是则合并，也即把它们从所属的链表中摘除并合并成一个新的 chunk，新 chunk 会添加在 unsorted bin 的前端。
-    
 
 ### 5.4. Large Bin
 
 大小大于等于 512 字节的 chunk 被称为「**large chunk**」，而保存 large chunks 的 bin 被称为 「**large bin**」。在内存分配回收的速度上，large bin 比 small bin 慢。
 
 - **数量**：63
-    
 
 - 32 个 bins 所维护的 chunk 大小以 64B 递增，也即`large chunk[0]`(Bin 65) 维护着大小为 512B ~ 568B 的 chunk 、`large chunk[1]`(Bin 66) 维护着大小为 576B ~ 632B 的 chunk，依此类推……
-    
+
 - 16 个 bins 所维护的 chunk 大小以 512 字节递增；
-    
+
 - 8 个 bins 所维护的 chunk 大小以 4096 字节递增；
-    
+
 - 4 个 bins 所维护的 chunk 大小以 32768 字节递增；
-    
+
 - 2 个 bins 所维护的 chunk 大小以 262144 字节递增；
-    
+
 - 1 个 bin 维护所有剩余 chunk 大小；
-    
+
 - 每个 large bin 都维护着一条 free chunk 的双向循环链表。采用双向链表的原因是，large bins 中的 chunk 可能会从链表中的任意位置插入及删除。
-    
+
 - 这 63 个 bins
-    
+
 - 不像 small bin ，large bin 中所有 chunk 大小不一定相同，各 chunk 大小递减保存。最大的 chunk 保存顶端，而最小的 chunk 保存在尾端；
-    
 
 - 合并 —— 两个相邻的空闲 chunk 会被合并；
-    
+
 - `malloc(large chunk)`
-    
 
 - User chunk（用户请求大小）—— 返回给用户；
-    
+
 - Remainder chunk （剩余大小）—— 添加到 unsorted bin。
-    
+
 - 初始情况下，large bin 都会是 NULL，因此尽管用户请求 large chunk ，提供服务的将是 next largetst bin 路径而不是 large bin 路劲 。
-    
+
 - 第一次调用`malloc`时，维护在 malloc_state 中的 small bin 和 large bin 将被初始化，它们都会指向自身以表示其为空；
-    
+
 - 此后当 large bin 非空，如果相应 bin 中的最大 chunk 大小大于用户请求大小，分配器就从该 bin 顶端遍历到尾端，以找到一个大小最接近用户请求的 chunk。一旦找到，相应 chunk 就会被切分成两块：
-    
+
 - 如果相应 bin 中的最大 chunk 大小小于用户请求大小，分配器就会扫描 binmaps，从而查找最小非空 bin。如果找到了这样的 bin，就从中选择合适的 chunk 并切割给用户；反之就使用 top chunk 响应用户请求。
-    
 
 - `free(large chunk)`—— 类似于 small chunk 。
-    
 
 ### 5.5. Top Chunk
 
@@ -414,9 +381,8 @@ thread arena 的图示如下（多堆段）：
 当 top chunk 的大小比用户请求的大小大的时候，top chunk 会分割为两个部分：
 
 - User chunk，返回给用户；
-    
+
 - Remainder chunk，剩余部分，将成为新的 top chunk。
-    
 
 当 top chunk 的大小比用户请求的大小小的时候，top chunk 就通过`sbrk`（main arena）或`mmap`（ thread arena）系统调用扩容。
 
@@ -432,15 +398,13 @@ thread arena 的图示如下（多堆段）：
 
 当用户的后续请求 small chunk，并且 last remainder chunk 是 unsorted bin 中唯一的 chunk，该 last remainder chunk 就将分割成两部分：返回给用户的 User chunk、添加到 unsorted bin 中的 Remainder chunk（也是 last remainder chunk）。因此后续的请求的 chunk 最终将被分配得彼此靠近。
 
----
+______________________________________________________________________
 
-刘翔,童薇,刘景宁,冯丹,陈劲龙.动态内存分配器研究综述[J].计算机学报,2018,41(10):2359-2378.
+刘翔,童薇,刘景宁,冯丹,陈劲龙.动态内存分配器研究综述\[J\].计算机学报,2018,41(10):2359-2378.
 
----
+______________________________________________________________________
 
 后台回复“加群”，带你进入高手如云交流群
-
-  
 
 **推荐阅读：**
 
@@ -448,9 +412,9 @@ thread arena 的图示如下（多堆段）：
 
 [Cilium 容器网络的落地实践](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247497237&idx=1&sn=d84b91d9e416bb8d18eee409b6993743&chksm=ea77c2addd004bbb0eda5815bbf216cff6a5054f74a25122c6e51fafd2512100e78848aad65e&scene=21#wechat_redirect)
 
-[【中断】的本质](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&scene=21#wechat_redirect)  
+[【中断】的本质](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&scene=21#wechat_redirect)
 
-[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)  
+[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)
 
 [Linux 应用内存调试神器- ASan](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496414&idx=1&sn=897d3d39e208652dcb969b5aca221ca1&chksm=ea77c666dd004f70ebee7b9b9d6e6ebd351aa60e3084149bfefa59bca570320ebcc7cadc6358&scene=21#wechat_redirect)
 
@@ -458,7 +422,7 @@ thread arena 的图示如下（多堆段）：
 
 [Page Cache和Buffer Cache关系](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495951&idx=1&sn=8bc76e05a63b8c9c9f05c3ebe3f99b7a&chksm=ea77c5b7dd004ca18c71a163588ccacd33231a58157957abc17f1eca17e5dcb35147b273bc52&scene=21#wechat_redirect)
 
-[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)  
+[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)
 
 [一文读懂基于Kubernetes打造的边缘计算](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495291&idx=1&sn=0aebc6ee54af03829e15ac659db923ae&chksm=ea77dac3dd0053d5cd4216e0dc91285ff37607c792d180b946bc09783d1a2032b0dffbcb03f0&scene=21#wechat_redirect)
 
@@ -492,13 +456,9 @@ thread arena 的图示如下（多堆段）：
 
 ▼
 
-  
+_\*\*_****喜欢，就给我一个****“在看”\*\*\*\*_\*\*_
 
-_**_****喜欢，就给我一个****“在看”****_**_
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **10T 技术资源大放送！包括但不限于：云计算、虚拟化、微服务、大数据、网络、**Linux、**Docker、Kubernetes、Python、Go、C/C++、Shell、PPT 等。在公众号内回复「****1024****」**，即可免费获！！****
 

@@ -1,12 +1,14 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-7-20 19:23 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
+
 # 一、前言
 
 这是一篇指导驱动工程师如何使用DMA API的文档，为了方便理解，文档中给出了伪代码的例程。另外一篇文档dma-api.txt给出了相关API的简明描述，有兴趣也可以看看那一篇，这两份文档在DMA API的描述方面是一致的。
+
 # 二、从CPU角度看到的地址和从DMA控制器看到的地址有什么不同？
 
 在DMA API中涉及好几个地址的概念（物理地址、虚拟地址和总线地址），正确的理解这些地址是非常重要的。
 
-内核通常使用的地址是虚拟地址。我们调用kmalloc()、vmalloc()或者类似的接口返回的地址都是虚拟地址，保存在"void *"的变量中。
+内核通常使用的地址是虚拟地址。我们调用kmalloc()、vmalloc()或者类似的接口返回的地址都是虚拟地址，保存在"void \*"的变量中。
 
 虚拟内存系统（TLB、页表等）将虚拟地址（程序角度）翻译成物理地址（CPU角度），物理地址保存在“phys_addr_t”或“resource_size_t”的变量中。对于一个硬件设备上的寄存器等设备资源，内核是按照物理地址来管理的。通过/proc/iomem，你可以看到这些和设备IO 相关的物理地址。当然，驱动并不能直接使用这些物理地址，必须首先通过ioremap()接口将这些物理地址映射到内核虚拟地址空间上去。
 
@@ -15,7 +17,7 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 从设备的角度来看，DMA控制器使用总线地址空间，不过可能仅限于总线空间的一个子集。例如：即便是一个系统支持64位地址内存和64 位地址的PCI bar，但是DMA可以不使用全部的64 bit地址，通过IOMMU的映射，PCI设备上的DMA可以只使用32位DMA地址。
 
 我们用下面这样的系统结构来说明各种地址的概念：
-![[Pasted image 20241007190209.png]]
+!\[\[Pasted image 20241007190209.png\]\]
 
 在PCI设备枚举（初始化）过程中，内核了解了所有的IO device及其对应的MMIO地址空间（MMIO是物理地址空间的子集），并且也了解了是PCI主桥设备将这些PCI device和系统连接在一起。PCI设备会有BAR（base address register），表示自己在PCI总线上的地址，CPU并不能通过总线地址A（位于BAR范围内）直接访问总线上的PCI设备，PCI host bridge会在MMIO（即物理地址）和总线地址之间进行mapping。因此，对于CPU，它实际上是可以通过B地址（位于MMIO地址空间）访问PCI设备（反正PCI host bridge会进行翻译）。地址B的信息保存在struct resource变量中，并可以通过/proc/iomem开放给用户空间。对于驱动程序，它往往是通过ioremap()把物理地址B映射成虚拟地址C，这时候，驱动程序就可以通过ioread32(C)来访问PCI总线上的地址A了。
 
@@ -27,11 +29,11 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 
 虽然上面的例子使用IOMMU为例描述，不过本文随后描述的API也可以在没有IOMMU硬件的平台上运行。
 
-顺便说明一点：DMA API适用于各种CPU arch，各种总线类型，DMA mapping framework已经屏蔽了底层硬件的细节。对于驱动工程师而言，你应该使用通用的DMA API（例如dma_map_*() 接口函数），而不是和特定总线相关的API（例如pci_map_*() 接口函数）。
+顺便说明一点：DMA API适用于各种CPU arch，各种总线类型，DMA mapping framework已经屏蔽了底层硬件的细节。对于驱动工程师而言，你应该使用通用的DMA API（例如dma_map\_*() 接口函数），而不是和特定总线相关的API（例如pci_map\_*() 接口函数）。
 
 驱动想要使用DMA mapping framework的API，需要首先包含相关头文件：
 
-> #include <linux/dma-mapping.h>
+> #include \<linux/dma-mapping.h>
 
 这个头文件中定义了dma_addr_t这种数据类型，而这种类型的变量可以保存任何有效的DMA地址，不管是什么总线，什么样的CPU arch。驱动调用了DMA API之后，返回的DMA地址（总线地址）就是这种类型的。
 
@@ -39,9 +41,9 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 
 既然驱动想要使用DMA mapping framework提供的接口，我们首先需要知道的就是是否所有的系统内存都是可以调用DMA API进行mapping？还是只有一部分？那么这些可以DMA控制器访问系统内存有什么特点？关于这一点，一直以来有一些不成文的规则，在本文中我们看看是否能够将其全部记录下来。
 
-如果驱动是通过伙伴系统的接口（例如__get_free_page*()）或者类似kmalloc() or kmem_cache_alloc()这样的通用内存分配的接口来分配DMA buffer，那么这些接口函数返回的虚拟地址可以直接用于DMA mapping接口API，并通过DMA操作在外设和dma buffer中交换数据。
+如果驱动是通过伙伴系统的接口（例如\_\_get_free_page\*()）或者类似kmalloc() or kmem_cache_alloc()这样的通用内存分配的接口来分配DMA buffer，那么这些接口函数返回的虚拟地址可以直接用于DMA mapping接口API，并通过DMA操作在外设和dma buffer中交换数据。
 
-使用vmalloc() 分配的DMA buffer可以直接使用吗？最好不要这样，虽然强行使用也没有问题，但是终究是比较麻烦。首先，vmalloc分配的page frame是不连续的，如果底层硬件需要物理内存连续，那么vmalloc分配的内存不能满足硬件要求。即便是底层DMA硬件支持scatter-gather，vmalloc分配出来的内存仍然存在其他问题。我们知道vmalloc分配的虚拟地址和对应的物理地址没有线性关系（kmalloc或者__get_free_page*这样的接口，其返回的虚拟地址和物理地址有一个固定偏移的关系），而在做DMA mapping的时候，需要知道物理地址，有线性关系的虚拟地址很容易可以获取其物理地址，但是对于vmalloc分配的虚拟地址，我们需要遍历页表才可以找到其物理地址。
+使用vmalloc() 分配的DMA buffer可以直接使用吗？最好不要这样，虽然强行使用也没有问题，但是终究是比较麻烦。首先，vmalloc分配的page frame是不连续的，如果底层硬件需要物理内存连续，那么vmalloc分配的内存不能满足硬件要求。即便是底层DMA硬件支持scatter-gather，vmalloc分配出来的内存仍然存在其他问题。我们知道vmalloc分配的虚拟地址和对应的物理地址没有线性关系（kmalloc或者\_\_get_free_page\*这样的接口，其返回的虚拟地址和物理地址有一个固定偏移的关系），而在做DMA mapping的时候，需要知道物理地址，有线性关系的虚拟地址很容易可以获取其物理地址，但是对于vmalloc分配的虚拟地址，我们需要遍历页表才可以找到其物理地址。
 
 在驱动中定义的全局变量可以用于DMA吗？如果编译到内核，那么全局变量位于内核的数据段或者bss段。在内核初始化的时候，会建立[kernel image mapping](http://www.wowotech.net/memory_management/__create_page_tables_code_analysis.html)，因此全局变量所占据的内存都是连续的，并且VA和PA是有固定偏移的线性关系，因此可以用于DMA操作。不过，在定义这些全局变量的DMA buffer的时候，我们要小心的进行cacheline的对齐，并且要处理CPU和DMA controller之间的操作同步，以避免cache coherence问题。
 
@@ -52,6 +54,7 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 块设备使用的I/O buffer和网络设备收发数据的buffer是如何确保其内存是可以进行DMA操作的呢？块设备I/O子系统和
 
 网络子系统在分配buffer的时候会确保这一点的。
+
 # 四、DMA寻址限制
 
 你的设备有DMA寻址限制吗？不同的硬件平台有不同的配置方式，有的平台没有限制，外设可以访问系统内存的每一个Byte，有些则不可以。例如：系统总线有32个bit，而你的设备通过DMA只能驱动低24位地址，在这种情况下，外设在发起DMA操作的时候，只能访问16M以下的系统内存。如果设备有DMA寻址的限制，那么驱动需要将这个限制通知到内核。如果驱动不通知内核，那么内核缺省情况下认为外设的DMA可以访问所有的系统总线的32 bit地址线。对于64 bit平台，情况类似，不再赘述。
@@ -62,13 +65,13 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 
 一旦确定了设备DMA寻址限制之后，我们可以通过下面的接口进行设定：
 
-> int dma_set_mask_and_coherent(struct device *dev, u64 mask);
+> int dma_set_mask_and_coherent(struct device \*dev, u64 mask);
 
 根据DMA buffer的特性，DMA操作有两种：一种是streaming，DMA buffer是一次性的，用完就算。这种DMA buffer需要自己考虑cache一致性。另外一种是DMA buffer是cache coherent的，软件实现上比较简单，更重要的是这种DMA buffer往往是静态的、长时间存在的。不同类型的DMA操作可能有有不同的寻址限制，也可能相同。如果相同，我们可以用上面这个接口设定streaming和coherent两种DMA 操作的地址掩码。如果不同，可以下面的接口进行设定：
 
-> int dma_set_mask(struct device *dev, u64 mask);
-> 
-> int dma_set_coherent_mask(struct device *dev, u64 mask);
+> int dma_set_mask(struct device \*dev, u64 mask);
+>
+> int dma_set_coherent_mask(struct device \*dev, u64 mask);
 
 前者是设定streaming类型的DMA地址掩码，后者是设定coherent类型的DMA地址掩码。为了更好的理解这些接口，我们聊聊参数和返回值。dev指向该设备的struct device对象，一般来说，这个struct device对象应该是嵌入在bus-specific 的实例中，例如对于PCI设备，有一个struct pci_dev的实例与之对应，而在这里需要传入的dev参数则可以通过&pdev->dev得到（pdev指向struct pci_dev的实例）。mask表示你的设备支持的地址线信息。如果调用这些接口返回0，则说明一切OK，从该设备到指定mask的内存的DMA操作是可以被系统支持的（包括DMA controller、bus layer等）。如果返回值非0，那么说明这样的DMA寻址是不能正确完成的，如果强行这么做将会产生不可预知的后果。驱动必须检测返回值，如果不行，那么建议修改mask或者不使用DMA。也就是说，对上面接口调用失败后，你有三个选择：
 
@@ -78,9 +81,9 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 
 一个可以寻址32 bit的设备，其初始化的示例代码如下：
 
-> if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32))) {  
->     dev_warn(dev, "mydev: No suitable DMA available\n");  
->     goto ignore_this_device;  
+> if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32))) {\
+> dev_warn(dev, "mydev: No suitable DMA available\\n");\
+> goto ignore_this_device;\
 > }
 
 另一个常见的场景是有64位寻址能力的设备。一般来说我们会首先尝试设定64位的地址掩码，但是这时候有可能会失败，从而将掩码降低为32位。内核之所以会在设定64位掩码的时候失败，这并不是因为平台不能进行64位寻址，而仅仅是因为32位寻址比64位寻址效率更高。例如，SPARC64 平台上，PCI SAC寻址比DAC寻址性能更好。
@@ -88,14 +91,14 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 下面的代码描述了如何确定streaming类型DMA的地址掩码：
 
 > int using_dac;
-> 
-> if (!dma_set_mask(dev, DMA_BIT_MASK(64))) {  
->     using_dac = 1;  
-> } else if (!dma_set_mask(dev, DMA_BIT_MASK(32))) {  
->     using_dac = 0;  
-> } else {  
->     dev_warn(dev, "mydev: No suitable DMA available\n");  
->     goto ignore_this_device;  
+>
+> if (!dma_set_mask(dev, DMA_BIT_MASK(64))) {\
+> using_dac = 1;\
+> } else if (!dma_set_mask(dev, DMA_BIT_MASK(32))) {\
+> using_dac = 0;\
+> } else {\
+> dev_warn(dev, "mydev: No suitable DMA available\\n");\
+> goto ignore_this_device;\
 > }
 
 设定coherent 类型的DMA地址掩码也是类似的，不再赘述。需要说明的是：coherent地址掩码总是等于或者小于streaming地址掩码，因此，一般来说，我们只要设定了streaming地址掩码成功了，那么使用同样的掩码或者小一些的掩码来设定coherent地址掩码总是会成功，因此这时候我们一般就不检查dma_set_coherent_mask的返回值了，当然，有些设备很奇怪，只能使用coherent DMA，那么这种情况下，驱动需要检查dma_set_coherent_mask的返回值。
@@ -124,9 +127,9 @@ Consistent DMA mapping有下面两种特点：
 
 需要注意的是：一致性的DMA映射并不意味着不需要memory barrier这样的工具来保证memory order，CPU有可能为了性能而重排对consistent memory上内存访问指令。例如：如果在DMA consistent memory上有两个word，分别是word0和word1，对于device一侧，必须保证word0先更新，然后才有对word1的更新，那么你需要这样写代码：
 
->        desc->word0 = address;  
->         wmb();  
->         desc->word1 = DESC_VALID;
+> desc->word0 = address;\
+> wmb();\
+> desc->word1 = DESC_VALID;
 
 只有这样才能保证在所有的平台上，给设备驱动可以正常的工作。
 
@@ -134,7 +137,7 @@ Consistent DMA mapping有下面两种特点：
 
 2、流式DMA映射（streaming DMA mapping）
 
-流式DMA映射是一次性的，一般是需要进行DMA传输的时候才进行mapping，一旦DMA传输完成，就立刻ummap（除非你使用dma_sync_*的接口，下面会描述）。并且硬件可以为顺序化访问进行优化。
+流式DMA映射是一次性的，一般是需要进行DMA传输的时候才进行mapping，一旦DMA传输完成，就立刻ummap（除非你使用dma_sync\_\*的接口，下面会描述）。并且硬件可以为顺序化访问进行优化。
 
 这里的streaming可以被认为是asynchronous，或者是不属于coherent memory范围的。
 
@@ -154,13 +157,13 @@ Consistent DMA mapping有下面两种特点：
 
 为了分配并映射一个较大（page大小或者类似）的coherent DMA memory，你需要调用下面的接口：
 
->    dma_addr_t dma_handle;
-> 
->     cpu_addr = dma_alloc_coherent(dev, size, &dma_handle, gfp);
+> dma_addr_t dma_handle;
+>
+> cpu_addr = dma_alloc_coherent(dev, size, &dma_handle, gfp);
 
 DMA操作总是会涉及具体设备上的DMA controller，而dev参数就是执行该设备的struct device对象的。size参数指明了你想要分配的DMA Buffer的大小，byte为单位。dma_alloc_coherent这个接口也可以在中断上下文调用，当然，gfp参数要传递GFP_ATOMIC标记，gfp是内存分配的flag，dma_alloc_coherent仅仅是透传该flag到内存管理模块。
 
-需要注意的是dma_alloc_coherent分配的内存的起始地址和size都是对齐在page上（类似__get_free_pages的感觉，当然__get_free_pages接受的size参数是page order），如果你的驱动不需要那么大的DMA buffer，那么可以选择dma_pool接口，下面会进一步描述。
+需要注意的是dma_alloc_coherent分配的内存的起始地址和size都是对齐在page上（类似\_\_get_free_pages的感觉，当然\_\_get_free_pages接受的size参数是page order），如果你的驱动不需要那么大的DMA buffer，那么可以选择dma_pool接口，下面会进一步描述。
 
 如果传入非空的dev参数，即使驱动调用了掩码设置接口函数设定了DMA mask，说明该设备可以访问大于32-bit地址空间的地址，一致性DMA映射的接口函数也一般会默认的返回一个32-bit可寻址的DMA buffer地址。要知道dma mask和coherent dma mask是不同的，除非驱动显示的调用dma_set_coherent_mask()接口来修改coherent dma mask，例如大小大于32-bit地址，dma_alloc_coherent接口函数才会返回大于32-bit地址空间的地址。dma pool接口也是如此。
 
@@ -178,15 +181,15 @@ dma_alloc_coherent函数返回两个值，一个是从CPU角度访问DMA buffer�
 
 3、dma pool
 
-如果你的驱动需非常多的小的dma buffer，那么dma pool是最适合你的机制。这个概念类似kmem_cache，__get_free_pages往往获取的是连续的page frame，而kmem_cache是批发了一大批page frame，然后自己“零售”。dma pool就是通过dma_alloc_coherent接口获取大块一致性的DMA内存，然后驱动可以调用dma_pool_alloc从那个大块DMA内存中分一个小块的dma buffer供自己使用。具体接口描述就不说了，大家可以自行阅读。
+如果你的驱动需非常多的小的dma buffer，那么dma pool是最适合你的机制。这个概念类似kmem_cache，\_\_get_free_pages往往获取的是连续的page frame，而kmem_cache是批发了一大批page frame，然后自己“零售”。dma pool就是通过dma_alloc_coherent接口获取大块一致性的DMA内存，然后驱动可以调用dma_pool_alloc从那个大块DMA内存中分一个小块的dma buffer供自己使用。具体接口描述就不说了，大家可以自行阅读。
 
 七、DMA操作方向
 
 由于下面的章节会用到DMA操作方向这个概念，因此我们先简单的描述一下，DMA操作方向定义如下：
 
-> DMA_BIDIRECTIONAL  
-> DMA_TO_DEVICE  
-> DMA_FROM_DEVICE  
+> DMA_BIDIRECTIONAL\
+> DMA_TO_DEVICE\
+> DMA_FROM_DEVICE\
 > DMA_NONE
 
 如果你知道的话，你应该尽可能的提供准确的DMA操作方向。
@@ -209,14 +212,14 @@ streaming DMA mapping的接口函数可以在中断上下文中调用。streamin
 
 map单个的dma buffer的示例如下：
 
-> struct device *dev = &my_dev->dev;  
-> dma_addr_t dma_handle;  
-> void *addr = buffer->ptr;  
+> struct device \*dev = &my_dev->dev;\
+> dma_addr_t dma_handle;\
+> void \*addr = buffer->ptr;\
 > size_t size = buffer->len;
-> 
-> dma_handle = dma_map_single(dev, addr, size, direction);  
-> if (dma_mapping_error(dev, dma_handle)) {  
->     goto map_error_handling;  
+>
+> dma_handle = dma_map_single(dev, addr, size, direction);\
+> if (dma_mapping_error(dev, dma_handle)) {\
+> goto map_error_handling;\
 > }
 
 umap单个的dma buffer可以使用下面的接口：
@@ -228,36 +231,36 @@ umap单个的dma buffer可以使用下面的接口：
 错误示例一：
 
 > dma_addr_t dma_handle;
-> 
-> dma_handle = dma_map_single(dev, addr, size, direction);  
-> if ((dma_handle & 0xffff != 0) || (dma_handle >= 0x1000000)) {  
->     goto map_error;  
+>
+> dma_handle = dma_map_single(dev, addr, size, direction);\
+> if ((dma_handle & 0xffff != 0) || (dma_handle >= 0x1000000)) {\
+> goto map_error;\
 > }
 
 错误示例二：
 
 > dma_addr_t dma_handle;
-> 
-> dma_handle = dma_map_single(dev, addr, size, direction);  
-> if (dma_handle == DMA_ERROR_CODE) {  
->     goto map_error;  
+>
+> dma_handle = dma_map_single(dev, addr, size, direction);\
+> if (dma_handle == DMA_ERROR_CODE) {\
+> goto map_error;\
 > }
 
 当DMA传输完成的时候，程序应该调用dma_unmap_single()函数umap dma buffer。例如：在DMA完成传输后会通过中断通知CPU，而在interrupt handler中可以调用dma_unmap_single()函数。dma_map_single函数在进行DMA mapping的时候使用的是CPU指针（虚拟地址），这样就导致该函数有一个弊端：不能使用HIGHMEM memory进行mapping。鉴于此，map/unmap接口提供了另外一个类似的接口，这个接口不使用CPU指针，而是使用page和page offset来进行DMA mapping：
 
-> struct device *dev = &my_dev->dev;  
-> dma_addr_t dma_handle;  
-> struct page *page = buffer->page;  
-> unsigned long offset = buffer->offset;  
+> struct device \*dev = &my_dev->dev;\
+> dma_addr_t dma_handle;\
+> struct page \*page = buffer->page;\
+> unsigned long offset = buffer->offset;\
 > size_t size = buffer->len;
-> 
-> dma_handle = dma_map_page(dev, page, offset, size, direction);  
-> if (dma_mapping_error(dev, dma_handle)) {  
->     goto map_error_handling;  
+>
+> dma_handle = dma_map_page(dev, page, offset, size, direction);\
+> if (dma_mapping_error(dev, dma_handle)) {\
+> goto map_error_handling;\
 > }
-> 
+>
 > ...
-> 
+>
 > dma_unmap_page(dev, dma_handle, size, direction);
 
 在上面的代码中，offset表示一个指定page内的页内偏移（以Byte为单位）。和dma_map_single接口函数一样，调用dma_map_page()返回错误后需要调用dma_mapping_error() 来进行错误处理，上面都已经描述了，这里不再赘述。当DMA传输完成的时候，程序应该调用dma_unmap_page()函数umap dma buffer。例如：在DMA完成传输后会通过中断通知CPU，而在interrupt handler中可以调用dma_unmap_page()函数。
@@ -266,12 +269,12 @@ umap单个的dma buffer可以使用下面的接口：
 
 在scatterlist的情况下，你要映射的对象是分散的若干段DMA buffer，示例代码如下：
 
-> int i, count = dma_map_sg(dev, sglist, nents, direction);  
-> struct scatterlist *sg;
-> 
-> for_each_sg(sglist, sg, count, i) {  
->     hw_address[i] = sg_dma_address(sg);  
->     hw_len[i] = sg_dma_len(sg);  
+> int i, count = dma_map_sg(dev, sglist, nents, direction);\
+> struct scatterlist \*sg;
+>
+> for_each_sg(sglist, sg, count, i) {\
+> hw_address\[i\] = sg_dma_address(sg);\
+> hw_len\[i\] = sg_dma_len(sg);\
 > }
 
 上面的代码中nents说明了sglist中条目的数量（即map多少段dma buffer）。
@@ -286,13 +289,13 @@ umap多个形成scatterlist的dma buffer是通过下面的接口实现的：
 
 再次强调，调用dma_unmap_sg的时候要确保DMA操作已经完成。另外，传递给dma_unmap_sg的nents参数需要等于传递给dma_map_sg的nents参数，而不是该函数返回的count。
 
-由于DMA地址空间是共享资源，每一次dma_map_{single,sg}() 的调用都需要有其对应的dma_unmap_{single,sg}()，如果你总是分配dma地址资源而不回收，那么系统将会由于DMA address被用尽而陷入不可用的状态。
+由于DMA地址空间是共享资源，每一次dma_map\_{single,sg}() 的调用都需要有其对应的dma_unmap\_{single,sg}()，如果你总是分配dma地址资源而不回收，那么系统将会由于DMA address被用尽而陷入不可用的状态。
 
 3、sync操作
 
 如果你需要多次访问同一个streaming DMA buffer，并且在DMA传输之间读写DMA Buffer上的数据，这时候你需要小心进行DMA buffer的sync操作，以便CPU和设备（DMA controller）可以看到最新的、正确的数据。
 
-首先用dma_map_{single,sg}()进行映射，在完成DMA传输之后，用：
+首先用dma_map\_{single,sg}()进行映射，在完成DMA传输之后，用：
 
 > dma_sync_single_for_cpu(dev, dma_handle, size, direction);
 
@@ -300,7 +303,7 @@ umap多个形成scatterlist的dma buffer是通过下面的接口实现的：
 
 > dma_sync_sg_for_cpu(dev, sglist, nents, direction);
 
-   来完成sync的操作，以便CPU可以看到最新的数据。
+来完成sync的操作，以便CPU可以看到最新的数据。
 
 如果，CPU操作了DMA buffer的数据，然后你又想把控制权交给设备上的DMA 控制器，让DMA controller访问DMA buffer，这时候，在真正让HW（指DMA控制器）去访问DMA buffer之前，你需要调用：
 
@@ -312,59 +315,58 @@ umap多个形成scatterlist的dma buffer是通过下面的接口实现的：
 
 以便device（也就是设备上的DMA控制器）可以看到cpu更新后的数据。此外，需要强调的是：传递给dma_sync_sg_for_cpu() 和 dma_sync_sg_for_device()的ents参数需要等于传递给dma_map_sg的nents参数，而不是该函数返回的count。
 
-在完成最后依次DMA传输之后，你需要调用DMA unmap函数dma_unmap_{single,sg}()。如果在第一次dma_map_*() 调用和dma_unmap_*()之间，你从来都没有碰过DMA buffer中的数据，那么你根本不需要调用dma_sync_*() 这样的sync操作。
+在完成最后依次DMA传输之后，你需要调用DMA unmap函数dma_unmap\_{single,sg}()。如果在第一次dma_map\_*() 调用和dma_unmap\_*()之间，你从来都没有碰过DMA buffer中的数据，那么你根本不需要调用dma_sync\_\*() 这样的sync操作。
 
 下面的例子给出了一个sync操作的示例：
 
-> my_card_setup_receive_buffer(struct my_card *cp, char *buffer, int len)  
-> {  
->     dma_addr_t mapping;
-> 
->     mapping = dma_map_single(cp->dev, buffer, len, DMA_FROM_DEVICE);  
->     if (dma_mapping_error(cp->dev, mapping)) {  
->         goto map_error_handling;  
->     }
-> 
->     cp->rx_buf = buffer;  
->     cp->rx_len = len;  
->     cp->rx_dma = mapping;
-> 
->     give_rx_buf_to_card(cp);  
+> my_card_setup_receive_buffer(struct my_card \*cp, char \*buffer, int len)\
+> {\
+> dma_addr_t mapping;
+>
+> mapping = dma_map_single(cp->dev, buffer, len, DMA_FROM_DEVICE);\
+> if (dma_mapping_error(cp->dev, mapping)) {\
+> goto map_error_handling;\
 > }
-> 
+>
+> cp->rx_buf = buffer;\
+> cp->rx_len = len;\
+> cp->rx_dma = mapping;
+>
+> give_rx_buf_to_card(cp);\
+> }
+>
 > ...
-> 
-> my_card_interrupt_handler(int irq, void *devid, struct pt_regs *regs)  
-> {  
->     struct my_card *cp = devid;
-> 
->     ...  
->     if (read_card_status(cp) == RX_BUF_TRANSFERRED) {  
->         struct my_card_header *hp;
-> 
-> HW已经完成了传输，在cpu访问buffer之前，cpu需要先sync一下，以便看到最新的数据。  
->         dma_sync_single_for_cpu(&cp->dev, cp->rx_dma,  
->                     cp->rx_len,  
->                     DMA_FROM_DEVICE);
-> 
-> sync之后就可以安全的读dma buffer了  
->         hp = (struct my_card_header *) cp->rx_buf;  
->         if (header_is_ok(hp)) {  
->             dma_unmap_single(&cp->dev, cp->rx_dma, cp->rx_len,  
->                      DMA_FROM_DEVICE);  
->             pass_to_upper_layers(cp->rx_buf);  
->             make_and_setup_new_rx_buf(cp);  
->         } else {  
->             give_rx_buf_to_card(cp);  
->         }  
->     }  
+>
+> my_card_interrupt_handler(int irq, void \*devid, struct pt_regs \*regs)\
+> {\
+> struct my_card \*cp = devid;
+>
+> ...\
+> if (read_card_status(cp) == RX_BUF_TRANSFERRED) {\
+> struct my_card_header \*hp;
+>
+> HW已经完成了传输，在cpu访问buffer之前，cpu需要先sync一下，以便看到最新的数据。\
+> dma_sync_single_for_cpu(&cp->dev, cp->rx_dma,\
+> cp->rx_len,\
+> DMA_FROM_DEVICE);
+>
+> sync之后就可以安全的读dma buffer了\
+> hp = (struct my_card_header \*) cp->rx_buf;\
+> if (header_is_ok(hp)) {\
+> dma_unmap_single(&cp->dev, cp->rx_dma, cp->rx_len,\
+> DMA_FROM_DEVICE);\
+> pass_to_upper_layers(cp->rx_buf);\
+> make_and_setup_new_rx_buf(cp);\
+> } else {\
+> give_rx_buf_to_card(cp);\
+> }\
+> }\
 > }
 
 当使用了这套DMA mapping接口后，驱动不应该再使用virt_to_bus() 这个接口了，当然bus_to_virt()也不行。不过，如果你的驱动使用了这些接口怎么办呢？其实这套新的DMA mapping接口没有和virt_to_bus、bus_to_virt()一一对应的接口，因此，为了让你的程序能工作，你需要对驱动程序进行小小的修改：你必须要保存从dma_alloc_coherent()、dma_pool_alloc()以及dma_map_single()接口函数返回的dma address（对于dma_map_sg()这个接口，dma地址保存在scatterlist 中，当然这需要硬件支持dynamic DMA mapping ），并把这个dma address保存在驱动的数据结构中，并且同时/或者保存在硬件的寄存器中。
 
 所有的驱动代码都需要迁移到DMA mapping framework的接口函数上来。目前内核已经计划完全移除virt_to_bus() 和bus_to_virt() 这两个函数，因为它们已经过时了。有些平台由于不能正确的支持virt_to_bus() 和bus_to_virt()，因此根本就没有提供这两个接口。
 
-  
 九、错误处理
 
 DMA地址空间在某些CPU架构上是有限的，因此分配并mapping可能会产生错误，我们可以通过下面的方法来判定是否发生了错误：
@@ -373,62 +375,62 @@ DMA地址空间在某些CPU架构上是有限的，因此分配并mapping可能�
 
 （2）检查dma_map_single和dma_map_page返回了dma address（通过dma_mapping_error函数）
 
->    dma_addr_t dma_handle;
-> 
->     dma_handle = dma_map_single(dev, addr, size, direction);  
->     if (dma_mapping_error(dev, dma_handle)) {  
->         goto map_error_handling;  
->     }
+> dma_addr_t dma_handle;
+>
+> dma_handle = dma_map_single(dev, addr, size, direction);\
+> if (dma_mapping_error(dev, dma_handle)) {\
+> goto map_error_handling;\
+> }
 
 （3）当在mapping多个page的时候，如果中间发生了mapping error，那么需要对那些已经mapped的page进行unmap的操作。下面的示例代码用dma_map_single函数，对于dma_map_page也一样适用。
 
 示例代码一：
 
-> dma_addr_t dma_handle1;  
+> dma_addr_t dma_handle1;\
 > dma_addr_t dma_handle2;
-> 
-> dma_handle1 = dma_map_single(dev, addr, size, direction);  
-> if (dma_mapping_error(dev, dma_handle1)) {  
->     goto map_error_handling1;  
-> }  
-> dma_handle2 = dma_map_single(dev, addr, size, direction);  
-> if (dma_mapping_error(dev, dma_handle2)) {  
->     goto map_error_handling2;  
+>
+> dma_handle1 = dma_map_single(dev, addr, size, direction);\
+> if (dma_mapping_error(dev, dma_handle1)) {\
+> goto map_error_handling1;\
+> }\
+> dma_handle2 = dma_map_single(dev, addr, size, direction);\
+> if (dma_mapping_error(dev, dma_handle2)) {\
+> goto map_error_handling2;\
 > }
-> 
+>
 > ...
-> 
-> map_error_handling2:  
->     dma_unmap_single(dma_handle1);  
+>
+> map_error_handling2:\
+> dma_unmap_single(dma_handle1);\
 > map_error_handling1:
 
 示例代码二（如果我们在循环中mapping dma buffer，当在中间出错的时候，一样要unmap所有已经映射的dma buffer）：
 
-> dma_addr_t dma_addr;  
-> dma_addr_t array[DMA_BUFFERS];  
+> dma_addr_t dma_addr;\
+> dma_addr_t array\[DMA_BUFFERS\];\
 > int save_index = 0;
-> 
-> for (i = 0; i < DMA_BUFFERS; i++) {
-> 
->     ...
-> 
->     dma_addr = dma_map_single(dev, addr, size, direction);  
->     if (dma_mapping_error(dev, dma_addr)) {  
->         goto map_error_handling;  
->     }  
->     array[i].dma_addr = dma_addr;  
->     save_index++;  
-> }
-> 
+>
+> for (i = 0; i \< DMA_BUFFERS; i++) {
+>
 > ...
-> 
+>
+> dma_addr = dma_map_single(dev, addr, size, direction);\
+> if (dma_mapping_error(dev, dma_addr)) {\
+> goto map_error_handling;\
+> }\
+> array\[i\].dma_addr = dma_addr;\
+> save_index++;\
+> }
+>
+> ...
+>
 > map_error_handling:
-> 
-> for (i = 0; i < save_index; i++) {
-> 
->     ...
-> 
->     dma_unmap_single(array[i].dma_addr);  
+>
+> for (i = 0; i \< save_index; i++) {
+>
+> ...
+>
+> dma_unmap_single(array\[i\].dma_addr);\
 > }
 
 如果在网卡驱动的tx回调函数（例如ndo_start_xmit）中出现了DMA mapping失败，那么驱动必须调用dev_kfree_skb() 来是否socket buffer并返回NETDEV_TX_OK 。这表示这个socket buffer由于错误而丢弃掉了。
@@ -437,53 +439,53 @@ DMA地址空间在某些CPU架构上是有限的，因此分配并mapping可能�
 
 十、优化数据结构
 
-在很多的平台上，dma_unmap_{single,page}()其实什么也没有做，是空函数。因此，跟踪映射的dma address及其长度基本上就是浪费内存空间。为了方便驱动工程师编写代码方便，我们提供了几个实用工具（宏定义），如果没有它们，驱动程序中将充分ifdef或者类似的一些“work around”。下面我们并不是一个个的介绍这些宏定义，而是给出一些示例代码，驱动工程师可以照葫芦画瓢。
+在很多的平台上，dma_unmap\_{single,page}()其实什么也没有做，是空函数。因此，跟踪映射的dma address及其长度基本上就是浪费内存空间。为了方便驱动工程师编写代码方便，我们提供了几个实用工具（宏定义），如果没有它们，驱动程序中将充分ifdef或者类似的一些“work around”。下面我们并不是一个个的介绍这些宏定义，而是给出一些示例代码，驱动工程师可以照葫芦画瓢。
 
-1、DEFINE_DMA_UNMAP_{ADDR,LEN}。在DMA buffer数据结构中使用这个宏定义，具体例子如下：
-
-> before:
-> 
->     struct ring_state {  
->         struct sk_buff *skb;  
->         dma_addr_t mapping;  
->         __u32 len;  
->     };
-> 
->    after:
-> 
->     struct ring_state {  
->         struct sk_buff *skb;  
->         DEFINE_DMA_UNMAP_ADDR(mapping);  
->         DEFINE_DMA_UNMAP_LEN(len);  
->     };
-
-根据CONFIG_NEED_DMA_MAP_STATE的配置不同，DEFINE_DMA_UNMAP_{ADDR,LEN}可能是定义相关的dma address和长度的成员，也可能是空。
-
-2、dma_unmap_{addr,len}_set()。使用该宏定义来赋值，具体例子如下：
+1、DEFINE_DMA_UNMAP\_{ADDR,LEN}。在DMA buffer数据结构中使用这个宏定义，具体例子如下：
 
 > before:
-> 
->     ringp->mapping = FOO;  
->     ringp->len = BAR;
-> 
->    after:
-> 
->     dma_unmap_addr_set(ringp, mapping, FOO);  
->     dma_unmap_len_set(ringp, len, BAR);
+>
+> struct ring_state {\
+> struct sk_buff \*skb;\
+> dma_addr_t mapping;\
+> \_\_u32 len;\
+> };
+>
+> after:
+>
+> struct ring_state {\
+> struct sk_buff \*skb;\
+> DEFINE_DMA_UNMAP_ADDR(mapping);\
+> DEFINE_DMA_UNMAP_LEN(len);\
+> };
 
-3、dma_unmap_{addr,len}()，使用该宏来访问变量。
+根据CONFIG_NEED_DMA_MAP_STATE的配置不同，DEFINE_DMA_UNMAP\_{ADDR,LEN}可能是定义相关的dma address和长度的成员，也可能是空。
+
+2、dma_unmap\_{addr,len}\_set()。使用该宏定义来赋值，具体例子如下：
 
 > before:
-> 
->     dma_unmap_single(dev, ringp->mapping, ringp->len,  
->              DMA_FROM_DEVICE);
-> 
->    after:
-> 
->     dma_unmap_single(dev,  
->              dma_unmap_addr(ringp, mapping),  
->              dma_unmap_len(ringp, len),  
->              DMA_FROM_DEVICE);
+>
+> ringp->mapping = FOO;\
+> ringp->len = BAR;
+>
+> after:
+>
+> dma_unmap_addr_set(ringp, mapping, FOO);\
+> dma_unmap_len_set(ringp, len, BAR);
+
+3、dma_unmap\_{addr,len}()，使用该宏来访问变量。
+
+> before:
+>
+> dma_unmap_single(dev, ringp->mapping, ringp->len,\
+> DMA_FROM_DEVICE);
+>
+> after:
+>
+> dma_unmap_single(dev,\
+> dma_unmap_addr(ringp, mapping),\
+> dma_unmap_len(ringp, len),\
+> DMA_FROM_DEVICE);
 
 上面的这些代码基本是不需要解释你就会明白的了。另外，我们对于dma address和len是分开处理的，因为在有些实现中，unmaping的操作仅仅需要dma address信息就够了。
 
@@ -507,19 +509,17 @@ CPU体系结构相关的代码必须要要保证kmalloc分配的buffer是DMA-saf
 
 此外，对这份文档有帮助的人如下（没有按照什么特别的顺序）：
 
-Russell King  
-Leo Dagum  
-Ralf Baechle  
-Grant Grundler  
-Jay Estabrook  
-Thomas Sailer  
-Andrea Arcangeli  
-Jens Axboe  
+Russell King\
+Leo Dagum\
+Ralf Baechle\
+Grant Grundler\
+Jay Estabrook\
+Thomas Sailer\
+Andrea Arcangeli\
+Jens Axboe\
 David Mosberger-Tang [davidm@hpl.hp.com](mailto:davidm@hpl.hp.com)
 
 备注：本文基本上是内核文档DMA-API-HOWTO.txt的翻译，如果有兴趣可以参考原文。
-
-  
 
 原创翻译文章，转发请注明出处。蜗窝科技
 
@@ -531,69 +531,69 @@ David Mosberger-Tang [davidm@hpl.hp.com](mailto:davidm@hpl.hp.com)
 
 **评论：**
 
-**gavin**  
+**gavin**\
 2022-05-19 19:05
 
 请问这个地方说：。dma_map_single函数在进行DMA mapping的时候使用的是CPU指针（虚拟地址），这样就导致该函数有一个弊端：不能使用HIGHMEM memory进行mapping。 这个为啥不能呢？谢谢
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-8619)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2022-05-24 20:49
 
 @gavin：因为HIGHMEM memory没有进行线性映射，所以没有虚拟地址呀。
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-8620)
 
-**nswcfd@cu**  
+**nswcfd@cu**\
 2017-12-14 17:26
 
-感谢分享，几个错别字：  
-s/大于大于/大小大于/  
-s/收尾相接/首尾相接/  
-s/邀请/要求/  
-  
-PS，最新的dma-api-howto里提到，  
-This rule also means that you may use neither kernel image addresses  
-(items in data/text/bss segments), nor module image addresses, nor  
-stack addresses for DMA.  These could all be mapped somewhere entirely  
+感谢分享，几个错别字：\
+s/大于大于/大小大于/\
+s/收尾相接/首尾相接/\
+s/邀请/要求/
+
+PS，最新的dma-api-howto里提到，\
+This rule also means that you may use neither kernel image addresses\
+(items in data/text/bss segments), nor module image addresses, nor\
+stack addresses for DMA.  These could all be mapped somewhere entirely\
 different than the rest of physical memory.
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-6364)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-12-16 09:12
 
 @nswcfd@cu：多谢指正。
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-6369)
 
-**bobo**  
+**bobo**\
 2017-12-13 17:01
 
 很详细，为什么 觉得 这份文档（包括DMA API本身）可能会显得过时，陈旧呢？
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-6362)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-12-16 09:15
 
 @bobo：因为目前的文档总是基于某个版本的内核，随着内核的发展，DMA API也许会修改，如果这份文档不及时更新，当然会显得陈旧了。因此，作者呼吁大家给出意见和建议。
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-6370)
 
-**Seitran**  
+**Seitran**\
 2017-07-30 12:28
 
-想请教一下，  
-“  
-如果DMA mapping是以PAGE_SIZE为粒度进行映射，那么那些分散的一块块的dma buffer可以被映射到一个对齐在PAGE_SIZE，然后各个dma buffer依次收尾相接的一个大的总线地址区域上。  
-”  
+想请教一下，\
+“\
+如果DMA mapping是以PAGE_SIZE为粒度进行映射，那么那些分散的一块块的dma buffer可以被映射到一个对齐在PAGE_SIZE，然后各个dma buffer依次收尾相接的一个大的总线地址区域上。\
+”\
 分散的DMA buffer怎么会被影射到同一个PAGE_SIZE里面去的呢？IOMMU怎么对这些地址进行翻译和映射？IOMMU应该是基于页为粒度来管理的吧？
 
 [回复](http://www.wowotech.net/memory_management/DMA-Mapping-api.html#comment-5860)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2017-07-30 23:59
 
 @Seitran："那些分散的一块块的dma buffer"当然也必须是分散的，一个个的page size为单位的dma buffer
@@ -602,152 +602,155 @@ different than the rest of physical memory.
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [蓝牙协议分析(10)_BLE安全机制之LE Encryption](http://www.wowotech.net/bluetooth/le_encryption.html)
-    - [进程切换分析（3）：同步处理](http://www.wowotech.net/process_management/scheudle-sync.html)
-    - [在PowerShell中使用Vim](http://www.wowotech.net/soft/vim_in_powershell.html)
-    - [schedutil governor情景分析](http://www.wowotech.net/process_management/schedutil_governor.html)
-    - [Linux内核同步机制之（一）：原子操作](http://www.wowotech.net/kernel_synchronization/atomic.html)
+
+  - [蓝牙协议分析(10)\_BLE安全机制之LE Encryption](http://www.wowotech.net/bluetooth/le_encryption.html)
+  - [进程切换分析（3）：同步处理](http://www.wowotech.net/process_management/scheudle-sync.html)
+  - [在PowerShell中使用Vim](http://www.wowotech.net/soft/vim_in_powershell.html)
+  - [schedutil governor情景分析](http://www.wowotech.net/process_management/schedutil_governor.html)
+  - [Linux内核同步机制之（一）：原子操作](http://www.wowotech.net/kernel_synchronization/atomic.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

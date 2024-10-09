@@ -1,11 +1,10 @@
-
 一口Linux
 
- _2022年02月07日 00:00_
+_2022年02月07日 00:00_
 
 以下文章来源于小梁编程汇 ，作者小梁编程汇
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM45mwGtQpMuT2Bj0aZKwKo2gysiclV00pyibVZ4VuPftE1Q/0)
 
@@ -13,7 +12,7 @@
 
 双非本科、acmer、tencent后台开发，喜欢分享技术干货【缓存 分布式 微服务 计算机网络 数据库等】、学习感悟、工作心得和职场打法！
 
-](https://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247502248&idx=1&sn=49ed63ff39308c0b6a4b8b9822d73a30&chksm=f96bbb5cce1c324aae780fb819b7bb51a1a84358d76098f56b07d5c805389287a0f9fdd5b027&mpshare=1&scene=24&srcid=0207Gbcg4Pi5U4jjS8dqY6AD&sharer_sharetime=1644194890632&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d06dbc3e5bd8522a59e19609c43e3772498b5618a49fe5f3a6cec8ebd89c86967b36e8f8bc31df761a8520b9d4940f4813952ff16438bd97423ea8dd6294de9b4fd6165686aa8861ab9afebd8f8ebdfdf332124c83fd3d4f707a1e6dfc43c69caab49475ec9ff7190a03ce00e4d82c5e6922da1370b184a89f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQqON5nS0Kou28tC33dzwwfRLmAQIE97dBBAEAAAAAAKghNSRmSaEAAAAOpnltbLcz9gKNyK89dVj0nSPanGLn%2BTdtglaaj751S3admq9HzhWuE0iU6fm2YAWK8G4sUGwIVkYouUoEDQUafRLrzRTH2WP2qyFPyU4zsN7kIAjt9AF2%2FT3gFiszhrxt6c%2F4nz86lwNk9ZXjzjP%2FPUUaNDVuOBieWgDH2kvUVr%2F7poNBKzwpFxo0e6fxQ5DU8MoT2vOvo5V4UrjkeA3a5L6vF5r3veX3cdgoZKo2k%2F%2B2ryDmLxXz1WWSnunr%2B8h5o42974QeiMAbJ2SHAAbz&acctmode=0&pass_ticket=qmLu1cut%2Bp6zn6gOyEIXd0FDuDRiKpsLiVZGNsfZ8K21h5cRaCKiAoXpG62gatM3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzUxMjEyNDgyNw==&mid=2247502248&idx=1&sn=49ed63ff39308c0b6a4b8b9822d73a30&chksm=f96bbb5cce1c324aae780fb819b7bb51a1a84358d76098f56b07d5c805389287a0f9fdd5b027&mpshare=1&scene=24&srcid=0207Gbcg4Pi5U4jjS8dqY6AD&sharer_sharetime=1644194890632&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d06dbc3e5bd8522a59e19609c43e3772498b5618a49fe5f3a6cec8ebd89c86967b36e8f8bc31df761a8520b9d4940f4813952ff16438bd97423ea8dd6294de9b4fd6165686aa8861ab9afebd8f8ebdfdf332124c83fd3d4f707a1e6dfc43c69caab49475ec9ff7190a03ce00e4d82c5e6922da1370b184a89f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQqON5nS0Kou28tC33dzwwfRLmAQIE97dBBAEAAAAAAKghNSRmSaEAAAAOpnltbLcz9gKNyK89dVj0nSPanGLn%2BTdtglaaj751S3admq9HzhWuE0iU6fm2YAWK8G4sUGwIVkYouUoEDQUafRLrzRTH2WP2qyFPyU4zsN7kIAjt9AF2%2FT3gFiszhrxt6c%2F4nz86lwNk9ZXjzjP%2FPUUaNDVuOBieWgDH2kvUVr%2F7poNBKzwpFxo0e6fxQ5DU8MoT2vOvo5V4UrjkeA3a5L6vF5r3veX3cdgoZKo2k%2F%2B2ryDmLxXz1WWSnunr%2B8h5o42974QeiMAbJ2SHAAbz&acctmode=0&pass_ticket=qmLu1cut%2Bp6zn6gOyEIXd0FDuDRiKpsLiVZGNsfZ8K21h5cRaCKiAoXpG62gatM3&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 > 内容目录
 
@@ -23,22 +22,21 @@
 
 本文来自 Marek’s 博客中 I/O multiplexing part 系列之三和四，原文一共有四篇，主要讲 Linux 上 IO 多路复用的一些问题，本文加入了我的一些个人理解，如有不对之处敬请指出。原文链接如下：
 
-The history of the Select(2) syscall [1]
+The history of the Select(2) syscall \[1\]
 
-Select(2) is fundamentally broken [2]
+Select(2) is fundamentally broken \[2\]
 
-Epoll is fundamentally broken 1/2 [3]
+Epoll is fundamentally broken 1/2 \[3\]
 
-Epoll is fundamentally broken 2/2 [4]
+Epoll is fundamentally broken 2/2 \[4\]
 
 ### 2 脉络
 
-系列三和系列四分别讲 epoll(2) 存在的两个不同的问题：  
+系列三和系列四分别讲 epoll(2) 存在的两个不同的问题：
 
 1. 系列三主要讲 epoll 的多线程扩展性的问题
-    
-2. 系列四主要讲 epoll 所注册的 fd (file descriptor) 和实际内核中控制的结构 file description 拥有不同的生命周期
-    
+
+1. 系列四主要讲 epoll 所注册的 fd (file descriptor) 和实际内核中控制的结构 file description 拥有不同的生命周期
 
 我们在此也按照该顺序进行阐述。
 
@@ -47,9 +45,8 @@ Epoll is fundamentally broken 2/2 [4]
 epoll 的多线程扩展性的问题主要体现在做多核之间负载均衡上，有两个典型的场景：
 
 1. 一个 TCP 服务器，对同一个 listen fd 在多个 CPU 上调用 `accept(2)` 系统调用
-    
-2. 大量 TCP 连接调用 `read(2)` 系统调用上
-    
+
+1. 大量 TCP 连接调用 `read(2)` 系统调用上
 
 ### 3.1 特定 TCP listen fd 的 accept(2) 的问题
 
@@ -109,27 +106,26 @@ epoll 的多线程扩展性的问题主要体现在做多核之间负载均衡�
 既然水平触发和边缘触发都不行，那怎样才是正确的做法呢？有两种 workaround 的方式:
 
 1. 最好的也是唯一支持可扩展的方式是使用从 Linux 4.5+ 开始出现的水平触发模式新增的 `EPOLLEXCLUSIVE` 标志，这个标志会保证一个事件只有一个 epoll_wait() 会被唤醒，避免了 “惊群效应”，并且可以在多个 CPU 之间很好的水平扩展。
-    
-2. 当内核不支持`EPOLLEXCLUSIVE` 时，可以通过 ET 模式下的 `EPOLLONESHOT` 来模拟 LT + `EPOLLEXCLUSIVE` 的效果，当然这样是有代价的，需要在每个事件处理完之后额外多调用一次 epoll_ctl(EPOLL_CTL_MOD) 重置这个 fd。这样做可以将负载均分到不同的 CPU 上，但是同一时刻，只能有一个 worker 调用 accept(2)。显然，这样又限制了处理 accept(2) 的吞吐。下面是这样做的例子：
-    
-3. `内核：接收到两个建连请求。线程 A 和 线程 B 两个线程都在等在 epoll_wait()。由于采用边缘触发模式，只有一个线程会被唤醒，我们这里假定线程 A 先被唤醒`
-    
-4. `线程A：epoll_wait() 返回`
-    
-5. `线程A：调用 accpet() 并且成功`
-    
-6. `线程A：调用 epoll_ctl(EPOLL_CTL_MOD)，这样会重置 EPOLLONESHOT 状态并将这个 socket fd 重新准备好 “`
-    
+
+1. 当内核不支持`EPOLLEXCLUSIVE` 时，可以通过 ET 模式下的 `EPOLLONESHOT` 来模拟 LT + `EPOLLEXCLUSIVE` 的效果，当然这样是有代价的，需要在每个事件处理完之后额外多调用一次 epoll_ctl(EPOLL_CTL_MOD) 重置这个 fd。这样做可以将负载均分到不同的 CPU 上，但是同一时刻，只能有一个 worker 调用 accept(2)。显然，这样又限制了处理 accept(2) 的吞吐。下面是这样做的例子：
+
+1. `内核：接收到两个建连请求。线程 A 和 线程 B 两个线程都在等在 epoll_wait()。由于采用边缘触发模式，只有一个线程会被唤醒，我们这里假定线程 A 先被唤醒`
+
+1. `线程A：epoll_wait() 返回`
+
+1. `线程A：调用 accpet() 并且成功`
+
+1. `线程A：调用 epoll_ctl(EPOLL_CTL_MOD)，这样会重置 EPOLLONESHOT 状态并将这个 socket fd 重新准备好 “`
 
 #### 3.1.4 其他方案
 
-当然，如果不依赖于 epoll() 的话，也还有其他方案。一种方案是使用 `SO_REUSEPORT` 这个 socket option，创建多个 listen socket 共用一个端口号，不过这种方案其实也存在问题: 当一个 listen socket fd 被关了，已经被分到这个 listen socket fd 的 accept 队列上的请求会被丢掉，具体可以参考 https://engineeringblog.yelp.com/2015/04/true-zero-downtime-haproxy-reloads.html 和 LWN 上的 comment[5]
+当然，如果不依赖于 epoll() 的话，也还有其他方案。一种方案是使用 `SO_REUSEPORT` 这个 socket option，创建多个 listen socket 共用一个端口号，不过这种方案其实也存在问题: 当一个 listen socket fd 被关了，已经被分到这个 listen socket fd 的 accept 队列上的请求会被丢掉，具体可以参考 https://engineeringblog.yelp.com/2015/04/true-zero-downtime-haproxy-reloads.html 和 LWN 上的 comment\[5\]
 
 从 Linux 4.5 开始引入了 `SO_ATTACH_REUSEPORT_CBPF` 和 `SO_ATTACH_REUSEPORT_EBPF` 这两个 BPF 相关的 socket option。通过巧妙的设计，应该可以避免掉建连请求被丢掉的情况。
 
 ### 3.2 大量 TCP 连接的 read(2) 的问题
 
-除了 3.1 中说的 accept(2) 的问题之外， 普通的 read(2) 在多核系统上也会有扩展性的问题。设想以下场景：一个 HTTP 服务器，需要跟大量的 HTTP client 通信，你希望尽快的处理每个客户端的请求。而每个客户端连接的请求的处理时间可能并不一样，有些快有些慢，并且不可预测，因此简单的将这些连接切分到不同的 CPU 上，可能导致平均响应时间变长。一种更好的排队策略可能是：用一个 epoll fd 来管理这些连接并设置 `EPOLLEXCLUSIVE`，然后多个 worker 线程来 epoll_wait()，取出就绪的连接并处理[注1]。油管上有个视频介绍这种称之为 “combined queue” 的模型。
+除了 3.1 中说的 accept(2) 的问题之外， 普通的 read(2) 在多核系统上也会有扩展性的问题。设想以下场景：一个 HTTP 服务器，需要跟大量的 HTTP client 通信，你希望尽快的处理每个客户端的请求。而每个客户端连接的请求的处理时间可能并不一样，有些快有些慢，并且不可预测，因此简单的将这些连接切分到不同的 CPU 上，可能导致平均响应时间变长。一种更好的排队策略可能是：用一个 epoll fd 来管理这些连接并设置 `EPOLLEXCLUSIVE`，然后多个 worker 线程来 epoll_wait()，取出就绪的连接并处理\[注1\]。油管上有个视频介绍这种称之为 “combined queue” 的模型。
 
 下面我们来看看 epoll 处理这种模型下的问题：
 
@@ -176,7 +172,7 @@ epoll 的多线程扩展性的问题主要体现在做多核之间负载均衡�
 
 这一章我们主要讨论 epoll 的另一个大问题：file descriptor 与 file description 生命周期不一致的问题。
 
-Foom 在 LWN[6] 上说道：
+Foom 在 LWN\[6\] 上说道：
 
 ```
 1显然 epoll 存在巨大的设计缺陷，任何懂得 file descriptor 的人应该都能看得出来。事实上当你回望 epoll 的历史，你会发现当时实现 epoll 的人们显然并不怎么了解 file descriptor 和 file description 的区别。:(
@@ -221,39 +217,33 @@ Marc Lehmann 也提到这个问题：
 
 希望本所提到的问题对于使用 Linux 上这个糟糕的 epoll() 设计的人有所帮助。
 
----
+______________________________________________________________________
 
 注1：笔者认为该场景下或许直接用一个 master 线程来做分发，多个 worker 线程做处理 或者采用每个 worker 线程一个自己独立的 epoll fd 可能是更好的方案。
 
 ### 5 引用
 
-[1]https://idea.popcount.org/2016-11-01-a-brief-history-of-select2/
+\[1\]https://idea.popcount.org/2016-11-01-a-brief-history-of-select2/
 
-[2]https://idea.popcount.org/2017-01-06-select-is-fundamentally-broken/
+\[2\]https://idea.popcount.org/2017-01-06-select-is-fundamentally-broken/
 
-[3]https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
+\[3\]https://idea.popcount.org/2017-02-20-epoll-is-fundamentally-broken-12/
 
-[4]https://idea.popcount.org/2017-03-20-epoll-is-fundamentally-broken-22/
+\[4\]https://idea.popcount.org/2017-03-20-epoll-is-fundamentally-broken-22/
 
-[5]https://lwn.net/Articles/542866/
+\[5\]https://lwn.net/Articles/542866/
 
-[6]https://lwn.net/Articles/542866/
+\[6\]https://lwn.net/Articles/542866/
 
-[7]https://kernel.taobao.org/2019/12/epoll-is-fundamentally-broken/
+\[7\]https://kernel.taobao.org/2019/12/epoll-is-fundamentally-broken/
 
-[8]https://zh.wikipedia.org/wiki/Epoll
+\[8\]https://zh.wikipedia.org/wiki/Epoll
 
-[9]https://stackoverflow.com/questions/4058368/what-does-eagain-mean
+\[9\]https://stackoverflow.com/questions/4058368/what-does-eagain-mean
 
 end
 
-  
-
-  
-
-**一口Linux** 
-
-  
+**一口Linux**
 
 **关注，回复【****1024****】海量Linux资料赠送**
 
@@ -267,7 +257,7 @@ end
 
 公众号
 
-**精彩文章合集**  
+**精彩文章合集**
 
 文章推荐
 
@@ -286,8 +276,6 @@ end
 ☞【干货】[嵌入式驱动工程师学习路线](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247496985&idx=1&sn=c3d5e8406ff328be92d3ef4814108cd0&chksm=f96b87edce1c0efb6f60a6a0088c714087e4a908db1938c44251cdd5175462160e26d50baf24&scene=21#wechat_redirect)
 
 ☞【干货】[Linux嵌入式所有知识点-思维导图](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247497822&idx=1&sn=1e2aed9294f95ae43b1ad057c2262980&chksm=f96b8aaace1c03bc2c9b0c3a94c023062f15e9ccdea20cd76fd38967b8f2eaad4dfd28e1ca3d&scene=21#wechat_redirect)
-
-  
 
 点击“**阅读原文**”查看更多分享，欢迎**点分享、收藏、点赞、在看**
 

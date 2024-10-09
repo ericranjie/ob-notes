@@ -1,11 +1,8 @@
-
 张彦飞allen 腾讯技术工程
 
- _2022年07月14日 18:00_ _广东_
+_2022年07月14日 18:00_ _广东_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
 
 作者：yanfeizhang，腾讯 PCG 后台开发工程师
 
@@ -29,8 +26,6 @@
 
 **友情提示**：本文中内核源码会比较多。如果你能理解的了更好，如果觉得理解起来有困难，那直接重点看本文中的描述性的文字，尤其是加粗部分的即可。另外文章最后有一张总结图归纳和整理了全文内容。
 
-  
-
 ### 一、服务器的 listen
 
 我们都知道，服务器在开始提供服务之前都需要先 listen 一下。但 listen 内部究竟干了啥，我们平时很少去琢磨。
@@ -45,15 +40,11 @@
 
 当全连接队列和半连接队列中有元素的时候，他们在内核中的结构图大致如下。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **在服务器 listen 的时候，主要是进行了全/半连接队列的长度限制计算，以及相关的内存申请和初始化**。全/连接队列初始化了以后才可以相应来自客户端的握手请求。
 
 如果想了解更多的 listen 内部操作细节可以看之前的一篇文章[《为什么服务端程序都需要先 listen 一下？》](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247485737&idx=1&sn=baba45ad4fb98afe543bdfb06a5720b8&scene=21#wechat_redirect)
-
-  
 
 ### 二、客户端 connect
 
@@ -68,8 +59,6 @@
 在 tcp_connect 申请和构造 SYN 包，然后将其发出。同时还启动了一个重传定时器，该定时器的作用是等到一定时间后收不到服务器的反馈的时候来开启重传。在 3.10 版本中首次超时时间是 1 s，一些老版本中是 3 s。
 
 **总结一下，客户端在 connect 的时候，把本地 socket 状态设置成了 TCP_SYN_SENT，选了一个可用的端口，接着发出 SYN 握手请求并启动重传定时器**。
-
-  
 
 ### 三、服务器响应 SYN
 
@@ -100,8 +89,6 @@
 最后把当前握手信息添加到半连接队列，并开启计时器。计时器的作用是如果某个时间之内还收不到客户端的第三次握手的话，服务器会重传 synack 包。
 
 **总结一下，服务器响应 ack 是主要工作是判断下接收队列是否满了，满的话可能会丢弃该请求，否则发出 synack。申请 request_sock 添加到半连接队列中，同时启动定时器**。
-
-  
 
 ### 四、客户端响应 SYNACK
 
@@ -177,8 +164,6 @@ tcp_v4_do_rcv => tcp_child_process => tcp_rcv_state_process
 
 **服务器响应第三次握手 ack 所做的工作是把当前半连接对象删除，创建了新的 sock 后加入到全连接队列中，最后将新连接状态设置为 ESTABLISHED**。
 
-  
-
 ### 六、服务器 accept
 
 最后 accept 一步咱们长话短说。
@@ -197,28 +182,25 @@ reqsk_queue_remove 这个操作很简单，就是从全连接队列的链表里�
 
 全文洋洋洒洒上万字字，其实可以用一幅图总结起来。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - 服务器 listen 时，计算了全/半连接队列的长度，还申请了相关内存并初始化。
-    
+
 - 客户端 connect 时，把本地 socket 状态设置成了 TCP_SYN_SENT，选则一个可用的端口，发出 SYN 握手请求并启动重传定时器。
-    
+
 - 服务器响应 ack 时，会判断下接收队列是否满了，满的话可能会丢弃该请求。否则发出 synack，申请 request_sock 添加到半连接队列中，同时启动定时器。
-    
+
 - 客户端响应 synack 时，清除了 connect 时设置的重传定时器，把当前 socket 状态设置为 ESTABLISHED，开启保活计时器后发出第三次握手的 ack 确认。
-    
+
 - 服务器响应 ack 时，把对应半连接对象删除，创建了新的 sock 后加入到全连接队列中，最后将新连接状态设置为 ESTABLISHED。
-    
+
 - accept 从已经建立好的全连接队列中取出一个返回给用户进程。
-    
 
 另外要注意的是，如果握手过程中发生丢包（网络问题，或者是连接队列溢出），内核会等待定时器到期后重试，重试时间间隔在 3.10 版本里分别是 1s 2s 4s ...。在一些老版本里，比如 2.6 里，第一次重试时间是 3 秒。最大重试次数分别由 tcp_syn_retries 和 tcp_synack_retries 控制。
 
 如果你的线上接口正常都是几十毫秒内返回，但偶尔出现了 1 s、或者 3 s 等这种偶发的响应耗时变长的问题，那么你就要去定位一下看看是不是出现了握手包的超时重传了。
 
 以上就是三次握手中一些更详细的内部操作。深度理解这个握手过程对于你排查线上问题会有极大的帮助的。下一讲我们来介绍三次握手中常见的异常问题。
-
-  
 
 腾讯程序员
 

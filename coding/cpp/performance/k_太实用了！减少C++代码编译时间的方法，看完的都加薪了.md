@@ -106,7 +106,7 @@ inline std::ostream& operator<<( std::ostream& os,const old& old_val )
 
 **2.1.使用 "impl" 实现方式写代码，减少客户端代码的编译依赖**
 
-impl 方法简单点说就是把 类的私有成员变量全部放进一个impl 类， 然后把这个类的私有成员变量只保留一个impl* 指针，代码如下
+impl 方法简单点说就是把 类的私有成员变量全部放进一个impl 类， 然后把这个类的私有成员变量只保留一个impl\* 指针，代码如下
 
 ```cpp
 // file old.h

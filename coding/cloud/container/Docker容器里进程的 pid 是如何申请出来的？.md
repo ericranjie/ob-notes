@@ -1,14 +1,14 @@
 # [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
 
-talk is cheap,  
+talk is cheap,\
 show me the code!
 
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
+- [首页](http://kfngxl.cn/index.php)
+- [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
+- [内存篇](https://kfngxl.cn/index.php/category/memory/)
+- [网络篇](https://kfngxl.cn/index.php/category/network/)
+- [关于](https://kfngxl.cn/index.php/about.html)
+-
 
 # [Docker容器里进程的 pid 是如何申请出来的？](https://kfngxl.cn/index.php/archives/745/)
 
@@ -309,7 +309,7 @@ static inline pid_t pid_nr(struct pid *pid)
 }
 ```
 
-然后再调用 attach_pid 是把申请到的 pid 结构挂到自己的 pids[PIDTYPE_PID] 链表里了。
+然后再调用 attach_pid 是把申请到的 pid 结构挂到自己的 pids\[PIDTYPE_PID\] 链表里了。
 
 ```
 //file:kernel/pid.c
@@ -389,8 +389,8 @@ pid_t pid_nr_ns(struct pid *pid, struct pid_namespace *ns)
 
 更多干货内容，详见：
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [Docker容器里进程的 pid 是如何申请出来的？](https://kfngxl.cn/index.php/archives/745/)
@@ -435,7 +435,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36923次
     - 本站运营：0年168天18小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

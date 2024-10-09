@@ -1,5 +1,5 @@
 开发内功修炼
- _2022年01月06日 09:08_
+_2022年01月06日 09:08_
 
 后面我有规划想写写协程，因此最近看了一些协程相关的文章。在协程产生的背景与现状上，我觉得大白的这篇文章写的不错，因此推荐给大家。大白是我在搜狗时的前同事，目前在字节从事后端工作，感兴趣的同学可以关注他！
 
@@ -10,11 +10,14 @@
 大白干了6年多后端，写过C/C++、Python、Go，每次说到协程的时候，脑海里就只能浮现一些关键字yeild、async、go等等。
 但是对于协程这个知识点，我理解的一直比较模糊，于是决定搞清楚。
 全文阅读预计耗时10分钟，少刷几个小视频的时间，多学点知识，想想就很划算噻！
+
 ## 协程概念的诞生
+
 先抛一个粗浅的结论：**协程从广义来说是一种设计理念，我们常说的只是具体的实现**。
 理解好思想，技术点就很简单了，关于协程道与术的区别：
-![[Pasted image 20241006114714.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006114714.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 ### 上古神器COBOL
 
 协程概念的出现比线程更早，甚至可以追溯到20世纪50年代，提协程就必须要说到一门生命力极强的最早的高级编程语言COBOL。
@@ -30,41 +33,40 @@
 看看这两位的简介，我沉默了：
 
 > 梅尔文·康威(Melvin Conway)也是一位超级大佬，著名的康威定律提出者。
-![[Pasted image 20241006114734.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+> !\[\[Pasted image 20241006114734.png\]\]
+> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 唐纳德·尔文·克努斯是算法和程序设计技术的先驱者，1974年的图灵奖得主，计算机排版系统TeX和字型设计系统METAFONT的发明者，他因这些成就和大量创造性的影响深远的著作而誉满全球，《计算机程序设计的艺术》被《美国科学家》杂志列为20世纪最重要的12本物理科学类专著之一。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)那究竟是什么问题让这群天才们投入这么大的精力呢？快来看看！
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)那究竟是什么问题让这群天才们投入这么大的精力呢？快来看看！
 
 ### COBOL编译器的技术难题
 
 我们都是知道高级编程语言需要借助编译器来生成二进制可执行文件，编译器的基本步骤包括：**读取字符流、词法分析、语法分析、语义分析、代码生成器、代码优化器等**。
 
 这种管道式的流程，上一步的输出作为下一步的输入，将中间结果存储在内存即可，这在现代计算机上毫无压力，但是受限于软硬件水平，在几十年前的COBOL语言却是很难的。
-![[Pasted image 20241006114748.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006114748.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 在1958年的时候，当时的存储还不发达，磁带作为存储器是1951年在计算机中得到应用的，所以那个时代的COBOL很依赖于磁带。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)其实，我在网上找了很多资料去看当时的编译器有什么问题，只找到了一条：编译器无法做到读一次磁带就可以完成整个编译过程，也就是所谓的one-pass编译器还没有产生。
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)其实，我在网上找了很多资料去看当时的编译器有什么问题，只找到了一条：编译器无法做到读一次磁带就可以完成整个编译过程，也就是所谓的one-pass编译器还没有产生。
 
 > 当时的COBOL程序被写在一个磁带上，而磁带不支持随机读写，只能顺序读，而当时的内存又不可能把整个磁带的内容都装进去，所以一次读取没编译完就要再从头读。
 
 于是，我脑补了COBOL编译器和磁带之间可能的两种multi-pass形式的交互情况：
 
-- **可能情况一**  
-    对于COBOL的编译器来说，要完成词法分析、语法分析就要从磁带上读取程序的源代码，在之前的编译器中词法分析和语法分析是相互独立的，这就意味着：
-    
+- **可能情况一**\
+  对于COBOL的编译器来说，要完成词法分析、语法分析就要从磁带上读取程序的源代码，在之前的编译器中词法分析和语法分析是相互独立的，这就意味着：
 
 - 词法分析时需要将磁带从头到尾过一遍
-    
-- 语法分析时需要将磁带从头到尾过一遍![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-![[Pasted image 20241006114820.png]]
 
-- **可能情况二**  
-    听过磁带的朋友们一定知道磁带的两个基本操作：倒带和快进。  
-    在完成编译器的词法分析和语法分析两件事情时，需要磁带反复的倒带和快进去寻找两类分析所需的部分，类似于磁盘的寻道，磁头需要反复移动横跳，并且当时的磁带不一定支持随机读写。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-![[Pasted image 20241006114829.png]]
+- 语法分析时需要将磁带从头到尾过一遍!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+  !\[\[Pasted image 20241006114820.png\]\]
+
+- **可能情况二**\
+  听过磁带的朋友们一定知道磁带的两个基本操作：倒带和快进。\
+  在完成编译器的词法分析和语法分析两件事情时，需要磁带反复的倒带和快进去寻找两类分析所需的部分，类似于磁盘的寻道，磁头需要反复移动横跳，并且当时的磁带不一定支持随机读写。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+  !\[\[Pasted image 20241006114829.png\]\]
 
 从一些资料可以看到，COBOL当时编译器各个环节相互独立的，这种软硬件的综合限制导致无法实现one-pass编译。
 
@@ -73,23 +75,22 @@
 在梅尔文·康威的编译器设计中**将词法分析和语法分析合作运行，而不再像其他编译器那样相互独立，两个模块交织运行，编译器的控制流在词法分析和语法分析之间来回切换**：
 
 - 当词法分析模块基于词素产生足够多的词法单元Token时就控制流转给语法分析
-    
+
 - 当语法分析模块处理完所有的词法单元Token时将控制流转给词法分析模块
-    
+
 - 词法分析和语法分析各自维护自身的运行状态，并且具备主动让出和恢复的能力
-    
 
 可以看到这个方案的核心思想在于：
 
 > 梅尔文·康威构建的这种协同工作机制，需要参与者让出（yield）控制流时，记住自身状态，以便在控制流返回时能从上次让出的位置恢复（resume）执行。简言之，`协程的全部精神就在于控制流的主动让出和恢复`。
-![[Pasted image 20241006114838.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这种协作式的任务流和计算机中断非常像，在当时条件的限制下，由梅尔文·康威提出的这种让出/恢复模式的协作程序被认为是最早的协程概念，并且基于这种思想可以打造新的COBOL编译器。
+> !\[\[Pasted image 20241006114838.png\]\]
+> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)这种协作式的任务流和计算机中断非常像，在当时条件的限制下，由梅尔文·康威提出的这种让出/恢复模式的协作程序被认为是最早的协程概念，并且基于这种思想可以打造新的COBOL编译器。
 
 在1963年，梅尔文·康威也发表了一篇论文来说明自己的这种思想，虽然半个多世纪过去了，有幸我还是找到了这篇论文：
 
 > https://melconway.com/Home/pdf/compiler.pdf
-![[Pasted image 20241006114903.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)说实话这paper真是有点难，时间过于久远，很难有共鸣，最后我放弃了，要不然我或许能搞明白之前编译器的具体问题了。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+> !\[\[Pasted image 20241006114903.png\]\]
+> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)说实话这paper真是有点难，时间过于久远，很难有共鸣，最后我放弃了，要不然我或许能搞明白之前编译器的具体问题了。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 怀才不遇的协程
 
@@ -112,9 +113,8 @@ C语言就是典型的top-down思想的代表，在main函数作为入口，各�
 那么不禁要问：协程看着不错，为啥没成为主流呢？
 
 - **协程的思想和当时的主流不符合**
-    
+
 - **抢占式的线程可以解决大部分的问题，让使用者感受的痛点不足**
-    
 
 换句话说：协程能干的线程干得也不错，线程干的不好的地方，使用者暂时也不太需要，所以协程就这样怀才不遇了。
 
@@ -125,8 +125,8 @@ C语言就是典型的top-down思想的代表，在main函数作为入口，各�
 **我们对于CPU的压榨从未停止。**
 
 对于CPU来说，任务分为两大类：**计算密集型和IO密集型**。
-![[Pasted image 20241006114914.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006114914.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 计算密集型已经可以最大程度发挥CPU的作用，但是IO密集型一直是提高CPU利用率的难点。
 
@@ -135,14 +135,14 @@ C语言就是典型的top-down思想的代表，在main函数作为入口，各�
 对于IO密集型任务，在抢占式调度中也有对应的解决方案：**异步+回调**。
 
 也就是遇到IO阻塞，比如下载图片时会立即返回，等待下载完成将结果进行回调处理，交付给发起者。
-![[Pasted image 20241006114923.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006114923.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 就像你常去早餐店，油条还没好，你和老板很熟悉就先交了钱去座位玩手机了，等你的油条好了，服务员就端过去了，这就是典型的异步+回调。
 
 虽然异步+回调在现实生活中看着也很简单，但是在程序设计上却很让人头痛，在某些场景下会让整个程序的可读性非常差，而且也不好写，相反同步IO虽然效率低，但是很好写，
-![[Pasted image 20241006115002.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006115002.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 还是以为异步图片下载为例，图片服务中台提供了异步接口，发起者请求之后立即返回，图片服务此时给了发起者一个唯一标识ID，等图片服务完成下载后把结果放到一个消息队列，此时需要发起者不断消费这个MQ才能拿到下载结果。
 
@@ -151,8 +151,8 @@ C语言就是典型的top-down思想的代表，在main函数作为入口，各�
 ### 用户态协同调度
 
 随着网络技术的发展和高并发要求，对于抢占式调度对IO型任务处理的低效逐渐受到重视，终于协程的机会来了。
-![[Pasted image 20241006115014.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006115014.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 协程将IO的处理权交给了程序员，遇到IO被阻塞时就交出控制权给其他协程，等其他协程处理完再把控制权交回来。
 
@@ -161,21 +161,20 @@ C语言就是典型的top-down思想的代表，在main函数作为入口，各�
 协程一直没有占上风的原因，除了设计思想的矛盾，还有一些其他原因，毕竟协程也不是银弹，来看看协程有什么问题：
 
 - 协程无法利用多核，需要配合进程来使用才可以在多CPU上发挥作用
-    
+
 - 线程的回调机制仍然有巨大生命力，协程无法全部替代
-    
+
 - 控制权需要转移可能造成某些协程的饥饿，抢占式更加公平
-    
+
 - 协程的控制权由用户态决定可能转移给某些恶意的代码，抢占式由操作系统来调度更加安全
-    
 
 综上来说，**协程和线程并非矛盾，协程的威力在于IO的处理，恰好这部分是线程的软肋，由对立转换为合作才能开辟新局面**。
 
 ## 拥抱协程的编程语言
 
 网络操作、文件操作、数据库操作、消息队列操作等重IO操作，是任何高级编程语言无法避开的问题，也是提高程序效率的关键。
-![[Pasted image 20241006115022.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20241006115022.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 像Java、C/C++、Python这些老牌语言也陆续开始借助于第三方包来支持协程，来解决自身语言的不足。
 
@@ -188,17 +187,16 @@ C语言就是典型的top-down思想的代表，在main函数作为入口，各�
 Python对协程的支持也经历了多个版本，从部分支持到完善支持一直在演进：
 
 - Python2.x对协程的支持比较有限，生成器yield实现了一部分但不完全
-    
+
 - 第三方库gevent对协程的实现有比较好，但不是官方的
-    
+
 - Python3.4加入了asyncio模块
-    
+
 - 在Python3.5中又提供了async/await语法层面的支持
-    
+
 - Python3.6中asyncio模块更加完善和稳
-    
+
 - Python3.7开始async/await成为保留关键字
-    
 
 我们以最新的async/await来说明Python的协程是如何使用的：
 
@@ -207,11 +205,10 @@ Python对协程的支持也经历了多个版本，从部分支持到完善支�
 这段代码展示了如何使用async/await来实现图片的并发下载功能。
 
 - 在普通的函数def前面加async关键字就变成异步/协程函数，调用该函数并不会运行，而是返回一个协程对象，后续在event_loop中执行
-    
+
 - await表示等待task执行完成，也就是yeild让出控制权，同时asyncio使用事件循环event_loop来实现整个过程，await需要在async标注的函数中使用
-    
+
 - event_loop事件循环充当管理者的角色，将控制权在几个协程函数之间切换
-    
 
 ### C++
 
@@ -228,38 +225,35 @@ go中的协程被称为goroutine，被认为是用户态更轻量级的线程，
 goroutine仍然是基于线程来实现的，因为线程才是CPU调度的基本单位，在go语言内部维护了一组数据结构和N个线程，协程的代码被放进队列中来由线程来实现调度执行，这就是著名的GMP模型。
 
 - **G:Goroutine**
-    
 
 > 每个Gotoutine对应一个G结构体，G存储Goroutine的运行堆栈，状态，以及任务函数，可重用函数实体G需要保存到P的队列或者全局队列才能被调度执行。
 
 - **M:machine**
-    
 
 > M是线程的抽象，代表真正执行计算的资源，在绑定有效的P后，进入调度执行循环，M会从P的本地队列来执行，
 
 - **P:Processor**
-    
 
 > P是一个抽象的概念，不是物理上的CPU而是表示逻辑处理器。当一个P有任务，需要创建或者唤醒一个系统线程M去处理它队列中的任务。
 
 > P决定同时执行的任务的数量，GOMAXPROCS限制系统线程执行用户层面的任务的数量。
 
 > 对M来说，P提供了相关的执行环境，入内存分配状态，任务队列等。
-![[Pasted image 20241006115652.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+> !\[\[Pasted image 20241006115652.png\]\]
+> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **GMP模型运行的基本过程**：
 
 - 首先创建一个G对象，然后G被保存在P的本地队列或者全局队列
-    
+
 - 这时P会唤醒一个M，M寻找一个空闲的P将G移动到它自己，然后M执行一个调度循环：调用G对象->执行->清理线程->继续寻找Goroutine。
-    
+
 - 在M的执行过程中，上下文切换随时发生。当切换发生，任务的执行现场需要被保护，这样在下一次调度执行可以进行现场恢复。
-    
+
 - M的栈保存在G对象，只有现场恢复需要的寄存器(SP,PC等)，需要被保存到G对象。
-    
-![[Pasted image 20241006115636.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20241006115636.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 总结
 
@@ -294,85 +288,84 @@ Comment
 **留言 10**
 
 - aWeSome
-    
-    2022年1月6日
-    
-    Like2
-    
-    前言 第二段有个typo可以改一下 yeild -&gt; yield
-    
-    开发内功修炼
-    
-    Author2022年1月6日
-    
-    Like
-    
-    感谢指出！
-    
+
+  2022年1月6日
+
+  Like2
+
+  前言 第二段有个typo可以改一下 yeild -> yield
+
+  开发内功修炼
+
+  Author2022年1月6日
+
+  Like
+
+  感谢指出！
+
 - on the way
-    
-    2022年1月6日
-    
-    Like1
-    
-    位于不同 P队列中的 Goroutine 之间可以互相通信吗？还是说只有位于同一个P队列中的Goroutine 可以通过信道互相通信？还是说 信道是类似于数据总线的概念 任何一个Goroutine都可以往里输出，只要有特定的其他的Goroutine 读取即可
-    
-    开发内功修炼
-    
-    Author2022年1月6日
-    
-    Like
-    
-    可以通信的
-    
+
+  2022年1月6日
+
+  Like1
+
+  位于不同 P队列中的 Goroutine 之间可以互相通信吗？还是说只有位于同一个P队列中的Goroutine 可以通过信道互相通信？还是说 信道是类似于数据总线的概念 任何一个Goroutine都可以往里输出，只要有特定的其他的Goroutine 读取即可
+
+  开发内功修炼
+
+  Author2022年1月6日
+
+  Like
+
+  可以通信的
+
 - KermitLiu
-    
-    2022年1月19日
-    
-    Like
-    
-    非常棒的文章，如果加上java和javascript的分析就更好了，666
-    
+
+  2022年1月19日
+
+  Like
+
+  非常棒的文章，如果加上java和javascript的分析就更好了，666
+
 - Haiyung
-    
-    2022年1月18日
-    
-    Like
-    
-    有一个地方我不大确定，文中「协程无法利用多核，需要配合进程来使用才可以在多CPU上发挥作用」，这里需要配合的是「进程」还是「线程」？是线程吧？
-    
-    开发内功修炼
-    
-    Author2022年1月18日
-    
-    Like
-    
-    嗯，线程更准确一点
-    
+
+  2022年1月18日
+
+  Like
+
+  有一个地方我不大确定，文中「协程无法利用多核，需要配合进程来使用才可以在多CPU上发挥作用」，这里需要配合的是「进程」还是「线程」？是线程吧？
+
+  开发内功修炼
+
+  Author2022年1月18日
+
+  Like
+
+  嗯，线程更准确一点
+
 - MiniLed 一站式方案
-    
-    2022年1月6日
-    
-    Like
-    
-    我10几年只用c和c++
-    
+
+  2022年1月6日
+
+  Like
+
+  我10几年只用c和c++
+
 - TapNugget
-    
-    2022年1月6日
-    
-    Like
-    
-    质量真的好，通俗易懂![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    开发内功修炼
-    
-    Author2022年1月6日
-    
-    Like
-    
-    嘎嘎！
-    
+
+  2022年1月6日
+
+  Like
+
+  质量真的好，通俗易懂![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  开发内功修炼
+
+  Author2022年1月6日
+
+  Like
+
+  嘎嘎！
 
 已无更多数据
 
@@ -391,84 +384,83 @@ Comment
 **留言 10**
 
 - aWeSome
-    
-    2022年1月6日
-    
-    Like2
-    
-    前言 第二段有个typo可以改一下 yeild -&gt; yield
-    
-    开发内功修炼
-    
-    Author2022年1月6日
-    
-    Like
-    
-    感谢指出！
-    
+
+  2022年1月6日
+
+  Like2
+
+  前言 第二段有个typo可以改一下 yeild -> yield
+
+  开发内功修炼
+
+  Author2022年1月6日
+
+  Like
+
+  感谢指出！
+
 - on the way
-    
-    2022年1月6日
-    
-    Like1
-    
-    位于不同 P队列中的 Goroutine 之间可以互相通信吗？还是说只有位于同一个P队列中的Goroutine 可以通过信道互相通信？还是说 信道是类似于数据总线的概念 任何一个Goroutine都可以往里输出，只要有特定的其他的Goroutine 读取即可
-    
-    开发内功修炼
-    
-    Author2022年1月6日
-    
-    Like
-    
-    可以通信的
-    
+
+  2022年1月6日
+
+  Like1
+
+  位于不同 P队列中的 Goroutine 之间可以互相通信吗？还是说只有位于同一个P队列中的Goroutine 可以通过信道互相通信？还是说 信道是类似于数据总线的概念 任何一个Goroutine都可以往里输出，只要有特定的其他的Goroutine 读取即可
+
+  开发内功修炼
+
+  Author2022年1月6日
+
+  Like
+
+  可以通信的
+
 - KermitLiu
-    
-    2022年1月19日
-    
-    Like
-    
-    非常棒的文章，如果加上java和javascript的分析就更好了，666
-    
+
+  2022年1月19日
+
+  Like
+
+  非常棒的文章，如果加上java和javascript的分析就更好了，666
+
 - Haiyung
-    
-    2022年1月18日
-    
-    Like
-    
-    有一个地方我不大确定，文中「协程无法利用多核，需要配合进程来使用才可以在多CPU上发挥作用」，这里需要配合的是「进程」还是「线程」？是线程吧？
-    
-    开发内功修炼
-    
-    Author2022年1月18日
-    
-    Like
-    
-    嗯，线程更准确一点
-    
+
+  2022年1月18日
+
+  Like
+
+  有一个地方我不大确定，文中「协程无法利用多核，需要配合进程来使用才可以在多CPU上发挥作用」，这里需要配合的是「进程」还是「线程」？是线程吧？
+
+  开发内功修炼
+
+  Author2022年1月18日
+
+  Like
+
+  嗯，线程更准确一点
+
 - MiniLed 一站式方案
-    
-    2022年1月6日
-    
-    Like
-    
-    我10几年只用c和c++
-    
+
+  2022年1月6日
+
+  Like
+
+  我10几年只用c和c++
+
 - TapNugget
-    
-    2022年1月6日
-    
-    Like
-    
-    质量真的好，通俗易懂![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    开发内功修炼
-    
-    Author2022年1月6日
-    
-    Like
-    
-    嘎嘎！
-    
+
+  2022年1月6日
+
+  Like
+
+  质量真的好，通俗易懂![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  开发内功修炼
+
+  Author2022年1月6日
+
+  Like
+
+  嘎嘎！
 
 已无更多数据

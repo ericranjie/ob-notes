@@ -1,31 +1,28 @@
-
 土豆居士 一口Linux
 
- _2022年01月07日 11:52_
+_2022年01月07日 11:52_
 
-# 收集项目组需求的时候，我们知道一个进程要运行起来需要以下的内存结构。  
+# 收集项目组需求的时候，我们知道一个进程要运行起来需要以下的内存结构。
 
 用户态：
 
 - 代码段、全局变量、BSS
-    
+
 - 函数栈
-    
+
 - 堆
-    
+
 - 内存映射区
-    
 
 内核态：
 
 - 内核的代码、全局变量、BSS
-    
+
 - 内核数据结构例如 task_struct
-    
+
 - 内核栈
-    
+
 - 内核中动态分配的内存
-    
 
 现在这些事是不是已经都有了着落？
 
@@ -33,15 +30,11 @@
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/icRxcMBeJfcibRhN7z0jEticTbTBY3br7n9Qlczo7zMVwLZ3vJKlzTHyLrjZXSI6QGvfxJRqJicwn8v7gIlaDa3yOw/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
 
-  
-
 对于 64 位的对应关系，只是稍有区别，我这里也画了一个图，方便你对比理解。
-![[Pasted image 20240914164616.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914164616.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
----
+______________________________________________________________________
 
 # 用户态和内核态的划分
 
@@ -74,8 +67,8 @@ current->mm->task_size = TASK_SIZE;
 对于 32 位系统，最大能够寻址 2^32=4G，其中用户态虚拟地址空间是 3G，内核态是 1G。
 
 对于 64 位置系统，虚拟地址只使用了 48 位。就像代码里面写的一样，1 左移了 47 位，就相当于 48 位地址空间一半的位置，0x0000800000000000，然后减去一个页，就是 0x00007FFFFFFFF000，共 128T。同样，内核空间也是 128T。内核空间和用户空间之间隔着很大的空隙，以此来进行隔离。
-![[Pasted image 20240914164638.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914164638.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 用户态布局
 
@@ -102,10 +95,8 @@ arg_start 和 arg_end 是参数列表的位置， env_start 和 env_end 是环�
 mmap_base 表示虚拟地址空间中用于内存映射的起始地址。一般情况下，这个空间是从高地址到低地址增长的。前面咱们讲 malloc 申请一大块内存的时候，就是通过 mmap 在这里映射一块区域到物理内存。咱们加载动态链接库 so 文件，也是在这个区域里面，映射一块区域到 so 文件。
 
 这下所有用户状态的区域的位置基本上都描述清楚了。整个布局就像下面这张图这样。虽然 32 位和 64 位置的空间相差很大，但是区域的类别和布局是相似的。
-![[Pasted image 20240914164651.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[\[Pasted image 20240914164651.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 除了位置信息之外，struct mm_struct 里面还专门有一个结构 vm_area_struct，来描述这些区域的属性。
 
@@ -136,15 +127,14 @@ static int load_elf_binary(struct linux_binprm *bprm){......  setup_new_exec(bpr
 load_elf_binary 会完成以下的事情：
 
 - 调用 setup_new_exec，设置内存映射区 mmap_base；
-    
+
 - 调用 setup_arg_pages，设置栈的 vm_area_struct，这里面设置了 mm->arg_start 是指向栈底的，current->mm->start_stack 就是栈底；
-    
+
 - elf_map 会将 ELF 文件中的代码部分映射到内存中来；
-    
+
 - set_brk 设置了堆的 vm_area_struct，这里面设置了 current->mm->start_brk = current->mm->brk，也即堆里面还是空的；
-    
+
 - load_elf_interp 将依赖的 so 映射到内存中的内存映射区域。
-    
 
 最终就形成下面这个内存映射图。
 
@@ -187,10 +177,8 @@ static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	
 在内核态，32 位和 64 位的布局差别比较大，主要是因为 32 位内核态空间太小了。
 
 我们来看 32 位的内核态的布局。
-![[Pasted image 20240914164710.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[\[Pasted image 20240914164710.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 32 位的内核态虚拟地址空间一共就 1G，占绝大部分的前 896M，我们称为直接映射区。
 
@@ -198,10 +186,9 @@ static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	
 
 在内核里面，有两个宏：
 
-- __pa(vaddr) 返回与虚拟地址 vaddr 相关的物理地址；
-    
-- __va(paddr) 则计算出对应于物理地址 paddr 的虚拟地址。
-    
+- \_\_pa(vaddr) 返回与虚拟地址 vaddr 相关的物理地址；
+
+- \_\_va(paddr) 则计算出对应于物理地址 paddr 的虚拟地址。
 
 ```c
 #define __va(x)			((void *)((unsigned long)(x)+PAGE_OFFSET))    #define __pa(x)		__phys_addr((unsigned long)(x))    #define __phys_addr(x)		__phys_addr_nodebug(x)    #define __phys_addr_nodebug(x)	((x) - PAGE_OFFSET)
@@ -240,34 +227,26 @@ FIXADDR_START 到 FIXADDR_TOP(0xFFFF F000) 的空间，称为固定映射区域�
 其实 64 位的内核布局反而简单，因为虚拟空间实在是太大了，根本不需要所谓的高端内存，因为内核是 128T，根本不可能有物理内存超过这个值。
 
 64 位的内存布局如图所示。
-![[Pasted image 20240914164720.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[\[Pasted image 20240914164720.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 64 位的内核主要包含以下几个部分。
 
 从 0xffff800000000000 开始就是内核的部分，只不过一开始有 8T 的空档区域。
 
-从 __PAGE_OFFSET_BASE(0xffff880000000000) 开始的 64T 的虚拟地址空间是直接映射区域，也就是减去 PAGE_OFFSET 就是物理地址。虚拟地址和物理地址之间的映射在大部分情况下还是会通过建立页表的方式进行映射。
+从 \_\_PAGE_OFFSET_BASE(0xffff880000000000) 开始的 64T 的虚拟地址空间是直接映射区域，也就是减去 PAGE_OFFSET 就是物理地址。虚拟地址和物理地址之间的映射在大部分情况下还是会通过建立页表的方式进行映射。
 
 从 VMALLOC_START（0xffffc90000000000）开始到 VMALLOC_END（0xffffe90000000000）的 32T 的空间是给 vmalloc 的。
 
 从 VMEMMAP_START（0xffffea0000000000）开始的 1T 空间用于存放物理页面的描述结构 struct page 的。
 
-从 __START_KERNEL_map（0xffffffff80000000）开始的 512M 用于存放内核代码段、全局变量、BSS 等。这里对应到物理内存开始的位置，减去 __START_KERNEL_map 就能得到物理内存的地址。这里和直接映射区有点像，但是不矛盾，因为直接映射区之前有 8T 的空当区域，早就过了内核代码在物理内存中加载的位置。
+从 \_\_START_KERNEL_map（0xffffffff80000000）开始的 512M 用于存放内核代码段、全局变量、BSS 等。这里对应到物理内存开始的位置，减去 \_\_START_KERNEL_map 就能得到物理内存的地址。这里和直接映射区有点像，但是不矛盾，因为直接映射区之前有 8T 的空当区域，早就过了内核代码在物理内存中加载的位置。
 
 到这里内核中虚拟空间的布局就介绍完了。
 
 end
 
-  
-
-  
-
-**一口Linux** 
-
-  
+**一口Linux**
 
 **关注，回复【****1024****】海量Linux资料赠送**
 
@@ -281,7 +260,7 @@ end
 
 公众号
 
-**精彩文章合集**  
+**精彩文章合集**
 
 文章推荐
 
@@ -300,8 +279,6 @@ end
 ☞【干货】[嵌入式驱动工程师学习路线](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247496985&idx=1&sn=c3d5e8406ff328be92d3ef4814108cd0&chksm=f96b87edce1c0efb6f60a6a0088c714087e4a908db1938c44251cdd5175462160e26d50baf24&scene=21#wechat_redirect)
 
 ☞【干货】[Linux嵌入式所有知识点-思维导图](http://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247497822&idx=1&sn=1e2aed9294f95ae43b1ad057c2262980&chksm=f96b8aaace1c03bc2c9b0c3a94c023062f15e9ccdea20cd76fd38967b8f2eaad4dfd28e1ca3d&scene=21#wechat_redirect)
-
-  
 
 点击“**阅读原文**”查看更多分享，欢迎**点分享、收藏、点赞、在看**
 

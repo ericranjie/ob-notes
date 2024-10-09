@@ -59,7 +59,7 @@ gcc -Wall -Wextra -pedantic -Werror main.c -o test; ./test
 
 输出：0x88f010
 
-我的机器是64位机器，进程的虚拟内存高地址为0xffffffffffffffff， 低地址为0x0，而0x88f010远小于0xffffffffffffffff，因此大概可以推断出被复制的字符串的地址(堆地址)是在内存低地址附近，具体可以通过/proc文件系统验证.ls /proc目录可以看到好多文件，这里主要关注/proc/[pid]/mem和/proc/[pid]/maps
+我的机器是64位机器，进程的虚拟内存高地址为0xffffffffffffffff， 低地址为0x0，而0x88f010远小于0xffffffffffffffff，因此大概可以推断出被复制的字符串的地址(堆地址)是在内存低地址附近，具体可以通过/proc文件系统验证.ls /proc目录可以看到好多文件，这里主要关注/proc/\[pid\]/mem和/proc/\[pid\]/maps
 
 ### **mem & maps**
 
@@ -219,7 +219,7 @@ ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0          �
 
 ```
 
-看见堆地址范围021dc000-021fd000，并且可读可写，而且021dc000<0x21dc010<021fd000，这就可以确认字符串的地址在堆中，在堆中的索引是0x10(至于为什么是0x10，后面会讲到)，这时可以通过mem文件到0x21dc010地址修改内容，字符串输出的内容也会随之更改，这里通过python脚本实现此功能.
+看见堆地址范围021dc000-021fd000，并且可读可写，而且021dc000\<0x21dc010\<021fd000，这就可以确认字符串的地址在堆中，在堆中的索引是0x10(至于为什么是0x10，后面会讲到)，这时可以通过mem文件到0x21dc010地址修改内容，字符串输出的内容也会随之更改，这里通过python脚本实现此功能.
 
 ```python
 #!/usr/bin/env python3
@@ -467,7 +467,7 @@ Address of function main: 0x561b9deb378a
 
 ```
 
-由于main(0x561b9deb378a) < heap(0x561b9ee8c670) < (0x7ffed846de2c)，可以画出分布图如下:
+由于main(0x561b9deb378a) \< heap(0x561b9ee8c670) \< (0x7ffed846de2c)，可以画出分布图如下:
 
 [https://mmbiz.qpic.cn/mmbiz_png/9lFFFiaKpEr8ZWrBt9SoqIMmdjw6L2WqPy4P6RORCspJLRFjPFiaqKYeLBiaNeRjJG0zA7uqvrR50wxfC9bAqz67g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/9lFFFiaKpEr8ZWrBt9SoqIMmdjw6L2WqPy4P6RORCspJLRFjPFiaqKYeLBiaNeRjJG0zA7uqvrR50wxfC9bAqz67g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -540,11 +540,11 @@ Address of the first environment variable: 0x7ffcc154b962
 
 ```
 
-结果如下：main(0x559bd09807ca) < heap(0x559bd1bee670) < stack(0x7ffcc154a748) < argv(0x7ffcc154a848) < env(0x7ffcc154a868) < arguments(0x7ffcc154b94f->0x7ffcc154b95c + 6)(6为hello+1('\0')) < env first(0x7ffcc154b962)可以看出所有的命令行参数都是相邻的，并且紧接着就是环境变量.
+结果如下：main(0x559bd09807ca) \< heap(0x559bd1bee670) \< stack(0x7ffcc154a748) \< argv(0x7ffcc154a848) \< env(0x7ffcc154a868) \< arguments(0x7ffcc154b94f->0x7ffcc154b95c + 6)(6为hello+1('\\0')) \< env first(0x7ffcc154b962)可以看出所有的命令行参数都是相邻的，并且紧接着就是环境变量.
 
 ### **argv和env数组地址是相邻的吗**
 
-上例中argv有4个元素，命令行中有三个参数，还有一个NULL指向标记数组的末尾，每个指针是8字节，8*4=32, argv(0x7ffcc154a848) + 32(0x20) = env(0x7ffcc154a868)，所以argv和env数组指针是相邻的.
+上例中argv有4个元素，命令行中有三个参数，还有一个NULL指向标记数组的末尾，每个指针是8字节，8\*4=32, argv(0x7ffcc154a848) + 32(0x20) = env(0x7ffcc154a868)，所以argv和env数组指针是相邻的.
 
 ### **命令行参数地址紧随环境变量地址之后吗**
 
@@ -697,7 +697,7 @@ Address of function main: 0x564d45b9880e
 [f] Adresses of a: 0x7ffefc7507ec, b = 0x7ffefc7507f0, c = 0x7ffefc7507f4
 ```
 
-结果可知: f{a} 0x7ffefc7507ec < main{a} 0x7ffefc75083c
+结果可知: f{a} 0x7ffefc7507ec \< main{a} 0x7ffefc75083c
 
 可画图如下：
 
@@ -721,7 +721,7 @@ The malloc() function allocates size bytes and returns a pointer to t
 
 ```
 
-### **不调用malloc，就不会有堆空间[heap]**
+### **不调用malloc，就不会有堆空间\[heap\]**
 
 看一段不调用malloc的代码
 
@@ -766,7 +766,7 @@ ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0          �
 
 ```
 
-可以看到，如果不调用malloc，maps中就没有[heap]
+可以看到，如果不调用malloc，maps中就没有\[heap\]
 
 下面运行一个带有malloc的程序
 
@@ -815,7 +815,7 @@ ffffffffff600000-ffffffffff601000 r-xp 00000000 00:00 0          �
 
 ```
 
-程序中带有malloc，那maps中就有[heap]段，并且malloc返回的地址在heap的地址段中，但是返回的地址却不再heap的最开始地址上，相差了0x10字节，为什么呢?看下面：
+程序中带有malloc，那maps中就有\[heap\]段，并且malloc返回的地址在heap的地址段中，但是返回的地址却不再heap的最开始地址上，相差了0x10字节，为什么呢?看下面：
 
 ### **strace, brk, sbrk**
 
@@ -907,7 +907,7 @@ DESCRIPTION
 
 ```
 
-程序中断是虚拟内存中程序数据段结束后的第一个位置的地址，malloc通过调用brk或者sbrk，增加程序中断的值就可以创建新空间来动态分配内存，首次调用brk会返回当前程序中断的地址，第二次调用brk也会返回程序中断的地址，可以发现第二次brk返回地址大于第一次brk返回地址，brk就是通过增加程序中断地址的方式来分配内存，可以看出现在的堆地址范围是0x781000-0x7a2000，通过cat /proc/[pid]/maps也可以验证，此处就不贴上实际验证的结果啦。
+程序中断是虚拟内存中程序数据段结束后的第一个位置的地址，malloc通过调用brk或者sbrk，增加程序中断的值就可以创建新空间来动态分配内存，首次调用brk会返回当前程序中断的地址，第二次调用brk也会返回程序中断的地址，可以发现第二次brk返回地址大于第一次brk返回地址，brk就是通过增加程序中断地址的方式来分配内存，可以看出现在的堆地址范围是0x781000-0x7a2000，通过cat /proc/\[pid\]/maps也可以验证，此处就不贴上实际验证的结果啦。
 
 ### **多次malloc**
 

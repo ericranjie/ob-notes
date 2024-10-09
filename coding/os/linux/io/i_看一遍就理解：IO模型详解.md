@@ -2,7 +2,7 @@
 
 捡田螺的小男孩 狼王编程
 
- _2021年12月06日 17:27_
+_2021年12月06日 17:27_
 
 ## 前言
 
@@ -39,9 +39,8 @@ IO，英文全称是Input/Output，翻译过来就是**输入/输出**。平时�
 **操作系统**负责计算机的资源管理和进程的调度。我们电脑上跑着的应用程序，其实是需要经过**操作系统**，才能做一些特殊操作，如**磁盘文件读写、内存的读写**等等。因为这些都是比较危险的操作，不可以由应用程序乱来，只能交给底层操作系统来。也就是说，你的应用程序要把数据写入磁盘，只能通过调用操作系统开放出来的API来操作。
 
 > - 什么是用户空间？什么是内核空间?
->     
+>
 > - 以32位操作系统为例，它为每一个进程都分配了4G(2的32次方)的内存空间。这4G可访问的内存空间分为二部分，一部分是用户空间，一部分是内核空间。内核空间是操作系统内核访问的区域，是受保护的内存空间，而用户空间是用户应用程序访问的内存区域。
->     
 
 我们应用程序是跑在用户空间的，它不存在实质的IO过程，真正的IO是在**操作系统**执行的。即应用程序的IO操作分为两种动作：**IO调用和IO执行**。IO调用是由进程（应用程序的运行态）发起，而IO执行是**操作系统内核**的工作。此时所说的IO是应用程序对操作系统IO功能的一次触发，即IO调用。
 
@@ -50,27 +49,24 @@ IO，英文全称是Input/Output，翻译过来就是**输入/输出**。平时�
 应用程序发起的一次IO操作包含两个阶段：
 
 - IO调用：应用程序进程向操作系统**内核**发起调用。
-    
+
 - IO执行：操作系统内核完成IO操作。
-    
 
 操作系统内核完成IO操作还包括两个过程：
 
 - 准备数据阶段：内核等待I/O设备准备好数据
-    
+
 - 拷贝数据阶段：将数据从内核缓冲区拷贝到用户进程缓冲区
-    
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1PmpznQic9871SM0Xlk5W1Kv5iazT9kWYbt1L2xibUrVOW05JFOsoDYrzNxB7eziasmxzsMBbbQakMLJOvKw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 其实IO就是把进程的内部数据转移到外部设备，或者把外部设备的数据迁移到进程内部。外部设备一般指硬盘、socket通讯的网卡。一个完整的**IO过程**包括以下几个步骤：
 
 - 应用程序进程向操作系统发起**IO调用请求**
-    
+
 - 操作系统**准备数据**，把IO外部设备的数据，加载到**内核缓冲区**
-    
+
 - 操作系统拷贝数据，即将内核缓冲区的数据，拷贝到用户进程缓冲区
-    
 
 ## 阻塞IO模型
 
@@ -81,28 +77,26 @@ IO，英文全称是Input/Output，翻译过来就是**输入/输出**。平时�
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/PoF8jo1PmpznQic9871SM0Xlk5W1Kv5iazGZbavGhMaZNbzP3VfPpBTO5NkibjRWOfxdSDZFqBYFiaXbQuHtHRjBWA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 - 阻塞IO比较经典的应用就是**阻塞socket、Java BIO**。
-    
+
 - 阻塞IO的缺点就是：如果内核数据一直没准备好，那用户进程将一直阻塞，**浪费性能**，可以使用**非阻塞IO**优化。
-    
 
 ## 非阻塞IO模型
 
 如果内核数据还没准备好，可以先返回错误信息给用户进程，让它不需要等待，而是通过轮询的方式再来请求。这就是非阻塞IO，流程图如下：
-![[Pasted image 20240922120715.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240922120715.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 非阻塞IO的流程如下：
 
 - 应用进程向操作系统内核，发起`recvfrom`读取数据。
-    
+
 - 操作系统内核数据没有准备好，立即返回`EWOULDBLOCK`错误码。
-    
+
 - 应用程序进程轮询调用，继续向操作系统内核发起`recvfrom`读取数据。
-    
+
 - 操作系统内核数据准备好了，从内核缓冲区拷贝到用户空间。
-    
+
 - 完成调用，返回成功提示。
-    
 
 非阻塞IO模型，简称**NIO**，`Non-Blocking IO`。它相对于阻塞IO，虽然大幅提升了性能，但是它依然存在**性能问题**，即**频繁的轮询**，导致频繁的系统调用，同样会消耗大量的CPU资源。可以考虑**IO复用模型**，去解决这个问题。
 
@@ -117,17 +111,16 @@ IO复用模型核心思路：系统给我们提供**一类函数**（如我们�
 ### IO多路复用之select
 
 应用进程通过调用**select**函数，可以同时监控多个`fd`，在`select`函数监控的`fd`中，只要有任何一个数据状态准备就绪了，`select`函数就会返回可读状态，这时应用进程再发起`recvfrom`请求去读取数据。
-![[Pasted image 20240922120724.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240922120724.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 非阻塞IO模型（NIO）中，需要`N`（N>=1）次轮询系统调用，然而借助`select`的IO多路复用模型，只需要发起一次询问就够了,大大优化了性能。
 
 但是呢，`select`有几个缺点：
 
 - 监听的IO最大连接数有限，在Linux系统上一般为1024。
-    
+
 - select函数返回后，是通过**遍历**`fdset`，找到就绪的描述符`fd`。（仅知道有I/O事件发生，却不知是哪几个流，所以**遍历所有流**）
-    
 
 因为**存在连接数限制**，所以后来又提出了**poll**。与select相比，**poll**解决了**连接数限制问题**。但是呢，select和poll一样，还是需要通过遍历文件描述符来获取已经就绪的`socket`。如果同时连接的大量客户端，在一时刻可能只有极少处于就绪状态，伴随着监视的描述符数量的增长，**效率也会线性下降**。
 
@@ -136,8 +129,8 @@ IO复用模型核心思路：系统给我们提供**一类函数**（如我们�
 ### IO多路复用之epoll
 
 为了解决`select/poll`存在的问题，多路复用模型`epoll`诞生，它采用事件驱动来实现，流程图如下：
-![[Pasted image 20240922120738.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240922120738.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **epoll**先通过`epoll_ctl()`来注册一个`fd`（文件描述符），一旦基于某个`fd`就绪时，内核会采用回调机制，迅速激活这个`fd`，当进程调用`epoll_wait()`时便得到通知。这里去掉了**遍历文件描述符**的坑爹操作，而是采用**监听事件回调**的机制。这就是epoll的亮点。
 
@@ -151,14 +144,13 @@ IO复用模型核心思路：系统给我们提供**一类函数**（如我们�
 |最大连接数|1024|无限制|无限制|
 |fd数据拷贝|每次调用select，需要将fd数据从用户空间拷贝到内核空间|每次调用poll，需要将fd数据从用户空间拷贝到内核空间|使用内存映射(mmap)，不需要从用户空间频繁拷贝fd数据到内核空间|
 
-
 **epoll**明显优化了IO的执行效率，但在进程调用`epoll_wait()`时，仍然可能被阻塞。能不能酱紫：不用我老是去问你数据是否准备就绪，等我发出请求后，你数据准备好了通知我就行了，这就诞生了**信号驱动IO模型**。
 
 ## IO模型之信号驱动模型
 
 信号驱动IO不再用主动询问的方式去确认数据是否就绪，而是向内核发送一个信号（调用`sigaction`的时候建立一个`SIGIO`的信号），然后应用用户进程可以去做别的事，不用阻塞。当内核数据准备好后，再通过`SIGIO`信号通知应用进程，数据准备好后的可读状态。应用用户进程收到信号之后，立即调用`recvfrom`，去读取数据。
-![[Pasted image 20240922120819.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240922120819.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 信号驱动IO模型，在应用进程发出信号后，是立即返回的，不会阻塞进程。它已经有异步操作的感觉了。但是你细看上面的流程图，**发现数据复制到应用缓冲的时候**，应用进程还是阻塞的。回过头来看下，不管是BIO，还是NIO，还是信号驱动，在数据从内核复制到应用缓冲的时候，都是阻塞的。还有没有优化方案呢？**AIO**（真正的异步IO）！
 
@@ -166,15 +158,16 @@ IO复用模型核心思路：系统给我们提供**一类函数**（如我们�
 
 前面讲的`BIO，NIO和信号驱动`，在数据从内核复制到应用缓冲的时候，都是**阻塞**的，因此都不算是真正的异步。`AIO`实现了IO全流程的非阻塞，就是应用进程发出系统调用后，是立即返回的，但是**立即返回的不是处理结果，而是表示提交成功类似的意思**。等内核数据准备好，将数据拷贝到用户进程缓冲区，发送信号通知用户进程IO操作执行完毕。
 
-流程如下：![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-![[Pasted image 20240922120834.png]]
+流程如下：!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240922120834.png\]\]
 异步IO的优化思路很简单，只需要向内核发送一次请求，就可以完成数据状态询问和数据拷贝的所有操作，并且不用阻塞等待结果。日常开发中，有类似思想的业务场景：
 
 > 比如发起一笔批量转账，但是批量转账处理比较耗时，这时候后端可以先告知前端转账提交成功，等到结果处理完，再通知前端结果即可。
 
 ## 阻塞、非阻塞、同步、异步IO划分
-![[Pasted image 20240922120843.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240922120843.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 |IO模型||
 |---|---|
@@ -187,20 +180,18 @@ IO复用模型核心思路：系统给我们提供**一类函数**（如我们�
 ## 一个通俗例子读懂BIO、NIO、AIO
 
 - 同步阻塞(blocking-IO)简称BIO
-    
+
 - 同步非阻塞(non-blocking-IO)简称NIO
-    
+
 - 异步非阻塞(asynchronous-non-blocking-IO)简称AIO
-    
 
 **一个经典生活的例子：**
 
 - 小明去吃同仁四季的椰子鸡，就这样在那里排队，**等了一小时**，然后才开始吃火锅。(**BIO**)
-    
+
 - 小红也去同仁四季的椰子鸡，她一看要等挺久的，于是去逛会商场，**每次逛一下，就跑回来看看，是不是轮到她了**。于是最后她既购了物，又吃上椰子鸡了。（**NIO**）
-    
+
 - 小华一样，去吃椰子鸡，由于他是高级会员，所以店长说，**你去商场随便逛会吧，等下有位置，我立马打电话给你**。于是小华不用干巴巴坐着等，也不用每过一会儿就跑回来看有没有等到，最后也吃上了美味的椰子鸡（**AIO**）
-    
 
 ## 最后
 
@@ -214,34 +205,31 @@ IO复用模型核心思路：系统给我们提供**一类函数**（如我们�
 
 ## 参考与感谢
 
-- 程序员应该这样理解IO[1]
-    
-- Linux IO模式及 select、poll、epoll详解[2]
-    
-- IO 模型知多少 | 理论篇[3]
-    
-- 100%弄明白5种IO模型[4]
-    
+- 程序员应该这样理解IO\[1\]
+
+- Linux IO模式及 select、poll、epoll详解\[2\]
+
+- IO 模型知多少 | 理论篇\[3\]
+
+- 100%弄明白5种IO模型\[4\]
 
 ### 参考资料
 
-[1]
+\[1\]
 
 程序员应该这样理解IO: _https://www.jianshu.com/p/fa7bdc4f3de7_
 
-[2]
+\[2\]
 
 Linux IO模式及 select、poll、epoll详解: _https://segmentfault.com/a/1190000003063859_
 
-[3]
+\[3\]
 
 IO 模型知多少 | 理论篇: _https://cloud.tencent.com/developer/article/1648650_
 
-[4]
+\[4\]
 
 100%弄明白5种IO模型: _https://zhuanlan.zhihu.com/p/115912936_
-
-  
 
 阅读 1446
 

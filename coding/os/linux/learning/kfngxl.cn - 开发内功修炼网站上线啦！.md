@@ -1,10 +1,8 @@
-
-
 原创 张彦飞allen 开发内功修炼
 
- _2024年03月27日 09:10_ _北京_
+_2024年03月27日 09:10_ _北京_
 
-大家好，我是飞哥！  
+大家好，我是飞哥！
 
 和大家分享一个事情，最近我花了两个周末，搞了个开发内功修炼技术网站。站点地址是 https://kfngxl.cn 。请大家收藏，后续我写的新文章也会陆续同步到网站上。
 
@@ -52,13 +50,13 @@
 
 记得版本要选的稍微高一点，别太低了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2）**配置 host**。
 
 一般在自己的 Linux 上，需要手工修改 Nginx 的配置文件来添加 host。但是宝塔后台直接在界面上可以操作。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这个时候，其实一个基于 Nginx 的静态网站就做好了。index.html 等文件都是外网可访问的了。
 
@@ -66,15 +64,15 @@
 
 到官网上下载 typecho 源码。然后通过宝塔后台上传到服务器中 host 的根目录下。然后解压。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 4）**动态网站初始化**typecho是基于 Mysql 来工作的。所以需要事先准备一个 Mysql 实例，这个同样在宝塔界面上就可以创建。创建完成后，把用户名密码记下来。然后通过 ip 访问 typecho 的管理后台。按照说明填入数据库用户名密码。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 之后网站就创建成功，并可以通过外网IP访问了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 域名备案
 
@@ -92,7 +90,7 @@
 
 主题的源码下载后上传到网站的 usr/themes 目录下。接着需要进行一些配置。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 网页的顶部导航栏、是否启用缩略图样式、是否配置幻灯片、侧边栏都显示哪些内容、作者简介、代码是否高亮展示、底部备案号、百度统计 js 代码等都是在上面的界面中配置的。
 
@@ -108,7 +106,7 @@
 
 后来我一咬牙，自己参考这两个插件的基础之上，开发了个新插件。新插件对上传的图片先添加水印，水印固定添加在图片的中心位置，并且给图片设置默认的灰色底色。然后再使用 pngquant 对 png 进行压缩。搞到晚上 3 点多终于开发成功了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 300 KB 的图片成功搞到了 100 KB 左右。
 
@@ -116,7 +114,7 @@
 
 现在的网站，HTTPS 是标配了。默认的 HTTP 页面在用户的浏览器里会被提示不安全。所以申请个证书也是很有必要的。我在腾讯云上申请了免费的证书。通过宝塔配置到网站上
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 剩下还有最后一个事是公安备案。根据腾讯云的提示是要求处理。根据网上的经验，我把网站的评论功能关了。不给祖国和自己添麻烦。我是按说明提交了公安备案，至于结果等两个个星期再看。
 
@@ -126,54 +124,53 @@
 
 所以我把我老婆也卷入到了这个小站的建设中来了。她来帮我把一篇一篇的历史文章同步到网站中。目前已经把网络篇同步完了。CPU、内存、磁盘方面的文章预计接下来一周左右同步完。
 
-到网站上看文章的时候要记得感谢你们的飞嫂！  
+到网站上看文章的时候要记得感谢你们的飞嫂！
 
 ### 建站总结
 
 建站的大概步骤是
 
 - 购买轻量云服务器
-    
+
 - 安装LNMP、安装 typecho、
-    
+
 - ICP 备案
-    
+
 - 配置装修动态网站
-    
+
 - 申请配置 HTTPS 证书
-    
+
 - 公安备案
-    
 
 至于成本的话，我觉得主要是精力的投入成本。钱的投入买对服务器的话很便宜。我的支出是 99 一年的腾讯云轻量服务器买了两年花了 198 元，域名花了 150 多。其它的就没有了。
 
 腾讯云 99 服务器是在2024采购节上买的，我相中的是它让优惠价再多续费一年的政策，活动地址在下方的小程序里。如果只买一年的话更便宜，只要50多块。
 
-[![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247491809&idx=1&sn=169e3f7888cf8332cef5526328f12b4b&chksm=a6e0e1da919768cc4ef83128cf096b0b9c970bec681bc1aaf92bd11874abc94200d5679f2969&mpshare=1&scene=24&srcid=03293IzcqRVRhAFizhQF7e2k&sharer_shareinfo=0a942377eea06b2e637a4a74ecbf65c6&sharer_shareinfo_first=0a942377eea06b2e637a4a74ecbf65c6&key=daf9bdc5abc4e8d0163943f101b20aa28bcf4e3758e1e1e20f4220f01bc858f8ca42a9f2205848e2d747cf07ba845dd3146be5b56392ebaf5a819d614af9a12ecd6f72cb6e443353717829678e3b6c589dc88456d91fa9f3abffcd64658a7f71807545636c714a286abe9e78a0a4d79c472f792bfb2f179629b4ba5bd12eef0b&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQyxaHkdoBSA3EhKAhRbV%2FmxLmAQIE97dBBAEAAAAAAEqnM91V96YAAAAOpnltbLcz9gKNyK89dVj0sLBITMOGeTsU4rtnTVvz630R49mu2eMYw0Fdn%2F6Vv1NojC%2BX5mREK%2F5G2svzI5JBsl31q2UjcvSx5hNqziR%2B5okvTvViuRd2x6V47kuKGc2tAOrmOG8PYcmLLf1fv2lBhsDRzmIIAolxSZn9zhFM4T0CKgpYLhCWyFknprxznAzBHmS330mzLpQsEpKaaMEpUjjOdq%2Bybfzy%2BNpc6tf6qa0ECFt3LUW9sWDPKljT6Mxo8%2BeEd4aOb8tHw8%2BpUKZ%2F&acctmode=0&pass_ticket=cTgP%2FbyvpHtXePrwegwLhX1ayZszDvcyd8RzoQ4oMa6N0Y4m4k5yf%2BASi0RRbl6Y&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)
+[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247491809&idx=1&sn=169e3f7888cf8332cef5526328f12b4b&chksm=a6e0e1da919768cc4ef83128cf096b0b9c970bec681bc1aaf92bd11874abc94200d5679f2969&mpshare=1&scene=24&srcid=03293IzcqRVRhAFizhQF7e2k&sharer_shareinfo=0a942377eea06b2e637a4a74ecbf65c6&sharer_shareinfo_first=0a942377eea06b2e637a4a74ecbf65c6&key=daf9bdc5abc4e8d0163943f101b20aa28bcf4e3758e1e1e20f4220f01bc858f8ca42a9f2205848e2d747cf07ba845dd3146be5b56392ebaf5a819d614af9a12ecd6f72cb6e443353717829678e3b6c589dc88456d91fa9f3abffcd64658a7f71807545636c714a286abe9e78a0a4d79c472f792bfb2f179629b4ba5bd12eef0b&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQyxaHkdoBSA3EhKAhRbV%2FmxLmAQIE97dBBAEAAAAAAEqnM91V96YAAAAOpnltbLcz9gKNyK89dVj0sLBITMOGeTsU4rtnTVvz630R49mu2eMYw0Fdn%2F6Vv1NojC%2BX5mREK%2F5G2svzI5JBsl31q2UjcvSx5hNqziR%2B5okvTvViuRd2x6V47kuKGc2tAOrmOG8PYcmLLf1fv2lBhsDRzmIIAolxSZn9zhFM4T0CKgpYLhCWyFknprxznAzBHmS330mzLpQsEpKaaMEpUjjOdq%2Bybfzy%2BNpc6tf6qa0ECFt3LUW9sWDPKljT6Mxo8%2BeEd4aOb8tHw8%2BpUKZ%2F&acctmode=0&pass_ticket=cTgP%2FbyvpHtXePrwegwLhX1ayZszDvcyd8RzoQ4oMa6N0Y4m4k5yf%2BASi0RRbl6Y&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)
 
 网站功能开发完毕以后，我发布了几篇文章，以下是网站的最终效果。
 
 这是网站最终效果图。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 移动端上适配的效果也不错。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 总之，动态站确实会需要一些人力成本。不是像网上很多人说的那样，不需要任何技术能力就可以维护一个动态站。我在中间遇到过好几次问题，最后都是翻开源码找到问题后解决的。
 
 如果你想简单轻松一点，用 Github Pages 搞个静态栈就可以了。如果你喜欢动态站的自由度，并且也不怕麻烦，还是很推荐搞一个真正的动态网站的。能通过技术驾驭服务器和代码，感觉会很不错。而且更重要的是功能扩展起来也方便，自己想加啥功能写几行代码就可以了，无拘无束！
 
-网站地址：https://kfngxl.cn  
+网站地址：https://kfngxl.cn
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/iaMl8iazctEu93J6Io4KDZQmx03HErmVeXnSnUAQ0MD6Nia3d97E8vmljv5DibLTWSeLES1JHicWVA2mynPVlbt1FAA/0?wx_fmt=jpeg)
 
 张彦飞allen
 
- 赞赏不分多少，头像出现就好！ 
+赞赏不分多少，头像出现就好！
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247491809&idx=1&sn=169e3f7888cf8332cef5526328f12b4b&chksm=a6e0e1da919768cc4ef83128cf096b0b9c970bec681bc1aaf92bd11874abc94200d5679f2969&mpshare=1&scene=24&srcid=03293IzcqRVRhAFizhQF7e2k&sharer_shareinfo=0a942377eea06b2e637a4a74ecbf65c6&sharer_shareinfo_first=0a942377eea06b2e637a4a74ecbf65c6&key=daf9bdc5abc4e8d0163943f101b20aa28bcf4e3758e1e1e20f4220f01bc858f8ca42a9f2205848e2d747cf07ba845dd3146be5b56392ebaf5a819d614af9a12ecd6f72cb6e443353717829678e3b6c589dc88456d91fa9f3abffcd64658a7f71807545636c714a286abe9e78a0a4d79c472f792bfb2f179629b4ba5bd12eef0b&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQyxaHkdoBSA3EhKAhRbV%2FmxLmAQIE97dBBAEAAAAAAEqnM91V96YAAAAOpnltbLcz9gKNyK89dVj0sLBITMOGeTsU4rtnTVvz630R49mu2eMYw0Fdn%2F6Vv1NojC%2BX5mREK%2F5G2svzI5JBsl31q2UjcvSx5hNqziR%2B5okvTvViuRd2x6V47kuKGc2tAOrmOG8PYcmLLf1fv2lBhsDRzmIIAolxSZn9zhFM4T0CKgpYLhCWyFknprxznAzBHmS330mzLpQsEpKaaMEpUjjOdq%2Bybfzy%2BNpc6tf6qa0ECFt3LUW9sWDPKljT6Mxo8%2BeEd4aOb8tHw8%2BpUKZ%2F&acctmode=0&pass_ticket=cTgP%2FbyvpHtXePrwegwLhX1ayZszDvcyd8RzoQ4oMa6N0Y4m4k5yf%2BASi0RRbl6Y&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 

@@ -2,31 +2,27 @@
 
 Original 王柏生 谢广军 Linux阅码场
 
- _2021年12月01日 07:00_
+_2021年12月01日 07:00_
 
 作者简介
 
-     **王柏生**  资深技术专家，先后就职于中科院软件所、红旗Linux和百度，现任百度主任架构师。在操作系统、虚拟化技术、分布式系统、云计算、自动驾驶等相关领域耕耘多年，有着丰富的实践经验。著有畅销书《深度探索Linux操作系统》（2013年出版）。
+**王柏生**  资深技术专家，先后就职于中科院软件所、红旗Linux和百度，现任百度主任架构师。在操作系统、虚拟化技术、分布式系统、云计算、自动驾驶等相关领域耕耘多年，有着丰富的实践经验。著有畅销书《深度探索Linux操作系统》（2013年出版）。
 
-**谢广军**  计算机专业博士，毕业于南开大学计算机系。资深技术专家，多年的IT行业工作经验。现担任百度智能云副总经理，负责云计算相关产品的研发。多年来一直从事操作系统、虚拟化技术、分布式系统、大数据、云计算等相关领域的研发工作，实践经验丰富。 
+**谢广军**  计算机专业博士，毕业于南开大学计算机系。资深技术专家，多年的IT行业工作经验。现担任百度智能云副总经理，负责云计算相关产品的研发。多年来一直从事操作系统、虚拟化技术、分布式系统、大数据、云计算等相关领域的研发工作，实践经验丰富。
 
-本文内容节选自**《深度探索Linux虚拟化技术》**，已获得机械工业出版社华章公司授权。
+本文内容节选自\*\*《深度探索Linux虚拟化技术》\*\*，已获得机械工业出版社华章公司授权。
 
 **欢迎读者文末留言，阅码场和机械工业出版社华章公司将为每位**精彩留言**获奖用户奉送该书一本。**
 
-  
-
 **PIC虚拟化**
 
-  
-
-计算机系统有很多的外设需要服务，显然，CPU采用轮询的方式逐个询问外设是否需要服务，是非常浪费CPU的计算的，尤其是对那些并不是频繁需要服务的设备。因此，计算机科学家们设计了外设主动向CPU发起服务请求的方式，这种方式就是中断。采用中断方式后，在没有外设请求时，CPU就可以继续其他计算任务，而不是进行很多不必要的轮询，极大地提高了系统的吞吐[1] 在每个指令周期结束后，如果CPU关中断标识（IF）没有被设置，那么其会去检查是否有中断请求，如果有中断请求，则运行对应的中断服务程序，然后返回被中断的计算任务继续执行。
+计算机系统有很多的外设需要服务，显然，CPU采用轮询的方式逐个询问外设是否需要服务，是非常浪费CPU的计算的，尤其是对那些并不是频繁需要服务的设备。因此，计算机科学家们设计了外设主动向CPU发起服务请求的方式，这种方式就是中断。采用中断方式后，在没有外设请求时，CPU就可以继续其他计算任务，而不是进行很多不必要的轮询，极大地提高了系统的吞吐\[1\] 在每个指令周期结束后，如果CPU关中断标识（IF）没有被设置，那么其会去检查是否有中断请求，如果有中断请求，则运行对应的中断服务程序，然后返回被中断的计算任务继续执行。
 
 CPU不可能为每个硬件都设计专门的管脚接收中断，管脚数量的限制、电路的复杂度、灵活度等方方面面都不现实，因此，需要设计一个专门管理中断的单元。由中断管理单元接受来自外围设备的请求，确定请求的优先级，并向CPU发出中断。1981年IBM推出的第1代个人电脑PC/XT使用了一个独立的8259A作为中断控制器，自此，8259A就成为了单核时代中断芯片事实上的标准。因为可以通过软件编程对其进行控制，比如当管脚收到设备信号时，可以编程控制其发出的中断向量号，因此，中断控制器又称为可编程中断控制器（programmable interrupt controller），简称PIC。单片8259A可以连接8个外设的中断信号线，可以多片级联支持更多外设。
 
 8259A和CPU的连接如图5所示。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图5 8259A和CPU连接_
 
@@ -66,23 +62,23 @@ KVM: Add support for in-kernel PIC emulation
 
 ﻿linux.git/drivers/kvm/i8259.c
 
-﻿static void pic_ioport_write(void *opaque, u32addr, u32 val)
+﻿static void pic_ioport_write(void \*opaque, u32addr, u32 val)
 
 {
 
-  …
+…
 
 ﻿    switch(s->init_state) {
 
-    …
+…
 
-    case 1:
+case 1:
 
-      s->irq_base = val & 0xf8;
+s->irq_base = val & 0xf8;
 
-    …
+…
 
-    }
+}
 
 }
 
@@ -96,35 +92,33 @@ KVM: Add support for in-kernel PIC emulation
 
 ﻿struct kvm_kpic_state {
 
-  u8last_irr;  /* edge detection */
+u8last_irr;  /\* edge detection \*/
 
-  u8 irr;  /* interrupt request register */
+u8 irr;  /\* interrupt request register \*/
 
-  u8imr;   /* interrupt mask register */
+u8imr;   /\* interrupt mask register \*/
 
-  u8isr;   /* interrupt service register */
+u8isr;   /\* interrupt service register \*/
 
-  …
+…
 
 };
 
 ﻿struct kvm_pic {
 
-  structkvm_kpic_state pics[2]; /* 0 is master pic, 1 is slave pic*/
+structkvm_kpic_state pics\[2\]; /\* 0 is master pic, 1 is slave pic\*/
 
- irq_request_func *irq_request;
+irq_request_func \*irq_request;
 
-  void*irq_request_opaque;
+void\*irq_request_opaque;
 
-  intoutput;   /* intr from master PIC */
+intoutput;   /\* intr from master PIC \*/
 
-  structkvm_io_device dev;
+structkvm_io_device dev;
 
 };
 
-1片8259A只能连接最多8个外设，如果需要支持更多外设，需要多片8259A级联。在结构体kvm_pic中，我们看到有2片8259A：pic[0]和pic[1]。KVM定义了结构体kvm_kpic_state记录8259A的状态，其中包括我们之前提到的IRR、IMR、ISR等等。
-
-  
+1片8259A只能连接最多8个外设，如果需要支持更多外设，需要多片8259A级联。在结构体kvm_pic中，我们看到有2片8259A：pic\[0\]和pic\[1\]。KVM定义了结构体kvm_kpic_state记录8259A的状态，其中包括我们之前提到的IRR、IMR、ISR等等。
 
 ### **1 虚拟设备向PIC发送中断请求**
 
@@ -140,31 +134,31 @@ kvm: Fix virtio block device support some more
 
 {
 
-  …
+…
 
 ﻿  caseVIRTIO_PCI_QUEUE_NOTIFY: {
 
-    …
+…
 
-    while(queue->vring.avail->idx != queue->last_avail_idx) {
+while(queue->vring.avail->idx != queue->last_avail_idx) {
 
-      if(!blk_virtio_read(self, queue))
+if(!blk_virtio_read(self, queue))
 
-       return false;
-
-    }
-
-   kvm__irq_line(self, VIRTIO_BLK_IRQ, 1);
-
-    break;
-
-  }
-
-  …
+return false;
 
 }
 
-当Guest内核的块设备驱动发出I/O通知VIRTIO_PCI_QUEUE_NOTIFY时，将触发CPU从Guest模式切换到Host模式，KVM中的块模拟设备开始I/O操作，比如访问保存Guest文件系统的镜像文件。virtio blk这个提交，块设备的I/O处理是同步的，也就是说，一直要等到文件操作完成，才会向Guest发送中断，返回Guest。当然同步阻塞在这里是不合理的，而是应该马上返回Guest，这样Guest可以执行其他的任务，虚拟设备完成I/O操作后，再通知Guest，这是kvmtool初期的实现，后来已经改进为异步的方式。代码中在一个while循环处理完设备驱动的I/O请求后，调用了函数kvm__irq_line，irq_line对应8259A的管脚IR0~7，其代码如下：
+kvm\_\_irq_line(self, VIRTIO_BLK_IRQ, 1);
+
+break;
+
+}
+
+…
+
+}
+
+当Guest内核的块设备驱动发出I/O通知VIRTIO_PCI_QUEUE_NOTIFY时，将触发CPU从Guest模式切换到Host模式，KVM中的块模拟设备开始I/O操作，比如访问保存Guest文件系统的镜像文件。virtio blk这个提交，块设备的I/O处理是同步的，也就是说，一直要等到文件操作完成，才会向Guest发送中断，返回Guest。当然同步阻塞在这里是不合理的，而是应该马上返回Guest，这样Guest可以执行其他的任务，虚拟设备完成I/O操作后，再通知Guest，这是kvmtool初期的实现，后来已经改进为异步的方式。代码中在一个while循环处理完设备驱动的I/O请求后，调用了函数kvm\_\_irq_line，irq_line对应8259A的管脚IR0~7，其代码如下：
 
 ﻿commit 4155ba8cda055b7831489e4c4a412b073493115b
 
@@ -172,31 +166,31 @@ kvm: Fix virtio block device support some more
 
 kvmtool.git/kvm.c
 
-void kvm__irq_line(struct kvm *self, int irq, intlevel)
+void kvm\_\_irq_line(struct kvm \*self, int irq, intlevel)
 
 {
 
-  structkvm_irq_level irq_level;
+structkvm_irq_level irq_level;
 
-  irq_level= (struct kvm_irq_level) {
+irq_level= (struct kvm_irq_level) {
 
-    {
+{
 
-     .irq    = irq,
+.irq    = irq,
 
-    },
+},
 
-   .level    = level,
+.level    = level,
 
-  };
+};
 
-  if(ioctl(self->vm_fd, KVM_IRQ_LINE, &irq_level) < 0)
+if(ioctl(self->vm_fd, KVM_IRQ_LINE, &irq_level) \< 0)
 
-   die_perror("KVM_IRQ_LINE failed");
+die_perror("KVM_IRQ_LINE failed");
 
 }
 
-函数kvm__irq_line将irq number和管脚电平信息，这里是1，表示拉高电平了，封装到结构体kvm_irq_level中，传递给内核中的KVM模块：
+函数kvm\_\_irq_line将irq number和管脚电平信息，这里是1，表示拉高电平了，封装到结构体kvm_irq_level中，传递给内核中的KVM模块：
 
 ﻿﻿commit 85f455f7ddbed403b34b4d54b1eaf0e14126a126
 
@@ -208,25 +202,25 @@ linux.git/drivers/kvm/kvm_main.c
 
 {
 
-  …
+…
 
 ﻿  caseKVM_IRQ_LINE: {
 
-    …
+…
 
-        kvm_pic_set_irq(pic_irqchip(kvm),
+kvm_pic_set_irq(pic_irqchip(kvm),
 
-         irq_event.irq,
+irq_event.irq,
 
-         irq_event.level);
+irq_event.level);
 
-    …
+…
 
-    break;
+break;
 
-  }
+}
 
-  …
+…
 
 }
 
@@ -244,45 +238,45 @@ KVM: Add support for in-kernel PIC emulation
 
 ﻿linux.git/drivers/kvm/i8259.c
 
-﻿void kvm_pic_set_irq(void *opaque, int irq, intlevel)
+﻿void kvm_pic_set_irq(void \*opaque, int irq, intlevel)
 
 {
 
-  structkvm_pic *s = opaque;
+structkvm_pic \*s = opaque;
 
- pic_set_irq1(&s->pics[irq >> 3], irq & 7, level);
+pic_set_irq1(&s->pics\[irq >> 3\], irq & 7, level);
 
-  ……
+……
 
 }
 
-﻿static inline void pic_set_irq1(structkvm_kpic_state *s,
+﻿static inline void pic_set_irq1(structkvm_kpic_state \*s,
 
 int irq, int level)
 
 {
 
-  int mask;
+int mask;
 
-  mask = 1<< irq;
+mask = 1\<\< irq;
 
-  if(s->elcr & mask) /* level triggered */
+if(s->elcr & mask) /\* level triggered \*/
 
-    …
+…
 
-  else  /* edge triggered */
+else  /\* edge triggered \*/
 
-    if(level) {
+if(level) {
 
-      if((s->last_irr & mask) == 0)
+if((s->last_irr & mask) == 0)
 
-       s->irr |= mask;
+s->irr |= mask;
 
-     s->last_irr |= mask;
+s->last_irr |= mask;
 
-    } else
+} else
 
-     s->last_irr &= ~mask;
+s->last_irr &= ~mask;
 
 }
 
@@ -300,43 +294,43 @@ KVM: Add support for in-kernel PIC emulation
 
 ﻿linux.git/drivers/kvm/i8259.c
 
-﻿void kvm_pic_set_irq(void *opaque, int irq, intlevel)
+﻿void kvm_pic_set_irq(void \*opaque, int irq, intlevel)
 
 {
 
-  structkvm_pic *s = opaque;
+structkvm_pic \*s = opaque;
 
- pic_set_irq1(&s->pics[irq >> 3], irq & 7, level);
+pic_set_irq1(&s->pics\[irq >> 3\], irq & 7, level);
 
 ﻿ pic_update_irq(s);
 
 }
 
-﻿static void pic_update_irq(struct kvm_pic *s)
+﻿static void pic_update_irq(struct kvm_pic \*s)
 
 {
 
-  …
+…
 
-  irq =pic_get_irq(&s->pics[0]);
+irq =pic_get_irq(&s->pics\[0\]);
 
-  if (irq>= 0)
+if (irq>= 0)
 
-   s->irq_request(s->irq_request_opaque, 1);
+s->irq_request(s->irq_request_opaque, 1);
 
-  else
+else
 
-   s->irq_request(s->irq_request_opaque, 0);
+s->irq_request(s->irq_request_opaque, 0);
 
 }
 
-﻿static void pic_irq_request(void *opaque, intlevel)
+﻿static void pic_irq_request(void \*opaque, intlevel)
 
 {
 
-  struct kvm*kvm = opaque;
+struct kvm\*kvm = opaque;
 
- pic_irqchip(kvm)->output = level;
+pic_irqchip(kvm)->output = level;
 
 }
 
@@ -352,39 +346,39 @@ linux.git/drivers/kvm/vmx.c
 
 {
 
-  …
+…
 
-   vmx_intr_assist(vcpu);
+vmx_intr_assist(vcpu);
 
-  …
+…
 
 }
 
-﻿static void vmx_intr_assist(struct kvm_vcpu*vcpu)
+﻿static void vmx_intr_assist(struct kvm_vcpu\*vcpu)
 
 {
 
-  …
+…
 
-  has_ext_irq= kvm_cpu_has_interrupt(vcpu);
+has_ext_irq= kvm_cpu_has_interrupt(vcpu);
 
-  …
+…
 
-  if(!has_ext_irq)
+if(!has_ext_irq)
 
-    return;
+return;
 
- interrupt_window_open =
+interrupt_window_open =
 
-   ((vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) &&
+((vmcs_readl(GUEST_RFLAGS) & X86_EFLAGS_IF) &&
 
-    (vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) & 3) == 0);
+(vmcs_read32(GUEST_INTERRUPTIBILITY_INFO) & 3) == 0);
 
 ﻿  if(interrupt_window_open)
 
-   vmx_inject_irq(vcpu, kvm_cpu_get_interrupt(vcpu));
+vmx_inject_irq(vcpu, kvm_cpu_get_interrupt(vcpu));
 
-  …
+…
 
 }
 
@@ -396,17 +390,17 @@ KVM: Add support for in-kernel PIC emulation
 
 ﻿linux.git/drivers/kvm/irq.c
 
-﻿int kvm_cpu_has_interrupt(struct kvm_vcpu *v)
+﻿int kvm_cpu_has_interrupt(struct kvm_vcpu \*v)
 
 {
 
-  structkvm_pic *s = pic_irqchip(v->kvm);
+structkvm_pic \*s = pic_irqchip(v->kvm);
 
-  if(s->output)  /* PIC */
+if(s->output)  /\* PIC \*/
 
-    return1;
+return1;
 
-  return 0;
+return 0;
 
 }
 
@@ -422,43 +416,43 @@ KVM: Add support for in-kernel PIC emulation
 
 linux.git/drivers/kvm/irq.c
 
-﻿int kvm_cpu_get_interrupt(struct kvm_vcpu *v)
+﻿int kvm_cpu_get_interrupt(struct kvm_vcpu \*v)
 
 {
 
-  ……
+……
 
-  vector =kvm_pic_read_irq(s);
+vector =kvm_pic_read_irq(s);
 
-  if (vector!= -1)
+if (vector!= -1)
 
-    returnvector;
+returnvector;
 
-  …
+…
 
 }
 
 ﻿linux.git/drivers/kvm/i8259.c
 
-﻿int kvm_pic_read_irq(struct kvm_pic *s)
+﻿int kvm_pic_read_irq(struct kvm_pic \*s)
 
 {
 
-  int irq,irq2, intno;
+int irq,irq2, intno;
 
-  irq =pic_get_irq(&s->pics[0]);
+irq =pic_get_irq(&s->pics\[0\]);
 
-  if (irq>= 0) {
+if (irq>= 0) {
 
-    …
+…
 
-      intno = s->pics[0].irq_base + irq;
+intno = s->pics\[0\].irq_base + irq;
 
-  } else {
+} else {
 
-  …
+…
 
-  returnintno;
+returnintno;
 
 }
 
@@ -478,61 +472,61 @@ KVM: Add support for in-kernel PIC emulation
 
 linux.git/drivers/kvm/i8259.c
 
-﻿static int pic_get_irq(struct kvm_kpic_state *s)
+﻿static int pic_get_irq(struct kvm_kpic_state \*s)
 
 {
 
-  int mask,cur_priority, priority;
+int mask,cur_priority, priority;
 
-  mask =s->irr & ~s->imr;
+mask =s->irr & ~s->imr;
 
-  priority =get_priority(s, mask);
+priority =get_priority(s, mask);
 
-  if(priority == 8)
+if(priority == 8)
 
-    return-1;
+return-1;
 
-  …
+…
 
-  mask =s->isr;
+mask =s->isr;
 
-  …
+…
 
- cur_priority = get_priority(s, mask);
+cur_priority = get_priority(s, mask);
 
-  if(priority < cur_priority)
+if(priority \< cur_priority)
 
-    /*
+/\*
 
-     *higher priority found: an irq should be generated
+\*higher priority found: an irq should be generated
 
-     */
+\*/
 
-    return(priority + s->priority_add) & 7;
+return(priority + s->priority_add) & 7;
 
-  else
+else
 
-    return-1;
+return-1;
 
 }
 
-﻿static inline int get_priority(structkvm_kpic_state *s, int mask)
+﻿static inline int get_priority(structkvm_kpic_state \*s, int mask)
 
 {
 
-  intpriority;
+intpriority;
 
-  if (mask== 0)
+if (mask== 0)
 
-    return8;
+return8;
 
-  priority =0;
+priority =0;
 
-  while((mask & (1 << ((priority + s->priority_add) & 7))) == 0)
+while((mask & (1 \<\< ((priority + s->priority_add) & 7))) == 0)
 
-   priority++;
+priority++;
 
-  returnpriority;
+returnpriority;
 
 }
 
@@ -550,43 +544,43 @@ KVM: Add support for in-kernel PIC emulation
 
 linux.git/drivers/kvm/i8259.c
 
-﻿int kvm_pic_read_irq(struct kvm_pic *s)
+﻿int kvm_pic_read_irq(struct kvm_pic \*s)
 
 {
 
-  int irq,irq2, intno;
+int irq,irq2, intno;
 
-  irq =pic_get_irq(&s->pics[0]);
+irq =pic_get_irq(&s->pics\[0\]);
 
-  if (irq>= 0) {
+if (irq>= 0) {
 
-   pic_intack(&s->pics[0], irq);
+pic_intack(&s->pics\[0\], irq);
 
-  …
+…
 
 }
 
-static inline void pic_intack(structkvm_kpic_state *s, int irq)
+static inline void pic_intack(structkvm_kpic_state \*s, int irq)
 
 {
 
 ﻿  if(s->auto_eoi) {
 
-    …
+…
 
-  } else
+} else
 
-   s->isr |= (1 << irq);
+s->isr |= (1 \<\< irq);
 
-  /*
+/\*
 
-   * Wedon't clear a level sensitive interrupt here
+\* Wedon't clear a level sensitive interrupt here
 
-   */
+\*/
 
-  if(!(s->elcr & (1 << irq)))
+if(!(s->elcr & (1 \<\< irq)))
 
-   s->irr &= ~(1 << irq);
+s->irr &= ~(1 \<\< irq);
 
 }
 
@@ -608,35 +602,35 @@ KVM: Add support for in-kernel PIC emulation
 
 linux.git/drivers/kvm/i8259.c
 
-static void pic_ioport_write(void *opaque, u32addr, u32 val)
+static void pic_ioport_write(void \*opaque, u32addr, u32 val)
 
 {
 
-  …
+…
 
-﻿      case1: /* end of interrupt */
+﻿      case1: /\* end of interrupt \*/
 
-      case5:
+case5:
 
-       priority = get_priority(s, s->isr);
+priority = get_priority(s, s->isr);
 
-        if(priority != 8) {
+if(priority != 8) {
 
-         irq = (priority + s->priority_add) & 7;
+irq = (priority + s->priority_add) & 7;
 
-         s->isr &= ~(1 << irq);
+s->isr &= ~(1 \<\< irq);
 
-          if(cmd == 5)
+if(cmd == 5)
 
-           s->priority_add = (irq + 1) & 7;
+s->priority_add = (irq + 1) & 7;
 
-         pic_update_irq(s->pics_state);
+pic_update_irq(s->pics_state);
 
-        }
+}
 
-       break;
+break;
 
-  …
+…
 
 }
 
@@ -646,19 +640,19 @@ static void pic_ioport_write(void *opaque, u32addr, u32 val)
 
 KVM: Add support for in-kernel PIC emulation
 
-static inline void pic_intack(structkvm_kpic_state *s, int irq)
+static inline void pic_intack(structkvm_kpic_state \*s, int irq)
 
 {
 
-  if(s->auto_eoi) {
+if(s->auto_eoi) {
 
-    if(s->rotate_on_auto_eoi)
+if(s->rotate_on_auto_eoi)
 
-     s->priority_add = (irq + 1) & 7;   
+s->priority_add = (irq + 1) & 7;
 
-  } else
+} else
 
-  …
+…
 
 }
 
@@ -673,7 +667,7 @@ static inline void pic_intack(structkvm_kpic_state *s, int irq)
 |位|内容|
 |7:0|中断或异常向量|
 |10:8|中断类型:<br><br>0: External  interrupt<br><br>1: Reserved<br><br>2: Non-maskable  interrupt (NMI)<br><br>3: Hardware  exception<br><br>4: Software  interrupt<br><br>5: Privileged  software exception<br><br>6: Software  exception<br><br>7: Other event|
-|31|是否有效[2]|
+|31|是否有效\[2\]|
 
 在VM entry前，KVM模块检查虚拟8259A中如果有pending中断需要处理，则将需要处理的中断信息写入到VMCS中的这个字段VM-entry interruption-information:
 
@@ -683,15 +677,15 @@ KVM: Add support for in-kernel PIC emulation
 
 ﻿linux.git/drivers/kvm/vmx.c
 
-﻿static void vmx_inject_irq(struct kvm_vcpu *vcpu,int irq)
+﻿static void vmx_inject_irq(struct kvm_vcpu \*vcpu,int irq)
 
 {
 
-  …
+…
 
- vmcs_write32(VM_ENTRY_INTR_INFO_FIELD,
+vmcs_write32(VM_ENTRY_INTR_INFO_FIELD,
 
-      irq |INTR_TYPE_EXT_INTR | INTR_INFO_VALID_MASK);
+irq |INTR_TYPE_EXT_INTR | INTR_INFO_VALID_MASK);
 
 }
 
@@ -713,17 +707,17 @@ KVM: Emulate hlt in the kernel
 
 ﻿linux.git/drivers/kvm/i8259.c
 
-static void pic_irq_request(void *opaque, intlevel)
+static void pic_irq_request(void \*opaque, intlevel)
 
 {
 
-  …
+…
 
- pic_irqchip(kvm)->output = level;
+pic_irqchip(kvm)->output = level;
 
-  if (vcpu)
+if (vcpu)
 
-   kvm_vcpu_kick(vcpu);
+kvm_vcpu_kick(vcpu);
 
 }
 
@@ -735,23 +729,23 @@ KVM: Emulate hlt in the kernel
 
 linux.git/drivers/kvm/irq.c
 
-﻿void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+﻿void kvm_vcpu_kick(struct kvm_vcpu \*vcpu)
 
 {
 
-  intipi_pcpu = vcpu->cpu;
+intipi_pcpu = vcpu->cpu;
 
-  if(waitqueue_active(&vcpu->wq)) {
+if(waitqueue_active(&vcpu->wq)) {
 
-   wake_up_interruptible(&vcpu->wq);
+wake_up_interruptible(&vcpu->wq);
 
-   ++vcpu->stat.halt_wakeup;
+++vcpu->stat.halt_wakeup;
 
-  }
+}
 
-  if(vcpu->guest_mode)
+if(vcpu->guest_mode)
 
-   smp_call_function_single(ipi_pcpu, vcpu_kick_intr,
+smp_call_function_single(ipi_pcpu, vcpu_kick_intr,
 
 vcpu, 0, 0);
 
@@ -767,15 +761,15 @@ KVM: use smp_send_reschedule in kvm_vcpu_kick
 
 ﻿linux.git/arch/x86/kvm/x86.c
 
-﻿void kvm_vcpu_kick(struct kvm_vcpu *vcpu)
+﻿void kvm_vcpu_kick(struct kvm_vcpu \*vcpu)
 
 {
 
-  …
+…
 
-     smp_send_reschedule(cpu);
+smp_send_reschedule(cpu);
 
-  …
+…
 
 }
 
@@ -785,25 +779,17 @@ KVM: use smp_send_reschedule in kvm_vcpu_kick
 
 {
 
-  …
+…
 
- apic->send_IPI_mask(cpumask_of(cpu), RESCHEDULE_VECTOR);
+apic->send_IPI_mask(cpumask_of(cpu), RESCHEDULE_VECTOR);
 
 }
 
-  
-
-  
-
 精彩回顾
 
-  
+[Linux系统虚拟化模型及障碍](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680510&idx=1&sn=db92933a82e8c848c54fbd9044077a91&chksm=810ff7a3b6787eb5f3814df0099bcab7624ff797ec92dd9477926b14d86dbfc54fe1995479d9&scene=21#wechat_redirect)
 
-[Linux系统虚拟化模型及障碍](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680510&idx=1&sn=db92933a82e8c848c54fbd9044077a91&chksm=810ff7a3b6787eb5f3814df0099bcab7624ff797ec92dd9477926b14d86dbfc54fe1995479d9&scene=21#wechat_redirect)  
-
-[Linux中断虚拟化（一）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680521&idx=1&sn=07074c7bcd3d182fbaa312d1100e04d6&chksm=810ff7d4b6787ec255d0ccf67584b6b60f139c3fc2dd66dbc8d9989f4738245bd5e4d3c48d41&scene=21#wechat_redirect)  
-
-  
+[Linux中断虚拟化（一）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680521&idx=1&sn=07074c7bcd3d182fbaa312d1100e04d6&chksm=810ff7d4b6787ec255d0ccf67584b6b60f139c3fc2dd66dbc8d9989f4738245bd5e4d3c48d41&scene=21#wechat_redirect)
 
 Reads 2097
 
@@ -814,13 +800,12 @@ Comment
 **留言 1**
 
 - 庭琹
-    
-    2021年12月2日
-    
-    Like1
-    
-    强烈建议，作者把所有虚拟化的知识放公众号上，为我们解读一遍！太棒了！
-    
+
+  2021年12月2日
+
+  Like1
+
+  强烈建议，作者把所有虚拟化的知识放公众号上，为我们解读一遍！太棒了！
 
 已无更多数据
 
@@ -839,12 +824,11 @@ Comment
 **留言 1**
 
 - 庭琹
-    
-    2021年12月2日
-    
-    Like1
-    
-    强烈建议，作者把所有虚拟化的知识放公众号上，为我们解读一遍！太棒了！
-    
+
+  2021年12月2日
+
+  Like1
+
+  强烈建议，作者把所有虚拟化的知识放公众号上，为我们解读一遍！太棒了！
 
 已无更多数据

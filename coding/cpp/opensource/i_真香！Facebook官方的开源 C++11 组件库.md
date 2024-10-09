@@ -6,7 +6,7 @@ Folly是Facebook open source library的缩写，提供了类似 Boost 和 std �
 
 Folly 是一组相对独立的组件，有的简单到几个符号。对内部依赖没有限制，这意味着给定的 folly 模块可以使用任何其他 folly 组件。
 
-所有符号都在顶级命名空间中定义folly，当然宏除外。宏名称为 ALL_UPPERCASE 并且应以FOLLY_. 命名空间folly定义了其他内部命名空间，例如internal或detail。用户代码不应依赖于这些命名空间中的符号。
+所有符号都在顶级命名空间中定义folly，当然宏除外。宏名称为 ALL_UPPERCASE 并且应以FOLLY\_. 命名空间folly定义了其他内部命名空间，例如internal或detail。用户代码不应依赖于这些命名空间中的符号。
 
 Folly 也有一个experimental目录。这一名称主要意味着我们认为 API 可能会随着时间的推移发生重大变化。通常，此代码仍在大量使用并且经过良好测试。
 

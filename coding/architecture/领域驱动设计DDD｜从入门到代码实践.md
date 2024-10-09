@@ -1,13 +1,10 @@
-
 Original 李爽(赋苏) 阿里云开发者
 
- _2023年05月30日 09:01_ _浙江_
+_2023年05月30日 09:01_ _浙江_
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/Z6bicxIx5naKytSMrJFcc0dxOeapicPFkezEec2LkcRWZlWRj5SRz1LEobHQSiciaNiagcgRnt2EGSwiaCCDicGPicyquQ/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 阿里妹导读
-
-  
 
 在本文中，作者将借鉴《实现领域驱动设计》的做法，介绍领域驱动设计的基本概念的同时，用一个虚拟的公司和一个虚拟的项目，把领域驱动设计进行落地实践。
 
@@ -20,8 +17,6 @@ Original 李爽(赋苏) 阿里云开发者
 后面我又阅读了Vaughn Vernon的《实现领域驱动设计》，跟随着作者在虚拟公司SaaSOvation下用DDD实践了CollabOvation和ProjectOvation两个虚拟项目，算是窥得了领域驱动设计的门径。但是这本书成书时间在2013年，距今已经10多年了，这其间业界技术早已发生翻天地覆的变化，书中的实践项目已经显得有些过时了。
 
 学习领域驱动设计一路跌跌撞撞，我希望把自己的理解和思考沉淀下来，如果同时能够对你有帮助就更好了。在本文中，我将借鉴《实现领域驱动设计》的做法，介绍领域驱动设计的基本概念的同时，用一个虚拟的公司和一个虚拟的项目，把领域驱动设计进行落地实践。
-
-  
 
 **虚拟的业务场景**
 
@@ -51,7 +46,7 @@ Original 李爽(赋苏) 阿里云开发者
 
 本文内容比较多，这里把主要的内容简要介绍一下，让大家有一个大的逻辑脉络印象。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 好了，背景介绍完毕，下面回归到我们的正题。
 
@@ -63,16 +58,15 @@ DDD是什么
 
 拿大家熟悉的MVC模式举例，这里的Model是数据库模型，业务逻辑在Controller中实现（一般会由Service来辅助实现），View层主要负责视图展示。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于业务逻辑不复杂的软件开发，MVC是简单高效的方法。但是随着业务逻辑愈来愈复杂，MVC会开始力不从心。主要体现在这几个方面：
 
 1. MVC模式仅仅反应了软件层面的架构，它不包含业务语言，无法使用该设计直接和业务对话。
-    
-2. MVC模式天然切割了数据和行为，然后用数据库实现数据，用服务实现行为，容易造成需求的首尾分离。
-    
-3. 缺乏明确的边界划分，至少在顶层设计层面没有边界划分的规范要求，更多地是靠技术负责人根据经验进行划分，大规模团队协作容易出现职责不清晰、分工不明确。
-    
+
+1. MVC模式天然切割了数据和行为，然后用数据库实现数据，用服务实现行为，容易造成需求的首尾分离。
+
+1. 缺乏明确的边界划分，至少在顶层设计层面没有边界划分的规范要求，更多地是靠技术负责人根据经验进行划分，大规模团队协作容易出现职责不清晰、分工不明确。
 
 传统的开发模式或多或少都存在上面的问题。
 
@@ -85,11 +79,10 @@ DDD就应运而生了：
 模型在领域驱动设计中，有三个重要用途：
 
 1. 通过模型直接反映软件实现的结构。
-    
-2. 以模型为基础形成团队的统一语言。
-    
-3. 把模型作为精粹的知识，用于传递。
-    
+
+1. 以模型为基础形成团队的统一语言。
+
+1. 把模型作为精粹的知识，用于传递。
 
 **DDD的价值**
 
@@ -121,18 +114,17 @@ DDD的基本概念
 
 以“智慧课堂”商业模式中的这句话“用户可以选择自己感兴趣的专栏进行付费订阅”，进行简单的建模。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 根据这个模型，我们可以形成统一语言：
 
 - 用户（User）是指所有在“智慧课堂”注册过的人。（来自领域模型概念）
-    
+
 - 订阅的专栏（Subscription）是指用户付费过的专栏。（来自领域模型概念）
-    
+
 - 用户可以订阅多个专栏。（来自领域模型逻辑）
-    
+
 - 订阅。（来自限界上下文）
-    
 
 通过定义与解释，我们使这些词语在其所使用的上下文中没有歧义。再通过这些基础词汇，去描述业务的行为或者规则，慢慢就可以将其确立为跨业务与技术的统一语言了。统一语言是在使用中被确立的。
 
@@ -150,7 +142,7 @@ DDD的基本概念
 
 在DDD中可以分为战略设计和战术设计，各自包含的内容如下图所示：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 战略设计指的是对整个领域进行分析和规划，确定领域中的概念、业务规则和领域边界等基础性问题。在战略设计中，需要对领域进行全面的了解和分析，探究业务的规则和本质，并且需要考虑到领域的未来发展趋势和可能的变化。领域、子域和限界上下文属于战略设计的范畴。
 
@@ -197,13 +189,12 @@ DDD的基本概念
 实体的代码形态一般有四种形态：
 
 - 失血模型：模型仅仅包含数据的定义和getter/setter方法，业务逻辑和应用逻辑都放到服务层中。这种类在Java中叫POJO。
-    
+
 - 贫血模型：贫血模型中包含了一些业务逻辑，但不包含依赖持久层的业务逻辑。这部分依赖于持久层的业务逻辑将会放到服务层中。
-    
+
 - 充血模型：充血模型中包含了所有的业务逻辑，包括依赖于持久层的业务逻辑。
-    
+
 - 胀血模型：胀血模型就是把和业务逻辑不想关的其他应用逻辑（如授权、事务等）都放到领域模型中。
-    
 
 结合团队以及兄弟团队的实践，建议实体采用贫血模型，实体和领域服务共同构成领域模型。这样可以使得实体具备业务知识，但又不至于太过臃肿。
 
@@ -221,7 +212,7 @@ DDD的基本概念
 
 领域、子域、限界上下文、聚合都是用来表示一个业务范围，那他们的关系是怎样的呢？领域、子域、限界上下文属于战略设计，而聚合属于战术设计，聚合的范围是小于前三者的，范围大小图如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 工厂
 
@@ -254,19 +245,18 @@ DDD的基本概念
 领域建模的主要目的是捕捉业务知识，形成统一语言，沉淀领域模型。好的领域建模就意味着对业务要有深刻的理解，能够洞察问题本质。领域建模的产出物一般有以下内容：
 
 - 领域模型：包含领域对象、属性、关系、行为、边界范围等各个方面，用于描述业务的本质，这也是最重要的产出物。
-    
+
 - 用例图：用于明确系统的功能。
-    
+
 - 数据模型：描述系统的数据结构和关系，包括实体关系模型、关系数据库模型等。
-    
+
 - 状态图：用于描述系统各个状态及其转移条件。
-    
+
 - 活动图：用于描述系统流程中的各个活动及其关系。
-    
+
 - 序列图：描述系统中各个对象之间的交互过程和消息传递序列。
-    
+
 - 架构模型：包含系统的物理和逻辑结构，包括组件、模块、接口等。
-    
 
 下面介绍两种常见的领域建模方法。
 
@@ -284,24 +274,23 @@ DDD的基本概念
 
 事件风暴通过事件、命令与策略之间的响应关系来组织逻辑。它定义了一套彩色贴纸的”语法”: 不同颜色的贴纸都有定义。浅黄色代表角色(Actor)、蓝色表示命令(Command)、粉色代表业务规则(Policy)、紫色代表系统（System）、橙色代表事件（Event）, 绿色表示阅读模型(Read Model)、红色代表热点问题(HotSpot)。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 每种语法的具体含义如下：
 
 - 行动者（Actors）是系统的使用者。这里使用者是一个相对模糊的概念，可能是现实中的人也可能是别的系统；
-    
+
 - 命令（Command）是由行动者发起的行为。它代表了某种决定，通常是事件的起因，也称作行动者触发命令（AIC，Actor Initiated Command）；
-    
+
 - 事件（Event）就是我们前文讨论过的事件；
-    
+
 - 系统（System）指代的是不需要了解细节的三方系统。因为不需要了解细节，所以我们可以将它们看作一个整体；
-    
+
 - 阅读模型（Read Model）用以支撑决策的信息。通常与界面布局有关；
-    
+
 - 策略（Policy）是对于事件的响应，通过策略可以触发新的命令，由策略触发的命令，被称作系统触发命令（SIC，System Initiated Command）。
-    
+
 - 热点问题（HotSpot）是业务痛点，瓶颈，模糊点。如果有争论，可以将双方观点用热点问题的形式记录。
-    
 
 事件风暴的这一系列语法的制定目的，是为了寻找到合适的载体来描述清楚业务逻辑和关键流转过程，从而更方便地在不同角色间传递领域知识。
 
@@ -341,7 +330,7 @@ DDD的基本概念
 
 追问unhappy path梳理出业务的完整视图，当大家发现新事件的速度接近停滞的时候，就应进入梳理业务规则的阶段了。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 第二步：业务规则（粉色贴纸）
 
@@ -354,9 +343,8 @@ DDD的基本概念
 例如“订单已创建”事件的业务逻辑
 
 - 订单已创建的前提条件是专栏可订阅，同时用户未订阅过该专栏。
-    
+
 - 订单创建后，会导致发起支付。
-    
 
 ##### 第三步：行动者（浅黄色贴纸），命令（蓝色贴纸）、阅读模型（绿色贴纸）和系统（紫色贴纸）
 
@@ -378,7 +366,7 @@ DDD的基本概念
 
 邀请一名现场成员，按事件发生的时间顺序串讲业务，过程中，听众注意到不一致的地方，提出问题；大家一起讨论，调整相关的事件、逻辑来达成一致。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 第六步：产出架构
 
@@ -390,7 +378,7 @@ DDD的基本概念
 
 但是事件风暴也有一些不足之处，一方面是事件风暴的模式偏重，需要不同角色的成员集体参与，涉及的人员多、流程长。另一方面，也是最关键的一点，事件风暴的成功关键在于收敛逻辑。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在发散阶段，所有参与者可以天马行空。不过这样的方法在产生有效信息的同时，也会产生大量的噪音。但是在收敛阶段，则会按照某一逻辑主线，合并相似概念，过滤无用信息。那么我们可以很容易地想到，如果主持人采用不同的逻辑去收敛事件，最后获得的结果也可能不尽相同。
 
@@ -407,11 +395,10 @@ DDD的基本概念
 四色法主要通过三个关键逻辑寻找领域事件。这三个逻辑源自企业运营与管理实践：
 
 - 如果有现金收入，表示承担了义务。拿钱办事，需要收集证据，说明义务履约成功。
-    
+
 - 如果有现金支出，表明拥有权利。花钱消灾，需要检查对方是否按时履约。
-    
+
 - 对于没有现金往来的，可以通过目标——实际对比，产生类似履约的约束。所谓目标——实际对比，就是设立一个目标 / 计划，然后追踪实际执行的结果。
-    
 
 寻找领域模型，提取统一语言，做分层与隔离，目的都是为了有效地控制变化和传播。那么我们更应该从源头入手，找到业务中相对稳定的部分去建模，而不是选择一段变化的业务去稳定地构造它的模型。毕竟我们期待领域驱动设计能够为我们带来的一切优点，都依赖于尽早地从业务侧隔离开稳定与易变的部分。
 
@@ -421,28 +408,27 @@ DDD的基本概念
 
 四色建模法之所以叫四色建模，主要是因为它里面存在四种主要的对象原型，且每一种原型都有一种颜色与之对应，一共有四种颜色，由此而得名。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 四色建模法操作流程
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - Step1: 寻找关键现金往来，构造一个凭证表示它。然后在凭证上罗列关键数据项，主要有发生的时间点、金额等
-    
+
 - Step2: 针对每一项关键数据项，寻找它的来源。来源只能有三个：用户输入，由前序凭证提供，或者根据算法计算。我们需要以此为依据去寻找前序凭证
-    
+
 - Step3: 回到现金凭证，思考它所对应的权利与责任。这些权利与责任需要哪些凭证证明，并以此为依据，寻找后续凭证
-    
+
 - Step4: 无论是何种凭证，必须罗列关键数据项，并保证数据项获取的顺畅
-    
+
 - Step5: 如果与现金往来关联不大，那么寻找关键KPI指标，并构造一个验收凭证表示它。其余步骤与现金往来一致
-    
+
 - Step6: 在获取了相互关联的凭证流之后（实际就是事件流），我们可以进入模型细化阶段，围绕每个凭证，寻找参与其中的角色
-    
+
 - Step7: 思考哪些参与方可能扮演这些角色，并将他们加入模型中
-    
+
 - Step8: 通过描述对象，为模型添加补充说明
-    
 
 可以看到四色建模法对最终模型的构造有更为明确的要求：凭证必须围绕现金往来或 KPI；凭证间必须通过关键数据项明确关联关系。这也是说四色建模是一种强分析方法的原因：可经由明确的逻辑推导，不需要依赖于发散 - 收敛式的探索。
 
@@ -452,7 +438,7 @@ DDD的基本概念
 
 首先我们需要思考一下在“智慧课堂”专栏的模型中，有哪些现金往来（Payment 和 Commission Payment）？很容易想到的就是读者购买专栏以及专栏作者分成这两项，构造的模型如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如图所示，我们构造了两个凭证去表示这两个现金往来，然后分别列出它们的关键数据项：时间点和金额。接着就可以开始追溯前序凭证了。
 
@@ -460,19 +446,19 @@ DDD的基本概念
 
 它的关键数据项金额（amount）显然不可能由读者输入，而应该由前序凭证提供。支付的前序凭证是什么呢？是订单，因为是针对订单进行支付的。因此支付的金额应该与订单的金额相等。而订单的金额显然也不可能是由读者输入的，那么订单的前序凭证是什么呢？是专栏报价，订单的金额应该与专栏报价相等。那报价哪里来的呢？是由编辑输入的。到此为止，我们就完成了一条完整的追溯，如图所示：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在寻找完前序凭证之后，Payment 有什么履约凭证吗？那我们要看一看，从客户那里收到的钱表示了什么权责。根据业务上下文，读者购买的是阅读专栏的权利，那么我们就需要一个凭证表示读者可以在后续阅读对应专栏里的内容。
 
 于是我们可以引入凭证订阅（Subscription），它具有关键数据项开始时间（start_time），也就是从何时开始，用户可以阅读对应专栏的内容。我们知道这个时间必须晚于支付完成，不能允许读者在支付完成前就阅读专栏，哪怕早一毫秒都不行：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 现在我们再来看专栏作者分成，和上面支付单类似，佣金支付单也有一个前序凭证，是佣金。 这里的难点在于佣金的关键数据项金额（amount）。显然不可能让作者自己输入要提取多少分成。这个分成通常是按某个规定好的时间段作为账期，比如每月一次，或者每季度一次。然后按照账期找到所有账期内读者购买的凭证，求出总销售金额，然后再按约定好的分成比例，计算作者的分成。
 
 不过这里就有一些数据项来路不明了：分成比例（percentage）、账期日（payment days）和上次分成付款日（last paid）。那么如果我们往前追溯，可以发现包含分成比例、账期日的凭证，是专栏撰写合同，而上次分成付款日则是通过计算得到的（分成支付凭证中最晚的那个。如果没有，则默认是合同签约日）。于是我们可以得到：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 到此为止，我们获得了一条由通过关键数据项彼此关联的凭证链，同时也是领域事件流。这条凭证链表示了从作者签约、专栏定价、读者付费、作者分成的全过程，捕捉了“智慧课堂”专栏这项业务的收入流，我们称之为业务的脊梁（Backbone of the business）。
 
@@ -480,13 +466,13 @@ DDD的基本概念
 
 接下来寻找与凭证相关的角色，然后再寻找能够扮演这些角色的参与者，以及与凭证相关的标的物，如图所示：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### **获得领域模型**
 
 按照关键数据项间的关联，将模型连在一起，稍加润色，就能得到领域模型了：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### **验证业务脊梁以及领域模型的有效性**
 
@@ -518,7 +504,7 @@ DDD的基本概念
 
 从前面的四色建模法中，我们已经得到了领域模型，稍加整理后得到下图：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 读者、编辑以及作者都可以看做是用户，但是三者在系统中所从事的动作，拥有的能力差异巨大，用户的共性仅体现在登录等极少数场景，因此本文建模更倾向于将“读者”、“编辑”以及“作者”视为三个独立的模型。下文中将不再出现“用户”。
 
@@ -526,7 +512,7 @@ DDD的基本概念
 
 针对上面的领域模型进行子域划分，子域划分时尽量要体现出聚合根，因此子域往往只包含一到两个领域模型，子域中的实体会以值对象的方式聚合其他子域的实体。子域划分如下图：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 根据子域对于业务重要性的不同，可以分为核心域、支撑域和通用域：
 
@@ -542,7 +528,7 @@ DDD的基本概念
 
 限界上下文中划分的一个技巧就是考虑一个完整的业务流程，保证这个业务流程所涉及的领域都在一个限界上下文中，例如“专栏订阅上下文”中包含了用户订阅这个业务流程的关键领域对象。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 限界上下文是指导微服务系统拆分的依据，上图中根据限界上下文的划分，需要拆分成5个微服务系统，分别是 专栏订阅系统、专栏信息系统、签约分佣系统、金融系统以及用户信息系统。
 
@@ -558,33 +544,33 @@ DDD的基本概念
 
 用例图可以清晰的表示出系统的功能，例如针对专栏订阅系统，用例图如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 状态机
 
 逻辑清晰的状态机是刻画实体生命周期的关键，例如针对专栏订阅系统，状态机如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 活动图
 
 活动图也叫流程图，是用来展示具体的业务流程，可以描述清楚业务具体的处理逻辑，一般流程图采用泳道图的形式表达。例如订阅和取消订阅的流程图如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 时序图
 
 时序图描述了完成某个业务流程，系统中各个对象之间的交互过程和消息传递序列，时序图可以帮助厘清系统间的依赖和调用。例如订阅的时序图如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### ER图
 
 ER图是描述的数据库建模，可用于直接指导数据库建表。对于习惯面向数据库模型编程的工程师来说，可能画ER图是需求研发的第一步，但是在领域驱动设计中，ER图只是仓储实施细节，只会在领域建模完成后才进行ER设计。 例如专栏订阅域中ER图如下：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **代码实施**
 
@@ -594,20 +580,19 @@ ER图是描述的数据库建模，可用于直接指导数据库建表。对于
 
 上文在“限界上下文划分”一节中建议分成5个微服务。为了尽可能演示出分布式业务系统，但同时又不至于让示例工程太复杂，在演示工程中就只分为两个应用，本文重点演示“专栏订阅”中的实践，将其他限界上下文统一放到了“smart-classroom-misc”系统中。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 应用模块分层
 
 在每个微服务应用分层有多种方法，一个核心原则就是“高内聚，低耦合”，本文参考COLA架构并结合实际工作经验，总结了如下的应用分层：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### **基本思想**
 
 - 为了保证核心业务逻辑的稳定，领域层应作为最纯粹、最少对外依赖的层次，只包含业务知识和业务规则，不该过多关心技术细节的实现（如存储、消息等）。
-    
+
 - 分层以领域层为核心来分层建设。
-    
 
 #### **模块职责**
 
@@ -640,15 +625,14 @@ ER图是描述的数据库建模，可用于直接指导数据库建表。对于
 定义要完成的业务功能，由该层负责协调和编排领域层的原子方法。因此应用层主要负责：
 
 - 事务控制
-    
+
 - 查询仓储（注意：只能查询仓储，不能写仓储，写仓储是领域层的能力）
-    
+
 - 领域事件（domain event）的触发和监听
-    
+
 - 操作日志
-    
+
 - 安全认证
-    
 
 注意一点，应用层虚线依赖仓储层和基础设施层，应用层要调用仓储查询或者使用中间件都应该使用领域层声明的接口，不能够直接使用仓储层和基础设施层的实现，例如应用层中不能直接使用Mapper，而应该使用Repository接口。虚线依赖是因为仓储层和基础设施层必须挂到主程序这个根上，整个项目模块才能被组织起来。
 
@@ -657,19 +641,18 @@ ER图是描述的数据库建模，可用于直接指导数据库建表。对于
 表达业务概念、业务状态、及业务规则。一个聚合（aggregate）一个package。领域层负责以下内容：
 
 - 实体（entity）
-    
+
 - 值对象（value object）
-    
+
 - 领域服务（domain service）
-    
+
 - 领域事件（domain event）
-    
+
 - 仓储（repository）接口定义，读写仓储
-    
+
 - 依赖的外部服务（anti-corruption layer）的接口定义
-    
+
 - 工厂（factory）
-    
 
 结合团队以及兄弟团队的实践，建议实体采用贫血模式，实体和领域服务共同构成领域模型。
 
@@ -785,27 +768,25 @@ XXConfiguration是应用中的配置类，各层负责自己层的配置，例�
 
 各种类型的对象及Bean所处位置如下图所示：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### **方法命名【建议】**
 
 - Service/Repository/Client/DAO方法命名规约
-    
 
 - 获取单个对象的方法用query作前缀。
-    
+
 - 获取多个对象列表的方法用list作前缀，复数结尾，如：listObjects。
-    
+
 - 获取多个对象分页的方法用page作前缀，复数结尾，如：pageObjects。
-    
+
 - 获取统计值的方法用count作前缀。
-    
+
 - 插入的方法用insert作前缀。
-    
+
 - 删除的方法用delete作前缀。
-    
+
 - 修改的方法用update作前缀。
-    
 
 #### **更多编码规范**
 
@@ -822,11 +803,10 @@ Saber工具位于testsuits中，它的作用是根据数据库表的元信息，
 #### **操作方法**
 
 - 在SaberConfig文件中修改一些配置，主要包括表前缀，包名，jdbc信息等。
-    
+
 - 在x文件夹下，写一个XXCommand的类，该类包含main函数，可以执行。在该类中指定表名，分页查询字段，枚举映射关系，忽略字段等配置。
-    
+
 - 运行上面写的XXCommand类，这时候就能在项目下看到自动生成的XXBaseMapper.xml, XXMapper.xml, XXBaseMapper.java, XXMapper.java, XXDO.java 五个文件。
-    
 
 #### **进阶用法**
 
@@ -848,18 +828,17 @@ Saber工具位于testsuits中，它的作用是根据数据库表的元信息，
 
 前端项目技术栈为：React, TypeScript, ReactRouter, Antd, Less, Vite。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 后记
 
 我认为领域驱动设计是一种软件工程的思想，它不是一套模板，它的思想精髓值得软件工程师以及架构师们领会，即：
 
 - 直接面向业务进行领域建模，将业务知识沉淀到领域模型中。
-    
+
 - 业务知识的沉淀不是一蹴而就，应该反复提炼，持续演进；为了让演进提炼的过程高效顺畅，团队使用统一语言来沟通、描述需求和设计方案。
-    
+
 - 高内聚、低耦合是应对软件复杂度的不二法则。领域、子域、限界上下文、聚合都是为这条宗旨服务的工具。
-    
 
 领域驱动设计也不是银弹，在软件开发过程中没有必要完全DDD一把梭，对于一些不复杂的项目，使用MVC模式开发反而更简单高效。同时业务本身的复杂度不是依靠某种软件设计思想或者设计范式就能规避的，DDD只是架构师们在架构设计过程中的一种指导思想，它本质上是一种工具。深刻理解业务，洞察问题本质才是一个架构师最核心的能力体现。当然，如果本文能够带你了解甚至是在工作中实践领域驱动设计，那本文的目的也就达到了。
 
@@ -870,41 +849,38 @@ Saber工具位于testsuits中，它的作用是根据数据库表的元信息，
 # **参考引用**
 
 - Eric Evans《领域驱动设计》
-    
-- Vaughn Vernon《实现领域驱动设计》
-    
-- 徐昊《如何落地业务建模》
-    
-- Erich Gamma《设计模式：可复用面向对象软件的基础》
-    
-- EventStorming：https://www.eventstorming.com/
-    
-- 迄今为止最完整的DDD实践：https://blog.csdn.net/AlibabaTech1024/article/details/125674376
-    
-- [聊一聊，我对DDD的关键理解](https://mp.weixin.qq.com/s?__biz=Mzg4NTczNzg2OA==&mid=2247487241&idx=1&sn=d4e617715c401dccfda479a254e0415e&scene=21#wechat_redirect)：https://mp.weixin.qq.com/s/fDU6MuIKs4wu8WDcsHsDzw
-    
-- 事件风暴与领域建模在阿里的实践：https://developer.aliyun.com/live/2877
-    
-- 阿里技术专家详解 DDD 系列 第一讲- Domain Primitive：https://zhuanlan.zhihu.com/p/340911587
-    
-- 限界上下文：冲破微服务设计困局的利器-阿里云开发者社区：https://developer.aliyun.com/article/913758?accounttraceid=d2b6e0e9135d48468535232849a22b2ebcey
-    
-- 复杂度应对之道 - COLA应用架构_cola 扩展点_张建飞（Frank）的博客-CSDN博客：https://blog.csdn.net/significantfrank/article/details/85785565
-    
-- 从壹开始微服务 [ DDD ] 之三 ║ 简单说说：领域、子域、限界上下文 - 老张的哲学 - 博客园：https://www.cnblogs.com/laozhang-is-phi/p/9845573.html
-    
-- 领域驱动设计详解：是什么、为什么、怎么做？：https://zhuanlan.zhihu.com/p/164757995?utm_source=wechat_timeline
-    
-- 领域驱动设计(DDD)-基础思想：https://zhuanlan.zhihu.com/p/109114670
-    
-- 阿里巴巴开发规约：https://developer.aliyun.com/ebook/386
-    
 
----
+- Vaughn Vernon《实现领域驱动设计》
+
+- 徐昊《如何落地业务建模》
+
+- Erich Gamma《设计模式：可复用面向对象软件的基础》
+
+- EventStorming：https://www.eventstorming.com/
+
+- 迄今为止最完整的DDD实践：https://blog.csdn.net/AlibabaTech1024/article/details/125674376
+
+- [聊一聊，我对DDD的关键理解](https://mp.weixin.qq.com/s?__biz=Mzg4NTczNzg2OA==&mid=2247487241&idx=1&sn=d4e617715c401dccfda479a254e0415e&scene=21#wechat_redirect)：https://mp.weixin.qq.com/s/fDU6MuIKs4wu8WDcsHsDzw
+
+- 事件风暴与领域建模在阿里的实践：https://developer.aliyun.com/live/2877
+
+- 阿里技术专家详解 DDD 系列 第一讲- Domain Primitive：https://zhuanlan.zhihu.com/p/340911587
+
+- 限界上下文：冲破微服务设计困局的利器-阿里云开发者社区：https://developer.aliyun.com/article/913758?accounttraceid=d2b6e0e9135d48468535232849a22b2ebcey
+
+- 复杂度应对之道 - COLA应用架构_cola 扩展点_张建飞（Frank）的博客-CSDN博客：https://blog.csdn.net/significantfrank/article/details/85785565
+
+- 从壹开始微服务 \[ DDD \] 之三 ║ 简单说说：领域、子域、限界上下文 - 老张的哲学 - 博客园：https://www.cnblogs.com/laozhang-is-phi/p/9845573.html
+
+- 领域驱动设计详解：是什么、为什么、怎么做？：https://zhuanlan.zhihu.com/p/164757995?utm_source=wechat_timeline
+
+- 领域驱动设计(DDD)-基础思想：https://zhuanlan.zhihu.com/p/109114670
+
+- 阿里巴巴开发规约：https://developer.aliyun.com/ebook/386
+
+______________________________________________________________________
 
 **阿里云开发者社区，千万开发者的选择**
-
-  
 
 阿里云开发者社区，百万精品技术内容、千节免费系统课程、丰富的体验场景、活跃的社群活动、行业专家分享交流，欢迎点击【阅读原文】加入我们。
 
@@ -918,8 +894,6 @@ Saber工具位于testsuits中，它的作用是根据数据库表的元信息，
 
 公众号
 
-  
-
 Read more
 
 Reads 25.2k
@@ -931,181 +905,180 @@ Comment
 **留言 29**
 
 - Now
-    
-    上海2023年5月30日
-    
-    Like22
-    
-    让人觉得尴尬的是，真正需要DDD的人，并不认同它；不需要DDD的人，被强迫认同它。
-    
+
+  上海2023年5月30日
+
+  Like22
+
+  让人觉得尴尬的是，真正需要DDD的人，并不认同它；不需要DDD的人，被强迫认同它。
+
 - Frank木风
-    
-    浙江2023年5月30日
-    
-    Like10
-    
-    领域用贫血，看不出来和三层比，优势在哪里？
-    
+
+  浙江2023年5月30日
+
+  Like10
+
+  领域用贫血，看不出来和三层比，优势在哪里？
+
 - Like丶
-    
-    广东2023年5月30日
-    
-    Like10
-    
-    总结的很好，但是学习的成本和开发的周期都是很现实的问题。时间短任务紧，根本没那么多时间给你慢慢建模
-    
-    林泽欢
-    
-    广东2023年5月30日
-    
-    Like3
-    
-    建模是需要业务专家参与的，不是技术人员自己摸
-    
-    2条回复
-    
+
+  广东2023年5月30日
+
+  Like10
+
+  总结的很好，但是学习的成本和开发的周期都是很现实的问题。时间短任务紧，根本没那么多时间给你慢慢建模
+
+  林泽欢
+
+  广东2023年5月30日
+
+  Like3
+
+  建模是需要业务专家参与的，不是技术人员自己摸
+
+  2条回复
+
 - 周明波
-    
-    广东2023年5月30日
-    
-    Like8
-    
-    从入门到放弃
-    
+
+  广东2023年5月30日
+
+  Like8
+
+  从入门到放弃
+
 - xxjacob
-    
-    北京2023年5月30日
-    
-    Like7
-    
-    示例的话，直接看iddd_samples就好。GitHub直接搜。
-    
+
+  北京2023年5月30日
+
+  Like7
+
+  示例的话，直接看iddd_samples就好。GitHub直接搜。
+
 - 木易xcᯤ⁶ᴳ
-    
-    广东2023年5月30日
-    
-    Like5
-    
-    一顿操作猛如虎，一问工期一周半
-    
+
+  广东2023年5月30日
+
+  Like5
+
+  一顿操作猛如虎，一问工期一周半
+
 - 海
-    
-    广东2023年5月30日
-    
-    Like3
-    
-    失血，贫血，充血，胀血。平时网络上的一些称呼好像又只分贫血和充血。这几种血模型有权威的解读吗？
-    
+
+  广东2023年5月30日
+
+  Like3
+
+  失血，贫血，充血，胀血。平时网络上的一些称呼好像又只分贫血和充血。这几种血模型有权威的解读吗？
+
 - 光辉
-    
-    上海2023年5月30日
-    
-    Like3
-    
-    能把一篇技术文写得像是散文诗，既有当下热点chatgpt,又有技术实践细节，干货满满，强烈建议加上这位阿里郎上照片！！！阿里妹举手求偶遇![[调皮]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  上海2023年5月30日
+
+  Like3
+
+  能把一篇技术文写得像是散文诗，既有当下热点chatgpt,又有技术实践细节，干货满满，强烈建议加上这位阿里郎上照片！！！阿里妹举手求偶遇![[调皮]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Bob
-    
-    上海2023年5月30日
-    
-    Like3
-    
-    真干货！作者是开源项目-蓝眼云盘的发起人和开发者![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  上海2023年5月30日
+
+  Like3
+
+  真干货！作者是开源项目-蓝眼云盘的发起人和开发者![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 崔洪涛
-    
-    四川2023年5月31日
-    
-    Like2
-    
-    DDD怎么会是解决MVC不足的问题的? 都不是一个层面的东西。
-    
+
+  四川2023年5月31日
+
+  Like2
+
+  DDD怎么会是解决MVC不足的问题的? 都不是一个层面的东西。
+
 - 忧郁的葡萄
-    
-    上海2023年5月30日
-    
-    Like2
-    
-    这篇是真干货啊![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  上海2023年5月30日
+
+  Like2
+
+  这篇是真干货啊![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 文攀
-    
-    上海2023年6月3日
-    
-    Like1
-    
-    有人知道这活动图和时序图是什么工具画的吗
-    
-    1条回复
-    
+
+  上海2023年6月3日
+
+  Like1
+
+  有人知道这活动图和时序图是什么工具画的吗
+
+  1条回复
+
 - 王云飞
-    
-    辽宁2023年5月30日
-    
-    Like1
-    
-    号称也从事DDD几年，文中很多场景都是我们实际碰到的，大部分落地方法和思路也是一致的。但是一万人做DDD就会有一万零一种方案出来，标准化以及统一语言才是最艰难的![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)期望有时间有机会能一起交流，谢谢大神![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    1条回复
-    
+
+  辽宁2023年5月30日
+
+  Like1
+
+  号称也从事DDD几年，文中很多场景都是我们实际碰到的，大部分落地方法和思路也是一致的。但是一万人做DDD就会有一万零一种方案出来，标准化以及统一语言才是最艰难的![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)期望有时间有机会能一起交流，谢谢大神![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  1条回复
+
 - stars
-    
-    北京2023年5月30日
-    
-    Like1
-    
-    好文![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京2023年5月30日
+
+  Like1
+
+  好文![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 阿佳妮
-    
-    江苏2023年5月30日
-    
-    Like1
-    
-    学到了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  江苏2023年5月30日
+
+  Like1
+
+  学到了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 云淡风轻
-    
-    天津2023年7月28日
-    
-    Like
-    
-    DDD是成为软件架构高手的内功心法
-    
+
+  天津2023年7月28日
+
+  Like
+
+  DDD是成为软件架构高手的内功心法
+
 - 养（🐰）
-    
-    湖北2023年5月30日
-    
-    Like
-    
-    没有理解为什么仓储层依赖领域层？
-    
-    4条回复
-    
+
+  湖北2023年5月30日
+
+  Like
+
+  没有理解为什么仓储层依赖领域层？
+
+  4条回复
+
 - 不知道
-    
-    湖北2023年5月30日
-    
-    Like
-    
-    公司也一直在推崇DDD，这个可以借鉴一下了
-    
+
+  湖北2023年5月30日
+
+  Like
+
+  公司也一直在推崇DDD，这个可以借鉴一下了
+
 - Tom Deng
-    
-    上海2023年5月30日
-    
-    Like
-    
-    写的真好
-    
+
+  上海2023年5月30日
+
+  Like
+
+  写的真好
+
 - 看大维好吗
-    
-    广西2023年5月30日
-    
-    Like
-    
-    👍
-    
+
+  广西2023年5月30日
+
+  Like
+
+  👍
 
 已无更多数据
 
@@ -1124,180 +1097,179 @@ Comment
 **留言 29**
 
 - Now
-    
-    上海2023年5月30日
-    
-    Like22
-    
-    让人觉得尴尬的是，真正需要DDD的人，并不认同它；不需要DDD的人，被强迫认同它。
-    
+
+  上海2023年5月30日
+
+  Like22
+
+  让人觉得尴尬的是，真正需要DDD的人，并不认同它；不需要DDD的人，被强迫认同它。
+
 - Frank木风
-    
-    浙江2023年5月30日
-    
-    Like10
-    
-    领域用贫血，看不出来和三层比，优势在哪里？
-    
+
+  浙江2023年5月30日
+
+  Like10
+
+  领域用贫血，看不出来和三层比，优势在哪里？
+
 - Like丶
-    
-    广东2023年5月30日
-    
-    Like10
-    
-    总结的很好，但是学习的成本和开发的周期都是很现实的问题。时间短任务紧，根本没那么多时间给你慢慢建模
-    
-    林泽欢
-    
-    广东2023年5月30日
-    
-    Like3
-    
-    建模是需要业务专家参与的，不是技术人员自己摸
-    
-    2条回复
-    
+
+  广东2023年5月30日
+
+  Like10
+
+  总结的很好，但是学习的成本和开发的周期都是很现实的问题。时间短任务紧，根本没那么多时间给你慢慢建模
+
+  林泽欢
+
+  广东2023年5月30日
+
+  Like3
+
+  建模是需要业务专家参与的，不是技术人员自己摸
+
+  2条回复
+
 - 周明波
-    
-    广东2023年5月30日
-    
-    Like8
-    
-    从入门到放弃
-    
+
+  广东2023年5月30日
+
+  Like8
+
+  从入门到放弃
+
 - xxjacob
-    
-    北京2023年5月30日
-    
-    Like7
-    
-    示例的话，直接看iddd_samples就好。GitHub直接搜。
-    
+
+  北京2023年5月30日
+
+  Like7
+
+  示例的话，直接看iddd_samples就好。GitHub直接搜。
+
 - 木易xcᯤ⁶ᴳ
-    
-    广东2023年5月30日
-    
-    Like5
-    
-    一顿操作猛如虎，一问工期一周半
-    
+
+  广东2023年5月30日
+
+  Like5
+
+  一顿操作猛如虎，一问工期一周半
+
 - 海
-    
-    广东2023年5月30日
-    
-    Like3
-    
-    失血，贫血，充血，胀血。平时网络上的一些称呼好像又只分贫血和充血。这几种血模型有权威的解读吗？
-    
+
+  广东2023年5月30日
+
+  Like3
+
+  失血，贫血，充血，胀血。平时网络上的一些称呼好像又只分贫血和充血。这几种血模型有权威的解读吗？
+
 - 光辉
-    
-    上海2023年5月30日
-    
-    Like3
-    
-    能把一篇技术文写得像是散文诗，既有当下热点chatgpt,又有技术实践细节，干货满满，强烈建议加上这位阿里郎上照片！！！阿里妹举手求偶遇![[调皮]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  上海2023年5月30日
+
+  Like3
+
+  能把一篇技术文写得像是散文诗，既有当下热点chatgpt,又有技术实践细节，干货满满，强烈建议加上这位阿里郎上照片！！！阿里妹举手求偶遇![[调皮]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Bob
-    
-    上海2023年5月30日
-    
-    Like3
-    
-    真干货！作者是开源项目-蓝眼云盘的发起人和开发者![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  上海2023年5月30日
+
+  Like3
+
+  真干货！作者是开源项目-蓝眼云盘的发起人和开发者![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 崔洪涛
-    
-    四川2023年5月31日
-    
-    Like2
-    
-    DDD怎么会是解决MVC不足的问题的? 都不是一个层面的东西。
-    
+
+  四川2023年5月31日
+
+  Like2
+
+  DDD怎么会是解决MVC不足的问题的? 都不是一个层面的东西。
+
 - 忧郁的葡萄
-    
-    上海2023年5月30日
-    
-    Like2
-    
-    这篇是真干货啊![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  上海2023年5月30日
+
+  Like2
+
+  这篇是真干货啊![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 文攀
-    
-    上海2023年6月3日
-    
-    Like1
-    
-    有人知道这活动图和时序图是什么工具画的吗
-    
-    1条回复
-    
+
+  上海2023年6月3日
+
+  Like1
+
+  有人知道这活动图和时序图是什么工具画的吗
+
+  1条回复
+
 - 王云飞
-    
-    辽宁2023年5月30日
-    
-    Like1
-    
-    号称也从事DDD几年，文中很多场景都是我们实际碰到的，大部分落地方法和思路也是一致的。但是一万人做DDD就会有一万零一种方案出来，标准化以及统一语言才是最艰难的![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)期望有时间有机会能一起交流，谢谢大神![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    1条回复
-    
+
+  辽宁2023年5月30日
+
+  Like1
+
+  号称也从事DDD几年，文中很多场景都是我们实际碰到的，大部分落地方法和思路也是一致的。但是一万人做DDD就会有一万零一种方案出来，标准化以及统一语言才是最艰难的![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)期望有时间有机会能一起交流，谢谢大神![[抱拳]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  1条回复
+
 - stars
-    
-    北京2023年5月30日
-    
-    Like1
-    
-    好文![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京2023年5月30日
+
+  Like1
+
+  好文![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 阿佳妮
-    
-    江苏2023年5月30日
-    
-    Like1
-    
-    学到了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  江苏2023年5月30日
+
+  Like1
+
+  学到了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 云淡风轻
-    
-    天津2023年7月28日
-    
-    Like
-    
-    DDD是成为软件架构高手的内功心法
-    
+
+  天津2023年7月28日
+
+  Like
+
+  DDD是成为软件架构高手的内功心法
+
 - 养（🐰）
-    
-    湖北2023年5月30日
-    
-    Like
-    
-    没有理解为什么仓储层依赖领域层？
-    
-    4条回复
-    
+
+  湖北2023年5月30日
+
+  Like
+
+  没有理解为什么仓储层依赖领域层？
+
+  4条回复
+
 - 不知道
-    
-    湖北2023年5月30日
-    
-    Like
-    
-    公司也一直在推崇DDD，这个可以借鉴一下了
-    
+
+  湖北2023年5月30日
+
+  Like
+
+  公司也一直在推崇DDD，这个可以借鉴一下了
+
 - Tom Deng
-    
-    上海2023年5月30日
-    
-    Like
-    
-    写的真好
-    
+
+  上海2023年5月30日
+
+  Like
+
+  写的真好
+
 - 看大维好吗
-    
-    广西2023年5月30日
-    
-    Like
-    
-    👍
-    
+
+  广西2023年5月30日
+
+  Like
+
+  👍
 
 已无更多数据

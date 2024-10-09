@@ -1,7 +1,6 @@
- 
 IT服务圈儿
 
- _2022年09月08日 17:30_ _江苏_
+_2022年09月08日 17:30_ _江苏_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/DY5wiavf38z6zz5UTGncwycEWAHcFljyMHXqusdAx8GX12IaE7WU9UR7HfTYwMVeUtVuygDWpBlUBXgJBEXMaVA/300?wx_fmt=png&wxfrom=19)
 
@@ -19,11 +18,9 @@ IT服务圈儿
 
 声明：本文为 CSDN 翻译，转载需注明来源。
 
-  
+作者 | Martin Sústrik
 
-作者 | Martin Sústrik     
-
-译者 | 弯月           责编 | 屠敏  
+译者 | 弯月           责编 | 屠敏
 
 出品 | CSDN（ID：CSDNnews）
 
@@ -34,13 +31,12 @@ IT服务圈儿
 因此，在开始构建个人项目ZeroMQ（可伸缩的分布式或并发应用程序设计的高性能异步消息库）时，我也选用了C++，主要原因如下：
 
 1. C++包含一些数据结构和算法库。如果使用C语言，我将不得不依赖第三方库，或者自己动手编写基本算法。
-    
-2. C++会强制我在编程风格上保持一些基本的统一性。例如，this参数不允许使用几种不同的机制将指针传递给正在处理的对象，而这个问题在C项目中很常见。同样，不可以明确将成员变量标记为私有，此外还有C++的一些其他特征。
-    
-3. 使用C语言实现虚函数非常复杂，会导致理解和管理代码的难度加剧。不过，严格来说，这个问题其实是上一个问题的一个子集，但我觉得有必要单独指出。
-    
-4. 最后，每个人都喜欢在代码的末尾自动调用析构函数。
-    
+
+1. C++会强制我在编程风格上保持一些基本的统一性。例如，this参数不允许使用几种不同的机制将指针传递给正在处理的对象，而这个问题在C项目中很常见。同样，不可以明确将成员变量标记为私有，此外还有C++的一些其他特征。
+
+1. 使用C语言实现虚函数非常复杂，会导致理解和管理代码的难度加剧。不过，严格来说，这个问题其实是上一个问题的一个子集，但我觉得有必要单独指出。
+
+1. 最后，每个人都喜欢在代码的末尾自动调用析构函数。
 
 然而，事到如今，我不得不承认C++是一个糟糕的选择。下面，我来解释一下原因。
 
@@ -92,7 +88,7 @@ class exception1 {};
 
 看到这里，你可能想说：这就是异常的正确用法啊？
 
-然而问题在于，**异常只是一个工具，目的是用更系统的方式管理呈现指数增长的错误处理代码，但它并不能解决根本的问题。**甚至可以说，异常有可能导致情况恶化，因为你不仅需要编写新的异常类型，还需要针对新类型编写异常处理代码。
+然而问题在于，\*\*异常只是一个工具，目的是用更系统的方式管理呈现指数增长的错误处理代码，但它并不能解决根本的问题。\*\*甚至可以说，异常有可能导致情况恶化，因为你不仅需要编写新的异常类型，还需要针对新类型编写异常处理代码。
 
 考虑到上述问题，我决定使用C++，但不使用异常。如今我的这个项目就是这样实现的。
 
@@ -156,9 +152,9 @@ class foo : public bar
 
 这个问题没有灵丹妙药。系统编程选择C语言更为合适。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1、[有了这个库，以后再也不用写正则表达式了！](http://mp.weixin.qq.com/s?__biz=MzUyMTY4MTk2OA==&mid=2247604326&idx=3&sn=13b3de83ae3b9c8ab254f3967495388b&chksm=f9d47539cea3fc2f6635e9f26905c1f951cf147b95cbd286676357c0955d31e67d7b97f11ea2&scene=21#wechat_redirect)
 
@@ -170,17 +166,17 @@ class foo : public bar
 
 5、[${} 和 #{} 有什么区别？](http://mp.weixin.qq.com/s?__biz=MzUyMTY4MTk2OA==&mid=2247604106&idx=3&sn=8be537923b7cd1c8d9c9226df0f9bc26&chksm=f9d47ad5cea3f3c3848e88fe221a4fbd76e22c6f7b29353297410d29e74f2a9a1dab3ac5fe2b&scene=21#wechat_redirect)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 点分享
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 点点赞
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 点在看
 

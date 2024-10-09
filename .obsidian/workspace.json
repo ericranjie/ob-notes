@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
+                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
+                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md",
+                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/reverse-engineering/b_RISC-V架构系列之1：指令集和特权模式.md"
+                "file": "0x01-leetcode/algorithm/backtracking/n-queens/h_51. N-Queens.md"
               }
             }
           }
@@ -146,8 +146,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "b_RISC-V架构系列之1：指令集和特权模式.md",
+    "zx99-image/Pasted image 20241009114447.png",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "zx99-image/Pasted image 20241009113121.png",
     "zx99-image/Pasted image 20241009113143.png",
@@ -159,7 +161,6 @@
     "zx99-image/Pasted image 20241009113354.png",
     "zx99-image/Pasted image 20241009113341.png",
     "zx99-image/Pasted image 20241009113253.png",
-    "zx99-image/Pasted image 20241009113221.png",
     "coding/cpp/low-level/C C++ 内存泄漏-原因、避免以及定位.md",
     "coding/cpp/idiom/a_n_惊爆C C++编程技巧 解锁无限可能的黑科技.md",
     "coding/cpp/grammar/pointer/b_C++ 智能指针最佳实践&源码分析.md",
@@ -183,7 +184,6 @@
     "coding/os/linux/performance/a_n_Linux性能优化全景指南.md",
     "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
     "coding/os/linux/performance/an _微信工程师：常见性能优化方案与实用工具.md",
-    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
     "coding/cpp/schedule/coroutine",
     "coding/cpp/schedule",
     "coding/cpp/memory",

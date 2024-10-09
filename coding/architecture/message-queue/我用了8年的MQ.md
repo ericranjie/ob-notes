@@ -2,11 +2,11 @@
 
 苏三说技术
 
- _2024年09月01日 09:20_ _四川_
+_2024年09月01日 09:20_ _四川_
 
 The following article is from 勇哥Java实战 Author 勇哥
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6yW3qKT0UHU1I6pwFEOGiaH3FEwicSx0ODGSRsX6W3XiadQ/0)
 
@@ -14,7 +14,7 @@ The following article is from 勇哥Java实战 Author 勇哥
 
 Java 基础、高并发解决方案三剑客（缓存、消息队列、分库分表）、实战项目讲解。
 
-](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247520264&idx=1&sn=cc5b6e40e22715d1fa255e59d20b74c5&chksm=c108c51d0959cd50af09804e681ef8ed8554e0e332c0a50222f31a174786c1f9f63f184eb2b9&mpshare=1&scene=24&srcid=09011Im74kZEqKi04rGEfSGe&sharer_shareinfo=d1452b974820f87fb78b1da16c5e67c8&sharer_shareinfo_first=d1452b974820f87fb78b1da16c5e67c8&key=daf9bdc5abc4e8d0be49e1432e1d16b1ad4d1e40b56059cf9b014ba4aaa5e99d12c83d1dd04c7964519b6e874b7d39ae62f24a0581fcd5fb47e1ddb375b3760dd8115a41624f21db3666ed89b0503ff0a6e1aec07d947ca245284d301b367b5eeba1614d3a36b10cd9e12ebc6c0f8541e64211e5352fe879d2351efd2e9f4d67&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_cbd73ca65bd1&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQP%2FKAtBYblxOV%2F0V7UvzV9RKUAgIE97dBBAEAAAAAAIoOF5mf5SgAAAAOpnltbLcz9gKNyK89dVj0gF%2B02rxcmSN5VAEtOmjRkZT5ayhWFB9sOj3BhwUzmbu6%2BDWq4vPRqgsPG%2B9u6L5dGFN%2BFM59R%2FYpnGXvrjWf0%2F%2FxWwJZUvx7lO%2BoCz2wM3Bjvu30Z05x%2FnefAAMeQtyKVNxV1iq%2FONh3jOaOlKgDrE1QQCHkw8EO6TQLK5VOp0Y39TdHSgOUOgXXOg6Eu1voECra%2BXCf1ylVFQu1DSZnHE8ixsKELQoYDRzKb2gNLuV4%2BjisyXmPF%2Bidlh%2FnthluHW1Pc4NPUZBbvl409rqrUtjraEStsI4OJxQx938lOAqiMJ6Wg8hBPaw2ns8LOw%3D%3D&acctmode=0&pass_ticket=Mweunl9%2FF4FuBJCXItr8WE7HE8e4LC4PVoftoBS4nM22eBalgLcYKc3WL%2FVPtlcW&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkwNjMwMTgzMQ==&mid=2247520264&idx=1&sn=cc5b6e40e22715d1fa255e59d20b74c5&chksm=c108c51d0959cd50af09804e681ef8ed8554e0e332c0a50222f31a174786c1f9f63f184eb2b9&mpshare=1&scene=24&srcid=09011Im74kZEqKi04rGEfSGe&sharer_shareinfo=d1452b974820f87fb78b1da16c5e67c8&sharer_shareinfo_first=d1452b974820f87fb78b1da16c5e67c8&key=daf9bdc5abc4e8d0be49e1432e1d16b1ad4d1e40b56059cf9b014ba4aaa5e99d12c83d1dd04c7964519b6e874b7d39ae62f24a0581fcd5fb47e1ddb375b3760dd8115a41624f21db3666ed89b0503ff0a6e1aec07d947ca245284d301b367b5eeba1614d3a36b10cd9e12ebc6c0f8541e64211e5352fe879d2351efd2e9f4d67&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_cbd73ca65bd1&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQP%2FKAtBYblxOV%2F0V7UvzV9RKUAgIE97dBBAEAAAAAAIoOF5mf5SgAAAAOpnltbLcz9gKNyK89dVj0gF%2B02rxcmSN5VAEtOmjRkZT5ayhWFB9sOj3BhwUzmbu6%2BDWq4vPRqgsPG%2B9u6L5dGFN%2BFM59R%2FYpnGXvrjWf0%2F%2FxWwJZUvx7lO%2BoCz2wM3Bjvu30Z05x%2FnefAAMeQtyKVNxV1iq%2FONh3jOaOlKgDrE1QQCHkw8EO6TQLK5VOp0Y39TdHSgOUOgXXOg6Eu1voECra%2BXCf1ylVFQu1DSZnHE8ixsKELQoYDRzKb2gNLuV4%2BjisyXmPF%2Bidlh%2FnthluHW1Pc4NPUZBbvl409rqrUtjraEStsI4OJxQx938lOAqiMJ6Wg8hBPaw2ns8LOw%3D%3D&acctmode=0&pass_ticket=Mweunl9%2FF4FuBJCXItr8WE7HE8e4LC4PVoftoBS4nM22eBalgLcYKc3WL%2FVPtlcW&wx_header=0#)
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/ibJZVicC7nz5iaP4Yynj4jUTic5xEPpzW3qVWbHraricStBd6KE3yx4ZhbGlq7dSROy89ftZuqPKPxlcSKJmLicnCrsw/300?wx_fmt=png&wxfrom=19)
 
@@ -33,13 +33,12 @@ Java 基础、高并发解决方案三剑客（缓存、消息队列、分库分
 我想按照下面的四个阶段分享我与消息队列的故事，同时也是对我技术成长经历的回顾。
 
 - 初识：ActiveMQ
-    
+
 - 进阶：Redis&RabbitMQ
-    
+
 - 升华：MetaQ
-    
+
 - 钟情：RocketMQ
-    
 
 # 1 初识ActiveMQ
 
@@ -49,25 +48,23 @@ Java 基础、高并发解决方案三剑客（缓存、消息队列、分库分
 
 我负责的是用户中心系统，提供用户注册，查询，修改等基础功能。用户注册成功之后，需要给用户发送短信。
 
-因为原来都是面向过程编程，我就把新增用户模块和发送短信模块都揉在一起了。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+因为原来都是面向过程编程，我就把新增用户模块和发送短信模块都揉在一起了。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 起初都还好，但问题慢慢的显现出来。
 
 - 短信渠道不够稳定，发送短信会达到5秒左右，这样用户注册接口耗时很大，影响前端用户体验;
-    
+
 - 短信渠道接口发生变化，用户中心代码就必须修改了。但用户中心是核心系统。每次上线都必要谨小慎微。这种感觉很别扭，非核心功能影响到核心系统了。
-    
 
 第一个问题，我可以采取线程池的方法来做，主要是**异步化**。但第二个问题却让我束手无措。
 
 于是我向技术经理请教，他告诉我引入消息队列去解决这个问题。
 
 - 将发送短信功能单独拆成独立的Job服务;
-    
-- 用户中心用户注册成功后，发送一条消息到消息队列，Job服务收到消息调用短信服务发送短信即可。
-    
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- 用户中心用户注册成功后，发送一条消息到消息队列，Job服务收到消息调用短信服务发送短信即可。
+
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这时，我才明白: 消息队列最核心的功能就是**异步**和**解耦**。
 
@@ -75,7 +72,7 @@ Java 基础、高并发解决方案三剑客（缓存、消息队列、分库分
 
 彩票系统的业务是比较复杂的。在彩票订单的生命周期里，经过创建，拆分子订单，出票，算奖等诸多环节。每一个环节都需要不同的服务处理，每个系统都有自己独立的表，业务功能也相对独立。假如每个应用都去修改订单主表的信息，那就会相当混乱了。
 
-公司的架构师设计了**调度中心**的服务，调度中心的职责是维护订单核心状态机，订单返奖流程，彩票核心数据生成。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+公司的架构师设计了**调度中心**的服务，调度中心的职责是维护订单核心状态机，订单返奖流程，彩票核心数据生成。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 调度中心通过**消息队列**和出票网关，算奖服务等系统传递和交换信息。
 
@@ -101,16 +98,15 @@ Java 基础、高并发解决方案三剑客（缓存、消息队列、分库分
 
 我当时正好在读毕玄老师的《分布式java应用基础与实践》，猜想是不是线程阻塞了，于是我用Jstack命令查看堆栈情况。果然不出所料，线程都阻塞在提交数据的方法上。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们马上和DBA沟通，发现oracle数据库执行了非常多的大事务，每次大的事务执行都需要30分钟以上，导致调度中心的调度出票线程阻塞了。
 
 技术部后来采取了如下的方案规避堆积问题：
 
 1. 生产者发送消息的时候，将超大的消息拆分成多批次的消息，减少调度中心执行大事务的几率;
-    
-2. 数据源配置参数，假如事务执行超过一定时长，自动抛异常，回滚。
-    
+
+1. 数据源配置参数，假如事务执行超过一定时长，自动抛异常，回滚。
 
 ## 1.4 复盘
 
@@ -119,7 +115,6 @@ Spring封装的ActiveMQ的API非常简洁易用，使用过程中真的非常舒
 受限于当时彩票技术团队的技术水平和视野，我们在使用ActiveMQ中遇到了一些问题。
 
 1. 高吞吐下，堆积到一定消息量易Hang住；
-    
 
 技术团队发现在吞吐量特别高的场景下，假如消息堆积越大，ActiveMQ有较小几率会Hang住的。
 
@@ -128,7 +123,6 @@ Spring封装的ActiveMQ的API非常简洁易用，使用过程中真的非常舒
 但这种方式感觉也挺怪的，消费消息的时候，还要本地再存储一份数据，消息存储在本地，假如磁盘坏了，也有丢消息的风险。
 
 2. 高可用机制待完善
-    
 
 我们采用的master/slave部署模式，一主一从，服务器配置是4核8G 。
 
@@ -144,57 +138,53 @@ Spring封装的ActiveMQ的API非常简洁易用，使用过程中真的非常舒
 
 ## 2.1 Redis可以做消息队列吗
 
-酒店优惠券计算服务使用的是初代流式计算框架**Storm**。Storm这里就不详细介绍，可以参看下面的逻辑图：![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+酒店优惠券计算服务使用的是初代流式计算框架**Storm**。Storm这里就不详细介绍，可以参看下面的逻辑图：!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-这里我们的Storm集群的水源头（数据源）是redis集群，使用**list**数据结构实现了消息队列的push/pop功能。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+这里我们的Storm集群的水源头（数据源）是redis集群，使用**list**数据结构实现了消息队列的push/pop功能。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 流式计算的整体流程：
 
 1. 酒店信息服务发送酒店信息到Redis集群A/B;
-    
-2. Storm的spout组件从Redis集群A/B获取数据, 获取成功后，发送tuple消息给Bolt组件;
-    
-3. Bolt组件收到消息后，通过运营配置的规则对数据进行清洗;
-    
-4. 最后Storm把处理好的数据发送到Redis集群C;
-    
-5. 入库服务从Redis集群C获取数据,存储数据到数据库;
-    
-6. 搜索团队扫描数据库表，生成索引。
-    
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. Storm的spout组件从Redis集群A/B获取数据, 获取成功后，发送tuple消息给Bolt组件;
+
+1. Bolt组件收到消息后，通过运营配置的规则对数据进行清洗;
+
+1. 最后Storm把处理好的数据发送到Redis集群C;
+
+1. 入库服务从Redis集群C获取数据,存储数据到数据库;
+
+1. 搜索团队扫描数据库表，生成索引。
+
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 storm说明
 
 这套流式计算服务每天处理千万条数据，处理得还算顺利。但方案在团队内部还是有不同声音:
 
 - storm的拓扑升级时候，或者优惠券服务重启的时候，偶尔出现丢消息的情况。但消息的丢失，对业务来讲没有那么敏感，而且我们也提供了手工刷新的功能，也在业务的容忍范围内;
-    
+
 - 团队需要经常关注Redis的缓存使用量，担心Redis队列堆积, 导致out of memory;
-    
+
 - 架构师认为搜索团队直接扫描数据库不够解耦，建议将Redis集群C替换成Kafka，搜索团队从kafka直接消费消息，生成索引;
-    
 
 我认为使用Redis做消息队列应该满足如下条件：
 
 1. 容忍小概率消息丢失，通过定时任务/手工触发达到最终一致的业务场景;
-    
-2. 消息堆积概率低，有相关的报警监控;
-    
-3. 消费者的消费模型要足够简单。
-    
+
+1. 消息堆积概率低，有相关的报警监控;
+
+1. 消费者的消费模型要足够简单。
 
 ## 2.2 RabbitMQ是管子不是池子
 
 RabbitMQ是用**erlang**语言编写的。RabbitMQ满足了我的两点需求：
 
 1. 高可用机制。艺龙内部是使用的镜像高可用模式，而且这种模式在艺龙已经使用了较长时间了，稳定性也得到了一定的验证。
-    
-2. 我负责的红包系统里，RabbitMQ每天的吞吐也在百万条消息左右，消息的发送和消费都还挺完美。
-    
 
-优惠券服务原使用**SqlServer**，由于数据量太大，技术团队决定使用分库分表的策略，使用公司自主研发的分布式数据库DDA。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 我负责的红包系统里，RabbitMQ每天的吞吐也在百万条消息左右，消息的发送和消费都还挺完美。
+
+优惠券服务原使用**SqlServer**，由于数据量太大，技术团队决定使用分库分表的策略，使用公司自主研发的分布式数据库DDA。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 因为是第一次使用分布式数据库，为了测试DDA的稳定性，我们模拟发送1000万条消息到RabbitMQ，然后优惠券重构服务消费消息后，按照用户编号hash到不同的mysql库。
 
@@ -210,7 +200,7 @@ RabbitMQ集群模式是镜像高可用，3台服务器，每台配置是4核8G �
 
 我心里面越来越相信：消息队列既可以做**管子**，也可以当做**池子**。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 # 3 升华MetaQ
 
@@ -226,7 +216,7 @@ MetaQ支持两种消费模型：**集群消费**和**广播消费** ，因为�
 
 **▍ 集群消费**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 订单创建成功后，发送一条消息给MetaQ。这条消息可以被派单服务消费，也可以被BI服务消费。
 
@@ -234,18 +224,17 @@ MetaQ支持两种消费模型：**集群消费**和**广播消费** ，因为�
 
 派单服务在讲订单指派给司机的时候，会给司机发送一个推送消息。推送就是用广播消费的模式实现的。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 大体流程是:
 
 1. 司机端推送服务是一个TCP服务，启动后，采用的是广播模式消费MetaQ的PushTopic;
-    
-2. 司机端会定时发送TCP请求到推送服务，鉴权成功后，推送服务会保存司机编号和channel的引用；
-    
-3. 派单服务发送推送消息到MetaQ；
-    
-4. 推送服务的每一台机器都会收到该消息，然后判断内存中是否存在该司机的channel引用，若存在，则推送消息。
-    
+
+1. 司机端会定时发送TCP请求到推送服务，鉴权成功后，推送服务会保存司机编号和channel的引用；
+
+1. 派单服务发送推送消息到MetaQ；
+
+1. 推送服务的每一台机器都会收到该消息，然后判断内存中是否存在该司机的channel引用，若存在，则推送消息。
 
 这是非常经典的广播消费的案例。我曾经研读京麦TCP网关的设计，它的推送也是采用类似的方式。
 
@@ -260,18 +249,16 @@ MetaQ支持两种消费模型：**集群消费**和**广播消费** ，因为�
 我们设计了现在看来有点激进的方案：
 
 1. 设计订单缓存。缓存方案大家要有兴趣，我们可以以后再聊，里面有很多可以详聊的点;
-    
-2. 在订单的载客生命周期里，订单的修改操作先修改缓存，然后发送消息到MetaQ，订单落盘服务消费消息，并判断订单信息是否正常（比如有无乱序)，若订单数据无误，则存储到数据库中。
-    
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 在订单的载客生命周期里，订单的修改操作先修改缓存，然后发送消息到MetaQ，订单落盘服务消费消息，并判断订单信息是否正常（比如有无乱序)，若订单数据无误，则存储到数据库中。
+
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里有两个细节：
 
-1. 消费者消费的时候需要顺序消费，实现的方式是按照订单号路由到不同的partition，同一个订单号的消息，每次都发到同一个partition;![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
-2. 一个守护任务，定时轮询当前正在进行的订单，当缓存与数据不一致时候，修复数据，并发送报警。
-    
+1. 消费者消费的时候需要顺序消费，实现的方式是按照订单号路由到不同的partition，同一个订单号的消息，每次都发到同一个partition;!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+1. 一个守护任务，定时轮询当前正在进行的订单，当缓存与数据不一致时候，修复数据，并发送报警。
 
 这次优化大大提升订单服务的整体性能，也为后来订单服务库分库分表以及异构打下了坚实的基础，根据我们的统计数据，基本没有发生过缓存和数据库最后不一致的场景。但这种方案对缓存高可用有较高的要求，还是有点小激进吧。
 
@@ -288,30 +275,28 @@ MetaQ支持两种消费模型：**集群消费**和**广播消费** ，因为�
 为了减少MetaQ对zk集群的影响，我们的目标是：“MetaQ使用独立的zk集群”。
 
 1. 需要部署新的zk集群；
-    
-2. MetaQ的zk数据需要同步到新的集群；
-    
-3. 保证切换到新的集群，应用服务基本无感知。
-    
+
+1. MetaQ的zk数据需要同步到新的集群；
+
+1. 保证切换到新的集群，应用服务基本无感知。
 
 我很好奇向架构部同学请教，他说新的集群已经部署好了，但需要同步zk数据到新的集群。他在客户端里添加了**双写**的操作。也就是说：我们除了会写原有的zk集群一份数据，同时也会在新的zk集群写一份。过了几周后，MetaQ使用独立的zk集群这个任务已经完成了。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这一次的经历带给我很大的感慨：“还可以这么玩？” ，也让我思考着：三方组件封装没有想像中那么简单。
 
 我们可以看下**快手**消息的SDK封装策略：
 
 1. 对外只提供最基本的 API，所有访问必须经过SDK提供的接口。简洁的 API 就像冰山的一个角，除了对外的简单接口，下面所有的东西都可以升级更换，而不会破坏兼容性 ;
-    
-2. 业务开发起来也很简单，只要需要提供 Topic（全局唯一）和 Group 就可以生产和消费，不用提供环境、NameServer 地址等。SDK 内部会根据 Topic 解析出集群 NameServer 的地址，然后连接相应的集群。生产环境和测试环境环境会解析出不同的地址，从而实现了隔离；
-    
-3. 上图分为 3 层，第二层是通用的，第三层才对应具体的 MQ 实现，因此，理论上可以更换为其它消息中间件，而客户端程序不需要修改；
-    
-4. SDK 内部集成了热变更机制，可以在不重启 Client 的情况下做动态配置，比如下发路由策略（更换集群 NameServer 的地址，或者连接到别的集群去），Client 的线程数、超时时间等。通过 Maven 强制更新机制，可以保证业务使用的 SDK 基本上是最新的。
-    
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 业务开发起来也很简单，只要需要提供 Topic（全局唯一）和 Group 就可以生产和消费，不用提供环境、NameServer 地址等。SDK 内部会根据 Topic 解析出集群 NameServer 的地址，然后连接相应的集群。生产环境和测试环境环境会解析出不同的地址，从而实现了隔离；
+
+1. 上图分为 3 层，第二层是通用的，第三层才对应具体的 MQ 实现，因此，理论上可以更换为其它消息中间件，而客户端程序不需要修改；
+
+1. SDK 内部集成了热变更机制，可以在不重启 Client 的情况下做动态配置，比如下发路由策略（更换集群 NameServer 的地址，或者连接到别的集群去），Client 的线程数、超时时间等。通过 Maven 强制更新机制，可以保证业务使用的 SDK 基本上是最新的。
+
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 3.4 重构MetaQ , 自成体系
 
@@ -320,9 +305,8 @@ MetaQ支持两种消费模型：**集群消费**和**广播消费** ，因为�
 MetaQ也有他的缺点。
 
 1. MetaQ的基层通讯框架是gecko，MetaQ偶尔会出现rpc无响应，应用假死的情况，不太好定位问题；
-    
-2. MetaQ的运维能力薄弱，只有简单的Dashboard界面，无法实现自动化主题申请，消息追踪等功能。
-    
+
+1. MetaQ的运维能力薄弱，只有简单的Dashboard界面，无法实现自动化主题申请，消息追踪等功能。
 
 有一天，我发现测试环境的一台消费者服务器启动后，不断报链接异常的问题，而且cpu占用很高。我用netstat命令马上查一下，发现已经创建了几百个链接。出于好奇心，我打开了源码，发现网络通讯框架gecko已经被替换成了netty。我们马上和架构部的同学联系。
 
@@ -334,7 +318,7 @@ MetaQ也有他的缺点。
 
 我从他们身上学到很多。
 
-也许在看到他们重构MetaQ的那一刻，我的心里埋下了种子。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+也许在看到他们重构MetaQ的那一刻，我的心里埋下了种子。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 # 4 钟情RocketMQ
 
@@ -342,7 +326,7 @@ MetaQ也有他的缺点。
 
 2014年，我搜罗了很多的淘宝的消息队列的资料，我知道MetaQ的版本已经升级MetaQ 3.0，只是开源版本还没有放出来。
 
-大约秋天的样子，我加入了RocketMQ技术群。誓嘉(RocketMQ创始人)在群里说：“最近要开源了，放出来后，大家赶紧fork呀”。他的这句话发在群里之后，群里都炸开了锅。我更是欢喜雀跃，期待着能早日见到阿里自己内部的消息中间件。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+大约秋天的样子，我加入了RocketMQ技术群。誓嘉(RocketMQ创始人)在群里说：“最近要开源了，放出来后，大家赶紧fork呀”。他的这句话发在群里之后，群里都炸开了锅。我更是欢喜雀跃，期待着能早日见到阿里自己内部的消息中间件。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 终于，RocketMQ终于开源了。我迫不及待想一窥他的风采。
 
@@ -359,26 +343,24 @@ MetaQ也有他的缺点。
 短信服务应用很广泛，比如用户注册登录验证码，营销短信，下单成功短信通知等等。最开始设计短信服务的时候，我想学习业界是怎么做的。于是把目标锁定在腾讯云的短信服务上。腾讯云的短信服务有如下特点：
 
 - 统一的SDK，后端入口是http/https服务 ,  分配appId/appSecret鉴权；
-    
+
 - 简洁的API设计：单发，群发，营销单发，营销群发，模板单发，模板群发。
-    
 
 于是，我参考了这种设计思路。
 
 1. 模仿腾讯云的SDK设计，提供简单易用的短信接口；
-    
-2. 设计短信服务API端，接收发短信请求，发送短信信息到消息队列；
-    
-3. worker服务消费消息，按照负载均衡的算法，调用不同渠道商的短信接口；
-    
-4. Dashboard可以查看短信发送记录，配置渠道商信息。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
+
+1. 设计短信服务API端，接收发短信请求，发送短信信息到消息队列；
+
+1. worker服务消费消息，按照负载均衡的算法，调用不同渠道商的短信接口；
+
+1. Dashboard可以查看短信发送记录，配置渠道商信息。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 短信服务是我真正意义第一次生产环境使用RocketMQ，当短信一条条发出来的时候，还是蛮有成就感的。
 
 **▍ MQ控制台**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 使用过RocketMQ的朋友，肯定对上图的控制台很熟悉。当时团队有多个RocketMQ集群，每组集群都需要单独部署一套控制台。于是我想着：能不能稍微把控制台改造一番，能满足支持多组集群。
 
@@ -395,11 +377,10 @@ MetaQ也有他的缺点。
 后来，我尝试进一步深入使用RocketMQ。
 
 - 仿ONS风格封装消息SDK；
-    
+
 - 运维侧平滑扩容消息队列；
-    
+
 - 生产环境DefaultMQPullConsumer消费模式尝试
-    
 
 这些做完之后，我们又自研了注册中心、配置中心，任务调度系统。设计这些系统的时候，从RocketMQ源码里汲取了很多的营养，虽然现在看来有很多设计不完善的地方，代码质量也有待提高，但做完这些系统后，还是大大提升我的自信心。
 
@@ -418,13 +399,12 @@ Kafka设计初衷就是为了应对大量日志传输场景，应用通过可靠
 日志同步主要有三个关键部分：日志采集客户端，Kafka消息队列以及后端的日志处理应用。
 
 1. 日志采集客户端，负责用户各类应用服务的日志数据采集，以消息方式将日志“批量”“异步”发送Kafka客户端。Kafka客户端批量提交和压缩消息，对应用服务的性能影响非常小。
-    
-2. Kafka将日志存储在消息文件中，提供持久化。
-    
-3. 日志处理应用，如Logstash，订阅并消费Kafka中的日志消息，最终供文件搜索服务检索日志，或者由Kafka将消息传递给Hadoop等其他大数据应用系统化存储与分析。
-    
 
-日志同步示意图：![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. Kafka将日志存储在消息文件中，提供持久化。
+
+1. 日志处理应用，如Logstash，订阅并消费Kafka中的日志消息，最终供文件搜索服务检索日志，或者由Kafka将消息传递给Hadoop等其他大数据应用系统化存储与分析。
+
+日志同步示意图：!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ▍**流计算处理**
 
@@ -436,7 +416,7 @@ Kafka设计初衷就是为了应对大量日志传输场景，应用通过可靠
 
 下图是美团 MySQL 数据实时同步到 Hive 的架构图，也是一个非常经典的案例。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 4.3 如何技术选型
 
@@ -455,18 +435,16 @@ Kafka设计初衷就是为了应对大量日志传输场景，应用通过可靠
 **▍ 技术储备**
 
 - 技术团队有无使用这门技术的经验，是否踩过生产环境的坑，以及针对这些坑有没有完备的解决方案；
-    
+
 - 架构团队是否有成熟的SDK，工具链，甚至是技术产品。
-    
 
 **▍ 成本**
 
 - 研发，测试，运维投入人力成本；
-    
+
 - 服务器资源成本；
-    
+
 - 招聘成本等。
-    
 
 最后一点是**人**的因素，特别是管理者的因素。每一次大的技术选型考验技术管理者的视野，格局，以及管理智慧。
 
@@ -478,7 +456,7 @@ Kafka设计初衷就是为了应对大量日志传输场景，应用通过可靠
 
 我始终相信：每天学习一点点，比昨天进步一点点就好。
 
----
+______________________________________________________________________
 
 如果我的文章对你有所帮助，还请帮忙**点赞、在看、转发**一下，你的支持会激励我输出更高质量的文章，非常感谢！
 
@@ -492,15 +470,11 @@ Kafka设计初衷就是为了应对大量日志传输场景，应用通过可靠
 
 扫描下方二维码即可订阅。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 原价199，今天只需19，可以永久买断，即将要涨价了。
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Reads 2809
 

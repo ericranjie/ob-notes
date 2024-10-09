@@ -2,7 +2,7 @@
 
 空无 石杉的架构笔记
 
- _2021年09月30日 09:02_
+_2021年09月30日 09:02_
 
 点击上方蓝色“石杉的架构笔记”，选择“设为星标”
 
@@ -12,19 +12,15 @@
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/1J6IbIcPCLaIb5EnzufAlYpg5JPibXbS6JagB6MqaPER5rsZ4icwS58Ez8B1jWC31MXKlEg6VVD7SMQRtejlib0iaw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
-  
-
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/c6gqmhWiafyraCOeb13lWRHKRDxOnqibg5ZxwV0hs3wIJa5qwByVh9J5FfvPdTKQJASYsBiahgiaZcKJribYsKOib1rg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 长按扫描上方一元购买
 
-  
-
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/1J6IbIcPCLanG2nzjVZov1VibmPXR7lDibFjRdTvH1iaDz9ic4H3xRZCz7BM563rFFfvRukzX7uhOqXc8yDhEZqicFQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
-来源：https://juejin.cn/post/6945753017878577165  
+来源：https://juejin.cn/post/6945753017878577165
 
-Logback 算是JAVA 里一个老牌的日志框架，从06年开始第一个版本，迭代至今也十几年了。不过logback最近一个稳定版本还停留在 2017 年，好几年都没有更新；logback的兄弟 slf4j 最近一个稳定版也是2017年，有点凉凉的意思。  
+Logback 算是JAVA 里一个老牌的日志框架，从06年开始第一个版本，迭代至今也十几年了。不过logback最近一个稳定版本还停留在 2017 年，好几年都没有更新；logback的兄弟 slf4j 最近一个稳定版也是2017年，有点凉凉的意思。
 
 而且 logback的异步性能实在拉跨，功能简陋，配置又繁琐，远不及Apache 的新一代日志框架 - Log4j
 
@@ -35,18 +31,16 @@ Logback 算是JAVA 里一个老牌的日志框架，从06年开始第一个版�
 Apache Log4j 2是 Log4j(1) 的升级版，比它的祖先 Log4j 1. x 有了很大的改进，和logback对比有很大的改进。除了内部设计的调整外，主要有以下几点的大升级：
 
 - 更简化的配置
-    
+
 - 更强大的参数格式化
-    
+
 - 最夸张的异步性能
-    
 
 Log4j 2中，分为 **API(log4j-api）和实现(log4j-core)** 两个模块。API 和slf4j 是一个类型，属于日志抽象/门面，而实现部分，才是Log4j 2的核心。
 
 - org.apache.logging.log4j » log4j-api
-    
+
 - org.apache.logging.log4j » log4j-core
-    
 
 ## 最牛逼的性能
 
@@ -56,7 +50,7 @@ Log4j 2中，分为 **API(log4j-api）和实现(log4j-core)** 两个模块。A
 
 先来看一下，几种日志框架benchmark对比结果（log4j2官方测试结果）：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从图上可以看出，log4j2的异步（全异步，非混合模式）下的性能，远超log4j1和logback，简直吊打。压力越大的情况下，吞吐上的差距就越大。在64线程测试下，log4j2的吞吐达到了180w+/s，而logback/log4j1只有不到20w，相差近十倍
 
@@ -138,16 +132,15 @@ log4j2.xml
 
 log4j2 由于拆分为 API 和 实现两部分，所以可能也需要和其他日志框架进行适配
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 其他的特点
 
 - 异步队列使用高性能队列 - LMAX Disruptor
-    
+
 - Appender丰富，有JMS/JPA/KAFKA/Http/MONGODB/CouchDB/Socket/Script等各种Appender的支持
-    
+
 - 支持自定义日志级别 ……
-    
 
 ## 基本用法
 
@@ -183,17 +176,13 @@ log4j-api在log4j-core中已经有依赖了，直接依赖core即可
 
 推荐配置log4j2 全异步（all async），在你的启动脚本中增加一个系统变量的配置：
 
-`-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector`  
+`-Dlog4j2.contextSelector=org.apache.logging.log4j.core.async.AsyncLoggerContextSelector`
 
 ## 总结
 
 Log4j2 如今性能最强，功能最强，而且持续更新维护。还在等什么？是时候替换你的logback/log4j1了！
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 6987
 

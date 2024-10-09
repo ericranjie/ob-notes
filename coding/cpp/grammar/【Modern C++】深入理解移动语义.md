@@ -2,7 +2,7 @@
 
 Original 雨乐 高性能架构探索
 
- _2022年03月21日 12:08_
+_2022年03月21日 12:08_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhKgtwWvzaYZodgfpphdA6WWKEMXTn6ImCCCuEzlPKicNBcpzBUyjK1XicWwqIwusqLGpwyyOc87JPQ/300?wx_fmt=png&wxfrom=19)
 
@@ -14,7 +14,7 @@ Original 雨乐 高性能架构探索
 
 公众号
 
-你好，我是雨乐！  
+你好，我是雨乐！
 
 一直以来，C++中基于值语义的拷贝和赋值严重影响了程序性能。尤其是对于资源密集型对象，如果进行大量的拷贝，势必会对程序性能造成很大的影响。为了尽可能的减小因为对象拷贝对程序的影响，开发人员使出了万般招式：尽可能的使用**指针、引用**。而编译器也没闲着，通过使用**RVO、NRVO以及复制省略**技术，来减小拷贝次数来提升代码的运行效率。
 
@@ -28,7 +28,7 @@ C++11新标准重新定义了lvalue和rvalue，并允许函数依照这两种不
 
 ## 值语义
 
-值语义(value semantics)指目标对象由源对象拷贝生成，且生成后与源对象完全无关，彼此独立存在，改变互不影响，就像int类型互相拷贝一样。C++的内置类型(bool/int/double/char)都是值语义，标准库里的complex<> 、pair<>、vector<>、map<>、string等等类型也都是值语意，拷贝之后就与原对象脱离关系。
+值语义(value semantics)指目标对象由源对象拷贝生成，且生成后与源对象完全无关，彼此独立存在，改变互不影响，就像int类型互相拷贝一样。C++的内置类型(bool/int/double/char)都是值语义，标准库里的complex\<> 、pair\<>、vector\<>、map\<>、string等等类型也都是值语意，拷贝之后就与原对象脱离关系。
 
 C++中基于值语义的拷贝构造和赋值拷贝，会招致对资源密集型对象不必要拷贝，大量的拷贝很可能成为程序的性能瓶颈。
 
@@ -48,16 +48,15 @@ C++中基于值语义的拷贝构造和赋值拷贝，会招致对资源密集�
 
 左值(lvalue,left value)，顾名思义就是赋值符号左边的值。准确来说，左值是表达式结束（不一定是赋值表达式）后依然存在的对象。
 
-可以将左值看作是一个关联了名称的内存位置，允许程序的其他部分来访问它。在这里，我们将 "名称" 解释为任何可用于访问内存位置的表达式。所以，如果 arr 是一个数组，那么 arr[1] 和 *(arr+1) 都将被视为相同内存位置的“名称”。
+可以将左值看作是一个关联了名称的内存位置，允许程序的其他部分来访问它。在这里，我们将 "名称" 解释为任何可用于访问内存位置的表达式。所以，如果 arr 是一个数组，那么 arr\[1\] 和 \*(arr+1) 都将被视为相同内存位置的“名称”。
 
 左值具有以下特征：
 
 - 可通过取地址运算符获取其地址
-    
+
 - 可修改的左值可用作内建赋值和内建符合赋值运算符的左操作数
-    
+
 - 可以用来初始化左值引用(后面有讲)
-    
 
 C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98标准中右值的概念，如非引用返回的函数返回的临时变量值；一些运算表达式，如1+2产生的临时变量；不跟对象关联的字面量值，如2，'c'，true，"hello"；这些值都不能够被取地址。而将亡值则是C++11新增的和右值引用相关的表达式，这样的表达式通常是将要移动的对象、T&&函数返回值、std::move()函数的返回值等。
 
@@ -88,15 +87,14 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 左值引用和右值引用的规则如下:
 
 - 左值引用，使用T&，只能绑定左值
-    
+
 - 右值引用，使用T&&，只能绑定右值
-    
+
 - 常量左值，使用const T&,既可以绑定左值，又可以绑定右值，但是不能对其进行修改
-    
+
 - 具名右值引用，编译器会认为是个左值
-    
+
 - 编译器的优化需要满足特定条件，不能过度依赖
-    
 
 好了，截止到目前，相信你对左值引用和右值引用的概念有了初步的认识，那么，现在我们介绍下为什么要有右值引用呢?我们看下述代码：
 
@@ -127,11 +125,10 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 移动语义通过**移动构造函数**和**移动赋值操作符**实现，其与拷贝构造函数类似，区别如下：
 
 - 参数的符号必须为右值引用符号，即为&&
-    
+
 - 参数不可以是常量，因为函数内需要修改参数的值
-    
+
 - 参数的成员转移后需要修改（如改为nullptr），避免临时对象的析构函数将资源释放掉
-    
 
 为了方便我们理解，下面代码包含了完整的移动构造和移动运算符，如下：
 
@@ -158,13 +155,12 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 移动赋值运算符的操作步骤如下：
 
 1. 释放当前拥有的资源
-    
-2. 窃取他人资源
-    
-3. 将他人资源设置为默认状态
-    
-4. 返回***this**
-    
+
+1. 窃取他人资源
+
+1. 将他人资源设置为默认状态
+
+1. 返回\***this**
 
 在定义移动赋值运算符的时候，需要进行判断，即被移动的对象是否跟目标对象一致，如果一致，则会出问题，如下代码：
 
@@ -181,20 +177,18 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 自C++11起，引入了另外两只特殊的成员函数：移动构造函数和移动赋值运算符。如果开发人员没有显示定义移动构造函数和移动赋值运算符，那么编译器也会生成默认。与其他四个特殊成员函数不同，编译器生成默认的移动构造函数和移动赋值运算符需要，满足以下条件：
 
 - 如果一个类定义了自己的**拷贝构造函数**,**拷贝赋值运算符**或者**析构函数**(这三者之一，表示程序员要自己处理对象的复制或释放问题)，编译器就不会为它生成默认的移动构造函数或者移动赋值运算符，这样做的目的是防止编译器生成的默认移动构造函数或者移动赋值运算符不是开发人员想要的
-    
+
 - 如果类中没有提供移动构造函数和移动赋值运算符，且编译器不会生成默认的，那么我们在代码中通过std::move()调用的移动构造或者移动赋值的行为将被转换为调用拷贝构造或者赋值运算符
-    
+
 - 只有一个类没有显示定义拷贝构造函数、赋值运算符以及析构函数，且类的每个非静态成员都可以移动时，编译器才会生成默认的移动构造函数或者移动赋值运算符
-    
+
 - 如果显式声明了移动构造函数或移动赋值运算符，则拷贝构造函数和拷贝赋值运算符将被 **隐式删除**（因此程开发人员必须在需要时实现拷贝构造函数和拷贝赋值运算符）
-    
 
 与拷贝操作一样，如果开发人员定义了移动操作，那么编译器就不会生成默认的移动操作，但是编译器生成移动操作的行为和生成拷贝操作的行为有些许不同，如下：
 
 - 两个拷贝操作是独立的：声明一个不会限制编译器生成另一个。所以如果你声明一个拷贝构造函数，但是没有声明拷贝赋值运算符，如果写的代码用到了拷贝赋值，编译器会帮助你生成拷贝赋值运算符。同样的，如果你声明拷贝赋值运算符但是没有拷贝构造函数，代码用到拷贝构造函数时编译器就会生成它。上述规则在C++98和C++11中都成立。
-    
+
 - 两个移动操作不是相互独立的。如果你声明了其中一个，编译器就不再生成另一个。如果你给类声明了，比如，一个移动构造函数，就表明对于移动操作应怎样实现，与编译器应生成的默认逐成员移动有些区别。如果逐成员移动构造有些问题，那么逐成员移动赋值同样也可能有问题。所以声明移动构造函数阻止编译器生成移动赋值运算符，声明移动赋值运算符同样阻止编译器生成移动构造函数。
-    
 
 ## 类型转换-move()函数
 
@@ -203,34 +197,32 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 首先，我们看下cppreference中对move语义的定义：
 
 > std::move is used to indicate that an object t may be "moved from", i.e. allowing the efficient transfer of resources from t to another object.
-> 
+>
 > In particular, std::move produces an xvalue expression that identifies its argument t. It is exactly equivalent to a static_cast to an rvalue reference type.
 
 从上述描述，我们可以理解为`std::move()`并没有`移动`任何东西，它只是进行类型转换而已，`真正进行资源转移的是开发人员实现的移动操作`。
 
 该函数在STL中定义如下：
 
- `template<typename _Tp>       constexpr typename std::remove_reference<_Tp>::type&&       move(_Tp&& __t) noexcept    { return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); }`
+`template<typename _Tp>       constexpr typename std::remove_reference<_Tp>::type&&       move(_Tp&& __t) noexcept    { return static_cast<typename std::remove_reference<_Tp>::type&&>(__t); }`
 
 从上面定义可以看出，std::move()并不是什么黑魔法，而只是进行了简单的类型转换：
 
 - 如果传递的是左值，则推导为左值引用，然后由static_cast转换为右值引用
-    
+
 - 如果传递的是右值，则推导为右值引用，然后static_cast转换为右值引用
-    
 
 使用move之后，就意味着两点：
 
 - **原对象不再被使用**，如果对其使用会造成不可预知的后果
-    
+
 - 所有权转移，资源的所有权被转移给新的对象
-    
 
 ## 使用
 
 在某些情况下，编译器会尝试隐式移动，这意味着您不必使用`std::move()`。只有当一个非常量的可移动对象被传递、返回或赋值，并且即将被自动销毁时，才会发生这种情况。
 
-自c++11起，开始支持右值引用。标准库中很多容器都支持移动语义，以std::vector<>为例，**vector::push_back()**定义了两个重载版本，一个像以前一样将const T&用于左值参数，另一个将T&&类型的参数用于右值参数。如下代码：
+自c++11起，开始支持右值引用。标准库中很多容器都支持移动语义，以std::vector\<>为例，\*\*vector::push_back()\*\*定义了两个重载版本，一个像以前一样将const T&用于左值参数，另一个将T&&类型的参数用于右值参数。如下代码：
 
 `int main() {     std::vector<BigObj> v;     v.push_back(BigObj(10));     v.push_back(BigObj(20));          return 0;   }   `
 
@@ -250,7 +242,7 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 
 如果T是简单类型，则上述转换没有问题。但如果T是含有指针的复合数据类型，则上述转换中会调用一次复制构造函数，两次赋值运算符重载。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 而如果使用move()函数后，则代码如下：
 
@@ -258,7 +250,7 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 
 与传统的swap实现相比，使用move()函数的swap()版本减少了拷贝等操作。如果T是可移动的，那么整个操作将非常高效。如果它是不可移动的，那么它和普通的swap函数一样，调用拷贝和赋值操作，不会出错，且是安全可靠的。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 经验之谈
 
@@ -278,7 +270,7 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 
 `class BigObj {   public:       explicit BigObj(size_t length)           : length_(length), data_(new int[length]) {       }          // Destructor.       ~BigObj() {        if (data_ != NULL) {          delete[] data_;           length_ = 0;        }       }          // 拷贝构造函数       BigObj(const BigObj& other) = default;          // 赋值运算符       BigObj& operator=(const BigObj& other) = default;          // 移动构造函数       BigObj(BigObj&& other) : data_(nullptr), length_(0) {           data_ = other.data_;           length_ = other.length_;       }      private:       size_t length_;       int* data_;   };      int main() {      BigObj obj(1000);      BigObj o;      {       o = std::move(obj);      }            // use obj;      return 0;   }   `
 
-在上述代码中，调用移动构造函数后，没有将原对象回复默认值，导致目标对象和原对象的底层资源(data_)执行同一个内存块，这样就导致退出main()函数的时候，原对象和目标对象均调用析构函数释放同一个内存块，进而导致程序崩溃。
+在上述代码中，调用移动构造函数后，没有将原对象回复默认值，导致目标对象和原对象的底层资源(data\_)执行同一个内存块，这样就导致退出main()函数的时候，原对象和目标对象均调用析构函数释放同一个内存块，进而导致程序崩溃。
 
 ### 不要在函数中使用std::move()进行返回
 
@@ -300,7 +292,7 @@ C++11将右值分为**纯右值**和**将亡值**两种。纯右值就是C++98�
 
 ### 知己知彼
 
-STL中大部分已经实现移动语义，比如std::vector<>，std::map<>等，同时std::unique_ptr<>等不能被拷贝的类也支持移动语义。
+STL中大部分已经实现移动语义，比如std::vector\<>，std::map\<>等，同时std::unique_ptr\<>等不能被拷贝的类也支持移动语义。
 
 我们看下如下代码：
 
@@ -310,7 +302,7 @@ STL中大部分已经实现移动语义，比如std::vector<>，std::map<>等，
 
 `BigObj::BigObj()   BigObj::BigObj()   BigObj::BigObj(BigObj&&)   BigObj::BigObj(BigObj&&)   BigObj::~BigObj()   BigObj::~BigObj()   BigObj::~BigObj()   BigObj::~BigObj()   `
 
-而如果把main()函数中的std::array<>换成std::vector<>后，如下：
+而如果把main()函数中的std::array\<>换成std::vector\<>后，如下：
 
 `int main() {     std::vector<BigObj> v;     v.resize(2);     auto v1 = std::move(v);        return 0;   }   `
 
@@ -318,7 +310,7 @@ STL中大部分已经实现移动语义，比如std::vector<>，std::map<>等，
 
 `BigObj::BigObj()   BigObj::BigObj()   BigObj::~BigObj()   BigObj::~BigObj()   `
 
-从上述两处输出可以看出，std::vector<>对应的移动构造不会生成多余的构造，且原本的element都移动到v1中；而相比std::array<>中对应的移动构造却有很大的区别，基本上会对每个element都调用移动构造函数而不是对std::array<>本身。
+从上述两处输出可以看出，std::vector\<>对应的移动构造不会生成多余的构造，且原本的element都移动到v1中；而相比std::array\<>中对应的移动构造却有很大的区别，基本上会对每个element都调用移动构造函数而不是对std::array\<>本身。
 
 因此，在使用std::move()的时候，最好要知道底层的基本实现原理，否则往往会得到我们意想不到的结果。
 
@@ -332,33 +324,23 @@ STL中大部分已经实现移动语义，比如std::vector<>，std::map<>等，
 
 如果对本文有疑问可以加笔者**微信**直接交流，笔者也建了C/C++相关的技术群，有兴趣的可以联系笔者加群。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **往期****精彩****回顾**
 
-  
+[【Modern C++】深入理解左值、右值](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247487751&idx=1&sn=3da21227cb1a4c80e36f91dc823529af&chksm=c33777c0f440fed6f9ebaa7f206f1e423f68c09a809a4d30033f34bd123ccf45d9e42655e199&scene=21#wechat_redirect)
 
-  
+[智能指针-使用、避坑和实现](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247487474&idx=1&sn=e29d0178bfd4139313c44139e1cb3899&chksm=c3376935f440e023b96e9f8feeb34e4e22fbb74f00ca345a2b867edfd4c088bc595821fe878e&scene=21#wechat_redirect)
 
-  
+[内存泄漏-原因、避免以及定位](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247487009&idx=1&sn=a812d27b9d65369ce2f38375b4a4ee96&chksm=c33768e6f440e1f015252fecf354f9f3712f59fc04b47b03401486c86fe51875428503ee9819&scene=21#wechat_redirect)
 
-  
-
-[【Modern C++】深入理解左值、右值](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247487751&idx=1&sn=3da21227cb1a4c80e36f91dc823529af&chksm=c33777c0f440fed6f9ebaa7f206f1e423f68c09a809a4d30033f34bd123ccf45d9e42655e199&scene=21#wechat_redirect)  
-
-[智能指针-使用、避坑和实现](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247487474&idx=1&sn=e29d0178bfd4139313c44139e1cb3899&chksm=c3376935f440e023b96e9f8feeb34e4e22fbb74f00ca345a2b867edfd4c088bc595821fe878e&scene=21#wechat_redirect)  
-
-[内存泄漏-原因、避免以及定位](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247487009&idx=1&sn=a812d27b9d65369ce2f38375b4a4ee96&chksm=c33768e6f440e1f015252fecf354f9f3712f59fc04b47b03401486c86fe51875428503ee9819&scene=21#wechat_redirect)  
-
-[GDB调试-从入门实践到原理](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486816&idx=1&sn=a6dfc1361ce15ce5ad1c7d7734f9c939&chksm=c3376ba7f440e2b18267c303c35572ab089fb97d3b2fe0adb58009637d6631020bb52bd9a28c&scene=21#wechat_redirect)  
+[GDB调试-从入门实践到原理](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486816&idx=1&sn=a6dfc1361ce15ce5ad1c7d7734f9c939&chksm=c3376ba7f440e2b18267c303c35572ab089fb97d3b2fe0adb58009637d6631020bb52bd9a28c&scene=21#wechat_redirect)
 
 [【线上问题】P1级公司故障，年终奖不保](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486357&idx=1&sn=3e7b88218f4416980b20add7575baa9a&chksm=c3376d52f440e444d28a01ef930ddfb92b5d30f26e7284012f08624ca1599e7efac1da3fb17c&scene=21#wechat_redirect)
 
 [【性能优化】高效内存池的设计与实现](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247486254&idx=1&sn=ebce58aa6b547af2a818faa5a6412e89&chksm=c3376de9f440e4ffea267926b7ce09ac439ab33a1da9dc6b4d631c971053f628cf91202d0f53&scene=21#wechat_redirect)
 
 [2万字|30张图带你领略glibc内存管理精髓](http://mp.weixin.qq.com/s?__biz=Mzk0MzI4OTI1Ng==&mid=2247485953&idx=1&sn=f8cd484607ab07f15247ecde773d2e1c&chksm=c3376cc6f440e5d047f7e648c951fd583df82ab4e3dab5767baeddef9fe7c1270f05b039d8c4&scene=21#wechat_redirect)
-
-  
 
 **点个关注吧!**
 
@@ -391,79 +373,78 @@ Comment
 **留言 9**
 
 - 雨乐
-    
-    2022年3月21日
-    
-    Like1
-    
-    尴尬了，移动赋值运算符一节中 代码错误，误拷贝成 赋值运算符了，抱歉
-    
-    Pinned
-    
+
+  2022年3月21日
+
+  Like1
+
+  尴尬了，移动赋值运算符一节中 代码错误，误拷贝成 赋值运算符了，抱歉
+
+  Pinned
+
 - Fu
-    
-    2022年3月21日
-    
-    Like2
-    
-    怎么回事 怎么没有赞赏？文章还没看就直拉到底部 金额都想好了发现居然没赞赏通道![[发呆]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    高性能架构探索
-    
-    Author2022年3月21日
-    
-    Like2
-    
-    哈哈哈，能收到认可，就是最大的赞赏![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年3月21日
+
+  Like2
+
+  怎么回事 怎么没有赞赏？文章还没看就直拉到底部 金额都想好了发现居然没赞赏通道![[发呆]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  高性能架构探索
+
+  Author2022年3月21日
+
+  Like2
+
+  哈哈哈，能收到认可，就是最大的赞赏![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 雪鱼
-    
-    2022年4月10日
-    
-    Like
-    
-    最后一个关于array 和 vector 的还不是很明白
-    
-    高性能架构探索
-    
-    Author2022年4月10日
-    
-    Like1
-    
-    这块可以理解为对vector的move 是整个vector（可以理解为整个内存块），而对arraymove 就是对里面的元素挨个move
-    
+
+  2022年4月10日
+
+  Like
+
+  最后一个关于array 和 vector 的还不是很明白
+
+  高性能架构探索
+
+  Author2022年4月10日
+
+  Like1
+
+  这块可以理解为对vector的move 是整个vector（可以理解为整个内存块），而对arraymove 就是对里面的元素挨个move
+
 - 洋洋
-    
-    2022年4月16日
-    
-    Like
-    
-    文中经验之谈的第二条:"move构造或者赋值函数中，请将原对象恢复默认值"中代码运行调用的是移动赋值运算函数，应该不是移动构造函数吧
-    
-    高性能架构探索
-    
-    Author2022年4月16日
-    
-    Like
-    
-    嗯，留言里面已经澄清了，代码重复了
-    
+
+  2022年4月16日
+
+  Like
+
+  文中经验之谈的第二条:"move构造或者赋值函数中，请将原对象恢复默认值"中代码运行调用的是移动赋值运算函数，应该不是移动构造函数吧
+
+  高性能架构探索
+
+  Author2022年4月16日
+
+  Like
+
+  嗯，留言里面已经澄清了，代码重复了
+
 - 路在脚下
-    
-    2022年3月21日
-    
-    Like
-    
-    semantics![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    高性能架构探索
-    
-    Author2022年3月21日
-    
-    Like
-    
-    这就尴尬了![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年3月21日
+
+  Like
+
+  semantics![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  高性能架构探索
+
+  Author2022年3月21日
+
+  Like
+
+  这就尴尬了![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
 
 已无更多数据
 
@@ -482,78 +463,77 @@ Comment
 **留言 9**
 
 - 雨乐
-    
-    2022年3月21日
-    
-    Like1
-    
-    尴尬了，移动赋值运算符一节中 代码错误，误拷贝成 赋值运算符了，抱歉
-    
-    Pinned
-    
+
+  2022年3月21日
+
+  Like1
+
+  尴尬了，移动赋值运算符一节中 代码错误，误拷贝成 赋值运算符了，抱歉
+
+  Pinned
+
 - Fu
-    
-    2022年3月21日
-    
-    Like2
-    
-    怎么回事 怎么没有赞赏？文章还没看就直拉到底部 金额都想好了发现居然没赞赏通道![[发呆]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    高性能架构探索
-    
-    Author2022年3月21日
-    
-    Like2
-    
-    哈哈哈，能收到认可，就是最大的赞赏![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年3月21日
+
+  Like2
+
+  怎么回事 怎么没有赞赏？文章还没看就直拉到底部 金额都想好了发现居然没赞赏通道![[发呆]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  高性能架构探索
+
+  Author2022年3月21日
+
+  Like2
+
+  哈哈哈，能收到认可，就是最大的赞赏![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 雪鱼
-    
-    2022年4月10日
-    
-    Like
-    
-    最后一个关于array 和 vector 的还不是很明白
-    
-    高性能架构探索
-    
-    Author2022年4月10日
-    
-    Like1
-    
-    这块可以理解为对vector的move 是整个vector（可以理解为整个内存块），而对arraymove 就是对里面的元素挨个move
-    
+
+  2022年4月10日
+
+  Like
+
+  最后一个关于array 和 vector 的还不是很明白
+
+  高性能架构探索
+
+  Author2022年4月10日
+
+  Like1
+
+  这块可以理解为对vector的move 是整个vector（可以理解为整个内存块），而对arraymove 就是对里面的元素挨个move
+
 - 洋洋
-    
-    2022年4月16日
-    
-    Like
-    
-    文中经验之谈的第二条:"move构造或者赋值函数中，请将原对象恢复默认值"中代码运行调用的是移动赋值运算函数，应该不是移动构造函数吧
-    
-    高性能架构探索
-    
-    Author2022年4月16日
-    
-    Like
-    
-    嗯，留言里面已经澄清了，代码重复了
-    
+
+  2022年4月16日
+
+  Like
+
+  文中经验之谈的第二条:"move构造或者赋值函数中，请将原对象恢复默认值"中代码运行调用的是移动赋值运算函数，应该不是移动构造函数吧
+
+  高性能架构探索
+
+  Author2022年4月16日
+
+  Like
+
+  嗯，留言里面已经澄清了，代码重复了
+
 - 路在脚下
-    
-    2022年3月21日
-    
-    Like
-    
-    semantics![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    高性能架构探索
-    
-    Author2022年3月21日
-    
-    Like
-    
-    这就尴尬了![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年3月21日
+
+  Like
+
+  semantics![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  高性能架构探索
+
+  Author2022年3月21日
+
+  Like
+
+  这就尴尬了![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[微笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
 
 已无更多数据

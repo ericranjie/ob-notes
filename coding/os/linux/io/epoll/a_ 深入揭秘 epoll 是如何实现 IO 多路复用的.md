@@ -1,11 +1,10 @@
 # 
+
 张彦飞allen 腾讯技术工程
 
- _2022年03月25日 18:00_
+_2022年03月25日 18:00_
 
 ![](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-  
 
 作者：yanfeizhang，腾讯 PCG 后开开发工程师
 
@@ -24,11 +23,10 @@
 其中和 epoll 相关的函数是如下三个：
 
 - epoll_create：创建一个 epoll 对象
-    
+
 - epoll_ctl：向 epoll 对象中添加要管理的连接
-    
+
 - epoll_wait：等待其管理的连接上的 IO 事件
-    
 
 借助这个 demo，我们来展开对 epoll 原理的深度拆解。相信等你理解了这篇文章以后，你对 epoll 的驾驭能力将变得炉火纯青！！
 
@@ -38,11 +36,11 @@
 
 我们直接从服务器端的 accept 讲起。当 accept 之后，进程会创建一个新的 socket 出来，专门用于和对应的客户端通信，然后把它放到当前进程的打开文件列表中。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsFdRcRAg6n2bib68a2sr9JUlxexbibclVfEYvj7393JK4diaJcVmkEEpwg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中一条连接的 socket 内核对象更为具体一点的结构图如下。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsr3H3gJgmtZJotxlWrooyrfEib8X6NvCyRVicfr4kibgCKIHxzf8Ktq6Mw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 接下来我们来看一下接收连接时 socket 内核对象的创建源码。accept 的系统调用代码位于源文件 net/socket.c 下。
 
@@ -52,7 +50,7 @@
 
 在上述的源码中，首先是调用 sock_alloc 申请一个 struct socket 对象出来。然后接着把 listen 状态的 socket 对象上的协议操作函数集合 ops 赋值给新的 socket。（对于所有的 AF_INET 协议族下的 socket 来说，它们的 ops 方法都是一样的，所以这里可以直接复制过来）
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsbjZreGlqj8sibSufEqLVuItTk8oOGSz6XRlvuLJDZr21YkiceUyHIbyw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 其中 inet_stream_ops 的定义如下
 
@@ -62,7 +60,7 @@
 
 struct socket 对象中有一个重要的成员 -- file 内核对象指针。这个指针初始化的时候是空的。在 accept 方法里会调用 sock_alloc_file 来申请内存并初始化。然后将新 file 对象设置到 sock->file 上。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsPZvnTHicv9m6zibkT5vVx2ib76tNv5OIpq5ta39Jr6gqA4kDgebpLKy6g/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 来看 sock_alloc_file 的实现过程：
 
@@ -108,13 +106,13 @@ socket_file_ops 的具体定义如下：
 
 在用户进程调用 epoll_create 时，内核会创建一个 struct eventpoll 的内核对象。并同样把它关联到当前进程的已打开文件列表中。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsp4RL6icgUEfOXWTAUIT4bSY0bib0faI0r3hkC2zg3zpaJ5dcLklrGoFw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2_files
 
 对于 struct eventpoll 对象，更详细的结构如下（同样只列出和今天主题相关的成员）。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsJLspzNlUC9jTCDUhv65QT5zWfstLRpQRbh9xagZxEzmFeTbgGo5IMw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 2_eventepoll
 
@@ -129,11 +127,10 @@ struct eventpoll 的定义也在这个源文件中。
 eventpoll 这个结构体中的几个成员的含义如下：
 
 - **wq：** 等待队列链表。软中断数据就绪的时候会通过 wq 来找到阻塞在 epoll 对象上的用户进程。
-    
+
 - **rbr：** 一棵红黑树。为了支持对海量连接的高效查找、插入和删除，eventpoll 内部使用了一棵红黑树。通过这棵树来管理用户进程下添加进来的所有 socket 连接。
-    
+
 - **rdllist：** 就绪的描述符的链表。当有的连接就绪的时候，内核会把就绪的连接放到 rdllist 链表里。这样应用进程只需要判断链表就能找出就绪进程，而不用去遍历整棵树。
-    
 
 当然这个结构被申请完之后，需要做一点点的初始化工作，这都在 ep_alloc 中完成。
 
@@ -150,15 +147,14 @@ eventpoll 这个结构体中的几个成员的含义如下：
 假设我们现在和客户端们的多个连接的 socket 都创建好了，也创建好了 epoll 内核对象。在使用 epoll_ctl 注册每一个 socket 的时候，内核会做如下三件事情
 
 - 1.分配一个红黑树节点对象 epitem，
-    
+
 - 2.添加等待事件到 socket 的等待队列中，其回调函数是 ep_poll_callback
-    
+
 - 3.将 epitem 插入到 epoll 对象的红黑树里
-    
 
 通过 epoll_ctl 添加两个 socket 以后，这些内核数据结构最终在进程中的关系图大致如下：
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsnUXfFSJicPBVA9F3MEGhZvoGTgA9mCYicqFh5eHZCVT00J1YN265QtPA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们来详细看看 socket 是如何添加到 epoll 对象里的，找到 epoll_ctl 的源码。
 
@@ -176,7 +172,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 
 对 epitem 进行了一些初始化，首先在 `epi->ep = ep` 这行代码中将其 ep 指针指向 eventpoll 对象。另外用要添加的 socket 的 file、fd 来填充 epitem->ffd。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYs291KpKJW0iaXXHiaPaTe6cuEr7RgAJkLQ8ZuTk9z7xYwZBlZcbZKLbKg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3_epitem
 
@@ -188,7 +184,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 
 在创建 epitem 并初始化之后，ep_insert 中第二件事情就是设置 socket 对象上的等待任务队列。并把函数 fs/eventpoll.c 文件下的 ep_poll_callback 设置为数据就绪时候的回调函数。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsVbzaGY6ibpl1PdibGyJE0Ibqgxbqb1iacicdUdbERx5AVZVQUkBJ8E3Wbg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3_wq
 
@@ -234,7 +230,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 
 分配完 epitem 对象后，紧接着并把它插入到红黑树中。一个插入了一些 socket 描述符的 epoll 里的红黑树的示意图如下：
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYs4skMviaLYyM4pZbia7KAic0tHcgI3e6ncvVRwkrqZC9QImnq3Z2OdR2Dg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 3_rbtree
 
@@ -244,7 +240,7 @@ eventpoll 这个结构体中的几个成员的含义如下：
 
 epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllist 链表里有没有数据即可。有数据就返回，没有数据就创建一个等待队列项，将其添加到 eventpoll 的等待队列上，然后把自己阻塞掉就完事。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsfIa3ib9BfYEicLneQXSYeAHRJic5llxZicp0hZdaP3aPXEcCawML9x8s0A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 4_epollwait
 
@@ -290,14 +286,13 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 
 在前面 epoll_ctl 执行的时候，内核为每一个 socket 上都添加了一个等待队列项。在 epoll_wait 运行完的时候，又在 event poll 对象上添加了等待队列元素。在讨论数据开始接收之前，我们把这些队列项的内容再稍微总结一下。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsN5zMZy3gibibI1XsBsKNRrchiadiaJj4fssyiaVia4gyRZOYv6XRxYRAmmsg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - socket->sock->sk_data_ready 设置的就绪处理函数是 sock_def_readable
-    
+
 - 在 socket 的等待队列项中，其回调函数是 ep_poll_callback。另外其 private 没有用了，指向的是空指针 null。
-    
+
 - 在 eventpoll 的等待队列项中，回调函数是 default_wake_function。其 private 指向的是等待该事件的用户进程。
-    
 
 在这一小节里，我们将看到软中断是怎么样在数据处理完之后依次进入各个回调函数，最后通知到用户进程的。
 
@@ -317,7 +312,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 
 在 tcp_rcv_established 中通过调用 tcp_queue_rcv 函数中完成了将接收数据放到 socket 的接收队列上。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsEI3sVHK8Ef9vkibn8U41fN1NqUYpicqnyp6wVepYqiaKziajLJ9R2I1oHA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如下源码所示：
 
@@ -329,7 +324,7 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 
 当 socket 上数据就绪时候，内核将以 sock_def_readable 这个函数为入口，找到 epoll_ctl 添加 socket 时在其上设置的回调函数 ep_poll_callback。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYseAs3qcuIXJAd2nofZXJgV3cNLbTFURV8ygKMfmnpvXZU21ruOFXzxw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们来详细看下细节：
 
@@ -338,9 +333,8 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 这里的函数名其实都有迷惑人的地方。
 
 - wq_has_sleeper，对于简单的 recvfrom 系统调用来说，确实是判断是否有进程阻塞。但是对于 epoll 下的 socket 只是判断等待队列不为空，不一定有进程阻塞的。
-    
+
 - wake_up_interruptible_sync_poll，只是会进入到 socket 等待队列项上设置的回调函数，并不一定有唤醒进程的操作。
-    
 
 那接下来就是我们重点看 wake_up_interruptible_sync_poll 。
 
@@ -350,11 +344,11 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 
 `//file: kernel/sched/core.c   void __wake_up_sync_key(wait_queue_head_t *q, unsigned int mode,               int nr_exclusive, void *key)   {       ...       __wake_up_common(q, mode, nr_exclusive, wake_flags, key);   }   `
 
-接着进入 __wake_up_common
+接着进入 \_\_wake_up_common
 
 `static void __wake_up_common(wait_queue_head_t *q, unsigned int mode,               int nr_exclusive, int wake_flags, void *key)   {       wait_queue_t *curr, *next;          list_for_each_entry_safe(curr, next, &q->task_list, task_list) {           unsigned flags = curr->flags;              if (curr->func(curr, mode, wake_flags, key) &&                   (flags & WQ_FLAG_EXCLUSIVE) && !--nr_exclusive)               break;       }   }   `
 
-在 __wake_up_common 中，选出等待队列里注册某个元素 curr， 回调其 curr->func。回忆我们 ep_insert 调用的时候，把这个 func 设置成 ep_poll_callback 了。
+在 \_\_wake_up_common 中，选出等待队列里注册某个元素 curr， 回调其 curr->func。回忆我们 ep_insert 调用的时候，把这个 func 设置成 ep_poll_callback 了。
 
 #### 5.3 执行 socket 就绪回调函数
 
@@ -370,19 +364,19 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 
 如果没执行软中断的事情就做完了。如果有等待项，那就查找到等待项里设置的回调函数。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYsVz4OEKwBpMbSegdbrgIj81YPE50LOC5JfOzanuoFfhxJJNiaw1HdcbQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-调用 wake_up_locked() => __wake_up_locked() => __wake_up_common。
+调用 wake_up_locked() => \_\_wake_up_locked() => \_\_wake_up_common。
 
 `static void __wake_up_common(wait_queue_head_t *q, unsigned int mode,               int nr_exclusive, int wake_flags, void *key)   {       wait_queue_t *curr, *next;          list_for_each_entry_safe(curr, next, &q->task_list, task_list) {           unsigned flags = curr->flags;              if (curr->func(curr, mode, wake_flags, key) &&                   (flags & WQ_FLAG_EXCLUSIVE) && !--nr_exclusive)               break;       }   }   `
 
-在 __wake_up_common 里， 调用 curr->func。这里的 func 是在 epoll_wait 是传入的 default_wake_function 函数。
+在 \_\_wake_up_common 里， 调用 curr->func。这里的 func 是在 epoll_wait 是传入的 default_wake_function 函数。
 
 #### 5.4 执行 epoll 就绪通知
 
 在 default_wake_function 中找到等待队列项里的进程描述符，然后唤醒之。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYso21lzFPaWZ7A9yRc0jqh090K8CVcUN9g3sysWhRQW3SuZe0kwYAj8g/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 源代码如下：
 
@@ -402,19 +396,18 @@ epoll_wait 做的事情不复杂，当它被调用时它观察 eventpoll->rdllis
 
 我们来用一幅图总结一下 epoll 的整个工作路程。
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavxOaOL8PgTuqHG7gFSzfYs4KWxl9jibCyz7lu0kXBm27uzokTJwB0nxP2Rt45TqicstpOkTGAeG7iaQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-其中软中断回调的时候回调函数也整理一下：  
-sock_def_readable：sock 对象初始化时设置的  
-=> ep_poll_callback : epoll_ctl 时添加到 socket 上的  
+其中软中断回调的时候回调函数也整理一下：\
+sock_def_readable：sock 对象初始化时设置的\
+=> ep_poll_callback : epoll_ctl 时添加到 socket 上的\
 => default_wake_function: epoll_wait 是设置到 epoll 上的
 
 总结下，epoll 相关的函数里内核运行环境分两部分：
 
 - 用户进程内核态。进行调用 epoll_wait 等函数时会将进程陷入内核态来执行。这部分代码负责查看接收队列，以及负责把当前进程阻塞掉，让出 CPU。
-    
+
 - 硬软中断上下文。在这些组件中，将包从网卡接收过来进行处理，然后放到 socket 的接收队列。对于 epoll 来说，再找到 socket 关联的 epitem，并把它添加到 epoll 对象的就绪链表中。这个时候再捎带检查一下 epoll 上是否有被阻塞的进程，如果有唤醒之。
-    
 
 为了介绍到每个细节，本文涉及到的流程比较多，把阻塞都介绍进来了。
 
@@ -423,9 +416,8 @@ sock_def_readable：sock 对象初始化时设置的
 包括本文在内，飞哥总共用三篇文章分析了一件事情，一个网络包是如何从网卡达到你的用户进程里的。另外两篇如下：
 
 - [图解 | Linux 网络包接收过程](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247484058&idx=1&sn=a2621bc27c74b313528eefbc81ee8c0f&scene=21#wechat_redirect)
-    
+
 - [图解 | 深入理解高性能网络开发路上的绊脚石 - 同步阻塞网络 IO](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247484834&idx=1&sn=b8620f402b68ce878d32df2f2bcd4e2e&scene=21#wechat_redirect)
-    
 
 恭喜你没被内核源码劝退，一直能坚持到了现在。赶快给先自己鼓个掌，晚饭去加个鸡腿！
 
@@ -434,37 +426,32 @@ sock_def_readable：sock 对象初始化时设置的
 **参考**
 
 - [epoll 原理-csdn](https://blog.csdn.net/daaikuaichuan/article/details/83862311)
-    
+
 - [关于 AVL 树和红黑树的一点看法](https://zhuanlan.zhihu.com/p/93369069)
-    
+
 - [源码解读 epoll 内核机制](http://gityuan.com/2019/01/06/linux-epoll/)
-    
+
 - [一个基于 epoll 的 demo 程序](https://blog.51cto.com/7666425/1261446)
-    
+
 - [tcp/ip 协议栈——epoll 的内部实现原理](https://zhuanlan.zhihu.com/p/340666719)
-    
+
 - [从 linux 源码看 epoll](https://zhuanlan.zhihu.com/p/116901360)
-    
+
 - [套接字之 recvfrom 系统调用实现](https://www.cnblogs.com/wanpengcoder/p/11749319.html)
-    
+
 - [如果这篇文章说不清 epoll 的本质，那就过来掐死我吧](https://zhuanlan.zhihu.com/p/64746509)
-    
+
 - [Linux 内核文件描述符表的演变](https://zhuanlan.zhihu.com/p/34280875)
-    
+
 - [三次握手过程的源码分析](https://blog.csdn.net/mrpre/article/details/24670659)
-    
 
-  
+推荐阅读：
 
-推荐阅读：  
+[低代码是什么？有什么优势](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769420&idx=1&sn=e250de87dbcde414f9c67bf50cc32022&chksm=beccd6b789bb5fa1878d5ca110cdd45f186edf173058ebf5d0b28c62a2bb87fc24b5093b74c6&scene=21#wechat_redirect)
 
-[低代码是什么？有什么优势](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769420&idx=1&sn=e250de87dbcde414f9c67bf50cc32022&chksm=beccd6b789bb5fa1878d5ca110cdd45f186edf173058ebf5d0b28c62a2bb87fc24b5093b74c6&scene=21#wechat_redirect)  
+[Go 高性能编程技法](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769371&idx=1&sn=2aa88c3a960edeeeac98fbbe741e5207&chksm=beccd6e089bb5ff6e1f9c915f40af886cb00c42668395e1d13bb0fa53d254a712a1cc510eabd&scene=21#wechat_redirect)
 
-[Go 高性能编程技法](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769371&idx=1&sn=2aa88c3a960edeeeac98fbbe741e5207&chksm=beccd6e089bb5ff6e1f9c915f40af886cb00c42668395e1d13bb0fa53d254a712a1cc510eabd&scene=21#wechat_redirect)  
-
-[微信全文搜索技术优化](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769274&idx=1&sn=a46fc1574ecbf5cfddd1f40af9cb1b4f&chksm=beccd64189bb5f57f80799fd2ea51c7669942254a2223dea55fe7d2bfa5762410a784dec8e2f&scene=21#wechat_redirect)  
-
-  
+[微信全文搜索技术优化](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649769274&idx=1&sn=a46fc1574ecbf5cfddd1f40af9cb1b4f&chksm=beccd64189bb5f57f80799fd2ea51c7669942254a2223dea55fe7d2bfa5762410a784dec8e2f&scene=21#wechat_redirect)
 
 阅读 1.1万
 

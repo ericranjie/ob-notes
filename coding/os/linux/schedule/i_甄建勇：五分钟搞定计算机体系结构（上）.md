@@ -1,27 +1,17 @@
 Original 甄建勇 Linux阅码场
- _2021年11月23日 07:00_
+_2021年11月23日 07:00_
 
- 作者简介
+作者简介
 
-甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。感兴趣领域:经济学、心理学、哲学。 
+甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。感兴趣领域:经济学、心理学、哲学。
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6byu4Ehr2AhQU61apyWj2hiaogup5mKZjakqBbtIQrIa1Yl00Trpyorb2yXTNjEBDvvqupOOHJLd35EA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 ## **并行技术**
-
-  
-
-  
 
 在计算机体系结构的发展中，并行技术无疑是浓墨重彩的一笔。正是采用的各种各样的并行技术，才使计算机的性能得到了翻天覆地的变化，本小节就介绍一下计算机体系结构设计中常用的并行技术。
 
-  
-
-### **流水线** 
-
-  
+### **流水线**
 
 并行技术，大体可分为指令级并行，数据级并行，任务级并行三个层次。而流水线技术就是指令级并行技术中最早也是最成熟的技术。
 
@@ -35,19 +25,11 @@ Original 甄建勇 Linux阅码场
 
 计算机流水线（Pipeline）技术是广泛应用于微处理芯片（CPU）中的一项关键技术，计算机流水线技术指的是对CPU内部的各条指令的执行方式的一种形容，要了解它，就必须先了解指令及其执行过程。
 
-  
-
 **（1）计算机指令**
-
-  
 
 计算机指令，就是告诉CPU要做什么事的一组特定的二进制集合。如果我们将CPU比喻成一个加工厂，那么，一条指令就好比一张订单，它引发了CPU加工厂的一系列动作，最后分别得到了运算结果和产品。那么，它们到底是怎样工作的呢？首先，要有一个接收订单的部门——CPU的取指令机构；其次，还要有完成订单的车间——CPU的执行指令机构。在工厂中，一张订单上的产品被分成了许多道工序，而指令亦在CPU中转换成了许多条对应的微操作，依次完成它们，就执行完了整条指令。
 
-  
-
 **（2）执行指令**
-
-  
 
 在低档的CPU中，指令的执行是串行的，简单地说，就是执行完了一条指令后、再执行下一条指令，好比我们上面提到的那个加工厂在创业之初，只有一间小车间及孤军奋战的老板，那么，当他接到一张订单之后，他必然忙于完成第1张订单，而没有能力去接第2张订单。这样接订单→完成订单→接订单→……取指令→执行指令→取指令→……是一个串行的过程。后来，老板发现接受订单不费太多时间，而且他还有了一个帮工，他们可以相互独立地工作，这样，老板就在完成上张订单产品的同时，接受下一张订单的订货。这表现在CPU上就是取指令机构与执行指令机构的分开，这样从CPU整体来看，CPU在执行上条指令的同时，又在并行地取下条指令。这在CPU技术上是一个质的飞跃，它使得CPU从串行工作变为并行工作，从而具有了流水线的雏型。
 
@@ -65,11 +47,7 @@ B．在执行中采取了无序执行（out－of－orderprocessing）技术。�
 
 C．将指令划分成了更细的阶段，从而使逻辑设计、工序等等更为简化，提高了速度。在486芯片中，一条指令一般被划分为五个标准的部分，奔腾亦是如此。而在P6中，由于采用了近似于RISC的技术，一条指令被划分成了创纪录的十四个阶段。这极大地提高了流水线的速度。
 
-  
-
 ### **乱序**
-
-  
 
 一切艺术都来源于生活，计算机体系结构也不例外。所以，我们就举一个例子来说明乱序执行的产生原因和过程。
 
@@ -77,21 +55,13 @@ C．将指令划分成了更细的阶段，从而使逻辑设计、工序等等�
 
 对于CPU也是一样，如果把排队买早点的人比作一条一条的指令，把买米粥的人比作加法指令（单周期），把买“现磨豆浆”的人比作乘法指令或者更复杂的指令（多周期）。如果这两条指令不相关，那么完全可以让排在后面的加法指令先执行，以提高性能。
 
-  
-
 ### **向量机SIMD**
-
-  
 
 SIMD(SingleInstruction Multiple Data，单指令多数据流)是指，采用这种架构而设计的计算机，其指令能够复制多个操作数，并把这些操作数打包到大型寄存器中，各个执行单元以同步方式，在同一时间内执行同一条指令。
 
 SIMD在性能上有其特有的优势。以加法指令为例，单指令单数据（SISD）的CPU对加法指令译码后，执行部件先访问内存，取得第一个操作数；之后再一次访问内存，取得第二个操作数；随后才能进行求和运算。而在SIMD型的CPU中，指令译码后几个执行部件同时访问内存，一次性获得所有操作数进行运算。这个特点使SIMD特别适合于多媒体应用等数据密集型运算。
 
-  
-
 ### **同时多线程**
-
-  
 
 SMT(同时多线程)技术是一种在多流出、动态调度的处理器上同时开发线程级并行和指令级并行的技术。
 
@@ -109,11 +79,7 @@ SMT一般可分为两类，细粒度多线程和粗粒度多线程
 
 任何事物都具有两面性，SMT在提高性能的同时也会带来一些问题。对于粗粒度多线程，其流水线建立时间的开销较大。粗粒度多线程的CPU只执行单个线程的指令，因此当发生停顿时，流水线必须排空或暂停。停顿后切换的新的线程在第一条指令执行完毕之前必须先填满整个流水线。此外，SMT也面临一些挑战，首先，保存多线程的现场需要设置更大的寄存器组，其次，SMT技术的采用不能影响时钟周期，特别是在关键路径上。SMT还需要保证由于并发执行多个线程带来的Cache冲突和TLB冲突不会导致明显的性能下降。
 
-  
-
 ### **CMP**
-
-  
 
 CMP是由美国斯坦福大学提出的，其思想是将大规模并行处理器中的SMP（对称多处理器）集成到同一芯片内，各个处理器并行执行不同的进程。与CMP比较， SMT处理器结构的灵活性比较突出。但是，当半导体工艺进入0.18微米以后，线延时已经超过了门延迟，要求微处理器的设计通过划分许多规模更小、局部性更好的基本单元结构来进行。相比之下，由于CMP结构已经被划分成多个处理器核来设计，每个核都比较简单，有利于优化设计，因此更有发展前途。目前，IBM 的Power 4芯片和Sun的 MAJC5200芯片都采用了CMP结构。多核处理器可以在处理器内部共享缓存，提高缓存利用率，同时简化多处理器系统设计的复杂度。
 
@@ -129,11 +95,7 @@ CMP是由美国斯坦福大学提出的，其思想是将大规模并行处理�
 
 2005年4月，Intel推出了第一款供个人使用的双核处理器，打开了处理器历史新的一页，从那之后，多核与众核处理器纷纷登场。
 
-  
-
 ### **SMP**
-
-  
 
 SMP（对称多处，Symmetrical Multi-Processing），是指在一个计算机上汇集了一组处理器(多CPU),各CPU之间共享内存子系统以及总线结构。它是相对非对称多处理技术而言的、应用十分广泛的并行技术。
 
@@ -141,19 +103,11 @@ SMP（对称多处，Symmetrical Multi-Processing），是指在一个计算机�
 
 我们平时所说的双CPU系统，实际上是对称多处理系统中最常见的一种，通常称为"2路对称多处理"，它在普通的商业、家庭应用之中并没有太多实际用途，但在专业制作，如3DMax Studio、Photoshop等软件应用中获得了非常良好的性能表现，是组建廉价工作站的良好伙伴。随着用户应用水平的提高，只使用单个的处理器确实已经很难满足实际应用的需求，因而各服务器厂商纷纷通过采用对称多处理系统来解决这一矛盾。在国内市场上这类机型的处理器一般以4个或8个为主，有少数是16个处理器。但是一般来讲，SMP结构的机器可扩展性较差，很难做到100个以上多处理器，常规的一般是8个到16个，不过这对于多数的用户来说已经够用了。这种机器的好处在于它的使用方式和微机或工作站的区别不大，编程的变化相对来说比较小，原来用微机工作站编写的程序如果要移植到SMP机器上使用，改动起来也相对比较容易。SMP结构的机型可用性比较差。因为4个或8个处理器共享一个操作系统和一个存储器，一旦操作系统出现了问题，整个机器就完全瘫痪掉了。而且由于这个机器的可扩展性较差，不容易保护用户的投资。但是这类机型技术比较成熟，相应的软件也比较多，因此现在国内市场上推出的并行机大量都是这一种。PC服务器中最常见的对称多处理系统通常采用2路、4路、6路或8路处理器。目前UNIX服务器可支持最多64个CPU的系统，如Sun公司的产品Enterprise 10000。SMP系统中最关键的技术是如何更好地解决多个处理器的相互通讯和协调问题。
 
-  
-
-  
-
 ## **局部性原理**
-
-  
-
-  
 
 局部性原理是除并行技术之外在计算机体系结构设计领域使用的最广泛的技术之一。可以这么说，在计算机系统中，局部性原理几乎无处不在。那么，什么事局部性原理呢？在回答这个问题之前，我们先看一个例子。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 _图1  局部性原理举例_
 
@@ -167,15 +121,9 @@ _图1  局部性原理举例_
 
 实质上，局部性原理可以认为是存储空间和存储访问速度之间的一种平衡机制。
 
-  
-
 ## 
 
 **计算机的评价**
-
-  
-
-  
 
 如何衡量一台计算机的优劣呢？一般包括三个主要方面，运算速度，成本，功耗。
 
@@ -189,31 +137,21 @@ _图1  局部性原理举例_
 
 上面所述对计算机优劣的衡量只是一个定性的考量，其实，计算速度，成本，功耗，这三个方面都是有具体的量化标准的，相关的计算公式在“常用公式和定律”中可以找到。
 
-  
-
-  
-
 精彩回顾
-
-  
 
 [甄建勇：芯片架构方法学](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652671184&idx=1&sn=16bfce9af8d5650a71ab961ea463a2db&chksm=810fca4db678435b634cb431f9dfc1fe805a57409e9b2d2c068ef16b696b978265c46a0c23ea&scene=21#wechat_redirect)
 
-[甄建勇：五分钟搞定MMU](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680376&idx=1&sn=75fb4280dd0b141dd385b4421b958afd&chksm=810ff625b6787f33c75bcd900f0158d927c81fed0267c1b1aa0f8d8ec173e0fa9aef0bfc58cc&scene=21#wechat_redirect)  
+[甄建勇：五分钟搞定MMU](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680376&idx=1&sn=75fb4280dd0b141dd385b4421b958afd&chksm=810ff625b6787f33c75bcd900f0158d927c81fed0267c1b1aa0f8d8ec173e0fa9aef0bfc58cc&scene=21#wechat_redirect)
 
-[甄建勇：五分钟搞定Cache（上）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680424&idx=1&sn=c1e23b0347f7ad77af0597f8c0a42038&chksm=810ff675b6787f634e3377adb3a0ae38b05bf5e62dd9f5582c9f29282e430bf30714b9ae495b&scene=21#wechat_redirect)  
+[甄建勇：五分钟搞定Cache（上）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680424&idx=1&sn=c1e23b0347f7ad77af0597f8c0a42038&chksm=810ff675b6787f634e3377adb3a0ae38b05bf5e62dd9f5582c9f29282e430bf30714b9ae495b&scene=21#wechat_redirect)
 
-[甄建勇：五分钟搞定Cache（下）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680446&idx=1&sn=011bb4ac9b4c57b2e6bfbef0f6d14770&chksm=810ff663b6787f75461f59d5ba95d38f73f9f952d378540cfea5e6c5f3951bcb2b47c011316f&scene=21#wechat_redirect)  
+[甄建勇：五分钟搞定Cache（下）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680446&idx=1&sn=011bb4ac9b4c57b2e6bfbef0f6d14770&chksm=810ff663b6787f75461f59d5ba95d38f73f9f952d378540cfea5e6c5f3951bcb2b47c011316f&scene=21#wechat_redirect)
 
-[甄建勇：五分钟搞定计算机的前世今生](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680475&idx=1&sn=0c12872fb5b359a73210e602f5a7f541&chksm=810ff786b6787e90d420cdc32ad887d4a544f6299d8020b80cb257c6952d92e308cad9763e22&scene=21#wechat_redirect)  
+[甄建勇：五分钟搞定计算机的前世今生](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680475&idx=1&sn=0c12872fb5b359a73210e602f5a7f541&chksm=810ff786b6787e90d420cdc32ad887d4a544f6299d8020b80cb257c6952d92e308cad9763e22&scene=21#wechat_redirect)
 
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-**扫码加入社群**  
-
-  
+**扫码加入社群**
 
 Reads 2285
 

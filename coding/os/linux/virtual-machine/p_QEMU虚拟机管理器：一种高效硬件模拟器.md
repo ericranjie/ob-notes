@@ -1,8 +1,6 @@
-
-
 原创 往事敬秋风 深度Linux
 
- _2024年03月28日 22:04_ _湖南_
+_2024年03月28日 22:04_ _湖南_
 
 QEMU（Quick EMUlator）是一种开源的虚拟机监视器和模拟器，它可以模拟多个硬件平台，包括x86、ARM、PowerPC等。QEMU广泛应用于虚拟化、嵌入式系统开发和仿真等领域。
 
@@ -55,21 +53,20 @@ configure脚本用于生成Makefile，其选项可以用`./configure --help`查�
 ```
 
 安装好之后，会生成如下应用程序：
-![[Pasted image 20240918110732.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918110732.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - ivshmem-client/server：这是一个 guest 和 host 共享内存的应用程序，遵循 C/S 的架构。
-    
+
 - qemu-ga：这是一个不利用网络实现 guest 和 host 之间交互的应用程序（使用 virtio-serial），运行在 guest 中。
-    
+
 - qemu-io：这是一个执行 Qemu I/O 操作的命令行工具。
-    
+
 - qemu-system-x86_64：Qemu 的核心应用程序，虚拟机就由它创建的。
-    
+
 - qemu-img：创建虚拟机镜像文件的工具，下面有例子说明。
-    
+
 - qemu-nbd：磁盘挂载工具。
-    
 
 ## 二、基本原理
 
@@ -122,25 +119,24 @@ qemu-img 支持非常多种的文件格式，可以通过 qemu-img -h 查看，�
 ## 四、Qemu源码结构
 
 Qemu 软件虚拟化实现的思路是采用二进制指令翻译技术，主要是提取 guest 代码，然后将其翻译成 TCG 中间代码，最后再将中间代码翻译成 host 指定架构的代码，如 x86 体系就翻译成其支持的代码形式，ARM 架构同理。
-![[Pasted image 20240918110751.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918110751.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 所以，从宏观上看，源码结构主要包含以下几个部分：
 
 - /vl.c：最主要的模拟循环，虚拟机环境初始化，和 CPU 的执行。
-    
+
 - /target-arch/translate.c：将 guest 代码翻译成不同架构的 TCG 操作码。
-    
+
 - /tcg/tcg.c：主要的 TCG 代码。
-    
+
 - /tcg/arch/tcg-target.c：将 TCG 代码转化生成主机代码。
-    
+
 - /cpu-exec.c：主要寻找下一个二进制翻译代码块，如果没有找到就请求得到下一个代码块，并且操作生成的代码块。
-    
 
 其中，涉及的主要几个函数如下：
-![[Pasted image 20240918110756.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918110756.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 知道了这个总体的代码结构，再去具体了解每一个模块可能会相对容易一点。
 
@@ -152,7 +148,7 @@ QEMU的main函数定义在/vl.c中，它也是执行的起点，这个函数的�
 
 (2)硬件模拟
 
-所有的硬件设备都在/hw/ 目录下面，所有的设备都有独自的文件，包括总线，串口，网卡，鼠标等等。它们通过设备模块串在一起，在vl.c中的machine _init中初始化。这里就不讲每种设备是怎么实现的了。
+所有的硬件设备都在/hw/ 目录下面，所有的设备都有独自的文件，包括总线，串口，网卡，鼠标等等。它们通过设备模块串在一起，在vl.c中的machine \_init中初始化。这里就不讲每种设备是怎么实现的了。
 
 (3)目标机器
 
@@ -173,39 +169,38 @@ QEMU的main函数定义在/vl.c中，它也是执行的起点，这个函数的�
 ### 4.1TCG动态翻译
 
 QEMU在 0.9.1版本之前使用DynGen翻译c代码.当我们需要的时候TCG会动态的转变代码，这个想法的目的是用更多的时间去执行我们生成的代码。当新的代 码从TB中生成以后， 将会被保存到一个cache中，因为很多相同的TB会被反复的进行操作，所以这样类似于内存的cache，能够提高使用效率。而 cache的刷新使用LRU算法。
-![[Pasted image 20240918111036.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918111036.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 编译器在执行器会从源代码中产生目标代码，像GCC这种编译器，它为了产生像函数调用目标代码会产生一些特殊的汇编目标代码，他们能够让编译器需要知道在调用函数。需要什么，以及函数调用以后需要返回什么，这些特殊的汇编代码产生过程就叫做函数的Prologue和Epilogue，这里就叫前端和后段吧。我在其他文章中也分析过汇编调用函数的过程，至于汇编里面函数调用过程中寄存器是如何变化的，在本文中就不再描述了。
 
 函数的后端会恢复前端的状态，主要做下面2点：
 
 - 1. 恢复堆栈的指针，包括栈顶和基地址。
-    
+
 - 2. 修改cs和ip，程序回到之前的前端记录点。
-    
 
 TCG就如编译器一样可以产生目标代码，代码会保存在缓冲区中，当进入前端和后端的时候就会将TCG生成的缓冲代码插入到目标代码中。
 
 接下来我们就来看下如何翻译代码的：
 
 客户机代码
-![[Pasted image 20240918111043.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918111043.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 TCG中间代码
-![[Pasted image 20240918111048.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918111048.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 主机代码
-![[Pasted image 20240918111053.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918111053.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 4.2TB链
 
 在QEMU中，从代码cache到静态代码再回到代码cache，这个过程比较耗时，所以在QEMU中涉及了一个TB链将所有TB连在一起，可以让一个TB执行完以后直接跳到下一个TB，而不用每次都返回到静态代码部分。具体过程如下图：
-![[Pasted image 20240918111058.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918111058.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 4.3TCG代码分析
 
@@ -225,21 +220,21 @@ cpu_exec_all(...){/cpus.c} :
 
 struct CPUState{/target-xyz/cpu.h} :
 
-它是CPU状态结构体，关于cpu的各种状态，不同架构下面还有不同。  
-  
+它是CPU状态结构体，关于cpu的各种状态，不同架构下面还有不同。
+
 cpu_exec(...){/cpu-exec.c}:
 
-这个函数是主要的执行循环，这里第一次翻译之前说道德TB，TB被初始化为(TranslationBlock *tb) ，然后不停的执行异常处理。其中嵌套了两个无限循环 find tb_find_fast() 和tcg_qemu_tb_exec().  
-cantb_find_fast()为客户机初始化查询下一个TB，并且生成主机代码。  
+这个函数是主要的执行循环，这里第一次翻译之前说道德TB，TB被初始化为(TranslationBlock \*tb) ，然后不停的执行异常处理。其中嵌套了两个无限循环 find tb_find_fast() 和tcg_qemu_tb_exec().\
+cantb_find_fast()为客户机初始化查询下一个TB，并且生成主机代码。\
 tcg_qemu_tb_exec()执行生成的主机代码
 
 struct TranslationBlock {/exec-all.h}:
 
-结构体_TranslationBlock_包含下面的成员：PC, CS_BASE, Flags （表明TB）, tc_ptr (指向这个TB翻译代码的指针), tb_next_offset[2], tb_jmp_offset[2] (接下去的Tb), *jmp_next[2], *jmp_first (之前的TB).  
-  
+结构体_TranslationBlock_包含下面的成员：PC, CS_BASE, Flags （表明TB）, tc_ptr (指向这个TB翻译代码的指针), tb_next_offset\[2\], tb_jmp_offset\[2\] (接下去的Tb), \*jmp_next\[2\], \*jmp_first (之前的TB).
+
 tb_find_fast(...){/cpu-exec.c} :
 
-函数通过调用获得程序指针计数器，然后传到一个哈希函数从 tb_jmp_cache[] （一个哈希表）得到TB的所以，所以使用tb_jmp_cache可以找到下一个TB。如果没有找到下一个TB，则使用tb_find_slow。
+函数通过调用获得程序指针计数器，然后传到一个哈希函数从 tb_jmp_cache\[\] （一个哈希表）得到TB的所以，所以使用tb_jmp_cache可以找到下一个TB。如果没有找到下一个TB，则使用tb_find_slow。
 
 tb_find_slow(...){/cpu-exec.c}:
 
@@ -247,9 +242,9 @@ tb_find_slow(...){/cpu-exec.c}:
 
 tb_gen_code(...){/exec.c}:
 
-开始分配一个新的TB，TB的PC是刚刚从CPUstate里面通过using get_page_addr_code()找到的  
-phys_pc = get_page_addr_code(env, pc);  
-tb = tb_alloc(pc);  
+开始分配一个新的TB，TB的PC是刚刚从CPUstate里面通过using get_page_addr_code()找到的\
+phys_pc = get_page_addr_code(env, pc);\
+tb = tb_alloc(pc);\
 ph当调用cpu_gen_code() 以后，接着会调用tb_link_page()，它将增加一个新的TB，并且指向它的物理页表。
 
 cpu_gen_code(...){translate-all.c}:
@@ -262,13 +257,13 @@ gen_intermediate_code(){/target-arch/translate.c}->gen_intermediate_code_interna
 
 disas_insn(){/target-arch/translate.c}
 
-函数disas_insn() 真正的实现将客户机代码翻译成TCG代码，它通过一长串的switch case，将不同的指令做不同的翻译，最后调用tcg_gen_code。  
-  
+函数disas_insn() 真正的实现将客户机代码翻译成TCG代码，它通过一长串的switch case，将不同的指令做不同的翻译，最后调用tcg_gen_code。
+
 tcg_gen_code(...){/tcg/tcg.c}:
 
-这个函数将TCG的代码转化成主机代码，这个就不细细说明了，和前面类似。  
-  
-#define tcg_qemu_tb_exec(...){/tcg/tcg.g}:  
+这个函数将TCG的代码转化成主机代码，这个就不细细说明了，和前面类似。
+
+#define tcg_qemu_tb_exec(...){/tcg/tcg.g}:\
 通过上面的步骤，当TB生成以后就通过这个函数进行执行
 
 ```c
@@ -318,8 +313,8 @@ QEMU的命令行中有参数：
 之所以QEMU可以指定最大内存、槽等参数，是因为QEMU可以模拟DIMM的热插拔，客户机操作系统可以和在真实的系统上一样，检测新内存被插入或者拔出。也就是说，内存热插拔的粒度是DIMM槽（或者说DIMM集合），而不是最小的byte。
 
 与内存相关的数据结构：
-![[Pasted image 20240918111112.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918111112.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 PCDIMMDevice和HostMemoryBackend对象都是在QEMU中用户可见的客户机内存。它们能通过QEMU命令行或者QMP监控器接口来管理。
 
@@ -352,9 +347,7 @@ typedef uint64_t ram_addr_t;struct RAMBlock {    struct rcu_head rcu; //该数�
 当客户机CPU或者DMA将数据保存到客户机内存时，需要通知下列一些用户：
 
 - 1. 热迁移特性依赖于跟踪脏页，因此他们能够在被改变之后重新传输。
-    
 - 2. 图形卡模拟依赖于跟踪脏的视频内存，用于重画某些界面。
-    
 
 所有的CPU架构都有内存地址空间、有些CPU架构又有一个IO地址空间。它们在QEMU中被表示为AddressSpace数据结构，它定义在include/exec/memory.h中。而每个地址空间都包含一个MemoryRegion的树状结构，所谓树状结构，指的是每个MemoryRegion的内部可以含有MemoryRegion，这样的包含所形成的树状结构。
 
@@ -368,11 +361,11 @@ struct AddressSpace {    /* All fields are private. */    struct rcu_head rcu;  
 
 2023年往期回顾
 
-[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)  
+[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)
 
-[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)  
+[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)
 
-[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)  
+[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)
 
 [存储全栈开发：构建高效的数据存储系统](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487696&idx=1&sn=b5ebe830ddb6798ac5bf6db4a8d5d075&chksm=cfb959b9f8ced0af76710c070a6db2677fb359af735e79c6378e82ead570aa1ce5350a146793&scene=21#wechat_redirect)
 

@@ -2,11 +2,11 @@
 
 苏三说技术
 
- _2024年09月07日 09:20_ _四川_
+_2024年09月07日 09:20_ _四川_
 
 The following article is from 坤哥漫谈IT Author Spurs蒋
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7Z8M9eEmzgQzeqdVNAMDR6e9ybhiclVEibrazq1nWRo2CA/0)
 
@@ -14,7 +14,7 @@ The following article is from 坤哥漫谈IT Author Spurs蒋
 
 一起进阶，一起牛逼！
 
-](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247520381&idx=1&sn=3ef24eba48d177b8e1294a08b504319c&chksm=c18f394f00e6ecf2d0ef38571b27e13939f0f5593003eda312d594ebad4468d5e0a1f94f9803&mpshare=1&scene=24&srcid=0907tLb0qOCd3Z1AvWYFM0RN&sharer_shareinfo=6deec49024a17604d5e6a91d0902618e&sharer_shareinfo_first=6deec49024a17604d5e6a91d0902618e&key=daf9bdc5abc4e8d04b44c2c7cbc084d96112d144d092b6332709754898761efd5dacb2dac5093e178a7a8035b881846fefec14d32757d10ae701a61b7dc4d5c7665769c1e3112cc5ec4b31660e273130b3ab1adb2bb475e88e66d750da3decfe35ef0603452eb5100f6b3e5d9788cf66b8a0d9123449465b002aeaffd4112724&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_cbd73ca65bd1&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQK%2Fhmjh3Dr%2F9Tm95b5iaTZRKUAgIE97dBBAEAAAAAAK2%2FC7ii8T8AAAAOpnltbLcz9gKNyK89dVj0RIWwyvcmcoRdHc9Vzhko3A6wIlKICGtSvmwaXor6WESYZV%2BRZk0Jy8ul6tG0yvbqiKLkYT9FbrVn%2Bqi3MQdZIM%2BkNfXbB2yoIBQmtmAfOu%2BQcLPyUhqz68eAgbqilmp2KlObQlpPaz2qcwQzYWxXecsj%2B%2Buocc1S8mCLvc3PR60xYAdczTiVuAoHEV9a4gSNAbIbmAOFENE7QRKF7wBSQrL5Dt2bnFnoPqSus%2Bw5K2h4PAZuvYxMDZmIWAmn1%2FBzkc9Lx0DqxMMA0QlB5ftHhZGdITeECVyUTpCFMFJnsfF7HKUbhDrkRiAjdeBwGA%3D%3D&acctmode=0&pass_ticket=ggfuBPsy72uG8U3m8O0m3TMGSqOJaJRTIbVzaAIpcXqvO6IgWdlh9eWEhVBlwcRr&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkwNjMwMTgzMQ==&mid=2247520381&idx=1&sn=3ef24eba48d177b8e1294a08b504319c&chksm=c18f394f00e6ecf2d0ef38571b27e13939f0f5593003eda312d594ebad4468d5e0a1f94f9803&mpshare=1&scene=24&srcid=0907tLb0qOCd3Z1AvWYFM0RN&sharer_shareinfo=6deec49024a17604d5e6a91d0902618e&sharer_shareinfo_first=6deec49024a17604d5e6a91d0902618e&key=daf9bdc5abc4e8d04b44c2c7cbc084d96112d144d092b6332709754898761efd5dacb2dac5093e178a7a8035b881846fefec14d32757d10ae701a61b7dc4d5c7665769c1e3112cc5ec4b31660e273130b3ab1adb2bb475e88e66d750da3decfe35ef0603452eb5100f6b3e5d9788cf66b8a0d9123449465b002aeaffd4112724&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_cbd73ca65bd1&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQK%2Fhmjh3Dr%2F9Tm95b5iaTZRKUAgIE97dBBAEAAAAAAK2%2FC7ii8T8AAAAOpnltbLcz9gKNyK89dVj0RIWwyvcmcoRdHc9Vzhko3A6wIlKICGtSvmwaXor6WESYZV%2BRZk0Jy8ul6tG0yvbqiKLkYT9FbrVn%2Bqi3MQdZIM%2BkNfXbB2yoIBQmtmAfOu%2BQcLPyUhqz68eAgbqilmp2KlObQlpPaz2qcwQzYWxXecsj%2B%2Buocc1S8mCLvc3PR60xYAdczTiVuAoHEV9a4gSNAbIbmAOFENE7QRKF7wBSQrL5Dt2bnFnoPqSus%2Bw5K2h4PAZuvYxMDZmIWAmn1%2FBzkc9Lx0DqxMMA0QlB5ftHhZGdITeECVyUTpCFMFJnsfF7HKUbhDrkRiAjdeBwGA%3D%3D&acctmode=0&pass_ticket=ggfuBPsy72uG8U3m8O0m3TMGSqOJaJRTIbVzaAIpcXqvO6IgWdlh9eWEhVBlwcRr&wx_header=0#)
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/ibJZVicC7nz5iaP4Yynj4jUTic5xEPpzW3qVWbHraricStBd6KE3yx4ZhbGlq7dSROy89ftZuqPKPxlcSKJmLicnCrsw/300?wx_fmt=png&wxfrom=19)
 
@@ -25,8 +25,6 @@ The following article is from 坤哥漫谈IT Author Spurs蒋
 116篇原创内容
 
 公众号
-
-  
 
 # 一、背景介绍
 
@@ -45,15 +43,14 @@ ELK日志架构.png
 ## 1. 版本及硬件配置
 
 - **JDK**：JDK1.8_171-b11 (64 位)
-    
+
 - **ES集群**：由3台16核32G的虚拟机部署 ES 集群，每个节点分配 20 G 堆内存
-    
+
 - **ELK版本**：6.3.0
-    
+
 - **垃圾回收器**：ES 默认指定的老年代（CMS）+ 新生代（ParNew）
-    
+
 - **操作系统**：CentOS Linux release 7.4.1708(Core)
-    
 
 ## 2. 性能问题
 
@@ -104,11 +101,10 @@ ES 的优化分为很多方面，我们要根据使用场景考虑对 ES 的要�
 **根据个人实践经验，列举三种不同场景下的特点**：
 
 - **SkyWalking**：一般配套使用 ES 作为数据存储，存储链路追踪数据、指标数据等信息。
-    
+
 - **ELK**：一般用来存储系统日志，并进行分析，搜索，定位应用的问题。
-    
+
 - **全文搜索的业务**：业务中常用 ES 作为全文搜索引擎，例如在外卖应用中，ES 用来存储商家、美食的业务数据，用户在客户端可以根据关键字、地理位置等查询条件搜索商家、美食信息。
-    
 
 **这三类场景的特点如下：**
 
@@ -122,11 +118,10 @@ ES 的优化分为很多方面，我们要根据使用场景考虑对 ES 的要�
 **关于实时性**
 
 - SkyWalking 在实际使用中，一般使用频率不太高，往往是发现应用的问题后，再去 SkyWalking 查历史链路追踪数据或指标数据，所以可以接受几分钟的延迟。
-    
+
 - ELK 不管是开发、测试等阶段，时常用来定位应用的问题，如果不能快速查询出数据，延迟太久，会耽误很多时间，大大降低工作效率；如果是查日志定位生产问题，那更是刻不容缓。
-    
+
 - 全文搜索的业务中一般可以接受在1分钟内查看到最新数据，比如新商品上架一分钟后才看到，但尽量实时，在几秒内可以可看到。
-    
 
 #### 4.2 优化的方向
 
@@ -144,46 +139,45 @@ ES 的优化分为很多方面，我们要根据使用场景考虑对 ES 的要�
 
 ### 1.1 监控 JVM 运行情况
 
-**（1）查看 GC 日志**  
+**（1）查看 GC 日志**
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLUic4O7L1lMHmz7BaHtv4hWxzXhdRTAZkhw0Vj6YrfuHa6pDeKHybFQ0OP9aWLw56FTwRqr6F0LwiaA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-**问题**：Young GC 和 Full GC 都很频繁，特别是 Young GC 频率高，累积耗时非常多。  
+**问题**：Young GC 和 Full GC 都很频繁，特别是 Young GC 频率高，累积耗时非常多。
 
 **(2) 使用 jstat 看下每秒的 GC 情况**![Image](https://mmbiz.qpic.cn/mmbiz_png/OyweysCSeLUic4O7L1lMHmz7BaHtv4hWxIYbCputiaTHT693Exibu2HSAES8rf9AgYiaia9OE1lm6QSVBICqhx6TiakA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)**参数说明**
 
 - S0：幸存1区当前使用比例
-    
+
 - S1：幸存2区当前使用比例
-    
+
 - E：伊甸园区使用比例
-    
+
 - O：老年代使用比例
-    
+
 - M：元数据区使用比例
-    
+
 - CCS：压缩使用比例
-    
+
 - YGC：年轻代垃圾回收次数
-    
+
 - FGC：老年代垃圾回收次数
-    
+
 - FGCT：老年代垃圾回收消耗时间
-    
+
 - GCT：垃圾回收消耗总时间**问题**：从 jstat gc 中也可以看出，每秒的 eden 增长速度非常快，很快就满了。
-    
 
 ### 1.2 定位 Young GC 频繁的原因
 
 #### 1.2.1 检查是否新生代的空间是否太小
 
-用下面几种方式都可查看新、老年代内存大小 (1) 使用 **jstat -gc pid**  查看 Eden 区、老年代空间大小 (2) 使用 **jmap -heap pid**  查看 Eden 区、老年代空间大小 (3) 查看 GC 日志中的 GC 明细![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)其中 996800K 为新生代可用空间大小，即 Eden 区 +1 个 Survivor 区的空间大小，所以新生代总内存是996800K/0.9， 约1081M
+用下面几种方式都可查看新、老年代内存大小 (1) 使用 **jstat -gc pid**  查看 Eden 区、老年代空间大小 (2) 使用 **jmap -heap pid**  查看 Eden 区、老年代空间大小 (3) 查看 GC 日志中的 GC 明细!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)其中 996800K 为新生代可用空间大小，即 Eden 区 +1 个 Survivor 区的空间大小，所以新生代总内存是996800K/0.9， 约1081M
 
 上面的几种方式都查询出，新生代总内存约1081M，即1G左右；老年代总内存为19864000K，约19G。新、老比例约1:19，出乎意料。
 
 #### 1.2.1 新老年代空间比例为什么不是 JDK 默认的1:2【重点！】
 
-**这真是一个容易踩坑的地方。**如果没有显示设置新生代大小，JVM 在使用 CMS 收集器时会自动调参，新生代的大小在没有设置的情况下是通过计算得出的，其大小可能与 NewRatio 的默认配置没什么关系而与 ParallelGCThreads 的配置有一定的关系。
+\*\*这真是一个容易踩坑的地方。\*\*如果没有显示设置新生代大小，JVM 在使用 CMS 收集器时会自动调参，新生代的大小在没有设置的情况下是通过计算得出的，其大小可能与 NewRatio 的默认配置没什么关系而与 ParallelGCThreads 的配置有一定的关系。
 
 > 参考文末链接：CMS GC 默认新生代是多大？
 
@@ -194,9 +188,8 @@ ES 的优化分为很多方面，我们要根据使用场景考虑对 ES 的要�
 **新生代过小，老年代过大的影响**
 
 - **新生代过小**: (1) 会导致新生代 Eden 区很快用完，而触发 Young GC，Young GC 的过程中会 STW(Stop The World)，也就是所有工作线程停止，只有 GC 的线程在进行垃圾回收，这会导致 ES 短时间停顿。频繁的 Young GC，积少成多，对系统性能影响较大。(2) 大部分对象很快进入老年代，老年代很容易用完而触发 Full GC。
-    
+
 - **老年代过大**：会导致 Full GC 的执行时间过长，Full GC 虽然有并行处理的步骤，但是还是比 Young GC 的 STW 时间更久，而 GC 导致的停顿时间在几十毫秒到几秒内，很影响 ES 的性能，同时也会导致请求 ES 服务端的客户端在一定时间内没有响应而发生 timeout 异常，导致请求失败。
-    
 
 ### 1.4 JVM优化
 
@@ -209,15 +202,14 @@ ES 的优化分为很多方面，我们要根据使用场景考虑对 ES 的要�
 **设置要求:**
 
 - Xms 与 Xmx 大小相同。
-    
-    在 jvm 的参数中 -Xms 和 -Xmx 设置的不一致，在初始化时只会初始 -Xms 大小的空间存储信息，每当空间不够用时再向操作系统申请，这样的话必然要进行一次 GC，GC会带来 STW。而剩余空间很多时，会触发缩容。再次不够用时再扩容，如此反复，这些过程会影响系统性能。同理在 MetaSpace 区也有类似的问题。
-    
+
+  在 jvm 的参数中 -Xms 和 -Xmx 设置的不一致，在初始化时只会初始 -Xms 大小的空间存储信息，每当空间不够用时再向操作系统申请，这样的话必然要进行一次 GC，GC会带来 STW。而剩余空间很多时，会触发缩容。再次不够用时再扩容，如此反复，这些过程会影响系统性能。同理在 MetaSpace 区也有类似的问题。
+
 - jvm 建议不要超过 32G，否则 jvm 会禁用内存对象指针压缩技术，造成内存浪费
-    
+
 - Xmx 和 Xms 不要超过物理 RAM 的50%。_参考文末：官方堆内存设置的建议_
-    
-    > Xmx 和 Xms 不要超过物理内存的50%。Elasticsearch 需要内存用于JVM堆以外的其他用途，为此留出空间非常重要。例如，Elasticsearch 使用堆外缓冲区进行有效的网络通信，依靠操作系统的文件系统缓存来高效地访问文件，而 JVM 本身也需要一些内存。
-    
+
+  > Xmx 和 Xms 不要超过物理内存的50%。Elasticsearch 需要内存用于JVM堆以外的其他用途，为此留出空间非常重要。例如，Elasticsearch 使用堆外缓冲区进行有效的网络通信，依靠操作系统的文件系统缓存来高效地访问文件，而 JVM 本身也需要一些内存。
 
 #### 1.4.2 配置堆内存新生代空间大小
 
@@ -243,7 +235,7 @@ ES默认使用的垃圾回收器是：老年代（CMS）+ 新生代（ParNew）�
 
 **优化前**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 优化前.png
 
@@ -251,7 +243,7 @@ ES默认使用的垃圾回收器是：老年代（CMS）+ 新生代（ParNew）�
 
 **优化后**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 优化后.png
 
@@ -263,17 +255,17 @@ ES 启动后，运行14个小时
 
 **优化前**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 优化前.png
 
 Young GC 每次的时间是不长的，从上面监控数据中可以看出每次GC时长 1467.995/27276 约等于 0.05 秒。那一秒钟有多少时间是在处理 Young GC ?
 
-计算公式：1467 秒/_( 60 秒× 60 分_ 14 小时）= 约 0.028 秒，也就是 100 秒中就有 2.8 秒在Young GC，也就是有 2.8S 的停顿，这对性能还是有很大消耗的。同时也可以算出多久一次 Young GC， 方程是：60秒×60分*14小时/ 27276次 = 1次/X秒，计算得出X = 0.54，也就是 0.54 秒就会有一次 Young GC，可见 Young GC 频率非常频繁。
+计算公式：1467 秒/_( 60 秒× 60 分_ 14 小时）= 约 0.028 秒，也就是 100 秒中就有 2.8 秒在Young GC，也就是有 2.8S 的停顿，这对性能还是有很大消耗的。同时也可以算出多久一次 Young GC， 方程是：60秒×60分\*14小时/ 27276次 = 1次/X秒，计算得出X = 0.54，也就是 0.54 秒就会有一次 Young GC，可见 Young GC 频率非常频繁。
 
 **优化后**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 优化后效果.png
 
@@ -289,7 +281,7 @@ GC 对系统的影响大大降低，性能已经得到很大的提升。
 
 ##### 2.2.1 ES 写数据底层原理
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ES写入数据的原理.png
 
@@ -312,7 +304,7 @@ ES 的一个 index 由多个 shard 组成，而一个 shard 其实就是一个 L
 为了保证不丢失数据，就要保护 translog 文件的安全:
 
 > Elasticsearch 2.0 之后, 每次写请求(如 index 、delete、update、bulk 等)完成时, 都会触发`fsync`将 translog 中的 segment 刷到磁盘, 然后才会返回`200 OK`的响应;
-> 
+>
 > 或者: 默认每隔5s就将 translog 中的数据通过`fsync`强制刷新到磁盘.
 
 该方式提高数据安全性的同时， 降低了一点性能.
@@ -351,7 +343,7 @@ index.merge.scheduler.max_thread_count 控制并发的 merge 线程数，如果�
 
 `# 制作模板 大部分索引都是业务应用的日志相关的索引，且索引名称是 202* 这种带着日期的格式   PUT _template/business_log   {     "index_patterns": ["*202*.*.*"],     "settings": {     "index.merge.scheduler.max_thread_count" : "1","index.refresh_interval" : "5s","index.translog.durability" : "async","index.translog.flush_threshold_size":"1024mb","index.translog.sync_interval" : "120s"}   }      # 查询模板是否创建成功   GET _template/business_log   `
 
-因为我们的业务日志是按天维度创建索引，索引名称示例：user-service-prod-2020.12.12，所以用通配符*__202_._.**匹配对应要创建的业务日志索引。
+因为我们的业务日志是按天维度创建索引，索引名称示例：user-service-prod-2020.12.12，所以用通配符\*\__202_.\_.\*\*匹配对应要创建的业务日志索引。
 
 ### 2.2 优化线程池配置
 
@@ -367,7 +359,7 @@ index.merge.scheduler.max_thread_count 控制并发的 merge 线程数，如果�
 
 经过上面的各种优化，拒绝的数据量少了很多，但是还是存在拒绝的情况，如下图：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 image.png
 
@@ -376,7 +368,7 @@ image.png
 _参考文末链接：ElasticSearch线程池_
 
 > **`write`**
-> 
+>
 > For single-document index/delete/update and bulk requests. Thread pool type is `fixed` with a size of `# of available processors`, queue_size of `200`. The maximum size for this pool is `1 + # of available processors`.
 
 write 线程池采用 fixed 类型的线程池，也就是核心线程数与最大线程数值相同。线程数默认等于 cpu 核数，可设置的最大值只能是 cpu 核数加 1，也就是 16 核 CPU，能设置的线程数最大值为 17。
@@ -384,21 +376,20 @@ write 线程池采用 fixed 类型的线程池，也就是核心线程数与最�
 **优化的方案：**
 
 - 线程数改为 17，也就是 cpu 总核数加 1
-    
+
 - 队列容量加大。队列在此时的作用是消峰。不过队列容量加大本身不会提升处理速度，只是起到缓冲作用。此外，队列容量也不能太大，否则积压很多任务时会占用过多堆内存。
-    
 
 config/elasticsearch.yml文件增加配置
 
 `# 线程数设置   thread_pool:     write:       # 线程数默认等于cpu核数，即16         size: 17       # 因为任务多时存在任务拒绝的情况，所以加大队列大小，可以在间歇性任务量陡增的情况下，缓存任务在队列，等高峰过去逐步消费完。       queue_size: 10000   `
 
-**优化后效果**![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)可以看到，已经没有拒绝的情况，这样也就是解决了日志丢失的问题。
+**优化后效果**!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)可以看到，已经没有拒绝的情况，这样也就是解决了日志丢失的问题。
 
 ### 2.３ 锁定内存，不让 JVM 使用 Swap
 
 **Swap 交换分区**:
 
-> 当系统的物理内存不够用的时候，就需要将物理内存中的一部分空间释放出来，以供当前运行的程序使用。那些被释放的空间可能来自一些很长时间没有什么操作的程序，**这些被释放的空间被临时保存到 Swap 中，等到那些程序要运行时，再从 Swap 中恢复保存的数据到内存中。**这样，系统总是在物理内存不够时，才进行 Swap 交换。
+> 当系统的物理内存不够用的时候，就需要将物理内存中的一部分空间释放出来，以供当前运行的程序使用。那些被释放的空间可能来自一些很长时间没有什么操作的程序，\*\*这些被释放的空间被临时保存到 Swap 中，等到那些程序要运行时，再从 Swap 中恢复保存的数据到内存中。\*\*这样，系统总是在物理内存不够时，才进行 Swap 交换。
 
 _参考文末链接：ElasticSearch官方解释为什么要禁用交换内存_
 
@@ -459,26 +450,22 @@ config/elasticsearch.yml 文件增加配置
 **优化后的两周内 ELK 性能良好，没有使用上的问题：**
 
 - ES 数据不再丢失
-    
-- 数据延时在 10 秒之内，一般在 5 秒可以查出
-    
-- 每个 ES 节点负载比较稳定，CPU 和内存使用率都不会过高，如下图
-    
-    ![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-    
-    ES 节点运行情况.png
-    
 
-  
+- 数据延时在 10 秒之内，一般在 5 秒可以查出
+
+- 每个 ES 节点负载比较稳定，CPU 和内存使用率都不会过高，如下图
+
+  !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+  ES 节点运行情况.png
 
 最后欢迎[加入苏三的星球](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247519298&idx=1&sn=8e052ae328c37d2e0aa7093e5864cdd6&chksm=c0e854aaf79fddbc9b819f9e099b911615aad6e13c30f2fc59e6b28a07d266d057ee6c927a66&token=249273388&lang=zh_CN&scene=21#wechat_redirect)，你将获得：商城系统实战、秒杀系统实战、代码生成工具、系统设计、性能优化、技术选型、高频面试题、底层原理、Spring源码解读、工作经验分享、痛点问题等多个优质专栏。
 
 - [我的技术成长之路](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247519298&idx=1&sn=8e052ae328c37d2e0aa7093e5864cdd6&chksm=c0e854aaf79fddbc9b819f9e099b911615aad6e13c30f2fc59e6b28a07d266d057ee6c927a66&token=249273388&lang=zh_CN&scene=21#wechat_redirect)
-    
+
 - [我的三个项目](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247518752&idx=1&sn=51b60dc6ee21e5042192eed74682f9ef&chksm=c0e852c8f79fdbdea7bd1a0ac93d986c32ef5ab5542e24d672dae60f786424ed50055a96d941&token=249273388&lang=zh_CN&scene=21#wechat_redirect)
-    
+
 - [被官方推荐了](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247518298&idx=1&sn=8bb5d8eef5d818bf3b1df2d31f6fa7f7&chksm=c0e850b2f79fd9a4aab89b9968b369819aba7680b99f44a12bc92bb36dbe6d4090b3cdb7ed8d&token=249273388&lang=zh_CN&scene=21#wechat_redirect)
-    
 
 还有1V1答疑、修改简历、职业规划、送书活动、技术交流。
 
@@ -496,17 +483,11 @@ Java、Spring、分布式、高并发、数据库、海量数据、线上问题�
 
 扫描下方二维码即可订阅：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 原价199，现价只需21，即将涨价。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Reads 1378
 
@@ -517,13 +498,12 @@ Comment
 **留言 1**
 
 - 阿光678😉
-    
-    北京6小时前
-    
-    Like
-    
-    优秀，思路清晰
-    
+
+  北京6小时前
+
+  Like
+
+  优秀，思路清晰
 
 已无更多数据
 
@@ -542,12 +522,11 @@ Comment
 **留言 1**
 
 - 阿光678😉
-    
-    北京6小时前
-    
-    Like
-    
-    优秀，思路清晰
-    
+
+  北京6小时前
+
+  Like
+
+  优秀，思路清晰
 
 已无更多数据

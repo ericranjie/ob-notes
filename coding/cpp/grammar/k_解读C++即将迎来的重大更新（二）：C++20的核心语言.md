@@ -14,11 +14,11 @@
 
 [https://mmbiz.qpic.cn/mmbiz_png/KmXPKA19gWibicMtMPFIyPdUxjIbk7w0vuX8NLTDEy4mX3TXQx7xyw7feALMunkJPVEUia1mj2avY57x19ObpofJg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/KmXPKA19gWibicMtMPFIyPdUxjIbk7w0vuX8NLTDEy4mX3TXQx7xyw7feALMunkJPVEUia1mj2avY57x19ObpofJg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-**三路比较运算符 <=>**
+**三路比较运算符 \<=>**
 
-三路比较运算符 <=> 通常被称为太空船运算符。飞船运算符能确定两个值 A 和 B 谁大谁小或相等。
+三路比较运算符 \<=> 通常被称为太空船运算符。飞船运算符能确定两个值 A 和 B 谁大谁小或相等。
 
-编译器可以自动生成三路比较运算符。你只需要用 default 礼貌地要求它即可。在这种情况下，你会得到所有六种比较运算符：==、!=、<、 <=、>、>=。
+编译器可以自动生成三路比较运算符。你只需要用 default 礼貌地要求它即可。在这种情况下，你会得到所有六种比较运算符：==、!=、\<、 \<=、>、>=。
 
 ```
 #include <compare>
@@ -29,7 +29,7 @@ struct MyInt {
 };
 ```
 
-默认的 <=> 执行的是字典顺序比较（lexicographical comparison），使用从基类开始从左到右并以声明顺序（declaration order）使用非静态元素的顺序。
+默认的 \<=> 执行的是字典顺序比较（lexicographical comparison），使用从基类开始从左到右并以声明顺序（declaration order）使用非静态元素的顺序。
 
 微软的博客上有一些相当复杂精细的示例：[https://devblogs.microsoft.com/cppblog/simplify-your-code-with-rocket-science-c20s-spaceship-operator/](https://devblogs.microsoft.com/cppblog/simplify-your-code-with-rocket-science-c20s-spaceship-operator/)
 
@@ -176,7 +176,7 @@ C++20 在 lambda 方面的改进也很多。
 
 如果你想要了解改动的细节，请参阅 Bartek 的博客：[https://www.bfilipek.com/2019/02/lambdas-story-part1.html，里面介绍了](https://www.bfilipek.com/2019/02/lambdas-story-part1.html%EF%BC%8C%E9%87%8C%E9%9D%A2%E4%BB%8B%E7%BB%8D%E4%BA%86) C++17 和 C++20 中的 lambda 改进。总之，我们会迎来两个有意思的变化。
 
-- 允许 [=, this] 作为 lambda capture，并通过 [=] 弃用这个的隐式 capture
+- 允许 \[=, this\] 作为 lambda capture，并通过 \[=\] 弃用这个的隐式 capture
 
 ```
 struct Lambda {
@@ -196,11 +196,11 @@ struct LambdaCpp20 {
 };
 ```
 
-在 C++20 中，通过在结构体 lambda 中复制而实现隐式 [=] capture 会出现弃用警告。如果你通过复制 [=, this] 来显式地获取它，就不会收到 C++20 的弃用警告。
+在 C++20 中，通过在结构体 lambda 中复制而实现隐式 \[=\] capture 会出现弃用警告。如果你通过复制 \[=, this\] 来显式地获取它，就不会收到 C++20 的弃用警告。
 
 - 模板 lambda
 
-你可能和我一样，最先想到的是：我们为什么需要模板 lambda？当你用 C++14 的 [](auto x){ return x; } 写一个通用 lambda 时，编译器会自动使用一个模板化的调用运算符来生成一个类：
+你可能和我一样，最先想到的是：我们为什么需要模板 lambda？当你用 C++14 的 \[\](auto x){ return x; } 写一个通用 lambda 时，编译器会自动使用一个模板化的调用运算符来生成一个类：
 
 ```
 template <typename T>
@@ -217,9 +217,9 @@ auto foo = []<typename T>(std::vector<T> const& vec) {
     };
 ```
 
-**新属性：[[likely]] 和 [[unlikely]]**
+**新属性：\[\[likely\]\] 和 \[\[unlikely\]\]**
 
-C++20 有 [[likely]] 和 [[unlikely]] 两个新属性。这两个新属性都允许为优化器提供提示：执行的路径是更可能或是更不可能。
+C++20 有 \[\[likely\]\] 和 \[\[unlikely\]\] 两个新属性。这两个新属性都允许为优化器提供提示：执行的路径是更可能或是更不可能。
 
 ```
 for(size_t i=0; i < v.size(); ++i){
@@ -270,7 +270,7 @@ int main()
 }
 ```
 
-*原文链接：[https://www.modernescpp.com/index.php/c-20-the-core-language*](https://www.modernescpp.com/index.php/c-20-the-core-language*)
+\*原文链接：[https://www.modernescpp.com/index.php/c-20-the-core-language\*](https://www.modernescpp.com/index.php/c-20-the-core-language*)
 
 **本文为机器之心编译，转载请联系本公众号获得授权。**
 

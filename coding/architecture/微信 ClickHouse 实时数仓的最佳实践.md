@@ -2,13 +2,11 @@
 
 原创 腾讯程序员 腾讯技术工程
 
- _2021年11月24日 18:00_
+_2021年11月24日 18:00_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
 
-  
-
-作者：微信WeOLAP团队&腾讯云数据仓库 Clickhouse 团队  
+作者：微信WeOLAP团队&腾讯云数据仓库 Clickhouse 团队
 
 微信作为一款国民级应用，已经覆盖了社交、支付、出行等人们生活的方方面面。海量多样化的业务形态，对数据分析提出了新的挑战。为了满足业务数据分析的需求，微信 WeOLAP 团队联手腾讯云，共建千台规模、数据 PB 级、批流一体的 ClickHouse 数据仓库，实现了 10 倍以上的性能提升。下文将由浅入深，为大家揭晓微信在 ClickHouse 实时数仓实践中积累的经验及方法。
 
@@ -54,11 +52,11 @@
 
 此时，腾讯云数据仓库 Clickhouse 团队积极深入业务，主动与微信团队合作，双方开始共同解决上述问题。腾讯云数据仓库 Clickhouse 提供全托管一站式的全面服务，使得微信团队不需要过多关注稳定性问题。另外，双方团队积累了丰富查询优化经验，共享经验更有利于 Clickhouse 性能极致提升。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 微信跟腾讯云数据仓库 Clickhouse 的合作，从今年 3 月份开始，在验证期小规模试用 ClickHouse 后，业务一直在快速增长，双方开始共建进行稳定性和性能上的优化。主要做了两件事：一个是建立了整个 ClickHouse OLAP 的生态，另外一个是做了的探索出贴近业务的查询优化方法。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 三、共建 ClickHouse OLAP 的生态
 
@@ -72,41 +70,35 @@
 
 **4.Monitor**：负责监控报警，亚健康检测，查询健康度分析，可与 Manager 联动；
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 微信 WeOLAP 团队和腾讯云重点在以下方面进行了合作攻坚：
 
 **1.高性能接入**：微信的吞吐达到了十亿级别，实时接入方面，通过令牌、反压的方案，比较好地解决了流量洪峰的问题。另外通过 Hash 路由接入，使数据落地了之后可直接做 Join，无需 shuffle 实现的更快 Join 查询，在接入上也实现了精确一次。离线同步方案上，微信跟大多数业界的做法基本上一致，在通过预构 Merge 成建成 Part，再送到线上的服务节点，这其实是种读写分离的思想，更便于满足高一致性、高吞吐的场景要求。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **2.极致的查询优化**：ClickHouse 整个的设计哲学，要求在特定的场景下，采用特定的语法，才能得到最极致的性能。为解决 ClickHouse 使用门槛高的问题，微信把相应的优化经验落地到内部 BI 平台上，沉淀到平台后，使得小白用户都可以方便使用 ClickHouse。通过一系列优化手段，在直播、视频号等多个 Case 实现 10 倍以上性能提升。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 基于共建的 ClickHouse 生态，在微信有以下的典型应用场景：
 
 **1.BI 分析/看板**：由于科学探索是随机的，很难通过预构建的方式来解决，之前用 Hadoop 的生态只能实现小时到分钟的级别。目前 ClickHouse 优化完之后，在单表万亿的数据量下，大多数的查询，P95 在 5 秒以内。数据科学家现在想做一个验证，非常快就可以实现。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**2.A/B 实验平台**：早期做 A/B 实验的时候，前一天晚上要把所有的实验统计结果，预先聚合好，第二天才能查询实验结果。在单表数据量级千亿 / 天、大表实时 Join 的场景下，微信前后经历了几个方案，实现了近 50 倍的性能提升。从离线到实时分析的飞跃，使得 P95 响应<3S，A/B 实验结论更加准确，实验周期更短 ，模型验证更快。
+**2.A/B 实验平台**：早期做 A/B 实验的时候，前一天晚上要把所有的实验统计结果，预先聚合好，第二天才能查询实验结果。在单表数据量级千亿 / 天、大表实时 Join 的场景下，微信前后经历了几个方案，实现了近 50 倍的性能提升。从离线到实时分析的飞跃，使得 P95 响应\<3S，A/B 实验结论更加准确，实验周期更短 ，模型验证更快。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**3.实时特征计算**：虽然大家普遍认为 ClickHouse 不太擅长解决实时相关的问题，但最终通过优化，可以做到扫描量数十亿，全链路时延<3 秒，P95 响应近 1 秒。
+**3.实时特征计算**：虽然大家普遍认为 ClickHouse 不太擅长解决实时相关的问题，但最终通过优化，可以做到扫描量数十亿，全链路时延\<3 秒，P95 响应近 1 秒。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 四、性能的显著提升
 
 目前，微信当前规模千台，数据量 PB 级，每天的查询量上百万，单集群 TPS 达到了亿级，而查询耗时均值仅需秒级返回。ClickHouse OLAP 的生态相对于之前的 Hadoop 生态，性能提升了 10 倍以上，通过流批一体提供更稳定可靠的服务，使得业务决策更迅速，实验结论更准确。
-
-  
 
 ### 五、共建存算分离的云原生数仓
 
@@ -122,27 +114,21 @@ ClickHouse 原始的设计和 Shard-Nothing 的架构，无法很好地实现秒
 
 存算分离的云原生数仓能力，明年将会在腾讯云官网上线，敬请期待！
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 本文章由微信技术架构部-WeOLAP 团队出品，「WeOLAP」专注于用前沿大数据技术解决微信海量数据高性能查询问题。
 
 腾讯云数据仓库 Clickhouse 10 元新客体验活动火爆进行中 ↓↓↓
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 最近热文：
 
-[Golang 编程思维和工程实战](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765517&idx=1&sn=b5036484e2782e9302e3e98ff0d6d1ea&chksm=becca5f689bb2ce0a20578ec53c3f8e3ab700f48e31a21bc6d27dd2fb0dfd28803117b96e3b1&scene=21#wechat_redirect)  
+[Golang 编程思维和工程实战](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765517&idx=1&sn=b5036484e2782e9302e3e98ff0d6d1ea&chksm=becca5f689bb2ce0a20578ec53c3f8e3ab700f48e31a21bc6d27dd2fb0dfd28803117b96e3b1&scene=21#wechat_redirect)
 
-[Linux I/O 那些事儿](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765494&idx=1&sn=f0711a27cdbcfb01c5fe3d734db95aae&chksm=becca50d89bb2c1bb036245e74a5e5662044fce20e03a49e2cdbb2b4888991535c4378463289&scene=21#wechat_redirect)  
+[Linux I/O 那些事儿](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765494&idx=1&sn=f0711a27cdbcfb01c5fe3d734db95aae&chksm=becca50d89bb2c1bb036245e74a5e5662044fce20e03a49e2cdbb2b4888991535c4378463289&scene=21#wechat_redirect)
 
-[开源监控系统 Prometheus 最佳实践](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765460&idx=1&sn=7b95f5497e4e04564e912ee85a56c6ac&chksm=becca52f89bb2c3946000426ca78bd1e321f64b51dc1d30e230f03cbf4b7bdc19165e41249d7&scene=21#wechat_redirect)  
-
-  
+[开源监控系统 Prometheus 最佳实践](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765460&idx=1&sn=7b95f5497e4e04564e912ee85a56c6ac&chksm=becca52f89bb2c3946000426ca78bd1e321f64b51dc1d30e230f03cbf4b7bdc19165e41249d7&scene=21#wechat_redirect)
 
 阅读 1.7万
 
@@ -153,13 +139,12 @@ ClickHouse 原始的设计和 Shard-Nothing 的架构，无法很好地实现秒
 **留言 1**
 
 - 王晓洪
-    
-    2021年11月24日
-    
-    赞9
-    
-    666，实时数据导入这一块，能否详细分享一下做法![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，谢谢
-    
+
+  2021年11月24日
+
+  赞9
+
+  666，实时数据导入这一块，能否详细分享一下做法![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，谢谢
 
 已无更多数据
 
@@ -178,12 +163,11 @@ ClickHouse 原始的设计和 Shard-Nothing 的架构，无法很好地实现秒
 **留言 1**
 
 - 王晓洪
-    
-    2021年11月24日
-    
-    赞9
-    
-    666，实时数据导入这一块，能否详细分享一下做法![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，谢谢
-    
+
+  2021年11月24日
+
+  赞9
+
+  666，实时数据导入这一块，能否详细分享一下做法![[机智]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)，谢谢
 
 已无更多数据

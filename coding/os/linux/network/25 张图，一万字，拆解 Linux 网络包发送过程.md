@@ -1,22 +1,18 @@
-
 Original 张彦飞allen 开发内功修炼
 
- _2021年05月12日 08:28_
+_2021年05月12日 08:28_
 
-  
-
-大家好，我是飞哥!  
+大家好，我是飞哥!
 
 半年前我以源码的方式描述了网络包的接收过程。之后不断有粉丝提醒我还没聊发送过程呢。好，安排！
 
 在开始今天的文章之前，我先来请大家思考几个小问题。
 
 - 问1：我们在查看内核发送数据消耗的 CPU 时，是应该看 sy 还是 si ？
-    
+
 - 问2：为什么你服务器上的 /proc/softirqs 里 NET_RX 要比 NET_TX 大的多的多？
-    
+
 - 问3：发送网络数据的时候都涉及到哪些内存拷贝操作？
-    
 
 这些问题虽然在线上经常看到，但我们似乎很少去深究。如果真的能透彻地把这些问题理解到位，我们对性能的掌控能力将会变得更强。
 
@@ -44,21 +40,21 @@ Original 张彦飞allen 开发内功修炼
 
 我这里先给大家准备了一个总的流程图，简单阐述下 send 发送了的数据是如何一步一步被发送到网卡的。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-在这幅图中，我们看到用户数据被拷贝到内核态，然后经过协议栈处理后进入到了 RingBuffer 中。随后网卡驱动真正将数据发送了出去。当发送完成的时候，是通过硬中断来通知 CPU，然后清理 RingBuffer。  
+在这幅图中，我们看到用户数据被拷贝到内核态，然后经过协议栈处理后进入到了 RingBuffer 中。随后网卡驱动真正将数据发送了出去。当发送完成的时候，是通过硬中断来通知 CPU，然后清理 RingBuffer。
 
 因为文章后面要进入源码，所以我们再从源码的角度给出一个流程图。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-虽然数据这时已经发送完毕，但是其实还有一件重要的事情没有做，那就是释放缓存队列等内存。  
+虽然数据这时已经发送完毕，但是其实还有一件重要的事情没有做，那就是释放缓存队列等内存。
 
 那内核是如何知道什么时候才能释放内存的呢，当然是等网络发送完毕之后。网卡在发送完毕的时候，会给 CPU 发送一个硬中断来通知 CPU。更完整的流程看图：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-注意，我们今天的主题虽然是发送数据，但是硬中断最终触发的软中断却是 NET_RX_SOFTIRQ，而并不是 NET_TX_SOFTIRQ ！！！（T 是 transmit 的缩写，R 表示 receive）  
+注意，我们今天的主题虽然是发送数据，但是硬中断最终触发的软中断却是 NET_RX_SOFTIRQ，而并不是 NET_TX_SOFTIRQ ！！！（T 是 transmit 的缩写，R 表示 receive）
 
 **意不意外，惊不惊喜？？？**
 
@@ -74,15 +70,15 @@ Original 张彦飞allen 开发内功修炼
 
 现在的服务器上的网卡一般都是支持多队列的。每一个队列上都是由一个 RingBuffer 表示的，开启了多队列以后的的网卡就会对应有多个 RingBuffer。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-网卡在启动时最重要的任务之一就是分配和初始化 RingBuffer，理解了 RingBuffer 将会非常有助于后面我们掌握发送。因为今天的主题是发送，所以就以传输队列为例，我们来看下网卡启动时分配 RingBuffer 的实际过程。  
+网卡在启动时最重要的任务之一就是分配和初始化 RingBuffer，理解了 RingBuffer 将会非常有助于后面我们掌握发送。因为今天的主题是发送，所以就以传输队列为例，我们来看下网卡启动时分配 RingBuffer 的实际过程。
 
-在网卡启动的时候，会调用到 __igb_open 函数，RingBuffer 就是在这里分配的。
+在网卡启动的时候，会调用到 \_\_igb_open 函数，RingBuffer 就是在这里分配的。
 
 `//file: drivers/net/ethernet/intel/igb/igb_main.c   static int __igb_open(struct net_device *netdev, bool resuming)   {    struct igb_adapter *adapter = netdev_priv(netdev);       //分配传输描述符数组    err = igb_setup_all_tx_resources(adapter);       //分配接收描述符数组    err = igb_setup_all_rx_resources(adapter);       //开启全部队列    netif_tx_start_all_queues(netdev);   }   `
 
-在上面 __igb_open 函数调用 igb_setup_all_tx_resources 分配所有的传输 RingBuffer, 调用 igb_setup_all_rx_resources 创建所有的接收 RingBuffer。
+在上面 \_\_igb_open 函数调用 igb_setup_all_tx_resources 分配所有的传输 RingBuffer, 调用 igb_setup_all_rx_resources 创建所有的接收 RingBuffer。
 
 `//file: drivers/net/ethernet/intel/igb/igb_main.c   static int igb_setup_all_tx_resources(struct igb_adapter *adapter)   {    //有几个队列就构造几个 RingBuffer    for (i = 0; i < adapter->num_tx_queues; i++) {     igb_setup_tx_resources(adapter->tx_ring[i]);    }   }   `
 
@@ -92,14 +88,14 @@ Original 张彦飞allen 开发内功修炼
 
 从上述源码可以看到，实际上一个 RingBuffer 的内部不仅仅是一个环形队列数组，而是有两个。
 
-1）igb_tx_buffer 数组：这个数组是内核使用的，通过 vzalloc 申请的。  
+1）igb_tx_buffer 数组：这个数组是内核使用的，通过 vzalloc 申请的。\
 2）e1000_adv_tx_desc 数组：这个数组是网卡硬件使用的，硬件是可以通过 DMA 直接访问这块内存，通过 dma_alloc_coherent 分配。
 
 这个时候它们之间还没有啥联系。将来在发送的时候，这两个环形数组中相同位置的指针将都将指向同一个 skb。这样，内核和硬件就能共同访问同样的数据了，内核往 skb 里写数据，网卡硬件负责发送。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-最后调用 netif_tx_start_all_queues 开启队列。另外，对于硬中断的处理函数 igb_msix_ring 其实也是在 __igb_open 中注册的。  
+最后调用 netif_tx_start_all_queues 开启队列。另外，对于硬中断的处理函数 igb_msix_ring 其实也是在 \_\_igb_open 中注册的。
 
 ## 三、accept 创建新 socket
 
@@ -109,13 +105,13 @@ Original 张彦飞allen 开发内功修炼
 
 假设服务器进程通过 accept 和客户端建立了两条连接，我们来简单看一下这两条连接和进程的关联关系。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-其中代表一条连接的 socket 内核对象更为具体一点的结构图如下。  
+其中代表一条连接的 socket 内核对象更为具体一点的结构图如下。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-为了避免喧宾夺主，accept 详细的源码过程这里就不介绍了，感兴趣请参考 [《图解 | 深入揭秘 epoll 是如何实现 IO 多路复用的！》](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247484905&idx=1&sn=a74ed5d7551c4fb80a8abe057405ea5e&scene=21#wechat_redirect)。一文中的第一部分。  
+为了避免喧宾夺主，accept 详细的源码过程这里就不介绍了，感兴趣请参考 [《图解 | 深入揭秘 epoll 是如何实现 IO 多路复用的！》](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247484905&idx=1&sn=a74ed5d7551c4fb80a8abe057405ea5e&scene=21#wechat_redirect)。一文中的第一部分。
 
 今天我们还是把重点放到数据发送过程上。
 
@@ -126,15 +122,14 @@ Original 张彦飞allen 开发内功修炼
 send 系统调用的源码位于文件 net/socket.c 中。在这个系统调用里，内部其实真正使用的是 sendto 系统调用。整个调用链条虽然不短，但其实主要只干了两件简单的事情，
 
 - 第一是在内核中把真正的 socket 找出来，在这个对象里记录着各种协议栈的函数地址。
-    
+
 - 第二是构造一个 struct msghdr 对象，把用户传入的数据，比如 buffer地址、数据长度啥的，统统都装进去.
-    
 
 剩下的事情就交给下一层，协议栈里的函数 inet_sendmsg 了，其中 inet_sendmsg 函数的地址是通过 socket 内核对象里的 ops 成员找到的。大致流程如图。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-有了上面的了解，我们再看起源码就要容易许多了。源码如下：  
+有了上面的了解，我们再看起源码就要容易许多了。源码如下：
 
 `//file: net/socket.c   SYSCALL_DEFINE4(send, int, fd, void __user *, buff, size_t, len,     unsigned int, flags)   {    return sys_sendto(fd, buff, len, flags, NULL, 0);   }      SYSCALL_DEFINE6(......)   {    //1.根据 fd 查找到 socket    sock = sockfd_lookup_light(fd, &err, &fput_needed);       //2.构造 msghdr    struct msghdr msg;    struct iovec iov;       iov.iov_base = buff;    iov.iov_len = len;    msg.msg_iovlen = 1;       msg.msg_iov = &iov;    msg.msg_flags = flags;    ......       //3.发送数据    sock_sendmsg(sock, &msg, len);   }   `
 
@@ -142,7 +137,7 @@ send 系统调用的源码位于文件 net/socket.c 中。在这个系统调用�
 
 在 sendto 系统调用里，首先根据用户传进来的 socket 句柄号来查找真正的 socket 内核对象。接着把用户请求的 buff、len、flag 等参数都统统打包到一个 struct msghdr 对象中。
 
-接着调用了 sock_sendmsg => __sock_sendmsg ==>  __sock_sendmsg_nosec。在__sock_sendmsg_nosec 中，调用将会由系统调用进入到协议栈，我们来看它的源码。
+接着调用了 sock_sendmsg => \_\_sock_sendmsg ==>  \_\_sock_sendmsg_nosec。在\_\_sock_sendmsg_nosec 中，调用将会由系统调用进入到协议栈，我们来看它的源码。
 
 `//file: net/socket.c   static inline int __sock_sendmsg_nosec(...)   {    ......    return sock->ops->sendmsg(iocb, sock, msg, size);   }   `
 
@@ -156,9 +151,9 @@ send 系统调用的源码位于文件 net/socket.c 中。在这个系统调用�
 
 在这个函数中，内核会申请一个内核态的 skb 内存，将用户待发送的数据拷贝进去。注意这个时候不一定会真正开始发送，如果没有达到发送条件的话很可能这次调用直接就返回了。大概过程如图：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-我们来看 inet_sendmsg 函数的源码。  
+我们来看 inet_sendmsg 函数的源码。
 
 `//file: net/ipv4/af_inet.c   int inet_sendmsg(......)   {    ......    return sk->sk_prot->sendmsg(iocb, sk, msg, size);   }   `
 
@@ -172,17 +167,17 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 理解对 socket 调用 tcp_write_queue_tail 是理解发送的前提。如上所示，这个函数是在获取 socket 发送队列中的最后一个 skb。skb 是 struct sk_buff 对象的简称，用户的发送队列就是该对象组成的一个链表。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-我们再接着看 tcp_sendmsg 的其它部分。  
+我们再接着看 tcp_sendmsg 的其它部分。
 
 `//file: net/ipv4/tcp.c   int tcp_sendmsg(struct kiocb *iocb, struct sock *sk, struct msghdr *msg,     size_t size)   {    //获取用户传递过来的数据和标志    iov = msg->msg_iov; //用户数据地址    iovlen = msg->msg_iovlen; //数据块数为1    flags = msg->msg_flags; //各种标志       //遍历用户层的数据块    while (--iovlen >= 0) {        //待发送数据块的地址     unsigned char __user *from = iov->iov_base;        while (seglen > 0) {         //需要申请新的 skb      if (copy <= 0) {          //申请 skb，并添加到发送队列的尾部       skb = sk_stream_alloc_skb(sk,            select_size(sk, sg),            sk->sk_allocation);          //把 skb 挂到socket的发送队列上       skb_entail(sk, skb);      }         // skb 中有足够的空间      if (skb_availroom(skb) > 0) {       //拷贝用户空间的数据到内核空间，同时计算校验和       //from是用户空间的数据地址        skb_add_data_nocache(sk, skb, from, copy);      }       ......   `
 
 这个函数比较长，不过其实逻辑并不复杂。其中 msg->msg_iov 存储的是用户态内存的要发送的数据的 buffer。接下来在内核态申请内核内存，比如 skb，并把用户内存里的数据拷贝到内核态内存中。**这就会涉及到一次或者几次内存拷贝的开销**。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-至于内核什么时候真正把 skb 发送出去。在 tcp_sendmsg 中会进行一些判断。  
+至于内核什么时候真正把 skb 发送出去。在 tcp_sendmsg 中会进行一些判断。
 
 `//file: net/ipv4/tcp.c   int tcp_sendmsg(...)   {    while(...){     while(...){      //申请内核内存并进行拷贝         //发送判断      if (forced_push(tp)) {       tcp_mark_push(tp, skb);       __tcp_push_pending_frames(sk, mss_now, TCP_NAGLE_PUSH);      } else if (skb == tcp_send_head(sk))       tcp_push_one(sk, mss_now);        }      continue;     }    }   }   `
 
@@ -192,13 +187,13 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 #### 2）传输层发送
 
-假设现在内核发送条件已经满足了，我们再来跟踪一下实际的发送过程。对于上小节函数中，当满足真正发送条件的时候，无论调用的是 __tcp_push_pending_frames 还是 tcp_push_one 最终都实际会执行到 tcp_write_xmit。
+假设现在内核发送条件已经满足了，我们再来跟踪一下实际的发送过程。对于上小节函数中，当满足真正发送条件的时候，无论调用的是 \_\_tcp_push_pending_frames 还是 tcp_push_one 最终都实际会执行到 tcp_write_xmit。
 
 所以我们直接从 tcp_write_xmit 看起，这个函数处理了传输层的拥塞控制、滑动窗口相关的工作。满足窗口要求的时候，设置一下 TCP 头然后将 skb 传到更低的网络层进行处理。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-我们来看下 tcp_write_xmit 的源码。  
+我们来看下 tcp_write_xmit 的源码。
 
 `//file: net/ipv4/tcp_output.c   static bool tcp_write_xmit(struct sock *sk, unsigned int mss_now, int nonagle,         int push_one, gfp_t gfp)   {    //循环获取待发送 skb    while ((skb = tcp_send_head(sk)))     {     //滑动窗口相关     cwnd_quota = tcp_cwnd_test(tp, skb);     tcp_snd_wnd_test(tp, skb, mss_now);     tcp_mss_split_point(...);     tso_fragment(sk, skb, ...);     ......        //真正开启发送     tcp_transmit_skb(sk, skb, 1, gfp);    }   }   `
 
@@ -212,9 +207,9 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 第二件事是修改 skb 中的 TCP header，根据实际情况把 TCP 头设置好。这里要介绍一个小技巧，skb 内部其实包含了网络协议中所有的 header。在设置 TCP 头的时候，只是把指针指向 skb 的合适位置。后面再设置 IP 头的时候，在把指针挪一挪就行，避免频繁的内存申请和拷贝，效率很高。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-tcp_transmit_skb 是发送数据位于传输层的最后一步，接下来就可以进入到网络层进行下一层的操作了。调用了网络层提供的发送接口icsk->icsk_af_ops->queue_xmit()。  
+tcp_transmit_skb 是发送数据位于传输层的最后一步，接下来就可以进入到网络层进行下一层的操作了。调用了网络层提供的发送接口icsk->icsk_af_ops->queue_xmit()。
 
 在下面的这个源码中，我们的知道了 queue_xmit 其实指向的是 ip_queue_xmit 函数。
 
@@ -228,9 +223,9 @@ Linux 内核网络层的发送的实现位于 net/ipv4/ip_output.c 这个文件�
 
 在网络层里主要处理路由项查找、IP 头设置、netfilter 过滤、skb 切分（大于 MTU 的话）等几项工作，处理完这些工作后会交给更下层的邻居子系统来处理。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-我们来看网络层入口函数 ip_queue_xmit 的源码：  
+我们来看网络层入口函数 ip_queue_xmit 的源码：
 
 `//file: net/ipv4/ip_output.c   int ip_queue_xmit(struct sk_buff *skb, struct flowi *fl)   {    //检查 socket 中是否有缓存的路由表    rt = (struct rtable *)__sk_dst_check(sk, 0);    if (rt == NULL) {     //没有缓存则展开查找     //则查找路由项， 并缓存到 socket 中     rt = ip_route_output_ports(...);     sk_setup_caps(sk, &rt->dst);    }       //为 skb 设置路由表    skb_dst_set_noref(skb, &rt->dst);       //设置 IP header    iph = ip_hdr(skb);    iph->protocol = sk->sk_protocol;    iph->ttl      = ip_select_ttl(inet, &rt->dst);    iph->frag_off = ...;       //发送    ip_local_out(skb);   }   `
 
@@ -238,9 +233,9 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 在 Linux 上通过 route 命令可以看到你本机的路由配置。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-在路由表中，可以查到某个目的网络应该通过哪个 Iface（网卡），哪个 Gateway（网卡）发送出去。查找出来以后缓存到 socket 上，下次再发送数据就不用查了。  
+在路由表中，可以查到某个目的网络应该通过哪个 Iface（网卡），哪个 Gateway（网卡）发送出去。查找出来以后缓存到 socket 上，下次再发送数据就不用查了。
 
 接着把路由表地址也放到 skb 里去。
 
@@ -248,13 +243,13 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 接下来就是定位到 skb 里的 IP 头的位置上，然后开始按照协议规范设置 IP header。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-再通过 ip_local_out 进入到下一步的处理。  
+再通过 ip_local_out 进入到下一步的处理。
 
 `//file: net/ipv4/ip_output.c     int ip_local_out(struct sk_buff *skb)   {    //执行 netfilter 过滤    err = __ip_local_out(skb);       //开始发送数据    if (likely(err == 1))     err = dst_output(skb);    ......   `
 
-在 ip_local_out => __ip_local_out => nf_hook 会执行 netfilter 过滤。如果你使用 iptables 配置了一些规则，那么这里将检测是否命中规则。**如果你设置了非常复杂的 netfilter 规则，在这个函数这里将会导致你的进程 CPU 开销会极大增加**。
+在 ip_local_out => \_\_ip_local_out => nf_hook 会执行 netfilter 过滤。如果你使用 iptables 配置了一些规则，那么这里将检测是否命中规则。**如果你设置了非常复杂的 netfilter 规则，在这个函数这里将会导致你的进程 CPU 开销会极大增加**。
 
 还是不多展开说，继续只聊和发送有关的过程 dst_output。
 
@@ -282,17 +277,17 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 而且这个邻居子系统并不位于协议栈 net/ipv4/ 目录内，而是位于 net/core/neighbour.c。因为无论是对于 IPv4 还是 IPv6 ，都需要使用该模块。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-在邻居子系统里主要是查找或者创建邻居项，在创造邻居项的时候，有可能会发出实际的 arp 请求。然后封装一下 MAC 头，将发送过程再传递到更下层的网络设备子系统。大致流程如图。  
+在邻居子系统里主要是查找或者创建邻居项，在创造邻居项的时候，有可能会发出实际的 arp 请求。然后封装一下 MAC 头，将发送过程再传递到更下层的网络设备子系统。大致流程如图。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-理解了大致流程，我们再回头看源码。在上面小节 ip_finish_output2 源码中调用了 __ipv4_neigh_lookup_noref。它是在 arp 缓存中进行查找，其第二个参数传入的是路由下一跳 IP 信息。  
+理解了大致流程，我们再回头看源码。在上面小节 ip_finish_output2 源码中调用了 \_\_ipv4_neigh_lookup_noref。它是在 arp 缓存中进行查找，其第二个参数传入的是路由下一跳 IP 信息。
 
 `//file: include/net/arp.h   extern struct neigh_table arp_tbl;   static inline struct neighbour *__ipv4_neigh_lookup_noref(    struct net_device *dev, u32 key)   {    struct neigh_hash_table *nht = rcu_dereference_bh(arp_tbl.nht);       //计算 hash 值，加速查找    hash_val = arp_hashfn(......);    for (n = rcu_dereference_bh(nht->hash_buckets[hash_val]);      n != NULL;      n = rcu_dereference_bh(n->next)) {     if (n->dev == dev && *(u32 *)n->primary_key == key)      return n;    }   }   `
 
-如果查找不到，则调用 __neigh_create 创建一个邻居。
+如果查找不到，则调用 \_\_neigh_create 创建一个邻居。
 
 `//file: net/core/neighbour.c   struct neighbour *__neigh_create(......)   {    //申请邻居表项    struct neighbour *n1, *rc, *n = neigh_alloc(tbl, dev);       //构造赋值    memcpy(n->primary_key, pkey, key_len);    n->dev = dev;    n->parms->neigh_setup(n);       //最后添加到邻居 hashtable 中    rcu_assign_pointer(nht->hash_buckets[hash_val], n);    ......   `
 
@@ -308,15 +303,15 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 ### 4.5 网络设备子系统
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-邻居子系统通过 dev_queue_xmit 进入到网络设备子系统中来。  
+邻居子系统通过 dev_queue_xmit 进入到网络设备子系统中来。
 
 `//file: net/core/dev.c    int dev_queue_xmit(struct sk_buff *skb)   {    //选择发送队列    txq = netdev_pick_tx(dev, skb);       //获取与此队列关联的排队规则    q = rcu_dereference_bh(txq->qdisc);       //如果有队列，则调用__dev_xmit_skb 继续处理数据    if (q->enqueue) {     rc = __dev_xmit_skb(skb, q, dev, txq);     goto out;    }       //没有队列的是回环设备和隧道设备    ......   }   `
 
 开篇第二节网卡启动准备里我们说过，网卡是有多个发送队列的（尤其是现在的网卡）。上面对 netdev_pick_tx 函数的调用就是选择一个队列进行发送。
 
-netdev_pick_tx 发送队列的选择受 XPS 等配置的影响，而且还有缓存，也是一套小复杂的逻辑。这里我们只关注两个逻辑，首先会获取用户的 XPS 配置，否则就自动计算了。代码见 netdev_pick_tx => __netdev_pick_tx。
+netdev_pick_tx 发送队列的选择受 XPS 等配置的影响，而且还有缓存，也是一套小复杂的逻辑。这里我们只关注两个逻辑，首先会获取用户的 XPS 配置，否则就自动计算了。代码见 netdev_pick_tx => \_\_netdev_pick_tx。
 
 `//file: net/core/flow_dissector.c   u16 __netdev_pick_tx(struct net_device *dev, struct sk_buff *skb)   {    //获取 XPS 配置    int new_index = get_xps_queue(dev, skb);       //自动计算队列    if (new_index < 0)     new_index = skb_tx_hash(dev, skb);}   `
 
@@ -324,13 +319,13 @@ netdev_pick_tx 发送队列的选择受 XPS 等配置的影响，而且还有缓
 
 `#tc qdisc   qdisc mq 0: dev eth0 root   `
 
-大部分的设备都有队列（回环设备和隧道设备除外），所以现在我们进入到 __dev_xmit_skb。
+大部分的设备都有队列（回环设备和隧道设备除外），所以现在我们进入到 \_\_dev_xmit_skb。
 
 `//file: net/core/dev.c   static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,        struct net_device *dev,        struct netdev_queue *txq)   {    //1.如果可以绕开排队系统    if ((q->flags & TCQ_F_CAN_BYPASS) && !qdisc_qlen(q) &&        qdisc_run_begin(q)) {     ......    }       //2.正常排队    else {        //入队     q->enqueue(skb, q)        //开始发送     __qdisc_run(q);    }   }   `
 
 上述代码中分两种情况，1 是可以 bypass（绕过）排队系统的，另外一种是正常排队。我们只看第二种情况。
 
-先调用 q->enqueue 把 skb 添加到队列里。然后调用 __qdisc_run 开始发送。
+先调用 q->enqueue 把 skb 添加到队列里。然后调用 \_\_qdisc_run 开始发送。
 
 `//file: net/sched/sch_generic.c   void __qdisc_run(struct Qdisc *q)   {    int quota = weight_p;       //循环从队列取出一个 skb 并发送    while (qdisc_restart(q)) {          // 如果发生下面情况之一，则延后处理：     // 1. quota 用尽     // 2. 其他进程需要 CPU     if (--quota <= 0 || need_resched()) {      //将触发一次 NET_TX_SOFTIRQ 类型 softirq      __netif_schedule(q);      break;     }    }   }   `
 
@@ -348,11 +343,11 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 ### 4.6 软中断调度
 
-在 4.5 咱们看到了如果系统态 CPU 发送网络包不够用的时候，会调用 __netif_schedule 触发一个软中断。该函数会进入到 __netif_reschedule，由它来实际发出 NET_TX_SOFTIRQ 类型软中断。
+在 4.5 咱们看到了如果系统态 CPU 发送网络包不够用的时候，会调用 \_\_netif_schedule 触发一个软中断。该函数会进入到 \_\_netif_reschedule，由它来实际发出 NET_TX_SOFTIRQ 类型软中断。
 
 软中断是由内核线程来运行的，该线程会进入到 net_tx_action 函数，在该函数中能获取到发送队列，并也最终调用到驱动程序里的入口函数 dev_hard_start_xmit。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 `//file: net/core/dev.c   static inline void __netif_reschedule(struct Qdisc *q)   {    sd = &__get_cpu_var(softnet_data);    q->next_sched = NULL;    *sd->output_queue_tailp = q;    sd->output_queue_tailp = &q->next_sched;       ......    raise_softirq_irqoff(NET_TX_SOFTIRQ);   }   `
 
@@ -366,9 +361,9 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 `//file: net/core/dev.c   static void net_tx_action(struct softirq_action *h)   {    //通过 softnet_data 获取发送队列    struct softnet_data *sd = &__get_cpu_var(softnet_data);       // 如果 output queue 上有 qdisc    if (sd->output_queue) {        // 将 head 指向第一个 qdisc     head = sd->output_queue;        //遍历 qdsics 列表     while (head) {      struct Qdisc *q = head;      head = head->next_sched;         //发送数据      qdisc_run(q);     }    }   }   `
 
-软中断这里会获取 softnet_data。前面我们看到进程内核态在调用 __netif_reschedule 的时候把发送队列写到 softnet_data 的 output_queue 里了。软中断循环遍历 sd->output_queue 发送数据帧。
+软中断这里会获取 softnet_data。前面我们看到进程内核态在调用 \_\_netif_reschedule 的时候把发送队列写到 softnet_data 的 output_queue 里了。软中断循环遍历 sd->output_queue 发送数据帧。
 
-来看 qdisc_run，它和进程用户态一样，也会调用到 __qdisc_run。
+来看 qdisc_run，它和进程用户态一样，也会调用到 \_\_qdisc_run。
 
 `//file: include/net/pkt_sched.h   static inline void qdisc_run(struct Qdisc *q)   {    if (qdisc_run_begin(q))     __qdisc_run(q);   }   `
 
@@ -380,9 +375,9 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 在驱动函数里，将 skb 会挂到 RingBuffer上，驱动调用完毕后，数据包将真正从网卡发送出去。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-我们来看看实际的源码：  
+我们来看看实际的源码：
 
 `//file: net/core/dev.c   int dev_hard_start_xmit(struct sk_buff *skb, struct net_device *dev,      struct netdev_queue *txq)   {    //获取设备的回调函数集合 ops    const struct net_device_ops *ops = dev->netdev_ops;       //获取设备支持的功能列表    features = netif_skb_features(skb);       //调用驱动的 ops 里面的发送回调函数 ndo_start_xmit 将数据包传给网卡设备    skb_len = skb->len;    rc = ops->ndo_start_xmit(skb, dev);   }   `
 
@@ -402,9 +397,9 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 在这里从网卡的发送队列的 RingBuffer 中取下来一个元素，并将 skb 挂到元素上。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区域。  
+igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区域。
 
 `//file: drivers/net/ethernet/intel/igb/igb_main.c   static void igb_tx_map(struct igb_ring *tx_ring,         struct igb_tx_buffer *first,         const u8 hdr_len)   {    //获取下一个可用描述符指针    tx_desc = IGB_TX_DESC(tx_ring, i);       //为 skb->data 构造内存映射，以允许设备通过 DMA 从 RAM 中读取数据    dma = dma_map_single(tx_ring->dev, skb->data, size, DMA_TO_DEVICE);       //遍历该数据包的所有分片,为 skb 的每个分片生成有效映射    for (frag = &skb_shinfo(skb)->frags[0];; frag++) {        tx_desc->read.buffer_addr = cpu_to_le64(dma);     tx_desc->read.cmd_type_len = ...;     tx_desc->read.olinfo_status = 0;    }       //设置最后一个descriptor    cmd_type |= size | IGB_TXD_DCMD;    tx_desc->read.cmd_type_len = cpu_to_le32(cmd_type);       /* Force memory writes to complete before letting h/w know there     * are new descriptors to fetch     */    wmb();   }   `
 
@@ -418,9 +413,9 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 在发送完成硬中断里，会执行 RingBuffer 内存的清理工作，如图。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-再回头看一下硬中断触发软中断的源码。  
+再回头看一下硬中断触发软中断的源码。
 
 `//file: drivers/net/ethernet/intel/igb/igb_main.c   static inline void ____napi_schedule(...){    list_add_tail(&napi->poll_list, &sd->poll_list);    __raise_softirq_irqoff(NET_RX_SOFTIRQ);   }   `
 
@@ -442,9 +437,9 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 用一张图总结一下整个发送过程
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-了解了整个发送过程以后，我们回头再来回顾开篇提到的几个问题。  
+了解了整个发送过程以后，我们回头再来回顾开篇提到的几个问题。
 
 **1.我们在监控内核发送数据消耗的 CPU 时，是应该看 sy 还是 si ？**
 
@@ -458,9 +453,9 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 之前我认为 NET_RX 是读取，NET_TX 是传输。对于一个既收取用户请求，又给用户返回的 Server 来说。这两块的数字应该差不多才对，至少不会有数量级的差异。但事实上，飞哥手头的一台服务器是这样的：
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-经过今天的源码分析，发现这个问题的原因有两个。  
+经过今天的源码分析，发现这个问题的原因有两个。
 
 第一个原因是当数据发送完成以后，通过硬中断的方式来通知驱动发送完毕。但是硬中断无论是有数据接收，还是对于发送完毕，触发的软中断都是 NET_RX_SOFTIRQ，而并不是 NET_TX_SOFTIRQ。
 
@@ -484,29 +479,27 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 还愣着干啥，赶紧帮飞哥**赞、再看、转发**三连走起！
 
-**Github:**https://github.com/yanfeizhang/coder-kung-fu
+\*\*Github:\*\*https://github.com/yanfeizhang/coder-kung-fu
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
----
+______________________________________________________________________
 
 由于本文比较长，在公众号上看起来确实是有点费劲。所以飞哥搞了个 pdf，带目录结构，可快速跳转，看起来更方便。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 不过获取方式仍然有点小门槛：**带任意推荐语转发本文到朋友圈，加飞哥微信知会**即可。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/iaMl8iazctEu93J6Io4KDZQmx03HErmVeXnSnUAQ0MD6Nia3d97E8vmljv5DibLTWSeLES1JHicWVA2mynPVlbt1FAA/0?wx_fmt=jpeg)
 
 张彦飞allen
 
- 赞赏不分多少，头像出现就好！ 
+赞赏不分多少，头像出现就好！
 
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247485146&idx=1&sn=e5bfc79ba915df1f6a8b32b87ef0ef78&chksm=a6e307e191948ef748dc73a4b9a862a22ce1db806a486afce57475d4331d905827d6ca161711&mpshare=1&scene=24&srcid=1108sK0v3IIBiCK6Zjom0uCx&sharer_sharetime=1636360606821&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0d6efa3ba7e6fb27c7ddc1d99146febd02e2b9c8327016d50f9acca4501b49a64f971c57f0ca01038ace35fb9b33232a3b09415b3973a356fa2f79d80f530d1148208af6a8f307ab059d6ae0b7ca4e6957d4152dbbd3feed0b16ce3d41169bbadba335097959295cc4ba52d7a3c98f475c2d0bae441a7b154&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQyhWCQOm2kbjcRe1HBktJdhKPAgIE97dBBAEAAAAAAL1YLQtlTxIAAAAOpnltbLcz9gKNyK89dVj0mXgMJVySvBtYiO2e8hXmRmvGd4qVFZscX2aG7dCXOvzwx5CQy6I4UH%2FydJVS8TEKgB9ROvziETa%2F1lphuZh8Hcf%2FnR5NTLm8%2B1OT%2B8xmjxBZSsbIAOnlf%2B5Rh4oCViWLOMf6CwPVj7TtNDGYTS1UuzGhhOWewynUzf0ABjbz%2FqzpQO9ihZmAKR0yF%2BxO%2BW%2FjcWBq2pfGFwx0klZ4YQzOKor6gdY4W5BYNziF%2FLw4rGnumJoRaWdCBDbEErQiSuQ01flW6T2oVOOgtL5C3B8sAUyMt6vjvRsX7klnYfqxGzyXf2wAq17xKC8%3D&acctmode=0&pass_ticket=EISml2p1%2BUu2hhr6qSfNHR6tvl%2B%2BgVLsCwy5t8b9qczJgYoJ4M1YiWU2Mxfriq7x&wx_header=0)Like the Author
+![赞赏二维码](<https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247485146&idx=1&sn=e5bfc79ba915df1f6a8b32b87ef0ef78&chksm=a6e307e191948ef748dc73a4b9a862a22ce1db806a486afce57475d4331d905827d6ca161711&mpshare=1&scene=24&srcid=1108sK0v3IIBiCK6Zjom0uCx&sharer_sharetime=1636360606821&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0d6efa3ba7e6fb27c7ddc1d99146febd02e2b9c8327016d50f9acca4501b49a64f971c57f0ca01038ace35fb9b33232a3b09415b3973a356fa2f79d80f530d1148208af6a8f307ab059d6ae0b7ca4e6957d4152dbbd3feed0b16ce3d41169bbadba335097959295cc4ba52d7a3c98f475c2d0bae441a7b154&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQyhWCQOm2kbjcRe1HBktJdhKPAgIE97dBBAEAAAAAAL1YLQtlTxIAAAAOpnltbLcz9gKNyK89dVj0mXgMJVySvBtYiO2e8hXmRmvGd4qVFZscX2aG7dCXOvzwx5CQy6I4UH%2FydJVS8TEKgB9ROvziETa%2F1lphuZh8Hcf%2FnR5NTLm8%2B1OT%2B8xmjxBZSsbIAOnlf%2B5Rh4oCViWLOMf6CwPVj7TtNDGYTS1UuzGhhOWewynUzf0ABjbz%2FqzpQO9ihZmAKR0yF%2BxO%2BW%2FjcWBq2pfGFwx0klZ4YQzOKor6gdY4W5BYNziF%2FLw4rGnumJoRaWdCBDbEErQiSuQ01flW6T2oVOOgtL5C3B8sAUyMt6vjvRsX7klnYfqxGzyXf2wAq17xKC8%3D&acctmode=0&pass_ticket=EISml2p1%2BUu2hhr6qSfNHR6tvl%2B%2BgVLsCwy5t8b9qczJgYoJ4M1YiWU2Mxfriq7x&wx_header=0>)Like the Author
 
 42 like(s)
 
@@ -527,937 +520,936 @@ Comment
 **留言 116**
 
 - 张彦飞
-    
-    2021年5月12日
-    
-    Like6
-    
-    想进技术群的同学抓紧了，三群又快满了，文尾有飞哥微信二维码![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 另外转发过朋友圈的小伙伴联系飞哥，提供 pdf 增值福利![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    Pinned
-    
+
+  2021年5月12日
+
+  Like6
+
+  想进技术群的同学抓紧了，三群又快满了，文尾有飞哥微信二维码![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 另外转发过朋友圈的小伙伴联系飞哥，提供 pdf 增值福利![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  Pinned
+
 - sowhat1412
-    
-    2021年5月12日
-    
-    Like7
-    
-    我找到了 卷的源头
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like1
-    
-    留言这么快，是不是直接来评论的![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    sowhat1412
-    
-    2021年5月12日
-    
-    Like
-    
-    我是先评论 再看![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嘎嘎！
-    
+
+  2021年5月12日
+
+  Like7
+
+  我找到了 卷的源头
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like1
+
+  留言这么快，是不是直接来评论的![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  sowhat1412
+
+  2021年5月12日
+
+  Like
+
+  我是先评论 再看![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嘎嘎！
+
 - 枫叶
-    
-    2021年5月20日
-    
-    Like3
-    
-    非常好的文章，解答了几个我一直很疑惑的问题，中午吃完饭开始看，一直看到上班时间，都忘记午休了![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月20日
-    
-    Like
-    
-    接下来我又梳理了一遍127.0.0.1的收发过程，等我后面整理完发送出来。
-    
+
+  2021年5月20日
+
+  Like3
+
+  非常好的文章，解答了几个我一直很疑惑的问题，中午吃完饭开始看，一直看到上班时间，都忘记午休了![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月20日
+
+  Like
+
+  接下来我又梳理了一遍127.0.0.1的收发过程，等我后面整理完发送出来。
+
 - 陈兴
-    
-    2022年9月27日
-    
-    Like
-    
-    请问如果socket设置了非阻塞，那么调用send是可以提前返回的，是在哪一步的时候返回的呢？
-    
-    开发内功修炼
-    
-    Author2022年9月28日
-    
-    Like1
-    
-    阻塞是发生在发送缓存区满了的时候，非阻塞返回的话应该也是在数据拷贝到发送缓存区但发现没有位置了，这个时机。
-    
-    Author liked
-    
+
+  2022年9月27日
+
+  Like
+
+  请问如果socket设置了非阻塞，那么调用send是可以提前返回的，是在哪一步的时候返回的呢？
+
+  开发内功修炼
+
+  Author2022年9月28日
+
+  Like1
+
+  阻塞是发生在发送缓存区满了的时候，非阻塞返回的话应该也是在数据拷贝到发送缓存区但发现没有位置了，这个时机。
+
+  Author liked
+
 - Jack
-    
-    2022年1月20日
-    
-    Like
-    
-    万字长篇，手机微信崩了，然后各种启动都不好使，只好把手机重启![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2022年1月20日
-    
-    Like
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    Jack
-    
-    2022年1月20日
-    
-    Like
-    
-    我想加入组织，但大神没有通过呀
-    
-    开发内功修炼
-    
-    Author2022年1月20日
-    
-    Like1
-    
-    我一天集中处理一回好友请求，要不中断太多就没法工作了
-    
+
+  2022年1月20日
+
+  Like
+
+  万字长篇，手机微信崩了，然后各种启动都不好使，只好把手机重启![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2022年1月20日
+
+  Like
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  Jack
+
+  2022年1月20日
+
+  Like
+
+  我想加入组织，但大神没有通过呀
+
+  开发内功修炼
+
+  Author2022年1月20日
+
+  Like1
+
+  我一天集中处理一回好友请求，要不中断太多就没法工作了
+
 - huangww
-    
-    2021年11月22日
-    
-    Like1
-    
-    把网络从应用到硬件的整条通路捋通了，豁然开朗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年11月22日
-    
-    Like1
-    
-    😃嘎嘎！
-    
+
+  2021年11月22日
+
+  Like1
+
+  把网络从应用到硬件的整条通路捋通了，豁然开朗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年11月22日
+
+  Like1
+
+  😃嘎嘎！
+
 - worldᑋᵉᑊᑊᵒ
-    
-    2021年5月12日
-    
-    Like1
-    
-    硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like1
+
+  硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Kaito
-    
-    2021年5月12日
-    
-    Like1
-    
-    飞哥真的是太硬核了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    老哥也一样的强！
-    
+
+  2021年5月12日
+
+  Like1
+
+  飞哥真的是太硬核了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  老哥也一样的强！
+
 - Zheng
-    
-    2021年5月12日
-    
-    Like1
-    
-    彦飞兄 太牛了
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like1
-    
-    争哥来了，给争哥倒茶！
-    
+
+  2021年5月12日
+
+  Like1
+
+  彦飞兄 太牛了
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like1
+
+  争哥来了，给争哥倒茶！
+
 - mi.chao
-    
-    2021年5月12日
-    
-    Like1
-    
-    这文章质量杠杠滴。为后面深入提供了指引，赞!
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，以后再想深入就知道往哪儿对了。后面我也准备再围绕发送写一篇优化方法。
-    
-    mi.chao
-    
-    2021年5月12日
-    
-    Like1
-    
-    哇，期待期待～ 工作中时不时会遇到网络io、CPU瓶颈等问题，很多时候，没明确清晰的思路，各种工具一顿乱试，结果指标也是一知半解，最后的优化方案也是连蒙带猜出来的，效果可想而知了。
-    
+
+  2021年5月12日
+
+  Like1
+
+  这文章质量杠杠滴。为后面深入提供了指引，赞!
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，以后再想深入就知道往哪儿对了。后面我也准备再围绕发送写一篇优化方法。
+
+  mi.chao
+
+  2021年5月12日
+
+  Like1
+
+  哇，期待期待～ 工作中时不时会遇到网络io、CPU瓶颈等问题，很多时候，没明确清晰的思路，各种工具一顿乱试，结果指标也是一知半解，最后的优化方案也是连蒙带猜出来的，效果可想而知了。
+
 - 我是一颗糖波波
-    
-    2021年5月12日
-    
-    Like1
-    
-    收藏了收藏了~
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    收藏等于学会？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like1
+
+  收藏了收藏了~
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  收藏等于学会？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 伢
-    
-    2021年5月12日
-    
-    Like1
-    
-    真的太实用了这个文章。弄清楚了很多之前模糊的点。
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like1
-    
-    嗯，理解了整体流程以后，再遇到一些技术点，就知道往哪儿对了。
-    
+
+  2021年5月12日
+
+  Like1
+
+  真的太实用了这个文章。弄清楚了很多之前模糊的点。
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like1
+
+  嗯，理解了整体流程以后，再遇到一些技术点，就知道往哪儿对了。
+
 - LFN
-    
-    北京2023年11月7日
-    
-    Like
-    
-    多队列指的是网卡硬件层面，还是内核软件层面？
-    
-    开发内功修炼
-    
-    Author2023年11月8日
-    
-    Like
-    
-    硬件层面也有，软件层面也需要支持
-    
+
+  北京2023年11月7日
+
+  Like
+
+  多队列指的是网卡硬件层面，还是内核软件层面？
+
+  开发内功修炼
+
+  Author2023年11月8日
+
+  Like
+
+  硬件层面也有，软件层面也需要支持
+
 - LFN
-    
-    北京2023年11月7日
-    
-    Like
-    
-    写得好清晰，读得酣畅淋漓![[鼓掌]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京2023年11月7日
+
+  Like
+
+  写得好清晰，读得酣畅淋漓![[鼓掌]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 云中墨
-    
-    浙江2023年8月2日
-    
-    Like
-    
-    太顶了，看了一天还没看完![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2023年8月2日
-    
-    Like
-    
-    😀
-    
+
+  浙江2023年8月2日
+
+  Like
+
+  太顶了，看了一天还没看完![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2023年8月2日
+
+  Like
+
+  😀
+
 - keysys
-    
-    四川2023年7月25日
-    
-    Like
-    
-    飞哥飞哥，你好，4.5节我有点疑问： txq = netdev_pick_tx(dev, skb); q = rcu_dereference_bh(txq->qdisc); 对于隧道和虚拟设备，它们也会有对应的 txq 和q么？是在哪儿创建的这些结构呢？
-    
-    开发内功修炼
-    
-    Author2023年7月26日
-    
-    Like
-    
-    隧道源码没看过，虚拟设备我专门写过一篇127.0.0.1的文章
-    
+
+  四川2023年7月25日
+
+  Like
+
+  飞哥飞哥，你好，4.5节我有点疑问： txq = netdev_pick_tx(dev, skb); q = rcu_dereference_bh(txq->qdisc); 对于隧道和虚拟设备，它们也会有对应的 txq 和q么？是在哪儿创建的这些结构呢？
+
+  开发内功修炼
+
+  Author2023年7月26日
+
+  Like
+
+  隧道源码没看过，虚拟设备我专门写过一篇127.0.0.1的文章
+
 - 快乐星球
-    
-    山东2022年11月13日
-    
-    Like
-    
-    如果java代码发送，java层面可以告知到发送成功了吗？发送动作是同步阻塞的吗？io多路复用只针对接受还是发送也有？谢谢
-    
-    开发内功修炼
-    
-    Author2023年6月28日
-    
-    Like
-    
-    多路复用可以对接收也可以对发送，它只是个事件管理机制而已
-    
-    开发内功修炼
-    
-    Author2023年6月28日
-    
-    Like
-    
-    应用层面不知道，可能拷贝到内核就返回了
-    
+
+  山东2022年11月13日
+
+  Like
+
+  如果java代码发送，java层面可以告知到发送成功了吗？发送动作是同步阻塞的吗？io多路复用只针对接受还是发送也有？谢谢
+
+  开发内功修炼
+
+  Author2023年6月28日
+
+  Like
+
+  多路复用可以对接收也可以对发送，它只是个事件管理机制而已
+
+  开发内功修炼
+
+  Author2023年6月28日
+
+  Like
+
+  应用层面不知道，可能拷贝到内核就返回了
+
 - 翟彬
-    
-    2022年2月28日
-    
-    Like
-    
-    随手一个赞，![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月28日
+
+  Like
+
+  随手一个赞，![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Ethan Tang
-    
-    2022年2月13日
-    
-    Like
-    
-    飞哥，啥时候能安排讲讲如何设置网卡的qdisc 规则实现qos功能呢？
-    
-    开发内功修炼
-    
-    Author2022年2月13日
-    
-    Like
-    
-    这个暂时还没考虑到
-    
+
+  2022年2月13日
+
+  Like
+
+  飞哥，啥时候能安排讲讲如何设置网卡的qdisc 规则实现qos功能呢？
+
+  开发内功修炼
+
+  Author2022年2月13日
+
+  Like
+
+  这个暂时还没考虑到
+
 - 简海青
-    
-    2022年1月13日
-    
-    Like
-    
-    如何去追踪请求链路呢？
-    
-    开发内功修炼
-    
-    Author2022年1月20日
-    
-    Like
-    
-    是说怎么跟踪出来的是吧？我就是看代码跳转，偶尔会用stab跟踪一下。
-    
+
+  2022年1月13日
+
+  Like
+
+  如何去追踪请求链路呢？
+
+  开发内功修炼
+
+  Author2022年1月20日
+
+  Like
+
+  是说怎么跟踪出来的是吧？我就是看代码跳转，偶尔会用stab跟踪一下。
+
 - 废言Pro
-    
-    2021年7月23日
-    
-    Like
-    
-    飞哥，太强了，我看了1天，好久可以讲讲QOS和netfilter啊
-    
-    开发内功修炼
-    
-    Author2021年7月23日
-    
-    Like
-    
-    netfilter遍布整个接收和发送过程，是iptable工作的基础，理解了接收发送再看iptable会很顺。
-    
+
+  2021年7月23日
+
+  Like
+
+  飞哥，太强了，我看了1天，好久可以讲讲QOS和netfilter啊
+
+  开发内功修炼
+
+  Author2021年7月23日
+
+  Like
+
+  netfilter遍布整个接收和发送过程，是iptable工作的基础，理解了接收发送再看iptable会很顺。
+
 - SyS
-    
-    2021年7月23日
-    
-    Like
-    
-    飞哥出书，必买！！！
-    
-    开发内功修炼
-    
-    Author2021年7月23日
-    
-    Like
-    
-    提前感谢😁！
-    
+
+  2021年7月23日
+
+  Like
+
+  飞哥出书，必买！！！
+
+  开发内功修炼
+
+  Author2021年7月23日
+
+  Like
+
+  提前感谢😁！
+
 - 正平
-    
-    2021年7月1日
-    
-    Like
-    
-    请博主接受我的膜拜，哈哈，看了2个小时。点赞，转发，加好友，过去电子书。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年7月1日
-    
-    Like
-    
-    👍🏻感谢！
-    
+
+  2021年7月1日
+
+  Like
+
+  请博主接受我的膜拜，哈哈，看了2个小时。点赞，转发，加好友，过去电子书。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年7月1日
+
+  Like
+
+  👍🏻感谢！
+
 - 二马
-    
-    2021年6月18日
-    
-    Like
-    
-    请接受我的膝盖
-    
-    开发内功修炼
-    
-    Author2021年6月18日
-    
-    Like
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年6月18日
+
+  Like
+
+  请接受我的膝盖
+
+  开发内功修炼
+
+  Author2021年6月18日
+
+  Like
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 这个异常捕获不了
-    
-    2021年6月18日
-    
-    Like
-    
-    大佬牛逼，讲讲ebpf吧。最近火的一批
-    
-    开发内功修炼
-    
-    Author2021年6月18日
-    
-    Like
-    
-    后续等倒出空来。
-    
+
+  2021年6月18日
+
+  Like
+
+  大佬牛逼，讲讲ebpf吧。最近火的一批
+
+  开发内功修炼
+
+  Author2021年6月18日
+
+  Like
+
+  后续等倒出空来。
+
 - coder
-    
-    2021年6月17日
-    
-    Like
-    
-    飞哥考虑出书吗？
-    
-    开发内功修炼
-    
-    Author2021年6月18日
-    
-    Like
-    
-    有这个计划。
-    
+
+  2021年6月17日
+
+  Like
+
+  飞哥考虑出书吗？
+
+  开发内功修炼
+
+  Author2021年6月18日
+
+  Like
+
+  有这个计划。
+
 - 善行通
-    
-    2021年6月7日
-    
-    Like
-    
-    厉害，中华有你这人才，中国必定成世界领导位置
-    
-    开发内功修炼
-    
-    Author2021年6月7日
-    
-    Like
-    
-    听完老哥这评价，我没差点从椅子上飞起来。![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年6月7日
+
+  Like
+
+  厉害，中华有你这人才，中国必定成世界领导位置
+
+  开发内功修炼
+
+  Author2021年6月7日
+
+  Like
+
+  听完老哥这评价，我没差点从椅子上飞起来。![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - MageByte
-    
-    2021年5月19日
-    
-    Like
-    
-    哥，这么猛么
-    
-    开发内功修炼
-    
-    Author2021年5月19日
-    
-    Like
-    
-    因为自己好奇这个，所以就肝了它。
-    
+
+  2021年5月19日
+
+  Like
+
+  哥，这么猛么
+
+  开发内功修炼
+
+  Author2021年5月19日
+
+  Like
+
+  因为自己好奇这个，所以就肝了它。
+
 - Alex
-    
-    2021年5月19日
-    
-    Like
-    
-    厉害![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月19日
-    
-    Like
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月19日
+
+  Like
+
+  厉害![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月19日
+
+  Like
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 争伟（建忠）
-    
-    2021年5月12日
-    
-    Like
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 请教个问题啊： q->enqueue(skb, q)入队后立即调用_qdisc_run遍历队列取出skb,既然每次入队后然后不停取出，也就是每次队列里面只有一个元素？如果是这样，为什么还要用队列呢，直接发送不行吗？
-    
-    开发内功修炼
-    
-    Author2021年5月14日
-    
-    Like
-    
-    q是Qdisc对象，这东东抽象了排队规则。这个规则并不是简单的先进先出。man tc命令查看其中的CLASSLESS QDISCS，能看到有十几多种排队规则存在。
-    
+
+  2021年5月12日
+
+  Like
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 请教个问题啊： q->enqueue(skb, q)入队后立即调用_qdisc_run遍历队列取出skb,既然每次入队后然后不停取出，也就是每次队列里面只有一个元素？如果是这样，为什么还要用队列呢，直接发送不行吗？
+
+  开发内功修炼
+
+  Author2021年5月14日
+
+  Like
+
+  q是Qdisc对象，这东东抽象了排队规则。这个规则并不是简单的先进先出。man tc命令查看其中的CLASSLESS QDISCS，能看到有十几多种排队规则存在。
+
 - 朱晋君
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥，太硬核了
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥，太硬核了
+
 - 逝水比喻时光荏苒
-    
-    2021年5月12日
-    
-    Like
-    
-    膜拜，等了好久，看完1/3提前顶礼膜拜！ 不枉我还特意私聊飞哥崔更，分析的太牛了！
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    没让老哥失望就行![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  膜拜，等了好久，看完1/3提前顶礼膜拜！ 不枉我还特意私聊飞哥崔更，分析的太牛了！
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  没让老哥失望就行![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 程序员Carl
-    
-    2021年5月12日
-    
-    Like
-    
-    提高内功 找飞哥![[加油]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  提高内功 找飞哥![[加油]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Wong
-    
-    2021年5月12日
-    
-    Like
-    
-    硬核~Orz![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  硬核~Orz![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Do
-    
-    2021年5月12日
-    
-    Like
-    
-    这么多字这么多图，这文章估计要写很久吧![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，前前后后十多天 😅
-    
+
+  2021年5月12日
+
+  Like
+
+  这么多字这么多图，这文章估计要写很久吧![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，前前后后十多天 😅
+
 - Aero
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥，图是用啥画的？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    我现在所有图都用 draw.io 来画
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥，图是用啥画的？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  我现在所有图都用 draw.io 来画
+
 - 阿星
-    
-    2021年5月12日
-    
-    Like
-    
-    大佬起飞
-    
+
+  2021年5月12日
+
+  Like
+
+  大佬起飞
+
 - 小K
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥太强了
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    小k马上起飞！
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥太强了
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  小k马上起飞！
+
 - 阿秀
-    
-    2021年5月12日
-    
-    Like
-    
-    太强了飞哥！！！
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    感谢阿秀！
-    
+
+  2021年5月12日
+
+  Like
+
+  太强了飞哥！！！
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  感谢阿秀！
+
 - 一口Linux-彭
-    
-    2021年5月12日
-    
-    Like
-    
-    太硬了！！
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈😃
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    新上一道主菜![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  太硬了！！
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈😃
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  新上一道主菜![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - hncboy
-    
-    2021年5月12日
-    
-    Like
-    
-    太硬了。
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嘎嘎！
-    
+
+  2021年5月12日
+
+  Like
+
+  太硬了。
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嘎嘎！
+
 - 沉默王二
-    
-    2021年5月12日
-    
-    Like
-    
-    这也太强了。
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    被二哥说强是一种什么体验![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  这也太强了。
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  被二哥说强是一种什么体验![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - cxuan
-    
-    2021年5月12日
-    
-    Like
-    
-    文章太硬了
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    肝了10天才肝出来的![[害羞]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-- 牛小号_
-    
-    2021年5月12日
-    
-    Like
-    
-    牛皮啊 看了我半个多小时![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈哈，赞！
-    
+
+  2021年5月12日
+
+  Like
+
+  文章太硬了
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  肝了10天才肝出来的![[害羞]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+- 牛小号\_
+
+  2021年5月12日
+
+  Like
+
+  牛皮啊 看了我半个多小时![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈哈，赞！
+
 - Yacov-lu
-    
-    2021年5月12日
-    
-    Like
-    
-    很硬，需要消化
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，先理解了总流程就行。后期有需要再往上对。
-    
+
+  2021年5月12日
+
+  Like
+
+  很硬，需要消化
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，先理解了总流程就行。后期有需要再往上对。
+
 - 蓝星空
-    
-    2021年5月12日
-    
-    Like
-    
-    赞 👍🏻
-    
+
+  2021年5月12日
+
+  Like
+
+  赞 👍🏻
+
 - 曾是少年
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥的文章是真的硬核
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥的文章是真的硬核
+
 - 我的名字叫浩仔
-    
-    2021年5月12日
-    
-    Like
-    
-    踩个jio印留个坑![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  踩个jio印留个坑![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 风做了云的梦
-    
-    2021年5月12日
-    
-    Like
-    
-    先留言再看![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈👍🏻
-    
+
+  2021年5月12日
+
+  Like
+
+  先留言再看![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈👍🏻
+
 - Santiago
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥，牛逼
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    感谢老哥！
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥，牛逼
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  感谢老哥！
+
 - Ethan
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥可以进行内核开发了~
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    飞哥志在充当应用开发同学们在内核里的一个眼，帮大家探地图的。
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥可以进行内核开发了~
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  飞哥志在充当应用开发同学们在内核里的一个眼，帮大家探地图的。
+
 - 会打酱油的猫°
-    
-    2021年5月12日
-    
-    Like
-    
-    太优秀了，要卷就要卷到底![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    对，从底卷起来😃
-    
+
+  2021年5月12日
+
+  Like
+
+  太优秀了，要卷就要卷到底![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  对，从底卷起来😃
+
 - 坤哥
-    
-    2021年5月12日
-    
-    Like
-    
-    有个疑问，发送数据后应该是收到对方的ack后才清的吧，不过我文章说是发送后立刻触发中断去清ringbuffer？
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    对，发完ringbuffer就清了，但传输层的留着skb的拷贝呢，如果收不到ack就再从传输层开始重发。
-    
-    坤哥
-    
-    2021年5月12日
-    
-    Like
-    
-    原来是这样![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，要不然ringbuffer很快就被撑爆了。
-    
+
+  2021年5月12日
+
+  Like
+
+  有个疑问，发送数据后应该是收到对方的ack后才清的吧，不过我文章说是发送后立刻触发中断去清ringbuffer？
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  对，发完ringbuffer就清了，但传输层的留着skb的拷贝呢，如果收不到ack就再从传输层开始重发。
+
+  坤哥
+
+  2021年5月12日
+
+  Like
+
+  原来是这样![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，要不然ringbuffer很快就被撑爆了。
+
 - TapNugget
-    
-    2021年5月12日
-    
-    Like
-    
-    牛批阿！![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  牛批阿！![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 南笙几梦
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥厉害
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    ![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)一起加油！
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥厉害
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  ![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)一起加油！
+
 - 王江华
-    
-    2021年5月12日
-    
-    Like
-    
-    相当硬核，跟着飞哥一起飞![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈，共同进步![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  相当硬核，跟着飞哥一起飞![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈，共同进步![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 小林
-    
-    2021年5月12日
-    
-    Like
-    
-    学底层，找飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈，感谢林总的认可！
-    
+
+  2021年5月12日
+
+  Like
+
+  学底层，找飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈，感谢林总的认可！
+
 - 黑洞
-    
-    2021年5月12日
-    
-    Like
-    
-    太厉害了
-    
+
+  2021年5月12日
+
+  Like
+
+  太厉害了
+
 - 悟空呀
-    
-    2021年5月12日
-    
-    Like
-    
-    硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 坤哥
-    
-    2021年5月12日
-    
-    Like
-    
-    开发内功，就服飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    感谢码海兄的认可🤝
-    
+
+  2021年5月12日
+
+  Like
+
+  开发内功，就服飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  感谢码海兄的认可🤝
 
 已无更多数据
 
@@ -1476,936 +1468,935 @@ Comment
 **留言 116**
 
 - 张彦飞
-    
-    2021年5月12日
-    
-    Like6
-    
-    想进技术群的同学抓紧了，三群又快满了，文尾有飞哥微信二维码![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 另外转发过朋友圈的小伙伴联系飞哥，提供 pdf 增值福利![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    Pinned
-    
+
+  2021年5月12日
+
+  Like6
+
+  想进技术群的同学抓紧了，三群又快满了，文尾有飞哥微信二维码![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 另外转发过朋友圈的小伙伴联系飞哥，提供 pdf 增值福利![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  Pinned
+
 - sowhat1412
-    
-    2021年5月12日
-    
-    Like7
-    
-    我找到了 卷的源头
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like1
-    
-    留言这么快，是不是直接来评论的![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    sowhat1412
-    
-    2021年5月12日
-    
-    Like
-    
-    我是先评论 再看![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嘎嘎！
-    
+
+  2021年5月12日
+
+  Like7
+
+  我找到了 卷的源头
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like1
+
+  留言这么快，是不是直接来评论的![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  sowhat1412
+
+  2021年5月12日
+
+  Like
+
+  我是先评论 再看![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嘎嘎！
+
 - 枫叶
-    
-    2021年5月20日
-    
-    Like3
-    
-    非常好的文章，解答了几个我一直很疑惑的问题，中午吃完饭开始看，一直看到上班时间，都忘记午休了![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月20日
-    
-    Like
-    
-    接下来我又梳理了一遍127.0.0.1的收发过程，等我后面整理完发送出来。
-    
+
+  2021年5月20日
+
+  Like3
+
+  非常好的文章，解答了几个我一直很疑惑的问题，中午吃完饭开始看，一直看到上班时间，都忘记午休了![[微笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月20日
+
+  Like
+
+  接下来我又梳理了一遍127.0.0.1的收发过程，等我后面整理完发送出来。
+
 - 陈兴
-    
-    2022年9月27日
-    
-    Like
-    
-    请问如果socket设置了非阻塞，那么调用send是可以提前返回的，是在哪一步的时候返回的呢？
-    
-    开发内功修炼
-    
-    Author2022年9月28日
-    
-    Like1
-    
-    阻塞是发生在发送缓存区满了的时候，非阻塞返回的话应该也是在数据拷贝到发送缓存区但发现没有位置了，这个时机。
-    
-    Author liked
-    
+
+  2022年9月27日
+
+  Like
+
+  请问如果socket设置了非阻塞，那么调用send是可以提前返回的，是在哪一步的时候返回的呢？
+
+  开发内功修炼
+
+  Author2022年9月28日
+
+  Like1
+
+  阻塞是发生在发送缓存区满了的时候，非阻塞返回的话应该也是在数据拷贝到发送缓存区但发现没有位置了，这个时机。
+
+  Author liked
+
 - Jack
-    
-    2022年1月20日
-    
-    Like
-    
-    万字长篇，手机微信崩了，然后各种启动都不好使，只好把手机重启![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2022年1月20日
-    
-    Like
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    Jack
-    
-    2022年1月20日
-    
-    Like
-    
-    我想加入组织，但大神没有通过呀
-    
-    开发内功修炼
-    
-    Author2022年1月20日
-    
-    Like1
-    
-    我一天集中处理一回好友请求，要不中断太多就没法工作了
-    
+
+  2022年1月20日
+
+  Like
+
+  万字长篇，手机微信崩了，然后各种启动都不好使，只好把手机重启![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2022年1月20日
+
+  Like
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  Jack
+
+  2022年1月20日
+
+  Like
+
+  我想加入组织，但大神没有通过呀
+
+  开发内功修炼
+
+  Author2022年1月20日
+
+  Like1
+
+  我一天集中处理一回好友请求，要不中断太多就没法工作了
+
 - huangww
-    
-    2021年11月22日
-    
-    Like1
-    
-    把网络从应用到硬件的整条通路捋通了，豁然开朗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年11月22日
-    
-    Like1
-    
-    😃嘎嘎！
-    
+
+  2021年11月22日
+
+  Like1
+
+  把网络从应用到硬件的整条通路捋通了，豁然开朗![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年11月22日
+
+  Like1
+
+  😃嘎嘎！
+
 - worldᑋᵉᑊᑊᵒ
-    
-    2021年5月12日
-    
-    Like1
-    
-    硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like1
+
+  硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Kaito
-    
-    2021年5月12日
-    
-    Like1
-    
-    飞哥真的是太硬核了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    老哥也一样的强！
-    
+
+  2021年5月12日
+
+  Like1
+
+  飞哥真的是太硬核了![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  老哥也一样的强！
+
 - Zheng
-    
-    2021年5月12日
-    
-    Like1
-    
-    彦飞兄 太牛了
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like1
-    
-    争哥来了，给争哥倒茶！
-    
+
+  2021年5月12日
+
+  Like1
+
+  彦飞兄 太牛了
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like1
+
+  争哥来了，给争哥倒茶！
+
 - mi.chao
-    
-    2021年5月12日
-    
-    Like1
-    
-    这文章质量杠杠滴。为后面深入提供了指引，赞!
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，以后再想深入就知道往哪儿对了。后面我也准备再围绕发送写一篇优化方法。
-    
-    mi.chao
-    
-    2021年5月12日
-    
-    Like1
-    
-    哇，期待期待～ 工作中时不时会遇到网络io、CPU瓶颈等问题，很多时候，没明确清晰的思路，各种工具一顿乱试，结果指标也是一知半解，最后的优化方案也是连蒙带猜出来的，效果可想而知了。
-    
+
+  2021年5月12日
+
+  Like1
+
+  这文章质量杠杠滴。为后面深入提供了指引，赞!
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，以后再想深入就知道往哪儿对了。后面我也准备再围绕发送写一篇优化方法。
+
+  mi.chao
+
+  2021年5月12日
+
+  Like1
+
+  哇，期待期待～ 工作中时不时会遇到网络io、CPU瓶颈等问题，很多时候，没明确清晰的思路，各种工具一顿乱试，结果指标也是一知半解，最后的优化方案也是连蒙带猜出来的，效果可想而知了。
+
 - 我是一颗糖波波
-    
-    2021年5月12日
-    
-    Like1
-    
-    收藏了收藏了~
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    收藏等于学会？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like1
+
+  收藏了收藏了~
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  收藏等于学会？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 伢
-    
-    2021年5月12日
-    
-    Like1
-    
-    真的太实用了这个文章。弄清楚了很多之前模糊的点。
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like1
-    
-    嗯，理解了整体流程以后，再遇到一些技术点，就知道往哪儿对了。
-    
+
+  2021年5月12日
+
+  Like1
+
+  真的太实用了这个文章。弄清楚了很多之前模糊的点。
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like1
+
+  嗯，理解了整体流程以后，再遇到一些技术点，就知道往哪儿对了。
+
 - LFN
-    
-    北京2023年11月7日
-    
-    Like
-    
-    多队列指的是网卡硬件层面，还是内核软件层面？
-    
-    开发内功修炼
-    
-    Author2023年11月8日
-    
-    Like
-    
-    硬件层面也有，软件层面也需要支持
-    
+
+  北京2023年11月7日
+
+  Like
+
+  多队列指的是网卡硬件层面，还是内核软件层面？
+
+  开发内功修炼
+
+  Author2023年11月8日
+
+  Like
+
+  硬件层面也有，软件层面也需要支持
+
 - LFN
-    
-    北京2023年11月7日
-    
-    Like
-    
-    写得好清晰，读得酣畅淋漓![[鼓掌]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京2023年11月7日
+
+  Like
+
+  写得好清晰，读得酣畅淋漓![[鼓掌]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 云中墨
-    
-    浙江2023年8月2日
-    
-    Like
-    
-    太顶了，看了一天还没看完![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2023年8月2日
-    
-    Like
-    
-    😀
-    
+
+  浙江2023年8月2日
+
+  Like
+
+  太顶了，看了一天还没看完![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2023年8月2日
+
+  Like
+
+  😀
+
 - keysys
-    
-    四川2023年7月25日
-    
-    Like
-    
-    飞哥飞哥，你好，4.5节我有点疑问： txq = netdev_pick_tx(dev, skb); q = rcu_dereference_bh(txq->qdisc); 对于隧道和虚拟设备，它们也会有对应的 txq 和q么？是在哪儿创建的这些结构呢？
-    
-    开发内功修炼
-    
-    Author2023年7月26日
-    
-    Like
-    
-    隧道源码没看过，虚拟设备我专门写过一篇127.0.0.1的文章
-    
+
+  四川2023年7月25日
+
+  Like
+
+  飞哥飞哥，你好，4.5节我有点疑问： txq = netdev_pick_tx(dev, skb); q = rcu_dereference_bh(txq->qdisc); 对于隧道和虚拟设备，它们也会有对应的 txq 和q么？是在哪儿创建的这些结构呢？
+
+  开发内功修炼
+
+  Author2023年7月26日
+
+  Like
+
+  隧道源码没看过，虚拟设备我专门写过一篇127.0.0.1的文章
+
 - 快乐星球
-    
-    山东2022年11月13日
-    
-    Like
-    
-    如果java代码发送，java层面可以告知到发送成功了吗？发送动作是同步阻塞的吗？io多路复用只针对接受还是发送也有？谢谢
-    
-    开发内功修炼
-    
-    Author2023年6月28日
-    
-    Like
-    
-    多路复用可以对接收也可以对发送，它只是个事件管理机制而已
-    
-    开发内功修炼
-    
-    Author2023年6月28日
-    
-    Like
-    
-    应用层面不知道，可能拷贝到内核就返回了
-    
+
+  山东2022年11月13日
+
+  Like
+
+  如果java代码发送，java层面可以告知到发送成功了吗？发送动作是同步阻塞的吗？io多路复用只针对接受还是发送也有？谢谢
+
+  开发内功修炼
+
+  Author2023年6月28日
+
+  Like
+
+  多路复用可以对接收也可以对发送，它只是个事件管理机制而已
+
+  开发内功修炼
+
+  Author2023年6月28日
+
+  Like
+
+  应用层面不知道，可能拷贝到内核就返回了
+
 - 翟彬
-    
-    2022年2月28日
-    
-    Like
-    
-    随手一个赞，![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年2月28日
+
+  Like
+
+  随手一个赞，![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Ethan Tang
-    
-    2022年2月13日
-    
-    Like
-    
-    飞哥，啥时候能安排讲讲如何设置网卡的qdisc 规则实现qos功能呢？
-    
-    开发内功修炼
-    
-    Author2022年2月13日
-    
-    Like
-    
-    这个暂时还没考虑到
-    
+
+  2022年2月13日
+
+  Like
+
+  飞哥，啥时候能安排讲讲如何设置网卡的qdisc 规则实现qos功能呢？
+
+  开发内功修炼
+
+  Author2022年2月13日
+
+  Like
+
+  这个暂时还没考虑到
+
 - 简海青
-    
-    2022年1月13日
-    
-    Like
-    
-    如何去追踪请求链路呢？
-    
-    开发内功修炼
-    
-    Author2022年1月20日
-    
-    Like
-    
-    是说怎么跟踪出来的是吧？我就是看代码跳转，偶尔会用stab跟踪一下。
-    
+
+  2022年1月13日
+
+  Like
+
+  如何去追踪请求链路呢？
+
+  开发内功修炼
+
+  Author2022年1月20日
+
+  Like
+
+  是说怎么跟踪出来的是吧？我就是看代码跳转，偶尔会用stab跟踪一下。
+
 - 废言Pro
-    
-    2021年7月23日
-    
-    Like
-    
-    飞哥，太强了，我看了1天，好久可以讲讲QOS和netfilter啊
-    
-    开发内功修炼
-    
-    Author2021年7月23日
-    
-    Like
-    
-    netfilter遍布整个接收和发送过程，是iptable工作的基础，理解了接收发送再看iptable会很顺。
-    
+
+  2021年7月23日
+
+  Like
+
+  飞哥，太强了，我看了1天，好久可以讲讲QOS和netfilter啊
+
+  开发内功修炼
+
+  Author2021年7月23日
+
+  Like
+
+  netfilter遍布整个接收和发送过程，是iptable工作的基础，理解了接收发送再看iptable会很顺。
+
 - SyS
-    
-    2021年7月23日
-    
-    Like
-    
-    飞哥出书，必买！！！
-    
-    开发内功修炼
-    
-    Author2021年7月23日
-    
-    Like
-    
-    提前感谢😁！
-    
+
+  2021年7月23日
+
+  Like
+
+  飞哥出书，必买！！！
+
+  开发内功修炼
+
+  Author2021年7月23日
+
+  Like
+
+  提前感谢😁！
+
 - 正平
-    
-    2021年7月1日
-    
-    Like
-    
-    请博主接受我的膜拜，哈哈，看了2个小时。点赞，转发，加好友，过去电子书。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年7月1日
-    
-    Like
-    
-    👍🏻感谢！
-    
+
+  2021年7月1日
+
+  Like
+
+  请博主接受我的膜拜，哈哈，看了2个小时。点赞，转发，加好友，过去电子书。![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年7月1日
+
+  Like
+
+  👍🏻感谢！
+
 - 二马
-    
-    2021年6月18日
-    
-    Like
-    
-    请接受我的膝盖
-    
-    开发内功修炼
-    
-    Author2021年6月18日
-    
-    Like
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年6月18日
+
+  Like
+
+  请接受我的膝盖
+
+  开发内功修炼
+
+  Author2021年6月18日
+
+  Like
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 这个异常捕获不了
-    
-    2021年6月18日
-    
-    Like
-    
-    大佬牛逼，讲讲ebpf吧。最近火的一批
-    
-    开发内功修炼
-    
-    Author2021年6月18日
-    
-    Like
-    
-    后续等倒出空来。
-    
+
+  2021年6月18日
+
+  Like
+
+  大佬牛逼，讲讲ebpf吧。最近火的一批
+
+  开发内功修炼
+
+  Author2021年6月18日
+
+  Like
+
+  后续等倒出空来。
+
 - coder
-    
-    2021年6月17日
-    
-    Like
-    
-    飞哥考虑出书吗？
-    
-    开发内功修炼
-    
-    Author2021年6月18日
-    
-    Like
-    
-    有这个计划。
-    
+
+  2021年6月17日
+
+  Like
+
+  飞哥考虑出书吗？
+
+  开发内功修炼
+
+  Author2021年6月18日
+
+  Like
+
+  有这个计划。
+
 - 善行通
-    
-    2021年6月7日
-    
-    Like
-    
-    厉害，中华有你这人才，中国必定成世界领导位置
-    
-    开发内功修炼
-    
-    Author2021年6月7日
-    
-    Like
-    
-    听完老哥这评价，我没差点从椅子上飞起来。![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年6月7日
+
+  Like
+
+  厉害，中华有你这人才，中国必定成世界领导位置
+
+  开发内功修炼
+
+  Author2021年6月7日
+
+  Like
+
+  听完老哥这评价，我没差点从椅子上飞起来。![[偷笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - MageByte
-    
-    2021年5月19日
-    
-    Like
-    
-    哥，这么猛么
-    
-    开发内功修炼
-    
-    Author2021年5月19日
-    
-    Like
-    
-    因为自己好奇这个，所以就肝了它。
-    
+
+  2021年5月19日
+
+  Like
+
+  哥，这么猛么
+
+  开发内功修炼
+
+  Author2021年5月19日
+
+  Like
+
+  因为自己好奇这个，所以就肝了它。
+
 - Alex
-    
-    2021年5月19日
-    
-    Like
-    
-    厉害![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月19日
-    
-    Like
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月19日
+
+  Like
+
+  厉害![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月19日
+
+  Like
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 争伟（建忠）
-    
-    2021年5月12日
-    
-    Like
-    
-    ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 请教个问题啊： q->enqueue(skb, q)入队后立即调用_qdisc_run遍历队列取出skb,既然每次入队后然后不停取出，也就是每次队列里面只有一个元素？如果是这样，为什么还要用队列呢，直接发送不行吗？
-    
-    开发内功修炼
-    
-    Author2021年5月14日
-    
-    Like
-    
-    q是Qdisc对象，这东东抽象了排队规则。这个规则并不是简单的先进先出。man tc命令查看其中的CLASSLESS QDISCS，能看到有十几多种排队规则存在。
-    
+
+  2021年5月12日
+
+  Like
+
+  ![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif) 请教个问题啊： q->enqueue(skb, q)入队后立即调用_qdisc_run遍历队列取出skb,既然每次入队后然后不停取出，也就是每次队列里面只有一个元素？如果是这样，为什么还要用队列呢，直接发送不行吗？
+
+  开发内功修炼
+
+  Author2021年5月14日
+
+  Like
+
+  q是Qdisc对象，这东东抽象了排队规则。这个规则并不是简单的先进先出。man tc命令查看其中的CLASSLESS QDISCS，能看到有十几多种排队规则存在。
+
 - 朱晋君
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥，太硬核了
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥，太硬核了
+
 - 逝水比喻时光荏苒
-    
-    2021年5月12日
-    
-    Like
-    
-    膜拜，等了好久，看完1/3提前顶礼膜拜！ 不枉我还特意私聊飞哥崔更，分析的太牛了！
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    没让老哥失望就行![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  膜拜，等了好久，看完1/3提前顶礼膜拜！ 不枉我还特意私聊飞哥崔更，分析的太牛了！
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  没让老哥失望就行![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 程序员Carl
-    
-    2021年5月12日
-    
-    Like
-    
-    提高内功 找飞哥![[加油]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  提高内功 找飞哥![[加油]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Wong
-    
-    2021年5月12日
-    
-    Like
-    
-    硬核~Orz![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  硬核~Orz![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - Do
-    
-    2021年5月12日
-    
-    Like
-    
-    这么多字这么多图，这文章估计要写很久吧![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，前前后后十多天 😅
-    
+
+  2021年5月12日
+
+  Like
+
+  这么多字这么多图，这文章估计要写很久吧![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，前前后后十多天 😅
+
 - Aero
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥，图是用啥画的？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    我现在所有图都用 draw.io 来画
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥，图是用啥画的？![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  我现在所有图都用 draw.io 来画
+
 - 阿星
-    
-    2021年5月12日
-    
-    Like
-    
-    大佬起飞
-    
+
+  2021年5月12日
+
+  Like
+
+  大佬起飞
+
 - 小K
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥太强了
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    小k马上起飞！
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥太强了
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  小k马上起飞！
+
 - 阿秀
-    
-    2021年5月12日
-    
-    Like
-    
-    太强了飞哥！！！
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    感谢阿秀！
-    
+
+  2021年5月12日
+
+  Like
+
+  太强了飞哥！！！
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  感谢阿秀！
+
 - 一口Linux-彭
-    
-    2021年5月12日
-    
-    Like
-    
-    太硬了！！
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈😃
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    新上一道主菜![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  太硬了！！
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈😃
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  新上一道主菜![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - hncboy
-    
-    2021年5月12日
-    
-    Like
-    
-    太硬了。
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嘎嘎！
-    
+
+  2021年5月12日
+
+  Like
+
+  太硬了。
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嘎嘎！
+
 - 沉默王二
-    
-    2021年5月12日
-    
-    Like
-    
-    这也太强了。
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    被二哥说强是一种什么体验![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  这也太强了。
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  被二哥说强是一种什么体验![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - cxuan
-    
-    2021年5月12日
-    
-    Like
-    
-    文章太硬了
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    肝了10天才肝出来的![[害羞]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-- 牛小号_
-    
-    2021年5月12日
-    
-    Like
-    
-    牛皮啊 看了我半个多小时![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈哈，赞！
-    
+
+  2021年5月12日
+
+  Like
+
+  文章太硬了
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  肝了10天才肝出来的![[害羞]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+- 牛小号\_
+
+  2021年5月12日
+
+  Like
+
+  牛皮啊 看了我半个多小时![[流泪]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈哈，赞！
+
 - Yacov-lu
-    
-    2021年5月12日
-    
-    Like
-    
-    很硬，需要消化
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，先理解了总流程就行。后期有需要再往上对。
-    
+
+  2021年5月12日
+
+  Like
+
+  很硬，需要消化
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，先理解了总流程就行。后期有需要再往上对。
+
 - 蓝星空
-    
-    2021年5月12日
-    
-    Like
-    
-    赞 👍🏻
-    
+
+  2021年5月12日
+
+  Like
+
+  赞 👍🏻
+
 - 曾是少年
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥的文章是真的硬核
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥的文章是真的硬核
+
 - 我的名字叫浩仔
-    
-    2021年5月12日
-    
-    Like
-    
-    踩个jio印留个坑![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  踩个jio印留个坑![[嘿哈]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 风做了云的梦
-    
-    2021年5月12日
-    
-    Like
-    
-    先留言再看![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈👍🏻
-    
+
+  2021年5月12日
+
+  Like
+
+  先留言再看![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈👍🏻
+
 - Santiago
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥，牛逼
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    感谢老哥！
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥，牛逼
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  感谢老哥！
+
 - Ethan
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥可以进行内核开发了~
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    飞哥志在充当应用开发同学们在内核里的一个眼，帮大家探地图的。
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥可以进行内核开发了~
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  飞哥志在充当应用开发同学们在内核里的一个眼，帮大家探地图的。
+
 - 会打酱油的猫°
-    
-    2021年5月12日
-    
-    Like
-    
-    太优秀了，要卷就要卷到底![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    对，从底卷起来😃
-    
+
+  2021年5月12日
+
+  Like
+
+  太优秀了，要卷就要卷到底![[旺柴]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  对，从底卷起来😃
+
 - 坤哥
-    
-    2021年5月12日
-    
-    Like
-    
-    有个疑问，发送数据后应该是收到对方的ack后才清的吧，不过我文章说是发送后立刻触发中断去清ringbuffer？
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    对，发完ringbuffer就清了，但传输层的留着skb的拷贝呢，如果收不到ack就再从传输层开始重发。
-    
-    坤哥
-    
-    2021年5月12日
-    
-    Like
-    
-    原来是这样![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    嗯，要不然ringbuffer很快就被撑爆了。
-    
+
+  2021年5月12日
+
+  Like
+
+  有个疑问，发送数据后应该是收到对方的ack后才清的吧，不过我文章说是发送后立刻触发中断去清ringbuffer？
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  对，发完ringbuffer就清了，但传输层的留着skb的拷贝呢，如果收不到ack就再从传输层开始重发。
+
+  坤哥
+
+  2021年5月12日
+
+  Like
+
+  原来是这样![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  嗯，要不然ringbuffer很快就被撑爆了。
+
 - TapNugget
-    
-    2021年5月12日
-    
-    Like
-    
-    牛批阿！![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  牛批阿！![[666]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 南笙几梦
-    
-    2021年5月12日
-    
-    Like
-    
-    飞哥厉害
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    ![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)一起加油！
-    
+
+  2021年5月12日
+
+  Like
+
+  飞哥厉害
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  ![[得意]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)一起加油！
+
 - 王江华
-    
-    2021年5月12日
-    
-    Like
-    
-    相当硬核，跟着飞哥一起飞![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈，共同进步![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  相当硬核，跟着飞哥一起飞![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈，共同进步![[呲牙]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 小林
-    
-    2021年5月12日
-    
-    Like
-    
-    学底层，找飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    哈哈，感谢林总的认可！
-    
+
+  2021年5月12日
+
+  Like
+
+  学底层，找飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  哈哈，感谢林总的认可！
+
 - 黑洞
-    
-    2021年5月12日
-    
-    Like
-    
-    太厉害了
-    
+
+  2021年5月12日
+
+  Like
+
+  太厉害了
+
 - 悟空呀
-    
-    2021年5月12日
-    
-    Like
-    
-    硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年5月12日
+
+  Like
+
+  硬核![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  ![[愉快]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 坤哥
-    
-    2021年5月12日
-    
-    Like
-    
-    开发内功，就服飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    Author2021年5月12日
-    
-    Like
-    
-    感谢码海兄的认可🤝
-    
+
+  2021年5月12日
+
+  Like
+
+  开发内功，就服飞哥![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  Author2021年5月12日
+
+  Like
+
+  感谢码海兄的认可🤝
 
 已无更多数据

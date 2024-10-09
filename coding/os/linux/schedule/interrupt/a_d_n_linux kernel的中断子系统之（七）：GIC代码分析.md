@@ -11,12 +11,15 @@ GIC（Generic Interrupt Controller）是ARM公司提供的一个通用的中断�
 本文主要分析了linux kernel中GIC中断控制器的驱动代码（位于drivers/irqchip/irq-gic.c和irq-gic-common.c）。 irq-gic-common.c中是GIC V2和V3的通用代码，而irq-gic.c是V2 specific的代码，irq-gic-v3.c是V3 specific的代码，不在本文的描述范围。本文主要分成三个部分：第二章描述了GIC V2的硬件；第三章描述了GIC V2的初始化过程；第四章描述了底层的硬件call back函数。
 
 注：具体的linux kernel的版本是linux-3.17-rc3。
+
 # 二、GIC-V2的硬件描述
+
 ## 1、GIC-V2的输入和输出信号
+
 ### （1）GIC-V2的输入和输出信号示意图
 
 要想理解一个building block（无论软件还是硬件），我们都可以先把它当成黑盒子，只是研究其input，output。GIC-V2的输入和输出信号的示意图如下（注：我们以GIC-400为例，同时省略了clock，config等信号）：
-![[Pasted image 20241009100741.png]]
+!\[\[Pasted image 20241009100741.png\]\]
 
 （2）输入信号
 
@@ -73,7 +76,7 @@ GIC-V2支持的中断类型有下面几种：
 
 GIC的block diagram如下图所示：
 
- [![gic](http://www.wowotech.net/content/uploadfile/201409/049e88993db95cd9b35b6d9e8c1fa99920140904115854.gif "gic")](http://www.wowotech.net/content/uploadfile/201409/e1fbd5278ddff2a62b06d22df15848e920140904115852.gif)
+[![gic](http://www.wowotech.net/content/uploadfile/201409/049e88993db95cd9b35b6d9e8c1fa99920140904115854.gif "gic")](http://www.wowotech.net/content/uploadfile/201409/e1fbd5278ddff2a62b06d22df15848e920140904115852.gif)
 
 GIC可以清晰的划分成两个block，一个block是Distributor（上图的左边的block），一个是CPU interface。CPU interface有两种，一种就是和普通processor接口，另外一种是和虚拟机接口的。Virtual CPU interface在本文中不会详细描述。
 
@@ -141,13 +144,14 @@ CPU interface这个block主要用于和process进行接口。该block的主要�
 
 # 三、GIC-V2 irq chip driver的初始化过程
 
-在linux-3.17-rc3\drivers\irqchip目录下保存在各种不同的中断控制器的驱动代码，这个版本的内核支持了GICV3。irq-gic-common.c是通用的GIC的驱动代码，可以被各个版本的GIC使用。irq-gic.c是用于V2版本的GIC controller，而irq-gic-v3.c是用于V3版本的GIC controller。
+在linux-3.17-rc3\\drivers\\irqchip目录下保存在各种不同的中断控制器的驱动代码，这个版本的内核支持了GICV3。irq-gic-common.c是通用的GIC的驱动代码，可以被各个版本的GIC使用。irq-gic.c是用于V2版本的GIC controller，而irq-gic-v3.c是用于V3版本的GIC controller。
 
 1、GIC的device node和GIC irq chip driver的匹配过程
 
 （1）irq chip driver中的声明
 
-在linux-3.17-rc3\drivers\irqchip目录下的irqchip.h文件中定义了IRQCHIP_DECLARE宏如下：
+在linux-3.17-rc3\\drivers\\irqchip目录下的irqchip.h文件中定义了IRQCHIP_DECLARE宏如下：
+
 ```cpp
 #define IRQCHIP_DECLARE(name, compat, fn) OF_DECLARE_2(irqchip, name, compat, fn)
 
@@ -160,7 +164,9 @@ __used __section(##table##of_table)            \
 = { .compatible = compat,                \  
 .data = (fn == (fn_type)NULL) ? fn : fn  }
 ```
-这个宏其实就是初始化了一个struct of_device_id的静态常量，并放置在__irqchip_of_table section中。irq-gic.c文件中使用IRQCHIP_DECLARE来定义了若干个静态的struct of_device_id常量，如下：
+
+这个宏其实就是初始化了一个struct of_device_id的静态常量，并放置在\_\_irqchip_of_table section中。irq-gic.c文件中使用IRQCHIP_DECLARE来定义了若干个静态的struct of_device_id常量，如下：
+
 ```cpp
 IRQCHIP_DECLARE(gic_400, "arm,gic-400", gic_of_init);  
 IRQCHIP_DECLARE(cortex_a15_gic, "arm,cortex-a15-gic", gic_of_init);  
@@ -169,73 +175,76 @@ IRQCHIP_DECLARE(cortex_a7_gic, "arm,cortex-a7-gic", gic_of_init);
 IRQCHIP_DECLARE(msm_8660_qgic, "qcom,msm-8660-qgic", gic_of_init);  
 IRQCHIP_DECLARE(msm_qgic2, "qcom,msm-qgic2", gic_of_init);
 ```
-兼容GIC-V2的GIC实现有很多，不过其初始化函数都是一个。在linux kernel编译的时候，你可以配置多个irq chip进入内核，编译系统会把所有的IRQCHIP_DECLARE宏定义的数据放入到一个特殊的section中（section name是__irqchip_of_table），我们称这个特殊的section叫做irq chip table。这个table也就保存了kernel支持的所有的中断控制器的ID信息（最重要的是驱动代码初始化函数和DT compatible string）。我们来看看struct of_device_id的定义：
 
-> struct of_device_id  
-> {  
->     char    name[32];－－－－－－要匹配的device node的名字  
->     char    type[32];－－－－－－－要匹配的device node的类型  
->     char    compatible[128];－－－匹配字符串（DT compatible string），用来匹配适合的device node  
->     const void *data;－－－－－－－－对于GIC，这里是初始化函数指针  
+兼容GIC-V2的GIC实现有很多，不过其初始化函数都是一个。在linux kernel编译的时候，你可以配置多个irq chip进入内核，编译系统会把所有的IRQCHIP_DECLARE宏定义的数据放入到一个特殊的section中（section name是\_\_irqchip_of_table），我们称这个特殊的section叫做irq chip table。这个table也就保存了kernel支持的所有的中断控制器的ID信息（最重要的是驱动代码初始化函数和DT compatible string）。我们来看看struct of_device_id的定义：
+
+> struct of_device_id\
+> {\
+> char    name\[32\];－－－－－－要匹配的device node的名字\
+> char    type\[32\];－－－－－－－要匹配的device node的类型\
+> char    compatible\[128\];－－－匹配字符串（DT compatible string），用来匹配适合的device node\
+> const void \*data;－－－－－－－－对于GIC，这里是初始化函数指针\
 > };
 
-这个数据结构主要被用来进行Device node和driver模块进行匹配用的。从该数据结构的定义可以看出，在匹配过程中，device name、device type和DT compatible string都是考虑的因素。更细节的内容请参考__of_device_is_compatible函数。
+这个数据结构主要被用来进行Device node和driver模块进行匹配用的。从该数据结构的定义可以看出，在匹配过程中，device name、device type和DT compatible string都是考虑的因素。更细节的内容请参考\_\_of_device_is_compatible函数。
 
 （2）device node
 
 不同的GIC-V2的实现总会有一些不同，这些信息可以通过Device tree的机制来传递。Device node中定义了各种属性，其中就包括了memory资源，IRQ描述等信息，这些信息需要在初始化的时候传递给具体的驱动，因此需要一个Device node和driver模块的匹配过程。在Device Tree模块中会包括系统中所有的device node，如果我们的系统使用了GIC-400，那么系统的device node数据库中会有一个node是GIC-400的，一个示例性的GIC-400的device node（我们以瑞芯微的RK3288处理器为例）定义如下：
 
-> gic: interrupt-controller@ffc01000 {  
->     compatible = "arm,gic-400";  
->     interrupt-controller;  
->     #interrupt-cells = <3>;  
->     #address-cells = <0>;
-> 
->     reg = <0xffc01000 0x1000="">,－－－－Distributor address range  
->           <0xffc02000 0x1000="">,－－－－－CPU interface address range  
->           <0xffc04000 0x2000="">,－－－－－Virtual interface control block  
->           <0xffc06000 0x2000="">;－－－－－Virtual CPU interfaces  
->     interrupts = ;  
+> gic: interrupt-controller@ffc01000 {\
+> compatible = "arm,gic-400";\
+> interrupt-controller;\
+> #interrupt-cells = \<3>;\
+> #address-cells = \<0>;
+>
+> reg = \<0xffc01000 0x1000="">,－－－－Distributor address range\
+> \<0xffc02000 0x1000="">,－－－－－CPU interface address range\
+> \<0xffc04000 0x2000="">,－－－－－Virtual interface control block\
+> \<0xffc06000 0x2000="">;－－－－－Virtual CPU interfaces\
+> interrupts = ;\
 > };
 
 （3）device node和irq chip driver的匹配
 
 在machine driver初始化的时候会调用irqchip_init函数进行irq chip driver的初始化。在driver/irqchip/irqchip.c文件中定义了irqchip_init函数，如下：
+
 ```cpp
 void init irqchip_init(void) {  
 of_irq_init(__irqchip_begin);  
 }
 ```
+
 `__irqchip_begin` 就是内核irq chip table的首地址，这个table也就保存了kernel支持的所有的中断控制器的ID信息（用于和device node的匹配）。of_irq_init函数执行之前，系统已经完成了device tree的初始化，因此系统中的所有的设备节点都已经形成了一个树状结构，每个节点代表一个设备的device node。of_irq_init是在所有的device node中寻找中断控制器节点，形成树状结构（系统可以有多个interrupt controller，之所以形成中断控制器的树状结构，是为了让系统中所有的中断控制器驱动按照一定的顺序进行初始化）。之后，从root interrupt controller节点开始，对于每一个interrupt controller的device node，扫描irq chip table，进行匹配，一旦匹配到，就调用该interrupt controller的初始化函数，并把该中断控制器的device node以及parent中断控制器的device node作为参数传递给irq chip driver。。具体的匹配过程的代码属于Device Tree模块的内容，更详细的信息可以参考[Device Tree代码分析文档](http://www.wowotech.net/linux_kenrel/dt-code-analysis.html)。
 
 2、GIC driver初始化代码分析
 
 （1）gic_of_init的代码如下：
 
-> int __init gic_of_init(struct device_node *node, struct device_node *parent)  
-> {  
->     void __iomem *cpu_base;  
->     void __iomem *dist_base;  
->     u32 percpu_offset;  
->     int irq;
-> 
->     dist_base = of_iomap(node, 0);----------------映射GIC Distributor的寄存器地址空间
-> 
->     cpu_base = of_iomap(node, 1);----------------映射GIC CPU interface的寄存器地址空间
-> 
->     if (of_property_read_u32(node, "cpu-offset", &percpu_offset))--------处理cpu-offset属性。  
->         percpu_offset = 0;
-> 
->     gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset, node);))-----主处理过程，后面详述  
->     if (!gic_cnt)  
->         gic_init_physaddr(node); -----对于不支持big.LITTLE switcher（CONFIG_BL_SWITCHER）的系统，该函数为空。
-> 
->     if (parent) {--------处理interrupt级联  
->         irq = irq_of_parse_and_map(node, 0); －－－解析second GIC的interrupts属性，并进行mapping，返回IRQ number  
->         gic_cascade_irq(gic_cnt, irq);  
->     }  
->     gic_cnt++;  
->     return 0;  
+> int \_\_init gic_of_init(struct device_node \*node, struct device_node \*parent)\
+> {\
+> void \_\_iomem \*cpu_base;\
+> void \_\_iomem \*dist_base;\
+> u32 percpu_offset;\
+> int irq;
+>
+> dist_base = of_iomap(node, 0);----------------映射GIC Distributor的寄存器地址空间
+>
+> cpu_base = of_iomap(node, 1);----------------映射GIC CPU interface的寄存器地址空间
+>
+> if (of_property_read_u32(node, "cpu-offset", &percpu_offset))--------处理cpu-offset属性。\
+> percpu_offset = 0;
+>
+> gic_init_bases(gic_cnt, -1, dist_base, cpu_base, percpu_offset, node);))-----主处理过程，后面详述\
+> if (!gic_cnt)\
+> gic_init_physaddr(node); -----对于不支持big.LITTLE switcher（CONFIG_BL_SWITCHER）的系统，该函数为空。
+>
+> if (parent) {--------处理interrupt级联\
+> irq = irq_of_parse_and_map(node, 0); －－－解析second GIC的interrupts属性，并进行mapping，返回IRQ number\
+> gic_cascade_irq(gic_cnt, irq);\
+> }\
+> gic_cnt++;\
+> return 0;\
 > }
 
 我们首先看看这个函数的参数，node参数代表需要初始化的那个interrupt controller的device node，parent参数指向其parent。在映射GIC-400的memory map I/O space的时候，我们只是映射了Distributor和CPU interface的寄存器地址空间，和虚拟化处理相关的寄存器没有映射，因此这个版本的GIC driver应该是不支持虚拟化的（不知道后续版本是否支持，在一个嵌入式平台上支持虚拟化有实际意义吗？最先支持虚拟化的应该是ARM64+GICV3/4这样的平台）。
@@ -246,71 +255,67 @@ interrupt controller可以级联。对于root GIC，其传入的parent是NULL，
 
 （2）gic_init_bases的代码如下：
 
-> void __init gic_init_bases(unsigned int gic_nr, int irq_start,  
->                void __iomem *dist_base, void __iomem *cpu_base,  
->                u32 percpu_offset, struct device_node *node)  
-> {  
->     irq_hw_number_t hwirq_base;  
->     struct gic_chip_data *gic;  
->     int gic_irqs, irq_base, i;
-> 
->     gic = &gic_data[gic_nr];   
->     gic->dist_base.common_base = dist_base; －－－－省略了non banked的情况  
->     gic->cpu_base.common_base = cpu_base;   
->     gic_set_base_accessor(gic, gic_get_common_base);
-> 
->   
->     for (i = 0; i < NR_GIC_CPU_IF; i++) －－－后面会具体描述gic_cpu_map的含义  
->         gic_cpu_map[i] = 0xff;
-> 
->   
->     if (gic_nr == 0 && (irq_start & 31) > 0) { －－－－－－－－－－－－－－－－－－－－（a）  
->         hwirq_base = 16;  
->         if (irq_start != -1)  
->             irq_start = (irq_start & ~31) + 16;  
->     } else {  
->         hwirq_base = 32;  
->     }
-> 
->   
->     gic_irqs = readl_relaxed(gic_data_dist_base(gic) + GIC_DIST_CTR) & 0x1f; －－－－（b）  
->     gic_irqs = (gic_irqs + 1) * 32;  
->     if (gic_irqs > 1020)  
->         gic_irqs = 1020;  
->     gic->gic_irqs = gic_irqs;
-> 
->     gic_irqs -= hwirq_base;－－－－－－－－－－－－－－－－－－－－－－－－－－－－（c）  
->    
-> 
->     if (of_property_read_u32(node, "arm,routable-irqs",－－－－－－－－－－－－－－－－（d）  
->                  &nr_routable_irqs)) {  
->         irq_base = irq_alloc_descs(irq_start, 16, gic_irqs,  numa_node_id()); －－－－－－－（e）  
->         if (IS_ERR_VALUE(irq_base)) {  
->             WARN(1, "Cannot allocate irq_descs @ IRQ%d, assuming pre-allocated\n",  
->                  irq_start);  
->             irq_base = irq_start;  
->         }
-> 
->         gic->domain = irq_domain_add_legacy(node, gic_irqs, irq_base, －－－－－－－（f）  
->                     hwirq_base, &gic_irq_domain_ops, gic);  
->     } else {  
->         gic->domain = irq_domain_add_linear(node, nr_routable_irqs, －－－－－－－－（f）  
->                             &gic_irq_domain_ops,  
->                             gic);  
->     }
-> 
->     if (gic_nr == 0) { －－－只对root GIC操作，因为设定callback、注册Notifier只需要一次就OK了  
-> #ifdef CONFIG_SMP  
->         set_smp_cross_call(gic_raise_softirq);－－－－－－－－－－－－－－－－－－（g）  
->         register_cpu_notifier(&gic_cpu_notifier);－－－－－－－－－－－－－－－－－－（h）  
-> #endif  
->         set_handle_irq(gic_handle_irq); －－－这个函数名字也不好，实际上是设定arch相关的irq handler  
->     }
-> 
->     gic_chip.flags |= gic_arch_extn.flags;  
->     gic_dist_init(gic);---------具体的硬件初始代码，参考下节的描述  
->     gic_cpu_init(gic);  
->     gic_pm_init(gic);  
+> void \_\_init gic_init_bases(unsigned int gic_nr, int irq_start,\
+> void \_\_iomem \*dist_base, void \_\_iomem \*cpu_base,\
+> u32 percpu_offset, struct device_node \*node)\
+> {\
+> irq_hw_number_t hwirq_base;\
+> struct gic_chip_data \*gic;\
+> int gic_irqs, irq_base, i;
+>
+> gic = &gic_data\[gic_nr\]; \
+> gic->dist_base.common_base = dist_base; －－－－省略了non banked的情况\
+> gic->cpu_base.common_base = cpu_base; \
+> gic_set_base_accessor(gic, gic_get_common_base);
+>
+> for (i = 0; i \< NR_GIC_CPU_IF; i++) －－－后面会具体描述gic_cpu_map的含义\
+> gic_cpu_map\[i\] = 0xff;
+>
+> if (gic_nr == 0 && (irq_start & 31) > 0) { －－－－－－－－－－－－－－－－－－－－（a）\
+> hwirq_base = 16;\
+> if (irq_start != -1)\
+> irq_start = (irq_start & ~31) + 16;\
+> } else {\
+> hwirq_base = 32;\
+> }
+>
+> gic_irqs = readl_relaxed(gic_data_dist_base(gic) + GIC_DIST_CTR) & 0x1f; －－－－（b）\
+> gic_irqs = (gic_irqs + 1) * 32;\
+> if (gic_irqs > 1020)\
+> gic_irqs = 1020;\
+> gic->gic_irqs = gic_irqs;
+>
+> gic_irqs -= hwirq_base;－－－－－－－－－－－－－－－－－－－－－－－－－－－－（c）
+>
+> if (of_property_read_u32(node, "arm,routable-irqs",－－－－－－－－－－－－－－－－（d）\
+> &nr_routable_irqs)) {\
+> irq_base = irq_alloc_descs(irq_start, 16, gic_irqs,  numa_node_id()); －－－－－－－（e）\
+> if (IS_ERR_VALUE(irq_base)) {\
+> WARN(1, "Cannot allocate irq_descs @ IRQ%d, assuming pre-allocated\\n",\
+> irq_start);\
+> irq_base = irq_start;\
+> }
+>
+> gic->domain = irq_domain_add_legacy(node, gic_irqs, irq_base, －－－－－－－（f）\
+> hwirq_base, &gic_irq_domain_ops, gic);\
+> } else {\
+> gic->domain = irq_domain_add_linear(node, nr_routable_irqs, －－－－－－－－（f）\
+> &gic_irq_domain_ops,\
+> gic);\
+> }
+>
+> if (gic_nr == 0) { －－－只对root GIC操作，因为设定callback、注册Notifier只需要一次就OK了\
+> #ifdef CONFIG_SMP\
+> set_smp_cross_call(gic_raise_softirq);－－－－－－－－－－－－－－－－－－（g）\
+> register_cpu_notifier(&gic_cpu_notifier);－－－－－－－－－－－－－－－－－－（h）\
+> #endif\
+> set_handle_irq(gic_handle_irq); －－－这个函数名字也不好，实际上是设定arch相关的irq handler\
+> }
+>
+> gic_chip.flags |= gic_arch_extn.flags;\
+> gic_dist_init(gic);---------具体的硬件初始代码，参考下节的描述\
+> gic_cpu_init(gic);\
+> gic_pm_init(gic);\
 > }
 
 （a）gic_nr标识GIC number，等于0就是root GIC。hwirq的意思就是GIC上的HW interrupt ID，并不是GIC上的每个interrupt ID都有map到linux IRQ framework中的一个IRQ number，对于SGI，是属于软件中断，用于CPU之间通信，没有必要进行HW interrupt ID到IRQ number的mapping。变量hwirq_base表示该GIC上要进行map的base ID，hwirq_base = 16也就意味着忽略掉16个SGI。对于系统中其他的GIC，其PPI也没有必要mapping，因此hwirq_base = 32。
@@ -329,41 +334,41 @@ interrupt controller可以级联。对于root GIC，其传入的parent是NULL，
 
 每个interrupt controller都会形成一个irq domain，负责解析其下游的interrut source。如果interrupt controller有级联的情况，那么一个非root interrupt controller的中断控制器也是其parent irq domain的一个普通的interrupt source。struct irq_domain定义如下：
 
-> struct irq_domain {  
-> ……  
->     const struct irq_domain_ops *ops;  
->     void *host_data;
-> 
-> ……  
+> struct irq_domain {\
+> ……\
+> const struct irq_domain_ops \*ops;\
+> void \*host_data;
+>
+> ……\
 > };
 
 这个数据结构是属于linux kernel通用中断子系统的一部分，我们这里只是描述相关的数据成员。host_data成员是底层interrupt controller的私有数据，linux kernel通用中断子系统不应该修改它。对于GIC而言，host_data成员指向一个struct gic_chip_data的数据结构，定义如下：
 
-> struct gic_chip_data {  
->     union gic_base dist_base;－－－－－－－－－－－－－－－－－－GIC Distributor的基地址空间  
->     union gic_base cpu_base;－－－－－－－－－－－－－－－－－－GIC CPU interface的基地址空间  
-> #ifdef CONFIG_CPU_PM－－－－－－－－－－－－－－－－－－－－GIC 电源管理相关的成员  
->     u32 saved_spi_enable[DIV_ROUND_UP(1020, 32)];  
->     u32 saved_spi_conf[DIV_ROUND_UP(1020, 16)];  
->     u32 saved_spi_target[DIV_ROUND_UP(1020, 4)];  
->     u32 __percpu *saved_ppi_enable;  
->     u32 __percpu *saved_ppi_conf;  
-> #endif  
->     struct irq_domain *domain;－－－－－－－－－－－－－－－－－该GIC对应的irq domain数据结构  
->     unsigned int gic_irqs;－－－－－－－－－－－－－－－－－－－GIC支持的IRQ的数目  
-> #ifdef CONFIG_GIC_NON_BANKED  
->     void __iomem *(*get_base)(union gic_base *);  
-> #endif  
+> struct gic_chip_data {\
+> union gic_base dist_base;－－－－－－－－－－－－－－－－－－GIC Distributor的基地址空间\
+> union gic_base cpu_base;－－－－－－－－－－－－－－－－－－GIC CPU interface的基地址空间\
+> #ifdef CONFIG_CPU_PM－－－－－－－－－－－－－－－－－－－－GIC 电源管理相关的成员\
+> u32 saved_spi_enable\[DIV_ROUND_UP(1020, 32)\];\
+> u32 saved_spi_conf\[DIV_ROUND_UP(1020, 16)\];\
+> u32 saved_spi_target\[DIV_ROUND_UP(1020, 4)\];\
+> u32 \_\_percpu \*saved_ppi_enable;\
+> u32 \_\_percpu \*saved_ppi_conf;\
+> #endif\
+> struct irq_domain \*domain;－－－－－－－－－－－－－－－－－该GIC对应的irq domain数据结构\
+> unsigned int gic_irqs;－－－－－－－－－－－－－－－－－－－GIC支持的IRQ的数目\
+> #ifdef CONFIG_GIC_NON_BANKED\
+> void \_\_iomem \*(\*get_base)(union gic_base \*);\
+> #endif\
 > };
 
 对于GIC支持的IRQ的数目，这里还要赘述几句。实际上并非GIC支持多少个HW interrupt ID，其就支持多少个IRQ。对于SGI，其处理比较特别，并不归入IRQ number中。因此，对于GIC而言，其SGI（从0到15的那些HW interrupt ID）不需要irq domain进行映射处理，也就是说SGI没有对应的IRQ number。如果系统越来越复杂，一个GIC不能支持所有的interrupt source（目前GIC支持1020个中断源，这个数目已经非常的大了），那么系统还需要引入secondary GIC，这个GIC主要负责扩展外设相关的interrupt source，也就是说，secondary GIC的SGI和PPI都变得冗余了（这些功能，primary GIC已经提供了）。这些信息可以协助理解代码中的hwirq_base的设定。
 
 在注册GIC的irq domain的时候还有一个重要的数据结构gic_irq_domain_ops，其类型是struct irq_domain_ops ，对于GIC，其irq domain的操作函数是gic_irq_domain_ops，定义如下：
 
-> static const struct irq_domain_ops gic_irq_domain_ops = {  
->     .map = gic_irq_domain_map,  
->     .unmap = gic_irq_domain_unmap,  
->     .xlate = gic_irq_domain_xlate,  
+> static const struct irq_domain_ops gic_irq_domain_ops = {\
+> .map = gic_irq_domain_map,\
+> .unmap = gic_irq_domain_unmap,\
+> .xlate = gic_irq_domain_xlate,\
 > };
 
 irq domain的概念是一个通用中断子系统的概念，在具体的irq chip driver这个层次，我们需要一些解析GIC binding，创建IRQ number和HW interrupt ID的mapping的callback函数，更具体的解析参考后文的描述。
@@ -373,49 +378,49 @@ irq domain的概念是一个通用中断子系统的概念，在具体的irq chi
 （g） 一个函数名字是否起的好足可以看出工程师的功力。set_smp_cross_call这个函数看名字也知道它的含义，就是设定一个多个CPU直接通信的callback函数。当一个CPU core上的软件控制行为需要传递到其他的CPU上的时候（例如在某一个CPU上运行的进程调用了系统调用进行reboot），就会调用这个callback函数。对于GIC，这个callback定义为gic_raise_softirq。这个函数名字起的不好，直观上以为是和softirq相关，实际上其实是触发了IPI中断。
 
 （h）在multi processor环境下，当processor状态发送变化的时候（例如online，offline），需要把这些事件通知到GIC。而GIC driver在收到来自CPU的事件后会对cpu interface进行相应的设定。
+
 # 3、GIC硬件初始化
 
 （1）Distributor初始化，代码如下：
 
-> static void __init gic_dist_init(struct gic_chip_data *gic)  
-> {  
->     unsigned int i;  
->     u32 cpumask;  
->     unsigned int gic_irqs = gic->gic_irqs;－－－－－－－－－获取该GIC支持的IRQ的数目  
->     void __iomem *base = gic_data_dist_base(gic); －－－－获取该GIC对应的Distributor基地址
-> 
->     writel_relaxed(0, base + GIC_DIST_CTRL); －－－－－－－－－－－（a）
-> 
->   
->     cpumask = gic_get_cpumask(gic);－－－－－－－－－－－－－－－（b）  
->     cpumask |= cpumask << 8;  
->     cpumask |= cpumask << 16;－－－－－－－－－－－－－－－－－－（c）  
->     for (i = 32; i < gic_irqs; i += 4)  
->         writel_relaxed(cpumask, base + GIC_DIST_TARGET + i * 4 / 4); －－（d）
-> 
->     gic_dist_config(base, gic_irqs, NULL); －－－－－－－－－－－－－－－（e）
-> 
->     writel_relaxed(1, base + GIC_DIST_CTRL);－－－－－－－－－－－－－（f）  
+> static void \_\_init gic_dist_init(struct gic_chip_data \*gic)\
+> {\
+> unsigned int i;\
+> u32 cpumask;\
+> unsigned int gic_irqs = gic->gic_irqs;－－－－－－－－－获取该GIC支持的IRQ的数目\
+> void \_\_iomem \*base = gic_data_dist_base(gic); －－－－获取该GIC对应的Distributor基地址
+>
+> writel_relaxed(0, base + GIC_DIST_CTRL); －－－－－－－－－－－（a）
+>
+> cpumask = gic_get_cpumask(gic);－－－－－－－－－－－－－－－（b）\
+> cpumask |= cpumask \<\< 8;\
+> cpumask |= cpumask \<\< 16;－－－－－－－－－－－－－－－－－－（c）\
+> for (i = 32; i \< gic_irqs; i += 4)\
+> writel_relaxed(cpumask, base + GIC_DIST_TARGET + i * 4 / 4); －－（d）
+>
+> gic_dist_config(base, gic_irqs, NULL); －－－－－－－－－－－－－－－（e）
+>
+> writel_relaxed(1, base + GIC_DIST_CTRL);－－－－－－－－－－－－－（f）\
 > }
 
 （a）Distributor Control Register用来控制全局的中断forward情况。写入0表示Distributor不向CPU interface发送中断请求信号，也就disable了全部的中断请求（group 0和group 1），CPU interace再也收不到中断请求信号了。在初始化的最后，step（f）那里会进行enable的动作（这里只是enable了group 0的中断）。在初始化代码中，并没有设定interrupt source的group（寄存器是GIC_DIST_IGROUP），我相信缺省值就是设定为group 0的。
 
 （b）我们先看看gic_get_cpumask的代码：
 
-> static u8 gic_get_cpumask(struct gic_chip_data *gic)  
-> {  
->     void __iomem *base = gic_data_dist_base(gic);  
->     u32 mask, i;
-> 
->     for (i = mask = 0; i < 32; i += 4) {  
->         mask = readl_relaxed(base + GIC_DIST_TARGET + i);  
->         mask |= mask >> 16;  
->         mask |= mask >> 8;  
->         if (mask)  
->             break;  
->     }
-> 
->     return mask;  
+> static u8 gic_get_cpumask(struct gic_chip_data \*gic)\
+> {\
+> void \_\_iomem \*base = gic_data_dist_base(gic);\
+> u32 mask, i;
+>
+> for (i = mask = 0; i \< 32; i += 4) {\
+> mask = readl_relaxed(base + GIC_DIST_TARGET + i);\
+> mask |= mask >> 16;\
+> mask |= mask >> 8;\
+> if (mask)\
+> break;\
+> }
+>
+> return mask;\
 > }
 
 这里操作的寄存器是Interrupt Processor Targets Registers，该寄存器组中，每个GIC上的interrupt ID都有8个bit来控制送达的target CPU。我们来看看下面的图片：
@@ -429,6 +434,7 @@ GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW 
 （c）step （b）中获取了8个bit的cpu mask值，通过简单的copy，扩充为32个bit，每8个bit都是cpu mask的值，这么做是为了下一步设定所有IRQ（对于GIC而言就是SPI类型的中断）的CPU mask。
 （d）设定每个SPI类型的中断都是只送达该CPU。
 （e）配置GIC distributor的其他寄存器，代码如下：
+
 ```cpp
 void init gic_dist_config(void __iomem base, int gic_irqs,  void (*sync_access)(void)) {  
 unsigned int i;
@@ -449,30 +455,29 @@ if (sync_access)
 sync_access();  
 }
 ```
+
 程序的注释已经非常清楚了，这里就不细述了。需要注意的是：这里设定的都是缺省值，实际上，在各种driver的初始化过程中，还是有可能改动这些设置的（例如触发方式）。
 
 （2）CPU interface初始化，代码如下：
 
-> static void gic_cpu_init(struct gic_chip_data *gic)  
-> {  
->     void __iomem *dist_base = gic_data_dist_base(gic);－－－－－－－Distributor的基地址空间  
->     void __iomem *base = gic_data_cpu_base(gic);－－－－－－－CPU interface的基地址空间  
->     unsigned int cpu_mask, cpu = smp_processor_id();－－－－－－获取CPU的逻辑ID  
->     int i;
-> 
->   
->     cpu_mask = gic_get_cpumask(gic);－－－－－－－－－－－－－（a）  
->     gic_cpu_map[cpu] = cpu_mask;
-> 
->   
->     for (i = 0; i < NR_GIC_CPU_IF; i++)  
->         if (i != cpu)  
->             gic_cpu_map[i] &= ~cpu_mask; －－－－－－－－－－－－（b）
-> 
->     gic_cpu_config(dist_base, NULL); －－－－－－－－－－－－－－（c）
-> 
->     writel_relaxed(0xf0, base + GIC_CPU_PRIMASK);－－－－－－－（d）  
->     writel_relaxed(1, base + GIC_CPU_CTRL);－－－－－－－－－－－（e）  
+> static void gic_cpu_init(struct gic_chip_data \*gic)\
+> {\
+> void \_\_iomem \*dist_base = gic_data_dist_base(gic);－－－－－－－Distributor的基地址空间\
+> void \_\_iomem \*base = gic_data_cpu_base(gic);－－－－－－－CPU interface的基地址空间\
+> unsigned int cpu_mask, cpu = smp_processor_id();－－－－－－获取CPU的逻辑ID\
+> int i;
+>
+> cpu_mask = gic_get_cpumask(gic);－－－－－－－－－－－－－（a）\
+> gic_cpu_map\[cpu\] = cpu_mask;
+>
+> for (i = 0; i \< NR_GIC_CPU_IF; i++)\
+> if (i != cpu)\
+> gic_cpu_map\[i\] &= ~cpu_mask; －－－－－－－－－－－－（b）
+>
+> gic_cpu_config(dist_base, NULL); －－－－－－－－－－－－－－（c）
+>
+> writel_relaxed(0xf0, base + GIC_CPU_PRIMASK);－－－－－－－（d）\
+> writel_relaxed(1, base + GIC_CPU_CTRL);－－－－－－－－－－－（e）\
 > }
 
 （a）系统软件实际上是使用CPU 逻辑ID这个概念的，通过smp_processor_id可以获得本CPU的逻辑ID。gic_cpu_map这个全部lookup table就是用CPU 逻辑ID作为所以，去寻找其cpu mask，后续通过cpu mask值来控制中断是否送达该CPU。在gic_init_bases函数中，我们将该lookup table中的值都初始化为0xff，也就是说不进行mask，送达所有的CPU。这里，我们会进行重新修正。
@@ -481,21 +486,21 @@ sync_access();
 
 （c）设定SGI和PPI的初始值。具体代码如下：
 
-> void gic_cpu_config(void __iomem *base, void (*sync_access)(void))  
-> {  
->     int i;
-> 
->     /* Deal with the banked PPI and SGI interrupts - disable all  
->      * PPI interrupts, ensure all SGI interrupts are enabled.     */  
->     writel_relaxed(0xffff0000, base + GIC_DIST_ENABLE_CLEAR);  
->     writel_relaxed(0x0000ffff, base + GIC_DIST_ENABLE_SET);
-> 
->     /* Set priority on PPI and SGI interrupts    */  
->     for (i = 0; i < 32; i += 4)  
->         writel_relaxed(0xa0a0a0a0, base + GIC_DIST_PRI + i * 4 / 4);
-> 
->     if (sync_access)  
->         sync_access();  
+> void gic_cpu_config(void \_\_iomem \*base, void (\*sync_access)(void))\
+> {\
+> int i;
+>
+> /\* Deal with the banked PPI and SGI interrupts - disable all\
+> \* PPI interrupts, ensure all SGI interrupts are enabled.     \*/\
+> writel_relaxed(0xffff0000, base + GIC_DIST_ENABLE_CLEAR);\
+> writel_relaxed(0x0000ffff, base + GIC_DIST_ENABLE_SET);
+>
+> /\* Set priority on PPI and SGI interrupts    \*/\
+> for (i = 0; i \< 32; i += 4)\
+> writel_relaxed(0xa0a0a0a0, base + GIC_DIST_PRI + i * 4 / 4);
+>
+> if (sync_access)\
+> sync_access();\
 > }
 
 程序的注释已经非常清楚了，这里就不细述了。
@@ -506,17 +511,18 @@ sync_access();
 
 （3）GIC电源管理初始化，代码如下：
 
-> static void __init gic_pm_init(struct gic_chip_data *gic)  
-> {  
->     gic->saved_ppi_enable = __alloc_percpu(DIV_ROUND_UP(32, 32) * 4, sizeof(u32));
-> 
->     gic->saved_ppi_conf = __alloc_percpu(DIV_ROUND_UP(32, 16) * 4,  sizeof(u32));
-> 
->     if (gic == &gic_data[0])  
->         cpu_pm_register_notifier(&gic_notifier_block);  
+> static void \_\_init gic_pm_init(struct gic_chip_data \*gic)\
+> {\
+> gic->saved_ppi_enable = \_\_alloc_percpu(DIV_ROUND_UP(32, 32) * 4, sizeof(u32));
+>
+> gic->saved_ppi_conf = \_\_alloc_percpu(DIV_ROUND_UP(32, 16) * 4,  sizeof(u32));
+>
+> if (gic == &gic_data\[0\])\
+> cpu_pm_register_notifier(&gic_notifier_block);\
 > }
 
 这段代码前面主要是分配两个per cpu的内存。这些内存在系统进入sleep状态的时候保存PPI的寄存器状态信息，在resume的时候，写回寄存器。对于root GIC，需要注册一个和电源管理的事件通知callback函数。不得不吐槽一下gic_notifier_block和gic_notifier这两个符号的命名，看不出来和电源管理有任何关系。更优雅的名字应该包括pm这样的符号，以便让其他工程师看到名字就立刻知道是和电源管理相关的。
+
 # 四、GIC callback函数分析
 
 1、irq domain相关callback函数分析
@@ -525,20 +531,20 @@ irq domain相关callback函数包括：
 
 （1）gic_irq_domain_map函数：创建IRQ number和GIC hw interrupt ID之间映射关系的时候，需要调用该回调函数。具体代码如下：
 
-> static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq, irq_hw_number_t hw)  
-> {  
->     if (hw < 32) {－－－－－－－－－－－－－－－－－－SGI或者PPI  
->         irq_set_percpu_devid(irq);－－－－－－－－－－－－－－－－－－－－－－－－－－（a）  
->         irq_set_chip_and_handler(irq, &gic_chip, handle_percpu_devid_irq);－－－－－－－（b）  
->         set_irq_flags(irq, IRQF_VALID | IRQF_NOAUTOEN);－－－－－－－－－－－－－－（c）  
->     } else {  
->         irq_set_chip_and_handler(irq, &gic_chip, handle_fasteoi_irq);－－－－－－－－－－（d）  
->         set_irq_flags(irq, IRQF_VALID | IRQF_PROBE);
-> 
->         gic_routable_irq_domain_ops->map(d, irq, hw);－－－－－－－－－－－－－－－－（e）  
->     }  
->     irq_set_chip_data(irq, d->host_data);－－－－－设定irq chip的私有数据  
->     return 0;  
+> static int gic_irq_domain_map(struct irq_domain \*d, unsigned int irq, irq_hw_number_t hw)\
+> {\
+> if (hw \< 32) {－－－－－－－－－－－－－－－－－－SGI或者PPI\
+> irq_set_percpu_devid(irq);－－－－－－－－－－－－－－－－－－－－－－－－－－（a）\
+> irq_set_chip_and_handler(irq, &gic_chip, handle_percpu_devid_irq);－－－－－－－（b）\
+> set_irq_flags(irq, IRQF_VALID | IRQF_NOAUTOEN);－－－－－－－－－－－－－－（c）\
+> } else {\
+> irq_set_chip_and_handler(irq, &gic_chip, handle_fasteoi_irq);－－－－－－－－－－（d）\
+> set_irq_flags(irq, IRQF_VALID | IRQF_PROBE);
+>
+> gic_routable_irq_domain_ops->map(d, irq, hw);－－－－－－－－－－－－－－－－（e）\
+> }\
+> irq_set_chip_data(irq, d->host_data);－－－－－设定irq chip的私有数据\
+> return 0;\
 > }
 
 （a）SGI或者PPI和SPI最大的不同是per cpu的，SPI是所有CPU共享的，因此需要分配per cpu的内存，设定一些per cpu的flag。
@@ -555,22 +561,22 @@ irq domain相关callback函数包括：
 
 （3）gic_irq_domain_xlate函数：除了标准的属性之外，各个具体的interrupt controller可以定义自己的device binding。这些device bindings都需在irq chip driver这个层面进行解析。要给定某个外设的device tree node 和interrupt specifier，该函数可以解码出该设备使用的hw interrupt ID和linux irq type value 。具体的代码如下：
 
-> static int gic_irq_domain_xlate(struct irq_domain *d,  
->                 struct device_node *controller,  
->                 const u32 *intspec, unsigned int intsize,－－－－－－－－输入参数  
->                 unsigned long *out_hwirq, unsigned int *out_type)－－－－输出参数  
-> {  
->     unsigned long ret = 0;   
->     *out_hwirq = intspec[1] + 16; －－－－－－－－－－－－－－－－－－－－－（a）
-> 
->     *out_type = intspec[2] & IRQ_TYPE_SENSE_MASK; －－－－－－－－－－－（b）
-> 
->     return ret;  
+> static int gic_irq_domain_xlate(struct irq_domain \*d,\
+> struct device_node \*controller,\
+> const u32 \*intspec, unsigned int intsize,－－－－－－－－输入参数\
+> unsigned long \*out_hwirq, unsigned int \*out_type)－－－－输出参数\
+> {\
+> unsigned long ret = 0; \
+> \*out_hwirq = intspec\[1\] + 16; －－－－－－－－－－－－－－－－－－－－－（a）
+>
+> \*out_type = intspec\[2\] & IRQ_TYPE_SENSE_MASK; －－－－－－－－－－－（b）
+>
+> return ret;\
 > }
 
-（a）根据gic binding文档的描述，其interrupt specifier包括3个cell，分别是interrupt type（0 表示SPI，1表示PPI），interrupt number（对于PPI，范围是[0-15]，对于SPI，范围是[0-987]），interrupt flag（触发方式）。GIC interrupt specifier中的interrupt number需要加上16（也就是加上SGI的那些ID号），才能转换成GIC的HW interrupt ID。
+（a）根据gic binding文档的描述，其interrupt specifier包括3个cell，分别是interrupt type（0 表示SPI，1表示PPI），interrupt number（对于PPI，范围是\[0-15\]，对于SPI，范围是\[0-987\]），interrupt flag（触发方式）。GIC interrupt specifier中的interrupt number需要加上16（也就是加上SGI的那些ID号），才能转换成GIC的HW interrupt ID。
 
-（b）取出bits[3:0]的信息，这些bits保存了触发方式的信息
+（b）取出bits\[3:0\]的信息，这些bits保存了触发方式的信息
 
 2、电源管理的callback函数
 
@@ -582,15 +588,15 @@ TODO
 
 这个函数用来mask一个interrupt source。代码如下：
 
-> static void gic_mask_irq(struct irq_data *d)  
-> {  
->     u32 mask = 1 << (gic_irq(d) % 32);
-> 
->     raw_spin_lock(&irq_controller_lock);  
->     writel_relaxed(mask, gic_dist_base(d) + GIC_DIST_ENABLE_CLEAR + (gic_irq(d) / 32) * 4);  
->     if (gic_arch_extn.irq_mask)  
->         gic_arch_extn.irq_mask(d);  
->     raw_spin_unlock(&irq_controller_lock);  
+> static void gic_mask_irq(struct irq_data \*d)\
+> {\
+> u32 mask = 1 \<\< (gic_irq(d) % 32);
+>
+> raw_spin_lock(&irq_controller_lock);\
+> writel_relaxed(mask, gic_dist_base(d) + GIC_DIST_ENABLE_CLEAR + (gic_irq(d) / 32) * 4);\
+> if (gic_arch_extn.irq_mask)\
+> gic_arch_extn.irq_mask(d);\
+> raw_spin_unlock(&irq_controller_lock);\
 > }
 
 GIC有若干个叫做Interrupt Clear-Enable Registers（具体数目是和GIC支持的hw interrupt数目相关，我们前面说过的，GIC是一个高度可配置的interrupt controller）。这些Interrupt Clear-Enable Registers寄存器的每个bit可以控制一个interrupt source是否forward到CPU interface，写入1表示Distributor不再forward该interrupt，因此CPU也就感知不到该中断，也就是mask了该中断。特别需要注意的是：写入0无效，而不是unmask的操作。
@@ -601,15 +607,15 @@ GIC有若干个叫做Interrupt Clear-Enable Registers（具体数目是和GIC支
 
 这个函数用来unmask一个interrupt source。代码如下：
 
-> static void gic_unmask_irq(struct irq_data *d)  
-> {  
->     u32 mask = 1 << (gic_irq(d) % 32);
-> 
->     raw_spin_lock(&irq_controller_lock);  
->     if (gic_arch_extn.irq_unmask)  
->         gic_arch_extn.irq_unmask(d);  
->     writel_relaxed(mask, gic_dist_base(d) + GIC_DIST_ENABLE_SET + (gic_irq(d) / 32) * 4);  
->     raw_spin_unlock(&irq_controller_lock);  
+> static void gic_unmask_irq(struct irq_data \*d)\
+> {\
+> u32 mask = 1 \<\< (gic_irq(d) % 32);
+>
+> raw_spin_lock(&irq_controller_lock);\
+> if (gic_arch_extn.irq_unmask)\
+> gic_arch_extn.irq_unmask(d);\
+> writel_relaxed(mask, gic_dist_base(d) + GIC_DIST_ENABLE_SET + (gic_irq(d) / 32) * 4);\
+> raw_spin_unlock(&irq_controller_lock);\
 > }
 
 GIC有若干个叫做Interrupt Set-Enable Registers的寄存器。这些寄存器的每个bit可以控制一个interrupt source。当写入1的时候，表示Distributor会forward该interrupt到CPU interface，也就是意味这unmask了该中断。特别需要注意的是：写入0无效，而不是mask的操作。
@@ -618,15 +624,15 @@ GIC有若干个叫做Interrupt Set-Enable Registers的寄存器。这些寄存�
 
 当processor处理中断的时候就会调用这个函数用来结束中断处理。代码如下：
 
-> static void gic_eoi_irq(struct irq_data *d)  
-> {  
->     if (gic_arch_extn.irq_eoi) {  
->         raw_spin_lock(&irq_controller_lock);  
->         gic_arch_extn.irq_eoi(d);  
->         raw_spin_unlock(&irq_controller_lock);  
->     }
-> 
->     writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_EOI);  
+> static void gic_eoi_irq(struct irq_data \*d)\
+> {\
+> if (gic_arch_extn.irq_eoi) {\
+> raw_spin_lock(&irq_controller_lock);\
+> gic_arch_extn.irq_eoi(d);\
+> raw_spin_unlock(&irq_controller_lock);\
+> }
+>
+> writel_relaxed(gic_irq(d), gic_cpu_base(d) + GIC_CPU_EOI);\
 > }
 
 对于GIC而言，其中断状态有四种：
@@ -645,52 +651,52 @@ processor ack了一个中断后，该中断会被设定为active。当处理完�
 
 这个函数用来设定一个interrupt source的type，例如是level sensitive还是edge triggered。代码如下：
 
-> static int gic_set_type(struct irq_data *d, unsigned int type)  
-> {  
->     void __iomem *base = gic_dist_base(d);  
->     unsigned int gicirq = gic_irq(d);  
->     u32 enablemask = 1 << (gicirq % 32);  
->     u32 enableoff = (gicirq / 32) * 4;  
->     u32 confmask = 0x2 << ((gicirq % 16) * 2);  
->     u32 confoff = (gicirq / 16) * 4;  
->     bool enabled = false;  
->     u32 val;
-> 
->     /* Interrupt configuration for SGIs can't be changed */  
->     if (gicirq < 16)  
->         return -EINVAL;
-> 
->     if (type != IRQ_TYPE_LEVEL_HIGH && type != IRQ_TYPE_EDGE_RISING)  
->         return -EINVAL;
-> 
->     raw_spin_lock(&irq_controller_lock);
-> 
->     if (gic_arch_extn.irq_set_type)  
->         gic_arch_extn.irq_set_type(d, type);
-> 
->     val = readl_relaxed(base + GIC_DIST_CONFIG + confoff);  
->     if (type == IRQ_TYPE_LEVEL_HIGH)  
->         val &= ~confmask;  
->     else if (type == IRQ_TYPE_EDGE_RISING)  
->         val |= confmask;
-> 
->     /*  
->      * As recommended by the spec, disable the interrupt before changing  
->      * the configuration  
->      */  
->     if (readl_relaxed(base + GIC_DIST_ENABLE_SET + enableoff) & enablemask) {  
->         writel_relaxed(enablemask, base + GIC_DIST_ENABLE_CLEAR + enableoff);  
->         enabled = true;  
->     }
-> 
->     writel_relaxed(val, base + GIC_DIST_CONFIG + confoff);
-> 
->     if (enabled)  
->         writel_relaxed(enablemask, base + GIC_DIST_ENABLE_SET + enableoff);
-> 
->     raw_spin_unlock(&irq_controller_lock);
-> 
->     return 0;  
+> static int gic_set_type(struct irq_data \*d, unsigned int type)\
+> {\
+> void \_\_iomem \*base = gic_dist_base(d);\
+> unsigned int gicirq = gic_irq(d);\
+> u32 enablemask = 1 \<\< (gicirq % 32);\
+> u32 enableoff = (gicirq / 32) * 4;\
+> u32 confmask = 0x2 \<\< ((gicirq % 16) * 2);\
+> u32 confoff = (gicirq / 16) * 4;\
+> bool enabled = false;\
+> u32 val;
+>
+> /\* Interrupt configuration for SGIs can't be changed \*/\
+> if (gicirq \< 16)\
+> return -EINVAL;
+>
+> if (type != IRQ_TYPE_LEVEL_HIGH && type != IRQ_TYPE_EDGE_RISING)\
+> return -EINVAL;
+>
+> raw_spin_lock(&irq_controller_lock);
+>
+> if (gic_arch_extn.irq_set_type)\
+> gic_arch_extn.irq_set_type(d, type);
+>
+> val = readl_relaxed(base + GIC_DIST_CONFIG + confoff);\
+> if (type == IRQ_TYPE_LEVEL_HIGH)\
+> val &= ~confmask;\
+> else if (type == IRQ_TYPE_EDGE_RISING)\
+> val |= confmask;
+>
+> /\*\
+> \* As recommended by the spec, disable the interrupt before changing\
+> \* the configuration\
+> \*/\
+> if (readl_relaxed(base + GIC_DIST_ENABLE_SET + enableoff) & enablemask) {\
+> writel_relaxed(enablemask, base + GIC_DIST_ENABLE_CLEAR + enableoff);\
+> enabled = true;\
+> }
+>
+> writel_relaxed(val, base + GIC_DIST_CONFIG + confoff);
+>
+> if (enabled)\
+> writel_relaxed(enablemask, base + GIC_DIST_ENABLE_SET + enableoff);
+>
+> raw_spin_unlock(&irq_controller_lock);
+>
+> return 0;\
 > }
 
 对于SGI类型的interrupt，是不能修改其type的，因为GIC中SGI固定就是edge-triggered。对于GIC，其type只支持高电平触发（IRQ_TYPE_LEVEL_HIGH）和上升沿触发（IRQ_TYPE_EDGE_RISING）的中断。另外需要注意的是，在更改其type的时候，先disable，然后修改type，然后再enable。
@@ -699,13 +705,13 @@ processor ack了一个中断后，该中断会被设定为active。当处理完�
 
 这个接口用来resend一个IRQ到CPU。
 
-> static int gic_retrigger(struct irq_data *d)  
-> {  
->     if (gic_arch_extn.irq_retrigger)  
->         return gic_arch_extn.irq_retrigger(d);
-> 
->     /* the genirq layer expects 0 if we can't retrigger in hardware */  
->     return 0;  
+> static int gic_retrigger(struct irq_data \*d)\
+> {\
+> if (gic_arch_extn.irq_retrigger)\
+> return gic_arch_extn.irq_retrigger(d);
+>
+> /\* the genirq layer expects 0 if we can't retrigger in hardware \*/\
+> return 0;\
 > }
 
 看起来这是功能不是通用GIC拥有的功能，各个厂家在集成GIC的时候，有可能进行功能扩展。
@@ -714,25 +720,25 @@ processor ack了一个中断后，该中断会被设定为active。当处理完�
 
 在多处理器的环境下，外部设备产生了一个中断就需要送到一个或者多个处理器去，这个设定是通过设定处理器的affinity进行的。具体代码如下：
 
-> static int gic_set_affinity(struct irq_data *d, const struct cpumask *mask_val,    bool force)  
-> {  
->     void __iomem *reg = gic_dist_base(d) + GIC_DIST_TARGET + (gic_irq(d) & ~3);  
->     unsigned int cpu, shift = (gic_irq(d) % 4) * 8;  
->     u32 val, mask, bit;
-> 
->     if (!force)  
->         cpu = cpumask_any_and(mask_val, cpu_online_mask);－－－随机选取一个online的cpu  
->     else  
->         cpu = cpumask_first(mask_val); －－－－－－－－选取mask中的第一个cpu，不管是否online
-> 
->     raw_spin_lock(&irq_controller_lock);  
->     mask = 0xff << shift;  
->     bit = gic_cpu_map[cpu] << shift;－－－－－－－将CPU的逻辑ID转换成要设定的cpu mask  
->     val = readl_relaxed(reg) & ~mask;  
->     writel_relaxed(val | bit, reg);  
->     raw_spin_unlock(&irq_controller_lock);
-> 
->     return IRQ_SET_MASK_OK;  
+> static int gic_set_affinity(struct irq_data \*d, const struct cpumask \*mask_val,    bool force)\
+> {\
+> void \_\_iomem \*reg = gic_dist_base(d) + GIC_DIST_TARGET + (gic_irq(d) & ~3);\
+> unsigned int cpu, shift = (gic_irq(d) % 4) * 8;\
+> u32 val, mask, bit;
+>
+> if (!force)\
+> cpu = cpumask_any_and(mask_val, cpu_online_mask);－－－随机选取一个online的cpu\
+> else\
+> cpu = cpumask_first(mask_val); －－－－－－－－选取mask中的第一个cpu，不管是否online
+>
+> raw_spin_lock(&irq_controller_lock);\
+> mask = 0xff \<\< shift;\
+> bit = gic_cpu_map\[cpu\] \<\< shift;－－－－－－－将CPU的逻辑ID转换成要设定的cpu mask\
+> val = readl_relaxed(reg) & ~mask;\
+> writel_relaxed(val | bit, reg);\
+> raw_spin_unlock(&irq_controller_lock);
+>
+> return IRQ_SET_MASK_OK;\
 > }
 
 GIC Distributor中有一个寄存器叫做Interrupt Processor Targets Registers，这个寄存器用来设定制定的中断送到哪个process去。由于GIC最大支持8个process，因此每个hw interrupt ID需要8个bit来表示送达的process。每一个Interrupt Processor Targets Registers由32个bit组成，因此每个Interrupt Processor Targets Registers可以表示4个HW interrupt ID的affinity，因此上面的代码中的shift就是计算该HW interrupt ID在寄存器中的偏移。
@@ -741,19 +747,17 @@ GIC Distributor中有一个寄存器叫做Interrupt Processor Targets Registers�
 
 这个接口用来设定唤醒CPU的interrupt source。对于GIC，代码如下：
 
-> static int gic_set_wake(struct irq_data *d, unsigned int on)  
-> {  
->     int ret = -ENXIO;
-> 
->     if (gic_arch_extn.irq_set_wake)  
->         ret = gic_arch_extn.irq_set_wake(d, on);
-> 
->     return ret;  
+> static int gic_set_wake(struct irq_data \*d, unsigned int on)\
+> {\
+> int ret = -ENXIO;
+>
+> if (gic_arch_extn.irq_set_wake)\
+> ret = gic_arch_extn.irq_set_wake(d, on);
+>
+> return ret;\
 > }
 
 设定唤醒的interrupt和具体的厂商相关，这里不再赘述。
-
-  
 
 4、BSP（bootstrap processor）之外，其他CPU的callback函数
 
@@ -761,17 +765,17 @@ GIC Distributor中有一个寄存器叫做Interrupt Processor Targets Registers�
 
 上面描述的都是BSP的初始化过程，具体包括：
 
-> ……  
->     gic_dist_init(gic);－－－－－－初始化GIC的Distributor  
->     gic_cpu_init(gic);－－－－－－初始化BSP的CPU interface  
->     gic_pm_init(gic);－－－－－－初始化GIC的Power management  
+> ……\
+> gic_dist_init(gic);－－－－－－初始化GIC的Distributor\
+> gic_cpu_init(gic);－－－－－－初始化BSP的CPU interface\
+> gic_pm_init(gic);－－－－－－初始化GIC的Power management\
 > ……
 
 对于GIC的Distributor和Power management，这两部分是全局性的，BSP执行初始化一次就OK了。对于CPU interface，每个processor负责初始化自己的连接的那个CPU interface HW block。我们用下面这个图片来描述这个过程：
 
 [![booting](http://www.wowotech.net/content/uploadfile/201409/cdec2bc26e9fb0e1a7b3d29389896b5420140909083806.gif "booting")](http://www.wowotech.net/content/uploadfile/201409/f9b5b82dcfa88ba9503bb8c835da63c420140909083805.gif)
 
-  假设CPUx被选定为BSP，那么第三章描述的初始化过程在该CPU上欢畅的执行。这时候，被初始化的GIC硬件包括：root GIC的Distributor、root GIC CPU Interface x（连接BSP的那个CPU interface）以及其他的级联的非root GIC（上图中绿色block，当然，我偷懒，没有画non-root GIC）。
+假设CPUx被选定为BSP，那么第三章描述的初始化过程在该CPU上欢畅的执行。这时候，被初始化的GIC硬件包括：root GIC的Distributor、root GIC CPU Interface x（连接BSP的那个CPU interface）以及其他的级联的非root GIC（上图中绿色block，当然，我偷懒，没有画non-root GIC）。
 
 BSP初始化完成之后，各个其他的CPU运行起来，会发送CPU_STARTING消息给关注该消息的模块。毫无疑问，GIC driver模块当然要关注这样的消息，在初始化过程中会注册callback函数如下：
 
@@ -779,24 +783,22 @@ BSP初始化完成之后，各个其他的CPU运行起来，会发送CPU_STARTIN
 
 GIC相关的回调函数定义如下：
 
-> static struct notifier_block gic_cpu_notifier = {  
->     .notifier_call = gic_secondary_init,  
->     .priority = 100,  
+> static struct notifier_block gic_cpu_notifier = {\
+> .notifier_call = gic_secondary_init,\
+> .priority = 100,\
 > };
-> 
-> static int gic_secondary_init(struct notifier_block *nfb, unsigned long action,  void *hcpu)  
-> {  
->     if (action == CPU_STARTING || action == CPU_STARTING_FROZEN)  
->         gic_cpu_init(&gic_data[0]);－－－－－－－－－初始化那些非BSP的CPU interface  
->     return NOTIFY_OK;  
+>
+> static int gic_secondary_init(struct notifier_block \*nfb, unsigned long action,  void \*hcpu)\
+> {\
+> if (action == CPU_STARTING || action == CPU_STARTING_FROZEN)\
+> gic_cpu_init(&gic_data\[0\]);－－－－－－－－－初始化那些非BSP的CPU interface\
+> return NOTIFY_OK;\
 > }
 
 因此，当non-BSP booting up的时候，发送CPU_STARTING消息，调用GIC的callback函数，对上图中的紫色的CPU Interface HW block进行初始化，这样，就完成了全部GIC硬件的初始化过程。
 
-  
-
-Change log：  
-11月3号，修改包括：  
+Change log：\
+11月3号，修改包括：\
 1、使用GIC-V2这样更通用的描述，而不是仅仅GIC-400
 
 _原创文章，转发请注明出处。蜗窝科技，[http://www.wowotech.net/linux_kenrel/gic_driver.html](http://www.wowotech.net/linux_kenrel/gic_driver.html)_
@@ -805,170 +807,170 @@ _原创文章，转发请注明出处。蜗窝科技，[http://www.wowotech.net/
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [Linux电源管理(7)_Wakeup events framework](http://www.wowotech.net/pm_subsystem/wakeup_events_framework.html) | [linux kernel的中断子系统之（四）：High level irq event handler](http://www.wowotech.net/irq_subsystem/High_level_irq_event_handler.html)»
+« [Linux电源管理(7)\_Wakeup events framework](http://www.wowotech.net/pm_subsystem/wakeup_events_framework.html) | [linux kernel的中断子系统之（四）：High level irq event handler](http://www.wowotech.net/irq_subsystem/High_level_irq_event_handler.html)»
 
 **评论：**
 
-**qixi**  
+**qixi**\
 2020-04-09 15:19
 
 谢谢作者的分享，请问文中描述GIC和CPU接口上的交互过程的时序图是参考的哪个文档？多谢
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7943)
 
-**无非**  
+**无非**\
 2019-11-09 16:02
 
-在GIC硬件初始化这一章节里：  设定CPU interface的control register。enable了group 0的中断，disable了group 1的中断，group 0的interrupt source触发IRQ中断（而不是FIQ中断）。  
+在GIC硬件初始化这一章节里：  设定CPU interface的control register。enable了group 0的中断，disable了group 1的中断，group 0的interrupt source触发IRQ中断（而不是FIQ中断）。\
 请问：既然没有打开FIQ，哪系统是怎样触发FIQ类型中断的，还是不能触发FIQ类型的中断。
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7742)
 
-**yz**  
+**yz**\
 2022-03-06 17:14
 
 @无非：group0和group1其中一个可以产生fiq，如果想要触发fiq，就需要把中断的group更改一下，并且开启gic中fiq的使能，就可以产生fiq中断
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-8568)
 
-**soc**  
+**soc**\
 2019-06-18 13:56
 
-博主："（3）gic_irq_domain_xlate函数" 下方的注释 "GIC interrupt specifier中的interrupt number需要加上16（也就是加上SGI的那些ID号），才能转换成GIC的HW interrupt ID。" 上面的步骤只是跳过了SGI,转换了PPI，如果是SPI的话还要+16，我查了下源码发现是有的：  
-/* For SPIs, we need to add 16 more to get the GIC irq ID number */  
-    if (!intspec[0])  
-        *out_hwirq += 16;
+博主："（3）gic_irq_domain_xlate函数" 下方的注释 "GIC interrupt specifier中的interrupt number需要加上16（也就是加上SGI的那些ID号），才能转换成GIC的HW interrupt ID。" 上面的步骤只是跳过了SGI,转换了PPI，如果是SPI的话还要+16，我查了下源码发现是有的：\
+/\* For SPIs, we need to add 16 more to get the GIC irq ID number \*/\
+if (!intspec\[0\])\
+\*out_hwirq += 16;
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7476)
 
-**BeDook**  
+**BeDook**\
 2019-06-04 17:16
 
 博主大侠，请教个关于GIC的入门问题，在ARM V8系统中，如何实现一个SPI中断同时给多个Core响应么？貌似手册上说对于SPI类型的中断，不论是Targeted distribution model模式还是1 of N model模式，其一次只能指定由一个核响应改变该中断的状态？而其他核上中断状态仍为Pending，菜鸟认为这样的后果是各个核一次轮流响应SPI z中断？
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7455)
 
-**威点零**  
+**威点零**\
 2019-05-22 16:18
 
-研究了一下：  
-为gic中断分配cpu, GIC_DIST_TARGET寄存器为gic中断提供8-bits的目标CPU，一个GIC_DIST_TARGET寄存器可服务于4个gic中断。为什么一个CPU target只需要8bit呢？因为cortex_a9_gic只支持8个CPU。若CPU targets=0xff，表示任何一个cpu都可处理该中断，如果CPU targets=0x01，则表示只有CPU0可处理该中断。GIC_DIST_TARGET结构如下：  
-    b31-b24        b23-b16        b15-b8         b7-b0  
-  CPU targets    CPU targets    CPU targets    CPU targets  
-    offset3        offset2        offset1        offset0
+研究了一下：\
+为gic中断分配cpu, GIC_DIST_TARGET寄存器为gic中断提供8-bits的目标CPU，一个GIC_DIST_TARGET寄存器可服务于4个gic中断。为什么一个CPU target只需要8bit呢？因为cortex_a9_gic只支持8个CPU。若CPU targets=0xff，表示任何一个cpu都可处理该中断，如果CPU targets=0x01，则表示只有CPU0可处理该中断。GIC_DIST_TARGET结构如下：\
+b31-b24        b23-b16        b15-b8         b7-b0\
+CPU targets    CPU targets    CPU targets    CPU targets\
+offset3        offset2        offset1        offset0
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7437)
 
-**威点零**  
+**威点零**\
 2019-05-22 15:54
 
-这里操作的寄存器是Interrupt Processor Targets Registers，该寄存器组中，每个GIC上的interrupt ID都有8个bit来控制送达的target CPU。我们来看看下面的图片：  
-GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW block中，能控制送达的CPU interface，并不是具体的CPU，如果具体的实现中CPU interface和CPU是严格按照上图中那样一一对应，那么GIC_DIST_TARGET送达了CPU Interface n，也就是送达了CPU n。当然现实未必如你所愿，那么怎样来获取这个CPU的mask呢？我们知道SGI和PPI不需要使用GIC_DIST_TARGET控制target CPU。SGI送达目标CPU有自己特有的寄存器来控制（Software Generated Interrupt Register），对于PPI，其是CPU私有的，因此不需要控制target CPU。GIC_DIST_TARGET0～GIC_DIST_TARGET7是控制0～31这32个interrupt ID（SGI和PPI）的target CPU的，但是实际上SGI和PPI是不需要控制target CPU的，因此，这些寄存器是read only的，读取这些寄存器返回的就是cpu mask值。假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。  
-  
-文章写得不错，但是上面这段，我是看了又看，有很多地方没明白。  
-1.上面提到每个interrupt Num由8bit控制送达的target cpu，后面又提到Cpu Interface和CPUx不是对应接的。不太明白，distributor到底是控制到cpu interface还是到Cpu的。  
-2.GIC_DIST_TARGET0～GIC_DIST_TARGET7是控制0～31这32个interrupt ID（SGI和PPI）的target CPU的。按第8bit来算，位数应该是32*32个bit，GIC_DIST_TARGET0～GIC_DIST_TARGET7，每个target是多少位呢？  
-3.假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。这里是无论读GIC_DIST_TARGET0\、GIC_DIST_TARGET1...GIC_DIST_TARGET7都是0b00010000吗？  
+这里操作的寄存器是Interrupt Processor Targets Registers，该寄存器组中，每个GIC上的interrupt ID都有8个bit来控制送达的target CPU。我们来看看下面的图片：\
+GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW block中，能控制送达的CPU interface，并不是具体的CPU，如果具体的实现中CPU interface和CPU是严格按照上图中那样一一对应，那么GIC_DIST_TARGET送达了CPU Interface n，也就是送达了CPU n。当然现实未必如你所愿，那么怎样来获取这个CPU的mask呢？我们知道SGI和PPI不需要使用GIC_DIST_TARGET控制target CPU。SGI送达目标CPU有自己特有的寄存器来控制（Software Generated Interrupt Register），对于PPI，其是CPU私有的，因此不需要控制target CPU。GIC_DIST_TARGET0～GIC_DIST_TARGET7是控制0～31这32个interrupt ID（SGI和PPI）的target CPU的，但是实际上SGI和PPI是不需要控制target CPU的，因此，这些寄存器是read only的，读取这些寄存器返回的就是cpu mask值。假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。
+
+文章写得不错，但是上面这段，我是看了又看，有很多地方没明白。\
+1.上面提到每个interrupt Num由8bit控制送达的target cpu，后面又提到Cpu Interface和CPUx不是对应接的。不太明白，distributor到底是控制到cpu interface还是到Cpu的。\
+2.GIC_DIST_TARGET0～GIC_DIST_TARGET7是控制0～31这32个interrupt ID（SGI和PPI）的target CPU的。按第8bit来算，位数应该是32\*32个bit，GIC_DIST_TARGET0～GIC_DIST_TARGET7，每个target是多少位呢？\
+3.假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。这里是无论读GIC_DIST_TARGET0\\、GIC_DIST_TARGET1...GIC_DIST_TARGET7都是0b00010000吗？\
 总得看下来，看得有点晕晕的。
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7436)
 
-**Mike_wu**  
+**Mike_wu**\
 2019-05-09 11:23
 
 您好，请问个问题。假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7403)
 
-**Mike_wu**  
+**Mike_wu**\
 2019-05-09 11:24
 
 @Mike_wu：这个不是太懂
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-7404)
 
-**zoro**  
+**zoro**\
 2018-06-26 18:24
 
-@linuxer:  
-   这里有个疑惑  
-   if (gic_nr == 0 && (irq_start & 31) > 0) {  
-        hwirq_base = 16;  
-        if (irq_start != -1)  
-            irq_start = (irq_start & ~31) + 16;  
-    } else {  
-        hwirq_base = 32;  
-    }  
-irq_start = -1  
+@linuxer:\
+这里有个疑惑\
+if (gic_nr == 0 && (irq_start & 31) > 0) {\
+hwirq_base = 16;\
+if (irq_start != -1)\
+irq_start = (irq_start & ~31) + 16;\
+} else {\
+hwirq_base = 32;\
+}\
+irq_start = -1\
 应该是进入上面的if语句吧，即PPI也mapping吧？
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-6819)
 
-**[callme_friend](http://www.wowotech.net/)**  
+**[callme_friend](http://www.wowotech.net/)**\
 2018-02-05 16:55
 
-请教郭大侠：  
-关于gic初始化distributor时：  
-1、为何要使用0-31(SGI/PPI)中断id中的一个来初始化所有的SPI中断？  
-  
-2、在获取0-31中某个中断时，实际上代码是获取0-4-8-...-28中断mask，代码如下所示，如果这些id对应的mask刚好全部无效，岂不很奇怪？  
-static u8 gic_get_cpumask(struct gic_chip_data *gic)  
-{  
-    void __iomem *base = gic_data_dist_base(gic);  
-    u32 mask, i;  
-    for (i = mask = 0; i < 32; i += 4) {   // 因为i += 4,因此获取的mask实际上是按4跳跃  
-        mask = readl_relaxed(base + GIC_DIST_TARGET + i);  
-        mask |= mask >> 16;  
-        mask |= mask >> 8;  
-        if (mask)  
-            break;  
-    }  
-    return mask;  
+请教郭大侠：\
+关于gic初始化distributor时：\
+1、为何要使用0-31(SGI/PPI)中断id中的一个来初始化所有的SPI中断？
+
+2、在获取0-31中某个中断时，实际上代码是获取0-4-8-...-28中断mask，代码如下所示，如果这些id对应的mask刚好全部无效，岂不很奇怪？\
+static u8 gic_get_cpumask(struct gic_chip_data \*gic)\
+{\
+void \_\_iomem \*base = gic_data_dist_base(gic);\
+u32 mask, i;\
+for (i = mask = 0; i \< 32; i += 4) {   // 因为i += 4,因此获取的mask实际上是按4跳跃\
+mask = readl_relaxed(base + GIC_DIST_TARGET + i);\
+mask |= mask >> 16;\
+mask |= mask >> 8;\
+if (mask)\
+break;\
+}\
+return mask;\
 }
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-6531)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2018-02-07 09:25
 
-@callme_friend：第二个问题：gic_get_cpumask是获取cpumask值，通过它可以设定该中断送达的CPU。之所以按照0-4-8-...-28进行操作，那是因为0、1、2、3是一样的。原文中有一段话清楚的说明了这个情况：  
-－－－－－－－－－－－－－－－－  
-GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW block中，能控制送达的CPU interface，并不是具体的CPU，如果具体的实现中CPU interface和CPU是严格按照上图中那样一一对应，那么GIC_DIST_TARGET送达了CPU Interface n，也就是送达了CPU n。当然现实未必如你所愿，那么怎样来获取这个CPU的mask呢？我们知道SGI和PPI不需要使用GIC_DIST_TARGET控制target CPU。SGI送达目标CPU有自己特有的寄存器来控制（Software Generated Interrupt Register），对于PPI，其是CPU私有的，因此不需要控制target CPU。GIC_DIST_TARGET0～GIC_DIST_TARGET7是控制0～31这32个interrupt ID（SGI和PPI）的target CPU的，但是实际上SGI和PPI是不需要控制target CPU的，因此，这些寄存器是read only的，读取这些寄存器返回的就是cpu mask值。假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。  
-－－－－－－－－－－－－－－－－－－－－－－－－－－  
-  
+@callme_friend：第二个问题：gic_get_cpumask是获取cpumask值，通过它可以设定该中断送达的CPU。之所以按照0-4-8-...-28进行操作，那是因为0、1、2、3是一样的。原文中有一段话清楚的说明了这个情况：\
+－－－－－－－－－－－－－－－－\
+GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW block中，能控制送达的CPU interface，并不是具体的CPU，如果具体的实现中CPU interface和CPU是严格按照上图中那样一一对应，那么GIC_DIST_TARGET送达了CPU Interface n，也就是送达了CPU n。当然现实未必如你所愿，那么怎样来获取这个CPU的mask呢？我们知道SGI和PPI不需要使用GIC_DIST_TARGET控制target CPU。SGI送达目标CPU有自己特有的寄存器来控制（Software Generated Interrupt Register），对于PPI，其是CPU私有的，因此不需要控制target CPU。GIC_DIST_TARGET0～GIC_DIST_TARGET7是控制0～31这32个interrupt ID（SGI和PPI）的target CPU的，但是实际上SGI和PPI是不需要控制target CPU的，因此，这些寄存器是read only的，读取这些寄存器返回的就是cpu mask值。假设CPU0接在CPU interface 4上，那么运行在CPU 0上的程序在读GIC_DIST_TARGET0～GIC_DIST_TARGET7的时候，返回的就是0b00010000。\
+－－－－－－－－－－－－－－－－－－－－－－－－－－
+
 第一个问题我没有特别搞清楚你的意思，能不能给出对应的代码？
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-6536)
 
-**[callme_friend](http://www.wowotech.net/)**  
+**[callme_friend](http://www.wowotech.net/)**\
 2018-02-07 10:04
 
-@linuxer：这两个问题都是关于中断的mask初始化。  
-第一个问题，我的意思是，为何通过0-31中断的cpu mask来初始化其他的SPI中断的cpu mask？  
-  
+@linuxer：这两个问题都是关于中断的mask初始化。\
+第一个问题，我的意思是，为何通过0-31中断的cpu mask来初始化其他的SPI中断的cpu mask？
+
 第二个问题，为何0、1、2、3号中断的cpu mask一样？
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-6538)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2018-02-07 10:24
 
-@callme_friend：第二个问题：  
-0-31的中断需要cpu mask吗？不需要啊，SGI是软件设定target，PPI是一对一的，因此，0-31的中断号不需要设定target cpu，也就是说它们的GIC_DIST_TARGET是没有意义的。不过ARM仍然提供了这些寄存器，是readonly的，通过它们可以读出8个CPU interface的mask值。8个CPU Interface如何对应到32个中断号上，那么就0、1、2、3对应cpu interface 0，4、5、6、7对应cpu interface 1 ........  
-  
-第一个问题  
+@callme_friend：第二个问题：\
+0-31的中断需要cpu mask吗？不需要啊，SGI是软件设定target，PPI是一对一的，因此，0-31的中断号不需要设定target cpu，也就是说它们的GIC_DIST_TARGET是没有意义的。不过ARM仍然提供了这些寄存器，是readonly的，通过它们可以读出8个CPU interface的mask值。8个CPU Interface如何对应到32个中断号上，那么就0、1、2、3对应cpu interface 0，4、5、6、7对应cpu interface 1 ........
+
+第一个问题\
 通过这样子可以把所有SPI中断送达系统中所有的CPU。
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-6539)
 
-**甲乙丙丁**  
+**甲乙丙丁**\
 2016-12-16 23:53
 
 既然GIC只支持高电平和上升沿种中断模式，那么外设的低电平触发中断和下降沿触发中断是怎么处理，是由什么硬件将其翻转为GIC支持的高电平和上升沿信号吗？
 
 [回复](http://www.wowotech.net/irq_subsystem/gic_driver.html#comment-5036)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2017-01-04 08:39
 
 @甲乙丙丁：文章中只是说“SGI只支持高电平触发”，其它的还是没有问题的。
@@ -979,152 +981,155 @@ GIC_DIST_TARGETn（Interrupt Processor Targets Registers）位于Distributor HW 
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [ARMv8之Atomicity](http://www.wowotech.net/armv8a_arch/atomicity.html)
-    - [建立讨论区的原因](http://www.wowotech.net/73.html)
-    - [Linux power supply class(1)_软件架构及API汇整](http://www.wowotech.net/pm_subsystem/psy_class_overview.html)
-    - [vim使用技巧摘录](http://www.wowotech.net/linux_application/vim_skill.html)
-    - [Linux调度器：进程优先级](http://www.wowotech.net/process_management/process-priority.html)
+
+  - [ARMv8之Atomicity](http://www.wowotech.net/armv8a_arch/atomicity.html)
+  - [建立讨论区的原因](http://www.wowotech.net/73.html)
+  - [Linux power supply class(1)\_软件架构及API汇整](http://www.wowotech.net/pm_subsystem/psy_class_overview.html)
+  - [vim使用技巧摘录](http://www.wowotech.net/linux_application/vim_skill.html)
+  - [Linux调度器：进程优先级](http://www.wowotech.net/process_management/process-priority.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

@@ -1,5 +1,5 @@
 Linux云计算网络  _2022年05月21日 15:21_ _广东_
-![[Pasted image 20241007231459.png]]
+!\[\[Pasted image 20241007231459.png\]\]
 
 来源：https://zhuanlan.zhihu.com/p/108425561
 
@@ -9,25 +9,19 @@ TLB是translation lookaside buffer的简称。首先，我们知道MMU的作用�
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/cYSwmJQric6lL2zLKT3ORjQp4K3KJkJEm3iaIjyd0HzicdyuzW4jIgkf5moYvlhI5zlVSoSSj6dkGY9WhIULKZChA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-**MMU工作原理**  
+**MMU工作原理**
 
 虚拟地址和物理地址的映射关系存储在页表中，而现在页表又是分级的。64位系统一般都是3~5级。常见的配置是4级页表，就以4级页表为例说明。分别是PGD、PUD、PMD、PTE四级页表。在硬件上会有一个叫做页表基地址寄存器，它存储PGD页表的首地址。
 
-  
-
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/cYSwmJQric6lL2zLKT3ORjQp4K3KJkJEmDqzR7q5iacALbMq9avNUPfTpVJVMPJtkdB2HwzWuJHbP0SqKBuHOv2A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-**Linux分页机制**  
+**Linux分页机制**
 
 MMU就是根据页表基地址寄存器从PGD页表一路查到PTE，最终找到物理地址(PTE页表中存储物理地址)。这就像在地图上显示你的家在哪一样，我为了找到你家的地址，先确定你是中国，再确定你是某个省，继续往下某个市，最后找到你家是一样的原理。一级一级找下去。这个过程你也看到了，非常繁琐。如果第一次查到你家的具体位置，我如果记下来你的姓名和你家的地址。下次查找时，是不是只需要跟我说你的姓名是什么，我就直接能够告诉你地址，而不需要一级一级查找。四级页表查找过程需要四次内存访问。延时可想而知，非常影响性能。页表查找过程的示例如下图所示。以后有机会详细展开，这里了解下即可。
-
-  
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/cYSwmJQric6lL2zLKT3ORjQp4K3KJkJEmrB1e7LAMEDbpPYQDoTaEpyiatoaaTHjMictDo2qQlppHCiadMVoHmSztg/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 **page table walk**
-
-  
 
 ## **TLB的本质是什么**
 
@@ -69,28 +63,21 @@ ASID和进程ID肯定是不一样的，别混淆二者。进程ID取值范围很
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_jpg/cYSwmJQric6lL2zLKT3ORjQp4K3KJkJEmleXacPmoXRBeKiad4H8BR1IMpkYSRtHjQqDC7ZHyVGX0jZsiafpR8ia2A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 ## **什么时候应该flush TLB**
 
 我们再来最后的总结，什么时候应该flush TLB。
 
 - 当ASID分配完的时候，需要flush全部TLB，ASID的管理可以使用bitmap管理，flush TLB后clear整个bitmap。
-    
-- 当我们建立页表映射的时候，就需要flush虚拟地址对应的TLB表项。
-    
-    第一印象可能是修改页表映射的时候才需要flush TLB，但是实际情况是只要建立映射就需要flush TLB。原因是，建立映射时你并不知道之前是否存在映射，例如，建立虚拟地址A到物理地址B的映射，我们并不知道之前是否存在虚拟地址A到物理地址C的映射情况，所以就统一在建立映射关系的时候flush TLB。
-    
 
-  
+- 当我们建立页表映射的时候，就需要flush虚拟地址对应的TLB表项。
+
+  第一印象可能是修改页表映射的时候才需要flush TLB，但是实际情况是只要建立映射就需要flush TLB。原因是，建立映射时你并不知道之前是否存在映射，例如，建立虚拟地址A到物理地址B的映射，我们并不知道之前是否存在虚拟地址A到物理地址C的映射情况，所以就统一在建立映射关系的时候flush TLB。
 
 n.net/yugemengjing/article/detai
 
----
+______________________________________________________________________
 
 后台回复“加群”，带你进入高手如云交流群
-
-  
 
 **推荐阅读：**
 
@@ -104,9 +91,9 @@ n.net/yugemengjing/article/detai
 
 [Cilium 容器网络的落地实践](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247497237&idx=1&sn=d84b91d9e416bb8d18eee409b6993743&chksm=ea77c2addd004bbb0eda5815bbf216cff6a5054f74a25122c6e51fafd2512100e78848aad65e&scene=21#wechat_redirect)
 
-[【中断】的本质](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&scene=21#wechat_redirect)  
+[【中断】的本质](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&scene=21#wechat_redirect)
 
-[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)  
+[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)
 
 [Linux 应用内存调试神器- ASan](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496414&idx=1&sn=897d3d39e208652dcb969b5aca221ca1&chksm=ea77c666dd004f70ebee7b9b9d6e6ebd351aa60e3084149bfefa59bca570320ebcc7cadc6358&scene=21#wechat_redirect)
 
@@ -114,7 +101,7 @@ n.net/yugemengjing/article/detai
 
 [Page Cache和Buffer Cache关系](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495951&idx=1&sn=8bc76e05a63b8c9c9f05c3ebe3f99b7a&chksm=ea77c5b7dd004ca18c71a163588ccacd33231a58157957abc17f1eca17e5dcb35147b273bc52&scene=21#wechat_redirect)
 
-[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)  
+[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)
 
 [一文读懂基于Kubernetes打造的边缘计算](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495291&idx=1&sn=0aebc6ee54af03829e15ac659db923ae&chksm=ea77dac3dd0053d5cd4216e0dc91285ff37607c792d180b946bc09783d1a2032b0dffbcb03f0&scene=21#wechat_redirect)
 
@@ -146,11 +133,7 @@ n.net/yugemengjing/article/detai
 
 ▼
 
-  
-
-_**_****喜欢，就给我一个****“在看”****_**_
-
-  
+_\*\*_****喜欢，就给我一个****“在看”\*\*\*\*_\*\*_
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/1TDxR6xkRSEBR9TP1Wsd64sicg7J9nbB41gbaHmcM73Yy5XkC5j8Sb3EV1ZGR8NZoKlZTposjm1IIdxibmngoobg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 

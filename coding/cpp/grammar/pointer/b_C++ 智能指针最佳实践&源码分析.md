@@ -2,11 +2,9 @@
 
 Original 腾讯程序员 腾讯技术工程
 
- _2021年12月20日 17:32_
+_2021年12月20日 17:32_
 
 ![Image](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1)
-
-  
 
 作者：lucasfan，腾讯 IEG Global Pub.Tech. 客户端工程师
 
@@ -19,9 +17,11 @@ Original 腾讯程序员 腾讯技术工程
 C++在堆上申请内存后，需要手动对内存进行释放。代码的初创者可能会注意内存的释放，但随着代码协作者加入，或者随着代码日趋复杂，很难保证内存都被正确释放。
 
 尤其是一些代码分支在开发中没有被完全测试覆盖的时候，就算是内存泄漏检查工具也不一定能检查到内存泄漏。
+
 ```c
 void test_memory_leak(bool open)   {       A *a = new A();          if(open)       {           // 代码变复杂过程中，很可能漏了 delete(a);           return;       }          delete(a);       return;   }   
 ```
+
 #### 1.2 多线程下对象析构问题
 
 多线程遇上对象析构，是一个很难的问题，稍有不慎就会导致程序崩溃。因此在对于 C++开发者而言，经常会使用静态单例来使得对象常驻内存，避免析构带来的问题。这势必会造成内存泄露，当单例对象比较大，或者程序对内存非常敏感的时候，就必须面对这个问题了。
@@ -29,6 +29,7 @@ void test_memory_leak(bool open)   {       A *a = new A();         
 先以一个常见的 C++多线程问题为例，介绍多线程下的对象析构问题。
 
 比如我们在开发过程中，经常会在一个 Class 中创建一个线程，这个线程读取外部对象的成员变量。
+
 ```c
 // 日志上报Class
 class ReportClass   {   private:       ReportClass() {}       ReportClass(const ReportClass&) = delete;       ReportClass& operator=(const ReportClass&) = delete;       ReportClass(const ReportClass&&) = delete;       ReportClass& operator=(const ReportClass&&) = delete;      private:       std::mutex mutex_;       int count_ = 0;       void addWorkThread();      public:       void pushEvent(std::string event);      private:       static void workThread(ReportClass *report);      private:       static ReportClass* instance_;       static std::mutex static_mutex_;      public:       static ReportClass* GetInstance();       static void ReleaseInstance();   };      std::mutex ReportClass::static_mutex_;   ReportClass* ReportClass::instance_;      ReportClass* ReportClass::GetInstance()   {       // 单例简单实现，非本文重点
@@ -38,23 +39,28 @@ std::unique_lock<std::mutex> lock(report->mutex_);           if(report-
 void ReportClass::addWorkThread()   {       std::thread new_thread(workThread, this);       new_thread.detach();   }      // 外部调用
 void ReportClass::pushEvent(std::string event)   {       std::unique_lock<std::mutex> lock(mutex_);       this->count_++;   }
 ```
+
 使用 ReportClass 的代码如下：
+
 ```c
 ReportClass::GetInstance()->pushEvent("test");
 ```
+
 但当这个外部对象（即`ReportClass`）析构时，对象创建的线程还在执行。此时线程引用的对象指针为野指针，程序必然会发生异常。
 
 解决这个问题的思路是在对象析构的时候，对线程进行`join`。
+
 ```c
 // 日志上报Class
 class ReportClass   {   private:       //...       ~ReportClass();      
 					 private:       //...       bool stop_ = false;       std::thread *work_thread_;       //...   };      // 轮询上报线程   void ReportClass::workThread(ReportClass *report)   {       while(true)       {           std::unique_lock<std::mutex> lock(report->mutex_);              // 如果上报停止，不再轮询上报           if(report->stop_)           {               break;           }              if(report->count_ > 0)           {               report->count_--;           }              usleep(1000*1000);       }   }      // 创建任务线程   void ReportClass::addWorkThread()   {       // 保存线程指针，不再使用分离线程       work_thread_ = new std::thread(workThread, this);   }      ReportClass::~ReportClass()   {       // 通过join来停止内部线程       stop_ = true;       work_thread_->join();       delete work_thread_;       work_thread_ = nullptr;   }
 ```
+
 这种方式看起来没问题了，但是由于这个对象一般是被多个线程使用。假如某个线程想要释放这个对象，但另外一个线程还在使用这个对象，可能会出现野指针问题。就算释放对象的线程将对象释放后将指针置为`nullptr`，但仍然可能在多线程下在指针置空前被另外一个线程取得地址并使用。
 
 |线程 A|线程 B|
 |---|---|
-|ReportClass::GetInstance()->ReleaseInstance();|ReportClass *report = ReportClass::GetInstance();  <br>if(report) {  <br>// 此时切换到线程 A  <br>report->pushEvent("test");  <br>}|
+|ReportClass::GetInstance()->ReleaseInstance();|ReportClass \*report = ReportClass::GetInstance();  <br>if(report) {  <br>// 此时切换到线程 A  <br>report->pushEvent("test");  <br>}|
 
 此种场景下，锁机制已经很难解决这个问题。对于多线程下的对象析构问题，智能指针可谓是神器。接下来我们先对智能指针的基本用法进行说明。
 
@@ -65,20 +71,21 @@ class ReportClass   {   private:       //...       ~ReportClass();
 目前 C++11 主要支持的智能指针为以下几种
 
 - unique_ptr
-    
+
 - shared_ptr
-    
+
 - weak_ptr
-    
 
 #### 2.1 unique_ptr
 
 先上代码
+
 ```c
 class A   {   public:       void do_something() {}   };      void test_unique_ptr(bool open)   {       std::unique_ptr<A> a(new A());       a->do_something();          if(open)       {           // 不再需要手动释放内存
 return;       }          // 不再需要手动释放内存
 																								return;   }
 ```
+
 `unique_ptr`的核心特点就如它的名字一样，它拥有对持有对象的唯一所有权。即两个`unique_ptr`不能同时指向同一个对象。
 
 那具体这个唯一所有权如何体现呢？
@@ -86,10 +93,12 @@ return;       }          // 不再需要手动释放内存
 1、`unique_ptr`不能被复制到另外一个`unique_ptr`
 
 2、`unique_ptr`所持有的对象只能通过转移语义将所有权转移到另外一个`unique_ptr`
+
 ```c
 std::unique_ptr<A> a1(new A());   std::unique_ptr<A> a2 = a1;//编译报错，不允许复制
 std::unique_ptr<A> a3 = std::move(a1);//可以转移所有权，所有权转义后a1不再拥有任何指针   
 ```
+
 智能指针有一个通用的规则，就是`->`表示用于调用指针原有的方法，而`.`则表示调用智能指针本身的方法。
 
 `unique_ptr`本身拥有的方法主要包括：
@@ -101,11 +110,13 @@ std::unique_ptr<A> a3 = std::move(a1);//可以转移所有权，所有权转�
 3、release() 释放所管理指针的所有权，返回原生指针。但并不销毁原生指针。
 
 4、reset() 释放并销毁原生指针。如果参数为一个新指针，将管理这个新指针
+
 ```c
 std::unique_ptr<A> a1(new A());   A *origin_a = a1.get();//尽量不要暴露原生指针
 if(a1)   {       // a1 拥有指针
 }      std::unique_ptr<A> a2(a1.release());//常见用法，转义拥有权   a2.reset(new A());//释放并销毁原有对象，持有一个新对象   a2.reset();//释放并销毁原有对象，等同于下面的写法   a2 = nullptr;//释放并销毁原有对象   
 ```
+
 #### 2.2 shared_ptr
 
 与`unique_ptr`的唯一所有权所不同的是，`shared_ptr`强调的是共享所有权。也就是说多个`shared_ptr`可以拥有同一个原生指针的所有权。
@@ -225,12 +236,15 @@ if(a1)   {       // a1 拥有指针
 `void incorrect_smart_pointer2()   {       A *a= new A();       std::unique_ptr<A> unique_ptr_a1(a);       std::unique_ptr<A> unique_ptr_a2(a);// 此处将导致对象的二次释放   }   `
 
 3、尽量不要使用 get()获取原生指针
+
 ```c
 void incorrect_smart_pointer3()   {       std::shared_ptr<A> shared_ptr_a1 = std::make_shared<A>();          A *a= shared_ptr_a1.get();          std::shared_ptr<A> shared_ptr_a2(a);// 此处将导致对象的二次释放          
 	delete a;// 此处也将导致对象的二次释放  
 }
 ```
+
 4、不要将 this 指针直接托管智能指针
+
 ```c
 class E   {
   void use_this()    { //错误方式，用this指针重新构造shared_ptr，将导致二次释放当前对象
@@ -240,12 +254,15 @@ class E   {
 
 std::shared_ptr<E> e = std::make_shared<E>();
 ```
+
 5、智能指针只能管理堆对象，不能管理栈上对象
 
 栈上对象本身在出栈时就会被自动销毁，如果将其指针交给智能指针，会造成对象的二次销毁
+
 ```c
 void incorrect_smart_pointer5()   {       int int_num = 3;       std::unique_ptr<int> int_unique_ptr(&amp;int_num);   }
 ```
+
 #### 3.3 解决多线程下对象析构问题
 
 有了智能指针之后，我们就可以使用智能指针解决多线程下的对象析构问题。
@@ -267,9 +284,8 @@ void incorrect_smart_pointer5()   {       int int_num = 3;       std
 先看下 `unique_ptr`的声明。`unique_ptr`有两个模板参数，分别为`_Tp`和`_Dp`。
 
 - `_Tp`表示原生指针的类型。
-    
+
 - `_Dp`则表示析构器，开发者可以自定义指针销毁的代码。其拥有一个默认值`default_delete<_Tp>`，其实就是标准的`delete`函数。
-    
 
 函数声明中`typename __pointer_type<_Tp, deleter_type>::type`可以简单理解为`_Tp*`，即原生指针类型。
 
@@ -325,17 +341,13 @@ void incorrect_smart_pointer5()   {       int int_num = 3;       std
 
 `// 通过shared_ptr构造weak_ptr。会将shared_ptr的成员变量地址进行复制。增加weak引用计数   weak_ptr<_Tp>::weak_ptr(shared_ptr<_Yp> const&amp; __r,                           typename enable_if<is_convertible<_Yp*, _Tp*>::value, __nat*>::type)                            _NOEXCEPT       : __ptr_(__r.__ptr_),         __cntrl_(__r.__cntrl_)   {       if (__cntrl_)           __cntrl_->__add_weak();   }      // weak_ptr析构器   template<class _Tp>   weak_ptr<_Tp>::~weak_ptr()   {       if (__cntrl_)           __cntrl_->__release_weak();   }      `
 
-  
+**最近热文：**
 
-**最近热文：**  
+[浅谈 K8s 网络模型CNI协议](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765825&idx=1&sn=2af68cbaf1dd1be65f5cecb6080039e9&chksm=becca4ba89bb2dacdec2e444f28be8ab3049aca6bf68165f1deac5816678e0235d8236f9e9c0&scene=21#wechat_redirect)
 
-[浅谈 K8s 网络模型CNI协议](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765825&idx=1&sn=2af68cbaf1dd1be65f5cecb6080039e9&chksm=becca4ba89bb2dacdec2e444f28be8ab3049aca6bf68165f1deac5816678e0235d8236f9e9c0&scene=21#wechat_redirect)  
+[提速 30%！腾讯TQUIC 网络传输协议](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765817&idx=1&sn=2eeb275c0200f6469c0b22c2eca62d08&chksm=becca4c289bb2dd4b3972c3a830c1c76d7b82e1a8d09edb6ce3a7f350d0ab1e663e320765b55&scene=21#wechat_redirect)
 
-[提速 30%！腾讯TQUIC 网络传输协议](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765817&idx=1&sn=2eeb275c0200f6469c0b22c2eca62d08&chksm=becca4c289bb2dd4b3972c3a830c1c76d7b82e1a8d09edb6ce3a7f350d0ab1e663e320765b55&scene=21#wechat_redirect)  
-
-[大牛书单 | 消息队列方向的好书](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765666&idx=1&sn=d1e01a47c4b5cd394f76c6fdc2b261f9&chksm=becca45989bb2d4f4a1249d88c4d18d93c84c05bd60e320a77288a221cf56e685e733c324eb7&scene=21#wechat_redirect)  
-
-  
+[大牛书单 | 消息队列方向的好书](http://mp.weixin.qq.com/s?__biz=MjM5ODYwMjI2MA==&mid=2649765666&idx=1&sn=d1e01a47c4b5cd394f76c6fdc2b261f9&chksm=becca45989bb2d4f4a1249d88c4d18d93c84c05bd60e320a77288a221cf56e685e733c324eb7&scene=21#wechat_redirect)
 
 腾讯程序员
 

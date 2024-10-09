@@ -1,14 +1,14 @@
 # [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
 
-talk is cheap,  
+talk is cheap,\
 show me the code!
 
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
+- [首页](http://kfngxl.cn/index.php)
+- [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
+- [内存篇](https://kfngxl.cn/index.php/category/memory/)
+- [网络篇](https://kfngxl.cn/index.php/category/network/)
+- [关于](https://kfngxl.cn/index.php/about.html)
+-
 
 # [内核是如何给容器中的进程分配CPU资源的？](https://kfngxl.cn/index.php/archives/752/)
 
@@ -875,9 +875,9 @@ struct cfs_rq {
 
 这里要注意的是，一般 period_timer 分配时间的周期都是 100 ms 左右。假如说你的进程前 50 ms 就把 cpu 给用光了，那你收到的请求可能在后面的 50 ms 都没有办法处理，对请求处理耗时会有影响。这也是为啥在关注 CPU 性能的时候要关注对容器 throttle 次数和时间的原因了。
 
-更多干货内容，详见：  
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+更多干货内容，详见：\
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [内核是如何给容器中的进程分配CPU资源的？](https://kfngxl.cn/index.php/archives/752/)
@@ -922,7 +922,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36920次
     - 本站运营：0年168天17小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

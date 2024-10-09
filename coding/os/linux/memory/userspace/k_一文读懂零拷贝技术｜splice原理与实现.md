@@ -1,5 +1,6 @@
 Original songsong001 Linux内核那些事
- _2022年09月27日 13:05_ _广东_
+_2022年09月27日 13:05_ _广东_
+
 ## splice 原理重温
 
 在《[splice使用](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466923&idx=1&sn=acf2fb71a960f3831f9b98657b39d4ce&scene=21#wechat_redirect)》一文中介绍了 `splice` 的原理和使用，现在我们来分析一下 `splice` 的代码实现。
@@ -13,14 +14,15 @@ Original songsong001 Linux内核那些事
 > 管道的实现可以参考：《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》
 
 我们在《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》一文中介绍过，管道有个 `环形缓冲区`，这个 `环形缓冲区` 需要绑定真实的物理内存页。而 splice 就是将管道的 `环形缓冲区` 绑定到文件的 `页缓存`，如下图所示：
-![[Pasted image 20240914164257.png]]
+!\[\[Pasted image 20240914164257.png\]\]
 通过将文件页缓存绑定到管道的环形缓冲区后，就可以通过管道的读端读取文件页缓存的数据。
+
 ## splice 代码实现
 
 在《[splice使用](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466923&idx=1&sn=acf2fb71a960f3831f9b98657b39d4ce&scene=21#wechat_redirect)》一文中介绍过 `splice` 的使用过程，要将文件内容发送到客户端连接的步骤如下：
 
 1. 首先，使用 `splice()` 系统调用将文件的内容与管道绑定。
-2. 然后，使用 `splice()` 系统调用将管道的数据拷贝到客户端连接 socket。
+1. 然后，使用 `splice()` 系统调用将管道的数据拷贝到客户端连接 socket。
 
 我们先来看看 `splice()` 系统调用的实现，代码如下：
 
@@ -37,9 +39,10 @@ static longdo_splice(struct file *in, loff_t *off_in,           
 如上面代码所示，`do_splice()` 函数分两种情况处理，如下：
 
 1. 如果输入端是一个管道，则调用 `do_splice_from()` 函数进行处理。
-2. 如果输出端是一个管道，则调用 `do_splice_to()` 函数进行处理。
+1. 如果输出端是一个管道，则调用 `do_splice_to()` 函数进行处理。
 
 下面我们分别来说明这两种情况的处理过程。
+
 ### 1. 输入端是一个管道
 
 如果输入端是一个管道（也就是说从管道拷贝数据到输出端句柄），那么将会调用 `do_splice_from()` 函数进行处理，`do_splice_from()` 函数的实现如下：
@@ -65,13 +68,14 @@ ssize_t__splice_from_pipe(struct pipe_inode_info *pipe, struct splice_desc 
 对 `__splice_from_pipe()` 函数进行简化后，逻辑就很简单。主要过程如下：
 
 1. 获取管道环形缓冲区（管道的实现可以参考《[图解 | Linux进程通信 - 管道实现](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648465715&idx=1&sn=3eaa62f290c02876b412326a5ebb30a6&scene=21#wechat_redirect)》一文）。
-2. 调用 `pipe_to_file()` 函数把管道环形缓冲区的数据拷贝到输出端的文件中。
+1. 调用 `pipe_to_file()` 函数把管道环形缓冲区的数据拷贝到输出端的文件中。
 
 所以，输入端是一个管道的调用链如下：
 
 ```c
 sys_splice()└→ do_splice()   └→ do_splice_from()      └→ generic_file_splice_write()         └→ __splice_from_pipe()            └→ pipe_to_file()
 ```
+
 ### 2. 输出端是一个管道
 
 如果输出端是一个管道（也就是说将输入端与管道绑定），那么将会调用 `do_splice_to()` 函数进行处理，`do_splice_to()` 函数的实现如下：
@@ -95,9 +99,9 @@ while (spd.nr_pages < nr_pages) {        page = find_get_page(mapp
 `__generic_file_splice_read()` 函数的代码比较长，为了更易于分析，所以对其进行了精简。从精简后的代码可以看出，`__generic_file_splice_read()` 函数主要完成 4 个步骤：
 
 1. 查找要绑定的页缓存是否已经存在（已经从硬盘同步到页缓存）。
-2. 如果还有没有同步到内核的页缓存，那么申请新的页缓存。
-3. 如果页缓存与硬盘的数据不一致，那么先从硬盘同步到页缓存。
-4. 调用 `splice_to_pipe()` 函数将页缓存与管道绑定。
+1. 如果还有没有同步到内核的页缓存，那么申请新的页缓存。
+1. 如果页缓存与硬盘的数据不一致，那么先从硬盘同步到页缓存。
+1. 调用 `splice_to_pipe()` 函数将页缓存与管道绑定。
 
 所以最终会调用 `splice_to_pipe()` 函数将页缓存与管道绑定，我们来看看 `splice_to_pipe()` 函数的实现：
 
@@ -112,6 +116,7 @@ ssize_tsplice_to_pipe(struct pipe_inode_info *pipe, struct splice_pipe_desc�
 ```c
 sys_splice()└→ do_splice()   └→ do_splice_to()      └→ generic_file_splice_read()         └→ __generic_file_splice_read()            └→ splice_to_pipe()
 ```
+
 ## 总结
 
 本文主要介绍了 `splice` 的原理与实现，`splice` 是 `零拷贝技术` 的一种实现。希望通过本文，能够让读者对 `零拷贝技术` 有更深入的理解。

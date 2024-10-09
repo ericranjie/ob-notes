@@ -1,42 +1,51 @@
 Original 晓泰 泰晓科技
- _2023年05月16日 15:09_ _广东_
-> Corrector: TinyCorrect v0.1-rc3 - [comments codeinline epw]  
-> Author:   XiakaiPan 13212017962@163.com  
-> Date:     2022/08/12  
-> Revisor:  walimis, Falcon  
-> Project:  RISC-V Linux 内核剖析  
-> Proposal: RISC-V 虚拟化技术调研与分析  
+_2023年05月16日 15:09_ _广东_
+
+> Corrector: TinyCorrect v0.1-rc3 - \[comments codeinline epw\]\
+> Author:   XiakaiPan 13212017962@163.com\
+> Date:     2022/08/12\
+> Revisor:  walimis, Falcon\
+> Project:  RISC-V Linux 内核剖析\
+> Proposal: RISC-V 虚拟化技术调研与分析\
 > Sponsor:  PLCT Lab, ISCAS
 
 本周继续连载 RISC-V 虚拟化系列文章，记得收藏分享+关注，写文章领补贴：gitee.com/tinylab/riscv-linux
 
 该活动统一采用泰晓社区自研 Linux Lab 开源实验环境，也可选用免装即插即跑 Linux Lab Disk (https://tinylab.org/linux-lab-disk)，某宝检索“泰晓 Linux”可找到。**Linux Lab v1.1 Inside —— 内核开发从未像今天这般简单！**
+
 # RISC-V 内存虚拟化简析（一）
+
 ## 前言
 
 本文首先简要介绍了 RISC-V 特权指令中的基本内存管理指令，包括 `SFENCE.VMA` (in S-Extension), `HFENCE.VVMA` 和 `HFENCE.GVMA` (in H-Extension) 等，随后分析了它们在指令集模拟器 Spike 中的实现，最后对与内存管理密切相关的两组 CSR（控制与状态寄存器）`xstatus` 和 `xatp` 的结构和功能进行了分析。
+
 ## RISC-V 特权指令集总览
 
 RISC-V 特权指令集如下表所示，包括 Trap 返回指令（`sret`, `mret`）、中断管理指令、S-Mode 内存管理指令和 H-Mode 指令（包含内存管理指令和加载、保存指令），其中 S-Mode 和 H-Mode 的内存管理指令功能类似。
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CuRxmicjibRWia0MxQRaN3E88B5fATF1bVebzQpGTfeu71gjLgP5UbNmrA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 priv-insts
+
 ### M-Level 指令
 
 `sret` 和 `mret` 指令涉及从 Trap 跳转处理中返回，其在虚拟化中的作用，可以参考 此文 的 **Trap 与虚拟化** 一节。
 
 `WFI`(`Waiting For Interrupt`) 指令有时被实现为无操作 `NOP` 指令。或者使 CPU 进入低功耗休眠状态，等待中断唤醒。
+
 ### S-Level 指令
 
 `SFENCE.VMA` 是 S 模式中的内存管理指令，而 `SINVAL.VMA`, `SFENCE.W.INVAL`, `SFENCE.INVAL.IR` 是其扩展指令，用于实现更细粒度的内存管理。
+
 ### H 扩展指令
 
 H 扩展的指令包括内存管理和数据加载存储指令两部分，其中，内存管理指令可以视为 S 模式的内存管理指令的变体，它们的功能相似；而 H 扩展的 `Load`, `Store` 指令与基础指令集里对应指令有所不同（指令生效的特权模式不同），而机器所在的特权模式（M，HS，VS，U）可通过特定 CSR 的特定位确定，故而其具体实现往往涉及特定 CSR 的读写和判断。
+
 ## 内存管理指令
 
 ### S 模式内存管理指令
 
 #### SFENCE.VMA 解读
+
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CmsiaDly52eUHts4QyMibARF9muiaGYqOg1gPKghUBWPxwfZsc0wYnhtEg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 sfence.vma
 
@@ -46,8 +55,8 @@ sfence.vma
 
 - 若 ，该指令将会对所有页表的页表项进行操作，若 ，该指令将对由  指定的虚拟地址对应的 PTE 进行操作。
 - 若 ，该指令将会对所有地址空间进行操作，若 ，该指令将对由  指定的 AS 进行操作。
-    
- 表示 0。
+
+表示 0。
 
 具体功能如下表所示：
 
@@ -81,8 +90,9 @@ Trap 相关的定义如下所示，上述 `require_novirt()` 函数实际上�
 ### H 扩展内存管理指令
 
 #### HFENCE.VVMA & HFENCE.GVMA
+
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CE5q4Lkux5Foh4gZQyAFiaxCjOBBXVoWon3wGFibdVnoADwYMcbksxmDg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hfence
 
@@ -132,7 +142,7 @@ hfence
 |`mstatus` to keep track of and controls the **hart’s current operating state**|`sstatus` to keeps track of the **processor’s current operating state**|`vsstatus` is **VS-mode’s version of `sstatus`**, when V=1, `vsstatus` substitutes for `sstatus`|
 ||`hstatus` provides facilities analogous to the `mstatus` register for tracking and controlling the **exception behavior of a VS-mode guest**||
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CVdrd0k2402jhibAKXW8oYA7N2hahvGk6lErU1picEcHiaHibs4BHFFvQBA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此图由 Mermaid 生成
 
@@ -146,7 +156,7 @@ hfence
 |TW|Timeout Wait|`WFI` (Wait For Interrupt)|TW=0, execute `WFI` in lower-privileged mode directly; TW=1, execute as before within time limit, if out of time limit, cause _illegal instruction exception_; 0 if only M-mode support|
 |TSR|Trap `SRET`|`sret` (Supervisor RETurn)|TSR=1, execute `sret` in S-mode causes _illegal instruction exception_; TSR=0, permitted; 0 if no S-mode support|
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CJlDrWd33rSB9iaafU6tZGqwROr7KEAqrKjllNIW4DtxoreRH0nWxKQg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 mstatus
 
@@ -154,7 +164,7 @@ mstatus
 
 `hstatus` 是 H 扩展引入的一个处理 HS 和 VS 特权级 Trap 的 CSR，与 `mstatus` 一同完成 H 扩展支持下的 Trap 处理。
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CrMz8ME6duuMP9mkRib4LxY6u3obUcmicAZkHTGNIOmkH1trjd6Lic03Bg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hstatus
 
@@ -176,9 +186,9 @@ hstatus
 |Virtualization Support|TVM (Trap Virtual Memory)|VTVM|V instructions affect execution only in **VS-mode**, and cause _virtual instruction exceptions_ instead of _illegal instruction exceptions_|
 ||TW (Timeout Wait)|VTW||
 ||TSR (Trap SRet)|VTSR||
-|Extension Context Status|FS[1:0]|||
-||VS[1:0]|||
-||XS[1:0]|||
+|Extension Context Status|FS\[1:0\]|||
+||VS\[1:0\]|||
+||XS\[1:0\]|||
 |Virtualization Trap Control|**MPV** (Machine Previous Virtualization mode)|**SPV** (Supervisor Previous Virtualization mode)|written by the implementation whenever **a trap is taken into M/HS-mode**|
 ||**GVA** (Guest Virtual Address)|**GVA** (Guest Virtual Address)|written by the implementation whenever **a trap is taken into M/HS-mode**|
 |VM Load/Store Control||**HU** (Hypervisor in U-mode)|controls whether the virtual-machine load/store instructions, `HLV`, `HLVX`, and `HSV`, can **be used also in U-mode**|
@@ -187,11 +197,11 @@ hstatus
 
 `sstatus` 可以视为 `mstatus` 的一个子集，保存的是作用于 S 特权级的信息。在简化版的 `sstatus` 的实现中，对于 `sstatus` 对应区域的读写等同于对 `mstatus` 对应区域的读写（这一点在 QEMU 和 Spike 对 `sret` 指令的实现中有所体现，详情参见 此文 中的 **返回指令与虚拟化** 一节）。
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9C37t7XzGyllJSMicRMDam4kCdrAhRvQ2YYZQc7ZpEfCUoZTaqOuUbAbA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 sstatus
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CKvbqNGiaTcTJibK5EMRlXt38ZvsFyG2n8cya5yU8xxTBTnHg2ulgIQAw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 vsstatus
 
@@ -205,15 +215,15 @@ vsstatus
 |Endianness Control|UBE|
 |Interrupt-Enable Stack|SIE|
 ||SPIE|
-|Extension Context Status|VS[1:0]|
-||FS[1:0]|
-||XS[1:0]|
+|Extension Context Status|VS\[1:0\]|
+||FS\[1:0\]|
+||XS\[1:0\]|
 
 #### 小结
 
 从 CSR 的分区来看，`mstatus`, `hstatus`, `sstatus/vsstatus` 的关系如下：
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CJ2IDaA3abtibricVI45fIu1krJwqhOicw61TJrpacexaatsL1eNT24Jibg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 此图由 Mermaid 生成
 
@@ -236,40 +246,41 @@ _S-Mode_ Address Translation and Protection (_satp_) Registers: 用于控制 S-
 | PPN        | 22         | 21:0       | 44         | 43:0       | hold the **page table number** of the root page table, i.e., its supervisor physical address divided by 4 KiB |
 |            |            |            |            |            |                                                                                                               |
 
-![[Pasted image 20240913184925.png]]![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240913184925.png\]\]!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 - MODE
-    
-    MODE 位用来标记当前系统所支持的内存模式，32 位和 64 位有所不同。Bare 为裸机模式，不存在 VA 和 PA 的转换以及内存保护机制。用 1 和 8-10 表示 64 位系统下基于页表的采用不同虚拟地址位宽的内存系统。![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CU6T40icCAMYj5AZZ9rnk90eSUcLVY108dL5xP4nibnyeibaf3DJ0ZpSbg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-    
+
+  MODE 位用来标记当前系统所支持的内存模式，32 位和 64 位有所不同。Bare 为裸机模式，不存在 VA 和 PA 的转换以及内存保护机制。用 1 和 8-10 表示 64 位系统下基于页表的采用不同虚拟地址位宽的内存系统。!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)\
+  ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CU6T40icCAMYj5AZZ9rnk90eSUcLVY108dL5xP4nibnyeibaf3DJ0ZpSbg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+
 - _Active_ Status
-    
-    `satp` CSR 的值仅在特定特权级（**S-Mode, U-Mode**）有效，处于这两个特权级时，`satp` 的值会被用于虚拟地址转换。
-    
+
+  `satp` CSR 的值仅在特定特权级（**S-Mode, U-Mode**）有效，处于这两个特权级时，`satp` 的值会被用于虚拟地址转换。
 
 #### hgatp
+
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CxGFw8RfQTekX0FuWcMLoTxO7jRgt51cfO6ykXp7b0hYtyh6UzcHpiag/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hgatp
 
 - PPN：保存 guest-physical 根页表编号
-    
+
 - VMID：相较于 `satp` 的 `ASID` 留出左边两位，剩余的位用于保存 Virtual Machine IDentifier
-    
+
 - MODE：与 `satp` 相同，指示系统采用的内存模式
-    
+
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CiczQ575mbITghbKlqIUkibs6WHZibTrwtrp3uJHULKicsBnPI7CUy2eyFw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 hgatp-MODE
 
 仅当处于 U 特权模式且 `hstatus.HU=0` 时，`vsatp` 才被视作无效状态。
 
 #### vsatp
+
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/XXJQJDtx0eZCqqGC5Fr3ecA7jGCZiag9CK58A1micDDqiaQl4rmeTexO9han3Z0hYHbM8C7hjcCxRTelMaKRlzKlw/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 vsatp
 
@@ -281,7 +292,7 @@ V=1 时，`vsatp` 将取代 `satp`，所有对 `satp` 的操作（读写）�
 
 `xatp` CSR 包含三个部分，MODE 部分用于标识采用哪种地址模式，第二部分用于指示隶属于不同部分的地址（进程的地址空间（Address Space）或虚拟机的标志符（VMID）），第三部分用于保存多级页表的根物理页的编号，进行地址转换时结合虚拟地址的 Offset 获取实际要访问的物理地址。
 
-|xatp|被用于*特权级的地址转换|无效化的条件|
+|xatp|被用于\*特权级的地址转换|无效化的条件|
 |---|---|---|
 |`satp`|S-Mode|M-Mode|
 |`hgatp`|H-Mode, G-Stage|U-Mode and `hstatus.HU=0`|
@@ -298,16 +309,13 @@ RISC-V 通过引入 S 扩展实现了能够运行操作系统的 Machine/Supervi
 ## 参考资料
 
 - RISC-V 特权指令集手册
-    
 
----
+______________________________________________________________________
 
-**首发地址**：https://tinylab.org/riscv-kvm-mem-virt-1  
+**首发地址**：https://tinylab.org/riscv-kvm-mem-virt-1\
 **技术服务**：https://tinylab.org/ruma.tech
 
 左下角 **阅读原文** 可访问外链。都看到这里了，就随手在看+分享一下吧 ;-)
-
-  
 
 RISC-V127
 

@@ -1,37 +1,32 @@
 Linux云计算网络
- _2021年10月25日 08:13_
+_2021年10月25日 08:13_
 以下文章来源于IOT物联网小镇 ，作者道哥
 
-](https://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&mpshare=1&scene=24&srcid=1025peMJiUpm4aKVPsLvw1Zn&sharer_sharetime=1635124512104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04bb4eb637ddf607b3f3973caff47f9e57980acde5c001b070729666898ffb01d5f76551b6a95ec17053ab6340bab531c5eeb9b906f26aa6d90c4d762c252e3a0b90e887c437bf278688d4d81ce27756f9b217aad492ab0073a93a5cc8fc73a152234fd3fdef5736e615b2607de46cc63275cbca893629594&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQhc%2BeS6SshNikRXyWPYNVNBLmAQIE97dBBAEAAAAAAEbHL71HiEUAAAAOpnltbLcz9gKNyK89dVj00M2etG%2Bpo5B0ubHnyhcWPD7ZS8ONZ1eK2%2B0AD0NAhI0c%2BRMZUOysodHehBQylawPN5DfXFo7cbWNYRhmF4vvkkoDd5ggzAMtVhIV32lQrV4KSqfCcAp5yA%2Fzv54VqpWZuYCglwE9mSfwic2P0jTjsCgBQG5nPfbsHFS%2B%2F2fVGkjigd2TDU%2F3v84g0z4Ol7BtMs6Mv0J9YmIZ9sLpeRtG5Y4vIfUyeyPDLZVdXdPgC49%2B3FQpPd4IMlyqyyl%2Bv52d&acctmode=0&pass_ticket=nI3fD44N03%2F076Ut5RH0dB6vWUwI3QJ7W38UCvR2PbFN4F%2BqtJgd0bIfpnIN4qRu&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&mpshare=1&scene=24&srcid=1025peMJiUpm4aKVPsLvw1Zn&sharer_sharetime=1635124512104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04bb4eb637ddf607b3f3973caff47f9e57980acde5c001b070729666898ffb01d5f76551b6a95ec17053ab6340bab531c5eeb9b906f26aa6d90c4d762c252e3a0b90e887c437bf278688d4d81ce27756f9b217aad492ab0073a93a5cc8fc73a152234fd3fdef5736e615b2607de46cc63275cbca893629594&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQhc%2BeS6SshNikRXyWPYNVNBLmAQIE97dBBAEAAAAAAEbHL71HiEUAAAAOpnltbLcz9gKNyK89dVj00M2etG%2Bpo5B0ubHnyhcWPD7ZS8ONZ1eK2%2B0AD0NAhI0c%2BRMZUOysodHehBQylawPN5DfXFo7cbWNYRhmF4vvkkoDd5ggzAMtVhIV32lQrV4KSqfCcAp5yA%2Fzv54VqpWZuYCglwE9mSfwic2P0jTjsCgBQG5nPfbsHFS%2B%2F2fVGkjigd2TDU%2F3v84g0z4Ol7BtMs6Mv0J9YmIZ9sLpeRtG5Y4vIfUyeyPDLZVdXdPgC49%2B3FQpPd4IMlyqyyl%2Bv52d&acctmode=0&pass_ticket=nI3fD44N03%2F076Ut5RH0dB6vWUwI3QJ7W38UCvR2PbFN4F%2BqtJgd0bIfpnIN4qRu&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 > 作  者：道哥，10+年的嵌入式开发老兵。
-> 
+>
 > 专注于：C/C++、Linux操作系统、应用程序设计、物联网、单片机和嵌入式开发等领域。
 
 - 中断向量与中断描述符
-    
+
 - 中断的分类
-    
 
 - 内部中断
-    
-- 外部中断  
-    
+
+- 外部中断
 
 - 中断号
-    
+
 - 中断向量和中断处理程序
-    
 
 - 中断向量的本质
-    
-- 中断处理程序的安装  
-    
+
+- 中断处理程序的安装
 
 - 中断现场的保护和恢复
-    
+
 - 总结：中断的本质
-    
 
 在软件开发中，中断是一个绕不开的重要话题，但是，不知道您是否遇到过这样的困惑：
 
@@ -55,7 +50,7 @@ Linux云计算网络
 
 因此，对于这种概念比较庞杂，无法用某种确定的逻辑来贯穿的知识点，在脑袋中一定要有一幅全局的地图。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 只有对这个全局的地图掌握了，在具体学习每一个局部的知识点时，才能知道自己所处的位置在哪里，才不至于走偏。
 
@@ -87,32 +82,31 @@ Linux云计算网络
 
 它俩就像一对兄弟一样，从外表上看是差不多，功能也是类似。但是透入到内部去看，就会发现有很多的不同之处。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 因此，这篇文章我们讲解的就是在实模式下的中断，这一点请大家先明白。
 
 ## 中断的分类
 
 在 `x86` 系统中，中断的分类如下：
-![[Pasted image 20240925102246.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102246.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 内部中断
 
 所谓的内部中断，是在 `CPU` 内部产生并进行处理的。比如：
 
 > 1. CPU 遇到一条除以 0 的指令时，将产生 0 号中断，并调用相应的中断处理程序;
->     
-> 2. CPU 遇到一条不存在的非法指令时，将产生 6 号中断，并调用相应的中断处理程序;
->     
+>
+> 1. CPU 遇到一条不存在的非法指令时，将产生 6 号中断，并调用相应的中断处理程序;
 
 对于内部中断，有时候也称之为异常。
 
 软中断也属于内部中断，是非常有用的，它是由 `int` 指令触发的。比如 `int3` 这条指令，`gdb` 就是利用它来实现对应用程序的调试。
 
 很久之前写过这样的一篇文章[原来gdb的底层调试原理这么简单](https://mp.weixin.qq.com/s?__biz=MzA3MzAwODYyNQ==&mid=2247483895&idx=1&sn=ba35d1823c259a959b72a310e0a92068&scene=21#wechat_redirect)，其中就描述了 `gdb` 是如何通过插入一个 `int` 指令，来替换被调试程序的指令码，从而实现断点调试功能的。
-![[Pasted image 20240925102253.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102253.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 外部中断
 
@@ -131,26 +125,24 @@ Linux云计算网络
 虽然现代计算机都已经是 `APIC`(高级可编程中断控制器) 了，但是由于 `8259a` 芯片是那么的经典，大部分描述外部中断的文章都会用它来举例。
 
 每一片 `8259a` 可以提供 `8` 个中断输入引脚，两片芯片级联在一起，就可以提供 `15` 个中断信号：
-![[Pasted image 20240925102304.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102304.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 1. 主片的输出引脚 INT 连接到 CPU 的 INTR 引脚上;
->     
-> 2. 从片的输出引脚 INT 连接到主片的引脚 2 上;
->     
+>
+> 1. 从片的输出引脚 INT 连接到主片的引脚 2 上;
 
 这样的话，两片 `8259a` 芯片就可以向 `CPU` 提供 `15` 个中断信号了，比如：鼠标、键盘、串口、硬盘等等外设。
 
 > 1. 8259a 之所以称作可编程，是因为它的内部有相关的寄存器。
-> 
-> 2. 可以通过指定的端口号，对这些寄存器进行设置，让 8 根 IRQ 中断线上的信号，在送到 CPU 时，对应不同的中断号。
+>
+> 1. 可以通过指定的端口号，对这些寄存器进行设置，让 8 根 IRQ 中断线上的信号，在送到 CPU 时，对应不同的中断号。
 
 另外，对于外部可屏蔽中断，有 `2` 层的屏蔽机制：
 
 > 1. 在 8259 芯片中，有中断屏蔽寄存器，可以对 IRQ0 ~ IRQ7 输入引脚进行屏蔽;
->     
-> 2. 在 CPU 内部，也有一个标志寄存器，可以对某一类中断信号进行屏蔽;
->     
+>
+> 1. 在 CPU 内部，也有一个标志寄存器，可以对某一类中断信号进行屏蔽;
 
 ## 中断号
 
@@ -165,30 +157,30 @@ Linux云计算网络
 比如：
 
 > 1. 系统定时器中断 IRQ0，分配的就是 32 号中断;
-> 
-> 2. Linux 的系统调用，分配的就是 128 号中断;
+>
+> 1. Linux 的系统调用，分配的就是 128 号中断;
 
 我们来分别看一下内部中断和外部中断相关的中断号：
-![[Pasted image 20240925102314.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102314.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 对于通过 `8259a` 可编程中断控制器接入的中断信号分配如下图所示：
-![[Pasted image 20240925102321.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102321.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 刚才已经说过，`8259a` 是可编程的，假如我们通过配置寄存器，把 `IRQ0` 的中断号设置为 `32`, 那么主片上 `IRQ1 ~ IRQ7` 所对应的中断号依次加 `1`，从片上 `IRQ8~IRQ15` 对应的中断号也是依次递增。
 
 所以，有时候我们可以在代码中断看到下面的宏定义：
-![[Pasted image 20240925102327.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102327.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 中断向量和中断处理程序
 
 当一个中断发生的时候，`CPU` 获取到该中断对应的中断号，下一步就是要确定调用哪一个函数来处理这个中断，这个函数就称作中断服务程序(Interrupt Service Routine，ISR)，有时候也称作中断处理程序、中断处理函数，本质都一样。
 
 中断向，就是通过中断号去查找处理程序的重要的桥梁！
-![[Pasted image 20240925102336.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102336.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 中断向量的本质
 
@@ -201,8 +193,8 @@ Linux云计算网络
 每一个中断向量占用 `4` 个字节(`2` 个字节的段地址，`2` 个字节的偏移地址)，`256` 个中断一共占用了 `1024` 个字节的空间。
 
 之前的文章中，已经介绍过相关的内存模型，如下图所示：
-![[Pasted image 20240925102347.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240925102347.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果把一个中断向量看作函数指针，那么这个中断向量表就相当于是函数指针数组。
 
@@ -214,15 +206,15 @@ Linux云计算网络
 
 然后在第 `8` 个字节开始，取 `4` 个字节的内容：`0x1000:0x2000`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 意思是：`2` 号中断的处理函数，在段地址为 0x1000，偏移量为 0x2000 的位置处。
 
 那么 `CPU` 就按照 `8086` 的物理地址计算方式，得到中断处理函数的物理地址为 `0x12000` (段地址左移 `4` 位 + 偏移地址)，于是就跳转到该函数地址处去执行。
 
 > 1. 由于 Linux 系统是运行在保护模式，在这个模式下，当发生中断时，是通过中断描述符来查找中断处理函数的。
-> 
-> 2. 每一个中断描述符，描述了一个中断处理函数所在段的选择子和偏移量，本质上也是用来查找一个中断处理函数。
+>
+> 1. 每一个中断描述符，描述了一个中断处理函数所在段的选择子和偏移量，本质上也是用来查找一个中断处理函数。
 
 #### 中断处理程序的安装
 
@@ -233,11 +225,10 @@ Linux云计算网络
 操作步骤是：
 
 > 1. 在代码中，写一个普通函数;
->     
-> 2. 把这个函数的指令码，搬运到内存中的某一个位置;
->     
-> 3. 把这个位置(段地址:偏移量)，作为一个中断向量，设置到中断向量表中;
->     
+>
+> 1. 把这个函数的指令码，搬运到内存中的某一个位置;
+>
+> 1. 把这个位置(段地址:偏移量)，作为一个中断向量，设置到中断向量表中;
 
 此时，如果发生了该中断，你所提供的函数就作为中断处理函数被执行了。
 
@@ -252,8 +243,6 @@ Linux云计算网络
 这些外设程序一般是进行一些自身的初始化，并填写相关的中断向量表，使它们指向外设自带的中断处理程序。
 
 对于操作系统来说就更不用说了，它会重新安排自己需要的中断处理函数，这部分内容我们以后再一起学习、讨论！
-
-  
 
 ## 中断现场的保护和恢复
 
@@ -276,9 +265,8 @@ Linux云计算网络
 从功能的角度看，中断有 `2` 个作用：
 
 > 1. 提供执行异步序列的机制；
->     
-> 2. 给应用程序提供进入系统层的入口；
->     
+>
+> 1. 给应用程序提供进入系统层的入口；
 
 关于第 `2` 点，以后在介绍到 `Linux` 中的 `int 0x80` 中断就非常清楚了，也就是通过中断，让应用层的程序有机会进入到系统代码中去执行。
 
@@ -300,11 +288,7 @@ Linux云计算网络
 
 这样的话，无论是发生硬件中断，还是应用层代码通过中断门来调用操作系统提供的函数，只要触发相应的中断就可以了，简化了 `CPU` 的设计。
 
-  
-
 ------ End ------
-
-  
 
 关于中断的相关内容，还有很多需要学习，任重而道远！
 
@@ -314,19 +298,17 @@ Linux云计算网络
 
 把学习周期拉长，一点一滴的积累，Haste Makes Waste！
 
-**”了吗？**  
+**”了吗？**
 
----
+______________________________________________________________________
 
 后台回复“加群”，带你进入高手如云交流群
-
-  
 
 **推荐阅读：**
 
 [我去，又又又被内存坑了！](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496569&idx=1&sn=1825966fa828bbcd6564b901d6eae8f0&chksm=ea77c7c1dd004ed78483167a0770a242982f377e43390a6087dccb8cfe98986fcfb5fef794f6&scene=21#wechat_redirect)
 
-[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)  
+[图解 | Linux内存回收之LRU算法](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496417&idx=1&sn=4267d317bb0aa5d871911f255a8bf4ad&chksm=ea77c659dd004f4f54a673830560f31851dfc819a2a62f248c7e391973bd14ab653eaf2a63b8&scene=21#wechat_redirect)
 
 [Linux 应用内存调试神器- ASan](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496414&idx=1&sn=897d3d39e208652dcb969b5aca221ca1&chksm=ea77c666dd004f70ebee7b9b9d6e6ebd351aa60e3084149bfefa59bca570320ebcc7cadc6358&scene=21#wechat_redirect)
 
@@ -334,7 +316,7 @@ Linux云计算网络
 
 [Page Cache和Buffer Cache关系](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495951&idx=1&sn=8bc76e05a63b8c9c9f05c3ebe3f99b7a&chksm=ea77c5b7dd004ca18c71a163588ccacd33231a58157957abc17f1eca17e5dcb35147b273bc52&scene=21#wechat_redirect)
 
-[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)  
+[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)
 
 [一文读懂基于Kubernetes打造的边缘计算](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495291&idx=1&sn=0aebc6ee54af03829e15ac659db923ae&chksm=ea77dac3dd0053d5cd4216e0dc91285ff37607c792d180b946bc09783d1a2032b0dffbcb03f0&scene=21#wechat_redirect)
 
@@ -346,7 +328,7 @@ Linux云计算网络
 
 [Linux 常用监控指标总结](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493544&idx=1&sn=68d86833cb3934abca18c95da8b1bae6&chksm=ea77d310dd005a06ad7de14d4d9f29d88e1cadebda7ccd975b3a265e5806608ace14ba12c8b4&scene=21#wechat_redirect)
 
-[Kubernetes 集群网络从懵圈到熟悉](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493426&idx=1&sn=e3492cf43c4268c5948d170f4a5d2441&chksm=ea77d38add005a9cdbb5775f2bfd4a2b953e950fcb65c25e91eaea45c68bf5684e3ebc8289e0&scene=21#wechat_redirect)  
+[Kubernetes 集群网络从懵圈到熟悉](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493426&idx=1&sn=e3492cf43c4268c5948d170f4a5d2441&chksm=ea77d38add005a9cdbb5775f2bfd4a2b953e950fcb65c25e91eaea45c68bf5684e3ebc8289e0&scene=21#wechat_redirect)
 
 [使用 GDB+Qemu 调试 Linux 内核](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493336&idx=1&sn=268fae00f4f88fe27b24796644186e9e&chksm=ea77d260dd005b76c10f75dafc38428b8357150f3fb63bc49a080fb39130d6590ddea61a98b5&scene=21#wechat_redirect)
 
@@ -372,13 +354,9 @@ Linux云计算网络
 
 ▼
 
-  
+_\*\*_****喜欢，就给我一个****“在看”\*\*\*\*_\*\*_
 
-_**_****喜欢，就给我一个****“在看”****_**_
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **10T 技术资源大放送！包括但不限于：云计算、虚拟化、微服务、大数据、网络、**Linux、**Docker、Kubernetes、Python、Go、C/C++、Shell、PPT 等。在公众号内回复「****1024****」**，即可免费获取！！****
 

@@ -2,11 +2,11 @@
 
 原创 典胜 海阔 徐亮 美团技术团队
 
- _2021年12月16日 19:58_
+_2021年12月16日 19:58_
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**总第483****篇**
+**总第483\*\*\*\*篇**
 
 **2021年 第053篇**
 
@@ -15,33 +15,28 @@
 美团外卖商家端基于 FlutterWeb 的技术探索已久，目前在多个业务中落地了App、PC、H5的多端复用，有效提升了产研的整体效率。在这过程中，性能问题是我们面临的最大挑战，本文结合实际业务场景进行思考，介绍美团外卖商家端在 FlutterWeb 性能优化上所进行的探索和实践，希望对大家能有所帮助或启发。
 
 - 一、背景
-    
 
 - 1.1 关于FlutterWeb
-    
+
 - 1.2 业务现状
-    
 
 - 二、挑战
-    
+
 - 三、整体设计
-    
+
 - 四、设计与实践
-    
 
 - 4.1 精简 SDK
-    
+
 - 4.2 JS 分片
-    
+
 - 4.3 预加载方案
-    
+
 - 4.4 分平台打包
-    
+
 - 4.5 图标字体精简
-    
 
 - 五、总结与展望
-    
 
 ## 一、背景
 
@@ -49,19 +44,19 @@
 
 时间回拨到 2018 年，Google 首次公开 FlutterWeb Beta 版，表露出要实现一份代码、多端运行的愿景。经过无数工程师两年多的努力，在今年年初（2021 年 3 月份），Flutter 2.0 正式对外发布，它将 FlutterWeb 功能并入了 Stable Channel，意味着 Google 更加坚定了多端复用的决心。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图1 FlutterWeb历史
 
 当然 Google 的“野心”不是没有底气的，主要体现在它强大的跨端能力上，我们看一下 Flutter 的跨端能力在 Web 侧是如何体现的：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图2 Flutter跨端能力
 
 上图分别是 FlutterNative 和 FlutterWeb 的架构图。通过对比可以看出，应用层 Framework 是公用的，意味着在 FlutterWeb 中我们也可以直接使用 Widgets、Gestures 等组件来实现逻辑跨端。而关于渲染跨端，FlutterWeb 提供了两种模式来对齐 Engine 层的渲染能力：Canvaskit Render 和 HTML Render，下方表格对两者的区别进行了对比：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图3 模式对比
 
@@ -75,7 +70,7 @@
 
 美团外卖商家端以 App、PC 等多元化的形态为商家提供了订单管理、商品维护、顾客评价、外卖课堂等一系列服务，且 App、PC 双端业务功能基本对齐。此外，我们还在 PC 上特供了针对连锁商家的多店管理功能。同时，为满足平台运营诉求，部分业务具有外投 H5 场景，例如美团外卖商家课堂，它是一个以文章、视频等形式帮助商家学习外卖运营知识、了解行业发展和跟进经营策略的内容平台，具有较强的传播属性，因此我们提供了站外分享的能力。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图4 业务形态
 
@@ -87,20 +82,19 @@
 
 不过，想要突破 FlutterWeb 页面加载的性能瓶颈，我们面临的挑战也是巨大的。这主要体现在 FlutterWeb 缺失静态资源的优化策略，以及复杂的架构设计和编译流程。下图展示了 Flutter 业务代码被转换成 Web 平台产物的流程，我们来具体进行分析：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图5 FlutterWeb 编译流程
 
 1. **Framework、Flutter_Web_SDK**（Flutter_Web_SDK 基于 HTML、Canvas，承载 HTML Render 模式的具体实现）等底层 SDK 是可被业务代码直接引入的，帮助我们快速开发出跨端应用；
-    
-2. **flutter_tools** 是各平台（Android、iOS、Web）的编译入口，它接收 flutter build web 命令和参数并开始编译流程，同时等待处理结果回调，在回调中我们可对编译产物进行二次加工；
-    
-3. **frontend_server** 负责将 Dart 转换为 AST，生成 kernel 中间产物 app.dill 文件（实际上各平台的编译过程都会生成这样的中间产物），并交由各平台 Compiler 进行转译；
-    
-4. **Dart2JS Compiler** 是 Dart-SDK 中具体负责转译 JS 的模块，它将上述中间产物 app.dill 进行读取和解析，并注入 Math、List、Map 等 JS 工具方法，最终生产出 Web 平台所能执行的 JS 文件。
-    
-5. **编译产物**主要为 main.dart.js、index.html、images 等静态资源，FlutterWeb 对这些静态资源缺少常规 Web 项目中的优化手段，例如：文件 Hash 化、文件分片、CDN 支持等。
-    
+
+1. **flutter_tools** 是各平台（Android、iOS、Web）的编译入口，它接收 flutter build web 命令和参数并开始编译流程，同时等待处理结果回调，在回调中我们可对编译产物进行二次加工；
+
+1. **frontend_server** 负责将 Dart 转换为 AST，生成 kernel 中间产物 app.dill 文件（实际上各平台的编译过程都会生成这样的中间产物），并交由各平台 Compiler 进行转译；
+
+1. **Dart2JS Compiler** 是 Dart-SDK 中具体负责转译 JS 的模块，它将上述中间产物 app.dill 进行读取和解析，并注入 Math、List、Map 等 JS 工具方法，最终生产出 Web 平台所能执行的 JS 文件。
+
+1. **编译产物**主要为 main.dart.js、index.html、images 等静态资源，FlutterWeb 对这些静态资源缺少常规 Web 项目中的优化手段，例如：文件 Hash 化、文件分片、CDN 支持等。
 
 可以看出，要完成对 FlutterWeb 编译产物的优化，就需要干预 FlutterWeb 的众多编译模块。而为了提升整体的编译效率，大部分模块都被提前编译成了 snapshot 文件（ 一种 Dart 的编译产物，可被 Dart VM 所运行，用于提升执行效率），例如：flutter_tools.snapshot、frontend_server.snapshot、dart2js.snapshot 等，这又加大了对 FlutterWeb 编译流程进行干预的难度。
 
@@ -108,16 +102,15 @@
 
 如前文所述，为了实现逻辑、渲染跨平台，Flutter 的架构设计及编译流程都具有一定的复杂性。但由于各平台（Android、iOS、Web）的具体实现是解耦的，因此我们的思路是定位各模块（Dart-SDK、Framework、Flutter_Web_SDK、flutter_tools）的 Web 平台实现并寻求优化，整体设计图如下所示：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图6 整体设计
 
 - **SDK 瘦身**：我们分别对 FlutterWeb 所依赖的 Dart-SDK、Framework、Flutter_Web_SDK 进行了瘦身，并将这些精简版 SDK 集成合入 CI/CD（持续集成与部署）系统，为减小产物包体积奠定了基础；
-    
+
 - **编译优化**：此外，我们在 flutter_tools 中的编译流程做了干预，分别进行了 JS 文件分片、静态资源 Hash 化、资源文件上传 CDN 等优化，使得这些在常规 Web 应用中基础的性能优化手段得以在 FlutterWeb 中落地。同时加强了 FlutterWeb 特殊场景下的资源优化，如：字体图标精简、Runtime Manifest 隔离、Mobile/PC 分平台打包等；
-    
+
 - **加载优化**：在编译阶段进行静态资源优化后，我们在前端运行时，支持了资源预加载与按需加载，通过设定合理的加载时机，从而减小初始代码体积，提升页面首屏的渲染速度。
-    
 
 下面，我们分别对各项优化进行详细的说明。
 
@@ -131,7 +124,7 @@
 
 Dart2JS 官方提供了 [--dump-info](https://dart.dev/tools/dart2js) 命令选项来分析 JS 产物，但其表现差强人意，它并不能很好地分析各个模块的体积占比。这里更推荐使用 [source-map-explorer](https://www.npmjs.com/package/source-map-explorer) ，它的原理是通过 sourcemap 文件进行反解，能清晰地反映出每个模块的占用大小，为 SDK 的精简提供了指引。下图展示了 FlutterWeb JS 产物的反解信息（截图仅包含 Framework 和 Flutter_Web_SDK）：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图7 反解信息
 
@@ -141,18 +134,18 @@ FlutterWeb 依赖的 SDK 主要包括 Dart-SDK、Framework 和 Flutter_Web_SDK�
 
 以 Flutter Framework 为例，由于它是全平台公用的模块，因此不可避免地存在各平台的兼容逻辑（通常以 if-else、switch 等条件判断形式出现），而这部分代码是不能被 Tree-Shaking 剔除的，我们观察如下的代码：
 
-// FileName: flutter/lib/src/rendering/editable.dart  
-void _handleKeyEvent(RawKeyEvent keyEvent) {  
-  if (kIsWeb) {  
-    // On web platform, we should ignore the key.  
-    return;  
-  }  
-  // Other codes ...  
+// FileName: flutter/lib/src/rendering/editable.dart\
+void \_handleKeyEvent(RawKeyEvent keyEvent) {\
+if (kIsWeb) {\
+// On web platform, we should ignore the key.\
+return;\
+}\
+// Other codes ...\
 }
 
 上述代码选自 Framework 中的 RenderEditable 类，当 kIsWeb 变量为真，表示当前应用运行在 Web 平台。受限于 Tree-Shaking 的机制原理，上述代码中，其它平台的兼容逻辑即注释 Other codes 的部分是无法被剔除的，但这部分代码，对 Web 平台来说却是 Dead Code（永远不可能被执行到的代码），是可以被进一步优化的。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图8 部分功能构成
 
@@ -160,7 +153,7 @@ void _handleKeyEvent(RawKeyEvent keyEvent) {
 
 通过上述分析可得，我们的思路就是对 Dead Code 进行二次剔除，以及对这些长尾功能做裁剪。基于这样的思路，我们深入 Dart-SDK、Framework 和 Flutter_Web_SDK 各个击破，最终将 JS Bundle 产物体积由 1.2M 精简至 0.7M，为 FlutterWeb 页面性能优化打下了坚实的基础。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图9 精简成果
 
@@ -168,7 +161,7 @@ void _handleKeyEvent(RawKeyEvent keyEvent) {
 
 为了提升构建效率，我们将 FlutterWeb 依赖的环境定制为 Docker 镜像，集成入 CI/CD（持续集成与部署）系统。SDK 裁剪后，我们需要更新 Docker 镜像，整个过程耗时较长且不够灵活。因此，我们将 Dart-SDK、Framework、Flutter_Web_SDK 按版本打包传至云端，在编译开始前读取 CI/CD 环境变量：sdk_version（SDK 版本号），远程拉取相应版本的 SDK 包，并替换当前 Docker 环境中的对应模块，基于以此方案实现 SDK 的灵活发布，具体流程图如下图所示：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图10 集成CI/CD
 
@@ -177,11 +170,10 @@ void _handleKeyEvent(RawKeyEvent keyEvent) {
 FlutterWeb 编译之后默认会生成 main.dart.js 文件，它囊括了 SDK 代码以及业务逻辑，这样会引起以下问题：
 
 1. **功能无法及时更新**：为了实现浏览器的缓存优化，我们的项目开启了对静态资源的强缓存，若 main.dart.js 产物不支持 Hash 命名，可能导致程序代码不能被及时更新；
-    
-2. **无法使用 CDN**：FlutterWeb 默认仅支持相对域名的资源加载方式，无法使用当前域名以外的 CDN 域名，导致无法享受 CDN 带来的优势；
-    
-3. **首屏渲染性能不佳**：虽然我们进行了 SDK 瘦身，但 main.dart.js 文件依然维持在 0.7M 以上，单一文件加载、解析时间过长，势必会影响首屏的渲染时间。
-    
+
+1. **无法使用 CDN**：FlutterWeb 默认仅支持相对域名的资源加载方式，无法使用当前域名以外的 CDN 域名，导致无法享受 CDN 带来的优势；
+
+1. **首屏渲染性能不佳**：虽然我们进行了 SDK 瘦身，但 main.dart.js 文件依然维持在 0.7M 以上，单一文件加载、解析时间过长，势必会影响首屏的渲染时间。
 
 针对文件 Hash 化和 CDN 加载的支持，我们在 flutter_tools 编译流程中对静态资源进行二次处理：遍历静态资源产物，增加文件 Hash （文件内容 MD5 值），并更新资源的引用；同时通过定制 Dart-SDK，修改了 main.dart.js、字体等静态资源的加载逻辑，使其支持 CDN 资源加载。
 
@@ -191,17 +183,17 @@ FlutterWeb 编译之后默认会生成 main.dart.js 文件，它囊括了 SDK �
 
 Flutter 官方提供 `deferred as` 关键字来实现 Widget 的懒加载，而 dart2js 在编译过程中可以将懒加载的 Widget 进行按需打包，这样的拆包机制叫做 Lazy Loading。借助 Lazy Loading，我们可以在路由表中使用 deferred 引入各个路由（页面），以此来达到业务代码拆离的目的，具体使用方法和效果如下所示：
 
-// 使用方式  
-import 'pages/index/index.dart' deferred as IndexPageDefer;  
-{  
-  '/index': (context) => FutureBuilder(  
-    future: IndexPageDefer.loadLibrary(),  
-    builder: (context, snapshot) => IndexPageDefer.Demo(),  
-  )  
-  ... ...  
+// 使用方式\
+import 'pages/index/index.dart' deferred as IndexPageDefer;\
+{\
+'/index': (context) => FutureBuilder(\
+future: IndexPageDefer.loadLibrary(),\
+builder: (context, snapshot) => IndexPageDefer.Demo(),\
+)\
+... ...\
 }
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图11 效果演示
 
@@ -211,13 +203,13 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 通过对业务代码的抽离，此时 main.dart.js 文件的构成主要包含 SDK 和  Runtime Manifest：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图12 main.dart.js构成
 
 那如何能将 Runtime Manifest 进行抽离呢？对比常规 Web 项目，我们的处理方式是把 SDK、Utils、三方包等基础依赖，利用 Webpack、Rollup 等打包工具进行抽离并赋予一个稳定的 Hash 值。同时，将 Runtime Manifest （分片文件的加载逻辑和映射关系）注入到 HTML 文件中，这样保证了业务代码的变动不会影响到公共包。借助常规 Web 项目的编译思路，我们深入分析了 FlutterWeb 中 Runtime Manifest 的生成逻辑和 PartJS 的加载逻辑，定制出如下的解决方案：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图13 Runtime Manifest抽离
 
@@ -229,7 +221,7 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 具体实现方案为：将 main.dart.js 在 flutter_tools 编译过程拆分成多份纯文本文件，前端通过 XHR 的方式并行加载并按顺序拼接成 JavaScript 代码置于 <script> 标签中，从而实现切片文件的并行加载。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图14 并行加载
 
@@ -242,15 +234,14 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 我们把整体的技术方案分为编译、监听、运行三个阶段。
 
 1. 编译阶段，在发布流水线上根据前期定制的匹配规则，筛选出符合条件的资源文件路径，生成云端 JSON 并上传；
-    
-2. 监听阶段，在 DOMContentLoaded 之后，对网络资源、事件、DOM 变动进行监听，并对监听结果根据特定规则进行分析加权，得到一个首屏加载完成的状态标识；
-    
-3. 运行阶段，在首屏加载完成之后对配置平台下发的云端 JSON 文件进行解析，对符合配置规则的资源进行 HTTP XHR 预加载，从而实现文件的预缓存功能。
-    
+
+1. 监听阶段，在 DOMContentLoaded 之后，对网络资源、事件、DOM 变动进行监听，并对监听结果根据特定规则进行分析加权，得到一个首屏加载完成的状态标识；
+
+1. 运行阶段，在首屏加载完成之后对配置平台下发的云端 JSON 文件进行解析，对符合配置规则的资源进行 HTTP XHR 预加载，从而实现文件的预缓存功能。
 
 下图为预缓存的整体方案设计：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图15 预缓存方案设计
 
@@ -258,18 +249,17 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 编译阶段会扩展现有的发布流水线，在 flutter build 之后增加 prefetch build 作业，这样 build 之后就可以对产物目录进行遍历和筛选，得到我们所需资源进而生成云端 JSON，为运行阶段提供数据基础。下面的流程图为编译阶段的详细方案设计：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图16 预缓存编译阶段
 
 编译阶段分为三部分：
 
 1. 第一部分：根据不同的发布环境，初始化线上/线下的配置平台，为配置文件的读写做好准备；
-    
-2. 第二部分：下载并解析配置平台下发的资源组 JSON，筛选出符合配置规则的资源路径，更新 JSON 文件并发布到配置平台；
-    
-3. 第三部分：通过发布流水线提供的 API，把 PROJECT_ID、发布环境注入HTML文件中，为运行阶段提供全局变量以便读取。
-    
+
+1. 第二部分：下载并解析配置平台下发的资源组 JSON，筛选出符合配置规则的资源路径，更新 JSON 文件并发布到配置平台；
+
+1. 第三部分：通过发布流水线提供的 API，把 PROJECT_ID、发布环境注入HTML文件中，为运行阶段提供全局变量以便读取。
 
 通过对流水线编译期的整合，我们可以生成新的云端 JSON 并上传到云端，为运行阶段的下发提供数据基础。
 
@@ -277,18 +267,17 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 我们知道，浏览器对文件请求的并发数量是有限制的，为了保证浏览器对当前页面的渲染处于高优先级，同时还能完成预缓存的功能，我们设计了一套对缓存文件的加载策略，在不影响当前页面加载的情况下，实现对缓存文件的加载操作。以下为详细的技术方案：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图17 预缓存监听阶段
 
 在页面 DOMContentLoaded 之后，我们会监听三部分的的变化。
 
 1. 第一部分是监听 DOM 的变化。这部分主要是在页面发生 Ajax 请求之后，随着MV模式的变动，DOM 也会随之发生变化。我们使用浏览器提供的 MutationObserver API 对 DOM 变化进行收集，并筛选有效节点进行深度优先遍历，计算每个 DOM 的递归权重值，低于阈值我们就认为首屏已加载完成。
-    
-2. 第二部分是监听资源的变化。我们利用浏览提供的 PerformanceObserver API，筛选出 img/script 类型的资源，在 3 秒内收集的资源没有增加时，我们认为首屏已加载完成。
-    
-3. 第三部分是监听 Event 事件。当用户发生 click、wheel、touchmove 等交互行为时，我们就认为当前页面处于一个可交互的状态，即首屏加载已完成，这样会在后续进行资源的预缓存。
-    
+
+1. 第二部分是监听资源的变化。我们利用浏览提供的 PerformanceObserver API，筛选出 img/script 类型的资源，在 3 秒内收集的资源没有增加时，我们认为首屏已加载完成。
+
+1. 第三部分是监听 Event 事件。当用户发生 click、wheel、touchmove 等交互行为时，我们就认为当前页面处于一个可交互的状态，即首屏加载已完成，这样会在后续进行资源的预缓存。
 
 通过上述步骤，我们就可以得到一个首屏渲染完成的时机，之后就可以实现预缓存功能了。以下为预缓存功能的实现。
 
@@ -296,7 +285,7 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 预缓存的整体流程为：下载编译阶段生成的云端 JSON，解析出需要进行预缓存资源的 CDN 路径，最后通过 HTTP XHR 进行缓存资源进行请求，利用浏览器本身的缓存策略，把其他业务的资源文件写入。当用户访问已命中缓存的页面时，资源已被提前加载，这样可以有效地减少首屏的加载时间。下图为运行阶段的详细方案设计：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图18 预缓存运行阶段
 
@@ -306,13 +295,13 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 当有页面间互访问命中预缓存时，浏览器会以 200（Disk Cache）的方式返回数据，这样就节省了大量资源加载的时间，下图为命中缓存后资源加载情况：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图19 预缓存效果展示
 
 目前，美团外卖商家端业务已有 10+ 个页面接入了预缓存功能，资源加载 90 线平均值由 400ms 下降到 350ms，降低了 12.5%；50 线平均值由 114ms 下降到 100ms，降低了 12%。随着项目接入接入越来越多，预缓存的效果也会越发的明显。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图20 预缓存数据展示
 
@@ -322,32 +311,31 @@ import 'pages/index/index.dart' deferred as IndexPageDefer;
 
 在 PC 适配过程中，我们不可避免地需要书写双端的兼容代码，如：为了实现在列表页面中对卡片组件的复用。为此我们开发了一个适配工具 ResponsiveSystem，分别传入 PC 和 App 的各端实现，内部会区分平台完成适配：
 
-// ResponsiveSystem 使用举例  
-Container(  
-  child: ResponsiveSystem(  
-    app: AppWidget(),  
-    pc: PCWidget(),  
-  ),  
+// ResponsiveSystem 使用举例\
+Container(\
+child: ResponsiveSystem(\
+app: AppWidget(),\
+pc: PCWidget(),\
+),\
 )
 
 上述代码能较方便的实现 PC 和 App 适配，但 AppWidget 或 PCWidget 在编译过程中都将无法被 Tree-Shaking 去除，因此会影响包体积大小。对此，我们将编译流程进行优化，设计分平台打包方案：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图21 分平台打包
 
 1. 修改 flutter-cli，使其支持 --responsiveSystem 命令行参数；
-    
-2. 我们在 flutter_tools 中的 AST 分析阶段增加了额外的处理：ResponsiveSystem 关键字的匹配，同时结合编译平台（PC 或 Mobile）来进行 AST 节点的改写；
-    
-3. 去除无用 AST 节点后，生成各个平台的代码快照（每份快照仅包含单独平台代码）；
-    
-4. 根据代码快照编译生成 PC 和 App 两套 JS 产物，并进行资源隔离。而对于 images、fonts 等公用资源，我们将其打入 common 目录。
-    
+
+1. 我们在 flutter_tools 中的 AST 分析阶段增加了额外的处理：ResponsiveSystem 关键字的匹配，同时结合编译平台（PC 或 Mobile）来进行 AST 节点的改写；
+
+1. 去除无用 AST 节点后，生成各个平台的代码快照（每份快照仅包含单独平台代码）；
+
+1. 根据代码快照编译生成 PC 和 App 两套 JS 产物，并进行资源隔离。而对于 images、fonts 等公用资源，我们将其打入 common 目录。
 
 通过这样的方式，我们去除了各自平台的无用代码，避免了 PC 适配过程中引起的包体积问题。依然以美团外卖商家课堂业务（6 个页面）为例，接入分平台打包后，单平台代码体积减小 100KB 左右。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图22 效果展示
 
@@ -357,33 +345,31 @@ Container(
 
 Flutter 官方提供的 `--tree-shake-icons` 命令选项是将业务使用到的 Icon 与 Flutter 内部维护的一个缩小版字体文件（大约 690KB）进行合并，能一定程度上减小字体文件大小。而我们需要的是只打包业务使用的 Icon，所以我们对官方 `tree-shake-icons` 进行了优化，设计了 Icon 的按需打包方案：
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图23 图标字体精简
 
 1. 扫描全部业务代码以及依赖的 Plugins、Packages、Flutter Framework，分析出所有用到的 Icon；
-    
-2. 把扫描到的所有 Icon 与  material/icons.dart（该文件包含 Flutter Icon 的 unicode 编码集合）进行对比，得到精简后的图标编码列表：iconStrList；
-    
-3. 使用 FontTools 工具把 iconStrList 生成字体文件 .woff，此时的字体文件仅包含真正使用到的 Icon。
-    
+
+1. 把扫描到的所有 Icon 与  material/icons.dart（该文件包含 Flutter Icon 的 unicode 编码集合）进行对比，得到精简后的图标编码列表：iconStrList；
+
+1. 使用 FontTools 工具把 iconStrList 生成字体文件 .woff，此时的字体文件仅包含真正使用到的 Icon。
 
 通过以上的方案，我们解决了字体文件过大带来的包体积问题，以美团外卖课堂业务（业务代码中使用了 5 个 Icon）为例，字体文件从 920KB 精简为 11.6kB。
 
-![](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-图24 效果展示  
+图24 效果展示
 
 ## 五、总结与展望
 
 综上所述，我们基于 HTML Render 模式对 FlutterWeb 性能优化进行了探索和实践，主要包括 SDK（Dart-SDK、Framework、Flutter_Web_SDK）的精简，静态资源产物优化（例如：JS 分片、文件 Hash、字体图标文件精简、分平台打包等）和前端资源加载优化（预加载与按需请求）。**最终使得 JS 产物由 1.2M 减少至 0.7M（****非业务代码****），页面完全加载时间 TP90 线由 6s 降到了 3s**，这样的结果已能满足美团外卖商家端的大部分业务要求。而未来的规划将聚焦于以下3个方向：
 
 1. **降低 Web 端适配成本**：目前已有 9+ 个业务借助 MTFlutterWeb 实现多端复用，但在 Web 侧（尤其是 PC 侧）的适配效率依然有优化空间，目标是将适配成本降低到 10% 以下（目前大约是 20% ）；
-    
-2. **构建 FlutterWeb 容灾体系**：Flutter 动态化包有一定的加载失败概率，而 FlutterWeb 作为兜底方案，能提升整体业务的加载成功率。此外 FlutterWeb 可以提供“免安装更新”的能力，降低 FlutterNative 老旧历史版本的维护成本；
-    
-3. **性能优化的持续推进**：性能优化的阶段性成果为 MTFlutterWeb 的应用推广巩固了基础，但依然是有进一步优化空间的，例如：目前我们仅将业务代码和 Runtime Manifest 进行了拆离，而 Framework 及 三方包在一定程度上也影响到了浏览器缓存的命中率，将这部分代码进行抽离，可进一步提升页面加载性能。
-    
+
+1. **构建 FlutterWeb 容灾体系**：Flutter 动态化包有一定的加载失败概率，而 FlutterWeb 作为兜底方案，能提升整体业务的加载成功率。此外 FlutterWeb 可以提供“免安装更新”的能力，降低 FlutterNative 老旧历史版本的维护成本；
+
+1. **性能优化的持续推进**：性能优化的阶段性成果为 MTFlutterWeb 的应用推广巩固了基础，但依然是有进一步优化空间的，例如：目前我们仅将业务代码和 Runtime Manifest 进行了拆离，而 Framework 及 三方包在一定程度上也影响到了浏览器缓存的命中率，将这部分代码进行抽离，可进一步提升页面加载性能。
 
 美团外卖技术团队正在基于 FlutterWeb 做更多的探索和尝试。如果你对这方面的技术也比较感兴趣，可以在文末留言，跟我们一起讨论。也欢迎大家给提出一些建议，非常感谢。
 
@@ -393,19 +379,17 @@ Flutter 官方提供的 `--tree-shake-icons` 命令选项是将业务使用到
 
 美团外卖长期招聘Android、iOS、FE 高级/资深工程师和技术专家。欢迎感兴趣的同学投递简历至：tech@meituan.com（邮件标题请注明：美团外卖技术团队）。
 
-**也许你还想看**  
+**也许你还想看**
 
-  **| [](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651748565&idx=1&sn=f92ce52627b680529c3c31e393779168&chksm=bd12a1988a65288eec838dbe64a31990f64baff2093f85ba8c75f581fcd5883947867d7a20a0&scene=21#wechat_redirect)** [Flutter的原理及美团的实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651748565&idx=1&sn=f92ce52627b680529c3c31e393779168&chksm=bd12a1988a65288eec838dbe64a31990f64baff2093f85ba8c75f581fcd5883947867d7a20a0&scene=21#wechat_redirect)
+**| [](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651748565&idx=1&sn=f92ce52627b680529c3c31e393779168&chksm=bd12a1988a65288eec838dbe64a31990f64baff2093f85ba8c75f581fcd5883947867d7a20a0&scene=21#wechat_redirect)** [Flutter的原理及美团的实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651748565&idx=1&sn=f92ce52627b680529c3c31e393779168&chksm=bd12a1988a65288eec838dbe64a31990f64baff2093f85ba8c75f581fcd5883947867d7a20a0&scene=21#wechat_redirect)
 
-  **|** [美团外卖Flutter动态化实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651752194&idx=1&sn=33f4373e84acea878614a8fa44b5f617&chksm=bd125e4f8a65d75908902b1bd208c9416a7a902896c8c12780d2ee6340fccda24498ee4309ed&scene=21#wechat_redirect)
+**|** [美团外卖Flutter动态化实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651752194&idx=1&sn=33f4373e84acea878614a8fa44b5f617&chksm=bd125e4f8a65d75908902b1bd208c9416a7a902896c8c12780d2ee6340fccda24498ee4309ed&scene=21#wechat_redirect)
 
-  **|** [FlutterWeb在美团外卖的实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651761029&idx=1&sn=1aee4aa8c6b8e508d25136ab33d1dc5b&chksm=bd1270c88a65f9dea24d2ffaa8c9bd16e48e5018d7ef49291a8dde9ffd05a914aaa35ab04841&scene=21#wechat_redirect)
-
-  
+**|** [FlutterWeb在美团外卖的实践](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651761029&idx=1&sn=1aee4aa8c6b8e508d25136ab33d1dc5b&chksm=bd1270c88a65f9dea24d2ffaa8c9bd16e48e5018d7ef49291a8dde9ffd05a914aaa35ab04841&scene=21#wechat_redirect)
 
 **阅读更多**
 
----  
+______________________________________________________________________
 
 [前端](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765958&idx=1&sn=8201546812e5a95a2bee9dffc6d12f00&chksm=bd12658b8a65ec9de2f5be1e96796dfb3c8f1a374d4b7bd91266072f557caf8118d4ddb72b07&scene=21#wechat_redirect) **|**  [](https://t.1yb.co/jo7v)[算法](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765981&idx=1&sn=c2dd86f15dee2cbbc89e27677d985060&chksm=bd1265908a65ec86d4d08f7600d1518b61c90f6453074f9b308c96861c045712280a73751c73&scene=21#wechat_redirect) **|** [后端](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765982&idx=1&sn=231b41f653ac7959f3e3b8213dcec2b0&chksm=bd1265938a65ec85630c546169444d56377bc2f11401d251da7ca50e5d07e353aa01580c7216&scene=21#wechat_redirect) **|** [数据](http://mp.weixin.qq.com/s?__biz=MjM5NjQ5MTI5OA==&mid=2651765964&idx=1&sn=ab6d8db147234fe57f27dd46eec40fef&chksm=bd1265818a65ec9749246dd1a2eb3bf7798772cc4d5b4283b15eae2f80bc6db63a1471a9e61e&scene=21#wechat_redirect)
 

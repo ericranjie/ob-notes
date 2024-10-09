@@ -2,32 +2,29 @@
 
 程序喵大人
 
- _2022年01月25日 08:24_
+_2022年01月25日 08:24_
 
 > 这个翻译的内容真不错，分享给大家。
-> 
+>
 > 翻译原文链接在这里：https://zhuanlan.zhihu.com/p/427778091
-> 
+>
 > 推荐大家直接看原文。
 
-干货开始：  
+干货开始：
 
 > 这本书的副标题是：45ish Simple Rules with Specific Action items for better C++ ,这本书是由公司大佬推荐的， 个人认为有必要掌握一下这45条最佳实践， 可以很大程度上提升代码的可读性和健壮性， 而且这本书也不长， 翻译起来也会比较简单，比很多人推荐的Effective C++ 要容易读的多， 抽了一个十一的尾巴就翻译完了，easy~ 翻译的过程中去掉了欧美人写书时喜欢带上的口水话，从而让文章更加精炼。++我翻译的时候会带上一些自己的理解，这部分我用下划线标出来了， 注意区分++。
-
-  
 
 ## 1. 导读
 
 我以一个训练者的目标希望各位能够：
 
 1. 学习如何自己做实验；
-    
-2. 不要仅仅信我说的话，要亲手实验；
-    
-3. 学习到这门语言是如何工作的；
-    
-4. 在下轮写代码的时候避免犯错；
-    
+
+1. 不要仅仅信我说的话，要亲手实验；
+
+1. 学习到这门语言是如何工作的；
+
+1. 在下轮写代码的时候避免犯错；
 
 ## 2. 有关"最佳实践"
 
@@ -44,13 +41,12 @@
 你需要一个单独的指令去跑所有的测试，如果你没有自动测试， 没有人会跑这些测试的：
 
 1. Catch2
-    
-2. DocTest
-    
-3. GoogleTest
-    
-4. Boost.Test
-    
+
+1. DocTest
+
+1. GoogleTest
+
+1. Boost.Test
 
 Ctest 是一个Cmake下用来测试的runner， 它可以很好地利用 Cmake的 add_test 特性。你需要很熟悉测试工具、搞清楚他们是怎么做的、并且从他们中选择一个。
 
@@ -65,13 +61,12 @@ Oleg Rabaev 说过：
 没有自动化的测试， 那就很难去保证代码的质量。在我生涯中的一些C++ 项目中，我的C++项目支持各种操作系统、各架构的组合。当你开始在不同平台、架构上组合不同的编译器的时候， 那就很有可能出现在一个平台能够使用在另外一个平台上不能使用的情况。为了解决这个问题， 使用带有持续测试的持续构建工具吧。
 
 1. 测试你将支持的所有平台的组合。
-    
-2. 将debug和最终发布分离
-    
-3. 测试所有的配置项。
-    
-4. 测试所有你需要支持的编译器
-    
+
+1. 将debug和最终发布分离
+
+1. 测试所有的配置项。
+
+1. 测试所有你需要支持的编译器
 
 ## 5.使用工具：编译器警告
 
@@ -120,15 +115,14 @@ Bjarne Stroustrup 在"The C++ Programming Language" 的第三版里面讲到：
 你必须明白C++ 是一种多科目语言， 它很好的支持了当下的所有编程范式：
 
 1. 过程式
-    
-2. 函数式
-    
-3. 面向对象
-    
-4. 泛型编程
-    
-5. 运行时编程（constexpr 以及模板元变成） 理解什么时候去用这些工具是写好C++的关键， 那些只执着用某一个编程范式的项目往往会错过这个语言的最佳特性。
-    
+
+1. 函数式
+
+1. 面向对象
+
+1. 泛型编程
+
+1. 运行时编程（constexpr 以及模板元变成） 理解什么时候去用这些工具是写好C++的关键， 那些只执着用某一个编程范式的项目往往会错过这个语言的最佳特性。
 
 ## 11.学习一门其他语言
 
@@ -161,11 +155,10 @@ static constexpr std::array<int,5> angles{-90,-45,0,45,90}
 这两个代码的区别有三：
 
 1. 这个array的大小我们是能够在编译时期知道的
-    
-2. 我们溢出了数组大小动态分配
-    
-3. 我们不需要再对访问static 对象付出额外代价（++这点我没明白啥意思，原文是 We no longer pay the cost of accessing a static++) 主要收益来源于前两点。
-    
+
+1. 我们溢出了数组大小动态分配
+
+1. 我们不需要再对访问static 对象付出额外代价（++这点我没明白啥意思，原文是 We no longer pay the cost of accessing a static++) 主要收益来源于前两点。
 
 ## 14.在大多数情况下使用auto来自动推断类型
 
@@ -173,9 +166,9 @@ static constexpr std::array<int,5> angles{-90,-45,0,45,90}
 
 我的回答是：我不在乎。
 
-```
+`````
 const auto result = std::count( /* stuff */ );````使用auto 避免没有必要的转换和数据丢失， 同样的场景经常在range-for 循环中出现，再举个栗子：```C++有可能发生代价很高的转换const std::string value = get_string_value();
-```
+`````
 
 `get_string_value()`的返回类型是什么？如果它是一个`std::string_view`或者是一个`const char *`, 我们将会有一个潜在的高代价的类型转化。
 
@@ -256,11 +249,10 @@ for (const auto &value : container){    // 不会发生意外的问题}
 优先考虑：
 
 1. 对于内部元素不可变类型的循环时选择 const auto &
-    
-2. 对于内部元素可变类型的循环时选择 auto &
-    
-3. auto && 当且仅当你需要一些奇怪的类型比如std::vector 时， 或者将元素移出容器时（++这个地方没懂， 原文：auto && only when you have to work with weird types like std::vector, or if moving elements out of the container++）
-    
+
+1. 对于内部元素可变类型的循环时选择 auto &
+
+1. auto && 当且仅当你需要一些奇怪的类型比如std::vector 时， 或者将元素移出容器时（++这个地方没懂， 原文：auto && only when you have to work with weird types like std::vector, or if moving elements out of the container++）
 
 ## 17.使用算法而不是循环
 
@@ -295,13 +287,12 @@ const auto has_value = std::any_of(begin(container), end(container), greater_tha
 后退一步并且再看下这些代码：
 
 1. 为什么你要复制它？
-    
-2. 这个代码和你的目标代码有多少相似？
-    
-3. 构造一个函数有意义吗？
-    
-4. 记住， 不要害怕使用模板！
-    
+
+1. 这个代码和你的目标代码有多少相似？
+
+1. 构造一个函数有意义吗？
+
+1. 记住， 不要害怕使用模板！
 
 我发现这个简单的条例可以对我的代码质量有着最直接的影响， 如果我们即将在当前的函数中进行粘贴一段代码， 那就考虑使用lambda 。C++14 的lambda 配合上泛型参数（也叫auto），可以让你更加容易写出可复用的代码还不要处理template 语法。
 
@@ -310,13 +301,12 @@ const auto has_value = std::any_of(begin(container), end(container), greater_tha
 在正确的情况下，没有析构函数总是更好的。空的析构函数会损失一部分性能，并且：
 
 1. 它会让类型不再简单；
-    
-2. 没有函数用途；
-    
-3. 会影响内联的析构；
-    
-4. 不经意间禁止了移动操作。如果你提供了一个自定义的删除行为， std::unique_ptr 可以帮助你遵循0法则
-    
+
+1. 没有函数用途；
+
+1. 会影响内联的析构；
+
+1. 不经意间禁止了移动操作。如果你提供了一个自定义的删除行为， std::unique_ptr 可以帮助你遵循0法则
 
 ## 21.如果你一定手动管理资源， 遵循“五法则”
 
@@ -338,7 +328,7 @@ struct Base {    virtual void do_stuff();    // because of the virtual function 
 
 现在我们知道有很多未定义的行为是很难追踪的， 在接下来的几节中我将给出一些例子。最重要的事情是你需要理解，未定义行为的存在会破坏你整个程序。
 
-> 一个符合规范的实现在运行一个格式良好的程序时，应该产生可以观测的行为，相同的程序和相同的输入应该产生与之相对应的行为。  
+> 一个符合规范的实现在运行一个格式良好的程序时，应该产生可以观测的行为，相同的程序和相同的输入应该产生与之相对应的行为。
 
 但是， 如果一个程序中包含着一个未定义的行为， 这段代码对执行输入的程序也就没有要求。（甚至对第一个未定义操作之前的操作也没有要求）
 
@@ -401,9 +391,8 @@ C++98 enumsenum Choices {    option1 // value in the global scope};enum OtherCho
 `enum Choices` 和`OtherChoices`它们俩很容易被搞混， 并且它们引入了全局命名空间下的标识符。
 
 - enum class Choices;
-    
+
 - enum class OtherChoices;
-    
 
 在这些枚举类中的值都是带有限定作用域的，并且更加强类型。
 
@@ -515,7 +504,7 @@ void handle_exception() {    try {        throw; // re-throw exception already i
 
 不过你能保证外部的使用者永远不调用内部的API嘛？你能保证内部使用者永远不误用API嘛？
 
-## 34. 大量使用[[nodiscard]]
+## 34. 大量使用\[\[nodiscard\]\]
 
 `[[nodiscard]]`(C++17提供) 是一个C++的特性，它告诉编译器如果返回值被放弃了则需要警告，
 
@@ -542,11 +531,10 @@ socket(int, int, int);
 每个参数代表：
 
 - 类型
-    
+
 - 协议
-    
+
 - 域名 这个设计是有问题的， 但是我们代码里面隐藏了更多比这个更不明显的问题。比如一个构造函数：
-    
 
 `Rectangle(int, int, int, int);` 这个函数可能是指`(x,y,width, height)`, 也有可能是指`(x1, y1, x2, y2)`, 或者不太可能但是仍然有可能出现的是含义是`(width, height, x, y)`
 
@@ -632,7 +620,7 @@ _非常糟糕的写法， 用了堆还内存泄露_
 void use_string() {    // The string lives on the heap    std::string *value = new std::string("Hello World");}
 ```
 
-> 记住，`std::string`本身也会在内部分配内存， 并且用的是堆， 如果你的目标是不用任何堆， 你需要用一些其它方法来打到。其实我们的目标是不分配不必要的堆。  
+> 记住，`std::string`本身也会在内部分配内存， 并且用的是堆， 如果你的目标是不用任何堆， 你需要用一些其它方法来打到。其实我们的目标是不分配不必要的堆。
 
 总体来说， 用`new` 创建的对象（或者用`make_unique`或者`make_shared`创建的对象） 都是堆对象， 并且拥有动态存储周期（Dynamic Storage Duration), 在本地作用域下创建的对象都是栈对象， 并且具有自动存储周期（Automactic Storage Duration)
 
@@ -644,20 +632,19 @@ void use_string() {    // The string lives on the heap    std::string *value = n
 
 优先以这种顺序选择你的容器：
 
-- std::array<>
-    
-- std::vector<>
-    
+- std::array\<>
+
+- std::vector\<>
 
 ## std::array
 
-一个固定大小的分配在栈上的连续容器， 数据的多少必须在编译时期知道， 你必须拥有足够的栈空间去承载数据。这个容器可以帮助我们优先使用栈而不是堆。已知的位置以及内存连续性会让std::array<>是一个“负成本抽象"(negative cost abstraction)", 因为编译器知道数据的大小和位置， 它可以用额外的一系列优化手段来优化。
+一个固定大小的分配在栈上的连续容器， 数据的多少必须在编译时期知道， 你必须拥有足够的栈空间去承载数据。这个容器可以帮助我们优先使用栈而不是堆。已知的位置以及内存连续性会让std::array\<>是一个“负成本抽象"(negative cost abstraction)", 因为编译器知道数据的大小和位置， 它可以用额外的一系列优化手段来优化。
 
 ## std::vector
 
 一个动态大小分配在堆上的连续容器， 尽管编译器不知道数据最终会驻留在哪里， 但他知道元素的在内存中是紧密布局的。内存的连续性给了编译器更多的优化空间并且对缓存更加友好。
 
-> 几乎任何其它事情都需要评论和解释原因， 对于小型的容器， 带有线性搜索的map可能比`std::map`性能要更好。但是别对这点太痴迷了， 如果你需要kv查找， 用`std::map`并且评估一下它是否有你想要的性能表现和特性。  
+> 几乎任何其它事情都需要评论和解释原因， 对于小型的容器， 带有线性搜索的map可能比`std::map`性能要更好。但是别对这点太痴迷了， 如果你需要kv查找， 用`std::map`并且评估一下它是否有你想要的性能表现和特性。
 
 ## 40. 避免使用std::bind和std::function
 
@@ -682,28 +669,26 @@ void use_string() {    // The string lives on the heap    std::string *value = n
 其中语言层面的特性包括：
 
 1. C++11 版本的`constexpr` 隐式地指定了所有成员函数为const(即不能修改this)， 这在C++14已经被改变。
-    
-2. C++11缺少对函数对auto 返回类型的推导(`lambdas`有）
-    
-3. C++11没有`auto`或者可变Lambda参数的
-    
-4. C++14新增`[[deprecated]]`特性
-    
-5. C++14新增了数字分隔符， 比如`1'000'000`
-    
-6. 在C++14里`constexpr` 函数可以有多个return
-    
+
+1. C++11缺少对函数对auto 返回类型的推导(`lambdas`有）
+
+1. C++11没有`auto`或者可变Lambda参数的
+
+1. C++14新增`[[deprecated]]`特性
+
+1. C++14新增了数字分隔符， 比如`1'000'000`
+
+1. 在C++14里`constexpr` 函数可以有多个return
 
 库层面特性包括：
 
 1. `std::make_unique` 在C++14中加入
-    
-2. C++11没有`std::exchange`
-    
-3. C++14新增了对`std::array`的`constexpr`支持
-    
-4. `cbegin`, `cend`, `crbegin`, 和`crend` 这些自由函数(`free function` ,没有入参的函数） 为了和begin 和end这些在C++11加入的标准容器中的自由函数保持一致而被加入了。
-    
+
+1. C++11没有`std::exchange`
+
+1. C++14新增了对`std::array`的`constexpr`支持
+
+1. `cbegin`, `cend`, `crbegin`, 和`crend` 这些自由函数(`free function` ,没有入参的函数） 为了和begin 和end这些在C++11加入的标准容器中的自由函数保持一致而被加入了。
 
 ## 42. 对于重要的类型，不要使用initializer_list
 
@@ -730,13 +715,12 @@ auto f(int i, int j, int k){    return std::initializer_list<int>{i, j, k};}auto
 ## 43. 使用工具：Build Generators
 
 - CMake
-    
+
 - Meson
-    
+
 - Bazel
-    
+
 - Others
-    
 
 裸make file或者visual studio的项目文件让上面列出的每个东西都很棘手并难以去实现。使用build tool工具去帮助你维护在不同平台和编译器之间的可移植性。对待你的build script就想对待你的其它code一样， 它们也有自己的一套best practise, 并且非常容易就写出一个不易维护的build sciprt， 就像写出一个不可维护的C++代码一样。在使用cmake --build的情况下， Build generators同时也可以帮助抽象和简化你的持续集成环境， 这样无论你在用什么平台开发，都可以做出正确的事情。
 
@@ -745,9 +729,8 @@ auto f(int i, int j, int k){    return std::initializer_list<int>{i, j, k};}auto
 最近几年开发者对C++的包管理工具表现出了浓厚的兴趣， 有两个成为了其中最著名的包管理工具：
 
 - Vcpkg
-    
+
 - Conan
-    
 
 使用一个包管理工具是绝对有好处的， 包管理工具可以提高可以提高可移植性并且降低开发人员的管理成本。
 
@@ -756,19 +739,18 @@ auto f(int i, int j, int k){    return std::initializer_list<int>{i, j, k};}auto
 对于减少构建时间带来的痛苦，有以下一些很实用的建议：
 
 1. 将你的代码尽可能地去模板化（不是不用模板）
-    
-2. 在有意义的地方使用前向声明（所谓前向声明是指：A.h引用B.h， B.h又要引用A.h，这时候解决问题的办法是在B.h里面只声明一下A.h里面的A类）
-    
-3. 在你的build system中开启PCH（precompile headers)
-    
-4. 使用ccache
-    
-5. 了解unity builds
-    
-6. 了解外部模板(extern template)能做什么以及它的局限性
-    
-7. 使用构建分析工具去看构建时间被花费在了哪里
-    
+
+1. 在有意义的地方使用前向声明（所谓前向声明是指：A.h引用B.h， B.h又要引用A.h，这时候解决问题的办法是在B.h里面只声明一下A.h里面的A类）
+
+1. 在你的build system中开启PCH（precompile headers)
+
+1. 使用ccache
+
+1. 了解unity builds
+
+1. 了解外部模板(extern template)能做什么以及它的局限性
+
+1. 使用构建分析工具去看构建时间被花费在了哪里
 
 使用IDE
 
@@ -780,7 +762,7 @@ auto f(int i, int j, int k){    return std::initializer_list<int>{i, j, k};}auto
 
 如果你使用linux系统，你应该能够在GCC和Clang之间能够灵活切换。
 
-> 注意， 在macOS上，确保你在使用的编译器是你想使用的那个，因为gcc 命令很可能是一个苹果公司安装的clang的软连接  
+> 注意， 在macOS上，确保你在使用的编译器是你想使用的那个，因为gcc 命令很可能是一个苹果公司安装的clang的软连接
 
 ## 47. 模糊测试(Fuzzing)和变异测试(Mutating)
 
@@ -814,121 +796,85 @@ bool greaterThanFive(const int value) {    return value < 5; // mutated}
 
 如果你想变得更强你就要持续不断地学习， 世面上有许多你可以在你的C++学习上使用在资源。(++若干年后， 你就会发现，你变禿了，也变强了++)
 
-  
-
-  
-
 往期推荐
 
-  
-
-  
-
-[
+\[
 
 万字长文 |  STL 算法总结
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491833&idx=2&sn=0b217d743cd62ef00ac7ce6ee24f285f&chksm=c21ed245f5695b539555663502112b71a7389fcf40509bafece03ffb7ee38ab650ecda4ee89d&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491833&idx=2&sn=0b217d743cd62ef00ac7ce6ee24f285f&chksm=c21ed245f5695b539555663502112b71a7389fcf40509bafece03ffb7ee38ab650ecda4ee89d&scene=21#wechat_redirect)
-
-[
+\[
 
 【性能优化】lock-free在召回引擎中的实现
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491655&idx=1&sn=6d5b0480adb1c90418ba898e4bd0ad9c&chksm=c21ed2fbf5695bedbf85fa11847ca0b3dcc5e7091de766d5c4314adb69e9b1f5bb5e52111707&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491655&idx=1&sn=6d5b0480adb1c90418ba898e4bd0ad9c&chksm=c21ed2fbf5695bedbf85fa11847ca0b3dcc5e7091de766d5c4314adb69e9b1f5bb5e52111707&scene=21#wechat_redirect)
-
-[
+\[
 
 定下来了！
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491650&idx=1&sn=3cfd99c86b03bdf98449385f371b9f0d&chksm=c21ed2fef5695be8c7207d4b37e872cd89d01646b2c77f9d4aa657fca5e9becc20f5a16409a8&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491650&idx=1&sn=3cfd99c86b03bdf98449385f371b9f0d&chksm=c21ed2fef5695be8c7207d4b37e872cd89d01646b2c77f9d4aa657fca5e9becc20f5a16409a8&scene=21#wechat_redirect)
-
-[
+\[
 
 SDK开发的一些思考
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491634&idx=1&sn=a97e47429633afaf120e9f1b34ab19bf&chksm=c21ed28ef5695b98b17c4ff4313ec893bd0f2a456e8d902bf36c3bc2a6269cdbe3104a9f20ca&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491634&idx=1&sn=a97e47429633afaf120e9f1b34ab19bf&chksm=c21ed28ef5695b98b17c4ff4313ec893bd0f2a456e8d902bf36c3bc2a6269cdbe3104a9f20ca&scene=21#wechat_redirect)
-
-[
+\[
 
 Linux中对【库函数】的调用进行跟踪的 3 种【插桩】技巧
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491615&idx=1&sn=a94432662834c868329e0b3df9a05beb&chksm=c21ed2a3f5695bb5a3ac1757511e1ed2e23dd07bd734a058af0ac58a0e518bbdc585728443bf&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491615&idx=1&sn=a94432662834c868329e0b3df9a05beb&chksm=c21ed2a3f5695bb5a3ac1757511e1ed2e23dd07bd734a058af0ac58a0e518bbdc585728443bf&scene=21#wechat_redirect)
-
-[
+\[
 
 【线上问题】P1级公司故障，年终奖不保
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491602&idx=1&sn=a9e4dd25cc35baf10b2508485b6dc550&chksm=c21ed2aef5695bb869e6302ccbf2b2cbbf25f28e04c107408c7d60a9d611097ef8c588f4cde2&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491602&idx=1&sn=a9e4dd25cc35baf10b2508485b6dc550&chksm=c21ed2aef5695bb869e6302ccbf2b2cbbf25f28e04c107408c7d60a9d611097ef8c588f4cde2&scene=21#wechat_redirect)
-
-[
+\[
 
 咳咳，说下开源项目这件事的进展
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491543&idx=1&sn=17eebcc8aba47fe9cb6eae4f8c65f9b2&chksm=c21d2d6bf56aa47d4f4036996e31397a3cb2935e332196873428d205fde43a1e6d0a0ea793c2&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491543&idx=1&sn=17eebcc8aba47fe9cb6eae4f8c65f9b2&chksm=c21d2d6bf56aa47d4f4036996e31397a3cb2935e332196873428d205fde43a1e6d0a0ea793c2&scene=21#wechat_redirect)
-
-[
+\[
 
 探索CPU的调度原理
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491534&idx=1&sn=f17baa3b00a30a410e629b6a9701bcf5&chksm=c21d2d72f56aa464adea2cbcc531a24fcd9aa9982d9b79f6d247425248284a3b6ccc8643d23b&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491534&idx=1&sn=f17baa3b00a30a410e629b6a9701bcf5&chksm=c21d2d72f56aa464adea2cbcc531a24fcd9aa9982d9b79f6d247425248284a3b6ccc8643d23b&scene=21#wechat_redirect)
-
-[
+\[
 
 想拉着大家搞点事！
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491530&idx=1&sn=39c437c103985dbea211932fe9ee609c&chksm=c21d2d76f56aa4605f7d27340ba573acbc72e1fbd72d4f9b38310a1b0884969ea3f372f0cf65&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491530&idx=1&sn=39c437c103985dbea211932fe9ee609c&chksm=c21d2d76f56aa4605f7d27340ba573acbc72e1fbd72d4f9b38310a1b0884969ea3f372f0cf65&scene=21#wechat_redirect)
-
-[
+\[
 
 防御性编程技巧
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491525&idx=1&sn=ea45c5caf3244858a92a243a53718538&chksm=c21d2d79f56aa46f5476dd30b7d54df9532679889b5f0430c5def19a49da9142fb93a99b20f5&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491525&idx=1&sn=ea45c5caf3244858a92a243a53718538&chksm=c21d2d79f56aa46f5476dd30b7d54df9532679889b5f0430c5def19a49da9142fb93a99b20f5&scene=21#wechat_redirect)
-
-[
+\[
 
 C++的全链路追踪方案，稍微有点高端
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491517&idx=1&sn=7c23fb215c7b71b93617f14eae70bdac&chksm=c21d2d01f56aa417021b4e6ef44393ef1c79d2ce1ed3cb2bc068071d6cde411088519d081b0f&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491517&idx=1&sn=7c23fb215c7b71b93617f14eae70bdac&chksm=c21d2d01f56aa417021b4e6ef44393ef1c79d2ce1ed3cb2bc068071d6cde411088519d081b0f&scene=21#wechat_redirect)
-
-[
+\[
 
 多线程程序中操作的原子性
 
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491516&idx=1&sn=252f4a15253c86eeb61667a8c82fb62b&chksm=c21d2d00f56aa41663c0d58245998a8511be91e1cb002942b54a329a5f7711867734ff71cba7&scene=21#wechat_redirect)
 
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491516&idx=1&sn=252f4a15253c86eeb61667a8c82fb62b&chksm=c21d2d00f56aa41663c0d58245998a8511be91e1cb002942b54a329a5f7711867734ff71cba7&scene=21#wechat_redirect)
-
-[
+\[
 
 喵哥吐血整理：软件开发的51条建议
 
-
-
-](https://mp.weixin.qq.com/s?__biz=MzkyODE5NjU2Mw==&mid=2247491489&idx=1&sn=5a5e68b50e67bf1aaad7fa9b690ae726&chksm=c21d2d1df56aa40b51b3e29a53a783740d3d3eb099b138e2fc32ca75faf9b3f5245f95fe1e79&scene=21#wechat_redirect)
-
-  
+\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODE5NjU2Mw==&mid=2247491489&idx=1&sn=5a5e68b50e67bf1aaad7fa9b690ae726&chksm=c21d2d1df56aa40b51b3e29a53a783740d3d3eb099b138e2fc32ca75faf9b3f5245f95fe1e79&scene=21#wechat_redirect)
 
 Read more
 
@@ -941,95 +887,94 @@ Comment
 **留言 11**
 
 - 小狸
-    
-    2022年1月25日
-    
-    Like3
-    
-    c++工具集： 编译选项：-Wpedantic，代码更具移植性。 catch2， 相比gtest，Header-Only这个理由很充分了 clang-format: 格式化神器 clang-tidy: 静态代码检测 asan：运行时资源检测，比valgrind快得不是一丁点儿，而且还提供了接口，用户可以运行时调用来检测内存泄漏，这个就太牛逼了 vcpkg：越精简越喜欢 cmake： 尽管越来越臃肿，已经成为一个DSL了，但谁让它生态大呢
-    
-    Pinned
-    
-    程序喵大人
-    
-    Author2022年1月25日
-    
-    Like
-    
-    赞
-    
+
+  2022年1月25日
+
+  Like3
+
+  c++工具集： 编译选项：-Wpedantic，代码更具移植性。 catch2， 相比gtest，Header-Only这个理由很充分了 clang-format: 格式化神器 clang-tidy: 静态代码检测 asan：运行时资源检测，比valgrind快得不是一丁点儿，而且还提供了接口，用户可以运行时调用来检测内存泄漏，这个就太牛逼了 vcpkg：越精简越喜欢 cmake： 尽管越来越臃肿，已经成为一个DSL了，但谁让它生态大呢
+
+  Pinned
+
+  程序喵大人
+
+  Author2022年1月25日
+
+  Like
+
+  赞
+
 - jojogh得木
-    
-    2022年1月25日
-    
-    Like2
-    
-    边拉屎边看
-    
-    程序喵大人
-    
-    Author2022年1月25日
-    
-    Like1
-    
-    注意卫生
-    
+
+  2022年1月25日
+
+  Like2
+
+  边拉屎边看
+
+  程序喵大人
+
+  Author2022年1月25日
+
+  Like1
+
+  注意卫生
+
 - Wiccy Cheng
-    
-    2022年1月25日
-    
-    Like1
-    
-    C++的最佳实践是Rust![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月25日
+
+  Like1
+
+  C++的最佳实践是Rust![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 秦时明月
-    
-    2022年2月3日
-    
-    Like
-    
-    C++的最佳实践是Rust所有权和安全至上的思想，rust作为工程语言无可厚非，但表达能力同时受生命周期所有权牵制，所以结果很明显了
-    
+
+  2022年2月3日
+
+  Like
+
+  C++的最佳实践是Rust所有权和安全至上的思想，rust作为工程语言无可厚非，但表达能力同时受生命周期所有权牵制，所以结果很明显了
+
 - 小罗罗
-    
-    2022年1月25日
-    
-    Like
-    
-    ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月25日
+
+  Like
+
+  ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Bob Liu
-    
-    2022年1月25日
-    
-    Like
-    
-    讲的很好确实是需要把包管理用起来了，java和c#之所以开发效率那么高跟包管理很有关系
-    
+
+  2022年1月25日
+
+  Like
+
+  讲的很好确实是需要把包管理用起来了，java和c#之所以开发效率那么高跟包管理很有关系
+
 - 雨乐
-    
-    2022年1月25日
-    
-    Like
-    
-    学习了
-    
+
+  2022年1月25日
+
+  Like
+
+  学习了
+
 - 依韵
-    
-    2022年1月25日
-    
-    Like
-    
-    手动点赞
-    
+
+  2022年1月25日
+
+  Like
+
+  手动点赞
+
 - Santiago
-    
-    2022年1月25日
-    
-    Like
-    
-    不错
-    
+
+  2022年1月25日
+
+  Like
+
+  不错
 
 已无更多数据
 
@@ -1048,94 +993,93 @@ Comment
 **留言 11**
 
 - 小狸
-    
-    2022年1月25日
-    
-    Like3
-    
-    c++工具集： 编译选项：-Wpedantic，代码更具移植性。 catch2， 相比gtest，Header-Only这个理由很充分了 clang-format: 格式化神器 clang-tidy: 静态代码检测 asan：运行时资源检测，比valgrind快得不是一丁点儿，而且还提供了接口，用户可以运行时调用来检测内存泄漏，这个就太牛逼了 vcpkg：越精简越喜欢 cmake： 尽管越来越臃肿，已经成为一个DSL了，但谁让它生态大呢
-    
-    Pinned
-    
-    程序喵大人
-    
-    Author2022年1月25日
-    
-    Like
-    
-    赞
-    
+
+  2022年1月25日
+
+  Like3
+
+  c++工具集： 编译选项：-Wpedantic，代码更具移植性。 catch2， 相比gtest，Header-Only这个理由很充分了 clang-format: 格式化神器 clang-tidy: 静态代码检测 asan：运行时资源检测，比valgrind快得不是一丁点儿，而且还提供了接口，用户可以运行时调用来检测内存泄漏，这个就太牛逼了 vcpkg：越精简越喜欢 cmake： 尽管越来越臃肿，已经成为一个DSL了，但谁让它生态大呢
+
+  Pinned
+
+  程序喵大人
+
+  Author2022年1月25日
+
+  Like
+
+  赞
+
 - jojogh得木
-    
-    2022年1月25日
-    
-    Like2
-    
-    边拉屎边看
-    
-    程序喵大人
-    
-    Author2022年1月25日
-    
-    Like1
-    
-    注意卫生
-    
+
+  2022年1月25日
+
+  Like2
+
+  边拉屎边看
+
+  程序喵大人
+
+  Author2022年1月25日
+
+  Like1
+
+  注意卫生
+
 - Wiccy Cheng
-    
-    2022年1月25日
-    
-    Like1
-    
-    C++的最佳实践是Rust![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月25日
+
+  Like1
+
+  C++的最佳实践是Rust![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 秦时明月
-    
-    2022年2月3日
-    
-    Like
-    
-    C++的最佳实践是Rust所有权和安全至上的思想，rust作为工程语言无可厚非，但表达能力同时受生命周期所有权牵制，所以结果很明显了
-    
+
+  2022年2月3日
+
+  Like
+
+  C++的最佳实践是Rust所有权和安全至上的思想，rust作为工程语言无可厚非，但表达能力同时受生命周期所有权牵制，所以结果很明显了
+
 - 小罗罗
-    
-    2022年1月25日
-    
-    Like
-    
-    ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月25日
+
+  Like
+
+  ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Bob Liu
-    
-    2022年1月25日
-    
-    Like
-    
-    讲的很好确实是需要把包管理用起来了，java和c#之所以开发效率那么高跟包管理很有关系
-    
+
+  2022年1月25日
+
+  Like
+
+  讲的很好确实是需要把包管理用起来了，java和c#之所以开发效率那么高跟包管理很有关系
+
 - 雨乐
-    
-    2022年1月25日
-    
-    Like
-    
-    学习了
-    
+
+  2022年1月25日
+
+  Like
+
+  学习了
+
 - 依韵
-    
-    2022年1月25日
-    
-    Like
-    
-    手动点赞
-    
+
+  2022年1月25日
+
+  Like
+
+  手动点赞
+
 - Santiago
-    
-    2022年1月25日
-    
-    Like
-    
-    不错
-    
+
+  2022年1月25日
+
+  Like
+
+  不错
 
 已无更多数据

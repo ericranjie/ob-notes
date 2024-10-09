@@ -85,7 +85,7 @@ linux kernel 时间子系统的源文件位于linux/kernel/time/目录下，我�
 
 （1）CONFIG_GENERIC_CLOCKEVENTS和CONFIG_GENERIC_CLOCKEVENTS_BUILD：使用新的时间子系统的构架，如果不配置，那么将使用第二节描述的旧的时间子系统架构。
 
-（2）曾经有一个CONFIG_ GENERIC_TIME的配置项对应clocksource的配置，不过在某个版本中删除了，也就是说目前的内核都是使用通用clocksource模块的，无法再退回到过去使用arch相关的clocksource的时代。为了兼容旧风格的timekeeping接口，kernel仍然提供了CONFIG_ARCH_USES_GETTIMEOFFSET这个配置项。由此可见，在软件框架在演化的过程中，如果这是一个被其他模块使用的基础组件，我们不可能是完全推到重来，必须考虑对旧的软件的兼容性，虽然是一个沉重的负担，但是必须这么做。
+（2）曾经有一个CONFIG\_ GENERIC_TIME的配置项对应clocksource的配置，不过在某个版本中删除了，也就是说目前的内核都是使用通用clocksource模块的，无法再退回到过去使用arch相关的clocksource的时代。为了兼容旧风格的timekeeping接口，kernel仍然提供了CONFIG_ARCH_USES_GETTIMEOFFSET这个配置项。由此可见，在软件框架在演化的过程中，如果这是一个被其他模块使用的基础组件，我们不可能是完全推到重来，必须考虑对旧的软件的兼容性，虽然是一个沉重的负担，但是必须这么做。
 
 3、tick device的配置
 
@@ -161,8 +161,6 @@ linux kernel 时间子系统的源文件位于linux/kernel/time/目录下，我�
 
 这种配置不多见，多半是由于硬件无法支持one shot的clock event device，这种情况下，整个系统仍然是运行在周期tick的模式下。
 
-  
-
 _原创文章，转发请注明出处。蜗窝科技_
 
 [http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html)
@@ -175,271 +173,272 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 **评论：**
 
-**奥特曼**  
+**奥特曼**\
 2022-10-18 16:11
 
-你好 我有一个问题  
-在用户层调用usleep(1000)时，发现实际用时有10000us(100HZ的配置)，但是我是有自己的HRTIMER的，不知道为啥没起效，经过排查，我自己注册的clk_event被系统的dummy_timer替代作为了pre_cpu的clk_evnent （我是ARMV7的），而我注册的clk_event却作为了Broadcast。所以定时应该是用了dummy_timer的，而系统又是100HZ的，所以精度只有10ms了。  
-我想知道我应该怎么做才能让我的clk_event作为定时器？  
+你好 我有一个问题\
+在用户层调用usleep(1000)时，发现实际用时有10000us(100HZ的配置)，但是我是有自己的HRTIMER的，不知道为啥没起效，经过排查，我自己注册的clk_event被系统的dummy_timer替代作为了pre_cpu的clk_evnent （我是ARMV7的），而我注册的clk_event却作为了Broadcast。所以定时应该是用了dummy_timer的，而系统又是100HZ的，所以精度只有10ms了。\
+我想知道我应该怎么做才能让我的clk_event作为定时器？\
 谢谢大哥
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-8688)
 
-**奥特曼**  
+**奥特曼**\
 2022-10-18 16:16
 
-@奥特曼：补充: kernel版本是4.14.73  
-启动时有  
-Clockevents: could not switch to one-shot  
-Clockevents: could not switch to one-shot  
-Clockevents: could not switch to one-shot  
-Clockevents: could not switch to one-shot  
+@奥特曼：补充: kernel版本是4.14.73\
+启动时有\
+Clockevents: could not switch to one-shot\
+Clockevents: could not switch to one-shot\
+Clockevents: could not switch to one-shot\
+Clockevents: could not switch to one-shot\
 等打印，经排查是tick_switch_to_oneshot()中的tick_device_is_functional()返回了真，说明是挑选了当前的pre_cpu的dummy_timer。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-8689)
 
-**kenneth**  
+**kenneth**\
 2018-02-27 15:57
 
 2.4 内核应该是没有timekeeping吧，timekeeping是在高版本跟hrtimer 一起出来的
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-6568)
 
-**gnx**  
+**gnx**\
 2017-11-22 23:08
 
-我觉得下面一段描述值得商榷  
-“4、高精度timer + 周期性Tick  
-这种配置不多见，多半是由于硬件无法支持one shot的clock event device，这种情况下，整个系统仍然是运行在周期tick的模式下。”  
+我觉得下面一段描述值得商榷\
+“4、高精度timer + 周期性Tick\
+这种配置不多见，多半是由于硬件无法支持one shot的clock event device，这种情况下，整个系统仍然是运行在周期tick的模式下。”\
 既然支持高精度timer，那么clock event device或者tick device肯定是支持one shot的，这种组合模式一般是由于在启动参数中配置了nohz=on，或者没有配置NO_HZ_COMMON选项，这种组合确实不多见
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-6232)
 
-**gnx**  
+**gnx**\
 2017-11-22 23:10
 
 @gnx：夜深了，脑袋有点糊了，应该是nohz=off。。。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-6233)
 
-**江南书生**  
+**江南书生**\
 2016-10-17 15:44
 
 你好，我想问一下，现在我开启了高精度的时钟，在用户空间定时ms级别还是比较准的，但是在us级别就出现实时性很差的情况，有时快有时慢。我想知道是不是实时性不好啊？
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4723)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-18 18:28
 
 @江南书生：在用户空间其实永远也不能达到很高的精度，因为时间精度依赖于调度器。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4737)
 
-**[江南书生](http://no/)**  
+**[江南书生](http://no/)**\
 2016-10-19 17:35
 
 @linuxer：我现在直接用硬件timer玩起来的，感觉你写的东西很不错，有没有群，加一下大家交流一下啊？
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4746)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-19 18:51
 
-@江南书生：网站上有写的，呵呵～～  
-联系我们  
-  
-QQ: 2841962892  
-  
-QQ交流群:457024058  
-  
-E-mail: service#wowotech.net  
-          发送邮件时请将#替换为@
+@江南书生：网站上有写的，呵呵～～\
+联系我们
+
+QQ: 2841962892
+
+QQ交流群:457024058
+
+E-mail: service#wowotech.net\
+发送邮件时请将#替换为@
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4747)
 
-**驴肉火烧**  
+**驴肉火烧**\
 2016-10-11 18:53
 
 wowo你好，我现在遇到一个问题，向您请教一下，arm64架构单板如果只使用arch_sys_counter作为时钟源，发现定时器不准，每睡眠10ms就会有10ms左右的误差，时钟源是50MHZ的，是否因为我内核版本低呢，3.10的内核，arm64下没有sched_clock
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4694)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2016-10-11 21:35
 
 @驴肉火烧：50MHZ 10ms差10ms？怎么可能？
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4695)
 
-**驴肉火烧**  
+**驴肉火烧**\
 2016-10-12 08:56
 
 @wowo：我也是很纳闷的，如果使用了jiffes到时可以解释的通，因为CONFIG_HZ = 100，但是从启动流程上很明确的将这个jiffies的默认时钟源切换为arch_sys_counter时钟源，我也是百思不得其解，参考了arm64的JUNO单板，如果将其arm,armv7-timer-mem时钟源禁用，也会有这种情况，难道arm64的时钟源必须依赖一个arm,armv7-timer-mem的时钟源么？
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4696)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2016-10-12 14:11
 
-@驴肉火烧：从你的描述里面,我觉得,你的系统是不是没有使能"arch_sys_counter" clock source?  
-因为只有dts中配置了"arm,armv7-timer"或者"arm,armv8-timer",才会走注册流程(arch_timer_init).  
-  
-/* drivers/clocksource/arm_arch_timer.c */  
-CLOCKSOURCE_OF_DECLARE(armv7_arch_timer, "arm,armv7-timer", arch_timer_init);    
+@驴肉火烧：从你的描述里面,我觉得,你的系统是不是没有使能"arch_sys_counter" clock source?\
+因为只有dts中配置了"arm,armv7-timer"或者"arm,armv8-timer",才会走注册流程(arch_timer_init).
+
+/\* drivers/clocksource/arm_arch_timer.c \*/\
+CLOCKSOURCE_OF_DECLARE(armv7_arch_timer, "arm,armv7-timer", arch_timer_init);  \
 CLOCKSOURCE_OF_DECLARE(armv8_arch_timer, "arm,armv8-timer", arch_timer_init);
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4697)
 
-**驴肉火烧**  
+**驴肉火烧**\
 2016-10-12 16:51
 
-@wowo：这里dts有描述，也完成了注册，但是我读/proc/timer_list  
-Tick Device: mode:     0  
-Per CPU device: 0  
-Clock Event Device: arch_sys_timer  
-max_delta_ns:   42949672900  
-min_delta_ns:   1000  
-mult:           214748365  
-shift:          32  
-mode:           3  
-next_event:     88105540000000 nsecs  
-set_next_event: arch_timer_set_next_event_phys  
-set_mode:       arch_timer_set_mode_phys  
-event_handler:  tick_handle_periodic  
-retries:        0  
-  
+@wowo：这里dts有描述，也完成了注册，但是我读/proc/timer_list\
+Tick Device: mode:     0\
+Per CPU device: 0\
+Clock Event Device: arch_sys_timer\
+max_delta_ns:   42949672900\
+min_delta_ns:   1000\
+mult:           214748365\
+shift:          32\
+mode:           3\
+next_event:     88105540000000 nsecs\
+set_next_event: arch_timer_set_next_event_phys\
+set_mode:       arch_timer_set_mode_phys\
+event_handler:  tick_handle_periodic\
+retries:        0
+
 event_handler这里看着是有问题的，拜读了你们的文章，看样子是时钟没能完成切换？
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4698)
 
-**驴肉火烧**  
+**驴肉火烧**\
 2016-10-12 18:06
 
 @驴肉火烧：知道原因了，仅描述了compatible = "arm,armv8-timer";还是不够的，系统中是存在compatible = "arm,armv7-timer-mem";时钟源的，dts中补充上就正常了，现在纳闷的是，我在飞腾arm64的服务器上测试，其dts中没有compatible = "arm,armv7-timer-mem";的描述，时钟也是准的，想不通了
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4699)
 
-**liana07151018**  
+**liana07151018**\
 2016-07-22 21:56
 
 那么请问wowo大神，hrtimer模式下的时候，更高的时间精度是基于怎样的时钟源选择？因为内核中，默认clock event的时钟频率是32.768KHz，所以想问问，要使用高精度定时器，内核是如何一层层实现ns级精度的
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4305)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2016-07-23 15:17
 
 @liana07151018：如果要用hrtimer，clock event就不能用32K的了，要用一个更高精度的。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-4306)
 
-**sched_fork**  
+**sched_fork**\
 2015-11-11 16:24
 
-好文章，拜读。以下两个小细节：  
-> 能维持50年左右的timeline也可以接受。  
-clocksource 回饶不是问题，就算回饶了，算出来的 delta 还是正确的。只要两次读取 clocksource 的时间内没有回饶就不会有bug。  
-> 有些事情（例如整个系统的负荷计算）不适合在local tick驱动下进行，因此，所有的local tick device中会有一个被选择做global tick device，该device负责维护整个系统的jiffies，更新wall clock，计算全局负荷什么的。  
-x86 架构里面的 local tick 是 apci timer，broadcast timer 是 hpet timer。  
-arm 架构里面的 local tick 是 arch timer，而 broadcast timer 一般是 soc 中额外的 timer。因为如果整个 cluster 掉电的时候， arch timer 也 clock gating 了。不能产生一个唤醒信号把 cluster 唤醒。
+好文章，拜读。以下两个小细节：
+
+> 能维持50年左右的timeline也可以接受。\
+> clocksource 回饶不是问题，就算回饶了，算出来的 delta 还是正确的。只要两次读取 clocksource 的时间内没有回饶就不会有bug。\
+> 有些事情（例如整个系统的负荷计算）不适合在local tick驱动下进行，因此，所有的local tick device中会有一个被选择做global tick device，该device负责维护整个系统的jiffies，更新wall clock，计算全局负荷什么的。\
+> x86 架构里面的 local tick 是 apci timer，broadcast timer 是 hpet timer。\
+> arm 架构里面的 local tick 是 arch timer，而 broadcast timer 一般是 soc 中额外的 timer。因为如果整个 cluster 掉电的时候， arch timer 也 clock gating 了。不能产生一个唤醒信号把 cluster 唤醒。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3028)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-11-12 10:19
 
-@sched_fork：多谢您的意见。关于回滚问题，我又仔细看了看代码，系统的timeline实际上是timekeeping模块负责的，而该模块是在tick到来的时候，根据上次和当前的clocksource的delta来更新timeline，因此，clocksource的回滚不是问题，只要delta值是对的就OK了。  
-  
+@sched_fork：多谢您的意见。关于回滚问题，我又仔细看了看代码，系统的timeline实际上是timekeeping模块负责的，而该模块是在tick到来的时候，根据上次和当前的clocksource的delta来更新timeline，因此，clocksource的回滚不是问题，只要delta值是对的就OK了。
+
 关于tick问题，x86的架构我不是很熟悉，不过根据您的描述，看起来apci timer应该是per cpu的，而hpet timer应该所有cpu core共享的，并且在CPU core idle的时候，仍然可以work。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3036)
 
-**[electrlife](http://www.wowotech.net/)**  
+**[electrlife](http://www.wowotech.net/)**\
 2016-02-26 14:39
 
 @linuxer：这里有点不解关于clocksource的回饶问题，正如上面所说，clocksource 回饶不是问题，就算回饶了，算出来的 delta 还是正确的。只要两次读取 clocksource 的时间内没有回饶就不会有bug。我的疑惑是如何保证两次读取 clocksource 的时间内没有回饶。在clocksource中确实有max_idle_ns这个变量，不知是否和这个回饶有关，如果样，Linux应该会在适当的时间点去更新clocksource的cycle_last变量，以保证用户在使用clocksource->read来计算cycle_delta出现回铙问题。关于这个部分代码在哪里可以找到，谢谢！
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3545)
 
-**[madang](http://www.wowotech.net/)**  
+**[madang](http://www.wowotech.net/)**\
 2015-11-10 17:30
 
-周期tick的软中断上下文中（参考run_timer_softirq），如果满足条件，会调用hrtimer_switch_to_hres将hrtimer从低精度模式切换到高精度模式上。  
-//---------------------------------  
+周期tick的软中断上下文中（参考run_timer_softirq），如果满足条件，会调用hrtimer_switch_to_hres将hrtimer从低精度模式切换到高精度模式上。\
+//---------------------------------\
 这里好像有点问题，看代码应该是hrtimer_run_queues 被调用到的，这里应该是在硬中断上下文。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3022)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-11-11 12:14
 
-@madang：void run_local_timers(void)  
-{  
-    hrtimer_run_queues();  
-    raise_softirq(TIMER_SOFTIRQ);  
-}  
+@madang：void run_local_timers(void)\
+{\
+hrtimer_run_queues();\
+raise_softirq(TIMER_SOFTIRQ);\
+}\
 在timer的硬件上下文中会调用hrtimer_run_queues，只是用于在周期性tick下驱动高精度timer（这时候，系统配置是低精度timer + 周期tick ），但是，我的文章中描述的是从低精度模式切换到高精度模式的过程，实际上，还是在timer的软中断上下文中（参考run_timer_softirq）中实现切换的，在hrtimer_run_queues函数中，我没有看到模式切换的内容啊
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3024)
 
-**[madang](http://www.wowotech.net/)**  
+**[madang](http://www.wowotech.net/)**\
 2015-11-11 15:51
 
-@linuxer：void hrtimer_run_queues(void)  
-{  
-......  
-    if (hrtimer_hres_active())  
-        return;  
-.......  
-}  
+@linuxer：void hrtimer_run_queues(void)\
+{\
+......\
+if (hrtimer_hres_active())\
+return;\
+.......\
+}\
 这个代码的意思应该是：如果处于高精度模式则退出 ？
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3027)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-11-11 17:37
 
-@madang：在这个场景下，驱动hrtimer_run_queues函数的是周期性tick。这时候，系统会在每一次周期性tick到来的时候调用hrtimer_run_queues函数，该函数来检查是否有expire的hrtimer。毫无疑问，这里的高精度timer也就是没有意义了。  
-  
+@madang：在这个场景下，驱动hrtimer_run_queues函数的是周期性tick。这时候，系统会在每一次周期性tick到来的时候调用hrtimer_run_queues函数，该函数来检查是否有expire的hrtimer。毫无疑问，这里的高精度timer也就是没有意义了。
+
 如果处于高精度模式的话，不会使用这个函数。我上面的回复有些武断了，需要修改。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-3030)
 
-**[firo](http://firoyang.org/)**  
+**[firo](http://firoyang.org/)**\
 2015-09-22 15:18
 
-一些传统的内核moik...  
-  
+一些传统的内核moik...
+
 模块?
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-2657)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2015-09-22 23:32
 
 @firo：多谢指正，已经修改了。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-2667)
 
-**[printk](http://www.wowotech.net/)**  
+**[printk](http://www.wowotech.net/)**\
 2015-04-21 17:22
 
-在kernel中，time 就是 frequence吗 这两个概念感觉是一样的，因为我要调整一个LDB的时钟频率，就要从源头看起 ，看这货是怎么从PLL5上分频出来的。。而PLL5 又来源于时钟晶振。 所以我是在调时间吗。。。  
+在kernel中，time 就是 frequence吗 这两个概念感觉是一样的，因为我要调整一个LDB的时钟频率，就要从源头看起 ，看这货是怎么从PLL5上分频出来的。。而PLL5 又来源于时钟晶振。 所以我是在调时间吗。。。\
 原谅我的思维混乱，毕竟工作了一天。。
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-1540)
 
-**[wowo](http://www.wowotech.net/)**  
+**[wowo](http://www.wowotech.net/)**\
 2015-04-21 21:33
 
-@printk：只有“愚蠢”的人类才需要“时间”这个概念啦，对kernel而言，它只知道tick啊，Tick，Tick，Tick...  
-Tick就是频率啊，无论是周期固定的频率还是周期不定的频率。  
+@printk：只有“愚蠢”的人类才需要“时间”这个概念啦，对kernel而言，它只知道tick啊，Tick，Tick，Tick...\
+Tick就是频率啊，无论是周期固定的频率还是周期不定的频率。\
 频率是什么呢？是变化。嗯，只有变化的才是有生命的...
 
 [回复](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html#comment-1542)
 
-**[printk](http://www.wowotech.net/)**  
+**[printk](http://www.wowotech.net/)**\
 2015-04-22 11:16
 
 @wowo：wowo大虾简直就是kernel中的哲学家阿。。。这个地方太有意思啦，以后常来分享~
@@ -450,152 +449,155 @@ Tick就是频率啊，无论是周期固定的频率还是周期不定的频率�
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [Linux PM QoS framework(2)_PM QoS class](http://www.wowotech.net/pm_subsystem/pm_qos_class.html)
-    - [显示技术介绍(3)_CRT技术](http://www.wowotech.net/display/crt_intro.html)
-    - [linux kernel内存回收机制](http://www.wowotech.net/memory_management/233.html)
-    - [CMA模块学习笔记](http://www.wowotech.net/memory_management/cma.html)
-    - [Linux电源管理(8)_Wakeup count功能](http://www.wowotech.net/pm_subsystem/wakeup_count.html)
+
+  - [Linux PM QoS framework(2)\_PM QoS class](http://www.wowotech.net/pm_subsystem/pm_qos_class.html)
+  - [显示技术介绍(3)\_CRT技术](http://www.wowotech.net/display/crt_intro.html)
+  - [linux kernel内存回收机制](http://www.wowotech.net/memory_management/233.html)
+  - [CMA模块学习笔记](http://www.wowotech.net/memory_management/cma.html)
+  - [Linux电源管理(8)\_Wakeup count功能](http://www.wowotech.net/pm_subsystem/wakeup_count.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

@@ -4,7 +4,7 @@
 
 在[深入了解服务器 CPU 的型号、代际、片内与片间互联架构](https://mp.weixin.qq.com/s/7nwiX3JaGwL-EOZz77GohA)一文中我们了解了服务器 CPU 的内部架构。在其中我们看到有一个内存控制器。
 
-关于CPU内存控制器中会有很多专技术细节。例如下面是Skylake 代际 CPU 对内存的支持情况。参见[https://en.wikichip.org/wiki/intel/microarchitectures/skylake_](https://en.wikichip.org/wiki/intel/microarchitectures/skylake_)(server)
+关于CPU内存控制器中会有很多专技术细节。例如下面是Skylake 代际 CPU 对内存的支持情况。参见[https://en.wikichip.org/wiki/intel/microarchitectures/skylake\_](https://en.wikichip.org/wiki/intel/microarchitectures/skylake_)(server)
 
 ```c
 DRAM
@@ -57,26 +57,26 @@ DIMM 是双列直插内存模块，是现代最常用的内存条模块的规格
 
 ![图3.png](https://kfngxl.cn/usr/uploads/2024/04/3333515706.png "图3.png")
 
-另外上面这个内存条还标识了 16 GB 2R*8 PC4-3200AA-U82-11。
+另外上面这个内存条还标识了 16 GB 2R\*8 PC4-3200AA-U82-11。
 
 **SO-DIMM：小外形模块**，是 Small Outline DIMM 的缩写。
 
 在笔记本电脑出现后，对内存的体积和功耗都要求更小一些。SO-DIMM 就是针对笔记本电脑定义的标准。其宽度标准是 67.6 mm。如下图是两个笔记本内存条，可见体积要比台式机小不少。
 
-![SODIMM_1R*8.png](https://kfngxl.cn/usr/uploads/2024/04/2513320475.png "SODIMM_1R*8.png")  
+![SODIMM_1R*8.png](https://kfngxl.cn/usr/uploads/2024/04/2513320475.png "SODIMM_1R*8.png")\
 ![SODIMM_1R*16.png](https://kfngxl.cn/usr/uploads/2024/04/1732418588.png "SODIMM_1R*16.png")
 
-**RDIMM：带寄存器双列直插模块**，是 Registered DIMM 的缩写。  
+**RDIMM：带寄存器双列直插模块**，是 Registered DIMM 的缩写。\
 RDIMM 在内存条上加了一个寄存缓存器（RCD，Register Clock Driver）进行传输。控制器输出的地址和控制信号经过Register芯片寄存后输出到DRAM芯片。
 
 CPU 访问数据时都先经过寄存器再到内存颗粒。减少了 CPU 到内存颗粒的距离，使得频率可以提高。而且不再像之前一样要求每个内存颗粒传输距离相等，工艺复杂度因寄存缓存器的引入而下降，使得容量也可以提高到 32 GB。主要用在服务器上。
 
 下图是一个服务器RDIMM 32 GB 内存条。这个服务器内存条不光正面有很多内存颗粒，连背面也有。可见服务器内存的颗粒数量比普通笔记本电脑、个人台式机的颗粒都要多很多。最关键的是内存条正中央位置的较大颗粒的寄存缓存器，表明了这是一条RDIMM内存。
 
-![图4_1.png](https://kfngxl.cn/usr/uploads/2024/04/3434529732.png "图4_1.png")  
+![图4_1.png](https://kfngxl.cn/usr/uploads/2024/04/3434529732.png "图4_1.png")\
 ![图4_2.png](https://kfngxl.cn/usr/uploads/2024/04/3468177107.png "图4_2.png")
 
-从图中可见内存的参数标识是 32 GB 2R*4 PC4-2666V-RB2-12-DB1。
+从图中可见内存的参数标识是 32 GB 2R\*4 PC4-2666V-RB2-12-DB1。
 
 **LRDIMM：低负载双列直插内存模块**，是 Load Reduced DIMM 的缩写。
 
@@ -120,20 +120,20 @@ CPU 每个 channel 支持同时支持 72 位的读写，其中 64 位是数据�
 
 我们再回到开篇提到的三个问题。
 
-**问题1：其中的 6 channle 是什么意思？**  
+**问题1：其中的 6 channle 是什么意思？**\
 这值得是 CPU 支持的内存通道数量为 6 ，不同的通道可以并行工作，通道数量越高，访问内存性能越好。
 
-**问题2：RDIMM、LRDIMM 又分别代表的是什么内存？**  
+**问题2：RDIMM、LRDIMM 又分别代表的是什么内存？**\
 RDIMM、LRDIMM 是在控制信号上、或者数据信号上加了一些硬件缓存，有了这些缓存可以支持单条做到更大的容量。制作工艺比较复杂，价格也会偏贵一些。
 
-**问题3：为什么内存带宽中 bandwidth 是 21.33 GB/s，aggregated bandwidth 128 GB/s？**  
+**问题3：为什么内存带宽中 bandwidth 是 21.33 GB/s，aggregated bandwidth 128 GB/s？**\
 单通道内存的带宽是根据内存的数据频率计算出来的，由于数据频率是 2666M，所以算得单通道带宽为 21.33 GB/s。由于总共有 6 个通道，所以总的带宽可以达到 128 GB/s。
 
 不过要注意的是，厂商的参数中都指的之理论最大带宽。而实际运行的过程中，内存硬件中会有各种延迟，实际带宽到不了这么高。
 
-更多干货内容，详见：  
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+更多干货内容，详见：\
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [看懂服务器 CPU 内存支持，学会计算内存带宽](https://kfngxl.cn/index.php/archives/787/)
@@ -178,7 +178,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36919次
     - 本站运营：0年168天17小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

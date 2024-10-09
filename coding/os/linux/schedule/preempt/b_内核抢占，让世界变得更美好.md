@@ -1,5 +1,5 @@
 一口Linux
- _2021年10月21日 11:50_
+_2021年10月21日 11:50_
 The following article is from 老吴嵌入式 Author 吴伟东Jack
 《坐拥2娃的超级奶爸》《100 个适合嵌入式初学者的开源软件》作者《老吴嵌入式》公众号号主《篮球动作拆解》视频号号主《中国 A股荣誉股民》《终身学习践行者》
 
@@ -7,6 +7,7 @@ The following article is from 老吴嵌入式 Author 吴伟东Jack
 今天要分享的是抢占相关的基础知识。
 本文以内核抢占为引子，概述一下 Linux 抢占的图景。
 我尽量避开细节问题和源码分析。
+
 ## 什么是内核抢占？
 
 别急，咱们慢慢来。
@@ -38,7 +39,7 @@ The following article is from 老吴嵌入式 Author 吴伟东Jack
 > a. 系统调用，本质是 soft interrupt，通常就是一条硬件指令 (x86 的 int 0x80)。
 > b. 硬件中断，最典型的就是会周期性发生的 timer 中断，或者其他各种外设中断.
 > c. exception，例如 page fault、div 0。
-![[Pasted image 20240906162125.png]]
+> !\[\[Pasted image 20240906162125.png\]\]
 
 2、陷入到内核态后，在合适的时机下，调用 sheduler 选出一个最重要的进程，如果被选中的不是当前正在运行的进程的话，就会执行 context switch 切换到新的进程。
 
@@ -56,12 +57,12 @@ The following article is from 老吴嵌入式 Author 吴伟东Jack
 2、kernel preemption
 
 Linux 2.6 之前是不支持内核抢占的。这意味着当处于用户空间的进程请求内核服务时，在该进程阻塞（进入睡眠）等待某事（通常是 I/O）或系统调用完成之前，不能调度其他进程。支持内核抢占意味着当一个进程在内核里运行时，另一个进程可以抢占第一个进程并被允许运行，即使第一个进程尚未完成其在内核里的工作。
-![[Pasted image 20240906162132.png]]
+!\[\[Pasted image 20240906162132.png\]\]
 
 支持内核抢占 vs 不支持内核抢占
 
 举个例子：
-![[Pasted image 20240906162140.png]]
+!\[\[Pasted image 20240906162140.png\]\]
 
 在上图中，进程 A 已经通过系统调用进入内核，也许是对设备或文件的 write() 调用。内核代表进程 A 执行时，具有更高优先级的进程 B 被中断唤醒。内核抢占进程 A 并将 CPU 分配给进程 B，即使进程 A 既没有阻塞也没有完成其在内核里的工作。
 
@@ -71,7 +72,8 @@ Linux 2.6 之前是不支持内核抢占的。这意味着当处于用户空间�
 > When kernel code becomes preemptible again
 > If a task in the kernel explicitly calls schedule()
 > If a task in the kernel blocks (which results in a call to schedule() )
-##  为什么要引入内核抢占？
+
+## 为什么要引入内核抢占？
 
 **根本原因**：
 
@@ -81,23 +83,22 @@ Linux 2.6 之前是不支持内核抢占的。这意味着当处于用户空间�
 
 并不是说内核抢占就是绝对的好，使用什么抢占机制最优是跟你的应用场景挂钩的。如果不是为了满足用户，内核其实是完全不想进行进程切换的，因为每一次 context switch，都会有 overhead，这些 overhead 就是对 cpu 的浪费，意味着吞吐量的下降。
 
-但是，如果你想要系统的响应性好一点，就得尽量多的允许抢占的发生，这是 Linux 作为一个通用操作系统所必须支持的。当你的系统做到随时都可以发生抢占时，系统的响应性就会非常好。  
-  
+但是，如果你想要系统的响应性好一点，就得尽量多的允许抢占的发生，这是 Linux 作为一个通用操作系统所必须支持的。当你的系统做到随时都可以发生抢占时，系统的响应性就会非常好。
 
 **为了让用户根据自己的需求进行配置，Linux 提供了 3 种 Preemption Model。**
-![[Pasted image 20240906162216.png]]
+!\[\[Pasted image 20240906162216.png\]\]
 
 CONFIG_PREEMPT_NONE=y：不允许内核抢占，吞吐量最大的 Model，一般用于 Server 系统。
-![[Pasted image 20240906162255.png]]
+!\[\[Pasted image 20240906162255.png\]\]
 
 CONFIG_PREEMPT_VOLUNTARY=y：在一些耗时较长的内核代码中主动调用cond_resched()让出CPU，对吞吐量有轻微影响，但是系统响应会稍微快一些。
-![[Pasted image 20240906162314.png]]
+!\[\[Pasted image 20240906162314.png\]\]
 
 CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他时候都允许内核抢占，响应速度进一步提升，吞吐量进一步下降，一般用于 Desktop / Embedded 系统。
-![[Pasted image 20240906162322.png]]
+!\[\[Pasted image 20240906162322.png\]\]
 
 另外，还有一个没有合并进主线内核的 Model: CONFIG_PREEMPT_RT，这个模式几乎将所有的 spinlock 都换成了 preemptable mutex，只剩下一些极其核心的地方仍然用禁止抢占的 spinlock，所以基本可以认为是随时可被抢占。
-![[Pasted image 20240906162327.png]]
+!\[\[Pasted image 20240906162327.png\]\]
 
 ## 抢占前的检查
 
@@ -107,7 +108,7 @@ CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他�
 
 - 需要抢占;
 - 能抢占;
-    
+
 **1、是否需要抢占？**
 
 判断是否需要抢占的依据是：thread_info 的成员 flags 是否设置了 TIF_NEED_RESCHED 标志位。
@@ -116,7 +117,7 @@ CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他�
 
 - set_tsk_need_resched() 用于设置该 flag。
 - tif_need_resched() 被用来判断该 flag 是否置位。
-- resched_curr(struct rq *rq)，标记当前 runqueue 需要抢占。
+- resched_curr(struct rq \*rq)，标记当前 runqueue 需要抢占。
 
 **2、是否能抢占？**
 
@@ -132,7 +133,7 @@ CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他�
 - preempt_disable()，关闭内核抢占，可嵌套调用。
 - preempt_count()，返回 preempt_count。
 
-##  什么场景会设置需要抢占 (TIF_NEED_RESCHED = 1)
+## 什么场景会设置需要抢占 (TIF_NEED_RESCHED = 1)
 
 通过 grep resched_curr 可以找出大多数标记抢占的场景。
 
@@ -226,6 +227,7 @@ static inline void __raw_spin_lock(raw_spinlock_t *lock){     preempt_d
 ## 真正执行抢占的地方
 
 这部分是 platform 相关的，下面以 ARM64 Linux-5.4 为例，快速看下执行抢占的具体代码。
+
 ### 执行 user preemption
 
 **系统调用和中断返回用户空间的时候：**
@@ -239,7 +241,8 @@ work_pending()        do_notify_resume()            schedule
 asmlinkage void do_notify_resume(struct pt_regs *regs,    unsigned long thread_flags){ do {      [...]        // 检查是否要需要调度      
 																						   if (thread_flags & _TIF_NEED_RESCHED) {           local_daif_restore(DAIF_PROCCTX_NOIRQ);           schedule();      } else {           [...] } while (thread_flags & _TIF_WORK_MASK);}
 ```
-###  执行 kernel preemption
+
+### 执行 kernel preemption
 
 **中断返回内核空间的时候：**
 
@@ -262,7 +265,7 @@ static inline void __raw_spin_unlock(raw_spinlock_t *lock){     spin_re
 
 **内核显式地要求调度的时候：**
 
-内核里有大量的地方会显式地要求进行调度，最常见的是：cond_resched() 和 sleep()类函数，它们最终都会调用到 __schedule()。
+内核里有大量的地方会显式地要求进行调度，最常见的是：cond_resched() 和 sleep()类函数，它们最终都会调用到 \_\_schedule()。
 
 **内核阻塞的时候：**
 
@@ -287,7 +290,7 @@ https://www.kernel.org/doc/Documentation/preempt-locking.txt
 
 **—— The End ——**
 
----
+______________________________________________________________________
 
 **推荐阅读：**
 

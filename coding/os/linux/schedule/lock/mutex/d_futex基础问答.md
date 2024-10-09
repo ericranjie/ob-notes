@@ -1,4 +1,5 @@
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-10-9 7:20 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
+
 # 一、什么是futex？
 
 futex是Fast Userspace muTEX的缩写，该机制是由Rusty Russell、Hubertus Franke和Mathew Kirkwood在2.5.7版本的内核中引入，虽然名字中有互斥锁（mutex）的含义，但实际它是一种用于用户空间应用程序的通用同步工具（基于futex可以在userspace实现互斥锁、读写锁、condition variable等同步机制）。Futex组成包括：
@@ -7,13 +8,14 @@ futex是Fast Userspace muTEX的缩写，该机制是由Rusty Russell、Hubertus 
 2、用户空间层的32-bit futex word（所有平台都是32bit，包括64位平台）
 
 在没有竞争的场景下，锁的获取和释放性能都非常高，不需要内核的参与，仅仅是通过用户空间的原子操作来修改futex word的状态即可。在有竞争的场景下，如果线程无法获取futex锁，那么把自己放入到 wait queue中（陷入内核，有系统调用的开销），而在owner task释放锁的时候，如果检测到有竞争（等待队列中有阻塞任务），就会通过系统调用来唤醒等待队列中的任务，使其恢复执行，继续去持锁。如果没有竞争，那么也无需陷入内核。
+
 # 二、Futex用户和内核空间接口API是什么？
 
 Futex接口函数的原型如下：
 
 |                                                                                                                                                                                                                              |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| #include<br><br>       #include<br><br>       int futex(int *uaddr, int futex_op, int val,<br><br>                 const struct timespec *timeout,   /* or: uint32_t val2 */<br><br>                 int *uaddr2, int val3); |
+| #include<br><br>       #include<br><br>       int futex(int \*uaddr, int futex_op, int val,<br><br>                 const struct timespec *timeout,   /* or: uint32_t val2 \*/<br><br>                 int \*uaddr2, int val3); |
 
 Futex系统调用的复杂性体现在其参数上，要理解futex需要充分理解其参数：
 
@@ -58,27 +60,28 @@ futex系统调用支持各种各样的操作码，如下：
 # 三、对于normal futex，内核中如何组织等待队列？
 
 Futex相关的数据结构组织如下图所示：
-![[Pasted image 20241008190725.png]]
+!\[\[Pasted image 20241008190725.png\]\]
 
 从逻辑上看，通过futex实现的互斥锁和内核中的互斥锁mutex是一样的（通过futex实现的读写锁的概念和内核的rwsem也是一样，不再赘述），只不过futex互斥锁是分裂开的：futex word和等待队列是分别在用户空间和内核空间，内核的mutex互斥锁可以讲把待队列头放置在mutex对象上，但是对于futex，我们没有对应的内核锁对象，因此我们就需要一个算法将futex word和其等待队列映射起来。为了管理挂入等待队列的futex阻塞任务，内核建立了一个hansh table如下：
 
 |   |
 |---|
-|static struct {<br><br>struct futex_hash_bucket *queues;<br><br>unsigned long            hashsize;<br><br>} __futex_data|
+|static struct {<br><br>struct futex_hash_bucket \*queues;<br><br>unsigned long            hashsize;<br><br>} \_\_futex_data|
 
 在初始化的时候，内核会构建hashsize个futex hash bucket结构，每个bucket用来管理futex链表（hash key相同）。futex_hash_bucket数据结构定义如下：
 
 |   |
 |---|
-|struct futex_hash_bucket {<br><br>atomic_t waiters;----在该队列上阻塞的任务个数<br><br>spinlock_t lock;---保护队列的锁<br><br>struct plist_head chain;----hash key相同的futex阻塞任务对象会挂在这个链表头上<br><br>} ____cacheline_aligned_in_smp;|
+|struct futex_hash_bucket {<br><br>atomic_t waiters;----在该队列上阻塞的任务个数<br><br>spinlock_t lock;---保护队列的锁<br><br>struct plist_head chain;----hash key相同的futex阻塞任务对象会挂在这个链表头上<br><br>} \_\_\_\_cacheline_aligned_in_smp;|
 
 每一个等待在futex word的task都有一个futex_q对象（后文称之futex阻塞任务对象），根据其哈希值挂入不同的队列：
 
 |   |
 |---|
-|struct futex_q {<br><br>struct plist_node list;---挂入队列的节点，按照优先级排序<br><br>struct task_struct *task;---等待在futex word的任务<br><br>spinlock_t *lock_ptr;---保护队列操作的自旋锁<br><br>union futex_key key;---计算hash key的数据结构<br><br>struct futex_pi_state *pi_state;---futex的pi-aware是通过rt mutex实现，pi_state是记录futex关于优先级继承的所有信息，包括rt mutex 对象。<br><br>struct rt_mutex_waiter *rt_waiter;---每个阻塞在rt mutex的任务都需要一个rt_mutex_waiter对象<br><br>union futex_key *requeue_pi_key;---和requeue pi相关，非本文关注的内容。<br><br>u32 bitset;---在futex wake的时候用来判断是否唤醒该任务<br><br>} __randomize_layout;|
+|struct futex_q {<br><br>struct plist_node list;---挂入队列的节点，按照优先级排序<br><br>struct task_struct \*task;---等待在futex word的任务<br><br>spinlock_t \*lock_ptr;---保护队列操作的自旋锁<br><br>union futex_key key;---计算hash key的数据结构<br><br>struct futex_pi_state \*pi_state;---futex的pi-aware是通过rt mutex实现，pi_state是记录futex关于优先级继承的所有信息，包括rt mutex 对象。<br><br>struct rt_mutex_waiter \*rt_waiter;---每个阻塞在rt mutex的任务都需要一个rt_mutex_waiter对象<br><br>union futex_key \*requeue_pi_key;---和requeue pi相关，非本文关注的内容。<br><br>u32 bitset;---在futex wake的时候用来判断是否唤醒该任务<br><br>} \_\_randomize_layout;|
 
 通过上面的数据结构，只要有了futex word，那么我们就能根据hash key定位到其挂入的链表。当然，为了精准的匹配，还需要其futex key完全相等，具体请参考match_futex函数。关于优先级继承相关的成员后面会详细描述。
+
 # 四、Futex wait的流程为何？
 
 futex_wait函数的流程如下：
@@ -95,6 +98,7 @@ futex_wait函数的流程如下：
 10、如果设置了超期时间，那么在当前上下文会定义hrtimer_sleeper的对象，如果的确是超期唤醒的话，在timer的上下文中会把hrtimer_sleeper中的task成员清掉（设置为NULL），通过这个可以判断是否是超期唤醒。
 11、如果当前任务有pending的信号，那说明是被信号打断。如果没有pending信号，那说明是spurious wakeup，需要再尝试一次futex入队操作。
 12、一般而言，如果被信号打断，直接返回ERESTARTSYS，让用户空间程序自己决定怎么后续处理就OK了。但是有一种情况例外，那就是设置了timeout（即还没有超期就被信号打断），这种场景需要restart syscall。
+
 # 五、Futex wake的流程为何？
 
 相比futex_wait，futex_wake就比较简单了，其核心操作就是出队和唤醒futex wait阻塞的任务，具体流程如下：
@@ -104,9 +108,11 @@ futex_wait函数的流程如下：
 3、三元组相等只能说明futex word是对应上了，但是futex机制也提供了用户可以控制唤醒的方法：比特匹配。在futex wait的时候，上层的应用程序可以传递bitset参数来标记自己（FUTEX_WAIT_BITSET），在futex wake的时候，应用程序会传递bitset参数来通知内核自己想要唤醒哪些线程（FUTEX_WAKE_BITSET）。对于FUTEX_WAIT和FUTEX_WAKE，bitset做了特殊处理，设置为FUTEX_BITSET_MATCH_ANY，即futex wake的时候可以唤醒任何阻塞在该futex word的线程。
 4、除了bitset，futex wake还可以控制唤醒线程的个数。为了完成多个线程的唤醒，这里使用了唤醒队列（wake queue）。当找到匹配的futex_q的时候，将其从hash bucket的队列中删除，加入到唤醒队列上来。需要注意的是：在进行这些队列操作的时候需要持有hash buck的自旋锁。
 5、完成指定数量的扫描之后会结束遍历，调用wake_up_q将wake queue的任务逐个唤醒。
+
 # 六、Futex requeue是什么鬼？
 
 在讲requeue流程之前我们需要先明白为何会有requeue这个op code。我们以java中的wait-notify机制来说明这个问题。我们有如下的java代码：
+
 ```cpp
 A临界区：
 Synchronized {
@@ -122,6 +128,7 @@ Notify（）；-----唤醒阻塞在wait上的线程，之后会立刻获取monit
 ......
 }
 ```
+
 Java中的Wait和notify的功能是native实现，在虚拟机提供支持。Synchronized是java内嵌锁，在虚拟机对应monitor lock（互斥锁），A临界区和B临界区都由monitor lock保护，确保了只有一个线程进入。为了确保A、B临界区的先后关系（A临界区需要等待B临界区的事件通知），我们引入了condition varible。在wait-notify场景中有两个等待队列：一个是monitor lock的等待队列，另外一个是condition varible的等待队列。而对于wait而言，它需要涉及两个等待队列的操作：一个是释放monitor lock（唤醒其等待队列的任务），一个是阻塞在条件变量上（把自己挂入其等待队列）。如果没有requeue，那么这样的操作需要两次futex的系统调用，有了futex requeue，一次futex就OK了。
 
 了解了requeue的由来，其流程也是非常的简单，特别是有了上面两节futex wait和futex wake基础。Requeue的流程如下（requeue有normal requeue和pi requeue，这里我们主要描述normal requeue的流程）：
@@ -130,6 +137,7 @@ Java中的Wait和notify的功能是native实现，在虚拟机提供支持。Syn
 2、如果是FUTEX_CMP_REQUEUE，那么我们还需要校验uaddr1中的值。需要特别说明的是：这里涉及内核空间访问用户空间的变量，读操作是一个非常复杂的过程，具体参考get_futex_value_locked函数。这些逻辑和本文的主题关系不大，就不再赘述了。
 3、遍历uaddr1 等待队列上的所有等待任务对象（futex_q），将nr_wake个futex_q通过mark_wake_futex暂存在wake_q唤醒队列上。通过requeue_futex将uaddr1 等待队列上nr_requeue个futex_q对象转移到uaddr2的等待队列上。注意，这些操作需要持有两个hash bucket的自旋锁。
 4、调用wake_up_q函数唤醒之前挂入唤醒队列的任务
+
 # 七、为何futex要支持PI？
 
 Non-PI futex引起的优先级翻转（priority inversion）问题如下图所示：
@@ -151,6 +159,7 @@ PI futex中的PI就是priority inheritance，可以通过优先级继承的方�
 2、阻塞在该锁的线程们（按照优先级进行排序）。注意，这里我们把优先级最高的那个阻塞线程叫做该所的top waiter。
 
 有了这些信息，我们需要维持一个准则就OK了：一个任务的临时优先级应该提升至其持有锁的top waiter线程中最高的那个优先级。
+
 # 八、Rt mutex的原理为何？
 
 PI-futex是通过rt mutex来实现的，因此我们这里简单的聊一聊内核的这个PI-aware mutex。
@@ -183,6 +192,7 @@ rt_mutex_waiter用来抽象一个阻塞在rt mutex的任务：task成员指向�
 4、task 3--->Lock B--->task 1--->Lock C--->task 2
 
 为了能够让PI正常起作用，PI chain中的任务必须维持这样的关系：处于PI chain中右端的任务的优先级必须大于等于PI chain中左端的任务们。我们以第四条PI chain为例，任务2的优先级必须大于等于任务1和任务3的优先级，而任务1的优先级必须要大于等于任务3的优先级。
+
 # 九、PI futex和rt mutex有什么关系？
 
 熟悉Linux的工程师都了解内核中的mutex互斥锁以及支持PI的互斥锁版本rt mutex。如果想让用户空间的互斥锁实现优先级继承的功能，那么其实不需要futex模块实现复杂的PI chain，实际上对PI状态的跟踪是通过rt mutex代理来完成的，原理图如下：
@@ -192,6 +202,7 @@ rt_mutex_waiter用来抽象一个阻塞在rt mutex的任务：task成员指向�
 我们先看接口部分，normal futex使用FUTEX_WAIT和FUTEX_WAKE操作码来完成阻塞和唤醒的动作。对于PI futex而言，FUTEX_LOCK_PI用来执行上锁，而FUTEX_UNLOCK_PI用来完成解锁。这里的lock和unlock其实是对futex的代理rt mutex而言的。
 
 无论是normal futex还是PI futex，阻塞于futex的任务都会有一个futex_q对象与之对应。对于normal futex，有了futex_q对象，挂入等待队列和将其唤醒的功能都能轻松实现。对于PI futex，我们不仅仅需要挂入队列和唤醒任务，最重要的是我们需要根据PI chain完成任务优先级的调整。为了完成这个功能，需要两个额外的对象，一个是rt_mutex_waiter，表示一个阻塞在rt mutex的任务，其rt mutex指针指向了其阻塞在哪个rt mutex上。另外一个是futex_pi_state对象，它记录了优先级翻转的信息，包括该用户空间上层锁对应的内核态的rt mutex，rt mutex的owner任务的信息等。
+
 # 十、Pi futex逻辑过程
 
 Pi futex主要有两个逻辑过程：通过FUTEX_LOCK_PI上锁，通过FUTEX_UNLOCK_PI完成释放锁的逻辑。
@@ -217,15 +228,15 @@ Pi futex主要有两个逻辑过程：通过FUTEX_LOCK_PI上锁，通过FUTEX_UN
 第二次以及后续的FUTEX_LOCK_PI会简单一点，因为不需要新建rt mutex对象了，只需要在bucket找到第一个futex_q对象，通过其pi state指针就可以定位rt mutex了。有了rt mutex，通过上锁即可让自己阻塞在这个rt mutex上了。
 
 FUTEX_UNLOCK_PI的流程留给读者自行分析了。
+
 # 十一、小结
 
 本文通过问答的形式简单的介绍了内核futex机制，它是上层同步机制的基石。在PI Futex的介绍中，我们对rt mutex浅尝辄止，读者未能领略其全貌。后续我们会出一篇关于rt mutex的文章，敬请期待。
+
 # 参考文献：
 
 1、linux-5.10.61内核源代码
-2、linux-5.10.61\Documentation\locking\*
-
-  
+2、linux-5.10.61\\Documentation\\locking\*
 
 本文首发在“内核工匠”微信公众号，欢迎扫描以下二维码关注公众号获取最新Linux技术分享：
 
@@ -239,21 +250,21 @@ FUTEX_UNLOCK_PI的流程留给读者自行分析了。
 
 **评论：**
 
-**[顶点软件](http://ddboke.net/)**  
+**[顶点软件](http://ddboke.net/)**\
 2023-05-08 21:15
 
 你写得非常清晰明了，让我很容易理解你的观点。
 
 [回复](http://www.wowotech.net/kernel_synchronization/futex.html#comment-8782)
 
-**王**  
+**王**\
 2022-10-26 16:47
 
 不错，休闲刚好学习一下
 
 [回复](http://www.wowotech.net/kernel_synchronization/futex.html#comment-8693)
 
-**狗子**  
+**狗子**\
 2024-04-16 08:34
 
 @王：老铁 休息就别卷了 受不了
@@ -262,152 +273,155 @@ FUTEX_UNLOCK_PI的流程留给读者自行分析了。
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [eMMC 原理 1 ：Flash Memory 简介](http://www.wowotech.net/basic_tech/flash_memory_intro.html)
-    - [Linux kernel内存管理的基本概念](http://www.wowotech.net/memory_management/concept.html)
-    - [ARMv8之Observability](http://www.wowotech.net/armv8a_arch/Observability.html)
-    - [“极致”神话和产品观念](http://www.wowotech.net/tech_discuss/140.html)
-    - [X-014-KERNEL-ARM GIC driver的移植](http://www.wowotech.net/x_project/gic_driver_porting.html)
+
+  - [eMMC 原理 1 ：Flash Memory 简介](http://www.wowotech.net/basic_tech/flash_memory_intro.html)
+  - [Linux kernel内存管理的基本概念](http://www.wowotech.net/memory_management/concept.html)
+  - [ARMv8之Observability](http://www.wowotech.net/armv8a_arch/Observability.html)
+  - [“极致”神话和产品观念](http://www.wowotech.net/tech_discuss/140.html)
+  - [X-014-KERNEL-ARM GIC driver的移植](http://www.wowotech.net/x_project/gic_driver_porting.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

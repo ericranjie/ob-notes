@@ -2,9 +2,7 @@
 
 Original Mcgrady_wu OPPO内核工匠
 
- _2021年09月10日 17:00_
-
-  
+_2021年09月10日 17:00_
 
 **一、技术模块简介**
 
@@ -14,51 +12,31 @@ Dm-verity类型的目标设备有两个底层设备，一个是数据设备(data
 
 简单的架构图如下：
 
-  
-
 ![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjOGz8hI5WJKqy9FNqicb0cgmOrQ7kzTnzrYhg5CTJHadozRMhk2nDSD1NWrFPDjDuEzRnkSdV5UFPw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 图中映射设备(Mapper Device)和目标设备(Target Device)是一对一关系，对映射设备的读操作被映射成对目标设备的读操作，在目标设备中，dm-verity又将读操作映射为数据设备（Data Device）的读操作。但是在读操作的结束处，dm-verity加了一个额外的校验操作，对读到的数据计算一个hash值，用这个哈希值和存储在哈希设备(Hash Device)
-
-  
 
 **二、设计原理**
 
 对于本文要介绍的dm-verity功能模块，笔者选择在当前移动终端应用的角度来展开讲解，也就是Android平台在dm-verity的应用。
 
-  
-
 Android 端主要是在镜像启动时验证这个功能场景上使用到了 dm-verity 技术，该技术可以对块存储设备进行完整性检查，有助于阻止某些恶意程序对镜像的修改，有助于Android用户在启动设备时确认设备状态与上次使用时是否相同。在系统镜像(比如 system、vendor等)启动时以及运行时可以实时性监测当前镜像是否被篡改。
-
-  
 
 通过dm-verity技术，可以确认块设备内容是否跟预期一致，具体的实现原理是利用哈希树(hashtree)做到的。用以下图来形象说明
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (图来自：https://source.android.com/security/verifiedboot/dm-verity)
-
-  
 
 简单说明一下这个插图背后的原理：
 
 在编译阶段，首先会对系统镜像(比如system.img、vendor.img)按照每4k大小计算对应hash，将这些hash信息存起来，形成上面图中的layer 0层，紧接着会对 layer 0 层同样按照每4k大小计算hash，并将这层的hash信息存起来，形成layer 1层，以此类推，直至最后的hash信息存放在一个4k大小的块中(未填满使用0填充)，这里边存储的hash信息称为 root hash。
 
-  
-
 在运行阶段，对于镜像里的文件进行访问时，操作对应所在块设备的存储区域时，会计算当前存储块(按4k大小)的hash值，然后会跟存储在哈希树上对应块的hash值进行比较，如果匹配不上，则认为当前该文件在底层存储被篡改或是损坏了。
 
 为了更形象的描述下镜像运行时如何利用哈希树做校验的，下面以一个1G大小的镜像为例，来说明一下这个过程：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 根据 hashtree 的生成方式，以 1G 的镜像为例：
 
@@ -78,45 +56,25 @@ Android 端主要是在镜像启动时验证这个功能场景上使用到了 dm
 
 作为对比，哈希树机制是如何体现出效率呢，下面以具体某一块 raw data 数据块的读取过程来说明其设计原理：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 1）假设目前正需要读取第 200000 块的数据块，通过前面哈希树的构造，可以比较快速的计算出在 Level 0 层，也就是直接对应这个数据块的hash值存储位置，通过对 128 相除以及求余的方式就可以分别计算出该 hash 值存储在具体某一块(块A)以及这一块上的偏移(偏移A)。
 
-  
-
 2）确定了 Level 0 层的具体块A后，利用相同的方式可以得到 Level 0 块A在 Level 1 层存储其 hash 值的块B位置以及块B上的偏移(偏移B)
 
-  
-
 3）同上述原理，可以最终定位到 Level 1 层块 B 在 Level 2 上的数据块(只有一块)上偏移(偏移C)
-
-  
 
 4）在获取到该数据块对应hashtree关联的各个层级的块以及偏移后，接下来就是做一层一层的验证：
 
 步骤1. 优先验证的是Level 2 中的数据块(只有一个4k的数据块)， 计算这个数据块的hash，跟保存的 root hash进行比对，验证Level 2的数据块块是否正确。
 
-  
-
 步骤2. 在Level 2中的数据块得到验证后，由上面计算到的Level 2中数据块上的偏移 C 去校验 Level 1 层的 B 块。
-
-  
 
 步骤3. 在 Level 1 层的 B 数据块得到验证后，由上面计算到的 Level 1 中 B 数据块上的偏移B去验证 Level 0 层的 A块。
 
-  
-
 步骤4. Level 0层中的 A 数据块得到验证后，最终会由 Level 0 层的偏移A来校验最终的 raw data数据块(第 200000 块).
 
-  
-
 可以看到，在使用哈希树的设计之后，对数据块验证整个过程中，涉及到的数据块hash计算只有3块(有N层就计算N块)，相比于一层校验模式，效率要高很多。
-
-  
 
 **三、应用层面**
 
@@ -128,13 +86,9 @@ Android 端主要是在镜像启动时验证这个功能场景上使用到了 dm
 
 创建 dm 设备主要有如下小步骤：
 
-    1) open  /dev/device-mapper 设备节点
+1\) open  /dev/device-mapper 设备节点
 
-  
-
-    2) 传入逻辑分区name、随机生成的uuid参数，调用  DM_DEV_CREATE ioctl 命令
-
-  
+2\) 传入逻辑分区name、随机生成的uuid参数，调用  DM_DEV_CREATE ioctl 命令
 
 步骤二. Load verity table
 
@@ -162,19 +116,11 @@ Android 端主要是在镜像启动时验证这个功能场景上使用到了 dm
 
 这些信息主要是跟最终数据块在校验计算过程中会被使用到的，比如说 hash 设备的起始位置、hash算法、root hash、salt，这些都在实际运行时校验数据块时会用到，这些信息是存储是镜像的固定位置上，这些信息在编译阶段构建镜像的时候就已经计算好的，并存储在镜像的固定位置。
 
-  
-
 Verity table 初始化代码具体如下：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 上层通过从镜像固定位置获取到信息并初始化好 verity table， 通过调用DM_TABLE_LOAD
-
-  
 
 Ioctl 命令将 verity table 传递至kernel。
 
@@ -184,13 +130,9 @@ Ioctl 命令将 verity table 传递至kernel。
 
 应用端在实现上比较简单，主要通过 create -> load verity table -> active dm device 的流程完成了对dm设备的创建、verity table的读取以及传递以及dm设备的激活，为后续实时进行的数据块校验做好了初始化工作。
 
-  
-
 **四、内核层面**
 
 有了以上应用层面的流程讲解，那对应内核，自然而然就是对每一步应用端的系统调用做对应的内核实现做讲解。
-
-  
 
 相应的，内核层面也有以下3个步骤：
 
@@ -198,11 +140,7 @@ Ioctl 命令将 verity table 传递至kernel。
 
 对应应用端的DM_DEV_CREATE ioctl cmd，kernel端的大致实现如下：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这部分比较简单：
 
@@ -216,45 +154,25 @@ Ioctl 命令将 verity table 传递至kernel。
 
 对应应用端的DM_TABLE_LOAD ioctl cmd，kernel端的大致实现可看下面的思维导图：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 总的来说，这个步骤主要是根据入参初始化相应的dm_table、dm_target结构，并且根据参数所指定的target类型，调用相应的target类型的构建函数ctr在内存中构建target device， 在结构上形成 dm_table --> dm_target --> target type --> target device 的链路结构。
 
 步骤三. dm_ctl_ioctl(DM_DEV_SUSPEND_CMD(dev_suspend))
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 很显然，这一个步骤主要是建立 mapped device 与 dm_table 的关联。
 
-  
-
 通过以上几个步骤，在内核中就建立一个可以提供给用户使用的mapped device逻辑块设备
-
-  
 
 综上涉及到了几个关键的数据结构： mapped device、dm_table、dm_target、target_type、target device(以dm-verity为例)
 
-  
-
 其实这几个步骤主要是对上述数据结构进行初始化，并且更重要是互相建立了关联关系。他们之间的关联关系如下：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 内核经过了这3个步骤，一方面是创建了一个可以提供给应用端使用的 mapped device 逻辑块设备，另一方面是内部建立了 mapped device - target device 的联系， 应用层可以通过对 mapped device 进行策略逻辑操作，最终会通过 mapped device - target device 的联系作用到 对应的target device 上。
-
-  
 
 **五、核心数据流**
 
@@ -264,15 +182,9 @@ Ioctl 命令将 verity table 传递至kernel。
 
 在这个过程中， 对块设备的IO请求会从逻辑设备mapped device转发相应的target device上，并且会根据对应target_type描述的IO处理规则对IO请求进行处理。以本文讨论的 dm-verity 类型的 target device 来说，对于 mapped device 转发过来的IO，会在 hashtree 里找到该 IO data 对应的 hash 数据，并进行比较，完成校验，返回此次的校验结果并结束本次IO请求。
 
-  
-
 **六、总结与回顾**
 
 本文从设计原理并结合例子出发，呈现了 dm-verity 在设计层面的实现效果，能让读者能简单、直白的了解原理核心所在，紧接着对应用层的 Ioctl 指令、kernel对应的实现细节的解读，搭建了一套用来支撑上述设计原理的软件结构，最后通过核心数据IO流的流转方式的描述，结合上述搭建的软件结构来反映了 dm-verity 设计原理的最终实现。
-
-  
-
-  
 
 参考资料：
 
@@ -280,22 +192,13 @@ Ioctl 命令将 verity table 传递至kernel。
 
 2. https://source.android.com/security/verifiedboot
 
-  
-
-  
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **长按关注**
 
 **内核工匠微信**
 
-  
-
 Linux 内核黑科技 | 技术文章 | 精选教程
-
-  
-
-  
 
 Reads 1984
 

@@ -24,7 +24,7 @@
 |int overload|该root domain是否处于overload状态|
 |int overutilized|该root domain是否处于overutilized状态|
 |unsigned long max_cpu_capacity;|该root domain内CPU的最大算力|
-|struct perf_domain __rcu *pd|该root domain的perf domain链表。通过cpu的runqueue我们可以获取该cpu对应的root domain，从而可以获取到整个root domain的性能域链表。|
+|struct perf_domain \_\_rcu \*pd|该root domain的perf domain链表。通过cpu的runqueue我们可以获取该cpu对应的root domain，从而可以获取到整个root domain的性能域链表。|
 
 这里需要澄清一下overload和overutilized这两个概念，对于一个CPU而言，其处于overload状态则说明其runqueue上有大于等于2个任务，或者虽然只有一个任务，但是是misfit task。对于一个CPU而言，其处于overutilized状态说明：该cpu的utility超过其capacity（缺省预留20%的算力，另外，这里的capacity是用于cfs任务的算力）。在单个cpu overload/overutilized基础上，我们定义root domain（即整个系统）的overload和overutilized。对于root domain，overload表示至少有一个cpu处于overload状态。overutilized表示至少有一个cpu处于overutilized状态。overutilized状态非常重要，它决定了调度器是否启用EAS，只有在系统没有overutilized的情况下，EAS才会生效。Overload和newidle balance的频次控制相关，当系统在overload的情况下，newidle balance才会启动进行均衡。
 
@@ -37,8 +37,8 @@ Struct perf_comain表示一个CPU性能域，perf_comain和cpufreq policy是一�
 |   |   |
 |---|---|
 |成员|描述|
-|struct em_perf_domain *em_pd|EM performance domain|
-|struct perf_domain *next|系统中的perf domain会形成链表，这里指向下一个perf domain|
+|struct em_perf_domain \*em_pd|EM performance domain|
+|struct perf_domain \*next|系统中的perf domain会形成链表，这里指向下一个perf domain|
 |struct rcu_head rcu|保护perf domain list的rcu|
 
 4、struct em_perf_domain
@@ -48,9 +48,9 @@ Struct perf_comain表示一个CPU性能域，perf_comain和cpufreq policy是一�
 |   |   |
 |---|---|
 |成员|描述|
-|struct em_perf_state *table|perf states表，记录了各个performance level的频率、能耗信息。|
+|struct em_perf_state \*table|perf states表，记录了各个performance level的频率、能耗信息。|
 |int nr_perf_states|该perf domain支持多少个perf states，即上面perf states表格的条目数|
-|unsigned long cpus[]|该性能域包括哪些cpu？|
+|unsigned long cpus\[\]|该性能域包括哪些cpu？|
 
 5、struct em_perf_state
 
@@ -141,7 +141,7 @@ E、判断本次唤醒是否想要wake affine（即wakee task靠近waker所在�
 
 |   |
 |---|
-|for_each_domain(cpu, tmp) {---------A<br><br>    if (want_affine && (tmp->flags & SD_WAKE_AFFINE) &&<br><br>      cpumask_test_cpu(prev_cpu, sched_domain_span(tmp))) {----------B<br><br>        if (cpu != prev_cpu)<br><br>            new_cpu = wake_affine(tmp, p, cpu, prev_cpu, sync);<br><br>        sd = NULL; /* Prefer wake_affine over balance flags */<br><br>        break;<br><br>    }<br><br>    if (tmp->flags & sd_flag)-------C<br><br>        sd = tmp;<br><br>    else if (!want_affine)<br><br>        break;<br><br>}|
+|for_each_domain(cpu, tmp) {---------A<br><br>    if (want_affine && (tmp->flags & SD_WAKE_AFFINE) &&<br><br>      cpumask_test_cpu(prev_cpu, sched_domain_span(tmp))) {----------B<br><br>        if (cpu != prev_cpu)<br><br>            new_cpu = wake_affine(tmp, p, cpu, prev_cpu, sync);<br><br>        sd = NULL; /\* Prefer wake_affine over balance flags \*/<br><br>        break;<br><br>    }<br><br>    if (tmp->flags & sd_flag)-------C<br><br>        sd = tmp;<br><br>    else if (!want_affine)<br><br>        break;<br><br>}|
 
 A、从当前cpu（waker所在的cpu）所在的base sched domain，自下而上，寻找合适的sched domain，从而确定任务放置的范围。
 
@@ -153,7 +153,7 @@ C、对于non wake affine场景，我们一样也是需要自下而上遍历sd�
 
 |   |
 |---|
-|if (unlikely(sd)) {/* Slow path */--------A<br><br>    new_cpu = find_idlest_cpu(sd, p, cpu, prev_cpu, sd_flag);<br><br>} else if (sd_flag & SD_BALANCE_WAKE) {/* Fast path */ ---------B<br><br>    new_cpu = select_idle_sibling(p, prev_cpu, new_cpu);<br><br>    if (want_affine)<br><br>        current->recent_used_cpu = cpu;<br><br>}|
+|if (unlikely(sd)) {/\* Slow path */--------A<br><br>    new_cpu = find_idlest_cpu(sd, p, cpu, prev_cpu, sd_flag);<br><br>} else if (sd_flag & SD_BALANCE_WAKE) {/* Fast path \*/ ---------B<br><br>    new_cpu = select_idle_sibling(p, prev_cpu, new_cpu);<br><br>    if (want_affine)<br><br>        current->recent_used_cpu = cpu;<br><br>}|
 
 A、慢速选核路径，需要在选定的sched domain中寻找最空闲的group，然后在最空闲的group中选择最空闲的cpu。然后继续在下层sched domain重复上面的过程，最终选择一个空闲CPU并把任务p放置在这个最空闲的CPU上。
 
@@ -175,13 +175,13 @@ Overutilized主要用来切换EAS调度器还是传统调度器。如果系统�
 
 |   |
 |---|
-|struct root_domain *rd = cpu_rq(smp_processor_id())->rd;<br><br>rcu_read_lock();<br><br>pd = rcu_dereference(rd->pd);<br><br>if (!pd \| READ_ONCE(rd->overutilized))<br><br>    goto fail;|
+|struct root_domain \*rd = cpu_rq(smp_processor_id())->rd;<br><br>rcu_read_lock();<br><br>pd = rcu_dereference(rd->pd);<br><br>if (!pd | READ_ONCE(rd->overutilized))<br><br>    goto fail;|
 
 EAS的选核逻辑是先确定一个sched domain，然后从sched domain中选择一个能效比高的CPU，具体选择sched domain的方式如下：
 
 |   |
 |---|
-|sd = rcu_dereference(*this_cpu_ptr(&sd_asym_cpucapacity));<br><br>while (sd && !cpumask_test_cpu(prev_cpu, sched_domain_span(sd)))<br><br>    sd = sd->parent;|
+|sd = rcu_dereference(\*this_cpu_ptr(&sd_asym_cpucapacity));<br><br>while (sd && !cpumask_test_cpu(prev_cpu, sched_domain_span(sd)))<br><br>    sd = sd->parent;|
 
 从最低level的，并且包括不同算力CPU的domain开始向上搜索，直到该domain覆盖了this cpu和prev cpu为止。对于手机平台一般找到的就是Die domain。之所以要求包括异构CPU的domain是因为同构的cpu不需要EAS，不会有功耗的节省。
 
@@ -197,7 +197,7 @@ EAS最核心的代码如下：
 
 |   |
 |---|
-|for (; pd; pd = pd->next) {<br><br>    base_energy_pd = compute_energy(p, -1, pd);-----A<br><br>    base_energy += base_energy_pd;<br><br>    for_each_cpu_and(cpu, perf_domain_span(pd), sched_domain_span(sd)) {<br><br>        util = cpu_util_next(cpu, p, cpu);-------------B<br><br>        cpu_cap = capacity_of(cpu);<br><br>        spare_cap = cpu_cap;<br><br>        lsub_positive(&spare_cap, util);<br><br>        util = uclamp_rq_util_with(cpu_rq(cpu), util, p);<br><br>        if (!fits_capacity(util, cpu_cap))---------------C<br><br>            continue;<br><br>        if (cpu == prev_cpu) {----------------------D<br><br>            prev_delta = compute_energy(p, prev_cpu, pd);<br><br>            prev_delta -= base_energy_pd;<br><br>            best_delta = min(best_delta, prev_delta);<br><br>        }<br><br>        if (spare_cap > max_spare_cap) {--------E<br><br>            max_spare_cap = spare_cap;<br><br>            max_spare_cap_cpu = cpu;<br><br>        }<br><br>    }<br><br>    if (max_spare_cap_cpu >= 0 && max_spare_cap_cpu != prev_cpu) {------F<br><br>        cur_delta = compute_energy(p, max_spare_cap_cpu, pd);<br><br>        cur_delta -= base_energy_pd;<br><br>        if (cur_delta < best_delta) {<br><br>            best_delta = cur_delta;<br><br>            best_energy_cpu = max_spare_cap_cpu;<br><br>        }<br><br>    }<br><br>}|
+|for (; pd; pd = pd->next) {<br><br>    base_energy_pd = compute_energy(p, -1, pd);-----A<br><br>    base_energy += base_energy_pd;<br><br>    for_each_cpu_and(cpu, perf_domain_span(pd), sched_domain_span(sd)) {<br><br>        util = cpu_util_next(cpu, p, cpu);-------------B<br><br>        cpu_cap = capacity_of(cpu);<br><br>        spare_cap = cpu_cap;<br><br>        lsub_positive(&spare_cap, util);<br><br>        util = uclamp_rq_util_with(cpu_rq(cpu), util, p);<br><br>        if (!fits_capacity(util, cpu_cap))---------------C<br><br>            continue;<br><br>        if (cpu == prev_cpu) {----------------------D<br><br>            prev_delta = compute_energy(p, prev_cpu, pd);<br><br>            prev_delta -= base_energy_pd;<br><br>            best_delta = min(best_delta, prev_delta);<br><br>        }<br><br>        if (spare_cap > max_spare_cap) {--------E<br><br>            max_spare_cap = spare_cap;<br><br>            max_spare_cap_cpu = cpu;<br><br>        }<br><br>    }<br><br>    if (max_spare_cap_cpu >= 0 && max_spare_cap_cpu != prev_cpu) {------F<br><br>        cur_delta = compute_energy(p, max_spare_cap_cpu, pd);<br><br>        cur_delta -= base_energy_pd;<br><br>        if (cur_delta \< best_delta) {<br><br>            best_delta = cur_delta;<br><br>            best_energy_cpu = max_spare_cap_cpu;<br><br>        }<br><br>    }<br><br>}|
 
 A、计算本performance domain的基础能量消耗，即未放置任务p的能耗（base_energy_pd）。同时这里会累计各个pd的能耗（base_energy），也就是整个cpu系统消耗的能量。
 
@@ -219,13 +219,13 @@ compute_energy函数原型如下：
 
 |   |
 |---|
-|static long compute_energy(struct task_struct *p, int dst_cpu, struct perf_domain *pd)|
+|static long compute_energy(struct task_struct \*p, int dst_cpu, struct perf_domain \*pd)|
 
 该函数主要用来计算当任务p放置到dst_cpu的时候，pd所在的perf domain会消耗多少能量。任务p放置到dst cpu的时候，这会影响pd所在的perf domain中各个CPU的utility，进而会驱动cpufreq进行频率调整。计算能量的时候，我们必须预测可能的调频，并通过这些utility可以估计该perf domain的能耗（任务放置在dst cpu之后）。详细的代码逻辑如下：
 
 |   |
 |---|
-|for_each_cpu_and(cpu, pd_mask, cpu_online_mask) {<br><br>    unsigned long cpu_util, util_cfs = cpu_util_next(cpu, p, dst_cpu);---------A<br><br>    struct task_struct *tsk = cpu == dst_cpu ? p : NULL;<br><br>    sum_util += schedutil_cpu_util(cpu, util_cfs, cpu_cap,<br><br>       ENERGY_UTIL, NULL);--------------B<br><br>    cpu_util = schedutil_cpu_util(cpu, util_cfs, cpu_cap,<br><br>      FREQUENCY_UTIL, tsk);-----------C<br><br>    max_util = max(max_util, cpu_util);---------------D<br><br>}<br><br>return em_cpu_energy(pd->em_pd, max_util, sum_util);-----E|
+|for_each_cpu_and(cpu, pd_mask, cpu_online_mask) {<br><br>    unsigned long cpu_util, util_cfs = cpu_util_next(cpu, p, dst_cpu);---------A<br><br>    struct task_struct \*tsk = cpu == dst_cpu ? p : NULL;<br><br>    sum_util += schedutil_cpu_util(cpu, util_cfs, cpu_cap,<br><br>       ENERGY_UTIL, NULL);--------------B<br><br>    cpu_util = schedutil_cpu_util(cpu, util_cfs, cpu_cap,<br><br>      FREQUENCY_UTIL, tsk);-----------C<br><br>    max_util = max(max_util, cpu_util);---------------D<br><br>}<br><br>return em_cpu_energy(pd->em_pd, max_util, sum_util);-----E|
 
 整个能量计算分成两个部分，首先遍历perf domain上的cpu，累计整个perf domain中的cpu utility总和。此外，还要记录最大cpu utility（推测运行频率）。完成sum_util和max_util之后调用em_cpu_energy即可。
 
@@ -248,7 +248,7 @@ task_struct中有三个成员用来记录被唤醒线程（wakee）的信息，�
 |成员|描述|
 |unsigned int wakee_flips|该线程唤醒不同wakee的次数。wakee_flips数值较大，则说明该该线程唤醒多个不同的任务。并且数值越大，说明唤醒的频率越快|
 |unsigned long wakee_flip_decay_ts|wakee_flips会随时间衰减，这里定义了上次进行衰减的时间点|
-|struct task_struct *last_wakee|该线程上次唤醒的线程|
+|struct task_struct \*last_wakee|该线程上次唤醒的线程|
 
 每次waker唤醒wakee的时候都会调用record_wakee来更新上面的成员，具体代码如下：
 
@@ -270,7 +270,7 @@ Waker唤醒wakee的场景中，有两种placement思路：一种是聚合的思�
 
 |   |
 |---|
-|unsigned int master = current->wakee_flips;---------A<br><br>unsigned int slave = p->wakee_flips;<br><br>int factor = __this_cpu_read(sd_llc_size);-------------B<br><br>if (master < slave)<br><br>    swap(master, slave);-------------C<br><br>if (slave < factor \| master < slave * factor)--------D<br><br>    return 0;------waker和wakee需要靠近<br><br>return 1;|
+|unsigned int master = current->wakee_flips;---------A<br><br>unsigned int slave = p->wakee_flips;<br><br>int factor = \_\_this_cpu_read(sd_llc_size);-------------B<br><br>if (master \< slave)<br><br>    swap(master, slave);-------------C<br><br>if (slave \< factor | master \< slave * factor)--------D<br><br>    return 0;------waker和wakee需要靠近<br><br>return 1;|
 
 A、这里的场景是current task唤醒任务p的场景，master是current唤醒不同线程的次数，slave是被唤醒的任务p唤醒不同线程的次数。
 
@@ -296,7 +296,7 @@ B、当根据idle状态无法完成选核的时候，我们会比拼this cpu和p
 
 |   |
 |---|
-|if (static_branch_unlikely(&sched_asym_cpucapacity)) {----A<br><br>    sync_entity_load_avg(&p->se);<br><br>    task_util = uclamp_task_util(p);<br><br>}<br><br>if ((available_idle_cpu(target) \| sched_idle_cpu(target)) &&<br><br>    asym_fits_capacity(task_util, target))-------B<br><br>    return target;|
+|if (static_branch_unlikely(&sched_asym_cpucapacity)) {----A<br><br>    sync_entity_load_avg(&p->se);<br><br>    task_util = uclamp_task_util(p);<br><br>}<br><br>if ((available_idle_cpu(target) | sched_idle_cpu(target)) &&<br><br>    asym_fits_capacity(task_util, target))-------B<br><br>    return target;|
 
 A、在异构系统中，我们后面的代码逻辑需要使用该任务的utility，看看是否能够适合CPU的算力，因此，这里需要进行一个负载更新动作，主要是衰减阻塞这段时间的负载。
 
@@ -306,7 +306,7 @@ B、如果之前选定的target cpu（waker所在的cpu或者任务prev cpu）�
 
 |   |
 |---|
-|if (prev != target && cpus_share_cache(prev, target) &&<br><br>    (available_idle_cpu(prev) \| sched_idle_cpu(prev)) &&<br><br>    asym_fits_capacity(task_util, prev))-----------A<br><br>       return prev;<br><br>if (is_per_cpu_kthread(current) &&<br><br>    prev == smp_processor_id() &&<br><br>    this_rq()->nr_running <= 1) {-----------------B<br><br>      return prev;<br><br>}|
+|if (prev != target && cpus_share_cache(prev, target) &&<br><br>    (available_idle_cpu(prev) | sched_idle_cpu(prev)) &&<br><br>    asym_fits_capacity(task_util, prev))-----------A<br><br>       return prev;<br><br>if (is_per_cpu_kthread(current) &&<br><br>    prev == smp_processor_id() &&<br><br>    this_rq()->nr_running \<= 1) {-----------------B<br><br>      return prev;<br><br>}|
 
 A、如果prev cpu是idle状态（包括runqueue上仅SCHED_IDLE的任务），并且prev cpu算力能承接该任务的utili，同时prev和target cpu在一个LLC domain，那么优选prev cpu
 
@@ -316,7 +316,7 @@ B、当waker是一个per cpu的kthread线程的时候，在wakee的prev cpu也�
 
 |   |
 |---|
-|recent_used_cpu = p->recent_used_cpu;<br><br>if (recent_used_cpu != prev &&<br><br>    recent_used_cpu != target &&<br><br>    cpus_share_cache(recent_used_cpu, target) &&<br><br>    (available_idle_cpu(recent_used_cpu) \| sched_idle_cpu(recent_used_cpu)) &&<br><br>    cpumask_test_cpu(p->recent_used_cpu, p->cpus_ptr) &&<br><br>    asym_fits_capacity(task_util, recent_used_cpu)) {<br><br>        p->recent_used_cpu = prev;<br><br>        return recent_used_cpu;<br><br>}|
+|recent_used_cpu = p->recent_used_cpu;<br><br>if (recent_used_cpu != prev &&<br><br>    recent_used_cpu != target &&<br><br>    cpus_share_cache(recent_used_cpu, target) &&<br><br>    (available_idle_cpu(recent_used_cpu) | sched_idle_cpu(recent_used_cpu)) &&<br><br>    cpumask_test_cpu(p->recent_used_cpu, p->cpus_ptr) &&<br><br>    asym_fits_capacity(task_util, recent_used_cpu)) {<br><br>        p->recent_used_cpu = prev;<br><br>        return recent_used_cpu;<br><br>}|
 
 我们假设有这样的一个场景，任务A和任务B互相唤醒，如果没有这段代码，选核如下：
 
@@ -340,7 +340,7 @@ B、当waker是一个per cpu的kthread线程的时候，在wakee的prev cpu也�
 
 |   |
 |---|
-|if (static_branch_unlikely(&sched_asym_cpucapacity)) {<br><br>    sd = rcu_dereference(per_cpu(sd_asym_cpucapacity, target));<br><br>    if (sd) {<br><br>        i = select_idle_capacity(p, sd, target);<br><br>        return ((unsigned)i < nr_cpumask_bits) ? i : target;<br><br>   }<br><br>}|
+|if (static_branch_unlikely(&sched_asym_cpucapacity)) {<br><br>    sd = rcu_dereference(per_cpu(sd_asym_cpucapacity, target));<br><br>    if (sd) {<br><br>        i = select_idle_capacity(p, sd, target);<br><br>        return ((unsigned)i \< nr_cpumask_bits) ? i : target;<br><br>   }<br><br>}|
 
 通过select_idle_capacity我们在DIE domain寻找第一个能够承载该任务的idle cpu，如果虽然找到idle cpu，但是cpu capacity不足，这种情况下，我们返回算力最大的CPU即可。如果找不到idle cpu，那么选择之前选择的target cpu。
 
@@ -348,7 +348,7 @@ B、当waker是一个per cpu的kthread线程的时候，在wakee的prev cpu也�
 
 |   |
 |---|
-|sd = rcu_dereference(per_cpu(sd_llc, target));<br><br>i = select_idle_cpu(p, sd, target);<br><br>if ((unsigned)i < nr_cpumask_bits)<br><br>    return i;|
+|sd = rcu_dereference(per_cpu(sd_llc, target));<br><br>i = select_idle_cpu(p, sd, target);<br><br>if ((unsigned)i \< nr_cpumask_bits)<br><br>    return i;|
 
 select_idle_cpu逻辑比较简单，就是从LLC domain中找到第一个idle的cpu。为了防止不必要的scan开销，在扫描之前需要对比该cpu rq的平均idle时间和扫描开销，如果扫描开销相对于平均idle时间太大，那么就不再进行扫描。
 
@@ -360,7 +360,7 @@ select_idle_cpu逻辑比较简单，就是从LLC domain中找到第一个idle的
 
 |   |
 |---|
-|int find_idlest_cpu(struct sched_domain *sd, struct task_struct *p,<br><br>  int cpu, int prev_cpu, int sd_flag)|
+|int find_idlest_cpu(struct sched_domain \*sd, struct task_struct \*p,<br><br>  int cpu, int prev_cpu, int sd_flag)|
 
 该函数的参数以及返回值解释如下：
 
@@ -388,7 +388,7 @@ B、由于后续需要进行cpu util的比拼，不同的选核会导致任务p 
 
 |   |
 |---|
-|while (sd) {---------------A<br><br>    group = find_idlest_group(sd, p, cpu);------------B<br><br>    if (!group) {<br><br>        sd = sd->child; continue;<br><br>    }<br><br>    new_cpu = find_idlest_group_cpu(group, p, cpu);--------C<br><br>    if (new_cpu == cpu) {<br><br>        sd = sd->child; continue;<br><br>    }<br><br>    cpu = new_cpu;<br><br>    weight = sd->span_weight;<br><br>    sd = NULL;<br><br>    for_each_domain(cpu, tmp) {---------------D<br><br>        if (weight <= tmp->span_weight)<br><br>            break;<br><br>        if (tmp->flags & sd_flag)<br><br>            sd = tmp;<br><br>    }<br><br>}|
+|while (sd) {---------------A<br><br>    group = find_idlest_group(sd, p, cpu);------------B<br><br>    if (!group) {<br><br>        sd = sd->child; continue;<br><br>    }<br><br>    new_cpu = find_idlest_group_cpu(group, p, cpu);--------C<br><br>    if (new_cpu == cpu) {<br><br>        sd = sd->child; continue;<br><br>    }<br><br>    cpu = new_cpu;<br><br>    weight = sd->span_weight;<br><br>    sd = NULL;<br><br>    for_each_domain(cpu, tmp) {---------------D<br><br>        if (weight \<= tmp->span_weight)<br><br>            break;<br><br>        if (tmp->flags & sd_flag)<br><br>            sd = tmp;<br><br>    }<br><br>}|
 
 A、Task placement也是均衡中的一个环节，而均衡是一个层层递进的过程：从指定的sched domain为起点，遍历其child sched domain，直到base domain。
 
@@ -404,7 +404,7 @@ find_idlest_group的代码逻辑主要分成两个部分：第一部分是更新
 
 |   |
 |---|
-|do {<br><br>    int local_group;<br><br>    if (!cpumask_intersects(sched_group_span(group), p->cpus_ptr))<br><br>        continue;------------------A<br><br>    local_group = cpumask_test_cpu(this_cpu, ---------------B<br><br>       sched_group_span(group));<br><br>    if (local_group) {<br><br>        sgs = &local_sgs; local = group;<br><br>    } else sgs = &tmp_sgs;<br><br>    update_sg_wakeup_stats(sd, group, sgs, p);--------C<br><br>    if (!local_group && update_pick_idlest(idlest, &idlest_sgs, group, sgs)) {<br><br>        idlest = group;<br><br>        idlest_sgs = *sgs;<br><br>    }--------------------------D<br><br>} while (group = group->next, group != sd->groups);|
+|do {<br><br>    int local_group;<br><br>    if (!cpumask_intersects(sched_group_span(group), p->cpus_ptr))<br><br>        continue;------------------A<br><br>    local_group = cpumask_test_cpu(this_cpu, ---------------B<br><br>       sched_group_span(group));<br><br>    if (local_group) {<br><br>        sgs = &local_sgs; local = group;<br><br>    } else sgs = &tmp_sgs;<br><br>    update_sg_wakeup_stats(sd, group, sgs, p);--------C<br><br>    if (!local_group && update_pick_idlest(idlest, &idlest_sgs, group, sgs)) {<br><br>        idlest = group;<br><br>        idlest_sgs = \*sgs;<br><br>    }--------------------------D<br><br>} while (group = group->next, group != sd->groups);|
 
 A、任务至少要能在该group中的一个cpu上运行，否则就不考虑该group
 
@@ -440,7 +440,7 @@ find_idlest_group_cpu的基本逻辑过程如下：
 
 1、内核源代码
 
-2、linux-5.10.61/Documentation/scheduler/*
+2、linux-5.10.61/Documentation/scheduler/\*
 
 3、linux-5.10.61/Documentation/power/ energy-model.rst
 
@@ -456,152 +456,155 @@ find_idlest_group_cpu的基本逻辑过程如下：
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [ARM CPU性能实验](http://www.wowotech.net/arm-performance-test.html)
-    - [Linux PM domain framework(1)_概述和使用流程](http://www.wowotech.net/pm_subsystem/pm_domain_overview.html)
-    - [schedutil governor情景分析](http://www.wowotech.net/process_management/schedutil_governor.html)
-    - [Linux kernel内核配置解析(1)_概述(基于ARM64架构)](http://www.wowotech.net/linux_kenrel/kernel_config_overview.html)
-    - [以太网驱动的流程浅析(三)-ifconfig的-19错误最底层分析](http://www.wowotech.net/linux_kenrel/465.html)
+
+  - [ARM CPU性能实验](http://www.wowotech.net/arm-performance-test.html)
+  - [Linux PM domain framework(1)\_概述和使用流程](http://www.wowotech.net/pm_subsystem/pm_domain_overview.html)
+  - [schedutil governor情景分析](http://www.wowotech.net/process_management/schedutil_governor.html)
+  - [Linux kernel内核配置解析(1)\_概述(基于ARM64架构)](http://www.wowotech.net/linux_kenrel/kernel_config_overview.html)
+  - [以太网驱动的流程浅析(三)-ifconfig的-19错误最底层分析](http://www.wowotech.net/linux_kenrel/465.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

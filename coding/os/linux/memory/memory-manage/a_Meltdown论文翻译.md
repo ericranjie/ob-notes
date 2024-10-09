@@ -1,9 +1,11 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-1-19 20:18 分类：[基础学科](http://www.wowotech.net/sort/basic_subject)
+
 # 摘要（Abstract）
 
-The security of computer systems fundamentally relies on memory isolation, e.g., kernel address ranges are marked as non-accessible and are protected from user access. In this paper, we present Meltdown. Meltdown exploits side effects of out-of-order execution on modern processors to read arbitrary kernel-memory locations including personal data and passwords. Out-of-order execution is an indispensable performance feature and present in a wide range of modern processors. The attack is independent of the operating system, and it does not rely on any software vulnerabilities. Meltdown breaks all security assumptions given by address space isolation as well as paravirtualized environments and, thus, every security mechanism building upon this foundation. On affected systems, Meltdown enables an adversary to read memory of other processes or virtual machines in the cloud without any permissions or privileges, affecting millions of customers and virtually every user of a personal computer. We show that the KAISER defense mechanism for KASLR [8] has the important (but inadvertent) side effect of impeding Meltdown. We stress that KAISER must be deployed immediately to prevent large-scale exploitation of this severe information leakage.
+The security of computer systems fundamentally relies on memory isolation, e.g., kernel address ranges are marked as non-accessible and are protected from user access. In this paper, we present Meltdown. Meltdown exploits side effects of out-of-order execution on modern processors to read arbitrary kernel-memory locations including personal data and passwords. Out-of-order execution is an indispensable performance feature and present in a wide range of modern processors. The attack is independent of the operating system, and it does not rely on any software vulnerabilities. Meltdown breaks all security assumptions given by address space isolation as well as paravirtualized environments and, thus, every security mechanism building upon this foundation. On affected systems, Meltdown enables an adversary to read memory of other processes or virtual machines in the cloud without any permissions or privileges, affecting millions of customers and virtually every user of a personal computer. We show that the KAISER defense mechanism for KASLR \[8\] has the important (but inadvertent) side effect of impeding Meltdown. We stress that KAISER must be deployed immediately to prevent large-scale exploitation of this severe information leakage.
 
 内存隔离是计算机系统安全的基础，例如：内核空间的地址段往往是标记为受保护的，用户态程序读写内核地址则会触发异常，从而阻止其访问。在这篇文章中，我们会详细描述这个叫Meltdown的硬件漏洞。Meltdown是利用了现代处理器上乱序执行（out-of-order execution）的副作用（side effect），使得用户态程序也可以读出内核空间的数据，包括个人私有数据和密码。由于可以提高性能，现代处理器广泛采用了乱序执行特性。利用Meltdown进行攻击的方法和操作系统无关，也不依赖于软件的漏洞。地址空间隔离带来的安全保证被Meltdown给无情的打碎了（半虚拟化环境也是如此），因此，所有基于地址空间隔离的安全机制都不再安全了。在受影响的系统中，Meltdown可以让一个攻击者读取其他进程的数据，或者读取云服务器中其他虚拟机的数据，而不需要相应的权限。这份文档也说明了KAISER（本意是解决KASLR不能解决的问题）可以防止Meltdown攻击。因此，我们强烈建议必须立即部署KAISER，以防止大规模、严重的信息泄漏。
+
 # 一、简介（Introduction）
 
 One of the central security features of today’s operating systems is memory isolation. Operating systems ensure that user applications cannot access each other’s memories and prevent user applications from reading or writing kernel memory. This isolation is a cornerstone of our computing environments and allows running multiple applications on personal devices or executing processes of multiple users on a single machine in the cloud.
@@ -20,9 +22,9 @@ While side-channel attacks typically require very specific knowledge about the t
 
 在这项工作中，我们提出了利用meltdown漏洞进行攻击的一种全新的方法，通过这种方法，任何用户进程都可以攻破操作系统对地址空间的隔离，通过一种简单的方法读取内核空间的数据，这里就包括映射到内核地址空间的所有的物理内存。Meltdown并不利用任何的软件的漏洞，也就是说它对任何一种操作系统都是有效的。相反，它是利用大多数现代处理器（例如2010年以后的Intel微架构（microarchitectural），其他CPU厂商也可能潜伏这样的问题）上的侧信道（side-channel）信息来发起攻击。一般的侧信道攻击（side-channel attack）都需要直到攻击目标的详细信息，然后根据这些信息指定具体的攻击方法，从而获取秘密数据。Meltdown攻击方法则不然，它可以dump整个内核地址空间的数据（包括全部映射到内核地址空间的物理内存）。Meltdown攻击力度非常很大，其根本原因是利用了乱序执行的副作用（side effect）。
 
-Out-of-order execution is an important performance feature of today’s processors in order to overcome latencies of busy execution units, e.g., a memory fetch unit needs to wait for data arrival from memory. Instead of stalling the execution, modern processors run operations out-of-order i.e., they look ahead and schedule subsequent operations to idle execution units of the processor. However, such operations often have unwanted side-effects, e.g., timing differences [28, 35, 11] can leak information from both sequential and out-of-order execution.
+Out-of-order execution is an important performance feature of today’s processors in order to overcome latencies of busy execution units, e.g., a memory fetch unit needs to wait for data arrival from memory. Instead of stalling the execution, modern processors run operations out-of-order i.e., they look ahead and schedule subsequent operations to idle execution units of the processor. However, such operations often have unwanted side-effects, e.g., timing differences \[28, 35, 11\] can leak information from both sequential and out-of-order execution.
 
-有时候CPU执行单元在执行的时候会需要等待操作结果，例如加载内存数据到寄存器这样的操作。为了提高性能，CPU并不是进入stall状态，而是采用了乱序执行的方法，继续处理后续指令并调度该指令去空闲的执行单元去执行。然而，这种操作常常有不必要的副作用，而通过这些执行指令时候的副作用，例如时序方面的差异[ 28, 35, 11 ]，我们可以窃取到相关的信息。
+有时候CPU执行单元在执行的时候会需要等待操作结果，例如加载内存数据到寄存器这样的操作。为了提高性能，CPU并不是进入stall状态，而是采用了乱序执行的方法，继续处理后续指令并调度该指令去空闲的执行单元去执行。然而，这种操作常常有不必要的副作用，而通过这些执行指令时候的副作用，例如时序方面的差异\[ 28, 35, 11 \]，我们可以窃取到相关的信息。
 
 From a security perspective, one observation is particularly significant: Out-of-order; vulnerable CPUs allow an unprivileged process to load data from a privileged (kernel or physical) address into a temporary CPU register. Moreover, the CPU even performs further computations based on this register value, e.g., access to an array based on the register value. The processor ensures correct program execution, by simply discarding the results of the memory lookups (e.g., the modified register states), if it turns out that an instruction should not have been executed. Hence, on the architectural level (e.g., the abstract definition of how the processor should perform computations), no security problem arises.
 
@@ -36,18 +38,18 @@ Meltdown breaks all security assumptions given by the CPU’s memory isolation c
 
 CPU苦心经营的内核隔离能力被Meltdown轻而易举的击破了。我们对现代台式机、笔记本电脑以及云服务器进行了攻击，并发现在Linux和OS X这样的系统中，meltdown可以让用户进程dump所有的物理内存（由于全部物理内存被映射到了内核地址空间）。而在Window系统中，meltdown可以让用户进程dump大部分的物理内存。这些物理内存可能包括其他进程的数据或者内核的数据。在共享内核的沙箱（sandbox）解决方案（例如Docker，LXC）或者半虚拟化模式的Xen中，dump的物理内存数据也包括了内核（即hypervisor）以及其他的guest OS的数据。根据系统的不同（例如处理器速度、TLB和高速缓存的大小，和DRAM的速度），dump内存的速度可以高达503kB／S。因此，Meltdown的影响是非常广泛的。
 
-The countermeasure KAISER [8], originally developed to prevent side-channel attacks targeting KASLR, inadvertently protects against Meltdown as well. Our evaluation shows that KAISER prevents Meltdown to a large extent. Consequently, we stress that it is of utmost importance to deploy KAISER on all operating systems immediately. Fortunately, during a responsible disclosure window, the three major operating systems (Windows, Linux, and OS X) implemented variants of KAISER and will roll out these patches in the near future.
+The countermeasure KAISER \[8\], originally developed to prevent side-channel attacks targeting KASLR, inadvertently protects against Meltdown as well. Our evaluation shows that KAISER prevents Meltdown to a large extent. Consequently, we stress that it is of utmost importance to deploy KAISER on all operating systems immediately. Fortunately, during a responsible disclosure window, the three major operating systems (Windows, Linux, and OS X) implemented variants of KAISER and will roll out these patches in the near future.
 
-我们提出的对策是KAISER[ 8 ]，KAISER最初是为了防止针对KASLR的侧信道攻击，不过无意中也意外的解决了Meltdown漏洞。我们的评估表明，KAISER在很大程度上防止了Meltdown，因此，我们强烈建议在所有操作系统上立即部署KAISER。幸运的是，三大操作系统（Windows、Linux和OS X）都已经实现了KAISER变种，并会在不久的将来推出这些补丁。
+我们提出的对策是KAISER\[ 8 \]，KAISER最初是为了防止针对KASLR的侧信道攻击，不过无意中也意外的解决了Meltdown漏洞。我们的评估表明，KAISER在很大程度上防止了Meltdown，因此，我们强烈建议在所有操作系统上立即部署KAISER。幸运的是，三大操作系统（Windows、Linux和OS X）都已经实现了KAISER变种，并会在不久的将来推出这些补丁。
 
-Meltdown is distinct from the Spectre Attacks [19] in several ways, notably that Spectre requires tailoring to the victim process’s software environment, but applies more broadly to CPUs and is not mitigated by KAISER.
+Meltdown is distinct from the Spectre Attacks \[19\] in several ways, notably that Spectre requires tailoring to the victim process’s software environment, but applies more broadly to CPUs and is not mitigated by KAISER.
 
-熔断（Meltdown）与幽灵（Spectre）攻击[19] 有几点不同，最明显的不同是发起幽灵攻击需要了解受害者进程的软件环境并针对这些信息修改具体的攻击方法。不过在更多的CPU上存在Spectre漏洞，而且KAISER对Spectre无效。
+熔断（Meltdown）与幽灵（Spectre）攻击\[19\] 有几点不同，最明显的不同是发起幽灵攻击需要了解受害者进程的软件环境并针对这些信息修改具体的攻击方法。不过在更多的CPU上存在Spectre漏洞，而且KAISER对Spectre无效。
 
 Contributions. The contributions of this work are:
 
 1. We describe out-of-order execution as a new, extremely powerful, software-based side channel.
-2. We show how out-of-order execution can be combined with a microarchitectural covert channel to
+1. We show how out-of-order execution can be combined with a microarchitectural covert channel to
 
 transfer the data from an elusive state to a receiver on the outside.
 
@@ -70,11 +72,13 @@ and on public cloud machines.
 Outline. The remainder of this paper is structured as follows: In Section 2, we describe the fundamental problem which is introduced with out-of-order execution. In Section 3, we provide a toy example illustrating the side channel Meltdown exploits. In Section 4, we describe the building blocks of the full Meltdown attack. In Section 5, we present the Meltdown attack. In Section 6, we evaluate the performance of the Meltdown attack on several different systems. In Section 7, we discuss the effects of the software-based KAISER countermeasure and propose solutions in hardware. In Section 8, we discuss related work and conclude our work in Section 9.
 
 本文概述：本文的其余部分的结构如下：在第2节中，我们描述了乱序执行带来的基本问题，在第3节中，我们提供了一个简单的示例来说明Meltdown利用的侧信道。在第4节中，我们描述了Meltdown攻击的方块结构图。在第5节中，我们展示如何进行Meltdown攻击。在第6节中，我们评估了几种不同系统上的meltdown攻击的性能。在第7节中，我们讨论了针对meltdown的软硬件对策。软件解决方案主要是KAISER机制，此外，我们也提出了硬件解决方案的建议。在第8节中，我们将讨论相关工作，并在第9节给出我们的结论。
+
 # 二、背景介绍（Background）
 
 In this section, we provide background on out-of-order execution, address translation, and cache attacks.
 
 这一小节，我们将描述乱序执行、地址翻译和缓存攻击的一些基本背景知识。
+
 ## 1、乱序执行（Out-of-order execution）
 
 Out-of-order execution is an optimization technique that allows to maximize the utilization of all execution units of a CPU core as exhaustive as possible. Instead of processing instructions strictly in the sequential program order, the CPU executes them as soon as all required resources are available. While the execution unit of the current operation is occupied, other execution units can run ahead. Hence, instructions can be run in parallel as long as their results follow the architectural definition.
@@ -85,29 +89,29 @@ In practice, CPUs supporting out-of-order execution support running operations s
 
 在实际中，CPU的乱序执行和推测执行（speculative execution）捆绑在一起的。在CPU无法确定下一条指令是否一定需要执行的时候往往会进行预测，并根据预测的结果来完成乱序执行。在本文中，speculative execution被认为是一个受限的概念，它特指跳转指令之后的指令序列的执行。而乱序执行这个术语是指处理器在提交所有前面指令操作结果之前，就已经提前执行了当前指令。
 
-In 1967, Tomasulo [33] developed an algorithm [33] that enabled dynamic scheduling of instructions to allow out-of-order execution. Tomasulo [33] introduced a unified reservation station that allows a CPU to use a data value as it has been computed instead of storing it to a register and re-reading it. The reservation station renames registers to allow instructions that operate on the same physical registers to use the last logical one to solve read-after-write (RAW), write-after-read (WAR) and write-after-write (WAW) hazards. Furthermore, the reservation unit connects all execution units via a common data bus (CDB). If an operand is not available, the reservation unit can listen on the CDB until it is available and then directly begin the execution of the instruction.
+In 1967, Tomasulo \[33\] developed an algorithm \[33\] that enabled dynamic scheduling of instructions to allow out-of-order execution. Tomasulo \[33\] introduced a unified reservation station that allows a CPU to use a data value as it has been computed instead of storing it to a register and re-reading it. The reservation station renames registers to allow instructions that operate on the same physical registers to use the last logical one to solve read-after-write (RAW), write-after-read (WAR) and write-after-write (WAW) hazards. Furthermore, the reservation unit connects all execution units via a common data bus (CDB). If an operand is not available, the reservation unit can listen on the CDB until it is available and then directly begin the execution of the instruction.
 
-1967，Tomasulo设计了一种算法[ 33 ] [ 33 ]，实现了指令的动态调度，从而允许了乱序执行。Tomasulo [ 33 ]为CPU执行单元设计了统一的保留站（reservation station）。在过去，CPU执行单元需要从寄存器中读出操作数或者把结果写入寄存器，现在，有了保留站，CPU的执行单元可以使用它来读取操作数并且保存操作结果。我们给出一个具体的RAW（read-after-write）的例子：
+1967，Tomasulo设计了一种算法\[ 33 \] \[ 33 \]，实现了指令的动态调度，从而允许了乱序执行。Tomasulo \[ 33 \]为CPU执行单元设计了统一的保留站（reservation station）。在过去，CPU执行单元需要从寄存器中读出操作数或者把结果写入寄存器，现在，有了保留站，CPU的执行单元可以使用它来读取操作数并且保存操作结果。我们给出一个具体的RAW（read-after-write）的例子：
 
-R2 <- R1 + R3
+R2 \<- R1 + R3
 
-R4 <- R2 + R3
+R4 \<- R2 + R3
 
 第一条指令是计算R1+R3并把结果保存到R2，第二条指令依赖于R2的值进行计算。在没有保留站的时候，第一条指令的操作结果提交到R2寄存器之后，第二条指令才可以执行，因为需要从R2寄存器中加载操作数。如果有了保留站，那么我们可以在保留站中重命名寄存器R2，我们称这个寄存器是R2.rename。这时候，第一条指令执行之后就把结果保存在R2.rename寄存器中，而不需要把最终结果提交到R2寄存器中，这样第二条指令就可以直接从R2.rename寄存器中获取操作数并执行，从而解决了RAW带来的hazard。WAR和WAW类似，不再赘述。（注：上面这一句的翻译我自己做了一些扩展，方便理解保留站）。此外，保留站和所有的执行单元通过一个统一的CDB（common data bus）相连。如果操作数尚未准备好，那么执行单元可以监听CDB，一旦获取到操作数，该执行单元会立刻开始指令的执行。
 
 [![clip_image002](http://www.wowotech.net/content/uploadfile/201801/25df405b3b80e4439f5b677cf23274f220180119121816.jpg "clip_image002")](http://www.wowotech.net/content/uploadfile/201801/a8ebc8be807bfae4e1dbfb2cb389c8d020180119121811.jpg)
 
-On the Intel architecture, the pipeline consists of the front-end, the execution engine (back-end) and the memory subsystem [14]. x86 instructions are fetched by the front-end from the memory and decoded to microoperations (μOPs) which are continuously sent to the execution engine. Out-of-order execution is implemented within the execution engine as illustrated in Figure 1. The Reorder Buffer is responsible for register allocation, register renaming and retiring. Additionally, other optimizations like move elimination or the recognition of zeroing idioms are directly handled by the reorder buffer. The μOPs are forwarded to the Unified Reservation Station that queues the operations on exit ports that are connected to Execution Units. Each execution unit can perform different tasks like ALU operations, AES operations, address generation units (AGU) or memory loads and stores. AGUs as well as load and store execution units are directly connected to the memory subsystem to process its requests.
+On the Intel architecture, the pipeline consists of the front-end, the execution engine (back-end) and the memory subsystem \[14\]. x86 instructions are fetched by the front-end from the memory and decoded to microoperations (μOPs) which are continuously sent to the execution engine. Out-of-order execution is implemented within the execution engine as illustrated in Figure 1. The Reorder Buffer is responsible for register allocation, register renaming and retiring. Additionally, other optimizations like move elimination or the recognition of zeroing idioms are directly handled by the reorder buffer. The μOPs are forwarded to the Unified Reservation Station that queues the operations on exit ports that are connected to Execution Units. Each execution unit can perform different tasks like ALU operations, AES operations, address generation units (AGU) or memory loads and stores. AGUs as well as load and store execution units are directly connected to the memory subsystem to process its requests.
 
-在英特尔CPU体系结构中，流水线是由前端、执行引擎（后端）和内存子系统组成[14]。前端模块将x86指令从存储器中读取出来并解码成微操作（μOPS，microoperations），uOPS随后被发送给执行引擎。在执行引擎中实现了乱序执行，如上图所示。重新排序缓冲区（Reorder Buffer）负责寄存器分配、寄存器重命名和将结果提交到软件可见的寄存器（这个过程也称为retirement）。此外，reorder buffer还有一些其他的功能，例如move elimination 、识别zeroing idioms等。uOPS被发送到统一保留站中，并在该保留站的输出端口上进行排队，而保留站的输出端口则直接连接到执行单元。每个执行单元可以执行不同的任务，如ALU运算，AES操作，地址生成单元（AGU）、memory load和memory store。AGU、memory load和memory store这三个执行单元会直接连接到存储子系统中以便处理内存请求。
+在英特尔CPU体系结构中，流水线是由前端、执行引擎（后端）和内存子系统组成\[14\]。前端模块将x86指令从存储器中读取出来并解码成微操作（μOPS，microoperations），uOPS随后被发送给执行引擎。在执行引擎中实现了乱序执行，如上图所示。重新排序缓冲区（Reorder Buffer）负责寄存器分配、寄存器重命名和将结果提交到软件可见的寄存器（这个过程也称为retirement）。此外，reorder buffer还有一些其他的功能，例如move elimination 、识别zeroing idioms等。uOPS被发送到统一保留站中，并在该保留站的输出端口上进行排队，而保留站的输出端口则直接连接到执行单元。每个执行单元可以执行不同的任务，如ALU运算，AES操作，地址生成单元（AGU）、memory load和memory store。AGU、memory load和memory store这三个执行单元会直接连接到存储子系统中以便处理内存请求。
 
 Since CPUs usually do not run linear instruction streams, they have branch prediction units that are used to obtain an educated guess of which instruction will be executed next. Branch predictors try to determine which direction of a branch will be taken before its condition is actually evaluated. Instructions that lie on that path and do not have any dependencies can be executed in advance and their results immediately used if the prediction was correct. If the prediction was incorrect, the reorder buffer allows to rollback by clearing the reorder buffer and re-initializing the unified reservation station.
 
 由于CPU并非总是运行线性指令流，所以它有分支预测单元。该单元可以记录过去程序跳转的结果并用它来推测下一条可能被执行的指令。分支预测单元会在实际条件被检查之前确定程序跳转路径。如果位于该路径上的指令没有任何依赖关系，那么这些指令可以提前执行。如果预测正确，指令执行的结果可以立即使用。如果预测不正确，reorder buffer可以回滚操作结果，而具体的回滚是通过清除重新排序缓冲区和初始化统一保留站来完成的。
 
-Various approaches to predict the branch exist: With static branch prediction [12], the outcome of the branch is solely based on the instruction itself. Dynamic branch prediction [2] gathers statistics at run-time to predict the outcome. One-level branch prediction uses a 1-bit or 2-bit counter to record the last outcome of the branch [21]. Modern processors often use two-level adaptive predictors [36] that remember the history of the last n outcomes allow to predict regularly recurring patterns. More recently, ideas to use neural branch prediction [34, 18, 32] have been picked up and integrated into CPU architectures [3].
+Various approaches to predict the branch exist: With static branch prediction \[12\], the outcome of the branch is solely based on the instruction itself. Dynamic branch prediction \[2\] gathers statistics at run-time to predict the outcome. One-level branch prediction uses a 1-bit or 2-bit counter to record the last outcome of the branch \[21\]. Modern processors often use two-level adaptive predictors \[36\] that remember the history of the last n outcomes allow to predict regularly recurring patterns. More recently, ideas to use neural branch prediction \[34, 18, 32\] have been picked up and integrated into CPU architectures \[3\].
 
-分支预测有各种各样的方法：使用静态分支预测[ 12 ] 的时候，程序跳转的结果完全基于指令本身。动态分支预测[ 2 ] 则是在运行时收集统计数据来预测结果。一级分支预测使用1位或2位计数器来记录跳转结果[ 21 ]。现代处理器通常使用两级自适应预测器[36]，这种方法会记住最后n个历史跳转结果，并通过这些历史跳转记过来寻找有规律的跳转模式。最近，使用神经分支预测[ 34, 18, 32 ]的想法被重新拾起并集成到CPU体系结构中[ 3 ]。
+分支预测有各种各样的方法：使用静态分支预测\[ 12 \] 的时候，程序跳转的结果完全基于指令本身。动态分支预测\[ 2 \] 则是在运行时收集统计数据来预测结果。一级分支预测使用1位或2位计数器来记录跳转结果\[ 21 \]。现代处理器通常使用两级自适应预测器\[36\]，这种方法会记住最后n个历史跳转结果，并通过这些历史跳转记过来寻找有规律的跳转模式。最近，使用神经分支预测\[ 34, 18, 32 \]的想法被重新拾起并集成到CPU体系结构中\[ 3 \]。
 
 2、地址空间（address space）
 
@@ -121,9 +125,9 @@ Instead of a direct-physical map, Windows maintains a multiple so-called paged p
 
 Windows中的地址映射机制，没有兴趣了解。
 
-The exploitation of memory corruption bugs often requires the knowledge of addresses of specific data. In order to impede such attacks, address space layout randomization (ASLR) has been introduced as well as nonexecutable stacks and stack canaries. In order to protect the kernel, KASLR randomizes the offsets where drivers are located on every boot, making attacks harder as they now require to guess the location of kernel data structures. However, side-channel attacks allow to detect the exact location of kernel data structures [9, 13, 17] or derandomize ASLR in JavaScript [6]. A combination of a software bug and the knowledge of these addresses can lead to privileged code execution.
+The exploitation of memory corruption bugs often requires the knowledge of addresses of specific data. In order to impede such attacks, address space layout randomization (ASLR) has been introduced as well as nonexecutable stacks and stack canaries. In order to protect the kernel, KASLR randomizes the offsets where drivers are located on every boot, making attacks harder as they now require to guess the location of kernel data structures. However, side-channel attacks allow to detect the exact location of kernel data structures \[9, 13, 17\] or derandomize ASLR in JavaScript \[6\]. A combination of a software bug and the knowledge of these addresses can lead to privileged code execution.
 
-利用memory corruption（指修改内存的内容而造成crash）bug进行攻击往往需要知道特定数据的地址（因为我们需要修改该地址中的数据）。为了阻止这种攻击，内核提供了地址空间布局随机化（ASLR）、非执行堆栈和堆栈溢出检查三种手段。为了保护内核，KASLR会在驱动每次开机加载的时候将其放置在一个随机偏移的位置，这种方法使得攻击变得更加困难，因为攻击者需要猜测内核数据结构的地址信息。然而，攻击者可以利用侧信道攻击手段获取内核数据结构的确定位置[ 9, 13, 17 ]或者在JavaScript中对ASLR 解随机化[ 6 ]。结合本节描述的两种机制，我们可以发起攻击，实现特权代码的执行。
+利用memory corruption（指修改内存的内容而造成crash）bug进行攻击往往需要知道特定数据的地址（因为我们需要修改该地址中的数据）。为了阻止这种攻击，内核提供了地址空间布局随机化（ASLR）、非执行堆栈和堆栈溢出检查三种手段。为了保护内核，KASLR会在驱动每次开机加载的时候将其放置在一个随机偏移的位置，这种方法使得攻击变得更加困难，因为攻击者需要猜测内核数据结构的地址信息。然而，攻击者可以利用侧信道攻击手段获取内核数据结构的确定位置\[ 9, 13, 17 \]或者在JavaScript中对ASLR 解随机化\[ 6 \]。结合本节描述的两种机制，我们可以发起攻击，实现特权代码的执行。
 
 3、缓存攻击（Cache Attacks）
 
@@ -131,13 +135,13 @@ In order to speed-up memory accesses and address translation, the CPU contains s
 
 为了加速内存访问和地址翻译过程，CPU内部包含了一些小的内存缓冲区，我们称之为cache，用来保存近期频繁使用的数据，这样，CPU cache实际上是隐藏了底层慢速内存的访问延迟。现代CPU有多个层次的cache，它们要么是属于特定CPU core的，要么是在多个CPU core中共享的。地址空间的页表存储在内存中，它也被缓存在cache中（即TLB）。
 
-Cache side-channel attacks exploit timing differences that are introduced by the caches. Different cache attack techniques have been proposed and demonstrated in the past, including Evict+Time [28], Prime+Probe [28, 29], and Flush+Reload [35]. Flush+Reload attacks work on a single cache line granularity. These attacks exploit the shared, inclusive last-level cache. An attacker frequently flushes a targeted memory location using the clflush instruction. By measuring the time it takes to reload the data, the attacker determines whether data was loaded into the cache by another process in the meantime. The Flush+Reload attack has been used for attacks on various computations, e.g., cryptographic algorithms [35, 16, 1], web server function calls [37], user input [11, 23, 31], and kernel addressing information [9].
+Cache side-channel attacks exploit timing differences that are introduced by the caches. Different cache attack techniques have been proposed and demonstrated in the past, including Evict+Time \[28\], Prime+Probe \[28, 29\], and Flush+Reload \[35\]. Flush+Reload attacks work on a single cache line granularity. These attacks exploit the shared, inclusive last-level cache. An attacker frequently flushes a targeted memory location using the clflush instruction. By measuring the time it takes to reload the data, the attacker determines whether data was loaded into the cache by another process in the meantime. The Flush+Reload attack has been used for attacks on various computations, e.g., cryptographic algorithms \[35, 16, 1\], web server function calls \[37\], user input \[11, 23, 31\], and kernel addressing information \[9\].
 
-缓存侧信道攻击（Cache side-channel attack）是一种利用缓存引入的时间差异而进行攻击的方法，在访问memory的时候，已经被cache的数据访问会非常快，而没有被cache的数据访问比较慢，缓存侧信道攻击就是利用了这个时间差来偷取数据的。各种各样的缓存攻击技术已经被提出并证明有效，包括Evict+Time [ 28 ]，Prime+Probe [ 28, 29 ]，Flush+Reload [ 35 ]。Flush+Reload方法在单个缓存行粒度上工作。缓存侧信道攻击主要是利用共享的cache（包含的最后一级缓存）进行攻击。攻击者经常使用CLFLUSH指令将目标内存位置的cache刷掉。然后读目标内存的数据并测量目标内存中数据加载所需的时间。通过这个时间信息，攻击者可以获取另一个进程是否已经将数据加载到缓存中。Flush+Reload攻击已被用于攻击各种算法，例如，密码算法[ 35, 16, 1 ]，Web服务器函数调用[ 37 ]，用户输入[ 11, 23, 31 ]，以及内核寻址信息[ 9 ]。
+缓存侧信道攻击（Cache side-channel attack）是一种利用缓存引入的时间差异而进行攻击的方法，在访问memory的时候，已经被cache的数据访问会非常快，而没有被cache的数据访问比较慢，缓存侧信道攻击就是利用了这个时间差来偷取数据的。各种各样的缓存攻击技术已经被提出并证明有效，包括Evict+Time \[ 28 \]，Prime+Probe \[ 28, 29 \]，Flush+Reload \[ 35 \]。Flush+Reload方法在单个缓存行粒度上工作。缓存侧信道攻击主要是利用共享的cache（包含的最后一级缓存）进行攻击。攻击者经常使用CLFLUSH指令将目标内存位置的cache刷掉。然后读目标内存的数据并测量目标内存中数据加载所需的时间。通过这个时间信息，攻击者可以获取另一个进程是否已经将数据加载到缓存中。Flush+Reload攻击已被用于攻击各种算法，例如，密码算法\[ 35, 16, 1 \]，Web服务器函数调用\[ 37 \]，用户输入\[ 11, 23, 31 \]，以及内核寻址信息\[ 9 \]。
 
-A special use case are covert channels. Here the attacker controls both, the part that induces the side effect, and the part that measures the side effect. This can be used to leak information from one security domain to another, while bypassing any boundaries existing on the architectural level or above. Both Prime+Probe and Flush+Reload have been used in high-performance covert channels [24, 26, 10].
+A special use case are covert channels. Here the attacker controls both, the part that induces the side effect, and the part that measures the side effect. This can be used to leak information from one security domain to another, while bypassing any boundaries existing on the architectural level or above. Both Prime+Probe and Flush+Reload have been used in high-performance covert channels \[24, 26, 10\].
 
-缓存侧信道攻击一个特殊的使用场景是构建隐蔽通道（covert channel）。在这个场景中，攻击者控制隐蔽通道的发送端和接收端，也就是说攻击者会通过程序触发产生cache side effect，同时他也会去量测这个cache side effect。通过这样的手段，信息可以绕过体系结构级别的边界检查，从一个安全域泄漏到外面的世界，。Prime+Probe 和 Flush+Reload这两种方法都已被用于构建高性能隐蔽通道[ 24, 26, 10 ]。
+缓存侧信道攻击一个特殊的使用场景是构建隐蔽通道（covert channel）。在这个场景中，攻击者控制隐蔽通道的发送端和接收端，也就是说攻击者会通过程序触发产生cache side effect，同时他也会去量测这个cache side effect。通过这样的手段，信息可以绕过体系结构级别的边界检查，从一个安全域泄漏到外面的世界，。Prime+Probe 和 Flush+Reload这两种方法都已被用于构建高性能隐蔽通道\[ 24, 26, 10 \]。
 
 三、简单示例（A toy example）
 
@@ -149,7 +153,7 @@ Listing 1 shows a simple code snippet first raising an (unhandled) exception and
 
 |   |
 |---|
-|1 raise_exception();<br><br>2 // the line below is never reached<br><br>3 access(probe_array[data * 4096]);|
+|1 raise_exception();<br><br>2 // the line below is never reached<br><br>3 access(probe_array\[data * 4096\]);|
 
 上面的列表显示了一个简单的代码片段：首先触发一个异常（我们并不处理它），然后访问probe_array数组。异常会导致控制流不会执行异常之后的代码，而是跳转到操作系统中的异常处理程序去执行。不管这个异常是由于内存访问而引起的（例如访问无效地址），或者是由于其他类型的CPU异常（例如除零），控制流都会转到内核中继续执行，而不是停留在用户空间，执行对probe_array数组的访问。
 
@@ -159,11 +163,11 @@ Thus, our toy example cannot access the array in theory, as the exception immedi
 
 因此，我们给出的示例代码在理论上不会访问probe_array数组，毕竟异常会立即陷入内核并终止了该应用程序。但是由于乱序执行，CPU可能已经执行了异常指令后面的那些指令，要知道异常指令和随后的指令没有依赖性。如上图所示。虽然异常指令后面的那些指令被执行了，但是由于产生了异常，那些指令并没有提交（注：instruction retire，instruction commit都是一个意思，就是指将指令执行结果体现到软件可见的寄存器或者memory中，不过retire这个术语翻译成中文容易引起误会，因此本文统一把retire翻译为提交或者不翻译），因此从CPU 体系结构角度看没有任何问题（也就是说软件工程师从ISA的角度看不到这些指令的执行）。
 
-Although the instructions executed out of order do not have any visible architectural effect on registers or memory, they have microarchitectural side effects. During the out-of-order execution, the referenced memory is fetched into a register and is also stored in the cache. If the out-of-order execution has to be discarded, the register and memory contents are never committed. Nevertheless, the cached memory contents are kept in the cache. We can leverage a microarchitectural side-channel attack such as Flush+Reload [35], which detects whether a specific memory location is cached, to make this microarchitectural state visible. There are other side channels as well which also detect whether a specific memory location is cached, including Prime+Probe [28, 24, 26], Evict+ Reload [23], or Flush+Flush [10]. However, as Flush+ Reload is the most accurate known cache side channel and is simple to implement, we do not consider any other side channel for this example.
+Although the instructions executed out of order do not have any visible architectural effect on registers or memory, they have microarchitectural side effects. During the out-of-order execution, the referenced memory is fetched into a register and is also stored in the cache. If the out-of-order execution has to be discarded, the register and memory contents are never committed. Nevertheless, the cached memory contents are kept in the cache. We can leverage a microarchitectural side-channel attack such as Flush+Reload \[35\], which detects whether a specific memory location is cached, to make this microarchitectural state visible. There are other side channels as well which also detect whether a specific memory location is cached, including Prime+Probe \[28, 24, 26\], Evict+ Reload \[23\], or Flush+Flush \[10\]. However, as Flush+ Reload is the most accurate known cache side channel and is simple to implement, we do not consider any other side channel for this example.
 
-虽然违反了program order，在CPU上执行了本不应该执行的指令，但是实际上从寄存器和memory上看，我们不能捕获到任何这些指令产生的变化（也就是说没有architecture effect）。不过，从CPU微架构的角度看确实是有副作用。在乱序执行过程中，加载内存值到寄存器同时也会把该值保存在cache中。如果必须要丢弃掉乱序执行的结果，那么寄存器和内存值都不会commit。但是，cache中的内容并没有丢弃，仍然在cache中。这时候，我们就可以使用微架构侧信道攻击（microarchitectural side-channel attack）的方法，例如Flush+Reload [35]，来检测是否指定的内存地址被cache了，从而让这些微架构状态信息变得对用户可见。我们也有其他的方法来检测内存地址是否被缓存，包括：Prime+Probe [28, 24, 26], Evict+ Reload [23], 或者Flush+Flush [10]。不过Flush+ Reload是最准确的感知cache side channel的方法，并且实现起来非常简单，因此在本文中我们主要介绍Flush+ Reload。
+虽然违反了program order，在CPU上执行了本不应该执行的指令，但是实际上从寄存器和memory上看，我们不能捕获到任何这些指令产生的变化（也就是说没有architecture effect）。不过，从CPU微架构的角度看确实是有副作用。在乱序执行过程中，加载内存值到寄存器同时也会把该值保存在cache中。如果必须要丢弃掉乱序执行的结果，那么寄存器和内存值都不会commit。但是，cache中的内容并没有丢弃，仍然在cache中。这时候，我们就可以使用微架构侧信道攻击（microarchitectural side-channel attack）的方法，例如Flush+Reload \[35\]，来检测是否指定的内存地址被cache了，从而让这些微架构状态信息变得对用户可见。我们也有其他的方法来检测内存地址是否被缓存，包括：Prime+Probe \[28, 24, 26\], Evict+ Reload \[23\], 或者Flush+Flush \[10\]。不过Flush+ Reload是最准确的感知cache side channel的方法，并且实现起来非常简单，因此在本文中我们主要介绍Flush+ Reload。
 
-Based on the value of data in this toy example, a different part of the cache is accessed when executing the memory access out of order. As data is multiplied by 4096, data accesses to probe array are scattered over the array with a distance of 4 kB (assuming an 1 B data type for probe array). Thus, there is an injective mapping from the value of data to a memory page, i.e., there are no two different values of data which result in an access to the same page. Consequently, if a cache line of a page is cached, we know the value of data. The spreading over different pages eliminates false positives due to the prefetcher, as the prefetcher cannot access data across page boundaries [14].
+Based on the value of data in this toy example, a different part of the cache is accessed when executing the memory access out of order. As data is multiplied by 4096, data accesses to probe array are scattered over the array with a distance of 4 kB (assuming an 1 B data type for probe array). Thus, there is an injective mapping from the value of data to a memory page, i.e., there are no two different values of data which result in an access to the same page. Consequently, if a cache line of a page is cached, we know the value of data. The spreading over different pages eliminates false positives due to the prefetcher, as the prefetcher cannot access data across page boundaries \[14\].
 
 我们再次回到上面列表中的示例代码。probe_array是一个按照4KB字节组织的数组，变化data变量的值就可以按照4K size来遍历访问该数组。如果在乱序执行中访问了data变量指定的probe_array数组内的某个4K内存块，那么对应页面（指的是probe_array数组内的4K内存块）的数据就会被加载到cache中。因此，通过程序扫描probe_array数组中各个页面的cache情况可以反推出data的数值（data数值和probe_array数组中的页面是一一对应的）。在Intel处理器中，prefetcher不会跨越page的边界，因此page size之间的cache状态是完全独立的。而在程序中把cache的检测分散到若干个page上主要是为了防止prefetcher带来的误报。
 
@@ -185,9 +189,9 @@ The adversary targets a secret value that is kept somewhere in physical memory. 
 
 攻击者的目标是保存在物理内存中的一个秘密值。注意：寄存器值也会在上下文切换时保存在物理内存中。根据2.2节所述，每个进程的地址空间通常包括整个用户地址空间以及整个内核地址空间（使用中的物理内存都会映射到该空间中），虽然进程能感知到内核空间的映射。但是这些内存区域只能在特权模式下访问（参见第2.2节）。
 
-In this work, we demonstrate leaking secrets by bypassing the privileged-mode isolation, giving an attacker full read access to the entire kernel space including any physical memory mapped, including the physical memory of any other process and the kernel. Note that Kocher et al. [19] pursue an orthogonal approach, called Spectre Attacks, which trick speculative executed instructions into leaking information that the victim process is authorized to access. As a result, Spectre Attacks lack the privilege escalation aspect of Meltdown and require tailoring to the victim process’s software environment, but apply more broadly to CPUs that support speculative execution and are not stopped by KAISER.
+In this work, we demonstrate leaking secrets by bypassing the privileged-mode isolation, giving an attacker full read access to the entire kernel space including any physical memory mapped, including the physical memory of any other process and the kernel. Note that Kocher et al. \[19\] pursue an orthogonal approach, called Spectre Attacks, which trick speculative executed instructions into leaking information that the victim process is authorized to access. As a result, Spectre Attacks lack the privilege escalation aspect of Meltdown and require tailoring to the victim process’s software environment, but apply more broadly to CPUs that support speculative execution and are not stopped by KAISER.
 
-在这项工作中，我们绕过了地址空间隔离机制，让攻击者可以对整个内核空间进行完整的读访问，这里面就包括物理内存直接映射部分。而通过直接映射，攻击者可以访问任何其他进程和内核的物理内存。注意：Kocher等人[ 19 ]正在研究一种称为幽灵（spectre）攻击的方法，它通过推测执行（speculative execution）来泄漏目标进程的秘密信息。因此，幽灵攻击不涉及Meltdown攻击中的特权提升，并且需要根据目标进程的软件环境进行定制。不过spectre会影响更多的CPU（只要支持speculative execution的CPU都会受影响），另外，KAISER无法阻挡spectre攻击。
+在这项工作中，我们绕过了地址空间隔离机制，让攻击者可以对整个内核空间进行完整的读访问，这里面就包括物理内存直接映射部分。而通过直接映射，攻击者可以访问任何其他进程和内核的物理内存。注意：Kocher等人\[ 19 \]正在研究一种称为幽灵（spectre）攻击的方法，它通过推测执行（speculative execution）来泄漏目标进程的秘密信息。因此，幽灵攻击不涉及Meltdown攻击中的特权提升，并且需要根据目标进程的软件环境进行定制。不过spectre会影响更多的CPU（只要支持speculative execution的CPU都会受影响），另外，KAISER无法阻挡spectre攻击。
 
 The full Meltdown attack consists of two building blocks, as illustrated in Figure 5. The first building block of Meltdown is to make the CPU execute one or more instructions that would never occur in the executed path. In the toy example (cf. Section 3), this is an access to an array, which would normally never be executed, as the previous instruction always raises an exception. We call such an instruction, which is executed out of order, leaving measurable side effects, a transient instruction. Furthermore, we call any sequence of instructions containing at least one transient instruction a transient instruction sequence.
 
@@ -207,7 +211,7 @@ Meltdown的第二个组件主要用来检测在瞬态指令序列执行完毕之
 
 The first building block of Meltdown is the execution of transient instructions. Transient instructions basically occur all the time, as the CPU continuously runs ahead of the current instruction to minimize the experienced latency and thus maximize the performance (cf. Section 2.1). Transient instructions introduce an exploitable side channel if their operation depends on a secret value. We focus on addresses that are mapped within the attacker’s process, i.e., the user-accessible user space addresses as well as the user-inaccessible kernel space addresses. Note that attacks targeting code that is executed
 
-within the context (i.e., address space) of another process are possible [19], but out of scope in this work, since all physical memory (including the memory of other processes) can be read through the kernel address space anyway.
+within the context (i.e., address space) of another process are possible \[19\], but out of scope in this work, since all physical memory (including the memory of other processes) can be read through the kernel address space anyway.
 
 Meltdown的第一个组件是执行瞬态指令。其实瞬态指令是时时刻刻都在发生的，因为CPU在执行当前指令之外，往往会提前执行当前指令之后的那些指令，从而最大限度地提高CPU性能（参见第2.1节的描述）。如果瞬态指令的执行依赖于一个受保护的值，那么它就引入一个可利用的侧信道。另外需要说明的是：本文主要精力放在攻击者的进程地址空间中，也就是说攻击者在用户态访问内核地址空间的受保护的数据。实际上攻击者进程访问盗取其他进程地址空间的数据也是可能的（不过本文并不描述这个场景），毕竟攻击者进程可以通过内核地址空间访问系统中所有内存，而其他进程的数据也就是保存在系统物理内存的某个地址上。
 
@@ -235,9 +239,9 @@ The second building block of Meltdown is the transfer of the microarchitectural 
 
 第二个Meltdown组件主要是用来把执行瞬态指令序列后CPU微架构状态变化的信息转换成相应的体系结构状态（参考上图）。瞬态指令序列可以认为是微架构隐蔽通道的发端，通道的接收端用来接收微架构状态的变化信息，从这些状态变化中推导出被保护的数据。需要注意的是：接收端并不是瞬态指令序列的一部分，可以来自其他的线程甚至是其他的进程。例如上节我们使用fork的那个例子中，瞬态指令序列在子进程中，而接收端位于父进程中
 
-We leverage techniques from cache attacks, as the cache state is a microarchitectural state which can be reliably transferred into an architectural state using various techniques [28, 35, 10]. Specifically, we use Flush+Reload [35], as it allows to build a fast and low-noise covert channel. Thus, depending on the secret value, the transient instruction sequence (cf. Section 4.1) performs a regular memory access, e.g., as it does in the toy example (cf. Section 3).
+We leverage techniques from cache attacks, as the cache state is a microarchitectural state which can be reliably transferred into an architectural state using various techniques \[28, 35, 10\]. Specifically, we use Flush+Reload \[35\], as it allows to build a fast and low-noise covert channel. Thus, depending on the secret value, the transient instruction sequence (cf. Section 4.1) performs a regular memory access, e.g., as it does in the toy example (cf. Section 3).
 
-我们可以利用缓存攻击（cache attack）技术，通过对高速缓存的状态（是微架构状态之一）的检测，我们可以使用各种技术[ 28, 35, 10 ]将其稳定地转换成CPU体系结构状态。具体来说，我们可以使用Flush+Reload技术 [35]，因为该技术允许建立一个快速的、低噪声的隐蔽通道。然后根据保密数据，瞬态指令序列（参见第4.1节）执行常规的存储器访问，具体可以参考在第3节给出的那个简单示例程序中所做的那样。
+我们可以利用缓存攻击（cache attack）技术，通过对高速缓存的状态（是微架构状态之一）的检测，我们可以使用各种技术\[ 28, 35, 10 \]将其稳定地转换成CPU体系结构状态。具体来说，我们可以使用Flush+Reload技术 \[35\]，因为该技术允许建立一个快速的、低噪声的隐蔽通道。然后根据保密数据，瞬态指令序列（参见第4.1节）执行常规的存储器访问，具体可以参考在第3节给出的那个简单示例程序中所做的那样。
 
 After the transient instruction sequence accessed an accessible address, i.e., this is the sender of the covert channel; the address is cached for subsequent accesses. The receiver can then monitor whether the address has been loaded into the cache by measuring the access time to the address. Thus, the sender can transmit a ‘1’-bit by accessing an address which is loaded into the monitored cache, and a ‘0’-bit by not accessing such an address.
 
@@ -247,9 +251,9 @@ Using multiple different cache lines, as in our toy example in Section 3, allows
 
 使用一个cacheline可以传递一个bit，如果使用多个不同的cacheline（类似我们在第3章中的简单示例代码一样），就可以同时传输多个比特。一个Byte（8-bit）有256个不同的值，针对每一个值，发送端都会访问不同的缓存行，这样通过对所有256个可能的缓存行进行Flush+Reload攻击，接收端可以恢复一个完整字节而不是一个bit。不过，由于Flush+Reload攻击所花费的时间比执行瞬态指令序列要长得多（通常是几百个cycle），所以只传输一个bit是更有效的。攻击者可以通过shift和mask来完成保密数据逐个bit的盗取。
 
-Note that the covert channel is not limited to microarchitectural states which rely on the cache. Any microarchitectural state which can be influenced by an instruction (sequence) and is observable through a side channel can be used to build the sending end of a covert channel. The sender could, for example, issue an instruction (sequence) which occupies a certain execution port such as the ALU to send a ‘1’-bit. The receiver measures the latency when executing an instruction (sequence) on the same execution port. A high latency implies that the sender sends a ‘1’-bit, whereas a low latency implies that sender sends a ‘0’-bit. The advantage of the Flush+ Reload cache covert channel is the noise resistance and the high transmission rate [10]. Furthermore, the leakage can be observed from any CPU core [35], i.e., rescheduling events do not significantly affect the covert channel.
+Note that the covert channel is not limited to microarchitectural states which rely on the cache. Any microarchitectural state which can be influenced by an instruction (sequence) and is observable through a side channel can be used to build the sending end of a covert channel. The sender could, for example, issue an instruction (sequence) which occupies a certain execution port such as the ALU to send a ‘1’-bit. The receiver measures the latency when executing an instruction (sequence) on the same execution port. A high latency implies that the sender sends a ‘1’-bit, whereas a low latency implies that sender sends a ‘0’-bit. The advantage of the Flush+ Reload cache covert channel is the noise resistance and the high transmission rate \[10\]. Furthermore, the leakage can be observed from any CPU core \[35\], i.e., rescheduling events do not significantly affect the covert channel.
 
-需要注意的是：隐蔽信道并非总是依赖于缓存。只要CPU微架构状态会被瞬态指令序列影响，并且可以通过side channel观察这个状态的改变，那么该微架构状态就可以用来构建隐蔽通道的发送端。例如，发送端可以执行一条指令（该指令会占用相关执行单元（如ALU）的端口），来发送一个“1”这个bit。接收端可以在同一个执行单元端口上执行指令，同时测量时间延迟。高延迟意味着发送方发送一个“1”位，而低延迟意味着发送方发送一个“0”位。Flush+ Reload隐蔽通道的优点是抗噪声和高传输速率[ 10 ]。此外，我们可以从任何cpu core上观察到数据泄漏[ 35 ]，即调度事件并不会显著影响隐蔽信道。
+需要注意的是：隐蔽信道并非总是依赖于缓存。只要CPU微架构状态会被瞬态指令序列影响，并且可以通过side channel观察这个状态的改变，那么该微架构状态就可以用来构建隐蔽通道的发送端。例如，发送端可以执行一条指令（该指令会占用相关执行单元（如ALU）的端口），来发送一个“1”这个bit。接收端可以在同一个执行单元端口上执行指令，同时测量时间延迟。高延迟意味着发送方发送一个“1”位，而低延迟意味着发送方发送一个“0”位。Flush+ Reload隐蔽通道的优点是抗噪声和高传输速率\[ 10 \]。此外，我们可以从任何cpu core上观察到数据泄漏\[ 35 \]，即调度事件并不会显著影响隐蔽信道。
 
 五、熔断（Meltdown）
 
@@ -317,9 +321,9 @@ When the μOPs finish their execution, they retire in order, and, thus, their re
 
 当μOPs执行完毕后，它们就按顺序进行retire（这个术语叫做retire，很难翻译，这里就不翻译了，但是和commit是一个意思），因此，μOPs的结果会被提交并体现在体系结构状态上。在提交过程中，在执行指令期间发生的任何中断和异常都会被处理。因此，在提交MOV指令的时候发现该指令操作的是内核地址，这时候会触发异常。这时候CPU流水线会执行flush操作，由于乱序执行而提前执行的那些指令（Mov指令之后）结果会被清掉。然而，在触发这个异常和我们执行的攻击步骤2之间有一个竞争条件（race condition），我们在下面描述。
 
-As reported by Gruss et al. [9], prefetching kernel addresses sometimes succeeds. We found that prefetching the kernel address can slightly improve the performance of the attack on some systems.
+As reported by Gruss et al. \[9\], prefetching kernel addresses sometimes succeeds. We found that prefetching the kernel address can slightly improve the performance of the attack on some systems.
 
-根据Gruss等人的研究[ 9 ]，预取内核地址有时成功。我们发现：预取内核地址可以略微改善某些系统的攻击性能。
+根据Gruss等人的研究\[ 9 \]，预取内核地址有时成功。我们发现：预取内核地址可以略微改善某些系统的攻击性能。
 
 Step 2: Transmitting the secret. The instruction sequence from step 1 which is executed out of order has to be chosen in a way that it becomes a transient instruction sequence. If this transient instruction sequence is executed before the MOV instruction is retired (i.e., raises the exception), and the transient instruction sequence performed computations based on the secret, it can be utilized to transmit the secret to the attacker.
 
@@ -403,11 +407,11 @@ Exception Suppression using Intel TSX.
 
 Dealing with KASLR.
 
-In 2013, kernel address space layout randomization (KASLR) had been introduced to the Linux kernel (starting from version 3.14 [4]) allowing to randomize the location of the kernel code at boot time. However, only as recently as May 2017, KASLR had been enabled by default in version 4.12 [27]. With KASLR also the direct-physical map is randomized and, thus, not fixed at a certain address such that the attacker is required to obtain the randomized offset before mounting the Meltdown attack. However, the randomization is limited to 40 bit.
+In 2013, kernel address space layout randomization (KASLR) had been introduced to the Linux kernel (starting from version 3.14 \[4\]) allowing to randomize the location of the kernel code at boot time. However, only as recently as May 2017, KASLR had been enabled by default in version 4.12 \[27\]. With KASLR also the direct-physical map is randomized and, thus, not fixed at a certain address such that the attacker is required to obtain the randomized offset before mounting the Meltdown attack. However, the randomization is limited to 40 bit.
 
 处理KASLR。
 
-2013年，内核地址空间布局随机化（KASLR）已被合并到Linux内核中（从3.14版开始[ 4 ]），这个特性允许在开机的时候把内核代码加载到一个随机化地址上去。在最近的（2017年5月）4.12版的内核中，KASLR已经被默认启用[ 27 ]。并且直接映射部分的地址也是随机的，并非固定在某个地址上。因此，在利用meltdown漏洞对内核进行攻击之前，攻击者需要需要获得一个40-bit的随机偏移值。
+2013年，内核地址空间布局随机化（KASLR）已被合并到Linux内核中（从3.14版开始\[ 4 \]），这个特性允许在开机的时候把内核代码加载到一个随机化地址上去。在最近的（2017年5月）4.12版的内核中，KASLR已经被默认启用\[ 27 \]。并且直接映射部分的地址也是随机的，并非固定在某个地址上。因此，在利用meltdown漏洞对内核进行攻击之前，攻击者需要需要获得一个40-bit的随机偏移值。
 
 Thus, if we assume a setup of the target machine with 8GB of RAM, it is sufficient to test the address space for addresses in 8GB steps. This allows to cover the search space of 40 bit with only 128 tests in the worst case. If the attacker can successfully obtain a value from a tested address, the attacker can proceed dumping the entire memory from that location. This allows to mount Meltdown on a system despite being protected by KASLR within seconds.
 
@@ -437,9 +441,9 @@ We successfully evaluated Meltdown on multiple versions of the Linux kernel, fro
 
 我们成功地对多个版本的Linux内核（从2.6.32到4.13.0）进行了Meltdown评估。在Linux内核的所有这些版本中，内核地址空间都映射到了用户进程地址空间中。但由于权限设置，任何来自用户空间的内核数据访问都被阻止。Meltdown可以绕过这些权限设置，并且只要攻击者知道内核虚拟地址，都可以发起攻击，从而泄露内核数据。由于所有主要操作系统都将整个物理内存映射到内核地址空间（参见第2.2节），因此利用meltdown漏洞可以读取所有物理内存的数据。
 
-Before kernel 4.12, kernel address space layout randomization (KASLR) was not active by default [30]. If KASLR is active, Meltdown can still be used to find the kernel by searching through the address space (cf. Section 5.2). An attacker can also simply de-randomize the direct-physical map by iterating through the virtual address space. Without KASLR, the direct-physical map starts at address 0xffff 8800 0000 0000 and linearly maps the entire physical memory. On such systems, an attacker can use Meltdown to dump the entire physical memory, simply by reading from virtual addresses starting at 0xffff 8800 0000 0000.
+Before kernel 4.12, kernel address space layout randomization (KASLR) was not active by default \[30\]. If KASLR is active, Meltdown can still be used to find the kernel by searching through the address space (cf. Section 5.2). An attacker can also simply de-randomize the direct-physical map by iterating through the virtual address space. Without KASLR, the direct-physical map starts at address 0xffff 8800 0000 0000 and linearly maps the entire physical memory. On such systems, an attacker can use Meltdown to dump the entire physical memory, simply by reading from virtual addresses starting at 0xffff 8800 0000 0000.
 
-在4.12内核之前，内核地址空间布局随机化（KASLR）不是默认启用的[ 30 ]。如果启动KASLR这个特性，meltdown仍然可以用来找到内核的映射位置（这是通过搜索地址空间的方法，具体参见5.2节）。攻击者也可以通过遍历虚拟地址空间的方法来找到物理内存直接映射的信息。没有KASLR，Linux内核会在0xffff 8800 0000 0000开始的线性地址区域内映射整个物理内存。在这样的系统中，攻击者可以用meltdown轻松dump整个物理内存，因为攻击者已经清楚的知道物理内存的虚拟地址是从0xffff 8800 0000 0000开始的。
+在4.12内核之前，内核地址空间布局随机化（KASLR）不是默认启用的\[ 30 \]。如果启动KASLR这个特性，meltdown仍然可以用来找到内核的映射位置（这是通过搜索地址空间的方法，具体参见5.2节）。攻击者也可以通过遍历虚拟地址空间的方法来找到物理内存直接映射的信息。没有KASLR，Linux内核会在0xffff 8800 0000 0000开始的线性地址区域内映射整个物理内存。在这样的系统中，攻击者可以用meltdown轻松dump整个物理内存，因为攻击者已经清楚的知道物理内存的虚拟地址是从0xffff 8800 0000 0000开始的。
 
 On newer systems, where KASLR is active by default, the randomization of the direct-physical map is limited to 40 bit. It is even further limited due to the linearity of the mapping. Assuming that the target system has at least 8GB of physical memory, the attacker can test addresses in steps of 8 GB, resulting in a maximum of 128 memory locations to test. Starting from one discovered location, the attacker can again dump the entire physical memory.
 
@@ -451,11 +455,11 @@ Hence, for the evaluation, we can assume that the randomization is either disabl
 
 （2）打了KAISER补丁的Linux系统（Linux with KAISER patch）
 
-The KAISER patch by Gruss et al. [8] implements a stronger isolation between kernel and user space.
+The KAISER patch by Gruss et al. \[8\] implements a stronger isolation between kernel and user space.
 
 KAISER does not map any kernel memory in the user space, except for some parts required by the x86 architecture (e.g., interrupt handlers). Thus, there is no valid mapping to either kernel memory or physical memory (via the direct-physical map) in the user space, and such addresses can therefore not be resolved. Consequently, Meltdown cannot leak any kernel or physical memory except for the few memory locations which have to be mapped in user space.
 
-Gruss发布的KAISER补丁[ 8 ]实现了内核和用户空间之间更强的隔离。KAISER根本不把内核地址空间映射到用户进程空间中去。除了x86架构所需的某些部分代码之外（如中断处理程序），在用户空间中根本看不到物理内存的直接映射，也看不到内核地址空间的任何信息。没有有效的映射，因此用户空间根本不能解析这些地址。因此，除了少数必须在用户空间中映射的物理内存或者内核地址外，meltdown不能泄漏任何数据。
+Gruss发布的KAISER补丁\[ 8 \]实现了内核和用户空间之间更强的隔离。KAISER根本不把内核地址空间映射到用户进程空间中去。除了x86架构所需的某些部分代码之外（如中断处理程序），在用户空间中根本看不到物理内存的直接映射，也看不到内核地址空间的任何信息。没有有效的映射，因此用户空间根本不能解析这些地址。因此，除了少数必须在用户空间中映射的物理内存或者内核地址外，meltdown不能泄漏任何数据。
 
 We verified that KAISER indeed prevents Meltdown, and there is no leakage of any kernel or physical memory.
 
@@ -489,9 +493,9 @@ To evaluate the performance of Meltdown, we leaked known values from kernel memo
 
 为了评估meltdown的性能，我们事先在准备攻击的内核内存中设定了指定的数值。这使我们不仅能够确定攻击者盗取内存数据的速度，而且还可以确定错误率（即有多少字节的错误）。在使用异常抑制（需要TSX支持）的情况下，我们实现了503kB / s的数据泄露速度，而错误率低于0.02%。对于性能评估，我们集中在英特尔的Core i7-6700k处理器，因为它支持TSX。这样我们可以在一个公平环境中（同一个CPU）比较异常处理和异常抑制两种方法下meltdown的性能。
 
-For all tests, we use Flush+Reload as a covert channel to leak the memory as described in Section 5. We evaluated the performance of both exception handling and exception suppression (cf. Section 4.1). For exception handling, we used signal handlers, and if the CPU supported it, we also used exception suppression using Intel TSX. An extensive evaluation of exception suppression using conditional branches was done by Kocher et al. [19] and is thus omitted in this paper for the sake of brevity.
+For all tests, we use Flush+Reload as a covert channel to leak the memory as described in Section 5. We evaluated the performance of both exception handling and exception suppression (cf. Section 4.1). For exception handling, we used signal handlers, and if the CPU supported it, we also used exception suppression using Intel TSX. An extensive evaluation of exception suppression using conditional branches was done by Kocher et al. \[19\] and is thus omitted in this paper for the sake of brevity.
 
-对于所有的测试，我们使用Flush+Reload作为一个隐蔽通道来泄漏内存信息，具体可以参考第5章的描述。我们评估了异常处理和异常抑制这两种方法下meltdown的性能（参见第4.1节）。对于异常处理，我们设置信号处理函数。如果CPU支持，我们也可以利用英特尔TSX来完成异常抑制。使用条件分支来完成异常抑制的评估是由Kocher等人完成的[ 19 ]。为了简洁起见，本文省略了这部分的内容。
+对于所有的测试，我们使用Flush+Reload作为一个隐蔽通道来泄漏内存信息，具体可以参考第5章的描述。我们评估了异常处理和异常抑制这两种方法下meltdown的性能（参见第4.1节）。对于异常处理，我们设置信号处理函数。如果CPU支持，我们也可以利用英特尔TSX来完成异常抑制。使用条件分支来完成异常抑制的评估是由Kocher等人完成的\[ 19 \]。为了简洁起见，本文省略了这部分的内容。
 
 （1）异常处理
 
@@ -525,9 +529,9 @@ In this section, we discuss countermeasures against the Meltdown attack. At firs
 
 1、硬件策略
 
-Meltdown bypasses the hardware-enforced isolation of security domains. There is no software vulnerability involved in Meltdown. Hence any software patch (e.g., KAISER [8]) will leave small amounts of memory exposed (cf. Section 7.2). There is no documentation whether such a fix requires the development of completely new hardware, or can be fixed using a microcode update.
+Meltdown bypasses the hardware-enforced isolation of security domains. There is no software vulnerability involved in Meltdown. Hence any software patch (e.g., KAISER \[8\]) will leave small amounts of memory exposed (cf. Section 7.2). There is no documentation whether such a fix requires the development of completely new hardware, or can be fixed using a microcode update.
 
-Meltdown并不涉及软件漏洞，它是直接绕过硬件隔离机制。因此，任何软件补丁（例如，KAISER[8]）都会暴露出少量的内存区域（参见第7.2节）。是否需要开发全新的硬件或使用微码更新来修复meltdown，没有文件说明这一点。
+Meltdown并不涉及软件漏洞，它是直接绕过硬件隔离机制。因此，任何软件补丁（例如，KAISER\[8\]）都会暴露出少量的内存区域（参见第7.2节）。是否需要开发全新的硬件或使用微码更新来修复meltdown，没有文件说明这一点。
 
 As Meltdown exploits out-of-order execution, a trivial countermeasure would be to completely disable out-of-order execution. However, the performance impacts would be devastating, as the parallelism of modern CPUs could not be leveraged anymore. Thus, this is not a viable solution.
 
@@ -541,19 +545,19 @@ A more realistic solution would be to introduce a hard split of user space and k
 
 一个更现实的解决方案是从硬件层面区分用户空间和内核空间。这可以通过CPU寄存器（例如cr4）的一个bit（称之hard-split bit）来开启。如果该bit设置为1，则内核地址必须在地址空间的上半部分，而用户空间必须位于地址空间的下半部分。有了这种硬件机制，违反权限的内存读取可以被立刻识别，这是因为所需特权级别可以直接从虚拟地址推导出来而不需要任何进一步的查找。我们认为这种解决方案对性能的影响是最小的。此外，向后兼容性也得到保证，因为默认情况下我们不设置hard-split bit，而内核仅在硬件支持的时候才设置它。
 
-Note that these countermeasures only prevent Meltdown, and not the class of Spectre attacks described by Kocher et al. [19]. Likewise, several countermeasures presented by Kocher et al. [19] have no effect on Meltdown. We stress that it is important to deploy countermeasures against both attacks.
+Note that these countermeasures only prevent Meltdown, and not the class of Spectre attacks described by Kocher et al. \[19\]. Likewise, several countermeasures presented by Kocher et al. \[19\] have no effect on Meltdown. We stress that it is important to deploy countermeasures against both attacks.
 
-请注意，这些对策只能防止meltdown，对Kocher等人发现的幽灵攻击无效[ 19 ]。同样，由Kocher等人提出的解决spectre漏洞[ 19 ] 的对策，对meltdown也没有效果。我们这里再次强调一下：针对这两种攻击部署相关的对策是非常重要的。
+请注意，这些对策只能防止meltdown，对Kocher等人发现的幽灵攻击无效\[ 19 \]。同样，由Kocher等人提出的解决spectre漏洞\[ 19 \] 的对策，对meltdown也没有效果。我们这里再次强调一下：针对这两种攻击部署相关的对策是非常重要的。
 
 2、KAISER
 
-As hardware is not as easy to patch, there is a need for software workarounds until new hardware can be deployed. Gruss et al. [8] proposed KAISER, a kernel modification to not have the kernel mapped in the user space. This modification was intended to prevent side-channel attacks breaking KASLR [13, 9, 17]. However, it also prevents Meltdown, as it ensures that there is no valid mapping to kernel space or physical memory available in user space. KAISER will be available in the upcoming releases of the Linux kernel under the name kernel page-table isolation (KPTI) [25]. The patch will also be backported to older Linux kernel versions. A similar patch was also introduced in Microsoft Windows 10 Build 17035 [15]. Also, Mac OS X and iOS have similar features [22].
+As hardware is not as easy to patch, there is a need for software workarounds until new hardware can be deployed. Gruss et al. \[8\] proposed KAISER, a kernel modification to not have the kernel mapped in the user space. This modification was intended to prevent side-channel attacks breaking KASLR \[13, 9, 17\]. However, it also prevents Meltdown, as it ensures that there is no valid mapping to kernel space or physical memory available in user space. KAISER will be available in the upcoming releases of the Linux kernel under the name kernel page-table isolation (KPTI) \[25\]. The patch will also be backported to older Linux kernel versions. A similar patch was also introduced in Microsoft Windows 10 Build 17035 \[15\]. Also, Mac OS X and iOS have similar features \[22\].
 
-硬件修复漏洞没有那么快，因此我们还是要到在新的硬件可以部署之前，提供软件绕过的方案。Gruss等人[ 8 ]建议了KAISER方案，该方案对内核进行修改，以便在用户进程地址空间中根本看不到内核地址的映射。这个补丁是为了防止侧信道攻击方法攻破KASLR [ 13, 9, 17 ]。然而，因为它确保了在用户空间没有有效的内核空间映射或物理内存映射，因此KAISER也能解决meltdown问题。KAISER将会出现在即将发布的Linux内核中，名字改成了KPTI（kernel page-table isolation）[ 25 ]，同时该补丁也将移植到旧的Linux内核版本。微软Windows 10也提供了类似的补丁[ 15 ]。另外，Mac OS X和iOS也有类似的功能[ 22 ]。
+硬件修复漏洞没有那么快，因此我们还是要到在新的硬件可以部署之前，提供软件绕过的方案。Gruss等人\[ 8 \]建议了KAISER方案，该方案对内核进行修改，以便在用户进程地址空间中根本看不到内核地址的映射。这个补丁是为了防止侧信道攻击方法攻破KASLR \[ 13, 9, 17 \]。然而，因为它确保了在用户空间没有有效的内核空间映射或物理内存映射，因此KAISER也能解决meltdown问题。KAISER将会出现在即将发布的Linux内核中，名字改成了KPTI（kernel page-table isolation）\[ 25 \]，同时该补丁也将移植到旧的Linux内核版本。微软Windows 10也提供了类似的补丁\[ 15 \]。另外，Mac OS X和iOS也有类似的功能\[ 22 \]。
 
-Although KAISER provides basic protection against Meltdown, it still has some limitations. Due to the design of the x86 architecture, several privileged memory locations are required to be mapped in user space [8]. This leaves a residual attack surface for Meltdown, i.e., these memory locations can still be read from user space. Even though these memory locations do not contain any secrets, such as credentials, they might still contain pointers. Leaking one pointer can be enough to again break KASLR, as the randomization can be calculated from the pointer value.
+Although KAISER provides basic protection against Meltdown, it still has some limitations. Due to the design of the x86 architecture, several privileged memory locations are required to be mapped in user space \[8\]. This leaves a residual attack surface for Meltdown, i.e., these memory locations can still be read from user space. Even though these memory locations do not contain any secrets, such as credentials, they might still contain pointers. Leaking one pointer can be enough to again break KASLR, as the randomization can be calculated from the pointer value.
 
-虽然KAISER提供了基本的保护以防止meltdown，但它仍然有一些局限性。由于x86架构的设计，需要在用户空间中映射一小段内核地址空间[ 8 ]，因此这些内存位置仍然可以从用户空间读取，这为meltdown攻击留下伏笔。即使这些内存位置不包含任何机密数据，它们仍然可能包含指针。其实一个指针的数据就足够攻破KASLR，因为随机偏移可以根据指针的值推导出来。
+虽然KAISER提供了基本的保护以防止meltdown，但它仍然有一些局限性。由于x86架构的设计，需要在用户空间中映射一小段内核地址空间\[ 8 \]，因此这些内存位置仍然可以从用户空间读取，这为meltdown攻击留下伏笔。即使这些内存位置不包含任何机密数据，它们仍然可能包含指针。其实一个指针的数据就足够攻破KASLR，因为随机偏移可以根据指针的值推导出来。
 
 Still, KAISER is the best short-time solution currently available and should therefore be deployed on all systems immediately. Even with Meltdown, KAISER can avoid having any kernel pointers on memory locations that are mapped in the user space which would leak information about the randomized offsets. This would require trampoline locations for every kernel pointer, i.e., the interrupt handler would not call into kernel code directly, but through a trampoline function. The trampoline function must only be mapped in the kernel. It must be randomized with a different offset than the remaining kernel. Consequently, an attacker can only leak pointers to the trampoline code, but not the randomized offsets of the remaining kernel. Such trampoline code is required for every kernel memory that still has to be mapped in user space and contains kernel addresses. This approach is a trade-off between performance and security which has to be assessed in future work.
 
@@ -561,9 +565,9 @@ Still, KAISER is the best short-time solution currently available and should the
 
 八、讨论
 
-Meltdown fundamentally changes our perspective on the security of hardware optimizations that manipulate the state of microarchitectural elements. The fact that hardware optimizations can change the state of microarchitectural elements, and thereby imperil secure soft-ware implementations, is known since more than 20 years [20]. Both industry and the scientific community so far accepted this as a necessary evil for efficient computing. Today it is considered a bug when a cryptographic algorithm is not protected against the microarchitectural leakage introduced by the hardware optimizations. Meltdown changes the situation entirely. Meltdown shifts the granularity from a comparably low spatial and temporal granularity, e.g., 64-bytes every few hundred cycles for cache attacks, to an arbitrary granularity, allowing an attacker to read every single bit. This is nothing any (cryptographic) algorithm can protect itself against. KAISER is a short-term software fix, but the problem we uncovered is much more significant.
+Meltdown fundamentally changes our perspective on the security of hardware optimizations that manipulate the state of microarchitectural elements. The fact that hardware optimizations can change the state of microarchitectural elements, and thereby imperil secure soft-ware implementations, is known since more than 20 years \[20\]. Both industry and the scientific community so far accepted this as a necessary evil for efficient computing. Today it is considered a bug when a cryptographic algorithm is not protected against the microarchitectural leakage introduced by the hardware optimizations. Meltdown changes the situation entirely. Meltdown shifts the granularity from a comparably low spatial and temporal granularity, e.g., 64-bytes every few hundred cycles for cache attacks, to an arbitrary granularity, allowing an attacker to read every single bit. This is nothing any (cryptographic) algorithm can protect itself against. KAISER is a short-term software fix, but the problem we uncovered is much more significant.
 
-通过调整CPU微架构状态，CPU设计者可以优化硬件的性能，由此引入的安全问题并没有引起足够的重视，Meltdown从根本上改变了这一点，即CPU设计者必须直面安全问题。20多年以来，CPU设计者很清楚的知道这样一个事实：硬件优化可以改变CPU微架构的状态，从而给安全软件的实现带来风险[ 20 ]。但是到目前为止，工业界和科学界都认为这是高效计算所必需面对的一个问题，你不得不接受它。现在，当一个加密算法不能保护微架构状态的泄露（由于硬件优化而引入），我们认为这是一个软件bug。Meltdown彻底改变了现状。原来的攻击在空间和时间粒度上是相对较小，例如，缓存攻击的空间粒度是64个字节，时间粒度是大概几百个周期。有了meltdown，空间和时间粒度可以任意指定，允许攻击者读取每一个比特位，这不是什么（加密）算法可以保护了的。KAISER是一个短期的软件解决方案，但我们揭示的问题更为重要（即不能为了性能而忽略安全性）。
+通过调整CPU微架构状态，CPU设计者可以优化硬件的性能，由此引入的安全问题并没有引起足够的重视，Meltdown从根本上改变了这一点，即CPU设计者必须直面安全问题。20多年以来，CPU设计者很清楚的知道这样一个事实：硬件优化可以改变CPU微架构的状态，从而给安全软件的实现带来风险\[ 20 \]。但是到目前为止，工业界和科学界都认为这是高效计算所必需面对的一个问题，你不得不接受它。现在，当一个加密算法不能保护微架构状态的泄露（由于硬件优化而引入），我们认为这是一个软件bug。Meltdown彻底改变了现状。原来的攻击在空间和时间粒度上是相对较小，例如，缓存攻击的空间粒度是64个字节，时间粒度是大概几百个周期。有了meltdown，空间和时间粒度可以任意指定，允许攻击者读取每一个比特位，这不是什么（加密）算法可以保护了的。KAISER是一个短期的软件解决方案，但我们揭示的问题更为重要（即不能为了性能而忽略安全性）。
 
 We expect several more performance optimizations in modern CPUs which affect the microarchitectural state in some way, not even necessarily through the cache. Thus, hardware which is designed to provide certain security guarantees, e.g., CPUs running untrusted code, require a redesign to avoid Meltdown- and Spectre-like attacks. Meltdown also shows that even error-free software, which is explicitly written to thwart side-channel attacks, is not secure if the design of the underlying hardware is not taken into account.
 
@@ -577,21 +581,21 @@ Meltdown also heavily affects cloud providers, especially if the guests are not 
 
 Meltdown也严重影响了云服务提供商，特别是在客户机没有完全虚拟化的场景中。出于性能方面的原因，许多云服务提供商没有虚拟内存的抽象层。在这样的环境中（通常是使用容器，如Docker或OpenVZ），内核在所有的guest os中共享。因此，虽然存在guest os之间的隔离，但是我们可以利用Meltdown，将其他guest os的数据（在同一个主机）暴露出来。对于这些供应商，改变他们的基础设施，变成全虚拟化或使用软件解决方法（如KAISER）都会增加成本。
 
-Even if Meltdown is fixed, Spectre [19] will remain an issue. Spectre [19] and Meltdown need different defenses. Specifically mitigating only one of them will leave the security of the entire system at risk. We expect that Meltdown and Spectre open a new field of research to investigate in what extent performance optimizations change the microarchitectural state, how this state can be translated into an architectural state, and how such attacks can be prevented.
+Even if Meltdown is fixed, Spectre \[19\] will remain an issue. Spectre \[19\] and Meltdown need different defenses. Specifically mitigating only one of them will leave the security of the entire system at risk. We expect that Meltdown and Spectre open a new field of research to investigate in what extent performance optimizations change the microarchitectural state, how this state can be translated into an architectural state, and how such attacks can be prevented.
 
-即使meltdown被修复了，spectre[ 19 ]仍然是一个问题。Spectre和meltdown需要不同的防御策略。只是解决其中一个并不能解决整个系统的安全问题。我们期待meltdown和spectre可以打开一个新的研究领域，让大家一起探讨CPU设计的相关问题，包括改变微架构的状态如何可以优化CPU性能，微架构状态如何转化为CPU体系结构状态，以及如何阻止这样的攻击。
+即使meltdown被修复了，spectre\[ 19 \]仍然是一个问题。Spectre和meltdown需要不同的防御策略。只是解决其中一个并不能解决整个系统的安全问题。我们期待meltdown和spectre可以打开一个新的研究领域，让大家一起探讨CPU设计的相关问题，包括改变微架构的状态如何可以优化CPU性能，微架构状态如何转化为CPU体系结构状态，以及如何阻止这样的攻击。
 
 九、结论
 
-In this paper, we presented Meltdown, a novel softwarebased side-channel attack exploiting out-of-order execution on modern processors to read arbitrary kernel- and physical-memory locations from an unprivileged user space program. Without requiring any software vulnerability and independent of the operating system, Meltdown enables an adversary to read sensitive data of other processes or virtual machines in the cloud with up to 503KB/s, affecting millions of devices. We showed that the countermeasure KAISER [8], originally proposed to protect from side-channel attacks against KASLR, inadvertently impedes Meltdown as well. We stress that KAISER needs to be deployed on every operating system as a short-term workaround, until Meltdown is fixed in hardware, to prevent large-scale exploitation of Meltdown.
+In this paper, we presented Meltdown, a novel softwarebased side-channel attack exploiting out-of-order execution on modern processors to read arbitrary kernel- and physical-memory locations from an unprivileged user space program. Without requiring any software vulnerability and independent of the operating system, Meltdown enables an adversary to read sensitive data of other processes or virtual machines in the cloud with up to 503KB/s, affecting millions of devices. We showed that the countermeasure KAISER \[8\], originally proposed to protect from side-channel attacks against KASLR, inadvertently impedes Meltdown as well. We stress that KAISER needs to be deployed on every operating system as a short-term workaround, until Meltdown is fixed in hardware, to prevent large-scale exploitation of Meltdown.
 
-在本文中，我们描述了一个新型的CPU漏洞meltdown，一种利用现代处理器上的乱序执行特性，通过侧信道攻击读取任意内核地址和物理内存数据的方法。不需要利用软件漏洞，也和具体操作系统无关，利用Meltdown漏洞，普通用户空间程序可以以503KB／s的速度读其他进程或虚拟机的敏感数据，这影响了数以百万计的设备。我们发现针对meltdown的对策是KAISER [ 8 ]，KAISER最初是为了防止侧信道攻击KASLR而引入的，但是无意中也可以防止meltdown漏洞。我们建议：一个短期的解决办法是在每一个操作系统上都部署KAISER，直到解决meltdown issue的硬件出现。
+在本文中，我们描述了一个新型的CPU漏洞meltdown，一种利用现代处理器上的乱序执行特性，通过侧信道攻击读取任意内核地址和物理内存数据的方法。不需要利用软件漏洞，也和具体操作系统无关，利用Meltdown漏洞，普通用户空间程序可以以503KB／s的速度读其他进程或虚拟机的敏感数据，这影响了数以百万计的设备。我们发现针对meltdown的对策是KAISER \[ 8 \]，KAISER最初是为了防止侧信道攻击KASLR而引入的，但是无意中也可以防止meltdown漏洞。我们建议：一个短期的解决办法是在每一个操作系统上都部署KAISER，直到解决meltdown issue的硬件出现。
 
 十、致谢
 
-We would like to thank Anders Fogh for fruitful discussions at BlackHat USA 2016 and BlackHat Europe 2016, which ultimately led to the discovery of Meltdown. Fogh [5] already suspected that it might be possible to abuse speculative execution in order to read kernel memory in user mode but his experiments were not successful. We would also like to thank Jann Horn for comments on an early draft. Jann disclosed the issue to Intel in June. The subsequent activity around the KAISER patch was the reason we started investigating this issue. Furthermore, we would like Intel, ARM, Qualcomm, and Microsoft for feedback on an early draft.
+We would like to thank Anders Fogh for fruitful discussions at BlackHat USA 2016 and BlackHat Europe 2016, which ultimately led to the discovery of Meltdown. Fogh \[5\] already suspected that it might be possible to abuse speculative execution in order to read kernel memory in user mode but his experiments were not successful. We would also like to thank Jann Horn for comments on an early draft. Jann disclosed the issue to Intel in June. The subsequent activity around the KAISER patch was the reason we started investigating this issue. Furthermore, we would like Intel, ARM, Qualcomm, and Microsoft for feedback on an early draft.
 
-我们感谢Anders Fogh在BlackHat USA 2016和BlackHat Europe 2016上富有成果的讨论，这些讨论最终导致meltdown的发现。Anders Fogh [ 5 ]已经怀疑利用推测执行可以在用户模式下读取内核数据，但他的实验并不成功。我们也要感谢Jann Horn对早期草稿的意见。Jann Horn在6月份向Intel透漏了这个问题。随后围绕KAISER补丁的后续活动也使得我们开始调查这个问题。此外，我们也欣赏英特尔、ARM、高通和微软在早期草案阶段给予的反馈。
+我们感谢Anders Fogh在BlackHat USA 2016和BlackHat Europe 2016上富有成果的讨论，这些讨论最终导致meltdown的发现。Anders Fogh \[ 5 \]已经怀疑利用推测执行可以在用户模式下读取内核数据，但他的实验并不成功。我们也要感谢Jann Horn对早期草稿的意见。Jann Horn在6月份向Intel透漏了这个问题。随后围绕KAISER补丁的后续活动也使得我们开始调查这个问题。此外，我们也欣赏英特尔、ARM、高通和微软在早期草案阶段给予的反馈。
 
 We would also like to thank Intel for awarding us with a bug bounty for the responsible disclosure process, and their professional handling of this issue through communicating a clear timeline and connecting all involved researchers. Furthermore, we would also thank ARM for their fast response upon disclosing the issue.
 
@@ -603,79 +607,79 @@ This work was supported in part by the European Research Council (ERC) under the
 
 参考文献：
 
-[1] BENGER, N., VAN DE POL, J., SMART, N. P., AND YAROM, Y. “Ooh Aah... Just a Little Bit”: A small amount of side channel can go a long way. In CHES’14 (2014).
+\[1\] BENGER, N., VAN DE POL, J., SMART, N. P., AND YAROM, Y. “Ooh Aah... Just a Little Bit”: A small amount of side channel can go a long way. In CHES’14 (2014).
 
-[2] CHENG, C.-C. The schemes and performances of dynamic branch predictors. Berkeley Wireless Research Center, Tech. Rep (2000).
+\[2\] CHENG, C.-C. The schemes and performances of dynamic branch predictors. Berkeley Wireless Research Center, Tech. Rep (2000).
 
-[3] DEVIES, A. M. AMD Takes Computing to a New Horizon with RyzenTMProcessors, 2016.
+\[3\] DEVIES, A. M. AMD Takes Computing to a New Horizon with RyzenTMProcessors, 2016.
 
-[4] EDGE, J. Kernel address space layout randomization, 2013.
+\[4\] EDGE, J. Kernel address space layout randomization, 2013.
 
-[5] FOGH, A. Negative Result: Reading Kernel Memory From User Mode, 2017.
+\[5\] FOGH, A. Negative Result: Reading Kernel Memory From User Mode, 2017.
 
-[6] GRAS, B., RAZAVI, K., BOSMAN, E., BOS, H., AND GIUFFRIDA, C. ASLR on the Line: Practical Cache Attacks on the MMU. In NDSS (2017).
+\[6\] GRAS, B., RAZAVI, K., BOSMAN, E., BOS, H., AND GIUFFRIDA, C. ASLR on the Line: Practical Cache Attacks on the MMU. In NDSS (2017).
 
-[7] GRUSS, D., LETTNER, J., SCHUSTER, F., OHRIMENKO, O., HALLER, I., AND COSTA, M. Strong and Efficient Cache Side-Channel Protection using Hardware Transactional Memory. In USENIX Security Symposium (2017).
+\[7\] GRUSS, D., LETTNER, J., SCHUSTER, F., OHRIMENKO, O., HALLER, I., AND COSTA, M. Strong and Efficient Cache Side-Channel Protection using Hardware Transactional Memory. In USENIX Security Symposium (2017).
 
-[8] GRUSS, D., LIPP, M., SCHWARZ, M., FELLNER, R., MAURICE, C., AND MANGARD, S. KASLR is Dead: Long Live KASLR. In International Symposium on Engineering Secure Software and Systems (2017), Springer, pp. 161–176.
+\[8\] GRUSS, D., LIPP, M., SCHWARZ, M., FELLNER, R., MAURICE, C., AND MANGARD, S. KASLR is Dead: Long Live KASLR. In International Symposium on Engineering Secure Software and Systems (2017), Springer, pp. 161–176.
 
-[9] GRUSS, D., MAURICE, C., FOGH, A., LIPP, M., AND MANGARD, S. Prefetch Side-Channel Attacks: Bypassing SMAP and Kernel ASLR. In CCS (2016).
+\[9\] GRUSS, D., MAURICE, C., FOGH, A., LIPP, M., AND MANGARD, S. Prefetch Side-Channel Attacks: Bypassing SMAP and Kernel ASLR. In CCS (2016).
 
-[10] GRUSS, D., MAURICE, C., WAGNER, K., AND MANGARD, S. Flush+Flush: A Fast and Stealthy Cache Attack. In DIMVA (2016).
+\[10\] GRUSS, D., MAURICE, C., WAGNER, K., AND MANGARD, S. Flush+Flush: A Fast and Stealthy Cache Attack. In DIMVA (2016).
 
-[11] GRUSS, D., SPREITZER, R., AND MANGARD, S. Cache Template Attacks: Automating Attacks on Inclusive Last-Level Caches. In USENIX Security Symposium (2015).
+\[11\] GRUSS, D., SPREITZER, R., AND MANGARD, S. Cache Template Attacks: Automating Attacks on Inclusive Last-Level Caches. In USENIX Security Symposium (2015).
 
-[12] HENNESSY, J. L., AND PATTERSON, D. A. Computer architecture: a quantitative approach. Elsevier, 2011.
+\[12\] HENNESSY, J. L., AND PATTERSON, D. A. Computer architecture: a quantitative approach. Elsevier, 2011.
 
-[13] HUND, R., WILLEMS, C., AND HOLZ, T. Practical Timing Side Channel Attacks against Kernel Space ASLR. In S&P (2013).
+\[13\] HUND, R., WILLEMS, C., AND HOLZ, T. Practical Timing Side Channel Attacks against Kernel Space ASLR. In S&P (2013).
 
-[14] INTEL. IntelR 64 and IA-32 Architectures Optimization Reference Manual, 2014.
+\[14\] INTEL. IntelR 64 and IA-32 Architectures Optimization Reference Manual, 2014.
 
-[15] IONESCU, A. Windows 17035 Kernel ASLR/VA Isolation In Practice (like Linux KAISER)., 2017.
+\[15\] IONESCU, A. Windows 17035 Kernel ASLR/VA Isolation In Practice (like Linux KAISER)., 2017.
 
-[16] IRAZOQUI, G., INCI, M. S., EISENBARTH, T., AND SUNAR, B. Wait a minute! A fast, Cross-VM attack on AES. In RAID’14 (2014).
+\[16\] IRAZOQUI, G., INCI, M. S., EISENBARTH, T., AND SUNAR, B. Wait a minute! A fast, Cross-VM attack on AES. In RAID’14 (2014).
 
-[17] JANG, Y., LEE, S., AND KIM, T. Breaking Kernel Address Space Layout Randomization with Intel TSX. In CCS (2016).
+\[17\] JANG, Y., LEE, S., AND KIM, T. Breaking Kernel Address Space Layout Randomization with Intel TSX. In CCS (2016).
 
-[18] JIM´E NEZ, D. A., AND LIN, C. Dynamic branch prediction with perceptrons. In High-Performance Computer Architecture, 2001. HPCA. The Seventh International Symposium on (2001), IEEE, pp. 197–206.
+\[18\] JIM´E NEZ, D. A., AND LIN, C. Dynamic branch prediction with perceptrons. In High-Performance Computer Architecture, 2001. HPCA. The Seventh International Symposium on (2001), IEEE, pp. 197–206.
 
-[19] KOCHER, P., GENKIN, D., GRUSS, D., HAAS, W., HAMBURG, M., LIPP, M., MANGARD, S., PRESCHER, T., SCHWARZ, M., AND YAROM, Y. Spectre Attacks: Exploiting Speculative Execution.
+\[19\] KOCHER, P., GENKIN, D., GRUSS, D., HAAS, W., HAMBURG, M., LIPP, M., MANGARD, S., PRESCHER, T., SCHWARZ, M., AND YAROM, Y. Spectre Attacks: Exploiting Speculative Execution.
 
-[20] KOCHER, P. C. Timing Attacks on Implementations of Diffe- Hellman, RSA, DSS, and Other Systems. In CRYPTO (1996).
+\[20\] KOCHER, P. C. Timing Attacks on Implementations of Diffe- Hellman, RSA, DSS, and Other Systems. In CRYPTO (1996).
 
-[21] LEE, B., MALISHEVSKY, A., BECK, D., SCHMID, A., AND LANDRY, E. Dynamic branch prediction. Oregon State University.
+\[21\] LEE, B., MALISHEVSKY, A., BECK, D., SCHMID, A., AND LANDRY, E. Dynamic branch prediction. Oregon State University.
 
-[22] LEVIN, J. Mac OS X and IOS Internals: To the Apple’s Core John Wiley & Sons, 2012.
+\[22\] LEVIN, J. Mac OS X and IOS Internals: To the Apple’s Core John Wiley & Sons, 2012.
 
-[23] LIPP, M., GRUSS, D., SPREITZER, R., MAURICE, C., AND MANGARD, S. ARMageddon: Cache Attacks on Mobile Devices. In USENIX Security Symposium (2016).
+\[23\] LIPP, M., GRUSS, D., SPREITZER, R., MAURICE, C., AND MANGARD, S. ARMageddon: Cache Attacks on Mobile Devices. In USENIX Security Symposium (2016).
 
-[24] LIU, F., YAROM, Y., GE, Q., HEISER, G., AND LEE, R. B. Last-Level Cache Side-Channel Attacks are Practical. In IEEE Symposium on Security and Privacy – SP (2015), IEEE Computer Society, pp. 605–622.
+\[24\] LIU, F., YAROM, Y., GE, Q., HEISER, G., AND LEE, R. B. Last-Level Cache Side-Channel Attacks are Practical. In IEEE Symposium on Security and Privacy – SP (2015), IEEE Computer Society, pp. 605–622.
 
-[25] LWN. The current state of kernel page-table isolation, Dec. 2017.
+\[25\] LWN. The current state of kernel page-table isolation, Dec. 2017.
 
-[26] MAURICE, C., WEBER, M., SCHWARZ, M., GINER, L., GRUSS, D., ALBERTO BOANO, C., MANGARD, S., AND R¨OMER, K. Hello from the Other Side: SSH over Robust Cache Covert Channels in the Cloud. In NDSS (2017).
+\[26\] MAURICE, C., WEBER, M., SCHWARZ, M., GINER, L., GRUSS, D., ALBERTO BOANO, C., MANGARD, S., AND R¨OMER, K. Hello from the Other Side: SSH over Robust Cache Covert Channels in the Cloud. In NDSS (2017).
 
-[27] MOLNAR, I. x86: Enable KASLR by default, 2017.
+\[27\] MOLNAR, I. x86: Enable KASLR by default, 2017.
 
-[28] OSVIK, D. A., SHAMIR, A., AND TROMER, E. Cache Attacks and Countermeasures: the Case of AES. In CT-RSA (2006).
+\[28\] OSVIK, D. A., SHAMIR, A., AND TROMER, E. Cache Attacks and Countermeasures: the Case of AES. In CT-RSA (2006).
 
-[29] PERCIVAL, C. Cache missing for fun and profit. In Proceedings of BSDCan (2005).
+\[29\] PERCIVAL, C. Cache missing for fun and profit. In Proceedings of BSDCan (2005).
 
-[30] PHORONIX. Linux 4.12 To Enable KASLR By Default, 2017.
+\[30\] PHORONIX. Linux 4.12 To Enable KASLR By Default, 2017.
 
-[31] SCHWARZ, M., LIPP, M., GRUSS, D., WEISER, S., MAURICE, C., SPREITZER, R., AND MANGARD, S. KeyDrown: Eliminating Software-Based Keystroke Timing Side-Channel Attacks. In NDSS’18 (2018).
+\[31\] SCHWARZ, M., LIPP, M., GRUSS, D., WEISER, S., MAURICE, C., SPREITZER, R., AND MANGARD, S. KeyDrown: Eliminating Software-Based Keystroke Timing Side-Channel Attacks. In NDSS’18 (2018).
 
-[32] TERAN, E., WANG, Z., AND JIM´ENEZ, D. A. Perceptron learning for reuse prediction. In Microarchitecture (MICRO), 2016 49th Annual IEEE/ACM International Symposium on (2016), IEEE, pp. 1–12.
+\[32\] TERAN, E., WANG, Z., AND JIM´ENEZ, D. A. Perceptron learning for reuse prediction. In Microarchitecture (MICRO), 2016 49th Annual IEEE/ACM International Symposium on (2016), IEEE, pp. 1–12.
 
-[33] TOMASULO, R. M. An efficient algorithm for exploiting multiple arithmetic units. IBM Journal of research and Development 11, 1 (1967), 25–33.
+\[33\] TOMASULO, R. M. An efficient algorithm for exploiting multiple arithmetic units. IBM Journal of research and Development 11, 1 (1967), 25–33.
 
-[34] VINTAN, L. N., AND IRIDON, M. Towards a high performance neural branch predictor. In Neural Networks, 1999. IJCNN’99. International Joint Conference on (1999), vol. 2, IEEE, pp. 868–873.
+\[34\] VINTAN, L. N., AND IRIDON, M. Towards a high performance neural branch predictor. In Neural Networks, 1999. IJCNN’99. International Joint Conference on (1999), vol. 2, IEEE, pp. 868–873.
 
-[35] YAROM, Y., AND FALKNER, K. Flush+Reload: a High Resolution, Low Noise, L3 Cache Side-Channel Attack. In USENIX Security Symposium (2014).
+\[35\] YAROM, Y., AND FALKNER, K. Flush+Reload: a High Resolution, Low Noise, L3 Cache Side-Channel Attack. In USENIX Security Symposium (2014).
 
-[36] YEH, T.-Y., AND PATT, Y. N. Two-level adaptive training branch prediction. In Proceedings of the 24th annual international symposium on Microarchitecture (1991), ACM, pp. 51–61.
+\[36\] YEH, T.-Y., AND PATT, Y. N. Two-level adaptive training branch prediction. In Proceedings of the 24th annual international symposium on Microarchitecture (1991), ACM, pp. 51–61.
 
-[37] ZHANG, Y., JUELS, A., REITER, M. K., AND RISTENPART, T. Cross-Tenant Side-Channel Attacks in PaaS Clouds. In CCS’14 (2014).
+\[37\] ZHANG, Y., JUELS, A., REITER, M. K., AND RISTENPART, T. Cross-Tenant Side-Channel Attacks in PaaS Clouds. In CCS’14 (2014).
 
 _原创翻译文章，转发请注明出处。蜗窝科技_
 
@@ -687,181 +691,184 @@ _原创翻译文章，转发请注明出处。蜗窝科技_
 
 **评论：**
 
-**Eric_Fan**  
+**Eric_Fan**\
 2018-08-31 14:37
 
 你好，想问一下，在触发异常之后，是先终止瞬态指令序列的执行还是先清除寄存器中的数据？
 
 [回复](http://www.wowotech.net/basic_subject/meltdown.html#comment-6921)
 
-**test**  
+**test**\
 2018-04-17 16:56
 
 能请教个问题吗？看了官方文档和网上的一些文章，试了一下meltdown和spectre漏洞，meltdown能读取新建内核模块的数据，但spectre读不出来，不管是分支还是乱序，但两个不都是因为上一个指令没执行完就提前执行下面的指令了吗，为什么spectre读不了内核数据？
 
 [回复](http://www.wowotech.net/basic_subject/meltdown.html#comment-6672)
 
-**leidong**  
+**leidong**\
 2018-03-06 11:35
 
-终于理解Meltdown的原理了。  
-总结一下，Meltdown获取内核数据的大致原理  
-1、推测执行（speculative execute） 造成 用户空间指令可以在内核空间中执行。引起用户空间指令在内核空间执行的序列称为 瞬态指令序列  
-2、内核地址空间中页的固定映射给 瞬态指令序列 获取了内核特定数据的机会  
-3、数据是否在cache中，会影响数据的读取速度，且这个速度有明显的时间差异，给判断提供了条件  
-4、瞬态指令序列读取内核数据后，通过影响用户空间数据 是否在cache中的这一状态 向用户空间的进程传递内核数据  
+终于理解Meltdown的原理了。\
+总结一下，Meltdown获取内核数据的大致原理\
+1、推测执行（speculative execute） 造成 用户空间指令可以在内核空间中执行。引起用户空间指令在内核空间执行的序列称为 瞬态指令序列\
+2、内核地址空间中页的固定映射给 瞬态指令序列 获取了内核特定数据的机会\
+3、数据是否在cache中，会影响数据的读取速度，且这个速度有明显的时间差异，给判断提供了条件\
+4、瞬态指令序列读取内核数据后，通过影响用户空间数据 是否在cache中的这一状态 向用户空间的进程传递内核数据\
 5、用户空间进程探测用户空间数据的cache状态来接收 内核数据
 
 [回复](http://www.wowotech.net/basic_subject/meltdown.html#comment-6596)
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [Linux内核同步机制之（六）：Seqlock](http://www.wowotech.net/kernel_synchronization/seqlock.html)
-    - [DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)
-    - [Linux时间子系统之（二）：软件架构](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html)
-    - [关于spin_lock的问题](http://www.wowotech.net/linux_kenrel/about_spin_lock.html)
-    - [process credentials相关的用户空间文件](http://www.wowotech.net/linux_application/24.html)
+
+  - [Linux内核同步机制之（六）：Seqlock](http://www.wowotech.net/kernel_synchronization/seqlock.html)
+  - [DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)
+  - [Linux时间子系统之（二）：软件架构](http://www.wowotech.net/timer_subsystem/time-subsyste-architecture.html)
+  - [关于spin_lock的问题](http://www.wowotech.net/linux_kenrel/about_spin_lock.html)
+  - [process credentials相关的用户空间文件](http://www.wowotech.net/linux_application/24.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

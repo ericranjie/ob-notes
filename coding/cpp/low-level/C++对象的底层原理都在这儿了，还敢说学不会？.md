@@ -2,11 +2,11 @@
 
 博文视点Broadview
 
- _2021年12月30日 22:03_
+_2021年12月30日 22:03_
 
 以下文章来源于畅游码海 ，作者CallMeEngineer
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM64xwHaVbpExZZAQkfwibGD4ExzQibjEianicwUMOPOo3qc6Q/0)
 
@@ -14,7 +14,7 @@
 
 记录学习过程中的知识，从零开始构建学习框架，大家共同学习、共同进步！
 
-](https://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651145971&idx=1&sn=5e93166204be4f7035673901bfc9c6ee&chksm=bd012cd98a76a5cf8b6dae9d26b290b9565acc294698ba9933745356f65b4092b1dff5f3668e&mpshare=1&scene=24&srcid=12318DzuWFSvzK2ZGPGCf8Kn&sharer_sharetime=1640915420455&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d09eda1af3d60063a3556ecc6348d0e3ed6cd2bf4072731727a3e1314f646f8216e497ffa7c2c1bc4942891ea4d15e7cf3878f251ed667ca179c127b1e14fc2493c09940cb4358d7f8eb0b4d8a63cfe41a00e9da7c980cde574d00d795f5e38ec23961a22571eda67eaaa27a75db5e46a15015dd4136a04b94&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQftJ6QXjiORzAha5CTryzSxLmAQIE97dBBAEAAAAAAD6ZA%2BgtpnUAAAAOpnltbLcz9gKNyK89dVj0wSKZLWo1k5UF2Em%2BcLR1YQy1YpwUidJ93ffS1top2Nsa2Zk2OtoHewDCfe%2FYbo%2B5EI6QAiiUAFWNA7SvKHT8Kp5x%2FfcHpPS93QKkX5jKpJTHFFhHZSqSGHZk1q3iZ%2BwEZggqaM6A3e35nyqjmvXio5jH1Kqqfql%2FutICk%2BHNUt2ETkG%2BDZRjQ5EnffkcdefHYsalptt38iutlvzU1IxVoR%2BAJeUg9Jp02uNPcf1khJOVipUY4fwH9DvEHg2RbiN3&acctmode=0&pass_ticket=JQ0s69mqP9d%2FKrzPrLqXdWXvznH9a8PyS%2BbDuJ3Z4CxHSa%2Fh6CIxZU88hadWnbl7&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MjM5NTk0NjMwOQ==&mid=2651145971&idx=1&sn=5e93166204be4f7035673901bfc9c6ee&chksm=bd012cd98a76a5cf8b6dae9d26b290b9565acc294698ba9933745356f65b4092b1dff5f3668e&mpshare=1&scene=24&srcid=12318DzuWFSvzK2ZGPGCf8Kn&sharer_sharetime=1640915420455&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d09eda1af3d60063a3556ecc6348d0e3ed6cd2bf4072731727a3e1314f646f8216e497ffa7c2c1bc4942891ea4d15e7cf3878f251ed667ca179c127b1e14fc2493c09940cb4358d7f8eb0b4d8a63cfe41a00e9da7c980cde574d00d795f5e38ec23961a22571eda67eaaa27a75db5e46a15015dd4136a04b94&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQftJ6QXjiORzAha5CTryzSxLmAQIE97dBBAEAAAAAAD6ZA%2BgtpnUAAAAOpnltbLcz9gKNyK89dVj0wSKZLWo1k5UF2Em%2BcLR1YQy1YpwUidJ93ffS1top2Nsa2Zk2OtoHewDCfe%2FYbo%2B5EI6QAiiUAFWNA7SvKHT8Kp5x%2FfcHpPS93QKkX5jKpJTHFFhHZSqSGHZk1q3iZ%2BwEZggqaM6A3e35nyqjmvXio5jH1Kqqfql%2FutICk%2BHNUt2ETkG%2BDZRjQ5EnffkcdefHYsalptt38iutlvzU1IxVoR%2BAJeUg9Jp02uNPcf1khJOVipUY4fwH9DvEHg2RbiN3&acctmode=0&pass_ticket=JQ0s69mqP9d%2FKrzPrLqXdWXvznH9a8PyS%2BbDuJ3Z4CxHSa%2Fh6CIxZU88hadWnbl7&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/QMtSGqOCILmSSG7r2JlmvT8RHDxcjIjNfOUpiaUD3Xqrqibrmcnx4sfFxbtIp4NxSibyib2Zjp0QbpoibkVu0OaTrgA/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -28,11 +28,11 @@ C++ 在布局以及存储时间上主要的额外负担是由**virtual**引起�
 
 ## 1.1 C++对象模式
 
-C++对象模型有以下几点**非静态数据成员**放在类对象**内****静态数据成员**放在类对象**外****静态和非静态成员函数**也放在类对象**外**虚函数则不同 每个类中存放一个指针称为**vptr**，指向**虚函数表**表中每个都指向一个虚函数
+C++对象模型有以下几点**非静态数据成员**放在类对象**内\*\*\*\*静态数据成员**放在类对象**外\*\*\*\*静态和非静态成员函数**也放在类对象**外**虚函数则不同 每个类中存放一个指针称为**vptr**，指向**虚函数表**表中每个都指向一个虚函数
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/QMtSGqOCILn62exN3ox3PAkZKUMK8SDzZ725qvtlc2bU2SuAhC6ZTk39nfzfQFx4mxbtrEbsbb49uianjBuzMyg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
-C++对象模型  
+C++对象模型
 
 ## 1.2 关键词所带来的差异
 
@@ -48,7 +48,7 @@ C++支持的多态类型：
 
 `1. 经由一组隐式的转化操作：如派生类指针转化为指向父类的指针      2. 经由虚函数机制      3. 经由dynamic_cast 和 typeid运算符   `
 
-**一个class所占的大小包括：**其非静态成员所占的大小 由于内存对齐填补上的大小 加上支持虚函数而产生的大小
+\*\*一个class所占的大小包括：\*\*其非静态成员所占的大小 由于内存对齐填补上的大小 加上支持虚函数而产生的大小
 
 指针的类型，只能代表其让编译器如何解释其所指向的地址内容，和它本身类型无关，所以**转换其实是一种编译器指令，不改变所指向的地址，只影响怎么解释它给出的地址**
 
@@ -60,13 +60,13 @@ C++支持的多态类型：
 
 以下四种情况下，会合成有用的构造函数：**带有默认构造函数的成员函数对象，不过这个合成操作只有在构造函数真正需要被调用时才发生，但只是调用其成员的默认构造函数，其他则不会初始化****如果一个派生类的父类带有默认构造函数，那么子类如果没有定义构造函数，则会合成默认构造函数，如果有的话但是没有调用父类的，则编译器会插入一些代码调用父类的默认构造函数****带有一个虚函数的类**类声明（或继承）一个虚函数 类派生自一个继承串链，其中有一个或更多的虚基类**带有一个虚基类的类**
 
-C++新手常见的两个**误解**：**任何class如果没有定义默认构造函数，就会被合成出来一个****编译器合成出来的默认构造函数会显式设定类中的每一个数据成员的额 默认值**
+C++新手常见的两个**误解**：**任何class如果没有定义默认构造函数，就会被合成出来一个\*\*\*\*编译器合成出来的默认构造函数会显式设定类中的每一个数据成员的额 默认值**
 
 ## 2.2 拷贝构造函数的构造操作
 
 有三种情况会调用拷贝构造函数：**对一个对象做显式的初始化操作****当对象被当作参数交给某个函数****当函数传回一个类对象时**
 
-如果类没有声明一个拷贝函数，就会有**隐式的声明和隐式的定义**出现，同**默认构造函数**一样在使用时才合成出来 什么情况下一个类不展现“浅拷贝语意”：当类内含有一个成员类而后者的类声明中有一个**拷贝构造函数**（例如内含有string成员变量） 当类继承自一个基类而**基类**中存在**拷贝构造函数**这两个编译器都会合成拷贝构造函数并且**安插进那个成员和基类的拷贝构造函数**当类声明了一个或多个**虚函数****编译器会显式的设定新类的虚函数表，而不是直接拷贝过来指向同一个**当类派生自一个继承串链，其中有一个或多个**虚基类****编译器会合成一个拷贝构造函数，安插一些代码用来设定虚基类指针和偏移的初值，对每个成员执行必要的深拷贝初始化操作，以及执行其他的内存相关工作**
+如果类没有声明一个拷贝函数，就会有**隐式的声明和隐式的定义**出现，同**默认构造函数**一样在使用时才合成出来 什么情况下一个类不展现“浅拷贝语意”：当类内含有一个成员类而后者的类声明中有一个**拷贝构造函数**（例如内含有string成员变量） 当类继承自一个基类而**基类**中存在**拷贝构造函数**这两个编译器都会合成拷贝构造函数并且**安插进那个成员和基类的拷贝构造函数**当类声明了一个或多个**虚函数\*\*\*\*编译器会显式的设定新类的虚函数表，而不是直接拷贝过来指向同一个**当类派生自一个继承串链，其中有一个或多个**虚基类\*\*\*\*编译器会合成一个拷贝构造函数，安插一些代码用来设定虚基类指针和偏移的初值，对每个成员执行必要的深拷贝初始化操作，以及执行其他的内存相关工作**
 
 ## 2.3 程序转化语意学
 
@@ -76,7 +76,7 @@ C++新手常见的两个**误解**：**任何class如果没有定义默认构造
 
 ## 2.4 成员们的初始化队伍
 
-四种情况下你需要使用成员初始化列表**当初始化一个引用成员变量****当初始化一个const 成员变量****当调用一个基类的构造函数，而它拥有一组参数****当调用一个类成员变量的构造函数，而它拥有一组参数**
+四种情况下你需要使用成员初始化列表**当初始化一个引用成员变量****当初始化一个const 成员变量****当调用一个基类的构造函数，而它拥有一组参数\*\*\*\*当调用一个类成员变量的构造函数，而它拥有一组参数**
 
 ```
 class Word{ String _name; int _cnt;public: Word(){  _name = 0;  _cnt = 0; }/*使用成员列表初始化可以解决         Word() : _name(0)，_cnt(0){ }*/ }
@@ -92,7 +92,7 @@ class Word{ String _name; int _cnt;public: Word(){  _name = 0;  _cnt
 class X{};class Y : public virtual X {};class Z : public virtual X {};class A : public Y,public Z {};sizeof(X) //1sizeof(Y) //4sizeof(Z) //4sizeof(A) //8
 ```
 
-X为1是因为编译器的处理，在其中插入了1个char，为了**让其对象能在内存中有自己独立的地址**Y，Z**是因为虚基类表的指针****A 中含有Y和Z所以是8**
+X为1是因为编译器的处理，在其中插入了1个char，为了**让其对象能在内存中有自己独立的地址**Y，Z**是因为虚基类表的指针\*\*\*\*A 中含有Y和Z所以是8**
 
 每一个类对象大小的影响因素：**非静态成员变量的大小****virtual特性****内存对齐**
 
@@ -112,21 +112,21 @@ X为1是因为编译器的处理，在其中插入了1个char，为了**让其�
 
 **在下面给定的两个类中依次讨论不同情况：**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 原本的数据模型
 
 ### 在单一继承没有虚函数的情况下布局图
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 单一继承且无虚函数
 
-**这种情况下常见错误**：可能会重复设计一些操作相同的**函数**，我们可以把某些函数写成**inline**,这样就可以在子类中**调用**父类的某些函数来**实现简化****把数据放在同一个类中和继承起来的内存布局可能不同，因为每个类需要内存对齐**
+**这种情况下常见错误**：可能会重复设计一些操作相同的**函数**，我们可以把某些函数写成**inline**,这样就可以在子类中**调用**父类的某些函数来**实现简化\*\*\*\*把数据放在同一个类中和继承起来的内存布局可能不同，因为每个类需要内存对齐**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 分层继承的布局
 
@@ -134,23 +134,23 @@ X为1是因为编译器的处理，在其中插入了1个char，为了**让其�
 
 **容易出现的不易发现的问题：**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 继承下易犯错误
 
 ### **当加上多态之后，对空间上增加的额外负担包括：**
 
-**导入一个虚函数表，表中的个数是声明的虚函数的个数加上一个或两个slots(用来支持运行类型识别)****在每个对象中加入vptr，提供执行期的链接，使每一个类能找到相应的虚函数表****加强构造函数，使它能够为vptr设定初值，让它指向对应的虚函数表，这可能意味着在派生类和每一个基类的构造函数中，重新设定vptr的值****加强析构函数，使它能够消抹“指向类的相关虚函数表”的vptr,vptr很可能以及在子类析构函数中被设定为子类的虚表地址。****析构函数的调用顺序是反向的，从子类到父类**
+\*\*导入一个虚函数表，表中的个数是声明的虚函数的个数加上一个或两个slots(用来支持运行类型识别)****在每个对象中加入vptr，提供执行期的链接，使每一个类能找到相应的虚函数表****加强构造函数，使它能够为vptr设定初值，让它指向对应的虚函数表，这可能意味着在派生类和每一个基类的构造函数中，重新设定vptr的值\*\*\*\*加强析构函数，使它能够消抹“指向类的相关虚函数表”的vptr,vptr很可能以及在子类析构函数中被设定为子类的虚表地址。\*\***析构函数的调用顺序是反向的，从子类到父类**
 
 以下是三种情况：不同的继承下会有不同的布局
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 vptr放在前端
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 单一继承有虚函数
 
@@ -160,35 +160,35 @@ vptr放在前端
 
 多重继承下会比较复杂
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-多重继承关系  
+多重继承关系
 
 **一个派生对象，把它的地址指定给最左边的基类，和单一继承一样，因为起始地址是一样的，但是后面的需要更改，因为需要加上前面基类的大小，才能得到后面基类的地址**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-多重继承数据分布  
+多重继承数据分布
 
 ### 虚继承
 
 STL标准库中使用的虚继承：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-虚继承例子  
+虚继承例子
 
 **虚继承关系：**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **虚继承数据在内存中的分布**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-虚继承数据模型2  
+虚继承数据模型2
 
 ## 3.5 对象成员的效率
 
@@ -196,17 +196,17 @@ STL标准库中使用的虚继承：
 
 ## 3.6 指向数据成员的指针
 
-vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放在类中的任何位置 取某个类成员变量的地址，通常取到得的是在**类的首地址的偏移位置****例如** `& Point3d::z;` **将得到在类的偏移位置，最低限度是类的成员大小总和，而这个偏移量通常都被加上了1****如果用一个真正绑定类对象（也就是使用 . 操作符访问成员变量）去取地址，得到的将会是内存中真正的地址**
+vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放在类中的任何位置 取某个类成员变量的地址，通常取到得的是在**类的首地址的偏移位置\*\*\*\*例如** `& Point3d::z;` **将得到在类的偏移位置，最低限度是类的成员大小总和，而这个偏移量通常都被加上了1\*\*\*\*如果用一个真正绑定类对象（也就是使用 . 操作符访问成员变量）去取地址，得到的将会是内存中真正的地址**
 
 在多重继承下，若要将第二个积累的指针和一个与派生类绑定的成员结合起来，那么将会因为需要加入偏移量而变得相当复杂
 
 # Part4四、Function 语意学
 
-**C++支持三种类型的成员函数：static 、non-static 、virtual**static函数**限制**：**不能直接存取non-static数据****不能被声明为const**
+**C++支持三种类型的成员函数：static 、non-static 、virtual**static函数**限制**：**不能直接存取non-static数据\*\*\*\*不能被声明为const**
 
 ## 4.1 成员函数的各种调用方式
 
-**非静态成员函数：C++会保证至少和一般的普通的函数有相同的效率，经过三个步骤的转换****改写函数，安插一个额外的参数到该函数中，用来提供一个存取管道------即this指针****对每一个非静态成员的存取操作改成使用this指针来调用****将成员函数改写成一个外部函数，并且名称改为独一无二的**
+**非静态成员函数：C++会保证至少和一般的普通的函数有相同的效率，经过三个步骤的转换****改写函数，安插一个额外的参数到该函数中，用来提供一个存取管道------即this指针****对每一个非静态成员的存取操作改成使用this指针来调用\*\*\*\*将成员函数改写成一个外部函数，并且名称改为独一无二的**
 
 **虚函数成员函数：也会经过类似的转化**例如：`ptr->normalize()`会被转化为`( * ptr->vptr[1] )( ptr )`**vptr是编译器产生的指针，指向虚函数表，其名称也会被改为独一无二****1 是该函数在虚函数表中的索引****ptr 则是this指针**
 
@@ -220,23 +220,23 @@ vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放
 
 ### **单一继承虚函数布局图**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-单一继承虚函数图  
+单一继承虚函数图
 
-**一个类派生自Point会发生什么事？三种可能的情况****它可以继承基类所声明的虚函数的函数实例**，**该函数实例的地址会被拷贝进子类的虚表的相对应的slot之中****它可以使用自己的虚函数实例----它自己的函数实例地址必须放在对应的slot之中****它可以加入一个新的虚函数，这时候虚函数表的尺寸会增加一个slot，而新加入的函数实例地址也会被放进该slot之中**
+**一个类派生自Point会发生什么事？三种可能的情况\*\*\*\*它可以继承基类所声明的虚函数的函数实例**，**该函数实例的地址会被拷贝进子类的虚表的相对应的slot之中****它可以使用自己的虚函数实例----它自己的函数实例地址必须放在对应的slot之中****它可以加入一个新的虚函数，这时候虚函数表的尺寸会增加一个slot，而新加入的函数实例地址也会被放进该slot之中**
 
 ### 多重继承下的虚函数
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-多继承虚函数图  
+多继承虚函数图
 
 ### 虚拟继承下的虚函数
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-虚继承下的虚函数图  
+虚继承下的虚函数图
 
 ## 4.4指向成员函数的指针
 
@@ -254,27 +254,27 @@ vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放
 
 # Part5五、构造、析构、拷贝语意学
 
-**应注意的一些问题：****构造函数不要写为纯虚函数，因为当抽象类中有数据的时候，将无法初始化****把所有函数设计成虚函数，再由编译器去除虚函数是错误的，不应该成为虚函数的函数不要设计成虚函数****当你无法抉择一个函数是否需要为const时，尤其是抽象类，最好不设置成const**
+**应注意的一些问题：****构造函数不要写为纯虚函数，因为当抽象类中有数据的时候，将无法初始化****把所有函数设计成虚函数，再由编译器去除虚函数是错误的，不应该成为虚函数的函数不要设计成虚函数\*\*\*\*当你无法抉择一个函数是否需要为const时，尤其是抽象类，最好不设置成const**
 
 ## 5.1 "无继承" 情况下的对象构造
 
-**对于没有初始化的全局变量，C语言中会将其放在一个未初始化全局区，而C++会将所有全局对象初始化**对于不需要构造函数、析构函数、赋值操作的类或结构体，C++会将其打上**POD**标签，赋值时按照c那样的位搬运**对于含有虚函数的类，编译器会在构造函数的开始放入一些初始化虚表和虚指针的操作****面对函数以值方式返回，编译器会将其优化为加入一个参数的引用方式，避免多次构造函数**
+**对于没有初始化的全局变量，C语言中会将其放在一个未初始化全局区，而C++会将所有全局对象初始化**对于不需要构造函数、析构函数、赋值操作的类或结构体，C++会将其打上**POD**标签，赋值时按照c那样的位搬运**对于含有虚函数的类，编译器会在构造函数的开始放入一些初始化虚表和虚指针的操作\*\*\*\*面对函数以值方式返回，编译器会将其优化为加入一个参数的引用方式，避免多次构造函数**
 
 ## 5.2 继承体系下的对象构造
 
-构造函数会含有大量的隐藏嘛，因为编译器会进行**扩充**：记录在成员**初始化列表中的成员数据**初始化会被放进构造函数的本体，并以成员在类中**声明**的顺序为顺序 如果有一个成员并**没有**出现在成员初始化列表中，但是它由一个**默认构造函数**，那么也会被**调用****在那之前，如果类对象由虚表指针，它必须被设定初值，指向适当的虚表****在那之前**，**所有**上一层的**基类构造函数**必须被调用，以**基类声明的顺序**（不是成员初始化列表出现的顺序）**如果基类被列于成员初始化列表中，那么任何显式指定的参数应该传递过去****如果基类没有被列于基类初始化列表中，而它有默认的构造函数，那么就调用****如果基类是多重继承下的第二个或后继的基类，那么this指针必须有所调整****在那之前**，所有**虚基类构造函数**必须被调用，**从左到右，从最深到最浅****如果类被列于成员初始化列表中，那么如果有任何显式指定的参数，都应该传递过去。若没有列于list中，而类中有一个默认构造，亦应该调用**此外，类中的每一个虚基类的偏移位置必须**在执行期可被存取****如果类对象是最底层的类，其构造函数可能被调用，某些用以支持这一行为的机制必须被放进来**
+构造函数会含有大量的隐藏嘛，因为编译器会进行**扩充**：记录在成员**初始化列表中的成员数据**初始化会被放进构造函数的本体，并以成员在类中**声明**的顺序为顺序 如果有一个成员并**没有**出现在成员初始化列表中，但是它由一个**默认构造函数**，那么也会被**调用****在那之前，如果类对象由虚表指针，它必须被设定初值，指向适当的虚表****在那之前**，**所有**上一层的**基类构造函数**必须被调用，以**基类声明的顺序**（不是成员初始化列表出现的顺序）**如果基类被列于成员初始化列表中，那么任何显式指定的参数应该传递过去****如果基类没有被列于基类初始化列表中，而它有默认的构造函数，那么就调用****如果基类是多重继承下的第二个或后继的基类，那么this指针必须有所调整\*\*\*\*在那之前**，所有**虚基类构造函数**必须被调用，**从左到右，从最深到最浅\*\*\*\*如果类被列于成员初始化列表中，那么如果有任何显式指定的参数，都应该传递过去。若没有列于list中，而类中有一个默认构造，亦应该调用**此外，类中的每一个虚基类的偏移位置必须**在执行期可被存取\*\*\*\*如果类对象是最底层的类，其构造函数可能被调用，某些用以支持这一行为的机制必须被放进来**
 
 不要忘记在赋值函数中，**检查自我赋值的情况**
 
 ## 5.3 对象复制语意学
 
-当一个类复制给另一个类时，能采用的有三种方式：**什么都不做，会实施默认行为**如果有需要，会自动生成一个**浅拷贝**，至于什么时候需要**深拷贝**（见第二章讲）**提供一个拷贝复制运算符****显式地拒绝把一个类拷贝给另一个**
+当一个类复制给另一个类时，能采用的有三种方式：**什么都不做，会实施默认行为**如果有需要，会自动生成一个**浅拷贝**，至于什么时候需要**深拷贝**（见第二章讲）**提供一个拷贝复制运算符\*\*\*\*显式地拒绝把一个类拷贝给另一个**
 
 **虚基类会使其复制操作调用一次以上，因此我们应该避免在虚基类中声明数据成员**
 
 ## 5.5 析构语意学
 
-什么时候会**合成析构函数**？**在类内含的成员函数有析构函数****基类含有析构函数**
+什么时候会**合成析构函数**？**在类内含的成员函数有析构函数\*\*\*\*基类含有析构函数**
 
 析构的**正确顺序**：**析构函数的本体首先被执行，vptr会在程序员的代码执行前被重设。****如果类拥有成员类对象，而后者拥有析构函数，那么他们会以其声明顺序的相反顺序被调用****如果类内涵一个vptr,现在被重新设定，指向适当的积累的虚表****如果有任何直接的非虚基类拥有析构函数，它们会以其声明顺序的相反顺序被调用****如果有任何虚基类拥有析构函数，而且目前讨论的这个类是最尾端的类，那么它们会以其原来的构造顺序的相反顺序被调用**
 
@@ -284,11 +284,11 @@ vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放
 
 编译器对**不同**的对象会做**不同**的操作：
 
-对于**全局对象**：编译器会在添加__main函数和_exit函数(和C库中的不同)，并且在这两个函数中对所有全局对象进行静态初始化和析构
+对于**全局对象**：编译器会在添加\_\_main函数和_exit函数(和C库中的不同)，并且在这两个函数中对所有全局对象进行静态初始化和析构
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-全局对象编译器操作  
+全局对象编译器操作
 
 使用被静态初始化的对象，有一些**缺点**：
 
@@ -306,7 +306,7 @@ vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放
 
 ## 6.2 new 和 delete 运算符
 
-对于**普通类型变量**：例如int *pi = new int(5) 调用函数库中的new运算符if(int *pi = _new (sizeof(int) )) 再配置初值 *pi = 5 对于delete来说 delete pi; 则先进行保护 if( pi != 0) 再调用delete  、_delete(pi)
+对于**普通类型变量**：例如int \*pi = new int(5) 调用函数库中的new运算符if(int \*pi = \_new (sizeof(int) )) 再配置初值 \*pi = 5 对于delete来说 delete pi; 则先进行保护 if( pi != 0) 再调用delete  、\_delete(pi)
 
 对于**成员对象**：
 
@@ -340,7 +340,7 @@ vptr通常放在**起始处或尾端**，与编译器有关，C++标准允许放
 
 ### Placement Operator new的语意
 
-**有一个预先定义好的重载的new运算符，称为placement operator new。它需要第二个参数，类型为void***
+**有一个预先定义好的重载的new运算符，称为placement operator new。它需要第二个参数，类型为void**\*
 
 形如 `Point2w *ptw = new (arena) Point2w`,**其中arena指向内存中的一个区块，用以放置新产生出来的Point2w 对象**
 
@@ -385,73 +385,60 @@ C++**异常处理**由**三个**主要的语汇组件：
 **因此一个解决办法就是将类封装在一个类中，这样变成局部类，如果抛出异常也会被自动析构**当一个异常抛出，**编译系统必须**：
 
 1. 检查发生throw操作的函数
-    
-2. 决定throw操作是否发生在try区段
-    
-3. 若是，编译系统必须把异常类型拿来和每一个catch子句进行比较
-    
-4. 如果比较后吻合，流程控制应该交到catch子句中
-    
-5. 如果throw的发生并不在try区段中，或没有一个catch子句吻合，那么系统必须：摧毁所有活跃局部类 从堆栈中将目前的函数(unwind)释放掉 进行到程序堆栈的下一个函数中去，然后重复上述步骤2—5
-    
+
+1. 决定throw操作是否发生在try区段
+
+1. 若是，编译系统必须把异常类型拿来和每一个catch子句进行比较
+
+1. 如果比较后吻合，流程控制应该交到catch子句中
+
+1. 如果throw的发生并不在try区段中，或没有一个catch子句吻合，那么系统必须：摧毁所有活跃局部类 从堆栈中将目前的函数(unwind)释放掉 进行到程序堆栈的下一个函数中去，然后重复上述步骤2—5
 
 ## 7.3 执行期类型识别
 
-当两个类有继承关系的时候，我们有转换需求时，可以进行向下转型，但是很多时候是**不安全的****C++的RTTI (执行期类型识别)提供了一个安全的向下转型设备，但是只对多态（继承和动态绑定）的类型有效，其用来支持RTTI的策略就是，在C++的虚函数表的第一个slot处，放一个指针，指向保存该类的一些信息----即type_info类（在编译器文件中可以找到其定义）****dynamic_cast运算符可以在执行期决定真正的类型**对于**指针**来说：**如果转型成功，则会返回一个转换后的指针****如果是不安全的，会传回0****放在程序中通过 if 来判断是否成功，采取不同措施**对于**引用**来说：**如果引用真正转换到适当的子类，则可以继续****如果不能转换的话，会抛出 bad_cast 异常****通常使用 try 和 catch 来进行判断是否成功**
+当两个类有继承关系的时候，我们有转换需求时，可以进行向下转型，但是很多时候是**不安全的\*\*\*\*C++的RTTI (执行期类型识别)提供了一个安全的向下转型设备，但是只对多态（继承和动态绑定）的类型有效，其用来支持RTTI的策略就是，在C++的虚函数表的第一个slot处，放一个指针，指向保存该类的一些信息----即type_info类（在编译器文件中可以找到其定义）\*\*\*\*dynamic_cast运算符可以在执行期决定真正的类型**对于**指针**来说：**如果转型成功，则会返回一个转换后的指针****如果是不安全的，会传回0****放在程序中通过 if 来判断是否成功，采取不同措施**对于**引用**来说：**如果引用真正转换到适当的子类，则可以继续****如果不能转换的话，会抛出 bad_cast 异常****通常使用 try 和 catch 来进行判断是否成功**
 
 **Typeid运算符**：**可以传入一个引用,typeid运算符会传回一个const reference,类型为type_info。其内部已经重载了 == 运算符，可以直接判断两个是否相等，回传一个bool值**例如  `if( typeid( rt ) == typeid( fct ) )`**RTTI虽然只适用于多态类，但是事实上type_info object也适用于内建类，以及非多态的使用者自定类型，只不过内建类型 得到的type_info类是静态取得，而不是执行期取得。**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+**品味经典**
 
-**品味经典**  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **▊《******C++ Primer中文版（第5版）******》**
 
 Stanley B. Lippman,Josee Lajoie,Barbara E. Moo 著
 
-王刚 杨巨峰 译 
-
-  
+王刚 杨巨峰 译
 
 - 如果只读一本C++书，本书将是你永不局悔的选择
-    
+
 - 征服全球数千万读者的大师之作
-    
+
 - C++学习头牌，技术影响力图书冠军
-    
 
 真正畅行全球20年的C++入门必读经典，惠及数百万高校师生启蒙5代国产程序员，语言缔造者与常青藤名校数版迭代的杰作，系统透彻：从初学到专家可全程案头备用。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "c++ primer二维码.png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "c++ primer二维码.png")
 
 （快快扫码抢购吧！）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "了不起的JavaScript工程师：从前端到全端高级进阶.jpg")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "了不起的JavaScript工程师：从前端到全端高级进阶.jpg")
 
-**▊《******Effective C++：改善程序与设计的55个具体做法（第三版）中文版**》**
+\*\*▊《\*\*****Effective C++：改善程序与设计的55个具体做法（第三版）中文版**》**
 
 Scott Meyers 著
 
 侯捷 译
 
-  
-
 - 一本轻薄短小高密度的“专家经验累积”
-    
+
 - 国际影响力波及了整个计算机技术出版领域
-    
-      
-    
 
 本书不是读完一遍就可以束之高阁的快餐读物，也不是用以解决手边问题的参考手册，而是需要您去反复阅读体会的，C++是真正程序员的语言，背后后精神的思想与无以伦比的表达能力，这使得它具有类似宗教般的魅力。希望这本书能够帮您跨越C++的重重险阻，领略高处才有的壮美风光，做一个成功而快乐的C++程序员。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "9787121387074.png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "9787121387074.png")
 
 **▊《******More Effective C++：35个改善编程与设计的有效方法（中文版）******》**
 
@@ -460,36 +447,32 @@ Scott Meyers 著
 侯捷 译
 
 - 梅耶尔大师Effective三部曲之一
-    
 
 继Effective C++之后，Scott Meyers于1996推出这本“续集”。条款变得比较少，页数倒是多了一些，原因是这次选材比“第一集”更高阶。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "More Effective C++二维码.png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "More Effective C++二维码.png")
 
 （京东满100减50，快快扫码抢购吧！）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**▊《****深度探索C++对象模型》**
+\*\*▊《\*\***深度探索C++对象模型》**
 
 Stanley，B. Lippman 著
 
 侯捷 译
 
-  
-
 - 一位伟大的C++编译程序设计者向你阐述他如何处理各种explicit（明确出现于C++程序代码中）和implicit（隐藏于程序代码背后）的C++语意
-    
 
 本书专注于C++面向对象程序设计的底层机制，包括结构式语意、临时性对象的生成、封装、继承，以及虚拟――虚拟函数和虚拟继承。
 
 这本书让你知道：一旦你能够了解底层实现模型，你的程序代码将获得多么大的效率。Lippman澄清了那些关于C++额外负荷与复杂度的各种错误信息和迷思，但也指出其中某些成本和利益交换确实存在。他阐述了各式各样的实现模型，指出它们的进化之道及其本质因素。书中涵盖了C++对象模型的语意暗示，并指出这个模型是如何影响你的程序的。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "深度探索C++对象模型二维码.png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "深度探索C++对象模型二维码.png")
 
 （京东满100减50，快快扫码抢购吧！）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "高性能JavaScript.jpg")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "高性能JavaScript.jpg")
 
 **▊《**********C++标准库（第2版）**********》**
 
@@ -497,82 +480,55 @@ Stanley，B. Lippman 著
 
 侯捷 译
 
-  
-
 - 全球C++经典权威参考书
-    
+
 - 1100页鸿篇巨著，基于C++11重写全书示例代码
-    
-      
-    
 
 标准库提供了一组公共类和接口，极大地拓展了C++语言核心功能。本书详细讲解了每一标准库组件，包括其设计目的和方法、复杂概念的剖析、实用而高效的编程细节、存在的陷阱、重要的类和函数，又辅以大量用C++11标准实现的实用代码范例。除覆盖全新组件、特性外，本书一如前版，重点着眼于标准模板库（STL），涉及容器、迭代器、函数对象以及STL算法。此外，本书同样关注lambda表达式、基于区间的for循环、move语义及可变参数模板等标准库中的新式C++编程风格及其影响。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "C++标准库（第2版）二维码.png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "C++标准库（第2版）二维码.png")
 
 （京东满100减50，快快扫码抢购吧！）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "C++服务器开发精髓.jpg")
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "C++服务器开发精髓.jpg")
 
 **▊《C++服务器开发精髓》**
 
 张远龙 著
 
-  
-
 - 从操作系统原理角度讲解C++服务器开发技术栈
-    
+
 - 内容详尽细致、版本新
-    
+
 - 重磅级C++服务器开发红宝书
-    
-      
-    
 
 本书详细讲解如何掌握C++服务器开发技术，以及如何成为合格的C++开发者，秉承的思想是，通过掌握技术原理，可以轻松制造“轮子”，灵活设计出优雅、鲁棒的服务，并快速学习新技术。
 
 无论是对于C/C++开发者、计算机专业的学生，还是对于想了解操作系统原理的读者，本书都极具参考价值。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "c++服务器二维码 (2).png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "c++服务器二维码 (2).png")
 
 （扫码了解本书详情）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果喜欢本文
 
 欢迎 **在看**丨**留言**丨**分享至朋友圈** 三连
 
-  
+**热文推荐**
 
-  
+- [直击前沿技术：云原生应用低代码开发平台实践](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651145823&idx=1&sn=3498d75233b25c1b97db9bb5da21233c&chksm=bd012c758a76a563c6a8f5a8ec121b81ff469490fae52ce837020ce1beabe33f81548a3d6ca2&scene=21#wechat_redirect)
 
- **热文推荐**  
+- [你能看到的互联网企业案例最多的一本书](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651145800&idx=1&sn=badf7210dc0b836618af0d24eddc1851&chksm=bd012c628a76a574ee621f7513e735677b2cc91893312d87aa6b86978484f850a683111ae886&scene=21#wechat_redirect)
 
-  
+- [机器翻译是否能替代人工翻译？](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651137246&idx=1&sn=6bd6d71aeaacc8f9d43aa65417119cd5&chksm=bd014ef48a76c7e2bba94f2fe022f067fc0f3c5211659888907622a700de1d670052aa5ef40d&scene=21#wechat_redirect)
 
-- [直击前沿技术：云原生应用低代码开发平台实践](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651145823&idx=1&sn=3498d75233b25c1b97db9bb5da21233c&chksm=bd012c758a76a563c6a8f5a8ec121b81ff469490fae52ce837020ce1beabe33f81548a3d6ca2&scene=21#wechat_redirect)  
-    
-- [你能看到的互联网企业案例最多的一本书](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651145800&idx=1&sn=badf7210dc0b836618af0d24eddc1851&chksm=bd012c628a76a574ee621f7513e735677b2cc91893312d87aa6b86978484f850a683111ae886&scene=21#wechat_redirect)  
-    
-- [机器翻译是否能替代人工翻译？](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651137246&idx=1&sn=6bd6d71aeaacc8f9d43aa65417119cd5&chksm=bd014ef48a76c7e2bba94f2fe022f067fc0f3c5211659888907622a700de1d670052aa5ef40d&scene=21#wechat_redirect)  
-    
 - [深度学习视频理解之图像分类](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651137170&idx=1&sn=cb4472a35e41c9cf15ad40a507441697&chksm=bd014eb88a76c7ae0b1c031d73132cd8c3effb5eb54e01f09b503a1ce3809385c1015a4be1db&scene=21#wechat_redirect)
-    
 
-  
+______________________________________________________________________
 
----
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 1645
 

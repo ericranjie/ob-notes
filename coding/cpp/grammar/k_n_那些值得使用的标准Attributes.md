@@ -1,4 +1,3 @@
-
 今天这篇文章，我想跟大家探索下Attributes这个概念。
 如果你还没有听过这个概念，或是一知半解，没咋用过，那正好表明它处于一个被忽略或是低估的位置。
 Meeting C++曾经对此做过一份调查，结果如下：
@@ -14,13 +13,13 @@ From Meeting C++ Community
 
 data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
-许多C++编译器不仅仅实现了语言的核心特性，还通过扩展提供了一些额外特性，比如gnu提供的__attribute__，msvc提供的__declspec。
+许多C++编译器不仅仅实现了语言的核心特性，还通过扩展提供了一些额外特性，比如gnu提供的\_\_attribute\_\_，msvc提供的\_\_declspec。
 
 编译器可以根据这些扩展的特性进行一些优化，但由于这些特性和平台绑定，使用这些特性就会影响代码的可移植性。
 
 因此，C++标准从C++11就开始把一些有用的扩展，慢慢添加到标准中来。
 
-这些添加进来的扩展就叫做**「C++ Attributes」**，标准对语法进行了统一，使用[[attr]]或是[[namespace::attr]]来指定普通的或是带有命名空间的Attributes。
+这些添加进来的扩展就叫做\*\*「C++ Attributes」\*\*，标准对语法进行了统一，使用\[\[attr\]\]或是\[\[namespace::attr\]\]来指定普通的或是带有命名空间的Attributes。
 
 那么为什么要采用新语法，而非引入新的关键字呢？
 
@@ -60,15 +59,15 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 第一部分，优化。指的是Attributes的目的是从内存布局、对齐、并发顺序、控制冒险等等这些可以提高性能的角度对代码进行优化。
 
-例如，[[no_unique_address]]从内存的角度优化类中数据成员的存储形式，[[(un)likely]]从动态分支预测的角度来应对控制冒险，从而提高程序性能，[[carries_depency]]从内存顺序的角度来优化并发能力。
+例如，\[\[no_unique_address\]\]从内存的角度优化类中数据成员的存储形式，\[\[(un)likely\]\]从动态分支预测的角度来应对控制冒险，从而提高程序性能，\[\[carries_depency\]\]从内存顺序的角度来优化并发能力。
 
 第二部分，约束。有句名言叫，「设计是为了厉行约束」。好的设计应该尽可能在编译期就发现大部分错误，约束就是保证用户的使用方式与你的设计意图相符合，一些Attributes提供了这方面的能力。
 
-例如，最流行的[[nodiscard]]可以在用户忽略重要的函数返回值时，进行提醒。[[deprecated]]可以标记某个组件已被弃用，并告知用户新的替代品。
+例如，最流行的\[\[nodiscard\]\]可以在用户忽略重要的函数返回值时，进行提醒。\[\[deprecated\]\]可以标记某个组件已被弃用，并告知用户新的替代品。
 
 第三部分，警告。C++包含许多奇技淫巧，所以有些代码看似无用，其实不然。然而编译期会对这些有意的代码进行误判，给出警告，当然也有技巧去消除这些警告，但Attributes提供了更加规范统一的做法。
 
-例如，[[fallthrough]]可以消除有意落空的case语句，就是故意省掉case中的break所导致的错误。[[maybe_unused]]可以消除未使用的变量警告。[[noreturn]]可以解决「调用不会返回的函数时」缺少返回值的错误。
+例如，\[\[fallthrough\]\]可以消除有意落空的case语句，就是故意省掉case中的break所导致的错误。\[\[maybe_unused\]\]可以消除未使用的变量警告。\[\[noreturn\]\]可以解决「调用不会返回的函数时」缺少返回值的错误。
 
 简而言之，Attributes涉及三个方面，优化、约束与警告。在你编写代码时，若程序想要更多的提高，可以停下来思考一下：
 
@@ -84,7 +83,7 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 下来让我们先来对这些特性有了基本的理解。
 
-首先来看[[no_unique_address]]，它使类数据成员可以拥有相同的地址。
+首先来看\[\[no_unique_address\]\]，它使类数据成员可以拥有相同的地址。
 
 有什么用呢？两点作用。
 
@@ -108,7 +107,7 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 许多类并没有被设计成一个基类，因此将它们作为基类也许并不合适。
 
-[[no_unique_address]]提供了另一种解决办法，这种方式要更加优雅：
+\[\[no_unique_address\]\]提供了另一种解决办法，这种方式要更加优雅：
 
 `1**template**<**class** **AllocPolicy**>2**class** **Foo** {3    **int** i;4    [[no_unique_address]] AllocPolicy alloc;5};`
 
@@ -126,19 +125,19 @@ foo中包含my_type，my_type中int占4字节，char占1字节，加上tail padd
 
 这里面tail padding一共增加了4字节的开销，其实my_type的那3字节开销，可以给3字节的char使用，这样总共就只需要占用8字节。
 
-[[no_unique_address]]可以实现这个目标，代码如下：
+\[\[no_unique_address\]\]可以实现这个目标，代码如下：
 
 `1**struct** **foo** {2    [[no_unique_address]] my_type var;3    **char** c[3];4};`
 
 **不过就我测试，gcc和msvc似乎都还没有这种优化，msvc甚至第一点作用也不支持。**
 
-另外，这里还需要强调一下，[[no_unique_address]]只能应用于「非静态的数据成员」，所以不要试图在静态变量或是全局变量之上使用它。。
+另外，这里还需要强调一下，\[\[no_unique_address\]\]只能应用于「非静态的数据成员」，所以不要试图在静态变量或是全局变量之上使用它。。
 
-接下来，简单说下[[(un)likely]]和[[carries_dependency]]，由于这两个我打算单独写文章，所以这里只蜻蜓点水一下。
+接下来，简单说下\[\[(un)likely\]\]和\[\[carries_dependency\]\]，由于这两个我打算单独写文章，所以这里只蜻蜓点水一下。
 
-[[(un)likely]]其实包含两个：[[unlikely]]和[[likely]]，用于在分支代码中辅助编译器实现更加准确的「分支预测」。这到底有没有用呢？对性能提升有多大用呢？等我准备好资料数据单篇中来论。
+\[\[(un)likely\]\]其实包含两个：\[\[unlikely\]\]和\[\[likely\]\]，用于在分支代码中辅助编译器实现更加准确的「分支预测」。这到底有没有用呢？对性能提升有多大用呢？等我准备好资料数据单篇中来论。
 
-[[carries_dependency]]这个是关于并发的优化，涉及我们讲过的Memory Order，还是单篇来说。
+\[\[carries_dependency\]\]这个是关于并发的优化，涉及我们讲过的Memory Order，还是单篇来说。
 
 总之，优化这部分的Attributes的确有用，而且必不可少，在合适的场景还是推荐使用。
 
@@ -150,7 +149,7 @@ foo中包含my_type，my_type中int占4字节，char占1字节，加上tail padd
 
 因而这成了使用率最高的一类Attributes。
 
-其中[[nodiscard]]无疑又是最常用的，它的目的在于**显式地表达所定义接口的意义**。
+其中\[\[nodiscard\]\]无疑又是最常用的，它的目的在于**显式地表达所定义接口的意义**。
 
 可以用它来标记一个函数的返回值：
 
@@ -160,7 +159,7 @@ foo中包含my_type，my_type中int占4字节，char占1字节，加上tail padd
 
 data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
-这样的警告有效，不过很模糊，应该使用扩展版本[[nodiscard("reason")]]来说明原因：
+这样的警告有效，不过很模糊，应该使用扩展版本\[\[nodiscard("reason")\]\]来说明原因：
 
 `1[[nodiscard("the return value indicates a state of executing result. do not ignore it.")]] 2**int** **foo**() {3    **return** 1;       4}`
 
@@ -178,23 +177,23 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 - 不使用返回值，通常会出现错误
 - std::async()，不使用返回值会导致调用变成同步的
 
-还有一种有趣的思路，对于那些你不想让用户使用的函数，为它加上一个[[nodiscard]]返回值。这样，就增加了此类函数的使用成本，亦即用起来变得麻烦了，用户便会趋于放弃它。比如给printf加一个 :D
+还有一种有趣的思路，对于那些你不想让用户使用的函数，为它加上一个\[\[nodiscard\]\]返回值。这样，就增加了此类函数的使用成本，亦即用起来变得麻烦了，用户便会趋于放弃它。比如给printf加一个 :D
 
 所以，不是所有地方都适合添加该属性，到处乱加可能会适得其反。
 
-其次流行的是[[deprecated]]，它表明弃用某个组件，组件可以是函数、变量、类等等，也可以直接弃用整个命名空间下的所有组件。
+其次流行的是\[\[deprecated\]\]，它表明弃用某个组件，组件可以是函数、变量、类等等，也可以直接弃用整个命名空间下的所有组件。
 
 使用起来相当简单，代码如下：
 
 `1[[deprecated]]2**void** **foo**() {}34**int** **main**() {5    foo();6}`
 
-因为显式指定了[[deprecated]]，所以当你试图调用foo()时，编译器会给出警告。
+因为显式指定了\[\[deprecated\]\]，所以当你试图调用foo()时，编译器会给出警告。
 
 [https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEmxR2YggWdKSdHb8fDppXS92uzbHe5V7kGRLbqib7Ej7Je5VNEpEzjpG5JjRNxaUlrxNicRlbUEHl4g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEmxR2YggWdKSdHb8fDppXS92uzbHe5V7kGRLbqib7Ej7Je5VNEpEzjpG5JjRNxaUlrxNicRlbUEHl4g/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 当然，只是这样，用户可能会不明就里。所以同时，你应该说明弃用的原因，以及替代品。
 
-这使用的是扩展版的[[deprecated("reason")]]，修改上面代码如下：
+这使用的是扩展版的\[\[deprecated("reason")\]\]，修改上面代码如下：
 
 `1[[deprecated("foo() may be unsafe. Consider using foo_safe() instead.")]]2**void** **foo**() {}`
 
@@ -202,7 +201,7 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 [https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEmxR2YggWdKSdHb8fDppXS9k4jVl0hDyoqPwcbO3C90DfqGvexmib0gSG7DFxrwiatmdVic8Qic3z7uSA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEmxR2YggWdKSdHb8fDppXS9k4jVl0hDyoqPwcbO3C90DfqGvexmib0gSG7DFxrwiatmdVic8Qic3z7uSA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-总结一下，[[nodiscard]]比较有用，使用场景非常多，可以一定程度杜绝用户的错误行为；[[deprecated]]可以在放弃旧的接口时，告诉用户应该使用新的接口。
+总结一下，\[\[nodiscard\]\]比较有用，使用场景非常多，可以一定程度杜绝用户的错误行为；\[\[deprecated\]\]可以在放弃旧的接口时，告诉用户应该使用新的接口。
 
 data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
@@ -210,7 +209,7 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 涉及警告的Attributes最为简单易用，所以使用率也还不错。
 
-其中，[[maybe_unused]]用于消除编译器的未使用变量警告。
+其中，\[\[maybe_unused\]\]用于消除编译器的未使用变量警告。
 
 比如，你在DEBUG时期可能会设置许多断言来检测错误，而当你编译RELEASE版本时，就可能会产生这个警告：
 
@@ -220,11 +219,11 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
-通过使用[[maybe_unused]]，便可以消除这个警告：
+通过使用\[\[maybe_unused\]\]，便可以消除这个警告：
 
 `1**void** **foo**() {2    [[maybe_unused]] **int** dummy = 1;3    assert(dummy == 1);4}`
 
-其次，来看[[fallthrough]]，它的使用场景在于switch-case语句，也非常简单。
+其次，来看\[\[fallthrough\]\]，它的使用场景在于switch-case语句，也非常简单。
 
 看如下代码：
 
@@ -238,9 +237,9 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 `1**void** **foo**(**int** connState) { 2    **switch**(connState) { 3    **default**: 4        **if**(connection_timeout()) { // 如果连接超时 5            connState = reset_connect();   // 重置连接 6            [[fall_through]];    7        } **else** { 8            **break**; 9        }10    **case** LISTEN:11        ...12    }13}`
 
-这里有一点需要注意，**[[fallthrough]]的下一条执行语句必须得是case标签。**
+这里有一点需要注意，**\[\[fallthrough\]\]的下一条执行语句必须得是case标签。**
 
-最后，有一个比较特殊的Attribute，就是[[noreturn]]。
+最后，有一个比较特殊的Attribute，就是\[\[noreturn\]\]。
 
 为什么说它特殊呢？因为它有两点作用，一是消除警告，二是优化。
 
@@ -252,19 +251,19 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 控制流永远不会返回到调用方，往往意味着程序遇到了错误，需要终结或抛出异常。
 
-那么为何我要在警告这块讲解[[noreturn]]，而不是在优化那里呢？
+那么为何我要在警告这块讲解\[\[noreturn\]\]，而不是在优化那里呢？
 
-一个很重要的原因就是，**优化并不是[[noreturn]]存在的主要目的，试想一下，这种「永远不会返回」的情况有多常见？几乎很少出现，所以通常来说也没有优化的必要。它更重要的目的在于，消除警告。**
+一个很重要的原因就是，**优化并不是\[\[noreturn\]\]存在的主要目的，试想一下，这种「永远不会返回」的情况有多常见？几乎很少出现，所以通常来说也没有优化的必要。它更重要的目的在于，消除警告。**
 
 看第10行代码，因为raise()永远不会返回，所以else分支也就没有必要写return。然而编译器并不知晓，它发现存在分支没有返回，于是给出警告：
 
 [https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEmANlctdrM18nSrBibSE31IOWoqpIib4cKWr5d3SPldjNxZJ5SdBiaYv9NMfyqKq6jzwiaL2Sq1xwBAFQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/9XBBCfGaPEmANlctdrM18nSrBibSE31IOWoqpIib4cKWr5d3SPldjNxZJ5SdBiaYv9NMfyqKq6jzwiaL2Sq1xwBAFQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-因此[[noreturn]]的**作用就是告诉编译器，这个函数永远不会返回，所以其后的任何代码都不会得到执行，也就自然不需要返回语句了。**
+因此\[\[noreturn\]\]的**作用就是告诉编译器，这个函数永远不会返回，所以其后的任何代码都不会得到执行，也就自然不需要返回语句了。**
 
 对于上述代码，若调用f(false)，那么第16行代码永远也不可能执行到，这种代码尤其应当避免。
 
-再稍微提一下，要小心使用[[noreturn]]，如果你的函数包含了一个while循环，之后你却无意识地打破了这个循环，程序的行为可能会变得非常怪异。
+再稍微提一下，要小心使用\[\[noreturn\]\]，如果你的函数包含了一个while循环，之后你却无意识地打破了这个循环，程序的行为可能会变得非常怪异。
 
 总而言之，警告这类Attributes使用起来比较简单，用处当然也不大，但当你遇到了上述问题，应该想到可以使用它们来进行解决。
 

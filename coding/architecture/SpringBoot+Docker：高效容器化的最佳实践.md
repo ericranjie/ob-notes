@@ -1,10 +1,8 @@
-
-
 码猿技术专栏
 
- _2024年04月15日 08:40_ _浙江_
+_2024年04月15日 08:40_ _浙江_
 
-**大家好，我是不才陈某~**  
+**大家好，我是不才陈某~**
 
 首先为什么要使用Docker？
 
@@ -39,19 +37,18 @@ Docker是一个强大的工具，它允许开发者将他们的应用程序打�
 第一部分指令的含义：
 
 - **java：** 这是运行Java应用程序或执行Java字节码的命令。
-    
+
 - **-Djarmode=layertools：** 这是一个系统属性，它使用-D标志指定。它将HRIMARMODE属性的值设置为更高级的LayerTools。这是启用“layertools”模式来操作模块化 JAR 文件中的“层”的另一种方法。
-    
+
 - **-jar app.jar：** 指定要执行的 JAR 文件名为“app.jar”。该`-jar`选项指示指定的文件是可执行的 JAR 文件。
-    
+
 - **extract：** 这是在 JAR 文件中传递给应用程序的参数或命令。它指示应用程序执行特定操作，在本例中是提取 JAR 文件的内容。
-    
 
 通过这种方式使用多阶段构建，我们可以创建一个精简的 Docker 映像，其中仅包含运行 Spring Boot 应用程序所需的依赖项和文件。通过这样做，我们可以减小图像的大小并提高应用程序的性能。
 
 另一种方法是使用 Build-pack.io，它会在您的 pom 中自动为您生成图像，并将其添加到插件标签中：
 
-`<build>       <plugins>           <plugin>               <configuration>                   <image>                       <name>kia/test</name>                   </image>               </configuration>               <groupId>org.springframework.boot</groupId>               <artifactId>spring-boot-maven-plugin</artifactId>           </plugin>       </plugins>   </build>`      
+`<build>       <plugins>           <plugin>               <configuration>                   <image>                       <name>kia/test</name>                   </image>               </configuration>               <groupId>org.springframework.boot</groupId>               <artifactId>spring-boot-maven-plugin</artifactId>           </plugin>       </plugins>   </build>`
 
 之后运行此命令：
 
@@ -98,11 +95,10 @@ Spring Boot 应用程序可以使用`application.properties`或`application.yml`
 在此示例中，我们使用多阶段构建，首先在单独的层中构建 Spring Boot 应用程序，然后将构建的 jar 文件复制到最终镜像中。通过在构建过程中使用单独的层，我们可以利用 Docker 缓存来避免每次构建新镜像时重建依赖项。
 
 - 构建过程的第一阶段使用`openjdk:11`基础镜像并复制pom.xml文件到容器。然后它运行`mvn dependency:go-offline`命令下载应用程序所需的所有依赖项。该命令确保所有必需的依赖项在本地可用，这将加快后续构建的速度。
-    
+
 - 构建过程的第二阶段使用`openjdk:11`基础映像并将源代码复制到容器中。然后它运行`mvn package`命令来构建应用程序 jar 文件。由于我们在上一阶段已经下载了依赖项，因此 Docker 将使用缓存层并跳过依赖项下载步骤。
-    
+
 - 最后，该`COPY --from=builder`指令将构建的 jar 文件从构建器阶段复制到最终映像，并且该`ENTRYPOINT`指令指定容器启动时应运行的命令。
-    
 
 ## 使用 .dockerignore 文件
 
@@ -115,13 +111,13 @@ Spring Boot 应用程序可以使用`application.properties`或`application.yml`
 通过使用`.dockerignore`文件，我们可以减少构建上下文的大小并提高构建性能。Docker只会复制`.dockerignore`构建上下文中包含的文件和目录，并且会忽略文件中排除的文件和目录。
 
 > “
-> 
+>
 > 使用`.dockerignore`文件是对 Spring Boot 应用程序进行 Docker 化的良好实践，因为它有助于确保尽可能高效、快速地构建 Docker 映像。
 
 此外，使用`.dockerignore`文件还可以帮助提高Docker 镜像的安全性。通过排除不必要的文件和目录，您可以减少 Docker 映像的攻击面，并最大限度地降低暴露敏感信息或凭据的风险。例如，如果您在构建目录中存储了配置文件或凭据，则将它们排除在`.dockerignore`文件中将阻止它们包含在 Docker 映像中。
 
 > “
-> 
+>
 > 还值得注意的是，该`.dockerignore`文件遵循与`.gitignore`文件类似的语法，用于从 Git 存储库中排除文件和目录。如果您熟悉该`.gitignore`文件，`.dockerignore`文件的使用是零学习成本。
 
 总之，使用`.dockerignore`文件是 Docker 化 Spring Boot 应用程序的良好实践。它可以帮助减少构建上下文的大小、提高构建性能并提高 Docker 映像的安全性。
@@ -142,11 +138,11 @@ Spring Boot 应用程序可以使用`application.properties`或`application.yml`
 
 以这种方式使用标签可以帮助提高 Docker 镜像的可用性和可维护性。通过向 Docker 映像添加元数据，您可以帮助用户了解镜像包含的内容及其构建方式。随着时间的推移，此信息对于调试、故障排除和维护 Docker 镜像非常有用。
 
-**后端专属技术群**  
+**后端专属技术群**
 
 构建高质量的技术交流社群，欢迎从事编程开发、技术招聘HR进群，也欢迎大家分享自己公司的内推信息，相互帮助，一起进步！
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 加我好友，拉你进群
 

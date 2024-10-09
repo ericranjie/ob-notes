@@ -1,11 +1,10 @@
-
 CPP开发者
 
- _2022年01月07日 11:55_
+_2022年01月07日 11:55_
 
 以下文章来源于编程往事 ，作者果冻虾仁
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7Hvg7rQmorRljlcVCzwYTttaruhY8OCBSft64AYB32Cg/0)
 
@@ -13,9 +12,9 @@ CPP开发者
 
 C++码农，brpc committer，搜广推在线工程。专注互联网后端技术分享、行业观察以及个人成长！也欢迎关注我的知乎：果冻虾仁
 
-](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651169684&idx=1&sn=3f60f93b5c10ae6dbc677ceae985260c&chksm=806472cbb713fbdd5c8850d3352a51dc491b82f71ab439036edbf27ee579b72f175d541ee31e&mpshare=1&scene=24&srcid=0107nRfHzeUhJxK9GOcTFLwC&sharer_sharetime=1641527818086&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b89c0d2ad9c53a4b7fa5295f04e88169b327166a669c47386fe758efee4ba34875700f2abd8b997f469fb1fff79a8f8cb97fc7572eaaa1c26e59bf9ba0ba42402df52861503f17684148af3160cc239238f5fe85c388ec0525d344e93fdb70a0b9e205d19a7039ec1546d7f1a1a5c773a951366c53df3b8f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQqtEIxkp5229A1Pu4WSCubBLmAQIE97dBBAEAAAAAAAclCsFcv10AAAAOpnltbLcz9gKNyK89dVj0sGt49kBtBqfPmP2V3gR5pMKlz%2BRV9tjgtzI1bIl%2BlSpSvA69u3bAKaZC7bvTWYiwLrPrXqNVfjxQxr4G%2BW4ZiOev54NGIB6n5ToXKRTG%2FVt%2Fg%2BYeIAKHikI8przD4l3KHUMP391KQRNjOV60dmqS0qJIWRZkPB%2BtHvd%2FahhQxSb5%2FoDsIVee%2F9UKxJN13fiBnQNkdrOd%2Bo%2BrhEy1%2FYSG%2Bd3hG3arCn5Kmr2GKdNdYm47f6hAMVToSQthWGizCWLl&acctmode=0&pass_ticket=2wTclGaZpx0f3aWctdLoJXhMGxHJqyrkYiQxbNV6krLBQRyNQYdukhmUnP72fJBr&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651169684&idx=1&sn=3f60f93b5c10ae6dbc677ceae985260c&chksm=806472cbb713fbdd5c8850d3352a51dc491b82f71ab439036edbf27ee579b72f175d541ee31e&mpshare=1&scene=24&srcid=0107nRfHzeUhJxK9GOcTFLwC&sharer_sharetime=1641527818086&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0b89c0d2ad9c53a4b7fa5295f04e88169b327166a669c47386fe758efee4ba34875700f2abd8b997f469fb1fff79a8f8cb97fc7572eaaa1c26e59bf9ba0ba42402df52861503f17684148af3160cc239238f5fe85c388ec0525d344e93fdb70a0b9e205d19a7039ec1546d7f1a1a5c773a951366c53df3b8f&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQqtEIxkp5229A1Pu4WSCubBLmAQIE97dBBAEAAAAAAAclCsFcv10AAAAOpnltbLcz9gKNyK89dVj0sGt49kBtBqfPmP2V3gR5pMKlz%2BRV9tjgtzI1bIl%2BlSpSvA69u3bAKaZC7bvTWYiwLrPrXqNVfjxQxr4G%2BW4ZiOev54NGIB6n5ToXKRTG%2FVt%2Fg%2BYeIAKHikI8przD4l3KHUMP391KQRNjOV60dmqS0qJIWRZkPB%2BtHvd%2FahhQxSb5%2FoDsIVee%2F9UKxJN13fiBnQNkdrOd%2Bo%2BrhEy1%2FYSG%2Bd3hG3arCn5Kmr2GKdNdYm47f6hAMVToSQthWGizCWLl&acctmode=0&pass_ticket=2wTclGaZpx0f3aWctdLoJXhMGxHJqyrkYiQxbNV6krLBQRyNQYdukhmUnP72fJBr&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
-针对类中特定成员函数的检测其实在工作中也可能用到。C++中可以用`SFINAE`技巧达到这个目的。  
+针对类中特定成员函数的检测其实在工作中也可能用到。C++中可以用`SFINAE`技巧达到这个目的。
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/hQZ4NEZ2sic6IxKk564AlUBJ5d1lSfJL6Dias1LWKjBEm6eFmgQ3Libq5FiareWH2GolkicHrfq9lSESyGORQfKx6Tw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -57,8 +56,6 @@ OK，这个用来检测类中是否有hello成员函数是可以的。但是改�
 
 该版本也有很多其他变种。所谓变种主要是在has的返回值、value的判断方面做改编。也有一定问题，具体大家自己测试吧。
 
-  
-
 - EOF -
 
 推荐阅读  点击标题可跳转
@@ -69,9 +66,7 @@ OK，这个用来检测类中是否有hello成员函数是可以的。但是改�
 
 3、[C++ Trick：什么时候需要前置声明？](http://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651169463&idx=1&sn=dd7dbafea61f90f9d5ed14ee9141ee2e&chksm=806473e8b713fafedb08df9c5c38a5a2308e43afeaf5fc4314afc051e662f7ea290ed93dacf7&scene=21#wechat_redirect)
 
-  
-
-**关注『CPP开发者』**  
+**关注『CPP开发者』**
 
 看精选C++技术文章 . 加C++开发者专属圈子
 

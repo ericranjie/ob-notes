@@ -1,9 +1,11 @@
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2023-5-29 20:57 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
+
 # 一、Linux为何会引入读写锁？
 
 除了mutex，在linux内核中，还有一个经常用到的睡眠锁就是rw semaphore（后文简称为rwsem），它到底和mutex有什么不同呢？为何会有rw semaphore？无他，仅仅是为了增加内核的并发，从而增加性能而已。Mutex严格的限制只有一个thread可以进入临界区，但是实际应用中，有些场景对共享资源的访问可以严格区分读和写的，并且是读多写少，这时候，其实多个读的thread同时进入临界区是OK的，使用mutex则限制一个线程进入临界区，从而导致性能的下降。
 
 本文会描述linux5.15.81中读写锁的数据结构和逻辑过程。
+
 # 二、如何抽象读写锁的数据结构？
 
 下图可以抽象rwsem相关的数据结构：
@@ -35,12 +37,12 @@
 |   |   |
 |---|---|
 |成员|描述|
-|atomic_long_t count|在64位平台上，成员count的各个bit解释如下：<br><br>* Bit 0 - 写锁比特<br><br>* Bit 1 - 标记等待队列的状态<br><br>* Bit 2 - 标记handoff状态<br><br>* Bits 3-7 - reserved<br><br>* Bits 8-62 - 55-bit reader counter（读锁counter）<br><br>* Bit 63 - read fail bit，溢出检查bit<br><br>为了能够检测reader数量溢出问题，我们在MSB设置了保护位，程序本身并不设置它，但是如果太多的reader进入临界区，会导致该bit变成1。当然，正常情况下，这个guard bit永远不会被设置，一旦被设置，作为保护措施，这时候reader也会被禁止进入临界区。<br><br>除了持锁状态的比特，count成员还有两个用来标记其他锁状态的bit。Bit 1用来标记该rwsem的等待队列是否有waiter任务，bit 2用来支持锁的递交功能，后面会详述。|
+|atomic_long_t count|在64位平台上，成员count的各个bit解释如下：<br><br>\* Bit 0 - 写锁比特<br><br>\* Bit 1 - 标记等待队列的状态<br><br>\* Bit 2 - 标记handoff状态<br><br>\* Bits 3-7 - reserved<br><br>\* Bits 8-62 - 55-bit reader counter（读锁counter）<br><br>\* Bit 63 - read fail bit，溢出检查bit<br><br>为了能够检测reader数量溢出问题，我们在MSB设置了保护位，程序本身并不设置它，但是如果太多的reader进入临界区，会导致该bit变成1。当然，正常情况下，这个guard bit永远不会被设置，一旦被设置，作为保护措施，这时候reader也会被禁止进入临界区。<br><br>除了持锁状态的比特，count成员还有两个用来标记其他锁状态的bit。Bit 1用来标记该rwsem的等待队列是否有waiter任务，bit 2用来支持锁的递交功能，后面会详述。|
 |atomic_long_t owner|owner这个成员有两个作用：<br><br>1、记录该rwsem对象被哪一个task持有（仅writer有效，对reader仅仅是debug的时候提供信息而已）。如果等于NULL表示还没有被任何一个任务持有。<br><br>2、由于task struct地址是L1_CACHE_BYTES对齐的，因此这个成员（实际是task struct指针）有若干的LSB可以被用于标记状态（在ARM64平台上，L1_CACHE_BYTES是64字节，因此LSB 6-bit可用于保存rwsem状态信息。具体的状态包括：<br><br>RWSEM_READER_OWNED：说明当前rwsem被一个或者一组reader所持有。<br><br>RWSEM_NONSPINNABLE：在该rwsem上不执行乐观自旋的操作，关于乐观自旋功能，后面会详述。|
 |struct optimistic_spin_queue osq|在配置了CONFIG_RWSEM_SPIN_ON_OWNER的时候，rwsem支持乐观自旋机制，osq成员就是乐观自旋需要持有的MCS锁。|
 |spinlock_t wait_lock|用于保护等待链表操作wait_list的自旋锁|
 |struct list_head wait_list|等待队列。该队列上的任务都是处于阻塞状态，等待临界区清空后唤醒队列上的任务。|
-|void *magic|和debug相关的成员。如果开启了CONFIG_DEBUG_RWSEMS配置项，初始化的时候magic会被设置为rwsem的地址，用来防止操作未初始化的rwsem。|
+|void \*magic|和debug相关的成员。如果开启了CONFIG_DEBUG_RWSEMS配置项，初始化的时候magic会被设置为rwsem的地址，用来防止操作未初始化的rwsem。|
 |Struct lockdep_map dep_map|和debug相关的成员|
 
 由于是sleep lock，我们需要把等待的任务挂入队列。在内核中，struct rwsem_waiter用来抽象等待rwsem的任务，其成员描述如下：
@@ -49,7 +51,7 @@
 |---|---|
 |成员|描述|
 |struct list_head list|挂入rwsem等待队列（wait_list成员）的节点|
-|struct task_struct *task|等待该rwsem的任务|
+|struct task_struct \*task|等待该rwsem的任务|
 |enum rwsem_waiter_type type|该对象为何挂入等待队列？是reader还是writer？|
 |unsigned long timeout|在队列中等待超时时间，目前设置为4ms|
 |bool handoff_set|如果该任务等待对象的handoff_set等于true，那么说明该对象就是该读写锁的第一顺位继承人，在唤醒之后可以乐观自旋去持锁|
@@ -63,9 +65,9 @@ Rwsem模块的外部接口API如下：
 |接口API|描述|
 |初始化接口API|
 |init_rwsem|初始化rwsem对象，该rwsem对象已经由调用者定义。|
-|__init_rwsem|基本类似init_rwsem，但允许更灵活的设置debug信息|
+|\_\_init_rwsem|基本类似init_rwsem，但允许更灵活的设置debug信息|
 |DECLARE_RWSEM|定义并初始化一个rwsem对象|
-|__RWSEM_INITIALIZER|当rwsem嵌入其他数据结构中的时候，通过该API可以初始化数据结构中内嵌的rwsem对象|
+|\_\_RWSEM_INITIALIZER|当rwsem嵌入其他数据结构中的时候，通过该API可以初始化数据结构中内嵌的rwsem对象|
 |获取rwsem锁的API|
 |down_read|Reader获取rwsem锁的接口，如果不成功，进入D状态|
 |down_read_interruptible|Reader获取rwsem锁的接口，如果不成功，进入S状态|
@@ -85,7 +87,7 @@ Rwsem模块的外部接口API如下：
 
 # 四、尝试获取读锁
 
-和down_read不一样，down_read_trylock只是尝试获取读锁，如果成功，那么自然是好的，直接返回1，如果失败，也不会阻塞，只是返回0就可以了。代码主逻辑在__down_read_trylock函数中，如下：
+和down_read不一样，down_read_trylock只是尝试获取读锁，如果成功，那么自然是好的，直接返回1，如果失败，也不会阻塞，只是返回0就可以了。代码主逻辑在\_\_down_read_trylock函数中，如下：
 
 |   |
 |---|
@@ -104,9 +106,10 @@ B、如果快速获取空锁不成功，这时候tmp已经赋值（等于sem->co
 |RWSEM_FLAG_READFAIL|有太多的reader在临界区，应该是异常状态|
 
 如果判断可以进入读临界区（临界区仅有reader并且没有writer等待的场景），那么重新进入循环，如果sem->count保持不变，那么可以持锁成功，给进入临界区的reader数目加一，并设置owner task和reader持锁标记（non-spinnable比特保持不变）。如果这期间有其他线程插入修改了count值，那么需要再次判断是否能持读锁，重复上面的循环。如果判断不可以进入临界区，退出循环，持锁失败。
+
 # 五、获取读锁
 
-Reader获取读锁的代码主要在__down_read_common函数中，如下：
+Reader获取读锁的代码主要在\_\_down_read_common函数中，如下：
 
 |   |
 |---|
@@ -118,9 +121,9 @@ rwsem_read_trylock是快速路径，代码如下：
 
 |   |
 |---|
-|*cntp = atomic_long_add_return_acquire(RWSEM_READER_BIAS, &sem->count);---A<br><br>if (WARN_ON_ONCE(*cntp < 0))----B<br><br>rwsem_set_nonspinnable(sem);<br><br>if (!(*cntp & RWSEM_READ_FAILED_MASK)) {----C<br><br>rwsem_set_reader_owned(sem);<br><br>return true;---持锁成功<br><br>}<br><br>return false;---持锁失败|
+|\*cntp = atomic_long_add_return_acquire(RWSEM_READER_BIAS, &sem->count);---A<br><br>if (WARN_ON_ONCE(\*cntp \< 0))----B<br><br>rwsem_set_nonspinnable(sem);<br><br>if (!(\*cntp & RWSEM_READ_FAILED_MASK)) {----C<br><br>rwsem_set_reader_owned(sem);<br><br>return true;---持锁成功<br><br>}<br><br>return false;---持锁失败|
 
-A、reader直接会给sem->count加RWSEM_READER_BIAS来增加读临界区的线程个数，当然这有可能失败，那么就进入慢速路径（需要回退错误增加读临界区线程数量）。如果恰好能够进入临界区，那么就直接设定owner返回即可。注意：这里*cntp保存了atomic add之后的新值。rwsem_down_read_slowpath会使用这个新值作为参数。
+A、reader直接会给sem->count加RWSEM_READER_BIAS来增加读临界区的线程个数，当然这有可能失败，那么就进入慢速路径（需要回退错误增加读临界区线程数量）。如果恰好能够进入临界区，那么就直接设定owner返回即可。注意：这里\*cntp保存了atomic add之后的新值。rwsem_down_read_slowpath会使用这个新值作为参数。
 
 B、当reader的数量过多（以至于都溢出了）的时候，需要禁止乐观自旋。
 
@@ -142,7 +145,7 @@ Reader偷锁的场景主要发生在唤醒top waiter的过程中，这时候临�
 
 |   |
 |---|
-|if (!(count & (RWSEM_WRITER_LOCKED \| RWSEM_FLAG_HANDOFF))) {-----A<br><br>rwsem_set_reader_owned(sem);-------------B<br><br>if ((rcnt == 1) && (count & RWSEM_FLAG_WAITERS)) {-------------C<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>if (!list_empty(&sem->wait_list))<br><br>rwsem_mark_wake(sem, RWSEM_WAKE_READ_OWNED,<br><br>&wake_q);<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>wake_up_q(&wake_q);<br><br>}<br><br>return sem;<br><br>}|
+|if (!(count & (RWSEM_WRITER_LOCKED | RWSEM_FLAG_HANDOFF))) {-----A<br><br>rwsem_set_reader_owned(sem);-------------B<br><br>if ((rcnt == 1) && (count & RWSEM_FLAG_WAITERS)) {-------------C<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>if (!list_empty(&sem->wait_list))<br><br>rwsem_mark_wake(sem, RWSEM_WAKE_READ_OWNED,<br><br>&wake_q);<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>wake_up_q(&wake_q);<br><br>}<br><br>return sem;<br><br>}|
 
 A、所谓偷锁就是不乐观自旋（要有排队），不管先来后到，直接获取锁。允许偷锁的场景是这样的：临界区没有writer持锁，也没有设置handoff，正在唤醒top waiter的过程中，并且有任务在等待队列的情况。这时候进入慢速路径的reader可以先于top waiter唤醒之前把锁偷走。需要特别说明的是：这时候reader counter已经加一，还是尽量让reader偷锁成功，否则还需要回退。
 
@@ -154,7 +157,7 @@ C、如果偷锁成功并且它是临界区第一个reader，那么它还会把�
 
 |   |
 |---|
-|waiter.task = current;<br><br>waiter.type = RWSEM_WAITING_FOR_READ;<br><br>waiter.timeout = jiffies + RWSEM_WAIT_TIMEOUT;--------A<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>if (list_empty(&sem->wait_list)) {------------B<br><br>if (!(atomic_long_read(&sem->count) &<br><br>(RWSEM_WRITER_MASK \| RWSEM_FLAG_HANDOFF))) {<br><br>smp_acquire__after_ctrl_dep();<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>rwsem_set_reader_owned(sem);<br><br>return sem;------------C<br><br>}<br><br>adjustment += RWSEM_FLAG_WAITERS;<br><br>}<br><br>rwsem_add_waiter(sem, &waiter);------------D<br><br>count = atomic_long_add_return(adjustment, &sem->count);|
+|waiter.task = current;<br><br>waiter.type = RWSEM_WAITING_FOR_READ;<br><br>waiter.timeout = jiffies + RWSEM_WAIT_TIMEOUT;--------A<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>if (list_empty(&sem->wait_list)) {------------B<br><br>if (!(atomic_long_read(&sem->count) &<br><br>(RWSEM_WRITER_MASK | RWSEM_FLAG_HANDOFF))) {<br><br>smp_acquire\_\_after_ctrl_dep();<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>rwsem_set_reader_owned(sem);<br><br>return sem;------------C<br><br>}<br><br>adjustment += RWSEM_FLAG_WAITERS;<br><br>}<br><br>rwsem_add_waiter(sem, &waiter);------------D<br><br>count = atomic_long_add_return(adjustment, &sem->count);|
 
 A、准备好挂入等待队列的rwsem waiter数据，需要特别说明的是这里的timeout时间：目前手机平台的HZ设置的是250，也就是说在触发handoff机制之前waiter需要至少在队列中等待一个tick（4ms）的时间。这里的timeout是指handoff timeout，为了防止偷锁或者自旋导致等待队列中的top waiter有一个长时间的持锁延迟。在timeout时间内，乐观偷锁或者自旋可以顺利进行，但是一旦超时就会设定handoff标记，乐观偷锁或者自旋被禁止，锁的所有权需要递交给等待队列中的top waiter。
 
@@ -168,7 +171,7 @@ D、等待队列非空的时候，逻辑稍微负载一点。调用rwsem_add_wai
 
 |   |
 |---|
-|if (!(count & RWSEM_LOCK_MASK)) {-------A<br><br>clear_nonspinnable(sem);<br><br>wake = true;<br><br>}<br><br>if (wake \| (!(count & RWSEM_WRITER_MASK) &&<br><br>(adjustment & RWSEM_FLAG_WAITERS)))------B<br><br>rwsem_mark_wake(sem, RWSEM_WAKE_ANY, &wake_q);<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>wake_up_q(&wake_q);|
+|if (!(count & RWSEM_LOCK_MASK)) {-------A<br><br>clear_nonspinnable(sem);<br><br>wake = true;<br><br>}<br><br>if (wake | (!(count & RWSEM_WRITER_MASK) &&<br><br>(adjustment & RWSEM_FLAG_WAITERS)))------B<br><br>rwsem_mark_wake(sem, RWSEM_WAKE_ANY, &wake_q);<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>wake_up_q(&wake_q);|
 
 A、如果这时候发现锁的owner恰好都离开了临界区，那么我们是需要执行唤醒top waiter操作的，唤醒之前需要清除禁止乐观自旋的标记，毕竟目前临界区没有任何线程。
 
@@ -178,7 +181,7 @@ B、除了上面说的场景需要唤醒，在reader持锁并且我们是队列�
 
 |   |
 |---|
-|for (;;) {<br><br>set_current_state(state);<br><br>if (!smp_load_acquire(&waiter.task)) {---------A<br><br>break;<br><br>}<br><br>if (signal_pending_state(state, current)) {-----B<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>if (waiter.task)<br><br>goto out_nolock;<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>break;<br><br>}<br><br>schedule();------C<br><br>}<br><br>__set_current_state(TASK_RUNNING);<br><br>return sem;|
+|for (;;) {<br><br>set_current_state(state);<br><br>if (!smp_load_acquire(&waiter.task)) {---------A<br><br>break;<br><br>}<br><br>if (signal_pending_state(state, current)) {-----B<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>if (waiter.task)<br><br>goto out_nolock;<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>break;<br><br>}<br><br>schedule();------C<br><br>}<br><br>\_\_set_current_state(TASK_RUNNING);<br><br>return sem;|
 
 A、在rwsem_mark_wake函数中我们会唤醒reader并将其等待对象的task成员（waiter.task）设置为NULL。因此，这里如果发现waiter.task等于NULL，那么说明是该线程被正常唤醒，那么从阻塞状态返回，持锁成功。
 
@@ -188,11 +191,11 @@ C、进入阻塞状态，让调度器选择next task
 
 六、释放读锁
 
-释放读锁的代码逻辑主要在__up_read函数中，如下：
+释放读锁的代码逻辑主要在\_\_up_read函数中，如下：
 
 |   |
 |---|
-|tmp = atomic_long_add_return_release(-RWSEM_READER_BIAS, &sem->count);<br><br>if (unlikely((tmp & (RWSEM_LOCK_MASK\|RWSEM_FLAG_WAITERS)) ==<br><br>RWSEM_FLAG_WAITERS)) {<br><br>clear_nonspinnable(sem);<br><br>rwsem_wake(sem);<br><br>}|
+|tmp = atomic_long_add_return_release(-RWSEM_READER_BIAS, &sem->count);<br><br>if (unlikely((tmp & (RWSEM_LOCK_MASK|RWSEM_FLAG_WAITERS)) ==<br><br>RWSEM_FLAG_WAITERS)) {<br><br>clear_nonspinnable(sem);<br><br>rwsem_wake(sem);<br><br>}|
 
 需要强调的是：这里仅仅是减去了读临界区的counter计数，并没有清除owner中的task pointer。此外，当等待队列有waiter并且没有writer或者reader在临界区的时候，我们会调用rwsem_wake来唤醒等待队列的线程。因为临界区已经没有线程，所以需要清除nonspinable标记。唤醒的动作主要是通过rwsem_mark_wake和wake_up_q来完成的，wake_up_q比较简单，我们就不赘述了，主要看看rwsem_mark_wake的逻辑。
 
@@ -217,7 +220,7 @@ C、进入阻塞状态，让调度器选择next task
 
 |   |
 |---|
-|if (wake_type != RWSEM_WAKE_READ_OWNED) {----------A<br><br>struct task_struct *owner;<br><br>adjustment = RWSEM_READER_BIAS;<br><br>oldcount = atomic_long_fetch_add(adjustment, &sem->count);<br><br>if (unlikely(oldcount & RWSEM_WRITER_MASK)) {---------B（持锁失败）<br><br>if (!(oldcount & RWSEM_FLAG_HANDOFF) &&<br><br>time_after(jiffies, waiter->timeout)) {<br><br>adjustment -= RWSEM_FLAG_HANDOFF;<br><br>}<br><br>atomic_long_add(-adjustment, &sem->count);设置handoff并恢复reader count<br><br>return;<br><br>}<br><br>owner = waiter->task;-------------C（持锁成功）<br><br>__rwsem_set_reader_owned(sem, owner);<br><br>}|
+|if (wake_type != RWSEM_WAKE_READ_OWNED) {----------A<br><br>struct task_struct \*owner;<br><br>adjustment = RWSEM_READER_BIAS;<br><br>oldcount = atomic_long_fetch_add(adjustment, &sem->count);<br><br>if (unlikely(oldcount & RWSEM_WRITER_MASK)) {---------B（持锁失败）<br><br>if (!(oldcount & RWSEM_FLAG_HANDOFF) &&<br><br>time_after(jiffies, waiter->timeout)) {<br><br>adjustment -= RWSEM_FLAG_HANDOFF;<br><br>}<br><br>atomic_long_add(-adjustment, &sem->count);设置handoff并恢复reader count<br><br>return;<br><br>}<br><br>owner = waiter->task;-------------C（持锁成功）<br><br>\_\_rwsem_set_reader_owned(sem, owner);<br><br>}|
 
 A、执行到这里，我们需要唤醒等待队列头部的若干reader线程去持锁。由于writer有可能会在这个阶段偷锁，因此，这里我们会先让top waiter（reader）持锁，然后再慢慢去计算到底需要唤醒多少个reader并将其唤醒。如果当前线程已经持有了读锁（wake type的类型是RWSEM_WAKE_READ_OWNED），则不需要提前持锁，直接越过这部分的逻辑即可。
 
@@ -259,7 +262,7 @@ C、完成sem->count的调整
 
 |   |
 |---|
-|list_for_each_entry_safe(waiter, tmp, &wlist, list) {<br><br>struct task_struct *tsk;<br><br>tsk = waiter->task;<br><br>get_task_struct(tsk);<br><br>smp_store_release(&waiter->task, NULL);<br><br>wake_q_add_safe(wake_q, tsk);<br><br>}|
+|list_for_each_entry_safe(waiter, tmp, &wlist, list) {<br><br>struct task_struct \*tsk;<br><br>tsk = waiter->task;<br><br>get_task_struct(tsk);<br><br>smp_store_release(&waiter->task, NULL);<br><br>wake_q_add_safe(wake_q, tsk);<br><br>}|
 
 主要是把等待任务对象的task成员设置为NULL，唤醒之后根据这个成员来判断是正常唤醒还是异常唤醒路径。
 
@@ -279,11 +282,11 @@ atomic_long_try_cmpxchg_acquire函数有三个参数，从左到右分别是valu
 
 八、获取写锁
 
-Writer获取写锁的代码主要在__down_write_common函数中，如下：
+Writer获取写锁的代码主要在\_\_down_write_common函数中，如下：
 
 |   |
 |---|
-|static inline int __down_write_common(struct rw_semaphore *sem, int state)<br><br>{<br><br>if (unlikely(!rwsem_write_trylock(sem))) {<br><br>if (IS_ERR(rwsem_down_write_slowpath(sem, state)))<br><br>return -EINTR;<br><br>}<br><br>return 0;<br><br>}|
+|static inline int \_\_down_write_common(struct rw_semaphore \*sem, int state)<br><br>{<br><br>if (unlikely(!rwsem_write_trylock(sem))) {<br><br>if (IS_ERR(rwsem_down_write_slowpath(sem, state)))<br><br>return -EINTR;<br><br>}<br><br>return 0;<br><br>}|
 
 rwsem_write_trylock（快速路径）上一节已经描述，我们主要看慢速路径的逻辑（乐观自旋我们下面会讲，这里暂且略过）：
 
@@ -295,7 +298,7 @@ rwsem_write_trylock（快速路径）上一节已经描述，我们主要看慢�
 
 |   |
 |---|
-|if (rwsem_first_waiter(sem) != &waiter) {----------A<br><br>count = atomic_long_read(&sem->count);<br><br>if (count & RWSEM_WRITER_MASK)---------B<br><br>goto wait;<br><br>rwsem_mark_wake(sem, (count & RWSEM_READER_MASK)----C<br><br>? RWSEM_WAKE_READERS<br><br>: RWSEM_WAKE_ANY, &wake_q);<br><br>if (!wake_q_empty(&wake_q)) {---------D<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>wake_up_q(&wake_q);<br><br>wake_q_init(&wake_q); /* Used again, reinit */<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>}<br><br>} else {<br><br>atomic_long_or(RWSEM_FLAG_WAITERS, &sem->count);<br><br>}|
+|if (rwsem_first_waiter(sem) != &waiter) {----------A<br><br>count = atomic_long_read(&sem->count);<br><br>if (count & RWSEM_WRITER_MASK)---------B<br><br>goto wait;<br><br>rwsem_mark_wake(sem, (count & RWSEM_READER_MASK)----C<br><br>? RWSEM_WAKE_READERS<br><br>: RWSEM_WAKE_ANY, &wake_q);<br><br>if (!wake_q_empty(&wake_q)) {---------D<br><br>raw_spin_unlock_irq(&sem->wait_lock);<br><br>wake_up_q(&wake_q);<br><br>wake_q_init(&wake_q); /\* Used again, reinit \*/<br><br>raw_spin_lock_irq(&sem->wait_lock);<br><br>}<br><br>} else {<br><br>atomic_long_or(RWSEM_FLAG_WAITERS, &sem->count);<br><br>}|
 
 A、如果我们是等待队列的top waiter（等待队列从空变为非空），那么需要设定RWSEM_FLAG_WAITERS标记，直接进入后续阻塞逻辑。如果不是，那么逻辑要复杂点，需要扫描一下之前挂入队列的任务，看看是否需要唤醒。
 
@@ -325,7 +328,7 @@ rwsem_try_write_lock代码如下：
 
 |   |
 |---|
-|count = atomic_long_read(&sem->count);<br><br>do {<br><br>bool has_handoff = !!(count & RWSEM_FLAG_HANDOFF);<br><br>if (has_handoff) {-----------A<br><br>if (!first)<br><br>return false;<br><br>waiter->handoff_set = true;<br><br>}<br><br>new = count;<br><br>if (count & RWSEM_LOCK_MASK) {<br><br>if (has_handoff \| (!rt_task(waiter->task) &&<br><br>!time_after(jiffies, waiter->timeout)))<br><br>return false;<br><br>new \|= RWSEM_FLAG_HANDOFF;--------------B<br><br>} else {<br><br>new \|= RWSEM_WRITER_LOCKED;-----------C<br><br>new &= ~RWSEM_FLAG_HANDOFF;<br><br>if (list_is_singular(&sem->wait_list))<br><br>new &= ~RWSEM_FLAG_WAITERS;<br><br>}<br><br>} while (!atomic_long_try_cmpxchg_acquire(&sem->count, &count, new));|
+|count = atomic_long_read(&sem->count);<br><br>do {<br><br>bool has_handoff = !!(count & RWSEM_FLAG_HANDOFF);<br><br>if (has_handoff) {-----------A<br><br>if (!first)<br><br>return false;<br><br>waiter->handoff_set = true;<br><br>}<br><br>new = count;<br><br>if (count & RWSEM_LOCK_MASK) {<br><br>if (has_handoff | (!rt_task(waiter->task) &&<br><br>!time_after(jiffies, waiter->timeout)))<br><br>return false;<br><br>new |= RWSEM_FLAG_HANDOFF;--------------B<br><br>} else {<br><br>new |= RWSEM_WRITER_LOCKED;-----------C<br><br>new &= ~RWSEM_FLAG_HANDOFF;<br><br>if (list_is_singular(&sem->wait_list))<br><br>new &= ~RWSEM_FLAG_WAITERS;<br><br>}<br><br>} while (!atomic_long_try_cmpxchg_acquire(&sem->count, &count, new));|
 
 A、如果已经设置了handoff，并且自己不是top waiter（top waiter才是锁要递交的对象），返回false，持锁失败。如果是top waiter，那么就设置handoff_set，标记自己就是锁递交的目标任务。
 
@@ -351,7 +354,7 @@ D、通过原子操作来持锁，成功操作后退出循环，否则是有其�
 
 |   |
 |---|
-|if (need_resched()) return false;---------A<br><br>owner = rwsem_owner_flags(sem, &flags);--------B<br><br>if ((flags & nonspinnable) \|<br><br>(owner && !(flags & RWSEM_READER_OWNED) && !owner_on_cpu(owner)))<br><br>ret = false;-----C|
+|if (need_resched()) return false;---------A<br><br>owner = rwsem_owner_flags(sem, &flags);--------B<br><br>if ((flags & nonspinnable) |<br><br>(owner && !(flags & RWSEM_READER_OWNED) && !owner_on_cpu(owner)))<br><br>ret = false;-----C|
 
 A、本cpu上需要reschedule，还自旋个毛线，赶紧去睡眠也顺便触发一次调度
 
@@ -365,7 +368,7 @@ C、如果该rwsem已经禁止了对应的nonspinnable标志，那么肯定是�
 
 |   |
 |---|
-|owner = rwsem_owner_flags(sem, &flags);-----A<br><br>state = rwsem_owner_state(owner, flags);<br><br>if (state != OWNER_WRITER)----B<br><br>return state;<br><br>for (;;) {-------自旋的writer线程进行rwsem的状态进行轮询<br><br>new = rwsem_owner_flags(sem, &new_flags);<br><br>if ((new != owner) \| (new_flags != flags)) {<br><br>state = rwsem_owner_state(new, new_flags);<br><br>break;----------C<br><br>}<br><br>if (need_resched() \| !owner_on_cpu(owner)) {<br><br>state = OWNER_NONSPINNABLE;<br><br>break;----------D<br><br>}<br><br>}|
+|owner = rwsem_owner_flags(sem, &flags);-----A<br><br>state = rwsem_owner_state(owner, flags);<br><br>if (state != OWNER_WRITER)----B<br><br>return state;<br><br>for (;;) {-------自旋的writer线程进行rwsem的状态进行轮询<br><br>new = rwsem_owner_flags(sem, &new_flags);<br><br>if ((new != owner) | (new_flags != flags)) {<br><br>state = rwsem_owner_state(new, new_flags);<br><br>break;----------C<br><br>}<br><br>if (need_resched() | !owner_on_cpu(owner)) {<br><br>state = OWNER_NONSPINNABLE;<br><br>break;----------D<br><br>}<br><br>}|
 
 A、在自旋之前，首先要获得初始的状态（owner task指针以及2-bit LSB flag），当这些状态发生变化才好退出自旋。
 
@@ -450,7 +453,7 @@ b) 锁是空闲的并且sem->owner已清除，但是在我们尝试获取锁之�
 
 1、linux-5.15.81内核源代码
 
-2、linux-5.15.81\Documentation\locking\*
+2、linux-5.15.81\\Documentation\\locking\*
 
 本文作者：郭健Cojack
 
@@ -466,7 +469,7 @@ b) 锁是空闲的并且sem->owner已清除，但是在我们尝试获取锁之�
 
 **评论：**
 
-**yanl1229**  
+**yanl1229**\
 2023-05-31 15:52
 
 终于等到更新了。
@@ -475,152 +478,155 @@ b) 锁是空闲的并且sem->owner已清除，但是在我们尝试获取锁之�
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [蓝牙协议分析(7)_BLE连接有关的技术分析](http://www.wowotech.net/bluetooth/ble_connection.html)
-    - [Linux设备模型(8)_platform设备](http://www.wowotech.net/device_model/platform_device.html)
-    - [“蜗窝”使用的软件开发环境介绍](http://www.wowotech.net/soft/5.html)
-    - [X-023-KERNEL-Linux pinctrl driver的移植](http://www.wowotech.net/x_project/kernel_pinctrl_driver_porting.html)
-    - [Deadline调度器之（二）：细节和使用方法](http://www.wowotech.net/process_management/dl-scheduler-2.html)
+
+  - [蓝牙协议分析(7)\_BLE连接有关的技术分析](http://www.wowotech.net/bluetooth/ble_connection.html)
+  - [Linux设备模型(8)\_platform设备](http://www.wowotech.net/device_model/platform_device.html)
+  - [“蜗窝”使用的软件开发环境介绍](http://www.wowotech.net/soft/5.html)
+  - [X-023-KERNEL-Linux pinctrl driver的移植](http://www.wowotech.net/x_project/kernel_pinctrl_driver_porting.html)
+  - [Deadline调度器之（二）：细节和使用方法](http://www.wowotech.net/process_management/dl-scheduler-2.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

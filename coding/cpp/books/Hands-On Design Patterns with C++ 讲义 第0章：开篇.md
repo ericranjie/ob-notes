@@ -1,7 +1,8 @@
 # 
+
 原创 果冻虾仁 编程往事
 
- _2022年02月27日 23:23_
+_2022年02月27日 23:23_
 
 **`点击底部阅读原文，观看视频版`**
 
@@ -119,11 +120,11 @@ Fedor G. Pikus 是高性能计算（HPC）与C++领域的专家。
 
 ## 知乎：果冻虾仁
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## B站：果冻虾仁丨
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 公众号：编程往事
 
@@ -137,7 +138,7 @@ C++码农，brpc committer，搜广推在线工程。专注互联网后端技术
 
 公众号
 
-# 谢谢大家  
+# 谢谢大家
 
 **`点击阅读原文，关注我的B站。现在关注就是老粉啦。`**
 
@@ -209,45 +210,44 @@ Python不灵兔
 **留言 5**
 
 - GlobaL Flanker
-    
-    2022年2月27日
-    
-    赞1
-    
-    up主的高质量高光时刻即将来临，期待ing！
-    
-    编程往事
-    
-    作者2022年2月28日
-    
-    赞2
-    
-    ![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)还在摸索，录制视频课程我不专业。继续学习中
-    
+
+  2022年2月27日
+
+  赞1
+
+  up主的高质量高光时刻即将来临，期待ing！
+
+  编程往事
+
+  作者2022年2月28日
+
+  赞2
+
+  ![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)还在摸索，录制视频课程我不专业。继续学习中
+
 - DD
-    
-    2022年2月27日
-    
-    赞
-    
-    想要电子版![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    编程往事
-    
-    作者2022年2月27日
-    
-    赞2
-    
-    回头我发到公众号里，敬请关注。
-    
-    DD
-    
-    2022年2月27日
-    
-    赞
-    
-    好的好的，感谢感谢
-    
+
+  2022年2月27日
+
+  赞
+
+  想要电子版![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  编程往事
+
+  作者2022年2月27日
+
+  赞2
+
+  回头我发到公众号里，敬请关注。
+
+  DD
+
+  2022年2月27日
+
+  赞
+
+  好的好的，感谢感谢
 
 已无更多数据
 
@@ -266,44 +266,43 @@ Python不灵兔
 **留言 5**
 
 - GlobaL Flanker
-    
-    2022年2月27日
-    
-    赞1
-    
-    up主的高质量高光时刻即将来临，期待ing！
-    
-    编程往事
-    
-    作者2022年2月28日
-    
-    赞2
-    
-    ![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)还在摸索，录制视频课程我不专业。继续学习中
-    
+
+  2022年2月27日
+
+  赞1
+
+  up主的高质量高光时刻即将来临，期待ing！
+
+  编程往事
+
+  作者2022年2月28日
+
+  赞2
+
+  ![[捂脸]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)还在摸索，录制视频课程我不专业。继续学习中
+
 - DD
-    
-    2022年2月27日
-    
-    赞
-    
-    想要电子版![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    编程往事
-    
-    作者2022年2月27日
-    
-    赞2
-    
-    回头我发到公众号里，敬请关注。
-    
-    DD
-    
-    2022年2月27日
-    
-    赞
-    
-    好的好的，感谢感谢
-    
+
+  2022年2月27日
+
+  赞
+
+  想要电子版![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[合十]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  编程往事
+
+  作者2022年2月27日
+
+  赞2
+
+  回头我发到公众号里，敬请关注。
+
+  DD
+
+  2022年2月27日
+
+  赞
+
+  好的好的，感谢感谢
 
 已无更多数据

@@ -2,8 +2,6 @@
 
 原创 何浩乾 冯力 SmartX技术团队 _2022年03月29日 17:57_
 
-  
-
 Coroutine（协程）一直都是比较热门的基础概念，现代化程序语言从语言或者标准库层面做到了对协程支持，例如 Golang，以及 C++ 20。本文介绍如何使用 GDB 来分析自实现的协程。在 C/C++ 中，可以使用最基本的几个 C API 来实现协程，本文只简单介绍协程的实现，关于协程的更多实现细节和内容，网络上有很多文章，我们不去详细分析，我们的重点是介绍如何使用 GDB，像调试 POSIX thread 一样，调试协程。
 
 # 协程背景
@@ -13,17 +11,16 @@ Coroutine（协程）一直都是比较热门的基础概念，现代化程序�
 协程创建以及调度相关的 C API 有：
 
 - setjmp
-    
+
 - longjmp
-    
+
 - makecontext
-    
+
 - swapcontext
-    
+
 - getcontext
-    
+
 - setcontext
-    
 
 GDB 原生并不支持对协程的调试，要使用 GDB 来追踪到协程的上下文，我们需要知道任意协程的上下文信息，包括寄存器信息，而这其实就是协程如何保存、恢复和切换上下文的原理。我们知道函数是运行在调用栈上，如果将一个函数作为协程，很自然地联想到保存协程上下文就是保存当前调用环境（通常是堆栈指针、程序计数器、寄存器的值和 signal mask）；恢复上下文是将保存的调用环境重新写入；而切换上下文是保存当前正在运行的协程函数的上下文，恢复另一个要运行的协程函数的上下文，所以我们先来分析协程的切换细节。
 
@@ -67,7 +64,7 @@ movq %rbx, (JB_RBX*8)(%rdi)movq %r12, (JB_R12*8)(%rdi)movq %r13, (JB_R13*8
 mov %RBP_LP, %RAX_LPPTR_MANGLE (%RAX_LP)mov %RAX_LP, (JB_RBP*8)(%rdi)
 ```
 
-上面的操作即为将 %rbp 寄存器值加密后存放到 (JB_RBP*8)(%rdi)。下面我们来探究 glibc 中的 pointer guard。
+上面的操作即为将 %rbp 寄存器值加密后存放到 (JB_RBP\*8)(%rdi)。下面我们来探究 glibc 中的 pointer guard。
 
 ## Pointer Guard
 
@@ -75,7 +72,7 @@ mov %RBP_LP, %RAX_LPPTR_MANGLE (%RAX_LP)mov %RAX_LP, (JB_RBP*8)(%rdi)
 
 实现方法就是上文提到的 `PTR_MANGLE` 这个宏，可以理解成 “加密”。与之对应的“解密” 的宏是 `PTR_DEMANGLE` ，longjmp 用到了这个宏。
 
-如果应用程序想要加密在 *stored_ptr 中存储的函数指针，可以这样做：`*stored_ptr = PTR_MANGLE(ptr)；`对应的，解密就是 `ptr = PTR_DEMANGLE(*stored_ptr);`
+如果应用程序想要加密在 \*stored_ptr 中存储的函数指针，可以这样做：`*stored_ptr = PTR_MANGLE(ptr)；`对应的，解密就是 `ptr = PTR_DEMANGLE(*stored_ptr);`
 
 来具体看看这两个宏在做什么：
 
@@ -109,7 +106,7 @@ def glibc_ptr_demangle(val, pointer_guard):    return gdb.parse_and_eval(
 
 ## TLS 与 FS 寄存器
 
-Thread local storage(TLS) 是线程独占的空间，可以使用 __thread 关键字告诉编译器某一个变量应当被放入线程局部存储的空间中。TLS 只能被当前线程访问和修改，使得其不能像一般的变量一样被简单的存储到 ELF 文件的某个段，而且 TLS 变量也与一般的变量不同。来看一个例子，这个例子定义了 3 个全局的 TLS 变量，我们分别在 main thread 和 test  thread 打印他们的值和地址。
+Thread local storage(TLS) 是线程独占的空间，可以使用 \_\_thread 关键字告诉编译器某一个变量应当被放入线程局部存储的空间中。TLS 只能被当前线程访问和修改，使得其不能像一般的变量一样被简单的存储到 ELF 文件的某个段，而且 TLS 变量也与一般的变量不同。来看一个例子，这个例子定义了 3 个全局的 TLS 变量，我们分别在 main thread 和 test  thread 打印他们的值和地址。
 
 ```
 #include <pthread.h>#include <stdio.h>__thread int a = 123; // 0x7b__thread unsigned long long b = 234; // 0xea__thread int c;void test(void *func) {    printf("in thread test: a = %d, b = %llu, c = %p\n", a, b, &c);    printf("in thread test: &a = %p, b = %p\n", &a, &b);}int main() {    a = 345; // 0x159    b = 456; // 0x1c8    c = 567; // 0x237    printf("in main thread: a = %d, b = %llu, c = %p\n", a, b, &c);    printf("in main thread: &a = %p, b = %p\n", &a, &b);    pthread_t pid;    pthread_create(&pid, NULL, test, NULL);    pthread_join(pid, NULL);    return 0;}
@@ -133,22 +130,21 @@ Thread local storage(TLS) 是线程独占的空间，可以使用 __thread 关�
 int arch_prctl(int code, unsigned long addr);int arch_prctl(int code, unsigned long *addr);
 ```
 
-arch_prctl 设置特定于体系结构的进程或线程状态。code 选择一个子函数并将参数 addr 传递给它；对于“set”操作，addr 被解释为 unsigned long，对于“get”操作，addr 被解释为 unsigned long*。arch_prctl 只适用于 X86/X86-64 平台。
+arch_prctl 设置特定于体系结构的进程或线程状态。code 选择一个子函数并将参数 addr 传递给它；对于“set”操作，addr 被解释为 unsigned long，对于“get”操作，addr 被解释为 unsigned long\*。arch_prctl 只适用于 X86/X86-64 平台。
 
 code 有如下几种：
 
 - ARCH_SET_CPUID
-    
+
 - ARCH_GET_CPUID
-    
+
 - ARCH_SET_FS
-    
+
 - ARCH_GET_FS
-    
+
 - ARCH_SET_GS
-    
+
 - ARCH_GET_GS
-    
 
 下面的 code 为 0x1003，对应 ARCH_GET_FS，用来获取 FS 寄存器的值，存放到 %rsp-0x8 的地址上。
 
@@ -174,13 +170,13 @@ setjmp 和 longjmp 这两个函数的核心是 jmp_buf 类型的 env ，所以�
 // from <setjmp.h>/* Calling environment, plus possibly a saved signal mask.  */struct __jmp_buf_tag  {    /* NOTE: The machine-dependent definitions of `__sigsetjmp'       assume that a `jmp_buf' begins with a `__jmp_buf' and that       `__mask_was_saved' follows it.  Do not move these members       or add others before it.  */    __jmp_buf __jmpbuf;  /* Calling environment.  */    int __mask_was_saved; /* Saved the signal mask?  */    __sigset_t __saved_mask; /* Saved signal mask.  */  };typedef struct __jmp_buf_tag jmp_buf[1];
 ```
 
-每个成员注释中解释的比较清楚，我们重点关注 __jmpbuf。
+每个成员注释中解释的比较清楚，我们重点关注 \_\_jmpbuf。
 
 ```
 # if __WORDSIZE == 64typedef long int __jmp_buf[8];# elif defined  __x86_64__typedef long long int __jmp_buf[8];# elsetypedef int __jmp_buf[6];# endif
 ```
 
-__jmpbuf 是一个数组，保存了 8 个 64 位的寄存器：%rbp, %rbx, %rsp, %r12, %r13, %r14, %r15, %rip。
+\_\_jmpbuf 是一个数组，保存了 8 个 64 位的寄存器：%rbp, %rbx, %rsp, %r12, %r13, %r14, %r15, %rip。
 
 关于 X86-64 的寄存器使用约定，我们来回忆一下调用者保存寄存器和被调用者保存寄存器：
 
@@ -190,7 +186,7 @@ __jmpbuf 是一个数组，保存了 8 个 64 位的寄存器：%rbp, %rbx, %rsp
 
 X86-64 规定 %rbx, %rsp, %rbp, %r12 ~ %r15 这些寄存器是被调用者保存寄存器，他们需要由被调用的函数保存。
 
-__jmpbuf 保存的 8 个寄存器包括了被调用者寄存器和 %rip，要正确回溯协程栈，恢复他们就可以。
+\_\_jmpbuf 保存的 8 个寄存器包括了被调用者寄存器和 %rip，要正确回溯协程栈，恢复他们就可以。
 
 此外因为 glibc 的 pointer guard，我们在处理 %rbp、%rsp、%rip 这三个寄存器时需要将他们解密还原他们的初始值，解密的方法在上文已经给出。
 
@@ -226,5 +222,5 @@ c/c++1
 
 ![](https://mp.weixin.qq.com/rr?timestamp=1725982229&src=11&ver=1&signature=s4-NRI8-bQyLoUHUbQ7UYGiy7CuvIbluYHu3*0jv8q4Or8rMVS5jBnOaoCoXv2JRmv89ZurbFLhoj*p7kI3P7o9MJ*u5*nyyyTGh20*Jhl8=)
 
-微信扫一扫  
+微信扫一扫\
 关注该公众号

@@ -1,8 +1,6 @@
-
-
 原创 酷玩BPF 酷玩BPF
 
- _2024年04月28日 08:30_ _浙江_
+_2024年04月28日 08:30_ _浙江_
 
 云场景下，虚拟化成了主流技术，virtio作为guest和host之间数据传输的重要通道，许多IO卡住（IO Hang）、网络时延高的问题有时就出在guest到host的前后端报文发送与获取上。对于网络，延迟高的点非常多，比如软中断、硬中断、调度延迟、用户态收包延迟等，而前后端交界处的延迟点，平常关注的并不多。
 
@@ -20,11 +18,9 @@ virtio-net 前后端交互主要是通过vring进行管理的，报文收发包�
 
 3.guest收到中断后，往vring中读数据，读数据的过程中会关闭中断，host此时不会发中断，但是host可以继续写数据，直到vring中没有数据，guest结束本次收包流程；
 
-下图所示为硬中断和软中断及调度执行的过程：  
+下图所示为硬中断和软中断及调度执行的过程：
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyEwUXicqPHolbicic9iceov878NiaIxhyYLTgTsThVcp8ich7g9GGS7CFrndDw/640?wx_fmt=png&from=appmsg&wxfrom=13)
-
-  
 
 上图1、2两个阶段，存在时延的影响点有：
 
@@ -40,35 +36,25 @@ vring_interrupt是virtio中断处理handler，通过回调skb_recv_done，在硬
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyExwDEanRdYg5DoRCxOB4MnNwicrJy6fUKh5VHibFZqYK9nUqybgT0lz3Q/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 guest在收包的开始阶段会关闭host的中断，在完成收包后再次开启，分别在virtqueue_disable_cb virtqueue_enable_cb_prepare设置，因此我们可以考虑probe这两个点来标记guest收包完成。
 
 由于这两个是公共函数，可以换成skb_recv_done 和 napi_complete_done。
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyEHSS8rwp0FJ6zX82p8V61KpTs5NuEGfL87Gk7MvUia4jBbrYr7FFTNnA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 实际probe的效果：
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyEq5gMGpaNEGvuOSVvz3zP69Bgicm4te8YSnYiaaI7Ss0rjMiaH1zvPzmdg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 这里有个问题就是如果host一直写，guest一直读，数据量超过64的话，那么一次poll received 的值就会等于budget(该值为64)，guset会继续poll，不会认为收包结束。
 
-所以如果同一时间收到的包越多，这两个probe的时间也越长，因此可以加上收包数的影响。这个收包数量在receive_buf中有统计。  
+所以如果同一时间收到的包越多，这两个probe的时间也越长，因此可以加上收包数的影响。这个收包数量在receive_buf中有统计。
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyEKxq2pBCibyteosbkL4JwSZSvLlySTRpvX2nM3fBiaOlFUTRDg0A7RA8w/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 内核对一直poll的情况也做了2个jiffies的限制。
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyEvjqIM4UsLMdm7jpnx9sSpsADv8I7YMftOcAI8qWgKWZszt6ichP3aTg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 通过上面的方法阶段2可以大概评估，下面介绍下阶段1的思路。
 
@@ -76,11 +62,7 @@ guest在收包的开始阶段会关闭host的中断，在完成收包后再次�
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyEFDxSwYvrDyTWfIsj3TpMLiaBcPeldibfmWqbwucadUEbDJBYtessrzpg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-  
-
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/RWnbgykjTNLnib18ECibrRm3Jfhx6sSoyE6dAaIw1rW2qDDx7DLeC8JiaMF037AgTYjzbMdlCJ3CG8HzReSVufKPg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 因此我们可以将last_used_idx 和used_idx 是否一致作为host写数据的标志，这里有个前提是当前不在收包的过程中。
 
@@ -94,20 +76,18 @@ guest在收包的开始阶段会关闭host的中断，在完成收包后再次�
 
 以上只能确定一轮收包的情况，对于单个包的时延情况较难判断，原因在于收包的结束标志是以vring中有无数据。而且每次从vring中读一个数据包就往上层发送。
 
-## 输出结果  
-  
-![[Pasted image 20240918133848.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+## 输出结果
 
-  
+!\[\[Pasted image 20240918133848.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 分析上面介绍的阶段1 的情况：
 
 timer定时5ms轮询一次，以cpu2为例，last_used_idx和used_idx不相同说明host有数据包过来，last_used_idx此时没有改变，且avail_flags_shadow置为0，说明host的中断没有立马上来，否则的话在中断函数中会将avail_flags_shadow置为1。
 
-## 核心代码  
+## 核心代码
 
-时延检测的关键在于通过定时器去分析几个idx的变化情况，以及时延的变化情况，通过脚本提取出存在时延高的情况，并进一步确定前后端的问题。  
+时延检测的关键在于通过定时器去分析几个idx的变化情况，以及时延的变化情况，通过脚本提取出存在时延高的情况，并进一步确定前后端的问题。
 
 ```c
 static enum hrtimer_restart trace_hrtimer_handler(struct hrtimer *hrtimer){ u64 now; u64 delta; u64 last_time; now = local_clock(); if (more_used(virtnet_trace_vq) &&   is_virtqueue_disable_cb(virtnet_trace_vq)) {  last_time = __this_cpu_read(virtnet_trace_cpu_trace->last_time);  delta = now - last_time;  if (is_used_idx_move(virtnet_trace_vq) &&    (delta > THRES)) {   record_trace_data(delta);#ifdef VIRTNET_DEBUG   printk("cpu:%d, vring last_used_idx:%u, used_idx:%u,avail_flags_shadow:%u, delta:%lluus\n",     smp_processor_id(), virtnet_trace_vq->last_used_idx,     virtnet_trace_vq->vring.used->idx,     virtnet_trace_vq->avail_flags_shadow,     delta / 1000U);#endif  } } else {  virtnet_trace_used_idx = virtnet_trace_vq->vring.used->idx;  __this_cpu_write(virtnet_trace_cpu_trace->last_time, now); } hrtimer_forward_now(hrtimer, ns_to_ktime(virtnet_trace_period * 1000U)); return HRTIMER_RESTART;}
@@ -116,8 +96,6 @@ static enum hrtimer_restart trace_hrtimer_handler(struct hrtimer *hrtimer){
 ## 总结
 
 本文通过内核模块的方式，来分析在virtio网卡中，前端和后端之间是否存在较大的延时，对我们定位报文整体延时有很大的帮助。这里没有及时用eBPF来实现是因为性能等问题，如果大家有兴趣，可以修改为eBPF的实现方式，贡献Coolbpf（https://gitee.com/anolis/coolbpf）项目中来。
-
-  
 
 ![](https://mmbiz.qlogo.cn/sz_mmbiz_png/WQ19uqD2IiaJkc0CjBicw45XNF7PtWbPck7zpQJ9WKZy8P1Z0CzCQhFgDESzlzUc2NQBUsciblfJicr8JH3V72Zy5Q/0?wx_fmt=png)
 

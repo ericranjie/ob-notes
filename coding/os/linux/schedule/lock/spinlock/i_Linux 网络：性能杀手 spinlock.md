@@ -1,16 +1,14 @@
-
 Linux内核之旅
 
- _2023年05月04日 19:59_ _陕西_
+_2023年05月04日 19:59_ _陕西_
 
 The following article is from eBPF Talk Author Leon Hwang
-
 
 **eBPF Talk**.
 
 专注于 eBPF 技术，以及 Linux 网络上的 eBPF 技术应用
 
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664615140&idx=1&sn=ed122d50dfbf213b5dbb677f064bf035&chksm=f04de101c73a68171c12770830b95816ddd689219a98030cceec6918ac2308b5ba182371ba1f&mpshare=1&scene=24&srcid=0505zL9zd2ko4BPkvPXLz1Vp&sharer_sharetime=1683265864901&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0e466774336f48c0d983d82c380500aca9e7683f0aa2be816a29815f2d2a637c6566d5a22ae73eb98553110af14a4b6a589fb728daf81c9dde0632bb2c27fe025c55077c4c5fd18466cf2bb6062d5aa6d0f0d71592263a364ed88c474b753ae346a901bdb205ebce13b6894fbcafc473015805a2378fe12a6&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQG5Rednm2Xy2R0vlqR1qtfxKUAgIE97dBBAEAAAAAAH3qJLmB90oAAAAOpnltbLcz9gKNyK89dVj0UuBMr%2BIR6O3KWmttps5MYuVFVNLeXFOaiO6VJpQgbvgudPSGz0y4pnDwtBIFqlKNolUZndYW2XGRQARPY%2FI%2FL98%2F7mkN3codd48sz%2FlSCEXRJM2Lj6gXR1G15XvKS8%2FEaczI4TM0XgmCI2R3x83NOiPknxi1dGBIKCYdS4c%2B%2Bn3mbRYm0MJsdYR4CGRdc%2Fb5zbOe6ObdKCkWs%2F%2FQVSSQDfZcF%2F3fedV6ownkkH7AD6hlWGsmL3c%2F9cTtf2hukjKWQ29wHXEBsjEGf9oO8xEudqXUgmkufW013sWLokw1tSOgbV2iFxaAd07RdidSXw%3D%3D&acctmode=0&pass_ticket=MV13lecejYFTWw7FQJeNLBx7z%2F8It0550ZqxphjfFJk5XM8nLF9sjGU7O%2Bv4Dwj5&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664615140&idx=1&sn=ed122d50dfbf213b5dbb677f064bf035&chksm=f04de101c73a68171c12770830b95816ddd689219a98030cceec6918ac2308b5ba182371ba1f&mpshare=1&scene=24&srcid=0505zL9zd2ko4BPkvPXLz1Vp&sharer_sharetime=1683265864901&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0e466774336f48c0d983d82c380500aca9e7683f0aa2be816a29815f2d2a637c6566d5a22ae73eb98553110af14a4b6a589fb728daf81c9dde0632bb2c27fe025c55077c4c5fd18466cf2bb6062d5aa6d0f0d71592263a364ed88c474b753ae346a901bdb205ebce13b6894fbcafc473015805a2378fe12a6&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQG5Rednm2Xy2R0vlqR1qtfxKUAgIE97dBBAEAAAAAAH3qJLmB90oAAAAOpnltbLcz9gKNyK89dVj0UuBMr%2BIR6O3KWmttps5MYuVFVNLeXFOaiO6VJpQgbvgudPSGz0y4pnDwtBIFqlKNolUZndYW2XGRQARPY%2FI%2FL98%2F7mkN3codd48sz%2FlSCEXRJM2Lj6gXR1G15XvKS8%2FEaczI4TM0XgmCI2R3x83NOiPknxi1dGBIKCYdS4c%2B%2Bn3mbRYm0MJsdYR4CGRdc%2Fb5zbOe6ObdKCkWs%2F%2FQVSSQDfZcF%2F3fedV6ownkkH7AD6hlWGsmL3c%2F9cTtf2hukjKWQ29wHXEBsjEGf9oO8xEudqXUgmkufW013sWLokw1tSOgbV2iFxaAd07RdidSXw%3D%3D&acctmode=0&pass_ticket=MV13lecejYFTWw7FQJeNLBx7z%2F8It0550ZqxphjfFJk5XM8nLF9sjGU7O%2Bv4Dwj5&wx_header=0#)
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/6QxwXGlhS9FPHblxYiaxMiaYWhCKBUs37o2XqGcg9ickZoh10hor44VRx8KT08XIaCYKCzUNBdxb2JWPCy6TFTzjw/300?wx_fmt=png&wxfrom=19)
 
@@ -33,13 +31,12 @@ The following article is from eBPF Talk Author Leon Hwang
 需要通过以下手段一顿操作：
 
 1. `mpstat -p ALL 1`
-    
-2. `perf top --cpu=3`
-    
-3. `timeout 5 bpftrace -e 'kprobe:native_queued_spin_lock_slowpath{@[stack(12)] = count()}'`
-    
-4. 参考 CPU Flame Graphs[1] 制作 CPU 火焰图
-    
+
+1. `perf top --cpu=3`
+
+1. `timeout 5 bpftrace -e 'kprobe:native_queued_spin_lock_slowpath{@[stack(12)] = count()}'`
+
+1. 参考 CPU Flame Graphs\[1\] 制作 CPU 火焰图
 
 最终发现，性能瓶颈在于 `dev_queue_xmit()` 设备层发包时的 `native_queued_spin_lock_slowpath()` `spinlock` 上。
 
@@ -88,24 +85,22 @@ The following article is from eBPF Talk Author Leon Hwang
 答案是肯定的，而且有多种方法。
 
 1. 使用一个 bpf map 保存 veth 设备的 ifindex，使用 rxqueue index 当作 key 查询得到 veth 设备的 ifindex。
-    
-2. 把该 bpf map 改为一个 ifindex 数组的全局变量，使用 rxqueue index 当作索引查询得到 veth 设备的 ifindex。
-    
-3. 把该全局变量改为一个 ifindex 数组的常量，使用 rxqueue index 当作索引查询得到 veth 设备的 ifindex。
-    
+
+1. 把该 bpf map 改为一个 ifindex 数组的全局变量，使用 rxqueue index 当作索引查询得到 veth 设备的 ifindex。
+
+1. 把该全局变量改为一个 ifindex 数组的常量，使用 rxqueue index 当作索引查询得到 veth 设备的 ifindex。
 
 得到 ifindex 后使用 `bpf_redirect(ifindex, 0)` 函数将网络包转发到指定 veth 设备。
 
 ## 小结
 
 1. `spinlock` 会导致 CPU 消耗，特别是在多 CPU 上。
-    
-2. 用分治法，避免多个 CPU 共享一个 `spinlock`。
-    
+
+1. 用分治法，避免多个 CPU 共享一个 `spinlock`。
 
 ### 参考资料
 
-[1]
+\[1\]
 
 CPU Flame Graphs: _https://www.brendangregg.com/FlameGraphs/cpuflamegraphs.html_
 
@@ -171,29 +166,28 @@ Comment
 **留言 3**
 
 - 超人腿短
-    
-    浙江2023年5月29日
-    
-    Like1
-    
-    你的需求不需要全局流控的话，用sch_mq就可以解决啊现成的～
-    
+
+  浙江2023年5月29日
+
+  Like1
+
+  你的需求不需要全局流控的话，用sch_mq就可以解决啊现成的～
+
 - 风二中
-    
-    北京2023年5月5日
-    
-    Like
-    
-    看不懂
-    
+
+  北京2023年5月5日
+
+  Like
+
+  看不懂
+
 - zhang
-    
-    北京2023年5月5日
-    
-    Like
-    
-    这个是什么场景下出现的呢？
-    
+
+  北京2023年5月5日
+
+  Like
+
+  这个是什么场景下出现的呢？
 
 已无更多数据
 
@@ -212,28 +206,27 @@ Comment
 **留言 3**
 
 - 超人腿短
-    
-    浙江2023年5月29日
-    
-    Like1
-    
-    你的需求不需要全局流控的话，用sch_mq就可以解决啊现成的～
-    
+
+  浙江2023年5月29日
+
+  Like1
+
+  你的需求不需要全局流控的话，用sch_mq就可以解决啊现成的～
+
 - 风二中
-    
-    北京2023年5月5日
-    
-    Like
-    
-    看不懂
-    
+
+  北京2023年5月5日
+
+  Like
+
+  看不懂
+
 - zhang
-    
-    北京2023年5月5日
-    
-    Like
-    
-    这个是什么场景下出现的呢？
-    
+
+  北京2023年5月5日
+
+  Like
+
+  这个是什么场景下出现的呢？
 
 已无更多数据

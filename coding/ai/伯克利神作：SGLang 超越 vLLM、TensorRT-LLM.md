@@ -1,6 +1,6 @@
 原创 MLSys2024 MLSys2024
 
- _2024年07月31日 07:40_ _北京_
+_2024年07月31日 07:40_ _北京_
 
 ![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/iakNhheymmzBFxVjhl8Yp0gRnEAxlQ5Lfg80lMBrVKx5oOxLJOHgrbfaiawpicJIgrpskphto785RN8KI8aZZRI3w/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
@@ -34,11 +34,11 @@ LM程序具有两大显著特点：首先，它们通常包含多个LLM调用，
 
 **一个显著的例子是键值（KV）缓存的重用问题**：KV缓存中存储了生成推理过程中至关重要的可重用中间数据。在LM程序的批量执行过程中，如果有多个大型语言模型（LLM）调用共享了相同的前缀，那么理论上可以多次重用KV缓存中的数据。然而，现有的系统却缺乏有效的机制来支持这种重用，结果导致了大量的重复计算和内存浪费。
 
-**另一个例子是结构化输出（如JSON格式）的受限解码：**在这种情况下，LLM的输出需要遵循由正则表达式定义的特定语法规则。在这些规则的限制下，很多标记其实是可以一次性解码的。但遗憾的是，当前的系统却只能逐一解码标记，这无疑降低了整体的解码效率。
+\*\*另一个例子是结构化输出（如JSON格式）的受限解码：\*\*在这种情况下，LLM的输出需要遵循由正则表达式定义的特定语法规则。在这些规则的限制下，很多标记其实是可以一次性解码的。但遗憾的是，当前的系统却只能逐一解码标记，这无疑降低了整体的解码效率。
 
 面对这些挑战，我们开发了SGLang，这是一种专为大型语言模型（LLMs）设计的结构化生成语言。SGLang的核心优势在于，它能够巧妙地利用语言模型（LM）程序中的多层调用结构，显著提升执行效率。
 
-**SGLang由两大核心部分组成：**前端语言与后端运行时。前端部分让LM程序的编写变得更为简便快捷，而后端运行时则负责加速程序的执行过程。这两部分既可以紧密合作，共同提升整体性能，也可以各自独立运行，灵活应对不同需求。
+\*\*SGLang由两大核心部分组成：\*\*前端语言与后端运行时。前端部分让LM程序的编写变得更为简便快捷，而后端运行时则负责加速程序的执行过程。这两部分既可以紧密合作，共同提升整体性能，也可以各自独立运行，灵活应对不同需求。
 
 值得一提的是，SGLang被设计为嵌入Python的特定领域语言（DSL）。它不仅提供了丰富的生成基元（如扩展、生成、选择），还支持并行控制（如分叉、合并）。由于与Python的控制流和库无缝兼容，用户只需运用熟悉的Python语法，即可轻松构建高级提示工作流程。
 
@@ -62,13 +62,13 @@ SGLang程序通过“fork”基础操作，能够串联多个生成调用，并�
 
 RadixAttention一种革命性的新技术，它能在程序运行时自动又智能地重用那些宝贵的KV缓存。跟以前那些“用完就扔”的系统不一样，RadixAttention会把缓存像宝贝一样存起来，放在一个叫做基数树的地方，专门用来存放那些提示符和生成的结果。为了让缓存更加高效，我们还特别设计了两种策略：一种是“最近最少使用”（LRU）的淘汰策略，它会自动把最不常用的缓存清理出去，给新的内容腾地方；另一种是缓存感知的调度策略，它能更聪明地安排缓存的使用，提高缓存的命中率。
 
-**RadixAttention：**基数树作为一种先进的数据结构，相较于传统的字典树（或称前缀树），显著提升了空间利用效率。它打破了常规树结构中边仅代表单个元素的限制，使得基数树的边能够表示元素的连续序列，这一特性极大地加速了数据处理速度。
+\*\*RadixAttention：\*\*基数树作为一种先进的数据结构，相较于传统的字典树（或称前缀树），显著提升了空间利用效率。它打破了常规树结构中边仅代表单个元素的限制，使得基数树的边能够表示元素的连续序列，这一特性极大地加速了数据处理速度。
 
 在我们的系统中，基数树被巧妙地用来管理token序列与相应KV缓存张量之间的映射关系。这些KV缓存张量并不连续存储，而是分布在按页划分的内存空间中，每页大小与一个特定的标记相匹配。
 
 鉴于GPU内存资源宝贵且易于被迅速消耗的特点，我们实施了一个简化的最近最少使用（LRU）淘汰策略，该策略优先移除那些最长时间未被访问的叶子节点。通过这一策略，我们不仅有效释放了被淘汰叶子节点所占用的内存，还充分利用了这些节点的共同祖先节点，实现内存的最大化复用。随着系统运行，当这些祖先节点也变成孤立的叶子节点并符合淘汰条件时，它们同样会被有序地逐出，从而保持整个缓存系统的健康与高效。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在连续批处理的场景中，对于当前正在处理的批次所使用的节点，我们无法直接进行移除。为此，每个节点都配备了一个引用计数器，该计数器实时记录着有多少个运行中的请求正在使用该节点。只有当节点的引用计数器归零时，该节点才会被视为可移除的。值得注意的是，我们并没有预先设定一个固定大小的内存池作为缓存区，而是让缓存的标记与当前正在处理的请求共享同一个内存资源池。这样，系统就能根据实际需求，动态地为缓存和正在运行的请求分配内存。
 
@@ -92,7 +92,7 @@ RadixAttention可以扩展到多个GPU上运行。在张量并行化方面，每
 
 在语言模型（LM）的应用中，用户常常希望模型的输出能够严格遵循特定的格式，比如JSON结构，这样做不仅增强了输出的可控性和鲁棒性，还使得后续处理更加便捷。SGLang为满足这一需求，引入了正则表达式参数作为约束工具，通过将其转换为有限状态机（FSM）来确保输出格式的正确性。这一方法在实践中已被证明相当有效。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在解码过程中，它们保持当前的有限状态机（FSM）状态，从后续状态中检索允许的标记，并将无效标记的概率设置为零，逐个标记进行解码。然而，当有机会一次性解码多个标记时，这种逐个标记的方法效率不高。例如，在图4（c）所示的正常解码过程中，常序列“summary:”跨越了多个标记，尽管在解码时只有一个有效的后续标记，但仍需要多个解码阶段。因此，整个序列原本可以在单一步骤（即前向传递）中完成解码。然而，由于现有系统中有限状态机（FSM）与模型运行器之间缺乏集成，导致无法处理多标记，因此现有系统只能一次解码一个标记，从而造成了解码速度缓慢。
 
@@ -102,17 +102,17 @@ RadixAttention可以扩展到多个GPU上运行。在张量并行化方面，每
 
 我们的目标是让大型语言模型（LLMs）遵循正则表达式（regex），这种表达式具有更高的表达能力，可用于表示诸如JSON模式等常见格式。为实现这一目标，我们将正则表达式转换为有限状态机（FSM），以在解码过程中指导生成流程。FSM本质上是一个由节点（状态）和边（带字符串/字符的转换）构成的图。从初始状态开始，每次转换都会将边上的字符串附加到当前状态，以移至下一个状态，最终通过一组终态来结束整个过程。这一机制指导LLMs的解码过程，根据FSM的当前状态转换过滤掉无效的标记，如图10所示。解码过程中，FSM可能会经历多次状态转换，直至达到终态。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 受限解码的挑战源自这样一个事实：约束条件通常以自然语言格式表达，即正则表达式通过字符/字符串来描绘，而大型语言模型（LLMs）则被设计为将这些内容解读并处理为标记（tokens）。这导致了一个复杂的场景，因为字符串与标记之间的映射关系错综复杂，且缺乏一一对应的关系。
 
-**压缩有限状态机（FSM）的实现细节：**为了简化压缩有限状态机（FSM）的构建过程，我们基于字符/字符串而非标记来构建原始FSM。在此，我们正式定义单一转换边和压缩边的概念如下：
+\*\*压缩有限状态机（FSM）的实现细节：\*\*为了简化压缩有限状态机（FSM）的构建过程，我们基于字符/字符串而非标记来构建原始FSM。在此，我们正式定义单一转换边和压缩边的概念如下：
 
 • 单一转换边：如果一条边满足以下条件，则称其为单一转换边：1) 其源节点仅有一个后继节点；2) 该边上仅有一个可接受的字符/字符串。
 
 • 压缩边：若连续相邻的边（e0, e1, ..., ek）均可被视为单一转换边，则这些边可合并压缩成一条边。压缩边的文本是e0, e1, ..., ek各边文本的连接。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 从基于字符的FSM出发，我们递归地将单一转换边合并到其前面的边上，直至无法进一步压缩，从而得到压缩FSM。此方法通过提升解码过程的速度证明了其有效性，如图11所示，SGLang在采用压缩FSM后展现了高效的运行时性能。
 
@@ -128,7 +128,7 @@ RadixAttention可以扩展到多个GPU上运行。在张量并行化方面，每
 
 众多研究已经深入探讨了键值（KV）缓存的重用策略，其中不少与我们的工作并驾齐驱。而我们的RadixAttention方法独树一帜，首次提出将KV缓存视为基于树的最近最少使用（LRU）缓存机制。这一创新不仅支持多级共享、缓存感知调度、前端与运行时协同调度，还能应对分布式场景。
 
-相比之下，vLLM[和ChunkedAttention虽然探索了简单的重用案例，如系统提示共享，但并未触及多级树形结构共享或LRU缓存的层面。
+相比之下，vLLM\[和ChunkedAttention虽然探索了简单的重用案例，如系统提示共享，但并未触及多级树形结构共享或LRU缓存的层面。
 
 PromptCache虽然提出了前缀之外的KV缓存模块化重用方案，但可能导致高达43%的精度损失。HydraGen、FlashInfer和ChunkedAttention则专注于CUDA内核优化，忽略了LRU缓存的重要性。
 
@@ -140,19 +140,19 @@ SGLang的创新之处在于其独特的运行时优化技术，专为加速编�
 
 **7 总结**
 
-**未来展望：**尽管SGLang已经取得了显著成就，但仍存在一些局限性，这些局限性为未来的研究指明了充满潜力的方向。
+\*\*未来展望：\*\*尽管SGLang已经取得了显著成就，但仍存在一些局限性，这些局限性为未来的研究指明了充满潜力的方向。
 
 扩展SGLang的功能，以支持更多样化的输出模式；调整RadixAttention算法，使其能够跨越不同的内存层次（如DRAM和磁盘）高效工作；
 
 在RadixAttention中引入模糊语义匹配功能；在SGLang的基础上提供更高层次的编程原语；解决缓存感知调度中的资源饥饿问题；并进一步增强SGLang编译器，以执行包括调度和内存规划在内的高级静态优化。
 
-**总结：**我们推出了SGLang框架，它专为高效编程和执行结构化语言模型程序而设计。通过RadixAttention、压缩有限状态机以及强大的语言解释器等创新优化技术，SGLang极大地提升了复杂语言模型程序的吞吐量和响应速度。它是研究和开发高级提示技术及智能代理工作流的强大工具。
+\*\*总结：\*\*我们推出了SGLang框架，它专为高效编程和执行结构化语言模型程序而设计。通过RadixAttention、压缩有限状态机以及强大的语言解释器等创新优化技术，SGLang极大地提升了复杂语言模型程序的吞吐量和响应速度。它是研究和开发高级提示技术及智能代理工作流的强大工具。
 
 现在，SGLang的源代码已全面开放，欢迎广大开发者共同探索其无限可能。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/iaicHNqyB8TgqKNAzs6pYOibDas08icibS0nc5HHwTKEq9fLEfKxoja8sPTvPjEnbBDRsOGouJhFE4MZ9ibh5sw7RkiaQ/0?wx_fmt=jpeg)
 

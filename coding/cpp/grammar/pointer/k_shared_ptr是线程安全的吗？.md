@@ -1,6 +1,6 @@
 最近看见交流群里小伙伴在讨论这个问题，自己也很感兴趣，上网找到了陈硕大佬的这篇文章，分享给大家！以下是正文：
 
----
+______________________________________________________________________
 
 我在《Linux 多线程服务端编程：使用 muduo C++ 网络库》第 1.9 节“再论 shared_ptr 的线程安全”中写道：
 
@@ -94,7 +94,7 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 如果把 boost::shared_ptr 放到 unordered_set 中，或者用于 unordered_map 的 key，那么要小心 hash table 退化为链表。[http://stackoverflow.com/questions/6404765/c-shared-ptr-as-unordered-sets-key/12122314#12122314](http://stackoverflow.com/questions/6404765/c-shared-ptr-as-unordered-sets-key/12122314#12122314)
 
-直到 Boost 1.47.0 发布之前，unordered_set<std::shared_ptr<T> > 虽然可以编译通过，但是其 hash_value 是 shared_ptr 隐式转换为 bool 的结果。也就是说，如果不自定义hash函数，那么 unordered_{set/map} 会退化为链表。[https://svn.boost.org/trac/boost/ticket/5216](https://svn.boost.org/trac/boost/ticket/5216)
+直到 Boost 1.47.0 发布之前，unordered_set\<std::shared_ptr<T> > 虽然可以编译通过，但是其 hash_value 是 shared_ptr 隐式转换为 bool 的结果。也就是说，如果不自定义hash函数，那么 unordered\_{set/map} 会退化为链表。[https://svn.boost.org/trac/boost/ticket/5216](https://svn.boost.org/trac/boost/ticket/5216)
 
 Boost 1.51 在 boost/functional/hash/extensions.hpp 中增加了有关重载，现在只要包含这个头文件就能安全高效地使用 unordered_set[std::shared_ptr](std::shared_ptr) 了。
 
@@ -104,9 +104,9 @@ Boost 1.51 在 boost/functional/hash/extensions.hpp 中增加了有关重载，�
 
 shared_ptr<Foo> sp(new Foo) 在构造 sp 的时候捕获了 Foo 的析构行为。实际上 shared_ptr.ptr 和 ref_count.ptr 可以是不同的类型（只要它们之间存在隐式转换），这是 shared_ptr 的一大功能。分 3 点来说：
 
-**1. 无需虚析构；**假设 Bar 是 Foo 的基类，但是 Bar 和 Foo 都没有虚析构。
+\*\*1. 无需虚析构；\*\*假设 Bar 是 Foo 的基类，但是 Bar 和 Foo 都没有虚析构。
 
-shared_ptr<Foo> sp1(new Foo); // ref_count.ptr 的类型是 Foo*
+shared_ptr<Foo> sp1(new Foo); // ref_count.ptr 的类型是 Foo\*
 
 shared_ptr<Bar> sp2 = sp1; // 可以赋值，自动向上转型（up-cast）
 
@@ -116,15 +116,15 @@ sp1.reset(); // 这时 Foo 对象的引用计数降为 1
 
 **2. shared_ptr<void>** 可以指向并安全地管理（析构或防止析构）任何对象；muduo::net::Channel class 的 tie() 函数就使用了这一特性，防止对象过早析构，见书 7.15.3 节。
 
-shared_ptr<Foo> sp1(new Foo); // ref_count.ptr 的类型是 Foo*
+shared_ptr<Foo> sp1(new Foo); // ref_count.ptr 的类型是 Foo\*
 
-shared_ptr<void> sp2 = sp1; // 可以赋值，Foo* 向 void* 自动转型
+shared_ptr<void> sp2 = sp1; // 可以赋值，Foo\* 向 void\* 自动转型
 
 sp1.reset(); // 这时 Foo 对象的引用计数降为 1
 
-此后 sp2 仍然能安全地管理 Foo 对象的生命期，并安全完整地释放 Foo，不会出现 delete void* 的情况，因为 delete 的是 ref_count.ptr，不是 sp2.ptr。
+此后 sp2 仍然能安全地管理 Foo 对象的生命期，并安全完整地释放 Foo，不会出现 delete void\* 的情况，因为 delete 的是 ref_count.ptr，不是 sp2.ptr。
 
-**3. 多继承。**假设 Bar 是 Foo 的多个基类之一，那么：
+\*\*3. 多继承。\*\*假设 Bar 是 Foo 的多个基类之一，那么：
 
 shared_ptr<Foo> sp1(new Foo);
 
@@ -132,7 +132,7 @@ shared_ptr<Bar> sp2 = sp1; // 这时 sp1.ptr 和 sp2.ptr 可能指向不同的�
 
 sp1.reset(); // 此时 Foo 对象的引用计数降为 1
 
-但是 sp2 仍然能安全地管理 Foo 对象的生命期，并安全完整地释放 Foo，因为 delete 的不是 Bar*，而是原来的 Foo*。换句话说，sp2.ptr 和 ref_count.ptr 可能具有不同的值（当然它们的类型也不同）。
+但是 sp2 仍然能安全地管理 Foo 对象的生命期，并安全完整地释放 Foo，因为 delete 的不是 Bar\*，而是原来的 Foo\*。换句话说，sp2.ptr 和 ref_count.ptr 可能具有不同的值（当然它们的类型也不同）。
 
 为什么要尽量使用 make_shared()？
 

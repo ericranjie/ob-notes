@@ -1,7 +1,8 @@
 # 
+
 原创 苏三呀 苏三说技术
 
- _2021年02月21日 09:26_
+_2021年02月21日 09:26_
 
 ![](https://res.wx.qq.com/op_res/NN_GToMiIjsXzgPzF9-74ZzwR3cA9-fv3o9eWo8f5gQWqx71CmGlY8kFxuIxZaG0TB1bFeMCmh1DGN_pWMRg0A)
 
@@ -11,7 +12,7 @@
 
 大家好，我是苏三，又和大家见面了。
 
-## 前言  
+## 前言
 
 我的上家公司是做餐饮系统的，每天中午和晚上用餐高峰期，系统的并发量不容小觑。为了保险起见，公司规定各部门都要在吃饭的时间轮流值班，防止出现线上问题时能够及时处理。
 
@@ -41,11 +42,11 @@
 
 我们都知道`kafka`的`topic`是无序的，但是一个`topic`包含多个`partition`，每个`partition`内部是有序的。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如此一来，思路就变得清晰了：只要保证生产者写消息时，按照一定的规则写到同一个`partition`，不同的消费者读不同的`partition`的消息，就能保证生产和消费者消息的顺序。
 
-我们刚开始就是这么做的，同一个`商户编号`的消息写到同一个`partition`，`topic`中创建了`4`个`partition`，然后部署了`4`个消费者节点，构成`消费者组`，一个`partition`对应一个消费者节点。从理论上说，这套方案是能够保证消息顺序的。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+我们刚开始就是这么做的，同一个`商户编号`的消息写到同一个`partition`，`topic`中创建了`4`个`partition`，然后部署了`4`个消费者节点，构成`消费者组`，一个`partition`对应一个消费者节点。从理论上说，这套方案是能够保证消息顺序的。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一切规划得看似“天衣无缝”，我们就这样”顺利“上线了。
 
@@ -61,7 +62,7 @@
 
 为什么这么说？
 
-假设订单系统发了：”下单“、”支付“、”完成“ 三条消息。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)而”下单“消息由于网络原因我们系统处理失败了，而后面的两条消息的数据是无法入库的，因为只有”下单“消息的数据才是完整的数据，其他类型的消息只会更新状态。
+假设订单系统发了：”下单“、”支付“、”完成“ 三条消息。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)而”下单“消息由于网络原因我们系统处理失败了，而后面的两条消息的数据是无法入库的，因为只有”下单“消息的数据才是完整的数据，其他类型的消息只会更新状态。
 
 加上，我们当时没有做`失败重试机制`，使得这个问题被放大了。问题变成：一旦”下单“消息的数据入库失败，用户就永远看不到这个订单和菜品了。
 
@@ -86,9 +87,8 @@
 如果真的这么做，会出现两个问题：
 
 1. ”支付“消息前面只有”下单“消息，这种情况比较简单。但如果某种类型的消息，前面有N多种消息，需要判断多少次呀，这种判断跟订单系统的耦合性太强了，相当于要把他们系统的逻辑搬一部分到我们系统。
-    
-2. 影响消费者的消费速度
-    
+
+1. 影响消费者的消费速度
 
 这时有种更简单的方案浮出水面：消费者在处理消息时，先判断该`订单号`在`重试表`有没有数据，如果有则直接把当前消息保存到`重试表`。如果没有，则进行业务处理，如果出现异常，把该消息保存到`重试表`。
 
@@ -104,7 +104,7 @@
 
 ### 1. 消息体过大
 
-虽说`kafka`号称支持`百万级的TPS`，但从`producer`发送消息到`broker`需要一次网络`IO`，`broker`写数据到磁盘需要一次磁盘`IO`（写操作），`consumer`从`broker`获取消息先经过一次磁盘`IO`（读操作），再经过一次网络`IO`。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+虽说`kafka`号称支持`百万级的TPS`，但从`producer`发送消息到`broker`需要一次网络`IO`，`broker`写数据到磁盘需要一次磁盘`IO`（写操作），`consumer`从`broker`获取消息先经过一次磁盘`IO`（读操作），再经过一次网络`IO`。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一次简单的消息从生产到消费过程，需要经过`2次网络IO`和`2次磁盘IO`。如果消息体过大，势必会增加IO的耗时，进而影响kafka生产和消费的速度。消费者速度太慢的结果，就会出现消息积压情况。
 
@@ -119,13 +119,12 @@
 如此甚好，我们就可以这样设计了：
 
 1. 订单系统发送的消息体只用包含：id和状态等关键信息。
-    
-2. 后厨显示系统消费消息后，通过id调用订单系统的订单详情查询接口获取数据。
-    
-3. 后厨显示系统判断数据库中是否有该订单的数据，如果没有则入库，有则更新。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 后厨显示系统消费消息后，通过id调用订单系统的订单详情查询接口获取数据。
+
+1. 后厨显示系统判断数据库中是否有该订单的数据，如果没有则入库，有则更新。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 果然这样调整之后，消息积压问题很长一段时间都没再出现。
 
@@ -135,7 +134,7 @@
 
 但这次有点诡异，不是所有`partition`上的消息都有积压，而是只有一个。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 刚开始，我以为是消费那个`partition`消息的节点出了什么问题导致的。但是经过排查，没有发现任何异常。
 
@@ -151,7 +150,7 @@
 
 调整后按`订单号`路由到不同的`partition`，同一个订单号的消息，每次到发到同一个`partition`。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 调整后，消息积压的问题又有很长一段时间都没有再出现。我们的商户数量在这段时间，增长的非常快，越来越多了。
 
@@ -193,20 +192,17 @@
 
 幸好，线程数是可以通过`zookeeper`动态调整的，我把核心线程数调成了`8`个，核心线程数改成了`10`个。
 
-后面，运维把订单服务挂的2个节点重启后恢复正常了，以防万一，再多加了2个节点。为了确保订单服务不会出现问题，就保持目前的消费速度，后厨显示系统的消息积压问题，1小时候后也恢复正常了。![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+后面，运维把订单服务挂的2个节点重启后恢复正常了，以防万一，再多加了2个节点。为了确保订单服务不会出现问题，就保持目前的消费速度，后厨显示系统的消息积压问题，1小时候后也恢复正常了。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 后来，我们开了一次复盘会，得出的结论是：
 
 1. 订单系统的批量操作一定提前通知下游系统团队。
-    
-2. 下游系统团队多线程调用订单查询接口一定要做压测。
-    
-3. 这次给订单查询服务敲响了警钟，它作为公司的核心服务，应对高并发场景做的不够好，需要做优化。
-    
-4. 对消息积压情况加监控。
-    
 
-  
+1. 下游系统团队多线程调用订单查询接口一定要做压测。
+
+1. 这次给订单查询服务敲响了警钟，它作为公司的核心服务，应对高并发场景做的不够好，需要做优化。
+
+1. 对消息积压情况加监控。
 
 顺便说一下，对于要求严格保证消息顺序的场景，可以将线程池改成多个队列，每个队列用单线程处理。
 
@@ -255,9 +251,8 @@
 但后面仔细思考了一下：
 
 1. 加分布式锁也可能会影响消费者的消息处理速度。
-    
-2. 消费者依赖于redis，如果redis出现网络超时，我们的服务就悲剧了。
-    
+
+1. 消费者依赖于redis，如果redis出现网络超时，我们的服务就悲剧了。
 
 所以，我也不打算用分布式锁。
 
@@ -294,11 +289,10 @@ INSERTINTOtable (column_list)VALUES (value_list)ONDUPLICATEKEYUPDATEc1 = v1, c2 
 `kafka`消费消息时支持三种模式：
 
 - at most once模式 最多一次。保证每一条消息commit成功之后，再进行消费处理。消息可能会丢失，但不会重复。
-    
+
 - at least once模式 至少一次。保证每一条消息处理成功之后，再进行commit。消息不会丢失，但可能会重复。
-    
+
 - exactly once模式 精确传递一次。将offset作为唯一id与消息同时处理，并且保证处理的原子性。消息只会处理一次，不丢失也不会重复。但这种方式很难做到。
-    
 
 `kafka`默认的模式是`at least once`，但这种模式可能会产生重复消费的问题，所以我们的业务逻辑必须做幂等设计。
 
@@ -319,9 +313,8 @@ INSERTINTOtable (column_list)VALUES (value_list)ONDUPLICATEKEYUPDATEc1 = v1, c2 
 除了上述问题之外，我还遇到过：
 
 - `kafka`的`consumer`使用自动确认机制，导致`cpu使用率100%`。
-    
+
 - `kafka`集群中的一个`broker`节点挂了，重启后又一直挂。
-    
 
 这两个问题说起来有些复杂，我就不一一列举了，有兴趣的朋友可以关注我的公众号，加我的微信找我私聊。
 
@@ -331,9 +324,7 @@ INSERTINTOtable (column_list)VALUES (value_list)ONDUPLICATEKEYUPDATEc1 = v1, c2 
 
 各位亲爱的朋友，我的文章一周才更新一到两篇。很有可能在你不经意间，就发文了，导致你错过精彩内容。在公众号中扩展右上角“设为星标”能第一时间看到我的好文章喔，纯干货分享，错过真的可惜。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 最后说一句(求关注，别白嫖我)
 
@@ -343,23 +334,19 @@ INSERTINTOtable (column_list)VALUES (value_list)ONDUPLICATEKEYUPDATEc1 = v1, c2 
 
 关注公众号：【苏三说技术】，在公众号中回复：面试、代码神器、开发手册、时间管理有超赞的粉丝福利，另外回复：加群，可以跟很多BAT大厂的前辈交流和学习。
 
- 个人公众号
+个人公众号
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
- 个人微信
+个人微信
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/vIUyCpqbpOIqQ06cDNQHYWxD6xmRrHS4BdVmgyMITxXQhWFAWhqAN83fKDVr6PAiaRP59jHibdHedicphUOQYibLgA/0?wx_fmt=jpeg)
 
 苏三呀
 
- 谢谢你的鼓励 
+谢谢你的鼓励
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzkwNjMwMTgzMQ==&mid=2247490289&idx=1&sn=bc311da9f4a4d3f48ee5dc207bf31a8b&source=41&key=daf9bdc5abc4e8d0eceb871dc244c6f5dae61e5d0e64a04496b0b4122861d7c5df98cfbf91ebcdc055ee3b8b87674b240689019776c0ea060b8538c27f49eda05f70a1767c4182349f7a4b3f8caacf3d7b2abc556d33705338129605faca7f3158ead52a41a4899c579eeb978adbc543e668d28498c1a19814976d58e5278ff9&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQOR28gt2McluQ3Lwix3RMGhLmAQIE97dBBAEAAAAAAA09Di%2BvVuEAAAAOpnltbLcz9gKNyK89dVj0hY3y5m4f07WGeCTE5ZmgIrZwRb8RFfTxW98nxbwQwnjlOg9ZYMy4q3HY3cvODYY%2BVg7unXsCCpPrWF%2BlMQ%2F8lnxk0R%2BOt%2BdOXfgmI7kDik720oRUKBK1VIx3sr06T0aKg3Qs3k%2FMlwdJEKU7aqKa%2B01WT%2BgpNuUJEYd6zxFEHiT5GJ7lfdmUAOH6Mth32qmbNpwOg%2B%2Fzqx4COatsStwRpYJDjG4%2Fk7Oro%2BNKZu5QcUO17ET9dtKFAW0F4LJ4sR6x&acctmode=0&pass_ticket=GgGxwbs84D5Tl8nmCyZJ19jGsb9q%2FuftwZrPYWu0QUfI6zCxBiFDy90qdKGmwxLf&wx_header=1)喜欢作者
 

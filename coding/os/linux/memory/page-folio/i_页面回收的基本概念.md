@@ -1,9 +1,11 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-8-25 19:01 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 本文主要介绍了一些page reclaim机制中的基本概念。这份文档其实也可以看成阅读ULK第17章第一小节的一个读书笔记。虽然ULK已经读了很多遍，不过每一遍还是觉得有收获。Linux内核虽然不断在演进，但是页面回收的基本概念是不变的，所以ULK仍然值得内核发烧友仔细品味。
+
 # 一、什么是page frame reclaiming？
 
 在用户进程的内存使用上，Linux内核并没有严格的限制，其实思路是：当系统负荷小的时候，内存都是位于各种cache中，以便提高性能。当系统负荷重（进程数目非常多）的时候，cache中的内存被收回，然后用于进程地址空间的创建和映射。在这样思路的指导下，一开始，内核大手大脚，一直从伙伴系统的free list上分配page frame给用户进程或者各种kernel cache使用，但是系统内存终归是有限的，当伙伴系统的空闲内存下降到一定的水位的时候，系统会从用户进程或者kernel cache中回收page frame到伙伴系统，以便满足新的内存分配的需求，这个过程就是page frame reclaiming。一言以蔽之，page frame reclaiming就是保证系统的空闲内存在一个指定的水位之上。
+
 # 二、什么时候启动page frame reclaiming？
 
 能不能等到空闲内存用尽之后才启动page frame reclaiming呢？不行，因为在page frame reclaiming的过程中也会消耗内存（例如在页面回收过程中，我们可能会将page frame的数据交换到磁盘，因此需要分配buffer head数据结构，完成IO操作），因此我们必须在伙伴系统中保持一定的水位，以便让page frame reclaiming机制正常工作，以便回收更多的内存，让系统运转下去，否则系统会crash掉。
@@ -14,7 +16,7 @@
 
 因此，总结起来，内核在内存回收的思路就是：系统在分配内存的时候就进行检查，如果有需要就唤醒kswapd，让系统的空闲内存的数量保持在一个水平之上，以免将自己逼入绝境。如果没有办法，的确进入了绝境（分配内存失败），那么就直接触发页面回收。具体的场景包括：
 
-1、synchronous page reclaim，即当遭遇分配内存失败的时候，一言不合，然后直接调用page frame reclaiming进行回收。例如：在分配page buffer的时候（alloc_page_buffers），如果分配不成功，直接调用free_more_memory进行内存回收。或者在调用__alloc_pages的时候，如果分配不成功，直接调用try_to_free_pages进行内存回收。当然，其实free_more_memory也是调用try_to_free_pages来实现页面回收的。
+1、synchronous page reclaim，即当遭遇分配内存失败的时候，一言不合，然后直接调用page frame reclaiming进行回收。例如：在分配page buffer的时候（alloc_page_buffers），如果分配不成功，直接调用free_more_memory进行内存回收。或者在调用\_\_alloc_pages的时候，如果分配不成功，直接调用try_to_free_pages进行内存回收。当然，其实free_more_memory也是调用try_to_free_pages来实现页面回收的。
 
 2、Suspend to disk（Hibernation）的场景。系统hibernate的时候需要大量内存，这时候会调用shrink_all_memory来回收指定数目的page frame。
 
@@ -52,4 +54,4 @@
 
 标签: [页面回收](http://www.wowotech.net/tag/%E9%A1%B5%E9%9D%A2%E5%9B%9E%E6%94%B6)
 
----
+______________________________________________________________________

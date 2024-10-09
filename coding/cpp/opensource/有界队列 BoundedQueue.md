@@ -1,11 +1,10 @@
-
 CPP开发者
 
- _2022年01月15日 11:55_
+_2022年01月15日 11:55_
 
 以下文章来源于编程往事 ，作者果冻虾仁
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7Hvg7rQmorRljlcVCzwYTttaruhY8OCBSft64AYB32Cg/0)
 
@@ -13,7 +12,7 @@ CPP开发者
 
 C++码农，brpc committer，搜广推在线工程。专注互联网后端技术分享、行业观察以及个人成长！也欢迎关注我的知乎：果冻虾仁
 
-](https://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651170136&idx=1&sn=547123f87ae6cb8a008b9c6ba8fc52fd&chksm=80647407b713fd11d3cbd0fd1372785bb325001ef53d8cb29f999264e2a7b3a65292b214239a&mpshare=1&scene=24&srcid=0115ynkVyYoQ2OB6HlhNqy3m&sharer_sharetime=1642219578093&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0907c562e4c8f5f8c6c111c677c15d4f2009243d78b6b46918120f841628303417a78299a8b21c0bb45ec807fea34b9bc242227b5e30ccd8200da73d12092063e5b99e8976310d2c36fba2b9168c55cd77d2b55fd9fd6d046a3e88dcd190ed7c798aa139478bbc21b4ca1c66137ab74783ef1e1cf7af44b7e&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQvsZuBh4nNuwTV%2Bm3t%2Fy5YxLmAQIE97dBBAEAAAAAAK9kFWahe%2BkAAAAOpnltbLcz9gKNyK89dVj08kEEz3C0XBQpEDg9cdJMohMOw8snBM%2BNpUy0HBiuOV0PVAnJbGNNIZjRCrGtaYvbz5puhg9Y8suviqfR9LoeKpcLhFr9k%2BUGKjp2KECUOCHmW0tvRXzVWvXnuyEzTkcC%2Bx2S3RMSe%2BCU7Vstov4qPle5kHhsPl77Wzh0h6XlwPyC%2BNGF3ZtP9wki6tLqeuyxH%2FYckbZaWlP80gJOE2YLbY6SDis2vsnsgw2GINwGZb2wuCUD%2B1XuzZ5ZtjgbRh6u&acctmode=0&pass_ticket=34Uc5cumMN4RB3MCUmL1hkQzYqt7WxPIvmfme9k5ZTg0NrW4HiLm730SZDlSRzJm&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651170136&idx=1&sn=547123f87ae6cb8a008b9c6ba8fc52fd&chksm=80647407b713fd11d3cbd0fd1372785bb325001ef53d8cb29f999264e2a7b3a65292b214239a&mpshare=1&scene=24&srcid=0115ynkVyYoQ2OB6HlhNqy3m&sharer_sharetime=1642219578093&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0907c562e4c8f5f8c6c111c677c15d4f2009243d78b6b46918120f841628303417a78299a8b21c0bb45ec807fea34b9bc242227b5e30ccd8200da73d12092063e5b99e8976310d2c36fba2b9168c55cd77d2b55fd9fd6d046a3e88dcd190ed7c798aa139478bbc21b4ca1c66137ab74783ef1e1cf7af44b7e&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQvsZuBh4nNuwTV%2Bm3t%2Fy5YxLmAQIE97dBBAEAAAAAAK9kFWahe%2BkAAAAOpnltbLcz9gKNyK89dVj08kEEz3C0XBQpEDg9cdJMohMOw8snBM%2BNpUy0HBiuOV0PVAnJbGNNIZjRCrGtaYvbz5puhg9Y8suviqfR9LoeKpcLhFr9k%2BUGKjp2KECUOCHmW0tvRXzVWvXnuyEzTkcC%2Bx2S3RMSe%2BCU7Vstov4qPle5kHhsPl77Wzh0h6XlwPyC%2BNGF3ZtP9wki6tLqeuyxH%2FYckbZaWlP80gJOE2YLbY6SDis2vsnsgw2GINwGZb2wuCUD%2B1XuzZ5ZtjgbRh6u&acctmode=0&pass_ticket=34Uc5cumMN4RB3MCUmL1hkQzYqt7WxPIvmfme9k5ZTg0NrW4HiLm730SZDlSRzJm&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 ## 开场白
 
@@ -39,7 +38,7 @@ brpc实现了一个“有界队列”的类模板`BoundedQueue`。先说一下�
 
 看注释可以发现，BoundedQueue是一个线程不安全的有界队列。所以BoundedQueue不支持多线程间的并发读写，不过也因此BoundedQueue的代码足够简单。简单到给你10分钟到时间就可以看完，基本上是一个“裸”的ring buffer实现。当然也不是说BoundedQueue不能应用在多线程读写的场景，只是说你需要在外围添加额外的线程同步控制逻辑，比如下文我们也会提到的RemoteTaskQueue。
 
-接下来我们来阅读一下他的源码：代码路径：butil\containers\bounded_queue.h
+接下来我们来阅读一下他的源码：代码路径：butil\\containers\\bounded_queue.h
 
 ## 模板声明与数据成员
 
@@ -57,11 +56,11 @@ StorageOwnership的定义：
 
 看一下构造函数，它有三个重载。第一个：
 
-    `// You have to pass the memory for storing items at creation.       // The queue contains at most memsize/sizeof(T) items.       BoundedQueue(void* mem, size_t memsize, StorageOwnership ownership)           : _count(0)           , _cap(memsize / sizeof(T))           , _start(0)           , _ownership(ownership)           , _items(mem) {           DCHECK(_items);       };`    
+`// You have to pass the memory for storing items at creation.       // The queue contains at most memsize/sizeof(T) items.       BoundedQueue(void* mem, size_t memsize, StorageOwnership ownership)           : _count(0)           , _cap(memsize / sizeof(T))           , _start(0)           , _ownership(ownership)           , _items(mem) {           DCHECK(_items);       };`
 
 支持传入数据所有权ownership，数据地址mem以及大小memsize。
 
-    `// Construct a queue with the given capacity.       // The malloc() may fail silently, call initialized() to test validity       // of the queue.       explicit BoundedQueue(size_t capacity)           : _count(0)           , _cap(capacity)           , _start(0)           , _ownership(OWNS_STORAGE)           , _items(malloc(capacity * sizeof(T))) {           DCHECK(_items);       };`
+`// Construct a queue with the given capacity.       // The malloc() may fail silently, call initialized() to test validity       // of the queue.       explicit BoundedQueue(size_t capacity)           : _count(0)           , _cap(capacity)           , _start(0)           , _ownership(OWNS_STORAGE)           , _items(malloc(capacity * sizeof(T))) {           DCHECK(_items);       };`
 
 只传入容量capacity，这种表示队列持有数据存储的所有权，在构造时用malloc来分配内存。当然鉴于malloc不一定总能成功，故而使用DCHECK来做一把校验。TODO,失败了如何？
 
@@ -69,23 +68,23 @@ StorageOwnership的定义：
 
 ### push()
 
-    `// Push |item| into bottom side of this queue.       // Returns true on success, false if queue is full.       bool push(const T& item) {           if (_count < _cap) {               new ((T*)_items + _mod(_start + _count, _cap)) T(item);               ++_count;               return true;           }           return false;       }`
+`// Push |item| into bottom side of this queue.       // Returns true on success, false if queue is full.       bool push(const T& item) {           if (_count < _cap) {               new ((T*)_items + _mod(_start + _count, _cap)) T(item);               ++_count;               return true;           }           return false;       }`
 
-    `// Push a default-constructed item into bottom side of this queue       // Returns address of the item inside this queue       T* push() {           if (_count < _cap) {               return new ((T*)_items + _mod(_start + _count++, _cap)) T();           }           return NULL;       }`
+`// Push a default-constructed item into bottom side of this queue       // Returns address of the item inside this queue       T* push() {           if (_count < _cap) {               return new ((T*)_items + _mod(_start + _count++, _cap)) T();           }           return NULL;       }`
 
 如果队列没满，则使用placement new进行构造。常规的new是不需要自己指定对象分配的堆地址的，而placement new则可以在指定的内存位置上构造对象。这里内存位置通过起始位置+元素个数来定位到。
 
-    `// This is faster than % in this queue because most |off| are smaller       // than |cap|. This is probably not true in other place, be careful       // before you use this trick.       static uint32_t _mod(uint32_t off, uint32_t cap) {           while (off >= cap) {               off -= cap;           }           return off;       }`
+`// This is faster than % in this queue because most |off| are smaller       // than |cap|. This is probably not true in other place, be careful       // before you use this trick.       static uint32_t _mod(uint32_t off, uint32_t cap) {           while (off >= cap) {               off -= cap;           }           return off;       }`
 
 这个模运算使用了一个比较Trick的技巧，他的限制是off永远能保证在`[0, 2*cap)`之间。
 
 ### push_top()
 
-   `// Push |item| into top side of this queue      // Returns true on success, false if queue is full.      bool push_top(const T& item) {          if (_count < _cap) {              _start = _start ? (_start - 1) : (_cap - 1);              ++_count;              new ((T*)_items + _start) T(item);              return true;          }          return false;      }                // Push a default-constructed item into top side of this queue      // Returns address of the item inside this queue      T* push_top() {          if (_count < _cap) {              _start = _start ? (_start - 1) : (_cap - 1);              ++_count;              return new ((T*)_items + _start) T();          }          return NULL;      }`
+`// Push |item| into top side of this queue      // Returns true on success, false if queue is full.      bool push_top(const T& item) {          if (_count < _cap) {              _start = _start ? (_start - 1) : (_cap - 1);              ++_count;              new ((T*)_items + _start) T(item);              return true;          }          return false;      }                // Push a default-constructed item into top side of this queue      // Returns address of the item inside this queue      T* push_top() {          if (_count < _cap) {              _start = _start ? (_start - 1) : (_cap - 1);              ++_count;              return new ((T*)_items + _start) T();          }          return NULL;      }`
 
 ### elim_push()
 
-    `// Push |item| into bottom side of this queue. If the queue is full,      // pop topmost item first.      void elim_push(const T& item) {          if (_count < _cap) {              new ((T*)_items + _mod(_start + _count, _cap)) T(item);              ++_count;          } else {              ((T*)_items)[_start] = item;              _start = _mod(_start + 1, _cap);          }      }`
+`// Push |item| into bottom side of this queue. If the queue is full,      // pop topmost item first.      void elim_push(const T& item) {          if (_count < _cap) {              new ((T*)_items + _mod(_start + _count, _cap)) T(item);              ++_count;          } else {              ((T*)_items)[_start] = item;              _start = _mod(_start + 1, _cap);          }      }`
 
 ## pop相关函数
 
@@ -93,19 +92,19 @@ pop是push的逆操作，这里大家可以选择性的阅读。
 
 ### pop()
 
-  `// Pop top-most item from this queue     // Returns true on success, false if queue is empty     bool pop() {         if (_count) {             --_count;             ((T*)_items + _start)->~T();             _start = _mod(_start + 1, _cap);             return true;         }         return false;     }        // Pop top-most item from this queue and copy into |item|.     // Returns true on success, false if queue is empty     bool pop(T* item) {         if (_count) {             --_count;             T* const p = (T*)_items + _start;             *item = *p;             p->~T();             _start = _mod(_start + 1, _cap);             return true;         }         return false;     }`
+`// Pop top-most item from this queue     // Returns true on success, false if queue is empty     bool pop() {         if (_count) {             --_count;             ((T*)_items + _start)->~T();             _start = _mod(_start + 1, _cap);             return true;         }         return false;     }        // Pop top-most item from this queue and copy into |item|.     // Returns true on success, false if queue is empty     bool pop(T* item) {         if (_count) {             --_count;             T* const p = (T*)_items + _start;             *item = *p;             p->~T();             _start = _mod(_start + 1, _cap);             return true;         }         return false;     }`
 
-值得一提的是pop() 和 push()是对称的一对操作，但是他们的函数参数却并不相同。在有参版的push()中，其参数是const T&，而pop()的参数是T*。这其中的差异是我们需要通过pop_bottom()的出参拿到元素。好的C++编码规范（比如谷歌编码规范）都指明，当函数参数做出参的时候用指针，而作为入参的时候使用const &。
+值得一提的是pop() 和 push()是对称的一对操作，但是他们的函数参数却并不相同。在有参版的push()中，其参数是const T&，而pop()的参数是T\*。这其中的差异是我们需要通过pop_bottom()的出参拿到元素。好的C++编码规范（比如谷歌编码规范）都指明，当函数参数做出参的时候用指针，而作为入参的时候使用const &。
 
 ### pop_bottom()
 
-    `// Pop bottom-most item from this queue       // Returns true on success, false if queue is empty       bool pop_bottom() {           if (_count) {               --_count;               ((T*)_items + _mod(_start + _count, _cap))->~T();               return true;           }           return false;       }          // Pop bottom-most item from this queue and copy into |item|.       // Returns true on success, false if queue is empty       bool pop_bottom(T* item) {           if (_count) {               --_count;               T* const p = (T*)_items + _mod(_start + _count, _cap);               *item = *p;               p->~T();               return true;           }           return false;       }`
+`// Pop bottom-most item from this queue       // Returns true on success, false if queue is empty       bool pop_bottom() {           if (_count) {               --_count;               ((T*)_items + _mod(_start + _count, _cap))->~T();               return true;           }           return false;       }          // Pop bottom-most item from this queue and copy into |item|.       // Returns true on success, false if queue is empty       bool pop_bottom(T* item) {           if (_count) {               --_count;               T* const p = (T*)_items + _mod(_start + _count, _cap);               *item = *p;               p->~T();               return true;           }           return false;       }`
 
 当然push系列函数中的`elim_push()`在pop中并没有对应的逆操作，这也不难理解。但队列已满的时候，我实在想插入数据可以移除队头元素，但是如果队列为空的时候，我们实在还想从中取出一个元素，那么则是没有什么办法。
 
 ## 清空队列
 
-    `void clear() {           for (uint32_t i = 0; i < _count; ++i) {               ((T*)_items + _mod(_start + i, _cap))->~T();           }           _count = 0;           _start = 0;       }`
+`void clear() {           for (uint32_t i = 0; i < _count; ++i) {               ((T*)_items + _mod(_start + i, _cap))->~T();           }           _count = 0;           _start = 0;       }`
 
 这里主要做的是，遍历所有元素，取显式调用其析构函数：`->~T()`。这个操作是由于我们的对象是通过placement new构造的，`->~T()` 就是其必须成对的析构操作。就像new必须有delete一般。但和new与delete不同的是，不管是placement new 还是 `->~T()` 都没有对本对象去做堆中内存的分配和释放！（当然如果T中有成员，其实还是会涉及到堆内存分配和释放的，但那是针对其中的成员，并不是T本身）
 
@@ -113,7 +112,7 @@ pop是push的逆操作，这里大家可以选择性的阅读。
 
 ## 析构函数
 
-    `~BoundedQueue() {           clear();           if (_ownership == OWNS_STORAGE) {               free(_items);               _items = NULL;           }       }`
+`~BoundedQueue() {           clear();           if (_ownership == OWNS_STORAGE) {               free(_items);               _items = NULL;           }       }`
 
 首先调用前面的clear()函数，然后需要对数据存储的所有权做一个判断，只有明确是自己持有的情况下，采取free()释放掉内存，和malloc()成对。而对于非自己持有的，就不必了。
 
@@ -123,29 +122,29 @@ pop是push的逆操作，这里大家可以选择性的阅读。
 
 ### top()
 
-    `// Get address of top-most item, NULL if queue is empty       T* top() {            return _count ? ((T*)_items + _start) : NULL;        }       const T* top() const {            return _count ? ((const T*)_items + _start) : NULL;        }          // Randomly access item from top side.       // top(0) == top(), top(size()-1) == bottom()       // Returns NULL if |index| is out of range.       T* top(size_t index) {           if (index < _count) {               return (T*)_items + _mod(_start + index, _cap);           }           return NULL;   // including _count == 0       }       const T* top(size_t index) const {           if (index < _count) {               return (const T*)_items + _mod(_start + index, _cap);           }           return NULL;   // including _count == 0       }`
+`// Get address of top-most item, NULL if queue is empty       T* top() {            return _count ? ((T*)_items + _start) : NULL;        }       const T* top() const {            return _count ? ((const T*)_items + _start) : NULL;        }          // Randomly access item from top side.       // top(0) == top(), top(size()-1) == bottom()       // Returns NULL if |index| is out of range.       T* top(size_t index) {           if (index < _count) {               return (T*)_items + _mod(_start + index, _cap);           }           return NULL;   // including _count == 0       }       const T* top(size_t index) const {           if (index < _count) {               return (const T*)_items + _mod(_start + index, _cap);           }           return NULL;   // including _count == 0       }`
 
 ### bottom()
 
-    `// Get address of bottom-most item, NULL if queue is empty       T* bottom() {            return _count ? ((T*)_items + _mod(_start + _count - 1, _cap)) : NULL;        }       const T* bottom() const {           return _count ? ((const T*)_items + _mod(_start + _count - 1, _cap)) : NULL;        }              // Randomly access item from bottom side.       // bottom(0) == bottom(), bottom(size()-1) == top()       // Returns NULL if |index| is out of range.       T* bottom(size_t index) {           if (index < _count) {               return (T*)_items + _mod(_start + _count - index - 1, _cap);           }           return NULL;  // including _count == 0       }       const T* bottom(size_t index) const {           if (index < _count) {               return (const T*)_items + _mod(_start + _count - index - 1, _cap);           }           return NULL;  // including _count == 0       }`
+`// Get address of bottom-most item, NULL if queue is empty       T* bottom() {            return _count ? ((T*)_items + _mod(_start + _count - 1, _cap)) : NULL;        }       const T* bottom() const {           return _count ? ((const T*)_items + _mod(_start + _count - 1, _cap)) : NULL;        }              // Randomly access item from bottom side.       // bottom(0) == bottom(), bottom(size()-1) == top()       // Returns NULL if |index| is out of range.       T* bottom(size_t index) {           if (index < _count) {               return (T*)_items + _mod(_start + _count - index - 1, _cap);           }           return NULL;  // including _count == 0       }       const T* bottom(size_t index) const {           if (index < _count) {               return (const T*)_items + _mod(_start + _count - index - 1, _cap);           }           return NULL;  // including _count == 0       }`
 
 ### initialized()
 
 检查队列是否已经初始化
 
-    `// True if the queue was constructed successfully.       bool initialized() const { return _items != NULL; }`
+`// True if the queue was constructed successfully.       bool initialized() const { return _items != NULL; }`
 
 ### empty()和full()
 
-    `bool empty() const { return !_count; }       bool full() const { return _cap == _count; }`
+`bool empty() const { return !_count; }       bool full() const { return _cap == _count; }`
 
 ### size()和capacity()
 
-    `// Number of items       size_t size() const { return _count; }          // Maximum number of items that can be in this queue       size_t capacity() const { return _cap; }`
+`// Number of items       size_t size() const { return _count; }          // Maximum number of items that can be in this queue       size_t capacity() const { return _cap; }`
 
 ### max_capacity()
 
-    `// Maximum value of capacity()       size_t max_capacity() const { return (1UL << (sizeof(_cap) * 8)) - 1; }`
+`// Maximum value of capacity()       size_t max_capacity() const { return (1UL << (sizeof(_cap) * 8)) - 1; }`
 
 这个函数的内容其实是编译期间就能确定的。也就是说返回的是固定值。`sizeof(_cap)`返回的是`_cap`的字节数，乘以8则是因为一个字节（byte）等于8个位（bit）。所以`sizeof(_cap) * 8)`表示的就是`uint32_t`类型所占的bit数，`1UL << (sizeof(_cap) * 8)) - 1`的结果就是`uint32_t`的每一位都是1，也就是`uint32_t`所能表示的最大值。
 
@@ -173,10 +172,6 @@ push_locked()函数，由于没有在内部加锁，所以需要调用RemoteTask
 
 `void TaskGroup::ready_to_run_remote(bthread_t tid, bool nosignal) {       _remote_rq._mutex.lock();       while (!_remote_rq.push_locked(tid)) {           flush_nosignal_tasks_remote_locked(_remote_rq._mutex);           LOG_EVERY_SECOND(ERROR) << "_remote_rq is full, capacity="                                   << _remote_rq.capacity();           ::usleep(1000);           _remote_rq._mutex.lock();       }      ...      ...      }   `
 
-  
-
-  
-
 - EOF -
 
 推荐阅读  点击标题可跳转
@@ -187,11 +182,9 @@ push_locked()函数，由于没有在内部加锁，所以需要调用RemoteTask
 
 3、[【C++面试题解析】之循环链表、队列、栈和堆](http://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651157541&idx=1&sn=87c9934730e8d9c407de601ce9fa1293&chksm=8064a57ab7132c6cc95648ad5476dcf11a25d4d11aaf8bfadbf585ac0e7da8d609d168903b3a&scene=21#wechat_redirect)
 
-  
+**关注『CPP开发者』**
 
-**关注『CPP开发者』**  
-
-看精选C/C++技术文章 
+看精选C/C++技术文章
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
 

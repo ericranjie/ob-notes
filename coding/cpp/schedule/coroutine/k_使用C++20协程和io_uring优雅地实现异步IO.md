@@ -1,24 +1,20 @@
-
-
 原创 ToF君 Qt教程
 
- _2024年03月28日 01:36_ _上海_
+_2024年03月28日 01:36_ _上海_
 
 C++20 引入了协程（Coroutines），使得异步编程变得更加直观和容易。同时，Linux 中的 io_uring 机制为异步 I/O 提供了一种高效的方法。结合这两者，我们可以实现高性能的异步 I/O。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 以下是一个简单的示例，展示如何使用 C++20 协程和 io_uring 实现异步读取文件：
 
 1. **设置 io_uring**
-    
 
 首先，你需要设置 io_uring。这通常涉及创建一个 io_uring 实例，并为其分配足够的 SQE（提交队列条目）和 CQE（完成队列条目）。
 
 `#include <linux/io_uring.h>   #include <sys/syscall.h>   #include <unistd.h>   #include <fcntl.h>   #include <iostream>   #include <vector>   #include <coroutine>   #include <experimental/coroutine>      struct IoUring {       int fd;       struct io_uring ring;          IoUring() {           fd = io_uring_setup(1024, &ring);  // 设置 io_uring，这里使用 1024 个 SQE/CQE 作为示例           if (fd < 0) {               perror("io_uring_setup");               exit(1);           }       }          ~IoUring() {           close(fd);       }          void submit(struct io_uring_sqe *sqe) {           io_uring_submit(fd, sqe);  // 提交 SQE       }          int wait_cqe() {           struct io_uring_cqe cqe;           int ret = io_uring_wait_cqe(fd, &cqe);  // 等待 CQE           if (ret < 0) {               perror("io_uring_wait_cqe");               exit(1);           }           io_uring_cqe_seen(fd, &cqe);  // 标记 CQE 为已处理           return cqe.res;  // 返回结果       }   };   `
 
 2. **定义协程类型**
-    
 
 接下来，定义一个协程类型来处理异步读取。这需要使用 C++20 的 `std::coroutine_handle` 和相关的协程特性。
 
@@ -27,7 +23,6 @@ C++20 引入了协程（Coroutines），使得异步编程变得更加直观和�
 `template <typename T>   struct Task {       struct promise_type {           T value;           std::coroutine_handle<> handle;              auto get_return_object() {               handle = std::coroutine_handle<promise_type>::from_promise(*this);               return Task{handle};           }              auto initial_suspend() { return std::suspend_never{}; }           auto final_suspend() noexcept { return std::suspend_never{}; }           void return_value(T v) { value = v; }           void unhandled_exception() { std::terminate(); }       };          std::coroutine_handle<promise_type> coro;          Task(std::coroutine_handle<promise_type> coro) : coro(coro) {}       ~Task() { if (coro) coro.destroy(); }   };   `
 
 3. **实现异步读取函数**
-    
 
 现在，我们可以实现一个异步读取文件的函数。这个函数将使用 io_uring 提交异步读取请求，并使用协程挂起等待结果。
 
@@ -40,8 +35,6 @@ C++20 引入了协程（Coroutines），使得异步编程变得更加直观和�
 最后，你可以使用 `async_read` 函数来异步地读取文件。但是，请注意上面的示例代码是不完整的，并且不能直接运行。在实际应用中，你需要一个完整的协程框架和事件循环来支持异步 I/O 和协程的挂起/恢复。
 
 这个示例主要是为了展示如何使用 C++20 协程和 io_uring 的基本概念进行异步 I/O。在实际应用中，你可能需要使用更成熟的库或框架（如 Boost.Coroutine2、libaco 或自定义的协程库）来处理协程和异步 I/O 的复杂性。同时，你也需要深入了解 io_uring 的工作原理和最佳实践来充分发挥其性能优势。
-
-  
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/cTULCN4PMSiaXZjvJJVW5bfya11ojXp96H7qQicOymLZkHR1HUc17SavicJLEoquVdYqmiaYYJ6aibdIu9WCzukaBicA/0?wx_fmt=jpeg)
 

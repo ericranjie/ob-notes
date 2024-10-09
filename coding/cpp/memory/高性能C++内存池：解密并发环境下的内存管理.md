@@ -1,7 +1,6 @@
-
 原创 往事敬秋风 深度Linux
 
- _2024年04月14日 09:10_ _湖南_
+_2024年04月14日 09:10_ _湖南_
 
 内存池是一种内存分配方式，又被称为固定大小区块规划（fixed-size-blocks allocation）。通常我们习惯直接使用new、malloc等API申请分配内存，这样做的缺点在于：由于所申请内存块的大小不定，当频繁使用时会造成大量的内存碎片并进而降低性能。
 
@@ -28,11 +27,11 @@ C++程序默认的内存管理（new，delete，malloc，free）会频繁地在�
 造成堆利用率很低的一个主要原因就是内存碎片化。如果有未使用的存储器，但是这块存储器不能用来满足分配的请求，这时候就会产生内存碎片化问题。内存碎片化分为内部碎片和外部碎片。
 
 - 内碎片：内部碎片是指一个已分配的块比有效载荷大时发生的。(假设以前分配了10个大小的字节，现在只用了5个字节，则剩下的5个字节就会内碎片)。内部碎片的大小就是已经分配的块的大小和他们的有效载荷之差的和。因此内部碎片取决于以前请求内存的模式和分配器实现(对齐的规则)的模式。
-    
+
 - 外碎片：假设系统依次分配了16byte、8byte、16byte、4byte，还剩余8byte未分配。这时要分配一个24byte的空间，操作系统回收了一个上面的两个16byte，总的剩余空间有40byte，但是却不能分配出一个连续24byte的空间，这就是外碎片问题。
-    
-![[Pasted image 20240910233414.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240910233414.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 (2)申请效率问题
 
@@ -55,39 +54,36 @@ C++程序默认的内存管理（new，delete，malloc，free）会频繁地在�
 算法原理：
 
 - 预申请一个内存区chunk，将内存中按照对象大小划分成多个内存块block
-    
+
 - 维持一个空闲内存块链表，通过指针相连，标记头指针为第一个空闲块
-    
+
 - 每次新申请一个对象的空间，则将该内存块从空闲链表中去除，更新空闲链表头指针
-    
+
 - 每次释放一个对象的空间，则重新将该内存块加到空闲链表头
-    
+
 - 如果一个内存区占满了，则新开辟一个内存区，维持一个内存区的链表，同指针相连，头指针指向最新的内存区，新的内存块从该区内重新划分和申请
-    
 
 通用内存分配和释放的缺点如下：
 
 - 使用malloc/new申请分配堆内存时系统需要根据最先匹配、最优匹配或其它算法在内存空闲块表中查找一块空闲内存；使用free/delete释放堆内存时，系统可能需要合并空闲内存块，因此会产生额外开销。
-    
+
 - 频繁使用时会产生大量内存碎片，从而降低程序运行效率。
-    
+
 - 造成内存泄漏。
-    
 
 内存池（Memory Pool)是代替直接调用malloc/free、new/delete进行内存管理的常用方法，当申请内存空间时，会从内存池中查找合适的内存块，而不是直接向操作系统申请。
 
 内存池技术的优点如下：
 
 - 堆内存碎片很少。
-    
+
 - 内存申请/释放比malloc/new方式快。
-    
+
 - 检查任何一个指针是否在内存池中。
-    
+
 - 写一个堆转储(Heap-Dump)到硬盘。
-    
+
 - 内存泄漏检测(memory-leak detection)，当没有释放分配的内存时，内存池(Memory Pool)会抛出一个断言(assertion)。
-    
 
 内存池可以分为不定长内存池和定长内存池两类。不定长内存池的典型实现包括Apache Portable Runtime中的apr_pool和GNU lib C中的obstack，而定长内存池的实现则有boost_pool等。对于不定长内存池，不需要为不同的数据类型创建不同的内存池，其缺点是无法将分配出的内存回收到池内；对于定长内存池，在使用完毕后，可以将内存归还到内存池中，但需要为不同类型的数据结构创建不同的内存池，需要内存的时候要从相应的内存池中申请内存。
 
@@ -143,7 +139,7 @@ dlmalloc 是一个内存分配器，由Doug Lea从1987年开始编写，目前�
 
 （3） SGI STL内存分配器
 
-SGI STL allocator 是目前设计最优秀的 C++ 内存分配器之一，其内部free_list[16] 数组负责管理从 8 bytes到128 bytes不同大小的内存块（ chunk ），每一个内存块都由连续的固定大小（ fixed size block ）的很多 chunk 组成，并用指针链表连接。
+SGI STL allocator 是目前设计最优秀的 C++ 内存分配器之一，其内部free_list\[16\] 数组负责管理从 8 bytes到128 bytes不同大小的内存块（ chunk ），每一个内存块都由连续的固定大小（ fixed size block ）的很多 chunk 组成，并用指针链表连接。
 
 （4）Loki小对象分配器
 
@@ -165,91 +161,84 @@ Google开源项目gperftools提供了内存池实现方案。TCMalloc替换了�
 
 分配器(allocator))是C ++标准库的一个组件, 主要用来处理所有给定容器(vector，list，map等)内存的分配和释放。C ++标准库提供了默认使用的通用分配器std::allocator，但开发者可以自定义分配器。
 
-GNU STL除了提供默认分配器，还提供了__pool_alloc、__mt_alloc、array_allocator、malloc_allocator 内存分配器。
+GNU STL除了提供默认分配器，还提供了\_\_pool_alloc、\_\_mt_alloc、array_allocator、malloc_allocator 内存分配器。
 
-- __pool_alloc ：SGI内存池分配器
-    
-- __mt_alloc ：多线程内存池分配器
-    
+- \_\_pool_alloc ：SGI内存池分配器
+
+- \_\_mt_alloc ：多线程内存池分配器
+
 - array_allocator ：全局内存分配，只分配不释放，交给系统来释放
-    
+
 - malloc_allocator ：堆std::malloc和std::free进行的封装
-    
 
 ## 三、内存池设计
 
 ### 3.1为什么要使用内存池
 
 - 解决内碎片问题
-    
+
 - 由于向内存申请的内存块都是比较大的，所以能够降低外碎片问题
-    
+
 - 一次性向内存申请一块大的内存慢慢使用，避免了频繁的向内存请求内存操作，提高内存分配的效率
-    
+
 - 但是内碎片问题无法避免，只能尽可能的降低
-    
 
 ### 3.2内存池的演变
 
 最简单的内存分配器，做一个链表指向空闲内存，分配就是取出一块来，改写链表，返回，释放就是放回到链表里面，并做好归并。注意做好标记和保护，避免二次释放，还可以花点力气在如何查找最适合大小的内存快的搜索上，减少内存碎片，有空你了还可以把链表换成伙伴算法。
 
 - 优点： 实现简单
-    
+
 - 缺点： 分配时搜索合适的内存块效率低，释放回归内存后归并消耗大，实际中不实用。
-    
 
 定长内存分配器，即实现一个 FreeList，每个 FreeList 用于分配固定大小的内存块，比如用于分配 32字节对象的固定内存分配器，之类的。每个固定内存分配器里面有两个链表，OpenList 用于存储未分配的空闲对象，CloseList用于存储已分配的内存对象，那么所谓的分配就是从 OpenList 中取出一个对象放到 CloseList 里并且返回给用户，释放又是从 CloseList 移回到 OpenList。分配时如果不够，那么就需要增长 OpenList：申请一个大一点的内存块，切割成比如 64 个相同大小的对象添加到 OpenList中。这个固定内存分配器回收的时候，统一把先前向系统申请的内存块全部还给系统。
 
 - 优点： 简单粗暴，分配和释放的效率高，解决实际中特定场景下的问题有效。
-    
+
 - 缺点： 功能单一，只能解决定长的内存需求，另外占着内存没有释放。
-    
-![[Pasted image 20240910233438.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240910233438.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 哈希映射的FreeList池，在定长分配器的基础上，按照不同对象大小(8，16，32，64，128，256，512，1k…64K),构造十多个固定内存分配器，分配内存时根据要申请内存大小进行对齐然后查H表，决定到底由哪个分配器负责，分配后要在内存头部的 header 处写上 cookie，表示由该块内存哪一个分配器分配的，这样释放时候你才能正确归还。如果大于64K，则直接用系统的 malloc作为分配，如此以浪费内存为代价你得到了一个分配时间近似O(1)的内存分配器。这种内存池的缺点是假设某个 FreeList 如果高峰期占用了大量内存即使后面不用，也无法支援到其他内存不够的 FreeList，达不到分配均衡的效果。
 
 - 优点：这个本质是定长内存池的改进，分配和释放的效率高。可以解决一定长度内的问题。
-    
+
 - 缺点：存在内碎片的问题，且将一块大内存切小以后，申请大内存无法使用。多线程并发场景下，锁竞争激烈，效率降低。
-    
 
 范例：sgi stl 六大组件中的空间配置器就是这种设计实现的。
-![[Pasted image 20240910233443.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240910233443.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 了解malloc底层原理
 
 C 标准库函数malloc 在底层使用的是 —– 分离适配，使用这种方法，分配器维护着一个空闲链表数组，每个空闲链表被组织成某种类型的显示/隐式链表。每个链表包含大小不同的块，这些块的大小是大小类的成员，当要分配一个块时，我们确定了大小类之后，对适当的空闲链表做首次适配，查找一个合适的块，如果找到，那么可选地分割它，并将剩余的部分插入到适当的空闲链表中。如果每找到，那就搜索下一个更大的大小类的空闲链表，重复直到找到一个合适的块。如果空闲链表中没有合适的块，那么就向操作系统请求额外的堆存储器，从这个新的堆存储器中分配一个块，将剩余部分放置在适当的大小类中，当释放一个块时，我们执行合并，并将结果放在相应的空闲链表中。
 
 - malloc优点: 使用自由链表的数组，提高分配释放效率；减少内存碎片，可以合并空闲的内存
-    
+
 - malloc缺点：为了维护隐式/显示链表需要维护一些信息，空间利用率不高；在多线程的情况下，会出现线程安全的问题，如果以加锁的方式解决，会大大降低效率。
-    
 
 ## 四、内存池的具体实现
 
 计划实现一个内存池管理的类MemoryPool，它具有如下特性：
 
 - 内存池的总大小自动增长。
-    
+
 - 内存池中内存片的大小固定。
-    
+
 - 支持线程安全。
-    
+
 - 在内存片被归还之后，清除其中的内容。
-    
+
 - 兼容std::allocator。
-    
 
 因为内存池的内存片的大小是固定的，不涉及到需要匹配最合适大小的内存片，由于会频繁的进行插入、移除的操作，但查找比较少，故选用链表数据结构来管理内存池中的内存片。
 
 MemoryPool中有2个链表，它们都是双向链表（设计成双向链表主要是为了在移除指定元素时，能够快速定位该元素的前后元素，从而在该元素被移除后，将其前后元素连接起来，保证链表的完整性）：
 
-- data_element_ 记录以及分配出去的内存片。
-    
-- free_element_ 记录未被分配出去的内存片。
-    
+- data_element\_ 记录以及分配出去的内存片。
+
+- free_element\_ 记录未被分配出去的内存片。
 
 MemoryPool实现代码
 
@@ -266,11 +255,11 @@ using namespace std;class Apple {public:    Apple() {        id_ = 0;        cou
 
 2023年往期回顾
 
-[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)  
+[C/C++发展方向（强烈推荐！！）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487749&idx=1&sn=e57e6f3df526b7ad78313d9428e55b6b&chksm=cfb9586cf8ced17a8c7830e380a45ce080c2b8258e145f5898503a779840a5fcfec3e8f8fa9a&scene=21#wechat_redirect)
 
-[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)  
+[Linux内核源码分析（强烈推荐收藏！](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)[）](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487832&idx=1&sn=bf0468e26f353306c743c4d7523ebb07&chksm=cfb95831f8ced127ca94eb61e6508732576bb150b2fb2047664f8256b3da284d0e53e2f792dc&scene=21#wechat_redirect)
 
-[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)  
+[从菜鸟到大师，用Qt编写出惊艳世界应用](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247488117&idx=1&sn=a83d661165a3840fbb23d0e62b5f303a&chksm=cfb95b1cf8ced20ae63206fe25891d9a37ffe76fd695ef55b5506c83aad387d55c4032cb7e4f&scene=21#wechat_redirect)
 
 [存储全栈开发：构建高效的数据存储系统](http://mp.weixin.qq.com/s?__biz=Mzg4NDQ0OTI4Ng==&mid=2247487696&idx=1&sn=b5ebe830ddb6798ac5bf6db4a8d5d075&chksm=cfb959b9f8ced0af76710c070a6db2677fb359af735e79c6378e82ead570aa1ce5350a146793&scene=21#wechat_redirect)
 

@@ -2,11 +2,11 @@
 
 中间件兴趣圈
 
- _2021年11月28日 11:00_
+_2021年11月28日 11:00_
 
 以下文章来源于石臻臻的杂货铺 ，作者石臻臻的杂货铺
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6ibRzSqibJhh1oGABcejIq7x4VkIhdCNvnsItnZNiaLANkw/0)
 
@@ -14,9 +14,9 @@
 
 CSDN博客之星Top5、Kafka Contributor、LogiKM PMC、华为云MVP。进滴滴技术交流群, 不同技术专家轮流值班, 本号分享Java/大数据/中间件等领域干货和视频
 
-](https://mp.weixin.qq.com/s?__biz=MzIzNzgyMjYxOQ==&mid=2247488527&idx=1&sn=c40613fd06b92b2ce900a1b270cb5e53&chksm=e8c3e3fbdfb46aede734c8aa810d91342073c01751f102588c6a381a4f8d39a77745e81a5050&mpshare=1&scene=24&srcid=1128eMjIrCx7oByGoNSiJTtw&sharer_sharetime=1638068683716&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d00aa19a85983342bc49d15933a807d22b81a1cb165452cd106e3d073ec80751dbb68273315949a41db8ab0086f9c3e177e72fc8a07395fe2ff58cb740ea49ba4b6ae78c33e610a96a8e1ba11dc61601c868eac26a33dcd1aeea6716b9097aeacc4162d7f808dd5db1322742eca79766f387c5dd975dfc57fe&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQWZY5UKI1QPdZsqL1W9nLPBLmAQIE97dBBAEAAAAAACTrK%2FRlFjIAAAAOpnltbLcz9gKNyK89dVj0TuAAvHRBHRTaelVN5H5lybsvvFtMtQLSfKwhGqNOx0rJngr9GvvJyo%2FIRCKcZsFvQ6daVJOlbG8TJ%2BHCud8KTLPhcTKgjslYmsmETFw4HGfaB3m6MVTKh5HVoqpGnzTpmunw44SDgmfgL4fL0plDJvGZd6Dl%2Bj8AHvnZZuzr8Z%2FSLYlcMjBo7PfKEQpVPR3ojnA45NEEizD2f0BT6E0N0Dk2uFU72qEWu1PWXbtt5rzK6seFu%2B3BlMGT6mrZWpLS&acctmode=0&pass_ticket=oZKjopXWDXHzjHw0dD9uSN9M1w29A8E3DBE0OpS8vP2EkC3Idaz0ITsOzG1%2Fb8gU&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzIzNzgyMjYxOQ==&mid=2247488527&idx=1&sn=c40613fd06b92b2ce900a1b270cb5e53&chksm=e8c3e3fbdfb46aede734c8aa810d91342073c01751f102588c6a381a4f8d39a77745e81a5050&mpshare=1&scene=24&srcid=1128eMjIrCx7oByGoNSiJTtw&sharer_sharetime=1638068683716&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d00aa19a85983342bc49d15933a807d22b81a1cb165452cd106e3d073ec80751dbb68273315949a41db8ab0086f9c3e177e72fc8a07395fe2ff58cb740ea49ba4b6ae78c33e610a96a8e1ba11dc61601c868eac26a33dcd1aeea6716b9097aeacc4162d7f808dd5db1322742eca79766f387c5dd975dfc57fe&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQWZY5UKI1QPdZsqL1W9nLPBLmAQIE97dBBAEAAAAAACTrK%2FRlFjIAAAAOpnltbLcz9gKNyK89dVj0TuAAvHRBHRTaelVN5H5lybsvvFtMtQLSfKwhGqNOx0rJngr9GvvJyo%2FIRCKcZsFvQ6daVJOlbG8TJ%2BHCud8KTLPhcTKgjslYmsmETFw4HGfaB3m6MVTKh5HVoqpGnzTpmunw44SDgmfgL4fL0plDJvGZd6Dl%2Bj8AHvnZZuzr8Z%2FSLYlcMjBo7PfKEQpVPR3ojnA45NEEizD2f0BT6E0N0Dk2uFU72qEWu1PWXbtt5rzK6seFu%2B3BlMGT6mrZWpLS&acctmode=0&pass_ticket=oZKjopXWDXHzjHw0dD9uSN9M1w29A8E3DBE0OpS8vP2EkC3Idaz0ITsOzG1%2Fb8gU&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
-在讲解 [Kafka的副本同步限流机制三部曲(源码篇)](http://mp.weixin.qq.com/s?__biz=Mzg4ODY1NTcxNg==&mid=2247489315&idx=1&sn=b51a08c0d77a7718d9b5234963d6f451&chksm=cff68d28f881043e84d03c4cc6e4e11c4ee8712fb49fd3740ba6ba5468093193e2f22e9eeb67&scene=21#wechat_redirect) 第二篇(原理篇) 之前  
+在讲解 [Kafka的副本同步限流机制三部曲(源码篇)](http://mp.weixin.qq.com/s?__biz=Mzg4ODY1NTcxNg==&mid=2247489315&idx=1&sn=b51a08c0d77a7718d9b5234963d6f451&chksm=cff68d28f881043e84d03c4cc6e4e11c4ee8712fb49fd3740ba6ba5468093193e2f22e9eeb67&scene=21#wechat_redirect) 第二篇(原理篇) 之前
 
 我想先讲解一下 **Kafka中的数据采集和统计机制** 当你了解这个机制之后才会更容易理解限流机制 **![图片](https://mmbiz.qpic.cn/mmbiz_png/kmWVxLDDVAXanWpBUwgJpibGt5zCApiaqI2xAzzPDVEgeWodhfpQwUNb3yd8xsyqwGEOahcWDGAziaRPsjYp8OTiaw/640?wx_fmt=png&wxfrom=13&tp=wxpic)**
 
@@ -42,7 +42,7 @@ LogiKM监控图
 
 我们先看下整个Kafka的数据采集和统计机制的类图
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 数据采集和统计全类图
 
@@ -66,7 +66,7 @@ LogiKM监控图
 
 当然这两个接口都有一个 **`MetricConfig`** 对象
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 MetricConfig
 
@@ -96,7 +96,7 @@ MetricConfig
   /**组合所有样本的数据 来统计出想要的数据 **/  public abstract double combine(List<Sample> samples, MetricConfig config, long now);
 ```
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 SampledStat图形化展示
 
@@ -109,22 +109,20 @@ SampledStat图形化展示
 ```
 
 1. 获取当前的**Sample**号,如果没有则创建一个新的**Sample**,  创建的时候设置 **初始化值** 和 **Sample起始时间(当前时间)** ,并保存到样品列表里面
-    
-2. 判断这个**Sample**是否完成(超过窗口期),判断的逻辑是 `当前时间 - 当前Sample的开始时间 >= 配置的时间窗口值 或者 事件总数 >= 配置的事件窗口值`
-    
+
+1. 判断这个**Sample**是否完成(超过窗口期),判断的逻辑是 `当前时间 - 当前Sample的开始时间 >= 配置的时间窗口值 或者 事件总数 >= 配置的事件窗口值`
 
 ```
   /** 当前时间 - 当前Sample的开始时间 >= 配置的时间窗口值 或者  事件总数 >= 配置的事件窗口值 **/  public boolean isComplete(long timeMs, MetricConfig config) {            return timeMs - lastWindowMs >= config.timeWindowMs() || eventCount >= config.eventWindow();        }        
 ```
 
 3. 如果这个**Sample**已经完成(超过窗口期), 则开始选择下一个窗口,如果下一个还没创建则创建新的,如果下一个已经存在,则重置这个**Sample**
-    
-4. 拿到最终要使用的**Sample**后, 将数据记录到这个**Sample**中。具体怎么记录是让具体的实现类来实现的,因为想要最终统计的数据可以不一样,比如你只想记录**Sample**中的最大值,那么更新的时候判断是不是比之前的值大则更新,如果你想统计平均值,那么这里就让单个**Sample**中所有的值累加（最终会 除以 **Sample**数量 求平均数的）
-    
-5. 记录事件次数+1。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 拿到最终要使用的**Sample**后, 将数据记录到这个**Sample**中。具体怎么记录是让具体的实现类来实现的,因为想要最终统计的数据可以不一样,比如你只想记录**Sample**中的最大值,那么更新的时候判断是不是比之前的值大则更新,如果你想统计平均值,那么这里就让单个**Sample**中所有的值累加（最终会 除以 **Sample**数量 求平均数的）
+
+1. 记录事件次数+1。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 记录数据的展示图
 
@@ -135,14 +133,12 @@ SampledStat图形化展示
 ```
 
 1. 先重置 **过期样本** , 过期样本的意思是：当前时间 - 每个样本的起始事件 > 样本数量 * 每个样本的窗口时间 ; 就是滑动窗口的概念,只统计这个滑动窗口的样本数据, 过期的样本数据会被重置(过期数据不采纳), 如下图所示
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 滑动窗口重置过期数据
 
 2. 组合所有样本数据并进行不同维度的统计并返回数值, 因为不同场景想要得到的数据不同，所以这个只是一个抽象方法,需要实现类来实现这个计算逻辑,比如如果是计算平均值 `Avg`, 它的计算逻辑就是把所有的**样本数据值累加**并除以**累积的次数**
-    
 
 那我们再来看看不同的统计实现类
 
@@ -150,7 +146,7 @@ SampledStat图形化展示
 
 > 一个简单的`SampledStat`实现类 它统计所有样本最终的平均值 每个样本都会累加每一次的记录值， 最后把所有样本数据叠加 / 总共记录的次数
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在这里插入图片描述
 
@@ -158,7 +154,7 @@ SampledStat图形化展示
 
 > 每个样本都保存这个样本的最大值, 然后最后再对比所有样本值的最大值
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在这里插入图片描述
 
@@ -166,7 +162,7 @@ SampledStat图形化展示
 
 > 每个样本累积每一次的记录值, 统计的时候 把所有样本的累计值 再累积返回
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在这里插入图片描述
 
@@ -184,21 +180,21 @@ SampledStat图形化展示
 
 这是Rate的有效时间的计算逻辑,当然`Rate` 还有一个子类是 `SampleRate`
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 SampleRate的窗口Size计算逻辑
 
-这个子类,将 有效时间的计算逻辑改的更简单, 如果运行时间<一个样本窗口的时间 则他的运行时间就是单个样本的窗口时间, 否则就直接用这个运行的时间, 这个计算逻辑更简单 它跟`Rate`的区别就是, 不考虑采样的时间是否足够多,我们用图来简单描述一下
+这个子类,将 有效时间的计算逻辑改的更简单, 如果运行时间\<一个样本窗口的时间 则他的运行时间就是单个样本的窗口时间, 否则就直接用这个运行的时间, 这个计算逻辑更简单 它跟`Rate`的区别就是, 不考虑采样的时间是否足够多,我们用图来简单描述一下
 
 **SampleRate**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 SampleRate 速率逻辑
 
 **Rate**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Rate 速率逻辑
 
@@ -220,13 +216,13 @@ Rate 速率逻辑
 if(quota.isThrottled(topicPartition))  quota.record(records.sizeInBytes)
 ```
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 设置时间窗口配置
 
 这里设置的`timeWindowMs` 单个样本窗口时间= 1 s`numQuotaSamples` 样本数 = 11 当然这些都是可以配置的
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 查看使用了哪个实现类
 

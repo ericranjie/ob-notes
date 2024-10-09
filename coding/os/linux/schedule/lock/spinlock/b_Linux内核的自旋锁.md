@@ -12,11 +12,13 @@
 (3)     第3个阶段是MCS自旋锁。入场券自旋锁存在性能问题：所有申请锁的处理器在同一个变量上自旋等待，缓存同步的开销大，不适合处理器很多的系统。MCS自旋锁的策略是为每个处理器创建一个变量副本，每个处理器在自己的本地变量上自旋等待，解决了性能问题。
 
 入场券自旋锁和MCS自旋锁都属于排队自旋锁（queued spinlock），进程按照申请锁的顺序排队，先申请的进程先获得锁。
+
 # **1. 数据结构**
 
 自旋锁的定义如下：
 
-**include/linux/spinlock**_types.h
+**include/linux/spinlock**\_types.h
+
 ```cpp
 typedef struct spinlock {
     union {
@@ -30,6 +32,7 @@ typedef struct raw_spinlock {
     …
 } raw_spinlock_t;
 ```
+
 可以看到，数据类型spinlock对raw_spinlock做了封装，然后数据类型raw_spinlock对arch_spinlock_t做了封装，各种处理器架构需要自定义数据类型arch_spinlock_t。
 
 spinlock和raw_spinlock（原始自旋锁）有什么关系？
@@ -42,7 +45,8 @@ Linux内核有一个实时内核分支（开启配置宏CONFIG_PREEMPT_RT）来�
 
 （1）尽可能使用spinlock。
 （2）绝对不允许被抢占和睡眠的地方，使用raw_spinlock，否则使用spinlock。
-（3）如果临界区足够小，使用raw_spinlock。 
+（3）如果临界区足够小，使用raw_spinlock。
+
 # **2. 使用方法**
 
 定义并且初始化静态自旋锁的方法是：
@@ -53,15 +57,15 @@ spin_lock_init(x);
 
 申请自旋锁的函数是：
 
-（1）void spin_lock(spinlock_t *lock);
+（1）void spin_lock(spinlock_t \*lock);
 
 申请自旋锁，如果锁被其他处理器占有，当前处理器自旋等待。
 
-（2）void spin_lock_bh(spinlock_t *lock);
+（2）void spin_lock_bh(spinlock_t \*lock);
 
 申请自旋锁，并且禁止当前处理器的软中断。
 
-（3）void spin_lock_irq(spinlock_t *lock);
+（3）void spin_lock_irq(spinlock_t \*lock);
 
 申请自旋锁，并且禁止当前处理器的硬中断。
 
@@ -69,22 +73,22 @@ spin_lock_init(x);
 
 申请自旋锁，保存当前处理器的硬中断状态，并且禁止当前处理器的硬中断。
 
-（5）int spin_trylock(spinlock_t *lock);
+（5）int spin_trylock(spinlock_t \*lock);
 
 申请自旋锁，如果申请成功，返回1；如果锁被其他处理器占有，当前处理器不等待，立即返回0。
 
 释放自旋锁的函数是：
 
-（1）void spin_unlock(spinlock_t *lock);
-（2）void spin_unlock_bh(spinlock_t *lock);
+（1）void spin_unlock(spinlock_t \*lock);
+（2）void spin_unlock_bh(spinlock_t \*lock);
 
 释放自旋锁，并且开启当前处理器的软中断。
 
-（3）void spin_unlock_irq(spinlock_t *lock);
+（3）void spin_unlock_irq(spinlock_t \*lock);
 
 释放自旋锁，并且开启当前处理器的硬中断。
 
-（4）void spin_unlock_irqrestore(spinlock_t *lock, unsigned long flags);
+（4）void spin_unlock_irqrestore(spinlock_t \*lock, unsigned long flags);
 
 释放自旋锁，并且恢复当前处理器的硬中断状态。
 
@@ -133,6 +137,7 @@ raw_spin_lock_init (x);
 （4）raw_spin_unlock_irqrestore(lock, flags)
 
 释放原始自旋锁，并且恢复当前处理器的硬中断状态。
+
 # **3.** **入场券自旋锁**
 
 入场券自旋锁（ticket spinlock）的算法类似于银行柜台的排队叫号：
@@ -143,7 +148,8 @@ raw_spin_lock_init (x);
 
 ARM64架构定义的数据类型arch_spinlock_t如下所示：
 
-**arch/arm64/include/asm/spinlock****_types.h**
+**arch/arm64/include/asm/spinlock**\*\*\_types.h\*\*
+
 ```cpp
 typedef struct {
 #ifdef __AARCH64EB__     /* 大端字节序（高位存放在低地址） */
@@ -155,13 +161,15 @@ typedef struct {
 #endif
 } __aligned(4) arch_spinlock_t;
 ```
+
 成员next是排队号，成员owner是服务号。
 
 在多处理器系统中，函数spin_lock()负责申请自旋锁，ARM64架构的代码如下所示：
 
-spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock()  -> do_raw_spin_lock() -> arch_spin_lock()
+spin_lock() -> raw_spin_lock() -> \_raw_spin_lock() -> \_\_raw_spin_lock()  -> do_raw_spin_lock() -> arch_spin_lock()
 
 **arch/arm64/include/asm/spinlock.h**
+
 ```c
 1    static inline void arch_spin_lock(arch_spinlock_t *lock)
 2    {
@@ -212,35 +220,35 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 函数spin_unlock()负责释放自旋锁，ARM64架构的代码如下所示：
 
-spin_unlock() -> raw_spin_unlock() -> _raw_spin_unlock() -> __raw_spin_unlock()  -> do_raw_spin_unlock() -> arch_spin_unlock()
+spin_unlock() -> raw_spin_unlock() -> \_raw_spin_unlock() -> \_\_raw_spin_unlock()  -> do_raw_spin_unlock() -> arch_spin_unlock()
 
 **arch/arm64/include/asm/spinlock.h**
 
-1   static inline void arch_spin_unlock(arch_spinlock_t *lock)
+1   static inline void arch_spin_unlock(arch_spinlock_t \*lock)
 
 2   {
 
 3    unsigned long tmp;
 
-4   
+4
 
 5    asm volatile(ARM64_LSE_ATOMIC_INSN(
 
-6    /* LL/SC */
+6    /\* LL/SC \*/
 
-7    "    ldrh   %w1, %0\n"
+7    "    ldrh   %w1, %0\\n"
 
-8    "    add   %w1, %w1, #1\n"
+8    "    add   %w1, %w1, #1\\n"
 
 9    "    stlrh   %w1, %0",
 
-10   /* 大多统扩展的原子指令 */
+10   /\* 大多统扩展的原子指令 \*/
 
-11   "    mov   %w1, #1\n"
+11   "    mov   %w1, #1\\n"
 
-12   "    staddlh   %w1, %0\n"
+12   "    staddlh   %w1, %0\\n"
 
-13   __nops(1))
+13   \_\_nops(1))
 
 14   : "=Q" (lock->owner), "=&r" (tmp)
 
@@ -258,27 +266,27 @@ spin_unlock() -> raw_spin_unlock() -> _raw_spin_unlock() -> __raw_spin_unl
 
 在单处理器系统中，自旋锁是空的。
 
-**include/linux/spinlock****_types****_up.h**
+**include/linux/spinlock**\*\*\_types\*\*\*\*\_up.h\*\*
 
 typedef struct { } arch_spinlock_t;
 
 函数spin_lock()只是禁止内核抢占。
 
-spin_lock() -> raw_spin_lock() -> _raw_spin_lock()
+spin_lock() -> raw_spin_lock() -> \_raw_spin_lock()
 
-**include/linux/spinlock****_api****_up.h**
+**include/linux/spinlock**\*\*\_api\*\*\*\*\_up.h\*\*
 
-#define _raw_spin_lock(lock)             __LOCK(lock)
+#define \_raw_spin_lock(lock)             \_\_LOCK(lock)
 
-#define __LOCK(lock) \
+#define \_\_LOCK(lock) \\
 
-  do { **preempt****_disable();** ___LOCK(lock); } while (0)
+do { **preempt**\*\*\_disable();\*\* \_\_\_LOCK(lock); } while (0)
 
-#define ___LOCK(lock) \
+#define \_\_\_LOCK(lock) \\
 
-  do { __acquire(lock); (void)(lock); } while (0)
+do { \_\_acquire(lock); (void)(lock); } while (0)
 
-**4. MCS自旋锁** 
+**4. MCS自旋锁**
 
 入场券自旋锁存在性能问题：所有等待同一个自旋锁的处理器在同一个变量上自旋等待，申请或者释放锁的时候会修改锁，导致其他处理器存放自旋锁的缓存行失效，在拥有几百甚至几千个处理器的大型系统中，处理器申请自旋锁时竞争可能很激烈，缓存同步的开销很大，导致系统性能大幅度下降。
 
@@ -290,43 +298,43 @@ MCS（MCS是“Mellor-Crummey”和“Scott”这两个发明人的名字的首�
 
 （1）一个指针tail指向队列的尾部。
 
-（2）每个处理器对应一个队列节点，即mcs_lock_node结构体，其中成员next指向队列的下一个节点，成员locked指示锁是否被其他处理器占有，如果成员locked的值为1，表示锁被其他处理器占有。 
+（2）每个处理器对应一个队列节点，即mcs_lock_node结构体，其中成员next指向队列的下一个节点，成员locked指示锁是否被其他处理器占有，如果成员locked的值为1，表示锁被其他处理器占有。
 
 结构体的定义如下所示：
 
-typedef struct __mcs_lock_node {   
+typedef struct \_\_mcs_lock_node {
 
-    struct __mcs_lock_node *next;
+struct \_\_mcs_lock_node \*next;
 
-    int locked;
+int locked;
 
-} ____cacheline_aligned_in_smp mcs_lock_node;
+} \_\_\_\_cacheline_aligned_in_smp mcs_lock_node;
 
 typedef struct {
 
-    mcs_lock_node *tail;
+mcs_lock_node \*tail;
 
-    mcs_lock_node nodes[NR_CPUS];/* NR_CPUS是处理器的数量 */
+mcs_lock_node nodes\[NR_CPUS\];/\* NR_CPUS是处理器的数量 \*/
 
 } spinlock_t;
 
-其中“____cacheline_aligned_in_smp”的作用是：在多处理器系统中，结构体的起始地址和长度都是一级缓存行长度的整数倍。
+其中“\_\_\_\_cacheline_aligned_in_smp”的作用是：在多处理器系统中，结构体的起始地址和长度都是一级缓存行长度的整数倍。
 
 当没有处理器占有或者等待自旋锁的时候，队列是空的，tail是空指针。
 
-![](http://www.wowotech.net.img.800cdn.com/content/uploadfile/201905/4a471558093598.png) 
+![](http://www.wowotech.net.img.800cdn.com/content/uploadfile/201905/4a471558093598.png)
 
 图 4.1 处理器0申请MCS自旋锁
 
 如图 4.1所示，当处理器0申请自旋锁的时候，执行原子交换操作，使tail指向处理器0的mcs_lock_node结构体，并且返回tail的旧值。tail的旧值是空指针，说明自旋锁处于空闲状态，那么处理器0获得自旋锁。
 
-![](http://www.wowotech.net.img.800cdn.com/content/uploadfile/201905/fb5c1558093598.png) 
+![](http://www.wowotech.net.img.800cdn.com/content/uploadfile/201905/fb5c1558093598.png)
 
 图 4.2 处理器1申请MCS自旋锁
 
 如图 4.2所示，当处理器0占有自旋锁的时候，处理器1申请自旋锁，执行原子交换操作，使tail指向处理器1的mcs_lock_node结构体，并且返回tail的旧值。tail的旧值是处理器0的mcs_lock_node结构体的地址，说明自旋锁被其他处理器占有，那么使处理器0的mcs_lock_node结构体的成员next指向处理器1的mcs_lock_node结构体，把处理器1的mcs_lock_node结构体的成员locked设置为1，然后处理器1在自己的mcs_lock_node结构体的成员locked上面自旋等待，等待成员locked的值变成0。
 
- ![](http://www.wowotech.net.img.800cdn.com/content/uploadfile/201905/10fb1558093598.png)
+![](http://www.wowotech.net.img.800cdn.com/content/uploadfile/201905/10fb1558093598.png)
 
 图 4.3 处理器0释放MCS自旋锁
 
@@ -344,7 +352,7 @@ typedef struct {
 
 typedef struct qspinlock {
 
-     atomic_t  val;
+atomic_t  val;
 
 } arch_spinlock_t;
 
@@ -362,7 +370,7 @@ typedef struct qspinlock {
 
 #endif
 
-static DEFINE_PER_CPU_ALIGNED(struct mcs_spinlock, mcs_nodes[MAX_NODES]);
+static DEFINE_PER_CPU_ALIGNED(struct mcs_spinlock, mcs_nodes\[MAX_NODES\]);
 
 配置宏CONFIG_PARAVIRT_SPINLOCKS用来启用半虚拟化的自旋锁，给虚拟机使用，本文不考虑这种使用场景。每个处理器需要4个队列节点，原因如下：
 
@@ -384,11 +392,11 @@ static DEFINE_PER_CPU_ALIGNED(struct mcs_spinlock, mcs_nodes[MAX_NODES]);
 
 struct mcs_spinlock {
 
-     struct mcs_spinlock *next;
+struct mcs_spinlock \*next;
 
-     int locked;
+int locked;
 
-     int count;
+int count;
 
 };
 
@@ -418,23 +426,23 @@ index字段和cpu字段合起来称为tail字段，存放队列的尾部节点�
 
 在多处理器系统中，申请MCS自旋锁的代码如下所示：
 
-spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock()  -> do_raw_spin_lock() -> arch_spin_lock()
+spin_lock() -> raw_spin_lock() -> \_raw_spin_lock() -> \_\_raw_spin_lock()  -> do_raw_spin_lock() -> arch_spin_lock()
 
 **include/asm-generic/qspinlock.h**
 
 1     #define arch_spin_lock(l)         queued_spin_lock(l)
 
-2    
+2
 
-3     static __always_inline void queued_spin_lock(struct qspinlock *lock)
+3     static \_\_always_inline void queued_spin_lock(struct qspinlock \*lock)
 
 4     {
 
 5     u32 val;
 
-6    
+6
 
-7     val = atomic_cmpxchg_acquire(&lock->val, 0, _Q_LOCKED_VAL);
+7     val = atomic_cmpxchg_acquire(&lock->val, 0, \_Q_LOCKED_VAL);
 
 8     if (likely(val == 0))
 
@@ -454,45 +462,45 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 **kernel/locking/qspinlock.c**
 
-1     void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
+1     void queued_spin_lock_slowpath(struct qspinlock \*lock, u32 val)
 
 2     {
 
-3     struct mcs_spinlock *prev, *next, *node;
+3     struct mcs_spinlock \*prev, \*next, \*node;
 
 4     u32 new, old, tail;
 
 5     int idx;
 
-6    
+6
 
 7     ...
 
-8     if (val == _Q_PENDING_VAL) {
+8     if (val == \_Q_PENDING_VAL) {
 
-9          while ((val = atomic_read(&lock->val)) == _Q_PENDING_VAL)
+9          while ((val = atomic_read(&lock->val)) == \_Q_PENDING_VAL)
 
 10             cpu_relax();
 
 11   }
 
-12  
+12
 
 13   for (;;) {
 
-14        if (val & ~_Q_LOCKED_MASK)
+14        if (val & ~\_Q_LOCKED_MASK)
 
 15             goto queue;
 
-16  
+16
 
-17        new = _Q_LOCKED_VAL;
+17        new = \_Q_LOCKED_VAL;
 
 18        if (val == new)
 
-19             new |= _Q_PENDING_VAL;
+19             new |= \_Q_PENDING_VAL;
 
-20  
+20
 
 21        old = atomic_cmpxchg_acquire(&lock->val, val, new);
 
@@ -500,39 +508,39 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 23             break;
 
-24  
+24
 
 25        val = old;
 
 26   }
 
-27  
+27
 
-28   if (new == _Q_LOCKED_VAL)
+28   if (new == \_Q_LOCKED_VAL)
 
 29        return;
 
-30  
+30
 
-31   smp_cond_load_acquire(&lock->val.counter, !(VAL & _Q_LOCKED_MASK));
+31   smp_cond_load_acquire(&lock->val.counter, !(VAL & \_Q_LOCKED_MASK));
 
-32  
+32
 
 33   clear_pending_set_locked(lock);
 
 34   return;
 
-35  
+35
 
 36   queue:
 
-37   node = this_cpu_ptr(&mcs_nodes[0]);
+37   node = this_cpu_ptr(&mcs_nodes\[0\]);
 
 38   idx = node->count++;
 
 39   tail = encode_tail(smp_processor_id(), idx);
 
-40  
+40
 
 41   node += idx;
 
@@ -542,37 +550,37 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 44   ...
 
-45  
+45
 
 46   if (queued_spin_trylock(lock))
 
 47        goto release;
 
-48  
+48
 
 49   old = xchg_tail(lock, tail);
 
 50   next = NULL;
 
-51  
+51
 
-52   if (old & _Q_TAIL_MASK) {
+52   if (old & \_Q_TAIL_MASK) {
 
 53        prev = decode_tail(old);
 
 54        smp_read_barrier_depends();
 
-55  
+55
 
 56        WRITE_ONCE(prev->next, node);
 
-57  
+57
 
 58        ...
 
 59        arch_mcs_spin_lock_contended(&node->locked);
 
-60  
+60
 
 61        next = READ_ONCE(node->next);
 
@@ -582,19 +590,19 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 64   }
 
-65  
+65
 
 66   ...
 
-67   val = smp_cond_load_acquire(&lock->val.counter, !(VAL & _Q_LOCKED_PENDING_MASK));
+67   val = smp_cond_load_acquire(&lock->val.counter, !(VAL & \_Q_LOCKED_PENDING_MASK));
 
-68  
+68
 
 69   locked:
 
 70   for (;;) {
 
-71        if ((val & _Q_TAIL_MASK) != tail) {
+71        if ((val & \_Q_TAIL_MASK) != tail) {
 
 72             set_locked(lock);
 
@@ -602,21 +610,21 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 74        }
 
-75  
+75
 
-76        old = atomic_cmpxchg_relaxed(&lock->val, val, _Q_LOCKED_VAL);
+76        old = atomic_cmpxchg_relaxed(&lock->val, val, \_Q_LOCKED_VAL);
 
 77        if (old == val)
 
 78             goto release;
 
-79  
+79
 
 80        val = old;
 
 81   }
 
-82  
+82
 
 83   if (!next) {
 
@@ -626,17 +634,17 @@ spin_lock() -> raw_spin_lock() -> _raw_spin_lock() -> __raw_spin_lock() �
 
 86   }
 
-87  
+87
 
 88   arch_mcs_spin_unlock_contended(&next->locked);
 
 89   ...
 
-90  
+90
 
 91   release:
 
-92   __this_cpu_dec(mcs_nodes[0].count);
+92   \_\_this_cpu_dec(mcs_nodes\[0\].count);
 
 93   }
 
@@ -684,19 +692,19 @@ q第88行代码，把下一个队列节点的locked字段设置为1。
 
 释放MCS自旋锁的代码如下所示：
 
-spin_unlock() -> raw_spin_unlock() -> _raw_spin_unlock() -> __raw_spin_unlock()  -> do_raw_spin_unlock() -> arch_spin_unlock()
+spin_unlock() -> raw_spin_unlock() -> \_raw_spin_unlock() -> \_\_raw_spin_unlock()  -> do_raw_spin_unlock() -> arch_spin_unlock()
 
 **include/asm-generic/qspinlock.h**
 
 1     #define arch_spin_unlock(l)       queued_spin_unlock(l)
 
-2    
+2
 
-3     static __always_inline void queued_spin_unlock(struct qspinlock *lock)
+3     static \_\_always_inline void queued_spin_unlock(struct qspinlock \*lock)
 
 4     {
 
-5     (void)atomic_sub_return_release(_Q_LOCKED_VAL, &lock->val);
+5     (void)atomic_sub_return_release(\_Q_LOCKED_VAL, &lock->val);
 
 6     }
 
@@ -708,27 +716,25 @@ MCS自旋锁的配置宏是CONFIG_ARCH_USE_QUEUED_SPINLOCKS 和CONFIG_QUEUED_SP
 
 config X86
 
-     def_bool y
+def_bool y
 
-     ...
+...
 
-     select ARCH_USE_QUEUED_SPINLOCKS
+select ARCH_USE_QUEUED_SPINLOCKS
 
-     ...
+...
 
 **kernel/kconfig.locks**
 
 config ARCH_USE_QUEUED_SPINLOCKS
 
-     bool
+bool
 
 config QUEUED_SPINLOCKS
 
-     def_bool y if ARCH_USE_QUEUED_SPINLOCKS
+def_bool y if ARCH_USE_QUEUED_SPINLOCKS
 
-     depends on SMP
-
-  
+depends on SMP
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [自旋锁](http://www.wowotech.net/tag/%E8%87%AA%E6%97%8B%E9%94%81) [锁](http://www.wowotech.net/tag/%E9%94%81)
 
@@ -738,97 +744,97 @@ config QUEUED_SPINLOCKS
 
 **评论：**
 
-**[bdfail](http://bdfail@163.com/)**  
+**[bdfail](http://bdfail@163.com/)**\
 2019-10-21 16:43
 
 这里的stxr为什么不用stlxr指令呢
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7708)
 
-**[沙漠之狐](http://www.wowotech.net/)**  
+**[沙漠之狐](http://www.wowotech.net/)**\
 2019-10-23 09:22
 
 @bdfail：释放锁的时候才需要使用带有释放语义的存储指令，因为要保证临界区里面的内存访问操作在释放操作完成之前被观察到。
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7711)
 
-**see**  
+**see**\
 2019-10-21 10:37
 
 买了你的书，目前正在看。
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7707)
 
-**jxh218@163.com**  
+**jxh218@163.com**\
 2019-09-05 14:40
 
 处理器0申请MCS自旋锁图挂了么？
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7646)
 
-**[沙漠之狐](http://www.wowotech.net/)**  
+**[沙漠之狐](http://www.wowotech.net/)**\
 2019-10-23 09:25
 
 @jxh218@163.com：有段时间图没有显示出来，现在恢复正常了。
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7712)
 
-**aaron0905**  
+**aaron0905**\
 2019-08-30 10:38
 
-您好，  
+您好，\
 文中提到“MCS自旋锁的策略是为每个处理器创建一个变量副本，每个处理器在自己的本地变量上自旋等待，解决了性能问题。”我有个疑问不太明白，每个处理器都有自己的副本，那么当其中一个处理器释放了自旋锁后，其他处理的副本是如何同步的呢
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7632)
 
-**firo**  
+**firo**\
 2019-09-01 14:48
 
 @aaron0905：其实不是副本. 只是一个变量而已. 持有锁的cpu, 在释放锁的时候, 回去更新下个cpu的本地变量(也就是你所谓的副本). 下个cpu看到自己的变量改变了, 就知道可以获取锁了.
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7638)
 
-**[沙漠之狐](http://www.wowotech.net/)**  
+**[沙漠之狐](http://www.wowotech.net/)**\
 2019-09-03 21:48
 
 @aaron0905：释放自旋锁的时候，通过next指针得到队列的下一个节点，把下一个节点的成员locked设置为0。
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7643)
 
-**wang**  
+**wang**\
 2019-08-08 09:44
 
 学习了，请教一个问题，再arch_spin_unlock中为什么没有sev指令，lock中的wfe在什么地方被唤醒呢？
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7575)
 
-**[沙漠之狐](http://www.wowotech.net/)**  
+**[沙漠之狐](http://www.wowotech.net/)**\
 2019-08-09 21:08
 
-@wang：等待自旋锁的时候，使用指令ldaxrh（带有获取语义的独占加载，h表示halfword，即2字节）读取服务号，独占加载操作会设置处理器的独占监视器，记录锁的物理地址。  
+@wang：等待自旋锁的时候，使用指令ldaxrh（带有获取语义的独占加载，h表示halfword，即2字节）读取服务号，独占加载操作会设置处理器的独占监视器，记录锁的物理地址。\
 释放锁的时候，使用stlrh指令修改锁的值，stlrh指令会清除所有监视锁的物理地址的处理器的独占监视器，清除独占监视器的时候会生成一个唤醒事件。
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7583)
 
-**wang**  
+**wang**\
 2019-08-28 11:38
 
-@沙漠之狐：多谢，找到了，吐槽一下 armv8 ref文档  
-  
+@沙漠之狐：多谢，找到了，吐槽一下 armv8 ref文档
+
 An event caused by the clearing of the global monitor for the PE.
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7621)
 
-**Totti_IT**  
+**Totti_IT**\
 2019-06-29 22:33
 
-在4.2节 小巧的MSC自旋锁一节中，在解释一个处理器最多同时等待4个自旋锁的4条原因中，第一条原因说“申请自旋锁的函数禁止内核抢占，所以进程在等待自旋锁的过程中不会被其他进程抢占”，但是，在进程获取自旋锁没有成功，等待自旋锁的时候，是会调用preempt_enable恢复进程抢占的,所以，进程在等待自旋锁过程中是可以被高优先级进程抢占的。  
-  
+在4.2节 小巧的MSC自旋锁一节中，在解释一个处理器最多同时等待4个自旋锁的4条原因中，第一条原因说“申请自旋锁的函数禁止内核抢占，所以进程在等待自旋锁的过程中不会被其他进程抢占”，但是，在进程获取自旋锁没有成功，等待自旋锁的时候，是会调用preempt_enable恢复进程抢占的,所以，进程在等待自旋锁过程中是可以被高优先级进程抢占的。
+
 不知我说的对不对，望赐教。
 
 [回复](http://www.wowotech.net/kernel_synchronization/460.html#comment-7496)
 
-**[沙漠之狐](http://www.wowotech.net/)**  
+**[沙漠之狐](http://www.wowotech.net/)**\
 2019-07-08 21:40
 
 @Totti_IT：在进程等待自旋锁的时候，没有调用preempt_enable()开启内核抢占,不会被高优先级进程抢占。
@@ -837,152 +843,155 @@ An event caused by the clearing of the global monitor for the PE.
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [DRAM 原理 5 ：DRAM Devices Organization](http://www.wowotech.net/basic_tech/343.html)
-    - [Linux内核同步机制之（二）：Per-CPU变量](http://www.wowotech.net/kernel_synchronization/per-cpu.html)
-    - [ARM WFI和WFE指令](http://www.wowotech.net/armv8a_arch/wfe_wfi.html)
-    - [中断唤醒系统流程](http://www.wowotech.net/irq_subsystem/irq_handle_procedure.html)
-    - [linux kernel的中断子系统之（八）：softirq](http://www.wowotech.net/irq_subsystem/soft-irq.html)
+
+  - [DRAM 原理 5 ：DRAM Devices Organization](http://www.wowotech.net/basic_tech/343.html)
+  - [Linux内核同步机制之（二）：Per-CPU变量](http://www.wowotech.net/kernel_synchronization/per-cpu.html)
+  - [ARM WFI和WFE指令](http://www.wowotech.net/armv8a_arch/wfe_wfi.html)
+  - [中断唤醒系统流程](http://www.wowotech.net/irq_subsystem/irq_handle_procedure.html)
+  - [linux kernel的中断子系统之（八）：softirq](http://www.wowotech.net/irq_subsystem/soft-irq.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

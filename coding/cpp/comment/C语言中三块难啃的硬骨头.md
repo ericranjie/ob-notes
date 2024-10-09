@@ -1,7 +1,6 @@
-
 C语言与CPP编程
 
- _2022年01月06日 08:44_
+_2022年01月06日 08:44_
 
 击上方“**C语言与CPP编程**”，选择“**置顶/星标公众号**”
 
@@ -49,15 +48,15 @@ C语言在嵌入式学习中是必备的知识，审核大部分操作都要围�
 
 `int p[3];   `
 
-首先从P处开始，先与[]结合，说明P是一个数组。然后与int结合，说明数组里的元素是整型的，所以P是一个由整型数据组成的数组。
+首先从P处开始，先与\[\]结合，说明P是一个数组。然后与int结合，说明数组里的元素是整型的，所以P是一个由整型数据组成的数组。
 
 `int *p[3];   `
 
-首先从P处开始，先与[]结合，因为其优先级比高，所以P是一个数组。然后再与结合，说明数组里的元素是指针类型。之后再与int结合，说明指针所指向的内容的类型是整型的，所以P是一个由返回整型数据的指针所组成的数组。
+首先从P处开始，先与\[\]结合，因为其优先级比高，所以P是一个数组。然后再与结合，说明数组里的元素是指针类型。之后再与int结合，说明指针所指向的内容的类型是整型的，所以P是一个由返回整型数据的指针所组成的数组。
 
 `int (*p)[3];   `
 
-首先从P处开始，先与结合，说明P是一个指针。然后再与[]结合(与"()"这步可以忽略，只是为了改变优先级)，说明指针所指向的内容是一个数组。之后再与int结合，说明数组里的元素是整型的。所以P是一个指向由整型数据组成3个整数的指针。
+首先从P处开始，先与结合，说明P是一个指针。然后再与\[\]结合(与"()"这步可以忽略，只是为了改变优先级)，说明指针所指向的内容是一个数组。之后再与int结合，说明数组里的元素是整型的。所以P是一个指向由整型数据组成3个整数的指针。
 
 `int **p;   `
 
@@ -73,7 +72,7 @@ C语言在嵌入式学习中是必备的知识，审核大部分操作都要围�
 
 `int (p(int))[3];   `
 
-可以先跳过，不看这个类型，过于复杂。从P开始，先与()结合，说明P是一个函数。然后进入()里面，与int结合，说明函数有一个整型变量参数。然后再与外面的结合，说明函数返回的是一个指针。之后到最外面一层，先与[]结合，说明返回的指针指向的是一个数组。接着再与结合，说明数组里的元素是指针，最后再与int结合，说明指针指向的内容是整型数据。所以P是一个参数为一个整数据且返回一个指向由整型指针变量组成的数组的指针变量的函数。
+可以先跳过，不看这个类型，过于复杂。从P开始，先与()结合，说明P是一个函数。然后进入()里面，与int结合，说明函数有一个整型变量参数。然后再与外面的结合，说明函数返回的是一个指针。之后到最外面一层，先与\[\]结合，说明返回的指针指向的是一个数组。接着再与结合，说明数组里的元素是指针，最后再与int结合，说明指针指向的内容是整型数据。所以P是一个参数为一个整数据且返回一个指向由整型指针变量组成的数组的指针变量的函数。
 
 说到这里也就差不多了。理解了这几个类型，其它的类型对我们来说也是小菜了。不过一般不会用太复杂的类型，那样会大大减小程序的可读性，请慎用。这上面的几种类型已经足够我们用了。
 
@@ -101,7 +100,7 @@ C语言在嵌入式学习中是必备的知识，审核大部分操作都要围�
 
 当通过指针来访问指针所指向的内存区时，指针所指向的类型决定了编译器将把那片内存区里的内容当做什么来看待。
 
-从语法上看，小伙伴们只需把指针声明语句中的指针名字和名字左边的指针声明符*去掉，剩下的就是指针所指向的类型。
+从语法上看，小伙伴们只需把指针声明语句中的指针名字和名字左边的指针声明符\*去掉，剩下的就是指针所指向的类型。
 
 上述例子中各个指针所指向的类型：
 
@@ -139,7 +138,7 @@ C语言在嵌入式学习中是必备的知识，审核大部分操作都要围�
 
 函数指针和指针函数，表面是两个字面意思的互换实际上含义截然不同，指针函数比较好理解，就是返回指针的一个函数，函数指针这个主要用在回调函数，很多人觉得函数都没还搞明白，回调函数更晕菜了。其实可以通俗的理解指向函数的指针，本身是一个指针变量，只不过在初始化的时候指向了函数，这又回到了指针层面。没搞明白指针再次深入的向前走特别难。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 C语言的开发者们为后来的开发者做了一些省力气的事情，他们编写了大量代码，将常见的基本功能都完成了，可以让别人直接拿来使用。但是那么多代码，如何从中找到自己需要的呢？将所有代码都拿来显然是不太现实。
 
@@ -186,9 +185,8 @@ C语言提供了很多功能，我们只需要一句简单的代码就能够使�
 相信大家对于结构体都不陌生。在此，分享出本人对C语言结构体的研究和学习的总结。如果你发现这个总结中有你以前所未掌握的，那本文也算是有点价值了。当然，水平有限，若发现不足之处恳请指出。代码文件test.c我放在下面。在此，我会围绕以下2个问题来分析和应用C语言结构体：
 
 1. C语言中的结构体有何作用
-    
-2. 结构体成员变量内存对齐有何讲究(重点)
-    
+
+1. 结构体成员变量内存对齐有何讲究(重点)
 
 对于一些概念的说明，我就不把C语言教材上的定义搬上来。我们坐下来慢慢聊吧。
 
@@ -218,7 +216,7 @@ C语言提供了很多功能，我们只需要一句简单的代码就能够使�
 
 `void DsipDateTime( vu16 year，vu8 month，vu8 date，vu8 week，vu8 hour，vu8 min，vu8 sec)   `
 
-可见这种方法来传递参数非常繁琐。所以以结构体作为函数的入口参数的好处之一就是函数的声明void DsipDateTime(_calendar_obj DateTimeVal)不需要改变，只需要增加结构体的成员变量，然后在函数的内部实现上对calendar.week作相应的处理即可。这样，在程序的修改、维护方面作用显著。
+可见这种方法来传递参数非常繁琐。所以以结构体作为函数的入口参数的好处之一就是函数的声明void DsipDateTime(\_calendar_obj DateTimeVal)不需要改变，只需要增加结构体的成员变量，然后在函数的内部实现上对calendar.week作相应的处理即可。这样，在程序的修改、维护方面作用显著。
 
 `typedef struct //公历日期和时间结构体   {   vu16 year;   vu8 month;   vu8 date;   vu8 week;   vu8 hour;   vu8 min;   vu8 sec;   }_calendar_obj;   _calendar_obj calendar; //定义结构体变量   `
 
@@ -230,7 +228,7 @@ C语言提供了很多功能，我们只需要一句简单的代码就能够使�
 
 程序的运行结果如下(注意：括号内的数据是成员变量的地址的十进制形式)：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 2. 结构体成员变量内存对齐
 
@@ -247,11 +245,10 @@ C语言提供了很多功能，我们只需要一句简单的代码就能够使�
 在这里，我就不卖关子了，直接给出如下结论，在没有#pragma pack宏的情况下：
 
 - 原则1 结构（struct或联合union）的数据成员，第一个数据成员放在offset为0的地方，以后每个数据成员存储的起始位置要从该成员大小的整数倍开始（比如int在32位机为4字节，则要从4的整数倍地址开始存储）。
-    
+
 - 原则2 结构体的总大小，也就是sizeof的结果，必须是其内部最大成员的整数倍，不足的要补齐。
-    
+
 - 原则3 结构体作为成员时，结构体成员要从其内部最大元素大小的整数倍地址开始存储。（struct a里存有struct b，b里有char，int，double等元素时，那么b应该从8的整数倍地址处开始存储，因为sizeof(double) = 8 bytes）
-    
 
 这里，我们结合上面的程序来分析(暂时不讨论原则3)。
 
@@ -265,7 +262,7 @@ C语言提供了很多功能，我们只需要一句简单的代码就能够使�
 
 可见，其内存分布图如下，共12 bytes：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 首先，1244972能被1整除，所以char_long_short.c放在1244972处没有问题(其实，就char型成员变量自身来说，其放在任何地址单元处都没有问题)，根据原则1，在之后的1244973~1244975中都没有能被4(因为sizeof(long)=4bytes)整除的，1244976能被4整除，所以char_long_short.l应该放在1244976处，那么同理，最后一个.s(sizeof(short)=2 bytes)是应该放在1244980处。
 
@@ -300,85 +297,84 @@ C语言提供了很多功能，我们只需要一句简单的代码就能够使�
 **留言 10**
 
 - Pursuit.
-    
-    2022年1月6日
-    
-    赞5
-    
-    收藏=学会![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    C语言与CPP编程
-    
-    作者2022年1月6日
-    
-    赞
-    
-    ![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月6日
+
+  赞5
+
+  收藏=学会![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  C语言与CPP编程
+
+  作者2022年1月6日
+
+  赞
+
+  ![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - echoOo
-    
-    2022年1月6日
-    
-    赞4
-    
-    我认为C中难学的是宏和位运算![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月6日
+
+  赞4
+
+  我认为C中难学的是宏和位运算![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Visit
-    
-    2022年1月6日
-    
-    赞2
-    
-    讲讲宏![[奸笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    C语言与CPP编程
-    
-    作者2022年1月6日
-    
-    赞
-    
-    好
-    
+
+  2022年1月6日
+
+  赞2
+
+  讲讲宏![[奸笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  C语言与CPP编程
+
+  作者2022年1月6日
+
+  赞
+
+  好
+
 - 姆路1号（减衣增福版）
-    
-    2022年1月6日
-    
-    赞2
-    
-    递归我至今都掌握的不好![[流泪]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)用不好
-    
-    C语言与CPP编程
-    
-    作者2022年1月6日
-    
-    赞
-    
-    明白函数要做什么，递归结束条件，函数等价关系，就好掌握了
-    
+
+  2022年1月6日
+
+  赞2
+
+  递归我至今都掌握的不好![[流泪]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)用不好
+
+  C语言与CPP编程
+
+  作者2022年1月6日
+
+  赞
+
+  明白函数要做什么，递归结束条件，函数等价关系，就好掌握了
+
 - VISTA5
-    
-    2022年1月26日
-    
-    赞
-    
-    int p那里写错了，第二个应该是int*p
-    
+
+  2022年1月26日
+
+  赞
+
+  int p那里写错了，第二个应该是int\*p
+
 - 张和阳
-    
-    2022年1月9日
-    
-    赞
-    
-    类型，变量类型，数据类型等，总结起来，两个点，一个是数值，一个是运算宽度。
-    
+
+  2022年1月9日
+
+  赞
+
+  类型，变量类型，数据类型等，总结起来，两个点，一个是数值，一个是运算宽度。
+
 - 爷甦
-    
-    2022年1月6日
-    
-    赞
-    
-    Complicated declaration 呢？
-    
+
+  2022年1月6日
+
+  赞
+
+  Complicated declaration 呢？
 
 已无更多数据
 
@@ -397,84 +393,83 @@ C语言与CPP编程
 **留言 10**
 
 - Pursuit.
-    
-    2022年1月6日
-    
-    赞5
-    
-    收藏=学会![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    C语言与CPP编程
-    
-    作者2022年1月6日
-    
-    赞
-    
-    ![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月6日
+
+  赞5
+
+  收藏=学会![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  C语言与CPP编程
+
+  作者2022年1月6日
+
+  赞
+
+  ![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - echoOo
-    
-    2022年1月6日
-    
-    赞4
-    
-    我认为C中难学的是宏和位运算![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2022年1月6日
+
+  赞4
+
+  我认为C中难学的是宏和位运算![[呲牙]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Visit
-    
-    2022年1月6日
-    
-    赞2
-    
-    讲讲宏![[奸笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    C语言与CPP编程
-    
-    作者2022年1月6日
-    
-    赞
-    
-    好
-    
+
+  2022年1月6日
+
+  赞2
+
+  讲讲宏![[奸笑]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  C语言与CPP编程
+
+  作者2022年1月6日
+
+  赞
+
+  好
+
 - 姆路1号（减衣增福版）
-    
-    2022年1月6日
-    
-    赞2
-    
-    递归我至今都掌握的不好![[流泪]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)用不好
-    
-    C语言与CPP编程
-    
-    作者2022年1月6日
-    
-    赞
-    
-    明白函数要做什么，递归结束条件，函数等价关系，就好掌握了
-    
+
+  2022年1月6日
+
+  赞2
+
+  递归我至今都掌握的不好![[流泪]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)用不好
+
+  C语言与CPP编程
+
+  作者2022年1月6日
+
+  赞
+
+  明白函数要做什么，递归结束条件，函数等价关系，就好掌握了
+
 - VISTA5
-    
-    2022年1月26日
-    
-    赞
-    
-    int p那里写错了，第二个应该是int*p
-    
+
+  2022年1月26日
+
+  赞
+
+  int p那里写错了，第二个应该是int\*p
+
 - 张和阳
-    
-    2022年1月9日
-    
-    赞
-    
-    类型，变量类型，数据类型等，总结起来，两个点，一个是数值，一个是运算宽度。
-    
+
+  2022年1月9日
+
+  赞
+
+  类型，变量类型，数据类型等，总结起来，两个点，一个是数值，一个是运算宽度。
+
 - 爷甦
-    
-    2022年1月6日
-    
-    赞
-    
-    Complicated declaration 呢？
-    
+
+  2022年1月6日
+
+  赞
+
+  Complicated declaration 呢？
 
 已无更多数据

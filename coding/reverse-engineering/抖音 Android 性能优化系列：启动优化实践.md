@@ -1,7 +1,8 @@
 # 
+
 原创 抖音基础技术团队 字节跳动技术团队
 
- _2022年03月25日 18:09_
+_2022年03月25日 18:09_
 
 ![](http://mmbiz.qpic.cn/mmbiz_png/5EcwYhllQOhkoWTP1gVm0Lqs480XOARyoSYjPEsRVCSF35cbWIp6cliaYic8KUfNfiaSjVnruzTQUTCA0lmv9vUmw/300?wx_fmt=png&wxfrom=19)
 
@@ -15,10 +16,8 @@
 
 **动手点关注 干货不迷路** 👆
 
-  
-
 > 启动性能是 APP 使用体验的门面，启动过程耗时较长很可能使用户削减使用 APP 的兴趣，抖音通过对启动性能做劣化实验也验证了其对于业务指标有显著影响。抖音有数亿的日活，启动耗时几百毫秒的增长就可能带来成千上万用户的留存缩减，因此，启动性能的优化成为了抖音 Android 基础技术团队在体验优化方向上的重中之重。
-> 
+>
 > 在上一篇[启动性能优化之理论和工具篇](https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247491335&idx=1&sn=e3eabd9253ab2f83925af974db3f3072&scene=21#wechat_redirect)中，已经从原理、方法论、工具的角度对抖音的启动性能优化进行了介绍，本文将从实践的角度通过具体的案例分析介绍抖音启动优化的方案与思路。
 
 ## 前言
@@ -39,7 +38,7 @@
 
 首先我们来看第一个阶段，也就是 Application 的 attachBaseContext 阶段。这个阶段由于 Applicaiton Context 赋值等问题，一般不会有太多的业务代码，预期中也不会有多少耗时。但在实际测试过程中，我们发现在某些机型上，应用安装后的首次启动耗时非常严重，经过初步定位，主要耗时在**MultiDex.install**。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在经过详细分析后，我们确定该问题集中在**4.x**的机型上，其影响首次安装及后续更新后的首次启动。
 
@@ -52,13 +51,12 @@
 因此我们选择破坏“**Dalvik 虚拟机需要加载 odex**”这一限制，即绕过 Dalvik 的限制直接加载未经优化的 dex。这个方案的核心在 Dalvik_dalvik_system_DexFile_openDexFile_bytearray 这个 native 函数，它支持加载未经优化后的 dex 文件。具体的优化方案如下：
 
 1. 首先从 APK 中解压获取原始的非首个 dex 文件的字节码；
-    
-2. 调用 Dalvik_dalvik_system_DexFile_openDexFile_bytearray，逐个传入之前从 APK 获取的 DEX 字节码，完成 DEX 加载，得到合法的 DexFile 对象；
-    
-3. 将 DexFile 都添加到 APP 的 PathClassLoader 的 DexPathList 里；
-    
-4. 延后异步对非首个 dex 进行 odex 优化。
-    
+
+1. 调用 Dalvik_dalvik_system_DexFile_openDexFile_bytearray，逐个传入之前从 APK 获取的 DEX 字节码，完成 DEX 加载，得到合法的 DexFile 对象；
+
+1. 将 DexFile 都添加到 APP 的 PathClassLoader 的 DexPathList 里；
+
+1. 延后异步对非首个 dex 进行 odex 优化。
 
 关于 MutilDex 优化的更多细节可以参照之前的一篇[公众号文章](https://mp.weixin.qq.com/s?__biz=MzI1MzYzMjE0MQ==&mid=2247485522&idx=1&sn=cddfb1c64642b53ee51ca00ce3c696ca&scene=21#wechat_redirect)，目前该方案已经开源，具体见该项目的 github 地址（https://github.com/bytedance/BoostMultiDex）。
 
@@ -68,7 +66,7 @@
 
 这个过程将会对当前进程的所有 ContentProvider 通过 for 循环的方式逐一进行实例化、调用它们的 attachInfo 与 onCreate 生命周期方法，最后将这些 ContentProvider 关联的 ContentProviderHolder 一次性 publish 到 AMS 进程。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ContentProvider 这种在进程初始化阶段自动初始化的特性，使得在其作为跨进程通信组件的同时，也被一些模块用来进行自动初始化，这其中最为典型的就是官方的 **Lifecycle** 组件，其初始化就是借助了一个叫 ProcessLifecycleOwnerInitializer 的 ContentProvider 进行初始化的。
 
@@ -85,11 +83,10 @@ LifeCycle 的初始化只是进行了 Activity 的 LifecycleCallbacks 的注册�
 FileProvider 是 Android7.0 引入的用于进行文件访问权限控制的组件，在引入 FileProvider 之前我们对于拍照等一些跨进程的文件操作，是以直接传递文件 Uri 的方式进行的；在引入 FileProvider 后，我们的整个过程则为：
 
 1. 首先继承 FileProvider 实现一个自定义的 FileProvider，并把这个 Provider 在 manifest 中进行注册，为其 FILE_PROVIDER_PATHS 属性关联一个 file path 的 xml 文件；
-    
-2. 使用方法通过 FileProvider 的 getUriForFile 方法将文件路径转化为 Content Uri，然后去调用 ContentProvider 的 query、openFile 等方法。
-    
-3. 当 FileProvider 被调用到时，将会首先去进行文件路径的校验，判断其是否在第 1 步定义的 xml 中，文件路径校验通过则继续执行后续的逻辑。
-    
+
+1. 使用方法通过 FileProvider 的 getUriForFile 方法将文件路径转化为 Content Uri，然后去调用 ContentProvider 的 query、openFile 等方法。
+
+1. 当 FileProvider 被调用到时，将会首先去进行文件路径的校验，判断其是否在第 1 步定义的 xml 中，文件路径校验通过则继续执行后续的逻辑。
 
 **耗时分析**
 
@@ -97,19 +94,17 @@ FileProvider 是 Android7.0 引入的用于进行文件访问权限控制的组�
 
 从实现来看， getPathStrategy 方法主要是进行 FileProvider 关联 xml 文件的解析，解析结果将会赋值给 mStrategy 变量。进一步分析我们会发现 mStrategy 会在 FileProvider 的 query、getType、openFile 等接口进行文件路径校验时用到，而我们的 query、getType、openFile 等接口在启动阶段是不会被调用到的，因此 FileProvider attachInfo 方法中的 getPathStrategy 是完全没有必要的，我们完全可以在 query、getType、openFile 等接口被调用到的时候再去执行 getPathStrategy 逻辑。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **优化方案**
 
 FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会参与我们的代码编译，我们可以在编译阶段通过修改字节码的方式去修改它的实现，具体的实现方案为：
 
 1. 对 ContentProvider 的 attachInfo 方法进行插桩，在执行原有实现前将参数 ProviderInfo 的 grantUriPermissions 设置为 false，然后调用原实现并进行异常捕获，在调用完成后再对 ProviderInfo 的 grantUriPermissions 设置回 true，利用 grantUriPermissions 的检查绕过 getPathStrategy 的执行。（这里之所以没有使用 ProviderInfo 的 exported 异常检测绕过 getPathStrategy 调用是因为在 attachInfo 的 super 方法中会对 ProviderInfo 的 exported 属性进行缓存）
-    
 
 `    public void attachInfo(@NonNull Context context, @NonNull ProviderInfo info) {       super.attachInfo(context, info);          // Sanity check our security       if (info.exported) {           throw new SecurityException("Provider must not be exported");       }       if (!info.grantUriPermissions) {           throw new SecurityException("Provider must grant uri permissions");       }          mStrategy = getPathStrategy(context, info.authority);   }    `
 
 2. 对 FileProvider 的 query、getType、openFile 等方法进行插桩，在调用原方法之前首先进行 getPathStrategy 的初始化，完成初始化之后再调用原始实现。
-    
 
 单个 FileProvider 的耗时虽然不多，但是对于一些大型的 app，为了模块解耦其可能会有多个 FileProvider，在这种情况下 FileProvider 优化的收益还是比较可观的。与 FileProvider 类似，Google 提供的 WorkManager 也会存在初始化的 ContentProvider，我们可以采用类似的方式进行优化。
 
@@ -117,7 +112,7 @@ FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会
 
 启动的第三个阶段是 Application 的 onCreate 阶段，这个阶段是启动任务执行的高峰阶段，该阶段的优化就是针对各类启动任务的优化，具有极强的业务关联性，这里简单介绍一下我们优化的大概思路。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 抖音启动任务优化的核心思想是**代码价值最大化**和**资源利用率最大化**。其中代码价值最大化主要是确定哪些任务应该在启动阶段执行，它的核心目标是将不应该在启动阶段执行的任务从启动阶段去除掉；资源利用率最大化则是在启动阶段任务已经确定的情况下，尽可能多的去利用系统资源以达到减少任务执行耗时的目的。对于单个任务而言，我们需要去优化它的内部实现，减少它本身的资源消耗以提供更多资源给其他任务执行，对于多个任务则是通过合理的调度以充分利用系统的资源。
 
@@ -130,61 +125,56 @@ FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会
 为此我们将启动任务分成了配置任务、预加载任务和功能任务三大类。其中配置任务主要用于对各类 sdk 进行初始化，在它没有执行之前相关的 sdk 是无法工作的；预加载任务主要是为了对后续的某些功能进行预热，以提升后续功能的执行速度；功能任务则是在进程启动这一生命周期执行的与功能相关的任务。对于这三类任务我们采用了不同的改造方式：
 
 - **配置任务**：对于配置任务我们最终目标是把它们从启动阶段去除掉，这样做主要有两个原因，首先部分配置任务仍然存在一定的耗时，将它们从启动任务移除掉可以提升我们的启动速度；其次配置任务在没有执行前相关 sdk 无法正常使用，这会对我们的功能可用性、稳定性以及优化过程中的调度造成影响。为了达到去除配置任务的目的，我们对配置任务进行了原子化的改造，将原本需要主动调用向 sdk 中注入 context、callback 等各类参数的实现，通过 spi（服务发现）的方式改为了按需调用的方式——对于抖音自己的代码我们在需要使用 context、callback 等参数时通过 spi 的方式去请求应用上层进行获取，对于我们无法修改代码的三方 sdk，我们则对它们进行一个中间层封装，后续对于三方 sdk 的使用都通过封装的中间层，在中间层相关接口被调用时再执行 sdk 的配置任务。通过这样的方式我们可以把配置任务从启动阶段移除掉，实现使用时再按需执行。
-    
+
 - **预加载任务**：对于预加载任务，我们则对它们进行了规范化改造，以确保预加载任务在被降级情况下功能的正确性，同时对过期的预加载任务以及预加载任务中冗余的逻辑进行去除，以提升预加载任务的价值。
-    
+
 - **功能任务**：对于功能性的启动任务，我们则是对它们进行了粒度拆解与瘦身，去除启动阶段非必须的逻辑，同时对功能任务添加了调度与降级能力支持，以供后续的调度与降级。
-    
 
 **任务调度**
 
 关于任务调度业界有过比较多的介绍，这里对于任务的依赖分析、任务排布等不再进行介绍，主要介绍抖音在实践过程中一些可能的创新点：
 
 - **基于落地页进行调度**：抖音启动除了进入首页，还有授权登录、push 拉活等不同的落地页，这些不同的落地页在任务的执行上是有比较大差异的，我们可以在 Application 阶段通过反射主线程消息队列中的消息获取待启动的目标页面，基于落地页进行针对性的任务调度；
-    
+
 - **基于设备性能调度**：采集设备的各类性能数据在后台对设备进行打分与归一化处理，将归一化之后的结果下发到端上，端上根据所在的性能等级进行任务的调度；
-    
+
 - **基于功能活跃度调度**：统计用户对各个功能的使用情况，为用户计算出每个功能的一个活跃度数据，并将他们下发到端上，端上根据功能活跃度高低来进行调度；
-    
+
 - **基于端智能的调度**：在端上通过端智能的方式预测用户的后续行为，为后续功能进行预热等；
-    
+
 - **启动功能降级**：对于部分性能较差的设备与用户，对启动阶段的任务、功能进行降级，将其延后到启动之后再去执行，甚至完全不执行，以保证整体体验。
-    
 
 #### 1.4 Activity 阶段优化
 
 之前的几个阶段都属于 Application 阶段，接下来看一下 Activity 阶段的相关优化，这个阶段我们将介绍 Splash 与 Main 合并、反序列化优化两个典型例子。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 1.4.1 Splash 与 Main 合并
 
 首先来看一下 SplashActivity 与 MainActivity 的合并，在之前的版本中抖音的 launcher activity 是 SplashActivity，它主要承载着广告、活动等开屏相关逻辑。一般情况下我们的启动流程为：
 
 1. 进入 SplashActivity，在 SplashActivity 中判断当前是否有待展示的开屏；
-    
-2. 如果有待展示的开屏则展示开屏，等待开屏展示结束再跳转到 MainActivity，如果没有开屏则直接跳转到 MainActivity。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 如果有待展示的开屏则展示开屏，等待开屏展示结束再跳转到 MainActivity，如果没有开屏则直接跳转到 MainActivity。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在这个流程下，我们的启动需要经历两个 Activity 的启动，如果把这两个 Activity 进行合并，我们可以取得**两方面的收益**：
 
 1. 减少一次 Activity 的启动过程；
-    
-2. 利用读取开屏信息的时间，做一些与 Activity 强关联的并发任务，比如异步 View 预加载等。
-    
+
+1. 利用读取开屏信息的时间，做一些与 Activity 强关联的并发任务，比如异步 View 预加载等。
 
 要实现 Splash 与 Main 合并，我们**需要解决的问题**主要有 2 个：
 
 - 合并后如何解决外部通过 Activity 名称跳转的问题；
-    
+
 - 如果解决 LaunchMode 与多实例的问题。
-    
 
 第 1 个问题比较容易解决，我们可以通过 activity-alias+targetActivity 将 SplashActivity 指向 MainActivity 解决。接下来我们来看一下第二个问题。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **launchMode 问题**
 
@@ -192,7 +182,7 @@ FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会
 
 将 SplashActivity 与 MainActivity 合并以后，我们的 launcher Activity 变成了 MainActivity，如果继续使用 singletask 这个 launchMode，当我们从二级页面 home 出去再次点击 icon 进入时，我们将无法回到二级页面，而会回到 Main 页面，因此合并后 MainActivity 的 launch mode 将不再能够使用 singletask。经过调研，我们最终选择了使用 singletop 作为我们的 launchMode。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **多实例问题**
 
@@ -208,7 +198,7 @@ FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会
 
 针对这个问题我们的解决方案是，修改启动 MainActivity Intent 的 Component 信息，将其改从 MainActivity 改为 **SplashActivity**，这样我们就彻底解决了内部启动 MainActivity 导致的多实例的问题。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 为了尽可能少的侵入业务，同时也防止后续迭代再出现内部启动导致 MainActivity 问题，我们对 Context startActivity 的调用进行了**插桩**。对于启动 MainActivity 的调用，在完成向 Intent 中添加 flag 和替换 Component 信息后再调用原有实现。之所以选择插桩方式实现，是因为抖音的代码结构比较复杂，存在多个基类 Activity，且部分基类 Activity 无法直接修改到代码。对于没有这方面问题的业务，可以通过重写基类 Activtity 及 Application 的 startActivity 方法的方式实现。
 
@@ -222,20 +212,19 @@ FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会
 
 解决了 MainActivity 对象数统计的问题，接下来我们就需要让 MainActivity **同时存在的对象数**永远保持在 1 个以下。要解决这个问题我们需要回顾一下 Activity 的启动流程，启动一个 Activity 首先会经过 AMS，AMS 会再调用到 Activity 所在的进程，在 Activity 所在的进程会经过主线程的 Handler post 到主线程，然后通过 Instrumentation 去创建 Activity 对象，以及执行后续的生命周期。对于外部启动 MainActivity ，我们能够控制的是从 AMS 回到进程之后的部分，这里可以选择以 Instrumentation 的 newActivity 作为入口。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 具体来说我们的优化方案如下：
 
 1. 继承 Instrumentation 实现一个自定义的 Instrumentaion 类，以代理转发方式重写里面的所有方法；
-    
-2. 反射获取 ActivityThread 中 Instrumentaion 对象，并以其为参数创建一个自定义的 Instrumentaion 对象，通过反射方式用自定义的 Instrumentaion 对象替换 ActivityThread 原有的 Instrumentaion；
-    
-3. 在自定义 Instrumentaion 类的 newActivity 方法中，进行判断当前待创建的 Activity 是否为 MainActivity，如果不是 MainActivity 或者当前不存在 MainActivity 对象，则调用原有实现，否则替换其 className 参数将其指向一个空的 Activity，以创建一个空的 Activity；
-    
-4. 在这个空的 Activity 的 onCreate 中 finish 掉自己，同时通过一个添加了 FLAG_ACTIVITY_NEW_TASK 和 FLAG_ACTIVITY_CLEAR_TOP flag 的 Intent 去启动一下 SplashActivity。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 反射获取 ActivityThread 中 Instrumentaion 对象，并以其为参数创建一个自定义的 Instrumentaion 对象，通过反射方式用自定义的 Instrumentaion 对象替换 ActivityThread 原有的 Instrumentaion；
+
+1. 在自定义 Instrumentaion 类的 newActivity 方法中，进行判断当前待创建的 Activity 是否为 MainActivity，如果不是 MainActivity 或者当前不存在 MainActivity 对象，则调用原有实现，否则替换其 className 参数将其指向一个空的 Activity，以创建一个空的 Activity；
+
+1. 在这个空的 Activity 的 onCreate 中 finish 掉自己，同时通过一个添加了 FLAG_ACTIVITY_NEW_TASK 和 FLAG_ACTIVITY_CLEAR_TOP flag 的 Intent 去启动一下 SplashActivity。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 需要注意的是我们这里 hook Instrumentaion 的实现方案，在高版本的 Android 系统上我们也可以以 AppComponentFactory instantiateActivity 的方式替换。
 
@@ -248,9 +237,8 @@ FileProvider 是 androidx 中的代码，我们无法直接修改，但是它会
 Gson 的首次解析耗时与它的实现方案有关，在 Gson 的数据解析过程中有一个非常重要的角色，那就是 **TypeAdapter**，对于每一个待解析的对象的 Class，Gson 会首先为其生成一个 TypeAdapter，然后利用这个 TypeAdapter 进行解析，Gson 默认的解析方案采用的是 ReflectiveTypeAdapterFactory 创建的 TypeAdapter 的，其创建与解析过程中涉及到大量的反射调用，具体流程为：
 
 1. 首先通过反射获取待解析对象的所有 Field，并逐个读取去读取它们的注解，生成一个从 serializeName 到 Filed 映射 map；
-    
-2. 解析过程中，通过读取到的 serializeName，到生成的 map 中找到对应的 Filed 信息，然后根据 Filed 的数据类型采用特定类型的方式进行解析，然后通过反射方式进行赋值。
-    
+
+1. 解析过程中，通过读取到的 serializeName，到生成的 map 中找到对应的 Filed 信息，然后根据 Filed 的数据类型采用特定类型的方式进行解析，然后通过反射方式进行赋值。
 
 因此对于 Gson 解析耗时优化的核心就是**减少反射**，这里具体介绍一下抖音中使用到的一些优化方案。
 
@@ -260,16 +248,15 @@ Gson 的首次解析耗时与它的实现方案有关，在 Gson 的数据解析
 
 这个自定义 TypeAdapterFactory 会在编译期为每个待优化的 Class 生成一个自定义的 TypeAdapter，在这个 TypeAdapter 中会为 Class 的每个字段生成相关的解析代码，以达到避免反射的目的。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 生成自定义 TypeAdapter 过程中的字节码处理，我们采用了抖音团队开源的字节码处理框架 Bytex（https://github.com/bytedance/ByteX/blob/master/README_zh.md），具体的实现过程如下：
 
 1. **配置待优化 Class**：在开发阶段，通过注解、配置文件的方式对我们需要优化的 Class 进行加白；
-    
-2. **收集待优化 Class 信息**：开始编译后，我们从配置文件中读取通过配置文件配置 Class；在遍历工程中所有的 class 的 traverse 阶段，我们通过 ASM 提供的 ClassVisitor 去读取通过注解配置的 Class。对于所有需要优化的 Class，我们利用 ClassVisitor 的 visitField 方法收集当前 Class 的所有 Filed 信息；
-    
-3. **生成自定义 TypeAdapter 和 TypeAdapterFactory**：在 trasform 阶段，我们利用收集到的 Class 和 Field 信息生成自定义的 TypeAdapter 类，同时生成创建这些 TypeAdapter 的自定义 TypeAdapterFactory；
-    
+
+1. **收集待优化 Class 信息**：开始编译后，我们从配置文件中读取通过配置文件配置 Class；在遍历工程中所有的 class 的 traverse 阶段，我们通过 ASM 提供的 ClassVisitor 去读取通过注解配置的 Class。对于所有需要优化的 Class，我们利用 ClassVisitor 的 visitField 方法收集当前 Class 的所有 Filed 信息；
+
+1. **生成自定义 TypeAdapter 和 TypeAdapterFactory**：在 trasform 阶段，我们利用收集到的 Class 和 Field 信息生成自定义的 TypeAdapter 类，同时生成创建这些 TypeAdapter 的自定义 TypeAdapterFactory；
 
 `public class GsonOptTypeAdapterFactory extends BaseAdapterFactory {          protected BaseAdapter createTypeAdapter(String var1) {           switch(var1.hashCode()) {           case -1939156288:               if (var1.equals("xxx/xxx/gsonopt/model/Model1")) {                   return new TypeAdapterForModel1(this.gson);               }               break;           case -1914731121:               if (var1.equals("xxx/xxx/gsonopt/model/Model2")) {                   return new TypeAdapterForModel2(this.gson);               }               break;           return null;       }   }      public abstract class TypeAdapterForModel1 extends BaseTypeAdapter {          protected void setFieldValue(String var1, Object var2, JsonReader var3) {       Object var4;       switch(var1.hashCode()) {       case 110371416:           if (var1.equals("field1")) {               var4 = this.gson.getAdapter(String.class).read(var3);               ((Model1)var2).field1 = (String)var4;               return true;           }           break;       case 1223751172:           if (var1.equals("filed2")) {               var4 = this.gson.getAdapter(String.class).read(var3);               ((Model1)var2).field2 = (String)var4;               return true;           }       }       return false;   }   }   `
 
@@ -288,32 +275,30 @@ Gson 的首次解析耗时与它的实现方案有关，在 Gson 的数据解析
 上面介绍了两种比较典型的优化方案，在抖音的实际优化过程中还尝试了其他的优化方案，在特定的场景也取得了不错的优化效果，大家可以参考：
 
 - **统一 Gson 对象**：Gson 会对解析过的 Class 进行 TypeAdapter 的缓存，但是这个缓存是 Gson 对象级别的，不同 Gson 对象之间不会进行复用，通过统一 Gson 对象可以实现 TypeAdapter 的复用；
-    
+
 - **预创建 TypeAdapter**：对于有足够的并发空间场景，我们在异步线程提前创建相关 Class 的 TypeAdapter，后续则可以直接使用预创建的 TypeAdapter 进行数据解析；
-    
+
 - **使用其他协议**：对于本地数据的序列化与反序列化我们尝试使用了二进制顺序化的存储方式，将反序化耗时减少了 95%。在具体实现上我们采用的是 Android 原生提供的 Parcel 方案，对于跨版本数据不兼容的情况，我们通过版本控制的方式回滚为版本兼容的 Gson 解析方式。
-    
 
 #### 1.5 UI 渲染优化
 
 介绍完 Activity 阶段的优化我们再来看一下 UI 渲染阶段的相关优化，这个阶段我们将介绍 View 加载的相关优化。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一般来说创建 View 有两种方式，第一种方式就是直接通过代码构建 View，第二种方式就是 LayoutInflate 去加载 xml 文件，这里将重点介绍**LayoutInflate 加载 xml 的优化**。LayoutInflate 进行 xml 加载包括三个步骤：
 
 1. 将 xml 文件解析到内存中 XmlResourceParser 的 IO 过程；
-    
-2. 根据 XmlResourceParser 的 Tag name 获取 Class 的 Java 反射过程；
-    
-3. 创建 View 实例，最终生成 View 树。
-    
+
+1. 根据 XmlResourceParser 的 Tag name 获取 Class 的 Java 反射过程；
+
+1. 创建 View 实例，最终生成 View 树。
 
 这 3 个步骤整体上是比较耗时的。在业务层面上，我们可以通过优化 xml 层级、使用 ViewStub 方式进行按需加载等方式进行优化，这些优化可以在一定程度上优化 xml 的加载时长。
 
 这里我们介绍另一种比较通用优化方案——**异步预加载方案**，以下图中 fragment 的 rootview 为例，它是在 UI 渲染的 measure 阶段被 inflate 出来的，而从应用启动到 measure 是有一定的时间 gap 的，我们完全可以利用这段时间在后台线程提前将这些 view 加载到内存，在 measure 阶段再直接从内存中进行读取。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **x2c 解决锁的问题**
 
@@ -334,13 +319,12 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 除了上面提到的多线程锁的问题和 LayoutParams 的问题，在进行预加载过程中还遇到了一些其他的问题，这些问题具体如下：
 
 1. **inflate 线程优先级的问题**：一般情况下后台线程的优先级会比较低，在进行异步 inflate 时可能会因为 inflate 线程优先级过低导致来不及预加载甚至比不进行预加载更耗时的情况，在这种情况下建议适当提升异步 inflate 线程的优先级。
-    
-2. **对 Handler 问题**：存在一些自定义 View 在创建的时候会去创建 handler，这种情况下我们需要去修改创建 Handler 的代码，为其指定主线程的 Looper。
-    
-3. **对线程有要求**：典型的就是自定义 View 里使用了动画，动画在 start 时会校验是否是 UI 线程主线程，这种情况我们需要去修改业务代码，将相关逻辑移动到后续真正添加到 View tree 时。
-    
-4. **需要使用 Activity context 的场景**：一种解决办法就是在 Activity 启动之后再进行异步预加载，这种方式无需专门处理 View 的 context 问题，但是预加载的并发空间可能会被压缩；另一种方式就是在 Application 阶段利用 Applicaiton 的 context 进行预加载，但是在 add 到 view tree 之前将预加载 View 的 context 替换为 Activity 的 context，以满足 Dialog 显示、LiveData 使用等场景对 Activity context 的需求。
-    
+
+1. **对 Handler 问题**：存在一些自定义 View 在创建的时候会去创建 handler，这种情况下我们需要去修改创建 Handler 的代码，为其指定主线程的 Looper。
+
+1. **对线程有要求**：典型的就是自定义 View 里使用了动画，动画在 start 时会校验是否是 UI 线程主线程，这种情况我们需要去修改业务代码，将相关逻辑移动到后续真正添加到 View tree 时。
+
+1. **需要使用 Activity context 的场景**：一种解决办法就是在 Activity 启动之后再进行异步预加载，这种方式无需专门处理 View 的 context 问题，但是预加载的并发空间可能会被压缩；另一种方式就是在 Application 阶段利用 Applicaiton 的 context 进行预加载，但是在 add 到 view tree 之前将预加载 View 的 context 替换为 Activity 的 context，以满足 Dialog 显示、LiveData 使用等场景对 Activity context 的需求。
 
 #### 1.6 主线程耗时消息优化
 
@@ -350,25 +334,23 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 
 对于自己工程中的代码，我们可以比较方便的优化；但是有些是第三方 SDK 内部的逻辑，我们比较难以进行优化；即使是方便优化掉的消息后期的防止劣化成本也非常高。我们尝试从另外一个角度解决这个问题，在优化部分往主线程 post 消息的同时，对主线程消息队列进行调整，让启动相关的消息优先执行。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们的核心原理是根据 App 启动流程确定核心启动路径，利用消息队列调整来保证冷启动场景涉及相关消息优先调度，进而提高启动速度，具体来说包括如下：
 
 1. 创建自定义的 Printer 通过 Looper 的 setMessageLogging 接口替换原有的 Printer，并对原始的 Printer 进行转发；
-    
-2. 在 Application 的 onCreate、MainActivity 的 onResume 中更新下一个待调度的消息，Application 的 onCreate 之后预期的目标消息是 Launch Activity，MainActivity 的 onResume 之后的预期消息则是渲染相关的 doFrame 消息。为了缩小影响范围，在启动完成或者执行了非正常路径后则会对 disable 掉消息调度；
-    
-3. 消息调度的具体执行则是在自定义 Printer 的 println 方法中进行的，在 println 方法中遍历主线程消息队列，根据 message.what 和 message.getTarget()判断在消息队列中是否存在目标消息，如果存在则将其移动到头部优先执行；
-    
+
+1. 在 Application 的 onCreate、MainActivity 的 onResume 中更新下一个待调度的消息，Application 的 onCreate 之后预期的目标消息是 Launch Activity，MainActivity 的 onResume 之后的预期消息则是渲染相关的 doFrame 消息。为了缩小影响范围，在启动完成或者执行了非正常路径后则会对 disable 掉消息调度；
+
+1. 消息调度的具体执行则是在自定义 Printer 的 println 方法中进行的，在 println 方法中遍历主线程消息队列，根据 message.what 和 message.getTarget()判断在消息队列中是否存在目标消息，如果存在则将其移动到头部优先执行；
 
 ##### 1.6.2 主线程耗时消息优化
 
 通过主线程消息调度，我们可以在一定程度上解决主线程消息对启动速度的影响，但是其也存在一定的局限性：
 
 1. **只能调整已经在消息队列中的消息**，比如在 MainActivity onResme 之后存在一个耗时的主线程消息，而此时 doFrame 的消息还没有进入主线程的消息队列，那我们则需要执行完我们的耗时消息才能执行 doFrame 消息，其仍然会对启动速度有所影响；
-    
-2. **治标不治本**，虽然我们将主线程耗时消息从启动阶段移走，但是在启动后仍然会有卡顿存在。
-    
+
+1. **治标不治本**，虽然我们将主线程耗时消息从启动阶段移走，但是在启动后仍然会有卡顿存在。
 
 基于这两个原因我们需要对启动阶段主线程的耗时消息进行优化。
 
@@ -376,7 +358,7 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 
 在我们的优化过程中发现一个主线程较大的耗时，其调用堆栈第一层为 **WebViewChromiumAwInit.startChromiumLocked**，是系统 Webview 中的代码，通过分析 WebView 代码发现其是在 WebViewChromiumAwInit 的 ensureChromiumStartedLocked 中 post 到主线程的，在每个进程周期首次使用 Webview 都会执行一次，无论是在主线程还是子线程调用最终都会被 post 到主线程造成耗时，因此我们无法通过修改调用线程解决主线程卡顿的问题；同时由于是系统代码我们也无法通过修改代码实现的方式去进行解决，因此我们只能从业务层从使用的角度尝试是否可以进行优化。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 `void ensureChromiumStartedLocked(boolean onMainThread) {          //省略其他逻辑           // We must post to the UI thread to cover the case that the user has invoked Chromium           // startup by using the (thread-safe) CookieManager rather than creating a WebView.           PostTask.postTask(UiThreadTaskTraits.DEFAULT, new Runnable() {               @Override               public void run() {                   synchronized (mLock) {                       startChromiumLocked();                   }               }           });           while (!mStarted) {               try {                   // Important: wait() releases |mLock| the UI thread can take it :-)                   mLock.wait();               } catch (InterruptedException e) {               }           }       }   `
 
@@ -390,7 +372,7 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 
 事实上对于 WebViewFactoryProvider 的情况我们可以采用一个更便捷的方式。在前面的分析中我们知道 WebViewFactoryProvider 是一个接口，我们是通过反射的方式获得其在 Webview 应用中实现的方式获得的，因此我们完全可以通过**动态代理方式**生成一个 WebViewFactoryProvider 对象，去替换 WebViewFactory 中的 WebViewFactoryProvider，在生成的 WebViewFactoryProvider 类的 invoke 方法中通过方法名过滤，对于我们的白名单方法输出其调用栈。通过这样的方式我们最终定位到触发主线程耗时逻辑的是我们的 WebView UA 的获取。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **解决方案**
 
@@ -403,9 +385,8 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 前面的案例基本都是主线程相关耗时的优化，事实上除了主线程直接的耗时，**后台任务的耗时**也是会影响到我们的启动速度的，因为它们会抢占我们前台任务的 cpu、io 等资源，导致前台任务的执行时间变长，因此我们在优化前台耗时的同时也需要优化我们的后台任务。一般来说后台任务的优化与具体的业务有很强的关联性，不过我们也可以整理出来一些**共性的优化原则**：
 
 1. 减少后台线程不必要的任务的执行，特别是一些重 CPU、IO 的任务；
-    
-2. 对启动阶段线程数进行收敛，防止过多的并发任务抢占主线程资源，同时也可以避免频繁的线程间调度降低并发效率。
-    
+
+1. 对启动阶段线程数进行收敛，防止过多的并发任务抢占主线程资源，同时也可以避免频繁的线程间调度降低并发效率。
 
 除了这些通用的原则，这里也介绍两个抖音中比较典型的后台任务优化的案例。
 
@@ -415,7 +396,7 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 
 在线下情况下我们可以通过对 logcat 中“**Start proc**”等关键字进行过滤，去发现是否存在启动阶段启动子进程的情况，以及获得触发子进程启动的组件信息。对于一些复杂的工程或者是三方 sdk，我们即使知道了启动进程的组件，也比较难定位到具体的启动逻辑，我们可以通过对 startService、bindService 等启动**Service、Recevier、ContentProvider**组件调用进行插桩，输入调用堆栈的方式，结合“Start proc”中组件的去精准定位我们的触发点。除了在 manifest 中生命的进程可能还存在一些 fork 出 native 进程的情况，这种进程我们可以通过**adb shell ps**的方式去进行发现。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 2.2 GC 抑制
 
@@ -436,9 +417,8 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 首先我们来看一下抖音在类加载方面的一个优化案例。谈到类加载我们就离不开类加载的双亲委派机制，我们简单回顾一下这种机制下的类加载过程：
 
 1. 首先从已加载类中查找，如果能够找到则直接返回，找不到则调用 parent classloader 的 loadClass 进行查找；
-    
-2. 如果 parent clasloader 能找到相关类则直接返回，否则调用 findClass 去进行类加载；
-    
+
+1. 如果 parent clasloader 能找到相关类则直接返回，否则调用 findClass 去进行类加载；
 
 `protected Class<?> loadClass(String name, boolean resolve)       throws ClassNotFoundException   {           Class<?> c = findLoadedClass(name);           if (c == null) {               try {                   if (parent != null) {                       c = parent.loadClass(name, false);                   } else {                       c = findBootstrapClassOrNull(name);                   }               } catch (ClassNotFoundException e) {               }                  if (c == null) {                   c = findClass(name);               }           }           return c;   }   `
 
@@ -451,17 +431,16 @@ LayoutInflater 对 View LayoutParam 处理主要依赖于 root 参数，对于 r
 ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实现上做了一定的优化。一般情况下它的大致流程如下：
 
 1. 首先调用 PathClassLoader 的 findLoadedClass 方法去查找已加载的类中查找，这个方法将会通过 jni 调用到 ClassLinker 的 LookupClass 方法，如果能够找到则直接返回；
-    
-2. 在已加载类中找不到的情况下，不会立刻返回到 java 层，其会在 native 层去调用 ClassLinker 的 FindClassInBaseDexClasLoader 进行类查找；
-    
-3. 在 FindClassInBaseDexClasLoader 中，首先会去判断当前 ClassLoader 是否为 BootClassLoader，如果为 BootClasLoader 则尝试从当前 ClassLoader 的已加载类中查找，如果能够找到则直接返回，如果找不到则尝试使用当前 ClassLodaer 进行加载，无论能否加载到都返回；
-    
-4. 如果当前 ClassLoader 不是 BootClassLoader，则会判断是否为 PathClasLoader，如果不是 PathClassLoader 则直接返回；
-    
-5. 如果当前 ClassLoader 为 PathClassLoader，则会去判断当前 PathClassLoader 是否存在 parent，如果存在 parent 则将 parent 传入递归调用 FindClassInBaseDexClasLoader 方法，如果能够找到则直接返回；如果找不到或者当前 PathClassLoader 没有 parent 则直接在 native 层通过 DexFile 直接进行类加载。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 在已加载类中找不到的情况下，不会立刻返回到 java 层，其会在 native 层去调用 ClassLinker 的 FindClassInBaseDexClasLoader 进行类查找；
+
+1. 在 FindClassInBaseDexClasLoader 中，首先会去判断当前 ClassLoader 是否为 BootClassLoader，如果为 BootClasLoader 则尝试从当前 ClassLoader 的已加载类中查找，如果能够找到则直接返回，如果找不到则尝试使用当前 ClassLodaer 进行加载，无论能否加载到都返回；
+
+1. 如果当前 ClassLoader 不是 BootClassLoader，则会判断是否为 PathClasLoader，如果不是 PathClassLoader 则直接返回；
+
+1. 如果当前 ClassLoader 为 PathClassLoader，则会去判断当前 PathClassLoader 是否存在 parent，如果存在 parent 则将 parent 传入递归调用 FindClassInBaseDexClasLoader 方法，如果能够找到则直接返回；如果找不到或者当前 PathClassLoader 没有 parent 则直接在 native 层通过 DexFile 直接进行类加载。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到当 PathClassLoader 到 BootClassLoader 的 ClassLoadeer 链路上只有 PathClassLoader 时，java 层的 findLoadedClass 方法调用后，并不止如其字面含义的去已加载的类中查找，其还会在 native 层直接通过 DexFile 去加载类，这种方式相对于回到 java 层调用 findClass 再调回 native 层通过 DexFile 加载可以减少一次不必要的 jni 调用，在运行效率上是更高的，这是 art 虚拟机对类加载效率的一个优化。
 
@@ -470,24 +449,22 @@ ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实�
 在前面我们介绍了 Android 中的类加载相关机制，那么我们究竟在类加载方面做了哪些优化，要解答这个问题我们需要了解一下抖音中的**ClassLoader 模型**。在抖音中为了减少包体积，一些非核心功能我们通过插件化的方式进行了动态下发。在接入插件化框架后抖音中的 ClassLoader 模型如下：
 
 1. 除了原有的 BootClassLoader 和 PathClassLoader 另外引入了 DelegateClassLoader 和 PluginClasLoader；
-    
-2. DelegateClassloader 全局 1 个，它是 PathClassLoader 的 parent，它的 parent 为 BootClassLoader；
-    
-3. PluginClassLoader 每个插件一个，它的 parent 为 BootClassLoader；
-    
-4. DelegateClassLoader 会持有 PluginClassLoader 的引用，PluginClassLoader 则会持有 PathClasloader 的引用；
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. DelegateClassloader 全局 1 个，它是 PathClassLoader 的 parent，它的 parent 为 BootClassLoader；
+
+1. PluginClassLoader 每个插件一个，它的 parent 为 BootClassLoader；
+
+1. DelegateClassLoader 会持有 PluginClassLoader 的引用，PluginClassLoader 则会持有 PathClasloader 的引用；
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这种 ClassLoader 模型有一个非常明显的优点，那就是它能够非常方便的同时支持类的隔离、复用以及插件化与组件化的切换；
 
 1. **类的隔离**：如果在宿主和多个插件中存在同名类，在宿主中使用某个类则会首先从宿主 apk 加载，在插件中使用某个类，则会优先从当前插件的 apk 中加载，这种加载机制单 ClassLoader 模型的插件框架是无法支持的；
-    
-2. **类的复用**：在宿主中使用某个插件中特有的类时，我们可以在 DelegateClassLoader 中检测到类加载失败，进而使用 PluginClassLoader 去插件中加载，实现宿主复用插件中的类；在插件中使用某个宿主特有的类时，可以在 PluginClassLoader 中检测到类加载失败，进而使用 PathClassLoader 去进行加载，实现插件复用宿主中的类，这种复用机制其他多 ClassLoader 模型的插件框是无法支持的；
-    
-3. **插件化与组件化自由切换**：这种 ClassLoader 模型下，我们加载宿主/插件中的类时无需任何显示的 ClassLoader 的指定，我们可以很方便的在直接依赖的组件化方式以及 compileonly+插件化的方式之间切换；
-    
+
+1. **类的复用**：在宿主中使用某个插件中特有的类时，我们可以在 DelegateClassLoader 中检测到类加载失败，进而使用 PluginClassLoader 去插件中加载，实现宿主复用插件中的类；在插件中使用某个宿主特有的类时，可以在 PluginClassLoader 中检测到类加载失败，进而使用 PathClassLoader 去进行加载，实现插件复用宿主中的类，这种复用机制其他多 ClassLoader 模型的插件框是无法支持的；
+
+1. **插件化与组件化自由切换**：这种 ClassLoader 模型下，我们加载宿主/插件中的类时无需任何显示的 ClassLoader 的指定，我们可以很方便的在直接依赖的组件化方式以及 compileonly+插件化的方式之间切换；
 
 **ART 类加载优化机制被破坏**
 
@@ -510,13 +487,12 @@ ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实�
 上面的方案无需侵入业务改造成本很小，但是它只是优化了 Application 阶段的类加载，后续阶段 ART 对类加载的优化仍然无法享受到，从极致性能的角度我们做了进一步的优化。我们优化的核心思想就是把 DelegateClassloader 从 PathClassLoader 和 BootClassLoader 之间彻底去除掉，通过其他方式来解决宿主加载插件类的问题。通过分析我们可以知道宿主加载插件的类主要有几种方式：
 
 1. 通过 Class.forName 的方式去反射加载插件的类；
-    
-2. 通过 compileOnly 隐式依赖插件的类，运行时直接加载插件的类；
-    
-3. 启动插件的四大组件时加载插件的组件类；
-    
-4. 在 xml 中使用插件的类；
-    
+
+1. 通过 compileOnly 隐式依赖插件的类，运行时直接加载插件的类；
+
+1. 启动插件的四大组件时加载插件的组件类；
+
+1. 在 xml 中使用插件的类；
 
 因此我们的问题就变成了在不注入 ClassLoader 的情况下，如何实现宿主加载插件的这四大类。
 
@@ -525,13 +501,12 @@ ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实�
 接下来是**compileOnly 的隐式依赖**，这种方式比较难进行通用处理，因为我们无法找到一个合适的时机去对类加载失败进行兜底。针对这个问题我们的解决办法就是进行业务的改造，将 compileOnly 的隐式依赖调用的方式改成通过 Class.forName 的方式，之所以进行这样的改造主要是基于几下几点考虑：
 
 1. 首先抖音中 compileOnly 隐式依赖调用的方式非常少，改造成本相对可控；
-    
-2. 其次 compileOnly 的方式在插件的使用上虽然便捷，但是它在入口上不够收敛，在插件加载管控、问题排查、插件宿主版本间兼容上都存在一定的问题，通过 Class.forName + 接口化的方式可以较好的解决这些问题。
-    
+
+1. 其次 compileOnly 的方式在插件的使用上虽然便捷，但是它在入口上不够收敛，在插件加载管控、问题排查、插件宿主版本间兼容上都存在一定的问题，通过 Class.forName + 接口化的方式可以较好的解决这些问题。
 
 插件四大组件类的加载和 xml 中使用插件类的问题都可以通过同一个方案来解决——将 LoadedApk 中的 ClassLoader 替换为**DelegateClassLoader**，这样无论是四大组件 class 的加载还是 LayoutInflate 加载 xml 时的 class 加载都会使用 DelegateClassLoader 加载，关于这部分的原理大家可以参考 DroidPlugin、Replugin 等相关插件化原理解析，这里就不展开介绍了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ##### 3.1.2 Class verify 优化
 
@@ -539,13 +514,13 @@ ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实�
 
 一般情况下 Android 中的 class 在应用安装或插件加载时就会进行 verify，但是存在一些特定 case，比如 Android10 之后的插件、插件编译采用 extract filter 类型、宿主与插件相互依赖导致静态 verify 失败等情况，则需要在运行时进行 verify。运行 verify 的过程除了会校验 class，还会触发它所依赖 class 的 load，从而造成耗时。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 事实上 classverify 主要是针对网络下发的字节码进行校验，对于我们的插件代码其在编译的过程中就会去校验 class 的合法性，而且即使真的出现了非法的 class，最多也是将 verify 阶段抛出的异常转移到 class 使用的时候。
 
 因此我们可以认为，运行时的 classverify 是没有必要的，可以通过**关闭 classverrify**来优化这些类的加载。关于关闭 classverify 目前业界已经有一些比较优秀的方案，比如运行时在内存中定位出 verify_所在内存地址，然后将其设置成跳过 verify 模式以实现跳过 classverify。
 
- `// If kNone, verification is disabled. kEnable by default.     verifier::VerifyMode verify_;           // If true, the runtime may use dex files directly with the interpreter if an oat file is not available/usable.     bool allow_dex_file_fallback_;           // List of supported cpu abis.     std::vector<std::string> cpu_abilist_;           // Specifies target SDK version to allow workarounds for certain API levels.     int32_t target_sdk_version_;`
+`// If kNone, verification is disabled. kEnable by default.     verifier::VerifyMode verify_;           // If true, the runtime may use dex files directly with the interpreter if an oat file is not available/usable.     bool allow_dex_file_fallback_;           // List of supported cpu abis.     std::vector<std::string> cpu_abilist_;           // Specifies target SDK version to allow workarounds for certain API levels.     int32_t target_sdk_version_;`
 
 当然关闭 classverify 的优化方案并不一定对所有的应用都有价值，在进行优化之前可以通过 oatdump 命令输出一下宿主、插件中在运行时进行 classverify 的类信息，对于存在大量类在运行时 verify 的情况可以采用上面介绍的方案进行优化。
 
@@ -556,21 +531,20 @@ ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实�
 在全局优化方面，还有一些其他比较通用的优化方案，这里也进行一些简单的介绍，以供大家参考：
 
 - **高频方法优化**：对服务发现(spi)、实验开关读取等高频调用方法进行优化，将原本在运行时的注解读取、反射等操作前置到编译阶段，通过编译阶段直接生成目标代码替换原有调用实现执行速度的提升；
-    
+
 - **IO 优化**：通过减少启动阶段不必要的 IO、对关键链路上的 IO 进行预读以及其他通用的 IO 优化方案提升 IO 效率；
-    
+
 - **binder 优化**：对启动阶段一些会多次调用的 binder 进行结果缓存以减少 IPC 的次数，比如我们应用自身的 packageinfo 的获取、网络状态获取等；
-    
+
 - **锁优化**：通过去除不必要的锁、降低锁粒度、减少持锁时间以及其他通用的方案减少锁问题对启动的影响
-    
+
 - **字节码执行优化**：通过方法调用内联的方式，减少一些不必要的字节码的执行，目前已经以插件的方式集成在抖音的字节码开源框架 Bytex 中（详见 Bytex 介绍）；
-    
+
 - **预加载优化**：充分利用系统的并发能力，通过用户画像、端智能预测等方式在异步线程对各类资源进行精准精准预加载，以达到消除或者减少关键节点耗时的目的，可供预加载的内容包括 sp、resource、view、class 等；
-    
+
 - **线程调度优化**：通过任务的动态优先级调整以及在不同 CPU 核心上的负载均衡等手段，降低 Sleeping 状态和 Uninterrupible Sleeping 耗时，在不提高 CPU 频率的情况下，提高 CPU 时间片的利用率（由 Client Infrastructure-App Health 团队提供解决方案）；
-    
+
 - **厂商合作**：与厂商合作通过 CPU 绑核、提频等方式获取到更多的系统资源，以达到提升启动速度的目的；
-    
 
 ## 总结与展望
 
@@ -610,9 +584,7 @@ ART 虚拟机在类加载方面仍然遵循双亲委派的原则，不过在实�
 
 公众号
 
-  
-
-  **![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  点击“阅读原文”了解岗位详情！**
+**!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)  点击“阅读原文”了解岗位详情！**
 
 抖音14
 
@@ -635,39 +607,38 @@ android8
 **留言 4**
 
 - Gary
-    
-    2022年3月25日
-    
-    赞5
-    
-    牛了牛了，请问怎样能加入抖音的Android基础技术团队呢？![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    置顶
-    
-    字节跳动技术团队
-    
-    作者2022年3月25日
-    
-    赞3
-    
-    对抖音工作机会感兴趣的同学可以点击“阅读原文”，进入字节跳动招聘官网查询「抖音基础技术 Android」相关职位，也可以邮件联系：fengda.1@bytedance.com 咨询相关信息或者直接发送简历内推！
-    
+
+  2022年3月25日
+
+  赞5
+
+  牛了牛了，请问怎样能加入抖音的Android基础技术团队呢？![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  置顶
+
+  字节跳动技术团队
+
+  作者2022年3月25日
+
+  赞3
+
+  对抖音工作机会感兴趣的同学可以点击“阅读原文”，进入字节跳动招聘官网查询「抖音基础技术 Android」相关职位，也可以邮件联系：fengda.1@bytedance.com 咨询相关信息或者直接发送简历内推！
+
 - 陈小凡
-    
-    2022年3月25日
-    
-    赞5
-    
-    杭州团队也有HC的！可以联系置顶邮箱投递哦，注明是杭州哦！![[可怜]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月25日
+
+  赞5
+
+  杭州团队也有HC的！可以联系置顶邮箱投递哦，注明是杭州哦！![[可怜]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 想不出好名字
-    
-    2022年3月25日
-    
-    赞1
-    
-    splash和main合并后，启动模式的问题，我们是通过router拦截中增加flag的方案来实现的，当然前提是站内站外的跳转都必须通过router。
-    
+
+  2022年3月25日
+
+  赞1
+
+  splash和main合并后，启动模式的问题，我们是通过router拦截中增加flag的方案来实现的，当然前提是站内站外的跳转都必须通过router。
 
 已无更多数据
 
@@ -686,38 +657,37 @@ android8
 **留言 4**
 
 - Gary
-    
-    2022年3月25日
-    
-    赞5
-    
-    牛了牛了，请问怎样能加入抖音的Android基础技术团队呢？![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    置顶
-    
-    字节跳动技术团队
-    
-    作者2022年3月25日
-    
-    赞3
-    
-    对抖音工作机会感兴趣的同学可以点击“阅读原文”，进入字节跳动招聘官网查询「抖音基础技术 Android」相关职位，也可以邮件联系：fengda.1@bytedance.com 咨询相关信息或者直接发送简历内推！
-    
+
+  2022年3月25日
+
+  赞5
+
+  牛了牛了，请问怎样能加入抖音的Android基础技术团队呢？![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[坏笑]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  置顶
+
+  字节跳动技术团队
+
+  作者2022年3月25日
+
+  赞3
+
+  对抖音工作机会感兴趣的同学可以点击“阅读原文”，进入字节跳动招聘官网查询「抖音基础技术 Android」相关职位，也可以邮件联系：fengda.1@bytedance.com 咨询相关信息或者直接发送简历内推！
+
 - 陈小凡
-    
-    2022年3月25日
-    
-    赞5
-    
-    杭州团队也有HC的！可以联系置顶邮箱投递哦，注明是杭州哦！![[可怜]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2022年3月25日
+
+  赞5
+
+  杭州团队也有HC的！可以联系置顶邮箱投递哦，注明是杭州哦！![[可怜]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 想不出好名字
-    
-    2022年3月25日
-    
-    赞1
-    
-    splash和main合并后，启动模式的问题，我们是通过router拦截中增加flag的方案来实现的，当然前提是站内站外的跳转都必须通过router。
-    
+
+  2022年3月25日
+
+  赞1
+
+  splash和main合并后，启动模式的问题，我们是通过router拦截中增加flag的方案来实现的，当然前提是站内站外的跳转都必须通过router。
 
 已无更多数据

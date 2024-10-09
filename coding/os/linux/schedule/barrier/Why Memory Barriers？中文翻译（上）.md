@@ -18,9 +18,9 @@ Getting a more detailed answer to this question requires a good understanding of
 
 1. present the structure of a cache,
 
-2. describe how cache-coherency protocols ensure that CPUs agree on the value of each location in memory, and, finally,
+1. describe how cache-coherency protocols ensure that CPUs agree on the value of each location in memory, and, finally,
 
-3. outline how store buffers and invalidate queues help caches and cache-coherency protocols achieve high performance.
+1. outline how store buffers and invalidate queues help caches and cache-coherency protocols achieve high performance.
 
 如果你想了解更多，需要充分理解CPU cache是如何工作的以及如何让CPU cache更好的工作，本文的主要内容包括：
 
@@ -42,12 +42,12 @@ Modern CPUs are much faster than are modern memory systems. A 2006 CPU might be 
 
 [![mcscs](http://www.wowotech.net/content/uploadfile/201512/5b66f900dc6d7e2e60f28d103444c0d820151210110913.gif "mcscs")](http://www.wowotech.net/content/uploadfile/201512/f67b56f268b224252770556a803050ba20151210110912.gif)
 
-Data flows among the CPUs’ caches and memory in fixed-length blocks called “cache lines”, which are normally  
+Data flows among the CPUs’ caches and memory in fixed-length blocks called “cache lines”, which are normally\
 a power of two in size, ranging from 16 to 256 bytes. When a given data item is first accessed by a given CPU, it will be absent from that CPU’s cache, meaning that a “cache miss” (or, more specifically, a “startup”or warmup” cache miss) has occurred. The cache miss means that the CPU will have to wait (or be “stalled”) for hundreds of cycles while the item is fetched from memory. However, the item will be loaded into that CPU’s cache, so that subsequent accesses will find it in the cache and therefore run at full speed.
 
 CPU cache和memory系统使用固定大小的数据块来进行交互，这个数据块被称为cache line，cache line的size一般是2的整数次幂，根据设计的不同，从16B到256B不等。当CPU首次访问某个数据的时候，它没有在cpu cache中，我们称之为cache miss（更准确的说法是startup或者warmup cache miss）。在这种情况下，cpu需要花费几百个cycle去把该数据对应的cacheline从memory中加载到cpu cache中，而在这个过程中，cpu只能是等待那个耗时内存操作完成。一旦完成了cpu cache数据的加载，随后的访问会由于数据在cache中而使得cpu全速运行。
 
-After some time, the CPU’s cache will fill, and subsequent misses will likely need to eject an item from the cache in order to make room for the newly fetched item. Such a cache miss is termed a “capacity miss”, because it is caused by the cache’s limited capacity. However, most caches can be forced to eject an old item to make room for a new item even when they are not yet full. This is due to the fact that large caches are implemented as hardware hash tables with fixed-size hash buckets (or “sets”, as CPU designers call them) and no chaining, as shown in  
+After some time, the CPU’s cache will fill, and subsequent misses will likely need to eject an item from the cache in order to make room for the newly fetched item. Such a cache miss is termed a “capacity miss”, because it is caused by the cache’s limited capacity. However, most caches can be forced to eject an old item to make room for a new item even when they are not yet full. This is due to the fact that large caches are implemented as hardware hash tables with fixed-size hash buckets (or “sets”, as CPU designers call them) and no chaining, as shown in\
 Figure C.2.
 
 运行一段时间之后，cpu cache的所有cacheline都会被填充有效的数据，这时候的，要加载新的数据到cache中必须将其他原来有效的cache数据“强制驱离”（一般选择最近最少使用的那些cacheline）。这种cache miss被称为capacity miss，因为CPU cache的容量有限，必须为新数据找到空闲的cacheline。有的时候，即便是cache中还有idle的cacheline，旧的cache数据也会被“强制驱离”，以便为新的数据加载到cacheline中做准备。当然，这是和cache的组织有关。size比较大的cache往往实现成hash table（为了硬件性能），所有的cache line被分成了若干个固定大小的hash buckets（更专业的术语叫做set），这些hash buckets之间不是形成链表，而是类似阵列，具体如下图所示：
@@ -90,18 +90,18 @@ MESI stands for “modified”, “exclusive”, “shared”, and “invalid”
 
 MESI是“modified”, “exclusive”, “shared”, 和 “invalid”首字母的大写，当使用MESI cache-coherence 协议的时候，cacheline可以处于这四个状态中的一个，因此，HW工程师设计cache的时候，除了物理地址和具体的数据之外，还需要为每一个cacheline设计一个2-bit的tag来标识该cacheline的状态。
 
-A line in the “modified” state has been subject to a recent memory store from the corresponding CPU, and the corresponding memory is guaranteed not to appear in any other CPU’s cache. Cache lines in the “modified”state can thus be said to be “owned” by the CPU. Because this cache holds the only up-to-date copy of the data, this  
+A line in the “modified” state has been subject to a recent memory store from the corresponding CPU, and the corresponding memory is guaranteed not to appear in any other CPU’s cache. Cache lines in the “modified”state can thus be said to be “owned” by the CPU. Because this cache holds the only up-to-date copy of the data, this\
 cache is ultimately responsible for either writing it back to memory or handing it off to some other cache, and must do so before reusing this line to hold other data.
 
 处于modified状态的cacheline说明近期有过来自对应cpu的写操作，同时也说明该该数据不会存在其他cpu对应的cache中。因此，处于modified状态的cacheline也可以说是被该CPU独占。而又因为只有该CPU的cache保存了最新的数据（最终的memory中都没有更新），所以，该cache需要对该数据负责到底。例如根据请求，该cache将数据及其控制权传递到其他cache中，或者cache需要负责将数据写回到memory中，而这些操作都需要在reuse该cache line之前完成。
 
-The “exclusive” state is very similar to the “modified”state, the single exception being that the cache line has not yet been modified by the corresponding CPU, which in turn means that the copy of the cache line’s data that resides in memory is up-to-date. However, since the CPU can store to this line at any time, without consulting other CPUs, a line in the “exclusive” state can still be said to be owned by the corresponding CPU. That said, because the corresponding value in memory is up to date, this cache can discard this data without writing it back to memory  
+The “exclusive” state is very similar to the “modified”state, the single exception being that the cache line has not yet been modified by the corresponding CPU, which in turn means that the copy of the cache line’s data that resides in memory is up-to-date. However, since the CPU can store to this line at any time, without consulting other CPUs, a line in the “exclusive” state can still be said to be owned by the corresponding CPU. That said, because the corresponding value in memory is up to date, this cache can discard this data without writing it back to memory\
 or handing it off to some other CPU.
 
 exclusive状态和modified状态非常类似，唯一的区别是对应CPU还没有修改cacheline中的数据，也正因为还没有修改数据，因此memory中对应的data也是最新的。在exclusive状态下，cpu也可以不通知其他CPU cache而直接对cacheline进行操作，因此，exclusive状态也可以被认为是被该CPU独占。由于memory中的数据和cacheline中的数据都是最新的，因此，cpu不需对exclusive状态的cacheline执行写回的操作或者将数据以及归属权转交其他cpu cache，而直接reuse该cacheline（将cacheine中的数据丢弃，用作他用）。
 
-A line in the “shared” state might be replicated in at least one other CPU’s cache, so that this CPU is not permitted to store to the line without first consulting with other CPUs. As with the “exclusive” state, because the  
-corresponding value in memory is up to date, this cache can discard this data without writing it back to memory  
+A line in the “shared” state might be replicated in at least one other CPU’s cache, so that this CPU is not permitted to store to the line without first consulting with other CPUs. As with the “exclusive” state, because the\
+corresponding value in memory is up to date, this cache can discard this data without writing it back to memory\
 or handing it off to some other CPU.
 
 处于share状态的cacheline，其数据可能在一个或者多个CPU cache中，因此，处于这种状态的cache line，CPU不能直接修改cacheline的数据，而是需要首先和其他CPU cache进行沟通。和exclusive状态类似，处于share状态的cacheline对应的memory中的数据也是最新的，因此，cpu也可以直接丢弃cacheline中的数据而不必将其转交给其他CPU cache或者写回到memory中。
@@ -110,7 +110,7 @@ A line in the “invalid” state is empty, in other words, it holds no data. Wh
 
 处于invalid状态的cacheline是空的，没有数据。当新的数据要进入cache的时候，优选状态是invalid的cacheline，之所以如此是因为如果选中其他状态的cacheline，则说明需要替换cacheline数据，而未来如果再次访问这个被替换掉的cacheline数据的时候将遇到开销非常大的cache miss。
 
-Since all CPUs must maintain a coherent view of the data carried in the cache lines, the cache-coherence protocol  
+Since all CPUs must maintain a coherent view of the data carried in the cache lines, the cache-coherence protocol\
 provides messages that coordinate the movement of cache lines through the system.
 
 由于所有的CPU需要通过其cache看到一致性的数据，因此cache-coherence协议被用来协调cacheline数据在系统中的移动。
@@ -145,7 +145,7 @@ Many of the transitions described in the previous section require communication 
 
 6、Writeback。该message包括两个参数，一个是地址，另外一个是写回的数据。该消息用在modified状态的cacheline被驱逐出境（给其他数据腾出地方）的时候发出，该命名用来将最新的数据写回到memory（或者其他的CPU cache中）。
 
-Interestingly enough, a shared-memory multiprocessor system really is a message-passing computer under the covers. This means that clusters of SMP machines that use distributed shared memory are using message passing  
+Interestingly enough, a shared-memory multiprocessor system really is a message-passing computer under the covers. This means that clusters of SMP machines that use distributed shared memory are using message passing\
 to implement shared memory at two different levels of the system architecture.
 
 有意思的是基于共享内存的多核系统其底层是基于消息传递的计算机系统。这也就意味着由多个SMP 机器组成的共享内存的cluster系统在两个不同的level上使用了消息传递机制，一个是SMP内部的message passing，另外一个是SMP机器之间的。
@@ -182,7 +182,7 @@ Transition (e): The CPU does an atomic readmodify-write operation on a data item
 
 Transition (e)：CPU需要执行一个原子的readmodify-write操作，并且其local cache中有read only的缓存数据（cacheline处于shared状态），这时候，CPU就会在总线上发送一个invalidate请求其他cpu清空自己的local copy，以便完成其独自霸占对该数据的所有权的梦想。同样的，该cpu必须收集所有其他cpu发来的invalidate acknowledge之后，才算完成整个bus transaction。
 
-Transition (f): Some other CPU reads the cache line, and it is supplied from this CPU’s cache, which retains  
+Transition (f): Some other CPU reads the cache line, and it is supplied from this CPU’s cache, which retains\
 a read-only copy, possibly also writing it back to memory. This transition is initiated by the reception of a “read” message, and this CPU responds with a “read response” message containing the requested data.
 
 Transition (f)：在本cpu独自享受独占数据的时候，其他的cpu发起read请求，希望获取数据，这时候，本cpu必须以其local cacheline的数据回应，并以read response回应之前总线上的read请求。这时候，本cpu失去了独占权，该cacheline状态从Modified状态变成shared状态（有可能也会进行写回的动作）。
@@ -221,10 +221,10 @@ OK，在理解了各种cacheline状态、各种MESI协议消息以及状态迁�
 
 第一列是操作序列号，第二列是执行操作的CPU，第三列是具体执行哪一种操作，第四列描述了各个cpu local cache中的cacheline的状态（用meory address/状态表示），最后一列描述了内存在0地址和8地址的数据内容的状态：V表示是最新的，和cache一致，I表示不是最新的内容，最新的内容保存在cache中。
 
-Initially, the CPU cache lines in which the data would reside are in the “invalid” state, and the data is valid in memory. When CPU 0 loads the data at address 0, it enters the “shared” state in CPU 0’s cache, and is still  
-valid in memory. CPU 3 also loads the data at address 0, so that it is in the “shared” state in both CPUs’ caches, and is still valid in memory. Next CPU 0 loads some other cache line (at address 8), which forces the data at  
-address 0 out of its cache via an invalidation, replacing it with the data at address 8. CPU 2 now does a load from address 0, but this CPU realizes that it will soon need to store to it, and so it uses a “read invalidate” message in order to gain an exclusive copy, invalidating it from CPU 3’s cache (though the copy in memory remains up to  
-date). Next CPU 2 does its anticipated store, changing the state to “modified”. The copy of the data in memory is  
+Initially, the CPU cache lines in which the data would reside are in the “invalid” state, and the data is valid in memory. When CPU 0 loads the data at address 0, it enters the “shared” state in CPU 0’s cache, and is still\
+valid in memory. CPU 3 also loads the data at address 0, so that it is in the “shared” state in both CPUs’ caches, and is still valid in memory. Next CPU 0 loads some other cache line (at address 8), which forces the data at\
+address 0 out of its cache via an invalidation, replacing it with the data at address 8. CPU 2 now does a load from address 0, but this CPU realizes that it will soon need to store to it, and so it uses a “read invalidate” message in order to gain an exclusive copy, invalidating it from CPU 3’s cache (though the copy in memory remains up to\
+date). Next CPU 2 does its anticipated store, changing the state to “modified”. The copy of the data in memory is\
 now out of date. CPU 1 does an atomic increment, using a “read invalidate” to snoop the data from CPU 2’s cache and invalidate it, so that the copy in CPU 1’s cache is in the “modified” state (and the copy in memory remains out of date). Finally, CPU 1 reads the cache line at address 8, which uses a “writeback” message to push address 0’s data back out to memory.
 
 最开始的时候（sequence 0），各个cpu cache中的cacheline都是Invalid状态，而Memory中的数据都保存了最新的数据。随后（sequence 1），CPU 0执行了load操作，将address 0的数据加载到寄存器，这个操作使得保存0地址数据的那个cacheline从invalid状态迁移到shared状态。随后（sequence 2），CPU3也对0地址执行了load操作，导致其local cache上对应的cacheline也切换到shared状态。当然，这时候，memory仍然是最新的。在sequence 3中，CPU 0执行了对地址8的load操作，由于地址0和地址8都是选择同一个cache set，而且，我们之前已经说过，该cache是direct-mapped的（即每个set只有一个cacheline），因此需要首先清空该cacheline中的数据（该操作被称为Invalidation），由于cacheline的状态是shared，因此，不需要通知其他CPU。Invalidation local cache上的cacheline之后，cpu 0的load操作将该cacheline状态修改成Shared状态（保存地址8的数据）。CPU 2也开始执行load操作了（sequence 4），虽然是load操作，但是CPU知道程序随后会修改该值（不是原子操作的read-modify-write，否就是迁移到Modified状态了，也不是单纯的load操作，否则会迁移到shared状态），因此向总线发送了read invalidate命令，一方面获取该数据（自己的local cache中没有地址0的数据），另外，CPU 2想独占该数据（因为随后要write）。这个操作导致CPU 3的cacheline迁移到invalid状态。当然，这时候，memory仍然是最新的有效数据。CPU 2的store操作很快到来（Sequence 5），由于准备工作做的比较充分（Exclusive状态，独占该数据），cpu直接修改cacheline中的数据（对应地址0），从而将其状态迁移到modified状态，同时要注意的是：memory中的数据已经失效，不是最新的数据了，任何其他CPU发起对地址0的load操作都不能从memory中读取，而是通过嗅探（snoop）的方式从CPU 2的local cache中获取。在sequence 6中，CPU 1对地址0的数据执行原子的加1操作，这时候CPU 1会发出read invalidate命令，将地址0的数据从CPU 2的cacheline中嗅探得到，同时通过invalidate其他CPU local cache的内容而获得独占性的数据访问权。这时候，CPU 2中的cacheline状态变成invalid状态，而CPU 1将从invalid状态迁移到modified状态。最后（sequence 7），CPU 1对地址8进行load操作，由于cacheline被地址0占据，因此需要首先将其驱逐出cache，于是执行write back操作将地址0的数据写回到memory，同时发送read命名，从CPU 0的cache中获得数据加载其cacheline，最后，CPU1的cache变成shared状态（保存地址8的数据）。由于执行了write back操作，memory中地址0的数据又变成最新的有效数据了。
@@ -245,7 +245,7 @@ But there is no real reason to force CPU 0 to stall for so long — after all, r
 
 1、Store Buffers
 
-One way to prevent this unnecessary stalling of writes is to add “store buffers” between each CPU and its cache,  
+One way to prevent this unnecessary stalling of writes is to add “store buffers” between each CPU and its cache,\
 as shown in Figure C.5. With the addition of these store buffers, CPU 0 can simply record its write in its store buffer and continue executing. When the cache line does finally make its way from CPU 1 to CPU 0, the data will be moved from the store buffer to the cache line.
 
 有一种可以阻止cpu进入无聊等待状态的方法就是在CPU和cache之间增加store buffer这个HW block，如下图所示：
@@ -264,13 +264,13 @@ To see the first complication, a violation of selfconsistency, consider the foll
 
 上文提到store buffer引入了复杂性，我们先看第一个例子：本地数据不一致的问题。我们先看看下面的代码：
 
-> 1 a = 1;  
-> 2 b = a + 1;  
+> 1 a = 1;\
+> 2 b = a + 1;\
 > 3 assert(b == 2);
 
 a和b都是初始化为0，并且变量a在CPU 1的cacheline中，变量b在CPU 0的cacheline中。
 
-One would not expect the assertion to fail. However, if one were foolish enough to use the very simple architecture  
+One would not expect the assertion to fail. However, if one were foolish enough to use the very simple architecture\
 shown in Figure C.5, one would be surprised. Such a system could potentially see the following sequence of events:
 
 如果cpu执行上述代码，那么第三行的assert不应该失败，不过，如果CPU设计者使用上图中的那个非常简单的store buffer结构，那么你应该会遇到“惊喜”（assert失败了）。具体的执行过程是这样的：
@@ -301,7 +301,7 @@ The problem is that we have two copies of “a”, one in the cache and the othe
 
 导致这个问题的根本原因是我们有两个a值，一个在cacheline中，一个在store buffer中。
 
-This example breaks a very important guarantee, namely that each CPU will always see its own operations  
+This example breaks a very important guarantee, namely that each CPU will always see its own operations\
 as if they happened in program order. Breaking this guarantee is violently counter-intuitive to software types, so much so that the hardware guys took pity and implemented “store forwarding”, where each CPU refers to (or “snoops”) its store buffer as well as its cache when performing loads, as shown in Figure C.6. In other words, a given CPU’s stores are directly forwarded to its subsequent loads, without having to pass through the cache.
 
 上面这个出错的例子之所以发生是因为它违背了一个基本的原则，即每个CPU按照其视角来观察自己的行为的时候必须是符合program order的。一旦违背这个原则，会导致一些非常不直观的软件行为，对软件工程师而言就是灾难。还好，有”好心“的硬件工程师帮助我们，修改了CPU的设计如下：
@@ -318,16 +318,16 @@ To see the second complication, a violation of global memory ordering, consider 
 
 关于store buffer引入的复杂性，我们再来看看第二个例子：
 
-> 1 void foo(void)  
-> 2 {  
-> 3 a = 1;  
-> 4 b = 1;  
-> 5 }  
-> 6  
-> 7 void bar(void)  
-> 8 {  
-> 9 while (b == 0) continue;  
-> 10 assert(a == 1);  
+> 1 void foo(void)\
+> 2 {\
+> 3 a = 1;\
+> 4 b = 1;\
+> 5 }\
+> 6\
+> 7 void bar(void)\
+> 8 {\
+> 9 while (b == 0) continue;\
+> 10 assert(a == 1);\
 > 11 }
 
 同样的，a和b都是初始化成0.
@@ -348,7 +348,7 @@ Suppose CPU 0 executes foo() and CPU 1 executes bar(). Suppose further that the 
 
 （6） CPU 1 can now finish executing while (b == 0) continue, and since it finds that the value of “b” is 1, it proceeds to the next statement. 由于b值等于1了，因此CPU 1跳出while (b == 0)的循环，继续前行。
 
-（7） CPU 1 executes the assert(a == 1), and, since CPU 1 is working with the old value of “a”, this  
+（7） CPU 1 executes the assert(a == 1), and, since CPU 1 is working with the old value of “a”, this\
 assertion fails. CPU 1执行assert(a == 1)，这时候CPU 1的local cache中还是旧的a值，因此assert(a == 1)失败。
 
 （8） CPU 1 receives the “read invalidate” message, and transmits the cache line containing “a” to CPU 0 and invalidates this cache line from its own cache. But it is too late. CPU 1收到了来自CPU 0的read invalidate消息，以a变量的值进行回应，同时清空自己的cacheline，但是这已经太晚了。
@@ -359,20 +359,20 @@ The hardware designers cannot help directly here, since the CPUs have no idea wh
 
 遇到这样的问题，CPU设计者也不能直接帮什么忙，毕竟CPU并不知道哪些变量有相关性，这些变量是如何相关的。不过CPU设计者可以间接提供一些工具让软件工程师来控制这些相关性。这些工具就是memory-barrier指令。要想程序正常运行，必须增加一些memory barrier的操作，具体如下：
 
-> 1 void foo(void)  
-> 2 {  
-> 3 a = 1;  
-> 4 smp_mb();  
-> 5 b = 1;  
-> 6 }  
-> 7  
-> 8 void bar(void)  
-> 9 {  
-> 10 while (b == 0) continue;  
-> 11 assert(a == 1);  
+> 1 void foo(void)\
+> 2 {\
+> 3 a = 1;\
+> 4 smp_mb();\
+> 5 b = 1;\
+> 6 }\
+> 7\
+> 8 void bar(void)\
+> 9 {\
+> 10 while (b == 0) continue;\
+> 11 assert(a == 1);\
 > 12 }
 
-The memory barrier smp_mb() will cause the CPU to flush its store buffer before applying each subsequent store to its variable’s cache line. The CPU could either simply stall until the store buffer was empty before proceeding, or it could use the store buffer to hold subsequent stores until all of the prior entries in the store buffer had been applied.  
+The memory barrier smp_mb() will cause the CPU to flush its store buffer before applying each subsequent store to its variable’s cache line. The CPU could either simply stall until the store buffer was empty before proceeding, or it could use the store buffer to hold subsequent stores until all of the prior entries in the store buffer had been applied.\
 With this latter approach the sequence of operations might be as follows:
 
 smp_mb() 这个内存屏障的操作会在执行后续的store操作之前，首先flush store buffer（也就是将之前的值写入到cacheline中）。smp_mb() 操作主要是为了让数据在local cache中的操作顺序是符合program order的顺序的，为了达到这个目标有两种方法：方法一就是让CPU stall，直到完成了清空了store buffer（也就是把store buffer中的数据写入cacheline了）。方法二是让CPU可以继续运行，不过需要在store buffer中做些文章，也就是要记录store buffer中数据的顺序，在将store buffer的数据更新到cacheline的操作中，严格按照顺序执行，即便是后来的store buffer数据对应的cacheline已经ready，也不能执行操作，要等前面的store buffer值写到cacheline之后才操作。增加smp_mb() 之后，操作顺序如下：
@@ -385,12 +385,12 @@ smp_mb() 这个内存屏障的操作会在执行后续的store操作之前，首
 
 （4） CPU 0 executes b = 1. It already owns this cache line (in other words, the cache line is already in either the “modified” or the “exclusive” state), but there is a marked entry in the store buffer. Therefore, rather than store the new value of “b” in the cache line, it instead places it in the store buffer (but in an unmarked entry). CPU 0继续执行b=1的赋值语句，虽然b就在自己的local cache中（cacheline处于modified状态或者exclusive状态），不过在store buffer中有marked entry，因此CPU0并没有直接操作将新的值1写入cache line，取而代之是b的新值”1“被写入store buffer，当然是unmarked状态。
 
-（5）CPU 0 receives the “read” message, and transmits the cache line containing the original value of “b” to  
+（5）CPU 0 receives the “read” message, and transmits the cache line containing the original value of “b” to\
 CPU 1. It also marks its own copy of this cache line as “shared”. CPU 0收到了read message，将b值”0“（新值”1“还在store buffer中）回送给CPU 1，同时将b cacheline的状态设定为shared。
 
 （6） CPU 1 receives the cache line containing “b” and installs it in its cache. CPU 1收到了来自CPU 0的read response消息，将b变量的值（”0“）写入自己的cacheline，状态修改为shared。
 
-（7） CPU 1 can now load the value of “b”, but since it finds that the value of “b” is still 0, it repeats the  
+（7） CPU 1 can now load the value of “b”, but since it finds that the value of “b” is still 0, it repeats the\
 while statement. The new value of “b” is safely hidden in CPU 0’s store buffer.  完成了bus transaction之后，CPU 1可以load b到寄存器中了（local cacheline中已经有b值了），当然，这时候b仍然等于0，因此循环不断的loop。虽然b值在CPU 0上已经赋值等于1，但是那个新值被安全的隐藏在CPU 0的store buffer中。
 
 （8） CPU 1 receives the “read invalidate” message, and transmits the cache line containing “a” to CPU 0 and  invalidates this cache line from its own cache. CPU 1收到了来自CPU 0的read invalidate消息，以a变量的值进行回应，同时清空自己的cacheline。
@@ -401,7 +401,7 @@ while statement. The new value of “b” is safely hidden in CPU 0’s store bu
 
 （11） CPU 0 therefore sends an “invalidate” message to CPU 1. CPU 0发送invalidate消息，请求b数据的独占权
 
-（12） CPU 1 receives the “invalidate” message, invalidates the cache line containing “b” from its cache, and  
+（12） CPU 1 receives the “invalidate” message, invalidates the cache line containing “b” from its cache, and\
 sends an “acknowledgement” message to CPU 0. CPU 1收到invalidate消息，清空自己的b cacheline，并回送acknowledgement给CPU 0。
 
 （13） CPU 1 executes while (b == 0) continue, but the cache line containing “b” is not in its cache. It therefore transmits a “read” message to CPU 0. CPU 1继续执行while (b == 0)，由于b不在自己的local cache中，因此 CPU 1发送read消息，请求获取b的数据。
@@ -432,7 +432,7 @@ This situation can be improved by making invalidate acknowledge messages arrive 
 
 1、Invalidate Queues
 
-One reason that invalidate acknowledge messages can take so long is that they must ensure that the corresponding  
+One reason that invalidate acknowledge messages can take so long is that they must ensure that the corresponding\
 cache line is actually invalidated, and this invalidation can be delayed if the cache is busy, for example, if the CPU is intensively loading and storing data, all of which resides in the cache. In addition, if a large number of invalidate messages arrive in a short time period, a given CPU might fall behind in processing them, thus possibly stalling all the other CPUs.
 
 invalidate acknowledge不能尽快回复的主要原因是invalidate cacheline的操作没有那么快完成，特别是cache比较繁忙的时候，这时，CPU往往进行密集的loading和storing的操作，而来自其他CPU的，对本CPU local cacheline的操作需要和本CPU的密集的cache操作进行竞争，只要完成了invalidate操作之后，本CPU才会发生invalidate acknowledge。此外，如果短时间内收到大量的invalidate消息，CPU有可能跟不上处理，从而导致其他CPU不断的等待。
@@ -461,22 +461,22 @@ However, the fact that invalidate messages can be buffered in the invalidate que
 
 3、Invalidate Queues and Memory Barriers
 
-Let us suppose that CPUs queue invalidation requests, but respond to them immediately. This approach minimizes the cache-invalidation latency seen by CPUs doing stores, but can defeat memory barriers, as seen in the following  
+Let us suppose that CPUs queue invalidation requests, but respond to them immediately. This approach minimizes the cache-invalidation latency seen by CPUs doing stores, but can defeat memory barriers, as seen in the following\
 example.
 
 我们假设CPU缓存invalidation消息，在操作cacheline之前直接回应该invalidation消息。这样的机制对于发送invalidation的CPU侧是非常好的事，该CPU的store性能会非常高，但是会使内存屏障指令失效，我们来看看下面的例子：
 
-> 1 void foo(void)  
-> 2 {  
-> 3 a = 1;  
-> 4 smp_mb();  
-> 5 b = 1;  
-> 6 }  
-> 7  
-> 8 void bar(void)  
-> 9 {  
-> 10 while (b == 0) continue;  
-> 11 assert(a == 1);  
+> 1 void foo(void)\
+> 2 {\
+> 3 a = 1;\
+> 4 smp_mb();\
+> 5 b = 1;\
+> 6 }\
+> 7\
+> 8 void bar(void)\
+> 9 {\
+> 10 while (b == 0) continue;\
+> 11 assert(a == 1);\
 > 12 }
 
 Suppose the values of “a” and “b” are initially zero, that “a” is replicated read-only (MESI “shared” state), and that “b” is owned by CPU 0 (MESI “exclusive” or “modified” state). Then suppose that CPU 0 executes foo() while CPU 1 executes function bar() in the following code fragment:
@@ -487,7 +487,7 @@ Then the sequence of operations might be as follows:
 
 具体的操作序列如下：
 
-（1） CPU 0 executes a = 1. The corresponding cache line is read-only in CPU 0’s cache, so CPU 0 places  
+（1） CPU 0 executes a = 1. The corresponding cache line is read-only in CPU 0’s cache, so CPU 0 places\
 the new value of “a” in its store buffer and transmits an “invalidate” message in order to flush the corresponding cache line from CPU 1’s cache. CPU 0执行a=1的赋值操作，由于a在CPU 0 local cache中的cacheline处于shared状态，因此，CPU 0将a的新值“1”放入store buffer，并且发送了invalidate消息去清空CPU 1对应的cacheline。
 
 （2） CPU 1 executes while (b == 0) continue, but the cache line containing “b” is not in its cache. It therefore transmits a “read” message.CPU 1执行while (b == 0)的循环操作，但是b没有在local cache，因此发送read消息试图获取该值。
@@ -504,36 +504,36 @@ the new value of “a” in its store buffer and transmits an “invalidate” m
 
 （8） CPU 1 can now finish executing while (b == 0) continue, and since it finds that the value of “b” is 1, it proceeds to the next statement. 对于CPU 1而言，b已经等于1了，因此跳出while (b == 0)的循环，继续执行后续代码
 
-（9） CPU 1 executes the assert(a == 1), and, since the old value of “a” is still in CPU 1’s cache, this  
+（9） CPU 1 executes the assert(a == 1), and, since the old value of “a” is still in CPU 1’s cache, this\
 assertion fails. CPU 1执行assert(a == 1)，但是由于这时候CPU 1 cache的a值仍然是旧值0，因此assertion 失败
 
-（10） Despite the assertion failure, CPU 1 processes the queued “invalidate” message, and (tardily) invalidates  
+（10） Despite the assertion failure, CPU 1 processes the queued “invalidate” message, and (tardily) invalidates\
 the cache line containing “a” from its own cache. 该来总会来，Invalidate Queue中针对a cacheline的invalidate消息最终会被CPU 1执行，将a设定为无效，但素，大错已经酿成。
 
-There is clearly not much point in accelerating invalidation responses if doing so causes memory barriers to effectively be ignored. However, the memory-barrier instructions can interact with the invalidate queue, so that when a given CPU executes a memory barrier, it marks all the entries currently in its invalidate queue, and forces any subsequent load to wait until all marked entries have been applied to the CPU’s cache. Therefore, we can add  
+There is clearly not much point in accelerating invalidation responses if doing so causes memory barriers to effectively be ignored. However, the memory-barrier instructions can interact with the invalidate queue, so that when a given CPU executes a memory barrier, it marks all the entries currently in its invalidate queue, and forces any subsequent load to wait until all marked entries have been applied to the CPU’s cache. Therefore, we can add\
 a memory barrier to function bar as follows:
 
 很明显，在上文中的场景中，加速Invalidation response导致foo函数中的memory barrier失效了，因此，这时候对Invalidation response已经没有意义了，毕竟程序逻辑都错了。怎么办？其实我们可以让memory barrier指令和Invalidate Queue进行交互来保证确定的memory order。具体做法是这样的：当CPU执行memory barrier指令的时候，对当前Invalidate Queue中的所有的entry进行标注，这些被标注的项次被称为marked entries，而随后CPU执行的任何的load操作都需要等到Invalidate Queue中所有marked entries完成对cacheline的操作之后才能进行。因此，要想保证程序逻辑正确，我们需要给bar函数增加内存屏障的操作，具体如下：
 
-> 1 void foo(void)  
-> 2 {  
-> 3 a = 1;  
-> 4 smp_mb();  
-> 5 b = 1;  
-> 6 }  
-> 7  
-> 8 void bar(void)  
-> 9 {  
-> 10 while (b == 0) continue;  
-> 11 smp_mb();  
-> 12 assert(a == 1);  
+> 1 void foo(void)\
+> 2 {\
+> 3 a = 1;\
+> 4 smp_mb();\
+> 5 b = 1;\
+> 6 }\
+> 7\
+> 8 void bar(void)\
+> 9 {\
+> 10 while (b == 0) continue;\
+> 11 smp_mb();\
+> 12 assert(a == 1);\
 > 13 }
 
 With this change, the sequence of operations might be as follows:
 
 程序修改之后，我们再来看看CPU的执行序列：
 
-（1） CPU 0 executes a = 1. The corresponding cache line is read-only in CPU 0’s cache, so CPU 0 places  
+（1） CPU 0 executes a = 1. The corresponding cache line is read-only in CPU 0’s cache, so CPU 0 places\
 the new value of “a” in its store buffer and transmits an “invalidate” message in order to flush the corresponding cache line from CPU 1’s cache. CPU 0执行a=1的赋值操作，由于a在CPU 0 local cache中的cacheline处于shared状态（read only），因此，CPU 0将a的新值“1”放入store buffer，并且发送了invalidate消息去清空CPU 1对应的cacheline。
 
 （2） CPU 1 executes while (b == 0) continue,  but the cache line containing “b” is not in its cache. It therefore transmits a “read” message. CPU 1执行while (b == 0)的循环操作，但是b没有在local cache，因此发送read消息试图获取该值。
@@ -582,31 +582,29 @@ If we update foo and bar to use read and write memory barriers, they appear as f
 
 现在，我们可以改一个用读写内存屏障的版本了，具体如下：
 
-> 1 void foo(void)  
-> 2 {  
-> 3 a = 1;  
-> 4 smp_wmb();  
-> 5 b = 1;  
-> 6 }  
-> 7  
-> 8 void bar(void)  
-> 9 {  
-> 10 while (b == 0) continue;  
-> 11 smp_rmb();  
-> 12 assert(a == 1);  
+> 1 void foo(void)\
+> 2 {\
+> 3 a = 1;\
+> 4 smp_wmb();\
+> 5 b = 1;\
+> 6 }\
+> 7\
+> 8 void bar(void)\
+> 9 {\
+> 10 while (b == 0) continue;\
+> 11 smp_rmb();\
+> 12 assert(a == 1);\
 > 13 }
 
 Some computers have even more flavors of memory barriers, but understanding these three variants will provide a good introduction to memory barriers in general.
 
 有些CPU有更多种类的memory barrier操作，不过read mb，write mb和全功能的mb是应用普遍的指令，理解了这三个之后再学习其他的就比较简单了。
 
-  
-
 参考文献：
 
 1、英文的原文来自perfbook-1c.2015.01.31a.pdf
 
-2、翻译的过程，参考了《深入理解并行编程V2.0.pdf》，多谢谢宝友/鲁阳/陈渝的辛苦劳动。他们的翻译忠于原著，我的翻译都是满嘴跑舌头，^_^。
+2、翻译的过程，参考了《深入理解并行编程V2.0.pdf》，多谢谢宝友/鲁阳/陈渝的辛苦劳动。他们的翻译忠于原著，我的翻译都是满嘴跑舌头，^\_^。
 
 _原创翻译文章，转发请注明出处。蜗窝科技_
 
@@ -614,363 +612,363 @@ _原创翻译文章，转发请注明出处。蜗窝科技_
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [Linux graphic subsytem(1)_概述](http://www.wowotech.net/graphic_subsystem/graphic_subsystem_overview.html) | [Linux内核同步机制之（七）：RCU基础](http://www.wowotech.net/kernel_synchronization/rcu_fundamentals.html)»
+« [Linux graphic subsytem(1)\_概述](http://www.wowotech.net/graphic_subsystem/graphic_subsystem_overview.html) | [Linux内核同步机制之（七）：RCU基础](http://www.wowotech.net/kernel_synchronization/rcu_fundamentals.html)»
 
 **评论：**
 
-**icy_river**  
+**icy_river**\
 2023-04-12 09:08
 
-从store_buffer和invalid_queue的角度, 能很好的理解rmb(), wmb(), mb(); 怎么从这种硬件的角度理解半屏障呢? ldaxr, stxr这样的指令执行之后, 在store_buffer和invalid_queue上,是个怎样的行为呢?  
-  
+从store_buffer和invalid_queue的角度, 能很好的理解rmb(), wmb(), mb(); 怎么从这种硬件的角度理解半屏障呢? ldaxr, stxr这样的指令执行之后, 在store_buffer和invalid_queue上,是个怎样的行为呢?
+
 最终从外部observer看起来, 半屏障外部的指令可以乱序进入半屏障, 半屏障内部的指令出不来?
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-8771)
 
-**内存屏障**  
+**内存屏障**\
 2020-03-23 09:46
 
-尊敬额博主：  
-当我读Why Memory Barriers？中文翻译（上）的时候遇到了两个问题：  
-1.引入Invalidate Queue的例子  
-  
-1 void foo(void)  
-2 {  
-3 a = 1;  
-4 smp_mb();  
-5 b = 1;  
-6 }  
-7  
-8 void bar(void)  
-9 {  
-10 while (b == 0) continue;  
-11 assert(a == 1);  
-12 }  
-  
-（4） CPU 0 receives the response from CPU 1, and is therefore free to proceed past the smp_mb() on line 4 above, moving the value of “a” from its store buffer to its cache line.  
-CPU 0收到了CPU 1的invalidate ACK之后，即可以越过程序设定内存屏障（第四行代码的smp_mb() ），这样a的新值从store buffer进入cacheline，状态变成Modified。  
-在第4步描述：为什么CPU 0收到了CPU 1的invalidate ACK之后，即可以越过程序设定内存屏障  
-  
-  
-2.加入读写屏障的一个问题  
-1 void foo(void)  
-2 {  
-3 a = 1;  
-4 smp_mb();  
-5 b = 1;  
-6 }  
-7  
-8 void bar(void)  
-9 {  
-10 while (b == 0) continue;  
-11 smp_mb();  
-12 assert(a == 1);  
-13 }  
-  
-原文是先执行5再执行6  
-（5） CPU 0 executes b = 1. It already owns this cache line (in other words, the cache line is already in either the “modified” or the “exclusive” state), so it stores the new value of “b” in its cache line. CPU 0 越过memory barrier后继续执行b=1的赋值操作（这时候该cacheline或者处于modified状态，或者处于exclusive状态），由于b值在CPU 0的local cache中，因此store操作完成并进入cache line。  
-  
-（6） CPU 0 receives the “read” message, and transmits the cache line containing the now-updated value of “b” to CPU 1, also marking the line as “shared” in its own cache. CPU 0收到了read消息后将b的最新值“1”回送给CPU 1，并修正该cacheline为shared状态。  
-  
+尊敬额博主：\
+当我读Why Memory Barriers？中文翻译（上）的时候遇到了两个问题：\
+1.引入Invalidate Queue的例子
+
+1 void foo(void)\
+2 {\
+3 a = 1;\
+4 smp_mb();\
+5 b = 1;\
+6 }\
+7\
+8 void bar(void)\
+9 {\
+10 while (b == 0) continue;\
+11 assert(a == 1);\
+12 }
+
+（4） CPU 0 receives the response from CPU 1, and is therefore free to proceed past the smp_mb() on line 4 above, moving the value of “a” from its store buffer to its cache line.\
+CPU 0收到了CPU 1的invalidate ACK之后，即可以越过程序设定内存屏障（第四行代码的smp_mb() ），这样a的新值从store buffer进入cacheline，状态变成Modified。\
+在第4步描述：为什么CPU 0收到了CPU 1的invalidate ACK之后，即可以越过程序设定内存屏障
+
+2.加入读写屏障的一个问题\
+1 void foo(void)\
+2 {\
+3 a = 1;\
+4 smp_mb();\
+5 b = 1;\
+6 }\
+7\
+8 void bar(void)\
+9 {\
+10 while (b == 0) continue;\
+11 smp_mb();\
+12 assert(a == 1);\
+13 }
+
+原文是先执行5再执行6\
+（5） CPU 0 executes b = 1. It already owns this cache line (in other words, the cache line is already in either the “modified” or the “exclusive” state), so it stores the new value of “b” in its cache line. CPU 0 越过memory barrier后继续执行b=1的赋值操作（这时候该cacheline或者处于modified状态，或者处于exclusive状态），由于b值在CPU 0的local cache中，因此store操作完成并进入cache line。
+
+（6） CPU 0 receives the “read” message, and transmits the cache line containing the now-updated value of “b” to CPU 1, also marking the line as “shared” in its own cache. CPU 0收到了read消息后将b的最新值“1”回送给CPU 1，并修正该cacheline为shared状态。
+
 有没有这种情况先执行6再执行5，如果是这样的话第10步while (b == 0) 这个循环是不是就无法跳出了，11-12永远不能执行了
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7926)
 
-**study**  
+**study**\
 2019-12-05 20:43
 
-void foo()  
-{  
-    a = 1;  
-    b = 1;  
-}  
-void bar()  
-{  
-while(b == 0) continue;  
-    assert(a == 1);  
-}  
-大佬你好,我想请教一下这个例子中b是什么时候更新到Memory的？  
-假设CPU0中b已经将最新值1写入了cache line中,此时其状态为M。  
-那是不是CPU0立即把b=1更新到Memory,然后CPU0中b cache line状态变为E。  
+void foo()\
+{\
+a = 1;\
+b = 1;\
+}\
+void bar()\
+{\
+while(b == 0) continue;\
+assert(a == 1);\
+}\
+大佬你好,我想请教一下这个例子中b是什么时候更新到Memory的？\
+假设CPU0中b已经将最新值1写入了cache line中,此时其状态为M。\
+那是不是CPU0立即把b=1更新到Memory,然后CPU0中b cache line状态变为E。\
 然后CPU1发送read 命令,CPU0把b=1 response给了CPU1,最后CPU0和CPU1状态都变为S了？
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7774)
 
-**barry**  
+**barry**\
 2019-08-14 18:48
 
-您好 请教一个困扰我很久的问题  
-第六章中 “对于read memory barrier指令，它只是约束执行CPU上的load操作的顺序，具体的效果就是CPU一定是完成read memory barrier之前的load操作之后，才开始执行read memory barrier之后的load操作。read memory barrier指令象一道栅栏，严格区分了之前和之后的load操作。”  
-  
+您好 请教一个困扰我很久的问题\
+第六章中 “对于read memory barrier指令，它只是约束执行CPU上的load操作的顺序，具体的效果就是CPU一定是完成read memory barrier之前的load操作之后，才开始执行read memory barrier之后的load操作。read memory barrier指令象一道栅栏，严格区分了之前和之后的load操作。”
+
 对于上边提到的作用于invalidatequeue上的读屏障  保障的是屏障之前load操作能load到新的数据  之后才能经过屏障执行后边的load操作   这里没有任何load操作乱序的问题啊    也就是说之前的讨论load都是顺序的   怎么突然就跳到乱序了   感觉逻辑有点问题
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7591)
 
-**barry**  
+**barry**\
 2019-08-14 18:56
 
-@barry：游客居然回复 哈哈 只是不能修改 最后这段话打错了 修改下  
-  
+@barry：游客居然回复 哈哈 只是不能修改 最后这段话打错了 修改下
+
 对于上边提到的作用于invalidatequeue上的读屏障  保障的是屏障之后load操作能load到新的数据   之后才能顺利执行下去   这里没有任何load操作乱序的问题啊    也就是说之前的讨论load都是顺序的   怎么突然就跳到乱序了   感觉逻辑有点问题
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7592)
 
-**farmer**  
+**farmer**\
 2019-05-26 23:08
 
-@linuxer  
-  
-> 在ARM architecture中，对一个normal memory location而言，是否是coherent是和> 它的页表中的shareability attribute的设定相关。  
-> （1）non-shareable。根本不会再多个agent之间共享，不存在coherent的问题。  
-> （2）inner-shareable。说明inner shareable domain中的所有的agent在对该内存>进行数据访问的时候，硬件会保证coherent。  
-> （3）outer-shareable。说明outer shareable domain中的所有的agent在对该内存进行数据访问的时候，硬件会保证coherent。  
-  
-您好，我是arm新手，请教个问题：  
-  
-这里说“硬件会保证coherent”，既然硬件会保证，为啥还需要软件管理cache？  
-我的一种猜测是这样的：硬件按照一致性协议能够保证真实的执行顺序的结果在shareable domain里看到的是一致的，但是硬件不能保证按照软件顺序执行，所以需要软件参与控制。 这种理解对吗？  
-  
+@linuxer
+
+> 在ARM architecture中，对一个normal memory location而言，是否是coherent是和> 它的页表中的shareability attribute的设定相关。\
+> （1）non-shareable。根本不会再多个agent之间共享，不存在coherent的问题。\
+> （2）inner-shareable。说明inner shareable domain中的所有的agent在对该内存>进行数据访问的时候，硬件会保证coherent。\
+> （3）outer-shareable。说明outer shareable domain中的所有的agent在对该内存进行数据访问的时候，硬件会保证coherent。
+
+您好，我是arm新手，请教个问题：
+
+这里说“硬件会保证coherent”，既然硬件会保证，为啥还需要软件管理cache？\
+我的一种猜测是这样的：硬件按照一致性协议能够保证真实的执行顺序的结果在shareable domain里看到的是一致的，但是硬件不能保证按照软件顺序执行，所以需要软件参与控制。 这种理解对吗？
+
 望您指点，谢谢 :)
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7441)
 
-**darell**  
+**darell**\
 2018-12-13 11:10
 
 此处介绍的 SMP 的 cache coherency，那么 NUMA 架构的呢？
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7083)
 
-**求学者123**  
+**求学者123**\
 2018-11-21 15:02
 
-非常好的文章收益匪浅，  
-但是请教您两个问题，  
-第一个问题：3. Store Buffers and Memory Barriers这章里面第二个加了smp_mb(); 内存屏障的例子的  
-5）CPU 0 receives the “read” message and transmits the cache line containing the original value of “b” to  
-CPU 1. It also marks its own copy of this cache line as “shared”. CPU 0收到了read message，将b值”0“（新值”1“还在store buffer中）回送给CPU 1，同时将b cacheline的状态设定为shared。  
-这里前面不是说有Store Forwarding机制吗？那么这个时候CPU 0应该先去读store buffer吗？读到了是1啊，为什么这里直接就去读cahce了呢？  
-第二个问题：接上一个问题，猜测Store Forwarding机制运行的时候是不是会根据Cache Line的state进行判断，如果是Modified才先去读store buffer，否则就直接读cache，这样的话就解释的通了。没有内存屏障的状态下，写入store buffer前会把cacheline的状态改成Modified（虽然此时为了性能buffer还没回写CacheLine）。有了内存屏障后，b的值虽然暂时保存在buffer中但是状态并未更改（shared状态），所以直接读cache，Store Forwarding并未生效。  
+非常好的文章收益匪浅，\
+但是请教您两个问题，\
+第一个问题：3. Store Buffers and Memory Barriers这章里面第二个加了smp_mb(); 内存屏障的例子的\
+5）CPU 0 receives the “read” message and transmits the cache line containing the original value of “b” to\
+CPU 1. It also marks its own copy of this cache line as “shared”. CPU 0收到了read message，将b值”0“（新值”1“还在store buffer中）回送给CPU 1，同时将b cacheline的状态设定为shared。\
+这里前面不是说有Store Forwarding机制吗？那么这个时候CPU 0应该先去读store buffer吗？读到了是1啊，为什么这里直接就去读cahce了呢？\
+第二个问题：接上一个问题，猜测Store Forwarding机制运行的时候是不是会根据Cache Line的state进行判断，如果是Modified才先去读store buffer，否则就直接读cache，这样的话就解释的通了。没有内存屏障的状态下，写入store buffer前会把cacheline的状态改成Modified（虽然此时为了性能buffer还没回写CacheLine）。有了内存屏障后，b的值虽然暂时保存在buffer中但是状态并未更改（shared状态），所以直接读cache，Store Forwarding并未生效。\
 谢谢
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7047)
 
-**Connor**  
+**Connor**\
 2019-03-11 22:51
 
-@求学者123：一开始我也是觉得你说的很有道理，后来想了半个小时吗，是不是该这么理解：  
-store forwarding机制是针对load操作的，只有cpu执行load指令的时候才会从cache中读取，文中cpu0收到read message不是load指令，是MESI的总线消息，所以只会从local cache中取数据然后回传，所以应该不是你说的第二个问题里的原因。  
+@求学者123：一开始我也是觉得你说的很有道理，后来想了半个小时吗，是不是该这么理解：\
+store forwarding机制是针对load操作的，只有cpu执行load指令的时候才会从cache中读取，文中cpu0收到read message不是load指令，是MESI的总线消息，所以只会从local cache中取数据然后回传，所以应该不是你说的第二个问题里的原因。\
 当然，上述也是我的猜测，未找到对应的解释
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-7263)
 
-**pangqiu**  
+**pangqiu**\
 2020-08-08 12:20
 
 @Connor：我也是这么猜测的，不然应该解释不通，只有cpu自己的load操作才会去读store buffer，而其它应该是从cache中读取的。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-8087)
 
-**小艾的**  
+**小艾的**\
 2018-08-24 18:40
 
 关于modified状态的cacheline描述中说“memmory中都没有最新数据”是否不太准确，因为write-through模式会直接回写到memory中，文章应该默认cache使用write-back模式吧。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-6912)
 
-**温柔海洋**  
+**温柔海洋**\
 2016-10-20 16:17
 
 问下arm 体系架构现在还是non-coherent的吗，如果这样的话，那么arm平台下，dma_alloc_coherent实际分配和操作的dma内存都是uncached，通过这个来保证coherent的吧？
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4755)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-20 23:58
 
-@温柔海洋：问下arm 体系架构现在还是non-coherent的吗？  
-----------------------  
-我先重复一下你的问题好了，我想你应该问的是：对于一个ARM系统而言，各个cpu core和dma controller对内存的访问是coherent的吗？  
-这个问题其实是不好回答的，因为arm体系结构只是定义了PE的操作行为，并没有定义DMA controller的行为，因此，我只能说，是否coherent是和具体的系统实现有关，哈哈。  
-  
-当然，想要理解cpu core、dma controller或者其他的bus master or agent在进行数据访问的时候是否是coherent的，首先需要理解shareable domain的概念。如何划分shareable domain是和系统设计相关，我们假设一个系统的domain分配如下：  
-（1）所有的cpu core属于一个inner shareable domain  
-（2）所有的cpu core和dma controller属于一个outer shareable domain  
-  
-在ARM architecture中，对一个normal memory location而言，是否是coherent是和它的页表中的shareability attribute的设定相关。  
-（1）non-shareable。根本不会再多个agent之间共享，不存在coherent的问题。  
-（2）inner-shareable。说明inner shareable domain中的所有的agent在对该内存进行数据访问的时候，硬件会保证coherent。  
-（3）outer-shareable。说明outer shareable domain中的所有的agent在对该内存进行数据访问的时候，硬件会保证coherent。  
-  
+## @温柔海洋：问下arm 体系架构现在还是non-coherent的吗？
+
+我先重复一下你的问题好了，我想你应该问的是：对于一个ARM系统而言，各个cpu core和dma controller对内存的访问是coherent的吗？\
+这个问题其实是不好回答的，因为arm体系结构只是定义了PE的操作行为，并没有定义DMA controller的行为，因此，我只能说，是否coherent是和具体的系统实现有关，哈哈。
+
+当然，想要理解cpu core、dma controller或者其他的bus master or agent在进行数据访问的时候是否是coherent的，首先需要理解shareable domain的概念。如何划分shareable domain是和系统设计相关，我们假设一个系统的domain分配如下：\
+（1）所有的cpu core属于一个inner shareable domain\
+（2）所有的cpu core和dma controller属于一个outer shareable domain
+
+在ARM architecture中，对一个normal memory location而言，是否是coherent是和它的页表中的shareability attribute的设定相关。\
+（1）non-shareable。根本不会再多个agent之间共享，不存在coherent的问题。\
+（2）inner-shareable。说明inner shareable domain中的所有的agent在对该内存进行数据访问的时候，硬件会保证coherent。\
+（3）outer-shareable。说明outer shareable domain中的所有的agent在对该内存进行数据访问的时候，硬件会保证coherent。
+
 已经有点晚了，另外一个问题，我改天再回答吧！
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4765)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-21 00:22
 
-@温柔海洋：算了，还是说两句吧，对于第二个问题，arm平台下，dma_alloc_coherent实际分配和操作的dma内存都是uncached，通过这个来保证coherent的吧？我是这么考虑的：  
------------------------  
-如果在该arm系统中，所有的物理内存都是inner shareable的，而cpu core和dma controller又不在一个inner shareable domain，也就是说，HW 无法维护内存数据访问的一致性，在这种情况下，dma_alloc_coherent函数分配的DMA BUFFER只能是uncached，因为只有这样，才能保证coherence。  
+## @温柔海洋：算了，还是说两句吧，对于第二个问题，arm平台下，dma_alloc_coherent实际分配和操作的dma内存都是uncached，通过这个来保证coherent的吧？我是这么考虑的：
+
+如果在该arm系统中，所有的物理内存都是inner shareable的，而cpu core和dma controller又不在一个inner shareable domain，也就是说，HW 无法维护内存数据访问的一致性，在这种情况下，dma_alloc_coherent函数分配的DMA BUFFER只能是uncached，因为只有这样，才能保证coherence。\
 当然，如果在ARM系统设计的时候，也可以引入一些HW block，对cpu core上的cache进行嗅探，维护cpu和dma controller数据访问的一致性，那么在这样的系统中，dma_alloc_coherent实际分配和操作的dma内存也可以是cached。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4766)
 
-**温柔海洋**  
+**温柔海洋**\
 2016-10-21 10:27
 
-@linuxer：太感谢了，哈哈，在我的内核arch/arm/mm/dma-mapping.c函数__dma_alloc里面  
-有个arch_is_coherent（）函数返回值判断，但是我grep了整个Linux 内核代码树，发现只有arch/arm/include/asm/memory.h里面定义了这个函数:  
-  
-#define arch_is_coherent()                0  
-  
-如果为0，就代表该arch不是coherent, 即函数__dma_alloc会走__dma_alloc_remap从consistent 区域分配一块虚存区域。  
-如果该arch为 coherent 的话，会走page_address函数，就是直接返回该物理页面对应的虚存地址即可。  
-  
-所以是不是比如我的soc芯片是NXP imx6,在厂商的kernel代码包定义arch_is_coherent 返回值为0，就说明该SOC在该kernel里面实现为non-coherent arch.是不是就可以推测出该SOC硬件上无法保证cache一致性？是不是就可以进一步推测出dma_coherent系统函数最后分配操作的内存都是uncached？  
-  
-因为国内做SOC级别的嵌入式工程师比较多些，对arch coherent 仅仅是熟悉，会灵活运用，知道它对内核态驱动开发产生的影响就行了。所以我比较关注它的实际应用。  
-  
+@linuxer：太感谢了，哈哈，在我的内核arch/arm/mm/dma-mapping.c函数\_\_dma_alloc里面\
+有个arch_is_coherent（）函数返回值判断，但是我grep了整个Linux 内核代码树，发现只有arch/arm/include/asm/memory.h里面定义了这个函数:
+
+#define arch_is_coherent()                0
+
+如果为0，就代表该arch不是coherent, 即函数\_\_dma_alloc会走\_\_dma_alloc_remap从consistent 区域分配一块虚存区域。\
+如果该arch为 coherent 的话，会走page_address函数，就是直接返回该物理页面对应的虚存地址即可。
+
+所以是不是比如我的soc芯片是NXP imx6,在厂商的kernel代码包定义arch_is_coherent 返回值为0，就说明该SOC在该kernel里面实现为non-coherent arch.是不是就可以推测出该SOC硬件上无法保证cache一致性？是不是就可以进一步推测出dma_coherent系统函数最后分配操作的内存都是uncached？
+
+因为国内做SOC级别的嵌入式工程师比较多些，对arch coherent 仅仅是熟悉，会灵活运用，知道它对内核态驱动开发产生的影响就行了。所以我比较关注它的实际应用。
+
 最后对于Linuxer这种精通arm arch的人，只能再次膜拜，哈哈。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4767)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-10-21 11:42
 
 @温柔海洋：其实在新的内核中（我正在读的是4.4.6的代码），arch_is_coherent() 已经消失了，因此我找了旧内核的代码（2.6.23）并简单的看了看。你的推断是对的，如果arch_is_coherent() 等于0，则说明在硬件设计中，有DMA能力的设备并不会“snooping”cache，也就是说，如果打开了cache，那么cpu对dma buffer的访问不会及时的更新到main memory中，可能暂存在cache中，这时候，dma controller访问dma buffer的时候将访问到旧的数据，从而产生了一致性问题。解决这个问题的方法就是设定dma buffer是uncached。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4768)
 
-**温柔海洋**  
+**温柔海洋**\
 2016-10-21 12:14
 
 @linuxer：谢谢答疑。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4769)
 
-**RaulXiong**  
+**RaulXiong**\
 2016-10-31 16:21
 
 @温柔海洋：从4.4的kernel代码上来看，dma_alloc_coherent分配的memory，在ARM/ARM64平台上都是uncached，在X86平台上则是cachable的。这说明，X86的架构有能力支持DMA的device和CPU cache之间的coherency。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-4811)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-01 11:22
 
 @RaulXiong：这样的说法太过于武断了，在ARM/ARM64平台上，通过dma_alloc_coherent分配的memory一定是coherent的，但并非都是uncached，这和系统架构相关。如果在系统设计过程中引入SMMU（IOMMU）这样的组件，那么连接在该组件上的master设备（例如GPU、DMA Controller等）和cpu core之间的memory coherence是由HW来处理的，也就是说，这时候，dma buffer可以是cached。
 
-**RaulXiong**  
+**RaulXiong**\
 2016-11-01 14:40
 
-@RaulXiong：你说的很准确，对，dma_alloc_coherent支持让device去重载它的实现，所以根据不同的硬件能力分配的buffer是可以不同属性的。我仅仅是看了默认的dma_alloc_coherent实现。  
+@RaulXiong：你说的很准确，对，dma_alloc_coherent支持让device去重载它的实现，所以根据不同的硬件能力分配的buffer是可以不同属性的。我仅仅是看了默认的dma_alloc_coherent实现。\
 不过，就算是有IOMMU，如果不能snoop CPU的cache，那么分配的buffer也不能是cached。如有错误请指教。
 
-**温柔海洋**  
+**温柔海洋**\
 2016-11-01 14:59
 
-@RaulXiong：这个话题非常好，讨论着也很有实用性，跟你说，我看到我这边内核：  
-sound/core/pcm_native.c里面有这么一段话：  
-  
-/*  
-* Only on coherent architectures, we can mmap the status and the control records  
-* for effcient data transfer.  On others, we have to use HWSYNC ioctl...  
-*/  
-#if defined(CONFIG_X86) || defined(CONFIG_PPC) || defined(CONFIG_ALPHA)  
-/*  
-* mmap status record  
-*/  
-static int snd_pcm_mmap_status_fault(struct vm_area_struct *area,  
-                                                struct vm_fault *vmf)  
-{  
-        struct snd_pcm_substream *substream = area->vm_private_data;  
-        struct snd_pcm_runtime *runtime;  
-  
-        if (substream == NULL)  
-                return VM_FAULT_SIGBUS;  
-        runtime = substream->runtime;  
-        vmf->page = virt_to_page(runtime->status);  
-        get_page(vmf->page);  
-        return 0;  
-}  
-  
-static const struct vm_operations_struct snd_pcm_vm_ops_status =  
-{  
-        .fault =        snd_pcm_mmap_status_fault,  
-};  
-#endif  
+@RaulXiong：这个话题非常好，讨论着也很有实用性，跟你说，我看到我这边内核：\
+sound/core/pcm_native.c里面有这么一段话：
+
+/\*
+
+- Only on coherent architectures, we can mmap the status and the control records
+- for effcient data transfer.  On others, we have to use HWSYNC ioctl...\
+  */\
+  #if defined(CONFIG_X86) || defined(CONFIG_PPC) || defined(CONFIG_ALPHA)\
+  /*
+- mmap status record\
+  \*/\
+  static int snd_pcm_mmap_status_fault(struct vm_area_struct \*area,\
+  struct vm_fault \*vmf)\
+  {\
+  struct snd_pcm_substream \*substream = area->vm_private_data;\
+  struct snd_pcm_runtime \*runtime;
+
+if (substream == NULL)\
+return VM_FAULT_SIGBUS;\
+runtime = substream->runtime;\
+vmf->page = virt_to_page(runtime->status);\
+get_page(vmf->page);\
+return 0;\
+}
+
+static const struct vm_operations_struct snd_pcm_vm_ops_status =\
+{\
+.fault =        snd_pcm_mmap_status_fault,\
+};\
+#endif\
 大家一看就知道 ，大概是想重载 缺页异常里面的那个回调，实现内核态和用户态的自由数据通讯。但是代码也只是说明了在这些非arm架构下可以实现。说明X86架构实现的比较高档，可以从硬件级别做到coherence。
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-01 22:26
 
 @RaulXiong：回复RaulXiong同学，同意你的说法，就算是有IOMMU，也不能保证cached DMA buffer是coherent的，重点应该是连接CPU core以及device的互联器件是否支持coherence，如果有这个能力，那么就能够snoop CPU cache。
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-11-01 22:49
 
-@RaulXiong：回复温柔海洋，X86架构比较单纯，基本上的组件都是标准的，涉及DMA buffer访问的路径有两条：  
-1、CPU core<----前端总线--->北桥芯片<---->DDR memory。  
-2、设备（内嵌DMA控制器，有能力发起DMA操作）<------PCIe总线----->北桥芯片<---->DDR memory  
-由于北桥芯片有snoop的能力，因此，X86架构下，所有的memory访问都是coherent的。这也许就是你贴的代码注释中的“coherent architectures”的含义吧。  
-  
+@RaulXiong：回复温柔海洋，X86架构比较单纯，基本上的组件都是标准的，涉及DMA buffer访问的路径有两条：\
+1、CPU core\<----前端总线--->北桥芯片\<---->DDR memory。\
+2、设备（内嵌DMA控制器，有能力发起DMA操作）\<------PCIe总线----->北桥芯片\<---->DDR memory\
+由于北桥芯片有snoop的能力，因此，X86架构下，所有的memory访问都是coherent的。这也许就是你贴的代码注释中的“coherent architectures”的含义吧。
+
 对于ARM架构，它不是那么玩的，ARM的策略是大家一起来玩，也就是博采众家之长。它采用license IP的方式，让更多的厂商加入ARM建立的生态系统。当然，这也就意味着架构的多样性。我们以你例子中的声卡驱动为例，在ARM arch下，其实系统拓扑有多种，例如声卡设备可以结在AMBA（APB）总线上（大部分的嵌入式设备应该这样），也可以接在PCIe总线上（然后通过AMBA bus接到CPU core上），即便是声卡设备和CPU core是通过AMBA连接，也许互联器件不支持coherence。因此，ARM是不是coherent architecture呢？我只能说是和具体的实现相关。随着ARM公司在服务器领域的耕耘，我猜ARM应该可以慢慢的象X86那么“高档”的，哈哈
 
-**[simonzhang](http://www.wowotech.net/)**  
+**[simonzhang](http://www.wowotech.net/)**\
 2016-01-03 17:35
 
-有个小小的疑问，  
-在（1）， CPU 0发了一个read invalidate，  
-然后（4）CPU 0 又回了一个read response给 CPU 1  
-（5）CPU 1收到了 CPU 0的read response  
-（8）CPU 1收到 了CPU0 的read invalidate  
+有个小小的疑问，\
+在（1）， CPU 0发了一个read invalidate，\
+然后（4）CPU 0 又回了一个read response给 CPU 1\
+（5）CPU 1收到了 CPU 0的read response\
+（8）CPU 1收到 了CPU0 的read invalidate\
 所以这里我的问题：消息后发先到？一个比较容易解释是message的收发有不确定性？
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-3330)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-01-03 23:19
 
 @simonzhang：是哪一个章节的，这个文档中有太多的（1）（4）（5）（8）了
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-3333)
 
-**[simonzhang](http://www.wowotech.net/)**  
+**[simonzhang](http://www.wowotech.net/)**\
 2016-01-04 15:05
 
 @linuxer：sorry，应该是四.3吧
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-3334)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-01-04 16:41
 
-@simonzhang：我的理解是这样的：  
-1、各个CPU core通过支持cache coherent协议的总线进行互联，总线上传递的是一个个的协议消息，我们称之message，例如read invalidate、read response等  
-2、总线上的一组message组成了transaction，完成一个指定的cache操作。例如CPU A发生invalidate message，收到invalidate response(可能是多个response，和CPU core的个数相关)，完成一次transaction  
-3、为了性能，总线上的transaction不可能是串行的，因此，总线往往支持多个transaction并发进行  
-  
-如果在上面3点上达成共识，那么不难理解这里的message的行为了：  
-在步骤（1），CPU 0发了一个read invalidate，这个message会立刻到达其他CPU，包括CPU1，但是，由于CPU1的cache异常繁忙，因此无法应用这个message到它的local cache中，因此也就无法回复response。  
-  
-在后续的操作中，transaction继续进行，因此（2）～（7）完成了各种其他的transaction  
-  
-在步骤（8）中，CPU1终于找到机会操作其cache，并回送response，但为时已晚。  
-  
+@simonzhang：我的理解是这样的：\
+1、各个CPU core通过支持cache coherent协议的总线进行互联，总线上传递的是一个个的协议消息，我们称之message，例如read invalidate、read response等\
+2、总线上的一组message组成了transaction，完成一个指定的cache操作。例如CPU A发生invalidate message，收到invalidate response(可能是多个response，和CPU core的个数相关)，完成一次transaction\
+3、为了性能，总线上的transaction不可能是串行的，因此，总线往往支持多个transaction并发进行
+
+如果在上面3点上达成共识，那么不难理解这里的message的行为了：\
+在步骤（1），CPU 0发了一个read invalidate，这个message会立刻到达其他CPU，包括CPU1，但是，由于CPU1的cache异常繁忙，因此无法应用这个message到它的local cache中，因此也就无法回复response。
+
+在后续的操作中，transaction继续进行，因此（2）～（7）完成了各种其他的transaction
+
+在步骤（8）中，CPU1终于找到机会操作其cache，并回送response，但为时已晚。
+
 因此，不是消息先发后到，而是是否及时处理的问题。
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-3336)
 
-**[simonzhang](http://www.wowotech.net/)**  
+**[simonzhang](http://www.wowotech.net/)**\
 2016-01-04 18:51
 
-@linuxer：首先我们一致同意了CPU间的不同消息传递时间是应该没有什么差别的，其实我之前就认为及时收到，和及时处理是两个不同的问题，但是CPU就算不能及时处理，既然CPU及时收到，那么它完全可以标记一下，这样CPU执行（7）时至少知道已经invalidate了，然后可以相应正确的处理。  
+@linuxer：首先我们一致同意了CPU间的不同消息传递时间是应该没有什么差别的，其实我之前就认为及时收到，和及时处理是两个不同的问题，但是CPU就算不能及时处理，既然CPU及时收到，那么它完全可以标记一下，这样CPU执行（7）时至少知道已经invalidate了，然后可以相应正确的处理。\
 不过我没有分析任何SMP处理器的体系结构，只是觉得理论上这个实现不难做到。不知道CPU实现会不会这样做？ARMv7，或ARMv8是如何处理这个的？
 
 [回复](http://www.wowotech.net/kernel_synchronization/Why-Memory-Barriers.html#comment-3339)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2016-01-04 19:27
 
 @simonzhang：是的，你说的是对的，这不正是write memory barrier和read memory barrier指令的作用吗？各个CPU通过这样的内存屏障指令来mark store buffer和invalidate queue中的条目，从而保证了memory order
@@ -981,152 +979,155 @@ static const struct vm_operations_struct snd_pcm_vm_ops_status =
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [计算机科学基础知识（三）:静态库和静态链接](http://www.wowotech.net/basic_subject/static-link.html)
-    - [load_balance函数代码详解](http://www.wowotech.net/process_management/load_balance_function.html)
-    - [Linux电源管理(9)_wakelocks](http://www.wowotech.net/pm_subsystem/wakelocks.html)
-    - [Concurrency Managed Workqueue之（一）：workqueue的基本概念](http://www.wowotech.net/irq_subsystem/workqueue.html)
-    - [Perf book 9.3章节翻译（下）](http://www.wowotech.net/kernel_synchronization/perfbook-9-3-rcu.html)
+
+  - [计算机科学基础知识（三）:静态库和静态链接](http://www.wowotech.net/basic_subject/static-link.html)
+  - [load_balance函数代码详解](http://www.wowotech.net/process_management/load_balance_function.html)
+  - [Linux电源管理(9)\_wakelocks](http://www.wowotech.net/pm_subsystem/wakelocks.html)
+  - [Concurrency Managed Workqueue之（一）：workqueue的基本概念](http://www.wowotech.net/irq_subsystem/workqueue.html)
+  - [Perf book 9.3章节翻译（下）](http://www.wowotech.net/kernel_synchronization/perfbook-9-3-rcu.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

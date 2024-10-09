@@ -1,5 +1,5 @@
 Original 字节跳动STE团队 字节跳动SYS Tech
- _2023年09月08日 17:30_ _河南_
+_2023年09月08日 17:30_ _河南_
 
 # **背景**
 
@@ -7,7 +7,7 @@ Original 字节跳动STE团队 字节跳动SYS Tech
 
 **测试环境**
 
-- CPU 架构：x86_64  
+- CPU 架构：x86_64
 - 操作系统及基础库版本：Debian GLIBC 2.28-10
 - Compiled by GNU CC version 8.3.0.
 
@@ -20,14 +20,12 @@ struct C { C() {} // <== break }; C c; int main() { return 0; }
 ```
 
 编译成可执行文件， 使用 gdb 在第 2 行打一个断点，运行：
-![[Pasted image 20240909083246.png]]
+!\[\[Pasted image 20240909083246.png\]\]
 
-可以看到， 在调用栈中并没有看到 main 的身影， 这是因为在 main 之前， 先进入到了全局对象 c 的构造函数中， 来完成初始化相关的工作。并且栈底指向了 _start， 这可能就是我们要找的入口函数。在确定 _start 是不是我们要找的入口函数之前， 需要先了解一下 Entry point 的概念：
+可以看到， 在调用栈中并没有看到 main 的身影， 这是因为在 main 之前， 先进入到了全局对象 c 的构造函数中， 来完成初始化相关的工作。并且栈底指向了 \_start， 这可能就是我们要找的入口函数。在确定 \_start 是不是我们要找的入口函数之前， 需要先了解一下 Entry point 的概念：
 
-  
-
-**Entry point：  
-**https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/chapter6-43405/index.html
+\*\*Entry point：\
+\*\*https://docs.oracle.com/cd/E19120-01/open.solaris/819-0690/chapter6-43405/index.html
 
 > e_entry: The virtual address to which the system first transfers control, thus starting the process.
 
@@ -38,8 +36,8 @@ info files
 ```
 
 来观察可执行程序的各个 section 在内存中的分布：
-![[Pasted image 20240909083308.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909083308.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 这里的 Entry point， 就是程序运行起来的入口地址， 我们可以进一步调试它：
 
@@ -48,15 +46,13 @@ b *0x555555555040
 r
 ```
 
-可以看到， 该入口地址指向了 _start。  
-
-  
+可以看到， 该入口地址指向了 \_start。
 
 **main 之前**
 
 下图给出了 main 之前与初始化相关的关键流程：
-![[Pasted image 20240909083321.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909083321.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 给一段简单的示例 test.cpp：
 
@@ -67,10 +63,8 @@ int main() { printf("Hello ByteDance!\n"); return 0; }
 
 当我们将这段代码编译成可以执行文件时， 站在开发者的角度上来说， 只有 test.cpp 一个文件参与了这个过程。但实际上并非如此， 追加 -v 选项后可以看到详细的编译连接过程， 实际上还有一些 .o 文件参与了链接的过程， 这些 .o 文件除了标准库相关的文件， 还包含了程序启动相关的文件， 我们接下来要做的就是找到这些与程序启动相关的文件， 这有助于我们理解 main 之前发生的一些事情。
 
-  
-
-**-nostdlib:  
-**https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
+\*\*-nostdlib:\
+\*\*https://gcc.gnu.org/onlinedocs/gcc/Link-Options.html
 
 > Do not use the standard system startup files or libraries when linking.
 
@@ -80,36 +74,28 @@ int main() { printf("Hello ByteDance!\n"); return 0; }
 g++ -g -nostdlib -lc test.cpp
 ```
 
-可以看到， 找不到 _start 符号， 在运行时发生了 coredump。
+可以看到， 找不到 \_start 符号， 在运行时发生了 coredump。
 
-  
+\_start 是程序启动的入口， 这是一个很好的起点。后续会详细介绍 \_start 到 main 之间发生了什么， 同时找到程序启动相关的文件， 来让这段简单的程序编译通过并成功运行起来。
 
-_start 是程序启动的入口， 这是一个很好的起点。后续会详细介绍 _start 到 main 之间发生了什么， 同时找到程序启动相关的文件， 来让这段简单的程序编译通过并成功运行起来。
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+**\_start**
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
- **_start**
-
-_start介绍 ：  
+\_start介绍 ：\
 https://elixir.bootlin.com/glibc/glibc-2.28/source/sysdeps/x86_64/start.S#L58
 
 > This is the canonical entry point, usually the first thing in the text segment.
-> 
-> Extract the arguments as encoded on the stack and set up the arguments for `main': argc, argv.  envp will be determined later in __libc_start_main.
+>
+> Extract the arguments as encoded on the stack and set up the arguments for \`main': argc, argv.  envp will be determined later in \_\_libc_start_main.
 
-  
-
-简化一下 _start 的指令代码：
+简化一下 \_start 的指令代码：
 
 ```cpp
 _start: xorl %ebp, %ebp mov %RDX_LP, %R9_LP /* Address of the shared library termination function.  */ popq %rsi       /* Pop the argument count.  */ /* argv starts just at the current stack top.  */ mov %RSP_LP, %RDX_LP /* Provide the highest stack address to the user code (for stacks which grow downwards).  */ pushq %rsp /* Pass address of our own entry points to .fini and .init.  */ mov $__libc_csu_fini, %R8_LP mov $__libc_csu_init, %RCX_LP mov $main, %RDI_LP call *__libc_start_main@GOTPCREL(%rip) hlt         /* Crash if somehow `exit' does return.  */
 ```
 
 更多指令细节可以参考：http://6.s081.scripts.mit.edu/sp18/x86-64-architecture-guide.html
-
-  
 
 上述指令代码的解释：
 
@@ -123,46 +109,39 @@ _start: xorl %ebp, %ebp mov %RDX_LP, %R9_LP /* Address of the shared library ter
 
 • pushq %rsp：压入堆栈地址。
 
-• mov $__libc_csu_fini, %R8_LP：将 __libc_csu_fini 存入第 5 参数寄存器 r8。
+• mov $\_\_libc_csu_fini, %R8_LP：将 \_\_libc_csu_fini 存入第 5 参数寄存器 r8。
 
-• mov $__libc_csu_init, %RCX_LP：将 __libc_csu_init 存入第 4 参数寄存器 rcx。
+• mov $\_\_libc_csu_init, %RCX_LP：将 \_\_libc_csu_init 存入第 4 参数寄存器 rcx。
 
 • mov $main, %RDI_LP：将 main 存入第 1 参数寄存器 rdi。
 
-• call *__libc_start_main@GOTPCREL(%rip)：调用 __libc_start_main
+• call \*\_\_libc_start_main@GOTPCREL(%rip)：调用 \_\_libc_start_main
 
 • hlt：保证退出。
 
-也就是说， _start 所做的事情就是调用 __libc_start_main。
+也就是说， \_start 所做的事情就是调用 \_\_libc_start_main。
 
-  
-
-在程序启动相关的文件中， _start 是定义在 crt1.o 中的， 我们尝试链接它:
+在程序启动相关的文件中， \_start 是定义在 crt1.o 中的， 我们尝试链接它:
 
 ```cpp
 g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o -lc test.cpp
 ```
-![[Pasted image 20240909083431.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-可以看到， 找不到 _init 而发生错误。
+!\[\[Pasted image 20240909083431.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+可以看到， 找不到 \_init 而发生错误。
 
-那 _init 是在哪里调用的， 看到上述告警信息， 在 __libc_csu_init 中引用了 _init， 而在前面介绍的 _start 内容中， __libc_csu_init 是作为参数传入 __libc_start_main 里的， 我们顺着这个调用链来看看里面发生了什么事。
+那 \_init 是在哪里调用的， 看到上述告警信息， 在 \_\_libc_csu_init 中引用了 \_init， 而在前面介绍的 \_start 内容中， \_\_libc_csu_init 是作为参数传入 \_\_libc_start_main 里的， 我们顺着这个调用链来看看里面发生了什么事。
 
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+**\_\_libc_start_main**
 
-**__libc_start_main**
-
-__libc_start_main介绍：  
+\_\_libc_start_main介绍：\
 https://elixir.bootlin.com/glibc/glibc-2.28/source/csu/libc-start.c#L129
 
-  
-
-简化一下 __libc_start_main 的代码：
+简化一下 \_\_libc_start_main 的代码：
 
 ```cpp
 STATIC int __libc_start_main (int (*main) (int, char **, char ** MAIN_AUXVEC_DECL), int argc, char **argv, __typeof (main) init, void (*fini) (void), void (*rtld_fini) (void), void *stack_end) { /* Result of the 'main' function.  */ int result; char **ev = &argv[argc + 1]; __environ = ev; /* Register the destructor of the program, if any.  */ if (fini) __cxa_atexit ((void (*) (void *)) fini, NULL, NULL); if (init) (*init) (argc, argv, __environ MAIN_AUXVEC_PARAM); result = main (argc, argv, __environ MAIN_AUXVEC_PARAM); exit (result); }
@@ -170,30 +149,26 @@ STATIC int __libc_start_main (int (*main) (int, char **, char ** MAIN_AUXVEC_DEC
 
 在这段代码里主要关注这几件事：
 
-• __environ = ev：存储环境变量信息。
+• \_\_environ = ev：存储环境变量信息。
 
-• __cxa_atexit(...)：注册全局析构。
+• \_\_cxa_atexit(...)：注册全局析构。
 
-• (*init)(...)：调用全局构造。
+• (\*init)(...)：调用全局构造。
 
 • result = main(...)：调用 main。
 
 • exit(result)：调用exit。
 
-可以看到， 在调用 main 之前， 会调用全局构造 init， 而这里的 init 就是 __libc_csu_init。
+可以看到， 在调用 main 之前， 会调用全局构造 init， 而这里的 init 就是 \_\_libc_csu_init。
 
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+**\_\_libc_csu_init**
 
-**__libc_csu_init**
-
-__libc_csu_init介绍：  
+\_\_libc_csu_init介绍：\
 https://elixir.bootlin.com/glibc/glibc-2.28/source/csu/elf-init.c#L67
 
-  
-
-简化一下 __libc_csu_init 的代码：
+简化一下 \_\_libc_csu_init 的代码：
 
 ```cpp
 void __libc_csu_init (int argc, char **argv, char **envp) { #ifndef NO_INITFINI _init (); #endif const size_t size = __init_array_end - __init_array_start; for (size_t i = 0; i < size; i++) (*__init_array_start [i]) (argc, argv, envp); }
@@ -201,15 +176,13 @@ void __libc_csu_init (int argc, char **argv, char **envp) { #ifndef NO_INITFINI 
 
 在这个函数中主要关注这 2 件事：
 
-1. 调用 _init()， 它被定义在 .init 段。
+1. 调用 \_init()， 它被定义在 .init 段。
 
-2. 循环调用 __init_array_start 数组里面的内容， 它被定义在 .init_array 段。
+1. 循环调用 \_\_init_array_start 数组里面的内容， 它被定义在 .init_array 段。
 
-  
+**.init**
 
- **.init**
-
-_init 对应 ELF sections 中的 .init section。详情查看：  
+\_init 对应 ELF sections 中的 .init section。详情查看：\
 https://elixir.bootlin.com/glibc/glibc-2.28/source/sysdeps/x86_64/crti.S#L63
 
 ```cpp
@@ -217,28 +190,26 @@ _init: _CET_ENDBR /* Maintain 16-byte stack alignment for called functions.  */ 
 ```
 
 这里的 PREINIT_FUNCTION 实际上是 __gmon_start__， 与 gprof 有关， 只有开启 -pg 选项才会生效， 否则为0x0:
-![[Pasted image 20240909083538.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909083538.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-在程序启动相关的文件中，_init 是定义在 crti.o 中的， 我们尝试链接它:
+在程序启动相关的文件中，\_init 是定义在 crti.o 中的， 我们尝试链接它:
 
 ```bash
 g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o -lc test.cpp
 ```
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到， 测试文件可以正常编译链接， 但是在运行时发生了 coredump。
 
 我们需要看下可执行文件的反汇编：
-![[Pasted image 20240909083557.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909083557.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-test   %rax,%rax， 即如果 rax 为 0 则 je     1012 <_init+0x12> 跳转到 1012， 这是一个一块非法内存地址。结合 _init 的定义和可执行程序的反汇编代码， 可以看出在结尾是没有 ret 返回指令的， 这部分实际上是被定义在了 crtn.S 中：
+test   %rax,%rax， 即如果 rax 为 0 则 je     1012 \<\_init+0x12> 跳转到 1012， 这是一个一块非法内存地址。结合 \_init 的定义和可执行程序的反汇编代码， 可以看出在结尾是没有 ret 返回指令的， 这部分实际上是被定义在了 crtn.S 中：
 
 https://elixir.bootlin.com/glibc/glibc-2.28/source/sysdeps/x86_64/crtn.S#L39
-
-  
 
 简化下代码：
 
@@ -246,35 +217,29 @@ https://elixir.bootlin.com/glibc/glibc-2.28/source/sysdeps/x86_64/crtn.S#L39
 _init: addq $8, %rsp ret
 ```
 
-使用汇编代码在某个section中插入代码：.section .init,"ax",@progbits  
+使用汇编代码在某个section中插入代码：.section .init,"ax",@progbits
 
-  
-
-在程序启动相关的文件中，_init 结尾部分是定义在 crtn.o 中的， 我们尝试链接它:
+在程序启动相关的文件中，\_init 结尾部分是定义在 crtn.o 中的， 我们尝试链接它:
 
 ```bash
 g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc test.cpp
 ```
 
-如上图结果显示：运行成功！也就是说， 要成功编译运行这段简单的程序， 至少需要 crt1.o、crti.o 和 crtn.o 这三个启动相关的文件。  
-
-  
+如上图结果显示：运行成功！也就是说， 要成功编译运行这段简单的程序， 至少需要 crt1.o、crti.o 和 crtn.o 这三个启动相关的文件。
 
 **.init_array**
 
 > DT_INIT_ARRAY: This element holds the address of the array of pointers to initialization functions.
 
-__init_array_start 对应 ELF sections 中的 .init_array section。  
+\_\_init_array_start 对应 ELF sections 中的 .init_array section。
 
-  
-
-在 __libc_csu_init 中我们可以看到， _init 并没有做有关全局对象初始化相关的工作， 实际在程序走到 main 之前， 是通过 __init_array 来实现程序本身的一些初始化的工作的：
+在 \_\_libc_csu_init 中我们可以看到， \_init 并没有做有关全局对象初始化相关的工作， 实际在程序走到 main 之前， 是通过 \_\_init_array 来实现程序本身的一些初始化的工作的：
 
 ```cpp
 const size_t size = __init_array_end - __init_array_start; for (size_t i = 0; i < size; i++) (*__init_array_start [i]) (argc, argv, envp);
 ```
 
-__init_array_start 是一个函数指针数组， 里面存储了全局初始化相关的函数:
+\_\_init_array_start 是一个函数指针数组， 里面存储了全局初始化相关的函数:
 
 ```cpp
 #include void  __attribute__ ((constructor)) constructor() { printf("%s\n", __FUNCTION__); } class C { public: C() { printf("hello C!\n"); } }; C c; int main() { printf("hello ByteDance!\n"); return 0; }
@@ -283,18 +248,17 @@ __init_array_start 是一个函数指针数组， 里面存储了全局初始化
 ```bash
 g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc test.cpp
 ```
-![[Pasted image 20240909083717.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-可以看到 .init_array 里面存储了2个地址：0x10e1 和 0x1137， 反汇编查看下这个地址：  
-![[Pasted image 20240909083722.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909083717.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+可以看到 .init_array 里面存储了2个地址：0x10e1 和 0x1137， 反汇编查看下这个地址：\
+!\[\[Pasted image 20240909083722.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到 0x10e1 就对应了我们自定义编写的 attribute constructor，0x1137 对应了全局对象 c 的初始化相关的函数。
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **.preinit_array**
 
@@ -302,17 +266,11 @@ g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti
 
 .preinit_array 是在进程建立映射并重定位之后， 但在所有初始化函数之前执行的初始化函数列表。
 
-  
-
 也就是说， .preinit_array 中的初始化函数是更早被执行的：
 
 https://elixir.bootlin.com/glibc/glibc-2.28/source/elf/dl-init.c#L78
 
-  
-
-可以通过源码发现， .preinit_array 的预初始化函数是在 _dl_init 中调用的， 而 _dl_init 是在 _start 之前被调用。
-
-  
+可以通过源码发现， .preinit_array 的预初始化函数是在 \_dl_init 中调用的， 而 \_dl_init 是在 \_start 之前被调用。
 
 我们可以在 .preinit_array 中注册一个初始化函数：
 
@@ -323,34 +281,32 @@ https://elixir.bootlin.com/glibc/glibc-2.28/source/elf/dl-init.c#L78
 ```bash
 g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc test.cpp
 ```
-![[Pasted image 20240909083757.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-可以看到 preinit 函数是最早被执行的， 我们可以观察下这个函数的存放位置：  
+!\[\[Pasted image 20240909083757.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+可以看到 preinit 函数是最早被执行的， 我们可以观察下这个函数的存放位置：
 
 ```bash
 objdump -s -j .preinit_array a.out
 ```
-![[Pasted image 20240909083810.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240909083810.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到多了一个 .preinit_array section， 里面存放了一个地址为 0x10f4， 反汇编查看下地址信息：
-![[Pasted image 20240909083816.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909083816.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到 0x10f4 对应了我们自定义编写的 preinit 函数。
 
-  
-
 **全局对象构造**
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **构造过程**
 
-给一段简单的示例代码：  
+给一段简单的示例代码：
 
 ```cpp
 #include struct C { C() { printf("%s\n", __FUNCTION__); } }; C c;  // <== break int main() { printf("%s\n", __FUNCTION__); return 0; }
@@ -359,64 +315,51 @@ objdump -s -j .preinit_array a.out
 ```cpp
 g++ -g -nostdlib /usr/lib/x86_64-linux-gnu/crt1.o /usr/lib/x86_64-linux-gnu/crti.o /usr/lib/x86_64-linux-gnu/crtn.o -lc test.cpp
 ```
-![[Pasted image 20240909083924.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-观察调用栈， 发现在调用 C::C() 之前还调用了另外两个函数， 分别是 _GLOBAL__sub_I_c 和 __static_initialization_and_destruction_0。  
+!\[\[Pasted image 20240909083924.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+观察调用栈， 发现在调用 C::C() 之前还调用了另外两个函数， 分别是 \_GLOBAL\_\_sub_I_c 和 \_\_static_initialization_and_destruction_0。
 
-在之前介绍 .init_array 的时候， 我们其实就发现 .init_array 里存的函数地址并不是 C::C()， 而是 _GLOBAL__sub_I_c， 这是编译器以 _GLOBAL__sub_I_ 为前缀给每个全局对象生成的symbol， 专门用于全局对象初始化的事宜， 我们看下它的内容：
+在之前介绍 .init_array 的时候， 我们其实就发现 .init_array 里存的函数地址并不是 C::C()， 而是 \_GLOBAL\_\_sub_I_c， 这是编译器以 _GLOBAL\_\_sub_I_ 为前缀给每个全局对象生成的symbol， 专门用于全局对象初始化的事宜， 我们看下它的内容：
 
 ```cpp
 f 1
 disassemble
 ```
-![[Pasted image 20240909083947.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-_GLOBAL__sub_I_c 中调用了 __static_initialization_and_destruction_0($0x1, $0xffff)， 我们再进一步观察下 __static_initialization_and_destruction_0 的指令信息：
+!\[\[Pasted image 20240909083947.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+\_GLOBAL\_\_sub_I_c 中调用了 \_\_static_initialization_and_destruction_0($0x1, $0xffff)， 我们再进一步观察下 \_\_static_initialization_and_destruction_0 的指令信息：
 
 ```cpp
 f 0
 disassemble
 ```
-![[Pasted image 20240909084004.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+!\[\[Pasted image 20240909084004.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-__static_initialization_and_destruction_0 的定义位于 https://github.com/gcc-mirror/gcc/blob/releases/gcc-8/gcc/cp/decl2.c#L3576， 有些信息解释了该函数参数列表的含义：
+\_\_static_initialization_and_destruction_0 的定义位于 https://github.com/gcc-mirror/gcc/blob/releases/gcc-8/gcc/cp/decl2.c#L3576， 有些信息解释了该函数参数列表的含义：
 
-> __initialize_p：If __INITIALIZE_P is nonzero, it performs initializations. Otherwise, it performs destructions.
-> 
-> __priority：It only performs those initializations or destructions with the indicated __PRIORITY.
+> \_\_initialize_p：If \_\_INITIALIZE_P is nonzero, it performs initializations. Otherwise, it performs destructions.
+>
+> \_\_priority：It only performs those initializations or destructions with the indicated \_\_PRIORITY.
 
-  
-
-在 __static_initialization_and_destruction_0 中来调用 c 的构造函数 C::C()， 完成初始化。
-
-  
+在 \_\_static_initialization_and_destruction_0 中来调用 c 的构造函数 C::C()， 完成初始化。
 
 **为什么不在 .init_array 里直接放构造函数的地址：**
 
 构造函数是与对象相关联的， 在调用构造函数之前需要为当前对象开辟内存， 需要将内存地址传入构造函数。在 .init_array 中只放构造函数的地址很明显是无法确定构造的是哪个对象的， 因此编译器在外部进行了封装。
 
-  
+在上述的示例中， 全局对象初始化的过程用链：\_\_libc_csu_init -> \_GLOBAL\_\_sub_I_c -> \_\_static_initialization_and_destruction_0 -> C::C()。
 
-在上述的示例中， 全局对象初始化的过程用链：__libc_csu_init -> _GLOBAL__sub_I_c -> __static_initialization_and_destruction_0 -> C::C()。
-
-  
-
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **init_priority**
 
-  
-
-init_priority介绍：  
+init_priority介绍：\
 https://gcc.gnu.org/onlinedocs/gcc/C_002b_002b-Attributes.html#index-init_005fpriority-variable-attribute
 
 _In Standard C++, objects defined at namespace scope are guaranteed to be initialized in an order in strict accordance with that of their definitions in a given translation unit. No guarantee is made for initializations across translation units. However, GNU C++ allows users to control the order of initialization of objects defined at namespace scope with the init_priority attribute by specifying a relative priority, a constant integral expression currently bounded between 101 and 65535 inclusive. Lower numbers indicate a higher priority._
@@ -424,61 +367,51 @@ _In Standard C++, objects defined at namespace scope are guaranteed to be initia
 在 C++ 标准中， 编译单元内的对象是按照定义的顺序进行初始化的，通过 init_priority 可以来控制构造函数被调用的相对顺序。
 
 看一段简单的示例：https://godbolt.org/z/6ozEGWKPq
-![[Pasted image 20240909084025.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084025.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 通过 init_priority 来使后定义的对象先初始化：
 
 https://godbolt.org/z/s5G1G3eEd
-![[Pasted image 20240909084030.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084030.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 查看下该示例的 section 与 反汇编代码：
-![[Pasted image 20240909084036.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084036.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-init_priority 决定了 初始化函数在 .init_array 里面的相对顺序， 200 的排在 201 的前面， 看下 __static_initialization_and_destruction_0 的汇编：
-![[Pasted image 20240909084041.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+init_priority 决定了 初始化函数在 .init_array 里面的相对顺序， 200 的排在 201 的前面， 看下 \_\_static_initialization_and_destruction_0 的汇编：
+!\[\[Pasted image 20240909084041.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-__priority 在 __static_initialization_and_destruction_0 仅表示一个数字， 这个数字代表了要调用的初始化函数， 它并不会实际控制初始化函数的调用顺序， 实际控制调用顺序的是 init_priority。
+\_\_priority 在 \_\_static_initialization_and_destruction_0 仅表示一个数字， 这个数字代表了要调用的初始化函数， 它并不会实际控制初始化函数的调用顺序， 实际控制调用顺序的是 init_priority。
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **思考**
 
-  
-
 **Q:** Does __attribute__((constructor)) execute before C++ static initialization?
 
-**A：**https://stackoverflow.com/questions/8433484/c-static-initialization-vs-attribute-constructor
-
-  
+\*\*A：\*\*https://stackoverflow.com/questions/8433484/c-static-initialization-vs-attribute-constructor
 
 **全局对象初始化顺序**
 
-全局对象初始化顺序介绍：  
+全局对象初始化顺序介绍：\
 https://downloads.ti.com/docs/esd/SPRUI04/global-object-constructors-stdz0560845.html
 
 > Constructors for global objects from a single module are invoked in the order declared in the source code, but the relative order of objects from different object files is unspecified.
 
-在同一编译单元内， 可以通过 init_priority 来控制全局对象的相对初始化顺序；跨编译单元之间全局对象初始化的顺序是未定义的。  
-
-  
+在同一编译单元内， 可以通过 init_priority 来控制全局对象的相对初始化顺序；跨编译单元之间全局对象初始化的顺序是未定义的。
 
 **1. 编译单元内**
 
 在同一编译单元内， 我们可以使用 init_priority 很好控制全局初始化函数的执行顺序。代码：https://godbolt.org/z/7ox99qv1n
-![[Pasted image 20240909084103.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084103.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **2. 跨编译单元**
 
 看一段示例：
-
-  
 
 test.cpp:
 
@@ -486,7 +419,7 @@ test.cpp:
 #include "third.h" class C { public: C() { printf("%s\n", __FUNCTION__); G_tc.dosomething(); } }; C G_c; int main() { printf("%s\n", __FUNCTION__); return 0; }
 ```
 
-thrid.h:  
+thrid.h:
 
 ```cpp
 #include class ThirdC { public: ThirdC() { printf("%s\n", __FUNCTION__); p = new int(10); } void dosomething() { *p = 20; } int *p; }; extern ThirdC G_tc;
@@ -498,8 +431,6 @@ third.cpp:
 #include "third.h" ThirdC G_tc;
 ```
 
-  
-
 **3. 静态链接**
 
 将 third.cpp 编译成静态库并链接到主程序执行：
@@ -507,28 +438,25 @@ third.cpp:
 ```cpp
 g++ -g -c third.cpp ar -r libthird.a third.o g++ -g test.cpp -L . -lthird
 ```
-![[Pasted image 20240909084209.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+!\[\[Pasted image 20240909084209.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 可以看到程序发生了core， 使用 gdb 进行调试：
-![[Pasted image 20240909084213.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084213.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 发现在在走到 G_c 构造函数的时候， 依赖的 G_tc 对象还没初始化， 在 G_tc.dosomething(); 的时候由于访问到非法内存而引发程序崩溃。
 
-  
-
 我们知道全局对象的构造函数是放在 .init_array 里面的， 静态链接的时候， 已经将两个编译单元内全局对象的构造函数相对地址按照某种顺序放在了 .init_array 里面， 查看可执行程序的 section 信息：
-![[Pasted image 20240909084220.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084220.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 那么他们的执行顺序为：先 0x1188， 后 0x1209， 查看可执行程序的反汇编代码， 查看这两个地址对应的内容：
-![[Pasted image 20240909084225.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240909084225.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 也就是说， 先构造 G_c， 再构造 G_tc。
-
-  
 
 **思考**：
 
@@ -536,51 +464,38 @@ https://downloads.ti.com/docs/esd/SPRUI04/global-constructors-stdz0545810.html#S
 
 > The linker combines the .init_array section form each input file to form a single table in the .init_array section.
 
-静态链接， 在链接阶段会把所有编译单元的.init_array按照某种顺序进行合并， 那么这个顺序是随机的吗？  
+静态链接， 在链接阶段会把所有编译单元的.init_array按照某种顺序进行合并， 那么这个顺序是随机的吗？
 
 https://codebrowser.dev/llvm/lld/ELF/OutputSections.cpp.html#703
 
-> Sorts input sections by section name suffixes, so that .foo.N comes before .foo.M if N < M.
-
-  
+> Sorts input sections by section name suffixes, so that .foo.N comes before .foo.M if N \< M.
 
 答案是否定的， 链接器会根据 .init_array 中存放的初始化函数的后缀来进行排序， 注释中的 N 和 M 是 init_priority 指定的数字。
-
-  
 
 **4. 动态链接**
 
 将 third.cpp 编译成动态库并链接到主程序执行：
 
-Shell  
+Shell
 
 ```cpp
 g++ -g -shared -fPIC third.cpp -o libthird.so g++ -g test.cpp ./libthird.so LD_LIBRARY_PATH=. ./a.out
 ```
-![[Pasted image 20240909084248.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-程序正确运行， 在 G_c 初始化之前， G_tc 已经完成了初始化。  
+!\[\[Pasted image 20240909084248.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+程序正确运行， 在 G_c 初始化之前， G_tc 已经完成了初始化。
 
 那么在动态链接的场景里， 这段程序一定是 100% 运行的吗？
 
-  
-
 答案是一定的， 这是因为对于动态链接的程序来说， loader 会预先加载动态库， 完成动态库中全局对象的初始化， 然后再执行主程序中全局对象的初始化：https://www.gnu.org/software/hurd/glibc/startup.html
 
-  
-
-可以看到在进入 _start 之前， 会先调用 _dl_init， 完成动态库的初始化工作：
+可以看到在进入 \_start 之前， 会先调用 \_dl_init， 完成动态库的初始化工作：
 
 https://elixir.bootlin.com/glibc/glibc-2.28/source/elf/dl-init.c#L78
 
-  
-
 当然， 这只是动态库相对于主程序而言。在复杂的项目中， 很可能会出现两个动态库的全局对象之间有引用的情况， 在这种情况下， 我们依然是无法保证全局对象的初始化的顺序， 这依赖于 linker 和 loader 来决定依赖的多个动态库谁的初始化工作先进行。
-
-  
 
 **5. 如何避免**
 
@@ -610,27 +525,19 @@ third.cpp:
 #include "third.h"
 ```
 
-  
-
 **std::cout 如何工作**
 
 https://en.cppreference.com/w/cpp/io/cout
 
 > These objects are guaranteed to be initialized during or before the first time an object of type std::ios_base::Init is constructed and are available for use in the constructors and destructors of static objects with ordered initialization (as long as  is included before the object is defined).
 
-  
-
 std::cout 是一个全局对象， 并且在 C++11 中， 它可以保证在其他全局对象构造之前被正确初始化， 它是通过 Schwarz Counter 这项设计来实现的， 并且纳入了 C++标准。
 
-  
-
-在 iostream 头文件中， 定义了 static ios_base::Init __ioinit; 私有的全局对象， 当包含 iostream 头文件时， 根据定义的顺序， 会预先执行 __ioinit 的初始化， 在 Init::Init() 里面会完成 cout 的初始化工作：
+在 iostream 头文件中， 定义了 static ios_base::Init \_\_ioinit; 私有的全局对象， 当包含 iostream 头文件时， 根据定义的顺序， 会预先执行 \_\_ioinit 的初始化， 在 Init::Init() 里面会完成 cout 的初始化工作：
 
 • 在此之前会定义一块全局的char类型的缓冲区， 该缓冲区的大小要能装得下流对象的大小， 并定义全局流对象指向这块缓冲区。
 
 • 在 Init::Init() 中使用 placement new 在缓冲区中构造流对象。
-
-  
 
 以 Schwarz Counter 来改写之前的示例：
 
@@ -641,7 +548,7 @@ test.cpp:
 class C { public: C() { printf("%s\n", __FUNCTION__); G_tc.dosomething(); } }; C G_c; int main() { printf("%s\n", __FUNCTION__); return 0; }
 ```
 
-thrid.h:  
+thrid.h:
 
 ```cpp
 #include
@@ -658,8 +565,6 @@ third.cpp:
 static int nifty_counter; static typename std::aligned_storage::type Buffer; ThirdC &G_tc = reinterpret_cast(Buffer); ThirdCInitializer::ThirdCInitializer() { if (nifty_counter++ == 0) new (&G_tc) ThirdC(); // placement new }
 ```
 
-  
-
 注：https://stackoverflow.com/questions/9251763/c-static-initialization-via-schwartz-counter
 
 在工程代码中并不建议使用 Schwarz Counter 来设计你的代码：
@@ -668,28 +573,23 @@ static int nifty_counter; static typename std::aligned_storage::type Buffer; Thi
 
 • 保证全局变量在其他各个编译单元的全局变量前完成初始化而带来的启动延迟。
 
-  
-
 **参考链接**
 
 - _https://www.gnu.org/software/hurd/glibc/startup.html_
-    
-- _https://refspecs.linuxbase.org/elf/gabi4+/ch5.dynamic.html_
-    
-- _https://refspecs.linuxfoundation.org/elf/gabi4+/ch4.sheader.html#special_sections_
-    
-- _https://stackoverflow.com/questions/42912038/what-is-the-difference-between-cxa-atexit-and-atexit_
-    
-- _https://gcc.gnu.org/onlinedocs/gcc-11.2.0/gcc/C_002b_002b-Attributes.html#C_002b_002b-Attributes_
-    
 
-  
+- _https://refspecs.linuxbase.org/elf/gabi4+/ch5.dynamic.html_
+
+- _https://refspecs.linuxfoundation.org/elf/gabi4+/ch4.sheader.html#special_sections_
+
+- _https://stackoverflow.com/questions/42912038/what-is-the-difference-between-cxa-atexit-and-atexit_
+
+- _https://gcc.gnu.org/onlinedocs/gcc-11.2.0/gcc/C_002b_002b-Attributes.html#C_002b_002b-Attributes_
 
 **热门招聘**
 
 字节跳动STE团队诚邀您的加入！团队长期招聘，**北京、上海、深圳、杭州、US、UK** 均设岗位，以下为近期的招聘职位信息，有意向者可直接扫描海报二维码投递简历，期待与你早日相遇，在字节共赴星辰大海！若有问题可咨询小助手微信：sys_tech，岗位多多，快来砸简历吧！
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **往期精彩**
 
@@ -731,13 +631,11 @@ static int nifty_counter; static typename std::aligned_storage::type Buffer; Thi
 
 [十年磨一剑，veLinux深度解读](http://mp.weixin.qq.com/s?__biz=Mzg3Mjg2NjU4NA==&mid=2247483680&idx=1&sn=d767d17e8b28baacb25f759c02e7bd0c&chksm=cee9f757f99e7e4136580232d4c56d619feacdd939e84ed9780d010b73417c5739b223a5c4dd&scene=21#wechat_redirect)
 
-  
-
 **关于STE团队**
 
 **字节跳动STE团队**（System Technologies&Engineering，系统技术与工程），一直致力于操作系统内核与虚拟化、系统基础软件与基础库的构建和性能优化、超大规模数据中心的系统稳定性和可靠性建设、新硬件与软件的协同设计等基础技术领域的研发与工程化落地，具备全面的基础软件工程能力，为字节上层业务保驾护航。同时，团队积极关注社区技术动向，拥抱开源和标准，欢迎更多同学加入我们，一起交流学习。扫描下方二维码了解职位详情，欢迎大家投递简历至huangxuechun.hr@bytedance.com 、wangan.hr@bytedance.com。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 扫码查看职位详情
 

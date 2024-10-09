@@ -1,10 +1,13 @@
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-1-27 18:31 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
+
 # 一、前言
 
 无论你愿意或者不愿意，linux kernel的版本总是不断的向前推进，做为一个热衷于专研内核的工程师，最大的痛苦莫过于此：当你熟悉了一个版本的内核之后，内核已经推进到一个新的版本，你曾经熟悉的内容可能会变得陌生（这里主要说的是该模块的内部实现，实际上，内核中的每一个子系统都是会尽量保持接口API的不变）。怎么应对这种变化呢？一方面，具体的实现可能千差万别，但是基本的概念是一样的，无论哪一个版本的内核，总是能够理解一个内核子系统的基本概念和运作机理。另外一方面，不同版本之间的实现不同往往是有原因的，新版本中具体实现的不同往往是针对旧版本的问题而改进的，如果你能够理清不同版本之间的差异以及背后的原因，那么你其实也在不断的加深对计算机系统的理解（不断的迭代是一个不错的学习linux内核的方法）。
 
 因此，在进入具体的Linux2.6.11版本内核RCU实现之前，我们首先描述why，也就是说为何修改RCU算法实现？旧内核有哪里不足，新的内核优点是什么？随后需要描述的是如何改进，最后，我们描述的是Linux2.6.11版本内核RCU模块的具体实现。
+
 # 二、 Linux2.5.43版本的可扩展性（scalability）问题
+
 ## 1、原理
 
 我们现在研究的并行运算系统大多是基于共享内存的：也就是说系统中有若干个CPU core，共享一个memory space。在这种情况下，各个CPU Core对memory space中的某个固定的变量数据的访问就很值得思考一下了。一个简单的例子：假设程序中有一个全局变量A，每个CPU core都运行一个线程对A进行访问。如果大家都是读，那么没有什么问题，除了第一个CPU core用于cache miss需要从main memory加载之外，其他的CPU core的第一次读操作都可以从通过snoop的操作，从其他cache中获取A的值，并将自己的A变量对应的cacheline设置成shared状态。之后，各个CPU core无论如何的发起多次read操作，都可以从自己的local cache中获取A值，因此，整个系统的性能非常好。
@@ -12,9 +15,11 @@
 如果有写的操作会怎样呢？事情就不那么美妙了，写操作不能直接施加到shared状态的cache，必须invalidate其他CPU的local cache中A变量对应的cacheline，才能发起写的动作。因此，一次写操作，由于invalidate其他的local cache中的内容，结果会立刻重创其他所有CPU上的read操作的性能。特别是当CPU core数据增加的时候，共享变量的读写性能瓶颈也会逐步的显现出来。
 
 对策是什么呢？主要有两种方法，一种是改成percpu变量。另外一种方法是减少对全局变量的访问。
+
 ## 2、Linux2.5.43版本的全局变量和访问分析
 
 现在，我们先一起review一下Linux2.5.43版本的全局变量（percpu的那些全局变量不考虑）：
+
 ```cpp
 struct rcu_ctrlblk rcu_ctrlblk =  
 { .mutex = SPIN_LOCK_UNLOCKED, .curbatch = 1,  .maxbatch = 1, .rcu_cpu_mask = 0 };
@@ -26,11 +31,13 @@ struct rcu_ctrlblk {
   unsigned long    rcu_cpu_mask;  
 };
 ```
+
 对于rcu_ctrlblk数据结构中，rcu_cpu_mask成员修改异常频繁，每个CPU都会在自己经历Quiescent state之后，修改该变量。curbatch和maxbatch仅仅是在一次Grace period才修改，特别是如果cpu core增多，curbatch和maxbatch访问频率不变，但是rcu_cpu_mask成员的写操作呈线性增长。因此，如果RCU算法经常读rcu_cpu_mask，那么其读性能一定是非常的差。
 
 下面，我们再一起过一下Linux2.5.43版本对对rcu_cpu_mask的访问情况。
 
 （1）rcu_pending函数对rcu_cpu_mask的访问情况，代码如下：
+
 ```cpp
 static inline int rcu_pending(int cpu)  
 {  
@@ -41,9 +48,11 @@ else
 return 0;  
 }
 ```
+
 在各个CPU的tick handler中，需要调用rcu_pending来检测是否进行后续RCU相关的操作（检查Quiescent state，调用callback什么的）。为什么做这个检查呢？逻辑思考是这样的：如果该CPU以及报告了Quiescent state，那么其rcu_cpu_mask必定被修改成0，因此，通过该bit可以知道其是否上报了Quiescent state，如果已经上报，那么后续的RCU相关的操作在该CPU上不需要进行（这时候，就需要等最后一个上报Quiescent state的CPU启动一次新的Grace Period检查过程之后，该CPU才有事情要做）。你知道的，CPU的资源有限，我们得省着点用，能少执行点代码就少执行点代码。
 
 （2）rcu_check_quiescent_state函数对rcu_cpu_mask的访问情况，代码如下：
+
 ```cpp
 static void rcu_check_quiescent_state(void)  
 {  
@@ -71,9 +80,11 @@ rcu_start_batch(rcu_ctrlblk.maxbatch);－－－－－－－－－－－－－E
 spin_unlock(&rcu_ctrlblk.mutex);  
 }
 ```
+
 在A点的访问，其思路和上一节描述的类似，也是本着解约CPU的MIPS的角度而增加的逻辑判断。B点的访问有必要吗？我没有看出有任何的必要。C和D的访问是必要的，在发现本CPU至少经历一次Quiescent state之后，当然要clear对应的cpu bit。如果rcu_cpu_mask等于0，当然要启动一个新的Grace period的检查过程（处理一批新的callback请求），这对应上面E处的代码。
 
 （3）rcu_start_batch函数对rcu_cpu_mask的访问情况，代码如下：
+
 ```cpp
 static void rcu_start_batch(long newbatch)  
 {  
@@ -87,29 +98,32 @@ return;
 rcu_ctrlblk.rcu_cpu_mask = cpu_online_map;－－－重置CPU BITMASK，必须的  
 }
 ```
+
 如果rcu_start_batch只是在rcu_check_quiescent_state函数（5）处被调用，那么rcu_start_batch函数中对rcu_cpu_mask的非零检查是没有必要的。不过，在rcu_process_callbacks函数，各个CPU在第一次从nextlist链表摘下请求挂入curlist链表中的时候，也会调用该函数。
 
 从上面的描述可以得出结论：Linux2.5.43版本对rcu_cpu_mask的读操作过于频繁，会导致cache line trashing，影响性能。
+
 # 三、Linux2.5.43版本的其他问题
+
 ## 1、实时性问题
 
 （1）原理。我们知道，对于linux kernel而言，中断上下文（包括softirq context，当然tasklet context是softirq context的一种）优先级总是高过进程优先级，也就是说，完成了中断上下文的执行，才会启动进程调度。RCU callback函数是在tasklet context中执行，本质上属于中断上下文，因此，一旦一个批次的Grace period过去，那么这个批次的callback函数会在中断上下文（bottom half）中被一一执行。
 
 （2）Linux2.5.43版本代码review。具体代码如下：
 
-> static void rcu_process_callbacks(unsigned long unused)  
-> {  
->     int cpu = smp_processor_id();  
->     LIST_HEAD(list);
-> 
->     if (!list_empty(&RCU_curlist(cpu)) && rcu_batch_after(rcu_ctrlblk.curbatch, RCU_batch(cpu))) {  
->         list_splice(&RCU_curlist(cpu), &list);  
->         INIT_LIST_HEAD(&RCU_curlist(cpu));  
->     }
-> 
-> ……  
->     if (!list_empty(&list))  
->         rcu_do_batch(&list);  
+> static void rcu_process_callbacks(unsigned long unused)\
+> {\
+> int cpu = smp_processor_id();\
+> LIST_HEAD(list);
+>
+> if (!list_empty(&RCU_curlist(cpu)) && rcu_batch_after(rcu_ctrlblk.curbatch, RCU_batch(cpu))) {\
+> list_splice(&RCU_curlist(cpu), &list);\
+> INIT_LIST_HEAD(&RCU_curlist(cpu));\
+> }
+>
+> ……\
+> if (!list_empty(&list))\
+> rcu_do_batch(&list);\
 > }
 
 在Linux2.5.43版本中，一旦一个批次的RCU callback请求完成了Grace Period，各个CPU会将curlist中的RCU callback请求从链表中摘下，并在tasklet上下文中，一次性的完成所有的callback函数的调用（参考rcu_do_batch函数）。在一般情况下，这样设计也没有什么问题，不过，在RCU callback比较多的时候，一次性完成所有的callback函数的执行是一个非常耗时的操作。当在tasklet上下文中调用成千个callback函数的时候，我想，此刻调度器的内心几乎是崩溃的，应该会有成千个草泥马奔腾而过。
@@ -120,9 +134,9 @@ rcu_ctrlblk.rcu_cpu_mask = cpu_online_map;－－－重置CPU BITMASK，必须的
 
 （2）Linux2.5.43版本代码review。在该版本上，RCU模块的接口API有四个：
 
-> #define **rcu_read_lock**()        preempt_disable()  
-> #define **rcu_read_unlock**()    preempt_enable()  
-> extern void FASTCALL(**call_rcu**(struct rcu_head *head, void (*func)(void *arg), void *arg));  
+> #define **rcu_read_lock**()        preempt_disable()\
+> #define **rcu_read_unlock**()    preempt_enable()\
+> extern void FASTCALL(**call_rcu**(struct rcu_head \*head, void (\*func)(void \*arg), void \*arg));\
 > extern void **synchronize_kernel**(void);
 
 前面两个用来标识RCU reader一侧的临界区的，后面两个是用来被updater调用，以便在适当的时候进行reclaimation的。这套接口函数有一个缺点，就是在RCU-protected pointer读写的时候需要一些额外的memory barrier的操作需要调用者自己来完成。
@@ -131,20 +145,20 @@ rcu_ctrlblk.rcu_cpu_mask = cpu_online_map;－－－重置CPU BITMASK，必须的
 
 在Linux2.5.43这个版本中，检测Quiescent state是通过两个变量来完成的，如下：
 
->     long        qsctr;           
->     long        last_qsctr
+> long        qsctr;         \
+> long        last_qsctr
 
 qsctr是一个不断累加的值，last_qsctr是记录上次的qsctr的值，通过比对last_qsctr和qsctr的值就可以判断CPU的Quiescent state了。但是，我们可以再想想：判断Quiescent state需要两个变量吗？我们需要用一个counter来记录Quiescent state吗？经历3次Quiescent state和经历5次Quiescent state有区别吗？没有。因此，实际上用一个变量就可以解决的问题却使用两个变量。
 
-另外，在Linux2.5.43这个版本中，RCU callback占用内存太多。将struct rcu_head 组织成双向链表是没有必要的，单链表足矣，此外，arg参数也没有必要，毕竟大多数情况下，struct rcu_head是嵌入在其他数据结构中，因此callback函数接收一个struct rcu_head *类型的指针就够了，在callback函数中，可以通过container_of还原嵌入struct rcu_head的数据结构，那么参数其实是没有必要了。
+另外，在Linux2.5.43这个版本中，RCU callback占用内存太多。将struct rcu_head 组织成双向链表是没有必要的，单链表足矣，此外，arg参数也没有必要，毕竟大多数情况下，struct rcu_head是嵌入在其他数据结构中，因此callback函数接收一个struct rcu_head \*类型的指针就够了，在callback函数中，可以通过container_of还原嵌入struct rcu_head的数据结构，那么参数其实是没有必要了。
 
 4、代码可读性问题
 
 在Linux2.5.43这个版本中，对RCU请求批次的管理是通过下面的数据结构控制的：
 
-> struct rcu_ctrlblk {…  
->     long        curbatch;  
->     long        maxbatch;   
+> struct rcu_ctrlblk {…\
+> long        curbatch;\
+> long        maxbatch; \
 > …};
 
 curbatch和maxbatch语义不明晰，给代码阅读带来困难，特别是maxbatch，根本不知道要表达什么。通过代码分析可以知道，maxbatch主要用来确定在上一个Grace Period结束之后（即该批次的Grace period已经过去了）是否立刻启动一个新的Grace period批次。通过maxbatch这个成员可以确定是否启动。如果curbatch==maxbatch，则表示不启动，如果curbatch！=maxbatch则表示需要启动。相信知道真相的你眼泪就会掉下来：一个flag的事，干嘛搞这么复杂？
@@ -155,19 +169,19 @@ curbatch和maxbatch语义不明晰，给代码阅读带来困难，特别是maxb
 
 1、对scalability的改进。可以考虑先把Grace Period相关的数据独立出来，如下：
 
-> struct rcu_state {  
->     spinlock_t    lock;  
->     cpumask_t    cpumask;  
+> struct rcu_state {\
+> spinlock_t    lock;\
+> cpumask_t    cpumask;\
 > };
 
 判断Grace Period的基本算法不变，还是依赖cpumask这个共享数据，每个bit表示一个CPU的Quiescent state，全0则表示渡过了Grace Period。write cpumask的策略不变，只要尽量减少对cpumask的读操作就OK了。
 
 当然，程序逻辑上还是要判断各个CPU的Quiescent state，怎么办呢？Linux2.6.11内核的struct rcu_data引入了两个新的成员，如下：
 
-> struct rcu_data {  
->     long        quiescbatch;   
->     int        qs_pending;
-> 
+> struct rcu_data {\
+> long        quiescbatch; \
+> int        qs_pending;
+>
 > …… };
 
 这两个成员用来判断本CPU的Quiescent state。quiescbatch用来记录本CPU上，正在为哪一个批次号码的RCU callback请求进行Quiescent state的检测。qs_pending用来记录当前CPU是否已经上报了Quiescent state（对应quiescbatch那个批次号），如果等于1，表示处于pending状态，也就是说还没有上报Quiescent state。
@@ -182,9 +196,9 @@ curbatch和maxbatch语义不明晰，给代码阅读带来困难，特别是maxb
 
 3、RCU callback数据结构的修改。struct rcu_head定义如下：
 
-> struct rcu_head {  
->     struct rcu_head *next;  
->     void (*func)(struct rcu_head *head);  
+> struct rcu_head {\
+> struct rcu_head \*next;\
+> void (\*func)(struct rcu_head \*head);\
 > };
 
 这个数据结构减少了50％的memory size，如果系统中大量使用了RCU，那么整体节省的memory不是一个小数目。
@@ -195,18 +209,18 @@ curbatch和maxbatch语义不明晰，给代码阅读带来困难，特别是maxb
 
 缺省定义为10，也就是说如果该批次的callback请求有16个，那么完成10个callback调用之后，必须结束rcu tasklet的执行，等到下一个tick的时候完成剩余callback函数的执行。由于不能一次性执行完所有的callback，因此，需要在struct rcu_data 增加donelist链表，如下：
 
->     struct rcu_head *donelist;  
->     struct rcu_head **donetail;
+> struct rcu_head \*donelist;\
+> struct rcu_head \*\*donetail;
 
 如果不能一次处理完所有的请求，那么剩余的callback请求可以调用tasklet_schedule函数，在下次tasklet context中继续完成（参考rcu_do_batch函数）。由于使用了单向链表，因此struct rcu_data中的链表头不再是struct list_head，而是struct rcu_head 类型的指针，donetail指向链表的尾部。
 
 5、对RCU控制块的改进。struct rcu_ctrlblk就是RCU模块的控制块，代码如下：
 
-> struct rcu_ctrlblk {  
->     long    cur;        /* Current batch number.                      */  
->     long    completed;    /* Number of the last completed batch         */  
->     int    next_pending;    /* Is the next batch already waiting?         */  
-> } ____cacheline_maxaligned_in_smp;
+> struct rcu_ctrlblk {\
+> long    cur;        /\* Current batch number.                      */\
+> long    completed;    /* Number of the last completed batch         */\
+> int    next_pending;    /* Is the next batch already waiting?         \*/\
+> } \_\_\_\_cacheline_maxaligned_in_smp;
 
 cur是当前正在处理的那个批次的callback请求（检测Grace Period进行中），这些请求会在各个CPU的curlist链表中（但是不表示各个CPU中的curlist中的RCU callback请求都属于当前批次，有些CPU的curlist中的请求属于next pending的批次）。对于当前正在处理的批次，它们正等待Grace Period过去，一旦过去，当前正在处理的批次会变成completed批次。
 
@@ -249,19 +263,19 @@ next batch只会出现在各个CPU的rcu_data->batch中。什么时候会出现�
 
 2、CPU0的tick到来事件处理
 
-我们来看看__rcu_pending函数的处理：
+我们来看看\_\_rcu_pending函数的处理：
 
-> static inline int __rcu_pending(struct rcu_ctrlblk *rcp, struct rcu_data *rdp)  
-> {  
->     if (rdp->curlist && !rcu_batch_before(rcp->completed, rdp->batch))－－－－－（1）  
->         return 1;   
->     if (!rdp->curlist && rdp->nxtlist)－－－－－－－－－－－－－－－－－－－－－（2）  
->         return 1;   
->     if (rdp->donelist)－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）  
->         return 1;   
->     if (rdp->quiescbatch != rcp->cur || rdp->qs_pending)－－－－－－－－－－－－（4）  
->         return 1;   
->     return 0;－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（5）  
+> static inline int \_\_rcu_pending(struct rcu_ctrlblk \*rcp, struct rcu_data \*rdp)\
+> {\
+> if (rdp->curlist && !rcu_batch_before(rcp->completed, rdp->batch))－－－－－（1）\
+> return 1; \
+> if (!rdp->curlist && rdp->nxtlist)－－－－－－－－－－－－－－－－－－－－－（2）\
+> return 1; \
+> if (rdp->donelist)－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）\
+> return 1; \
+> if (rdp->quiescbatch != rcp->cur || rdp->qs_pending)－－－－－－－－－－－－（4）\
+> return 1; \
+> return 0;－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（5）\
 > }
 
 （1）如果rcp->completed大于或者等于rdp->batch，那么说明该CPU上的批次（rdp->batch）已经渡过GP（Grace Period），如果rdp->curlist非空，那说明本CPU需要将curlist链表中的请求转移到donelist中，因此pending状态检测返回true。当然，对于本场景，rcp->completed小于rdp->batch，不成立。
@@ -280,16 +294,16 @@ next batch只会出现在各个CPU的rcu_data->batch中。什么时候会出现�
 
 只是在进程切换的时候修改passed_quiesc是否足够呢？我们举一个极端的场景：加入当前系统中有一个realtime的进程，并且优先级最高，那么实际上在该进程进入阻塞状态之前，系统不会发生进程切换，如果把passed_quiesc的修改任务只交给进程切换，那么这种场景下不就悲剧了吗？因此在周期性tick中，其handler中也有可能修改passed_quiesc，如下：
 
-> void rcu_check_callbacks(int cpu, int user)  
-> {  
->     if (user || －－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）  
->         (idle_cpu(cpu) && !in_softirq() &&  
->                 hardirq_count() <= (1 << HARDIRQ_SHIFT))) {－－－－－－－－（2）  
->         rcu_qsctr_inc(cpu);  
->         rcu_bh_qsctr_inc(cpu);  
->     } else if (!in_softirq())－－－－－－－－－－－－－－－－－－－－－－－（3）  
->         rcu_bh_qsctr_inc(cpu);  
->     tasklet_schedule(&per_cpu(rcu_tasklet, cpu));  
+> void rcu_check_callbacks(int cpu, int user)\
+> {\
+> if (user || －－－－－－－－－－－－－－－－－－－－－－－－－－－－（1）\
+> (idle_cpu(cpu) && !in_softirq() &&\
+> hardirq_count() \<= (1 \<\< HARDIRQ_SHIFT))) {－－－－－－－－（2）\
+> rcu_qsctr_inc(cpu);\
+> rcu_bh_qsctr_inc(cpu);\
+> } else if (!in_softirq())－－－－－－－－－－－－－－－－－－－－－－－（3）\
+> rcu_bh_qsctr_inc(cpu);\
+> tasklet_schedule(&per_cpu(rcu_tasklet, cpu));\
 > }
 
 （1）首先，我们知道，rcu_check_callbacks函数是在tick handler中处理，如果timer中断命中了userspace，说明thread已经立刻内核空间，那么必定离开了reader侧的临界区（RCU读侧的临界区不能block，而且我们在rcu_read_lock中disable了preempt，因此RCU读侧的临界区也不会发生抢占）。
@@ -304,19 +318,19 @@ next batch只会出现在各个CPU的rcu_data->batch中。什么时候会出现�
 
 CPU1的tick事件到来的时候，会有哪些逻辑动作呢？在rcu_check_quiescent_state函数中，检测到passed_quiesc被置位，这是推动进入下一个状态的原动力。这时候会执行下面的动作：
 
-> rdp->qs_pending = 0;  
-> if (likely(rdp->quiescbatch == rcp->cur))  
->     cpu_quiet(rdp->cpu, rcp, rsp);
+> rdp->qs_pending = 0;\
+> if (likely(rdp->quiescbatch == rcp->cur))\
+> cpu_quiet(rdp->cpu, rcp, rsp);
 
 一方面由于已经探测到本CPU的QS已经通过，因此clear该CPU的qs_pending，说明当前批次在本CPU上的QS状态探测已经完毕。另外，需要调用cpu_quiet来设置本CPU的Quiescent state，代码如下：
 
-> static void cpu_quiet(int cpu, struct rcu_ctrlblk *rcp, struct rcu_state *rsp)  
-> {  
->     cpu_clear(cpu, rsp->cpumask);－－－－－－－－－－－－－－－－（1）  
->     if (cpus_empty(rsp->cpumask)) {－－－－－－－－－－－－－－－（2）  
->         rcp->completed = rcp->cur;－－－－－－－－－－－－－－－－（3）  
->         rcu_start_batch(rcp, rsp, 0);－－－－－－－－－－－－－－－－（4）  
->     }  
+> static void cpu_quiet(int cpu, struct rcu_ctrlblk \*rcp, struct rcu_state \*rsp)\
+> {\
+> cpu_clear(cpu, rsp->cpumask);－－－－－－－－－－－－－－－－（1）\
+> if (cpus_empty(rsp->cpumask)) {－－－－－－－－－－－－－－－（2）\
+> rcp->completed = rcp->cur;－－－－－－－－－－－－－－－－（3）\
+> rcu_start_batch(rcp, rsp, 0);－－－－－－－－－－－－－－－－（4）\
+> }\
 > }
 
 （1）清除cpumask这个bitmask中代表自己的那个bit
@@ -351,39 +365,39 @@ OK，至此，我们可以得到当前的状态如下：
 |   |   |   |   |
 |---|---|---|---|
 |rcu_state|rcu_ctrlblk|CPU0的rcu_data|CPU1的rcu_data|
-|cpumask（0，0）|Cur（5）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（5）  <br>passed_quiesc（1）  <br>qs_pending（0）  <br>batch（5）  <br>nextlist（**）  <br>curlist（＝＝）  <br>donelist（）|Quiescbatch（5）  <br>passed_quiesc（1）  <br>qs_pending（0）  <br>batch（5）  <br>nextlist（）  <br>curlist（＝＝＝）  <br>donelist（）|
+|cpumask（0，0）|Cur（5）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（5）  <br>passed_quiesc（1）  <br>qs_pending（0）  <br>batch（5）  <br>nextlist（\*\*）  <br>curlist（＝＝）  <br>donelist（）|Quiescbatch（5）  <br>passed_quiesc（1）  <br>qs_pending（0）  <br>batch（5）  <br>nextlist（）  <br>curlist（＝＝＝）  <br>donelist（）|
 
 6、CPU0的tick到来事件处理
 
-这次tick的到来会处理不少的事情，我们一起来看看__rcu_process_callbacks的代码：
+这次tick的到来会处理不少的事情，我们一起来看看\_\_rcu_process_callbacks的代码：
 
-> static void __rcu_process_callbacks(struct rcu_ctrlblk *rcp,  
->             struct rcu_state *rsp, struct rcu_data *rdp)  
-> {  
->     if (rdp->curlist && !rcu_batch_before(rcp->completed, rdp->batch)) {－－－－（1）  
->         将curlist链表中的请求转移到donelist  
->     }
-> 
->     local_irq_disable();  
->     if (rdp->nxtlist && !rdp->curlist) {  
->         将nxtlistlist链表中的请求转移到curlist  
->         local_irq_enable();
-> 
->         rdp->batch = rcp->cur + 1;－－－－－－－－－－－－－－－－－－－－－（2）  
->         smp_rmb();
-> 
->         if (!rcp->next_pending) {－－－－－－－－－－－－－－－－－－－－－－（3）  
->             spin_lock(&rsp->lock);  
->             rcu_start_batch(rcp, rsp, 1);－－－－－－－－－－－－－－－－－－－（4）  
->             spin_unlock(&rsp->lock);  
->         }  
->     } else {  
->         local_irq_enable();  
->     }  
->     rcu_check_quiescent_state(rcp, rsp, rdp);  
->     if (rdp->donelist)  
->         rcu_do_batch(rdp);－－－－－完成callback函数的执行
-> 
+> static void \_\_rcu_process_callbacks(struct rcu_ctrlblk \*rcp,\
+> struct rcu_state \*rsp, struct rcu_data \*rdp)\
+> {\
+> if (rdp->curlist && !rcu_batch_before(rcp->completed, rdp->batch)) {－－－－（1）\
+> 将curlist链表中的请求转移到donelist\
+> }
+>
+> local_irq_disable();\
+> if (rdp->nxtlist && !rdp->curlist) {\
+> 将nxtlistlist链表中的请求转移到curlist\
+> local_irq_enable();
+>
+> rdp->batch = rcp->cur + 1;－－－－－－－－－－－－－－－－－－－－－（2）\
+> smp_rmb();
+>
+> if (!rcp->next_pending) {－－－－－－－－－－－－－－－－－－－－－－（3）\
+> spin_lock(&rsp->lock);\
+> rcu_start_batch(rcp, rsp, 1);－－－－－－－－－－－－－－－－－－－（4）\
+> spin_unlock(&rsp->lock);\
+> }\
+> } else {\
+> local_irq_enable();\
+> }\
+> rcu_check_quiescent_state(rcp, rsp, rdp);\
+> if (rdp->donelist)\
+> rcu_do_batch(rdp);－－－－－完成callback函数的执行
+>
 > }
 
 （1）一旦该cpu上的curlist链表有请求，并且completed大于或者等于其批次号（rdp->batch），那么说明该CPU上的curlist链表中的批次已经渡过GP，可以移动到donelist中了。
@@ -394,43 +408,43 @@ OK，至此，我们可以得到当前的状态如下：
 
 （4）rcu_start_batch函数中的next_pending参数是用来控制是否设定pending标志的，对于这个场景，我们刚刚分配了一个新的batch number，当然传递1的标志了，这样可以将其设定为pending状态。不过，如果能够顺利的启动一个新的批次，那么pending标志还是会被清除（一个新分配的批次如果立刻启动，那么说明其变成当前的批次，而不是pending了）。具体代码如下：
 
-> static void rcu_start_batch(struct rcu_ctrlblk *rcp, struct rcu_state *rsp, int next_pending)  
-> {  
->     if (next_pending)  
->         rcp->next_pending = 1; －－－－－先设置为pending，pending的批次号是6
-> 
->     if (rcp->next_pending && rcp->completed == rcp->cur) {－－－当前的5号批次刚刚完成  
->         启动6号批次的GP探测  
->         cpus_andnot(rsp->cpumask, cpu_online_map, nohz_cpu_mask);
-> 
->         rcp->next_pending = 0;－－－6号批次已经扶正，成为current，因此clear pending flag  
->         smp_wmb();  
->         rcp->cur++;－－－－－让cur成员指向6号批次  
->     }  
+> static void rcu_start_batch(struct rcu_ctrlblk \*rcp, struct rcu_state \*rsp, int next_pending)\
+> {\
+> if (next_pending)\
+> rcp->next_pending = 1; －－－－－先设置为pending，pending的批次号是6
+>
+> if (rcp->next_pending && rcp->completed == rcp->cur) {－－－当前的5号批次刚刚完成\
+> 启动6号批次的GP探测\
+> cpus_andnot(rsp->cpumask, cpu_online_map, nohz_cpu_mask);
+>
+> rcp->next_pending = 0;－－－6号批次已经扶正，成为current，因此clear pending flag\
+> smp_wmb();\
+> rcp->cur++;－－－－－让cur成员指向6号批次\
+> }\
 > }
 
 如果当前批次刚刚完成（rcp->completed == rcp->cur）并且有pending的批次（批次6刚刚新鲜出炉）要处理，那么还犹豫什么，立刻启动这个pending的批次处理，这时候，pending的6号批次也就变成了current批次了。需要注意的是：当前的批次是6号批次是一个重大事件，需要广播到系统中的所有的CPU上去，怎么广播的呢？通过rcp->cur++这条指令完成。而其他CPU可以通过对比Quiescbatch和rcp->cur就可以知道是否启动了一个新的批次了。
 
 顺便一提的是：虽然CPU1上5号批次尚未完成，CPU0又启动了6号批次GP的处理（整个系统的cpumask（包括CPU1）被重置），不过没有关系，通过对比rcp->completed和该CPU的rdp->batch就可以知道该CPU上的curlist是否完成了GP探测，需要移动到donelist中。
 
-__rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_check_quiescent_state，代码如下：
+\_\_rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_check_quiescent_state，代码如下：
 
-> static void rcu_check_quiescent_state(struct rcu_ctrlblk *rcp,  
->             struct rcu_state *rsp, struct rcu_data *rdp)  
-> {  
->     if (rdp->quiescbatch != rcp->cur) {－－－－－－－－－－－－－－－－（1）  
->         rdp->qs_pending = 1;  
->         rdp->passed_quiesc = 0;  
->         rdp->quiescbatch = rcp->cur;  
->         return;  
->     }   
->     if (!rdp->qs_pending)－－－－－－－－－－－－－－－－－－－－－－（2）  
->         return;   
->     if (!rdp->passed_quiesc)－－－－－－－－－－－－－－－－－－－－－（3）  
->         return;  
->     rdp->qs_pending = 0; －－－－－－－－－－－－－－－－－－－－－－（4）
-> 
-> ……  
+> static void rcu_check_quiescent_state(struct rcu_ctrlblk \*rcp,\
+> struct rcu_state \*rsp, struct rcu_data \*rdp)\
+> {\
+> if (rdp->quiescbatch != rcp->cur) {－－－－－－－－－－－－－－－－（1）\
+> rdp->qs_pending = 1;\
+> rdp->passed_quiesc = 0;\
+> rdp->quiescbatch = rcp->cur;\
+> return;\
+> } \
+> if (!rdp->qs_pending)－－－－－－－－－－－－－－－－－－－－－－（2）\
+> return; \
+> if (!rdp->passed_quiesc)－－－－－－－－－－－－－－－－－－－－－（3）\
+> return;\
+> rdp->qs_pending = 0; －－－－－－－－－－－－－－－－－－－－－－（4）
+>
+> ……\
 > }
 
 （1）已经启动了新的6号批次的GP处理，而GP的处理需要各个CPU上的QS的检测，因此，在一个新的批次开始之初，需要reset本CPU上的QS检测的flag。
@@ -446,7 +460,7 @@ __rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_ch
 |   |   |   |   |
 |---|---|---|---|
 |rcu_state|rcu_ctrlblk|CPU0的rcu_data|CPU1的rcu_data|
-|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（**）  <br>donelist（＝＝）|Quiescbatch（5）  <br>passed_quiesc（1）  <br>qs_pending（0）  <br>batch（5）  <br>nextlist（）  <br>curlist（＝＝＝）  <br>donelist（）|
+|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（\*\*）  <br>donelist（＝＝）|Quiescbatch（5）  <br>passed_quiesc（1）  <br>qs_pending（0）  <br>batch（5）  <br>nextlist（）  <br>curlist（＝＝＝）  <br>donelist（）|
 
 由上面的状态图可知，当前处理的批次已经变成6，当然5是上次完成的那个批次，在CPU1上还没有处理完毕。此外，CPU0的donelist中的请求也会在本次tick handler中处理。如果请求较少，那么可以一次性处理完毕，这时候donelist是空，否则，会在几次tick handler中（tasklet context）处理完成。
 
@@ -457,7 +471,7 @@ __rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_ch
 |   |   |   |   |
 |---|---|---|---|
 |rcu_state|rcu_ctrlblk|CPU0的rcu_data|CPU1的rcu_data|
-|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（**）  <br>donelist（）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（5）  <br>nextlist（）  <br>curlist（）  <br>donelist（＝＝＝）|
+|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（\*\*）  <br>donelist（）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（5）  <br>nextlist（）  <br>curlist（）  <br>donelist（＝＝＝）|
 
 这时候，CPU1上的batch等于5没有任何实际的意义，因为curlist为空了。
 
@@ -468,7 +482,7 @@ __rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_ch
 |   |   |   |   |
 |---|---|---|---|
 |rcu_state|rcu_ctrlblk|CPU0的rcu_data|CPU1的rcu_data|
-|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（**）  <br>donelist（）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（5）  <br>nextlist（****）  <br>curlist（）  <br>donelist（）|
+|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（0）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（\*\*）  <br>donelist（）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（5）  <br>nextlist（\*\*\*\*）  <br>curlist（）  <br>donelist（）|
 
 9、CPU0的tick再次到来
 
@@ -476,16 +490,16 @@ __rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_ch
 
 10、CPU1的tick再次到来
 
-由于curlist为空并且有新的请求，因此nextlist中的请求又需要移到curlist链表中，同时伴随的动作就是分配一个新的batch number 7，__rcu_process_callbacks相关代码如下：
+由于curlist为空并且有新的请求，因此nextlist中的请求又需要移到curlist链表中，同时伴随的动作就是分配一个新的batch number 7，\_\_rcu_process_callbacks相关代码如下：
 
->         rdp->batch = rcp->cur + 1;－－－－－－－－－－－－－（1）  
->         smp_rmb(); －－－－－－－－－－－－－－－－－－－－（2）
-> 
->         if (!rcp->next_pending) {－－－－－－－－－－－－－－－（3）  
->             spin_lock(&rsp->lock);  
->             rcu_start_batch(rcp, rsp, 1);－－－－－－－－－－－－（4）  
->             spin_unlock(&rsp->lock);  
->         }
+> rdp->batch = rcp->cur + 1;－－－－－－－－－－－－－（1）\
+> smp_rmb(); －－－－－－－－－－－－－－－－－－－－（2）
+>
+> if (!rcp->next_pending) {－－－－－－－－－－－－－－－（3）\
+> spin_lock(&rsp->lock);\
+> rcu_start_batch(rcp, rsp, 1);－－－－－－－－－－－－（4）\
+> spin_unlock(&rsp->lock);\
+> }
 
 （1）新的批次号总是current批次号加一，因此7号批次横空出世，请求挂在本cpu的curlist中。
 
@@ -502,20 +516,20 @@ __rcu_process_callbacks中的大部分的代码逻辑已经清晰，除了rcu_ch
 
 （4）虽然7号批次横空出世，但是是否能启动GP探测呢？当然不能，目前current的6号批次还没有渡过GP，各个CPU还在不断的检测其passed_quiesc呢。因此，这里的rcu_start_batch过程执行如下：
 
-> if (next_pending)  
->     rcp->next_pending = 1; －－－－－－－因为有了7号批次，因此设定pending标志
-> 
-> if (rcp->next_pending &&  
->         rcp->completed == rcp->cur) {－－－－－completed是5，而current是6，因此是false  
->     ……  
+> if (next_pending)\
+> rcp->next_pending = 1; －－－－－－－因为有了7号批次，因此设定pending标志
+>
+> if (rcp->next_pending &&\
+> rcp->completed == rcp->cur) {－－－－－completed是5，而current是6，因此是false\
+> ……\
 > }
 
-completed是5，而current是6，这就意味着当前批次还没有完成GP探测，不能启动新的批次。至此，我们可以得到当前的状态如下： 
+completed是5，而current是6，这就意味着当前批次还没有完成GP探测，不能启动新的批次。至此，我们可以得到当前的状态如下：
 
 |   |   |   |   |
 |---|---|---|---|
 |rcu_state|rcu_ctrlblk|CPU0的rcu_data|CPU1的rcu_data|
-|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（1）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（**）  <br>donelist（）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（7）  <br>nextlist（）  <br>curlist（****）  <br>donelist（）|
+|cpumask（1，1）|Cur（6）  <br>Completed（5）  <br>next_pending（1）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（6）  <br>nextlist（）  <br>curlist（\*\*）  <br>donelist（）|Quiescbatch（6）  <br>passed_quiesc（0）  <br>qs_pending（1）  <br>batch（7）  <br>nextlist（）  <br>curlist（\*\*\*\*）  <br>donelist（）|
 
 这时候，系统中的当前批次是6号批次，正在检测GP，5号批次已经完成，而7号批次是处于pending状态，一旦6号批次完成，7号就可以上位，成为当前批次。
 
@@ -523,13 +537,13 @@ completed是5，而current是6，这就意味着当前批次还没有完成GP探
 
 我们假设CPU0和CPU1的QS都已经通过，也就是说在某个CPU（最后那个通过QS的）cpu_quiet函数中会启动新的批次，这时候的代码如下：
 
-> static void cpu_quiet(int cpu, struct rcu_ctrlblk *rcp, struct rcu_state *rsp)  
-> {  
->     cpu_clear(cpu, rsp->cpumask);  
->     if (cpus_empty(rsp->cpumask)) {  
->         rcp->completed = rcp->cur;  
->         rcu_start_batch(rcp, rsp, 0);  
->     }  
+> static void cpu_quiet(int cpu, struct rcu_ctrlblk \*rcp, struct rcu_state \*rsp)\
+> {\
+> cpu_clear(cpu, rsp->cpumask);\
+> if (cpus_empty(rsp->cpumask)) {\
+> rcp->completed = rcp->cur;\
+> rcu_start_batch(rcp, rsp, 0);\
+> }\
 > }
 
 这时候，  rcu_start_batch函数传递的next_pending参数是0，也就是说不标记pending状态（又不是向curlist中提交请求，当然不会标记pending了）。但是，实际上RCU控制块中的pending已经置位了，这时候rcu_start_batch中的条件成立，因此会立刻启动7号批次。
@@ -548,207 +562,210 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 [![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
-« [显示技术介绍(3)_CRT技术](http://www.wowotech.net/display/crt_intro.html) | [Linux 2.5.43版本的RCU实现（废弃）](http://www.wowotech.net/kernel_synchronization/Linux-2-5-43-RCU.html)»
+« [显示技术介绍(3)\_CRT技术](http://www.wowotech.net/display/crt_intro.html) | [Linux 2.5.43版本的RCU实现（废弃）](http://www.wowotech.net/kernel_synchronization/Linux-2-5-43-RCU.html)»
 
 **评论：**
 
-**fear**  
+**fear**\
 2019-04-04 19:22
 
-static void __rcu_offline_cpu(struct rcu_data *this_rdp,  
-    struct rcu_ctrlblk *rcp, struct rcu_state *rsp, struct rcu_data *rdp)  
-{  
-      
-    spin_lock_bh(&rsp->lock);  
-    if (rcp->cur != rcp->completed)  
-        cpu_quiet(rdp->cpu, rcp, rsp);  
-    spin_unlock_bh(&rsp->lock);  
-        // 还有就是这里有个疑问：如果offline的cpu的curlist上的callback属于下一个batch  
-        // 而当前cpu上的curlist属于当前正在被检测的batch  
-        // 这样不会导致没有经过GP的callback被移动到donelist吗？  
-        // 因为一旦当前batch结束，offline上的callback就会被一起放入donelist了。  
-    rcu_move_batch(this_rdp, rdp->curlist, rdp->curtail);  
-    rcu_move_batch(this_rdp, rdp->nxtlist, rdp->nxttail);  
-  
+static void \_\_rcu_offline_cpu(struct rcu_data \*this_rdp,\
+struct rcu_ctrlblk \*rcp, struct rcu_state \*rsp, struct rcu_data \*rdp)\
+{\
+\
+spin_lock_bh(&rsp->lock);\
+if (rcp->cur != rcp->completed)\
+cpu_quiet(rdp->cpu, rcp, rsp);\
+spin_unlock_bh(&rsp->lock);\
+// 还有就是这里有个疑问：如果offline的cpu的curlist上的callback属于下一个batch\
+// 而当前cpu上的curlist属于当前正在被检测的batch\
+// 这样不会导致没有经过GP的callback被移动到donelist吗？\
+// 因为一旦当前batch结束，offline上的callback就会被一起放入donelist了。\
+rcu_move_batch(this_rdp, rdp->curlist, rdp->curtail);\
+rcu_move_batch(this_rdp, rdp->nxtlist, rdp->nxttail);
+
 }
 
 [回复](http://www.wowotech.net/kernel_synchronization/linux2-6-11-RCU.html#comment-7345)
 
-**fear**  
+**fear**\
 2019-04-04 19:11
 
-static void __rcu_process_callbacks(struct rcu_ctrlblk *rcp,  
-            struct rcu_state *rsp, struct rcu_data *rdp)  
-{  
-    ....  
-                // 如果两个cpu同时进入了下面的if块，后执行rcu_start_batch的cpu会再次设置  
-                // next_pending，但是其实这两个cpu的curlist上的callback应该属于同一个batch  
-                // 这样不会start一次无用的batch吗  
-        if (!rcp->next_pending) {  
-            /* and start it/schedule start if it's a new batch */  
-            spin_lock(&rsp->lock);  
-            rcu_start_batch(rcp, rsp, 1);  
-            spin_unlock(&rsp->lock);  
-        }
+static void \_\_rcu_process_callbacks(struct rcu_ctrlblk \*rcp,\
+struct rcu_state \*rsp, struct rcu_data *rdp)\
+{\
+....\
+// 如果两个cpu同时进入了下面的if块，后执行rcu_start_batch的cpu会再次设置\
+// next_pending，但是其实这两个cpu的curlist上的callback应该属于同一个batch\
+// 这样不会start一次无用的batch吗\
+if (!rcp->next_pending) {\
+/* and start it/schedule start if it's a new batch \*/\
+spin_lock(&rsp->lock);\
+rcu_start_batch(rcp, rsp, 1);\
+spin_unlock(&rsp->lock);\
+}
 
 [回复](http://www.wowotech.net/kernel_synchronization/linux2-6-11-RCU.html#comment-7344)
 
-**goku**  
+**goku**\
 2019-02-25 10:35
 
-我看了这个版本的代码，有个疑问想问一下，为什么rcu_ctrlblk的cur要初始化为-300？这点真想不明白。  
+我看了这个版本的代码，有个疑问想问一下，为什么rcu_ctrlblk的cur要初始化为-300？这点真想不明白。\
 struct rcu_ctrlblk rcu_ctrlblk =  { .cur = -300, .completed = -300 };代码是这样写的。。
 
 [回复](http://www.wowotech.net/kernel_synchronization/linux2-6-11-RCU.html#comment-7203)
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - Shiina  
-        [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
-    - Shiina  
-        [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
-    - leelockhey  
-        [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
+  - Shiina\
+    [一个电路（circuit）中，由于是回路，所以用电势差的概念...](http://www.wowotech.net/basic_subject/voltage.html#8926)
+  - Shiina\
+    [其中比较关键的点是相对位置概念和点电荷的静电势能计算。](http://www.wowotech.net/basic_subject/voltage.html#8925)
+  - leelockhey\
+    [你这是哪个内核版本](http://www.wowotech.net/pm_subsystem/generic_pm_architecture.html#8924)
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [linux cpufreq framework(4)_cpufreq governor](http://www.wowotech.net/pm_subsystem/cpufreq_governor.html)
-    - [Process Creation（二）](http://www.wowotech.net/process_management/process-creation-2.html)
-    - [Why Memory Barriers中文翻译（下）](http://www.wowotech.net/kernel_synchronization/why-memory-barrier-2.html)
-    - [mmap在arm64背后的那个深坑](http://www.wowotech.net/linux_kenrel/516.html)
-    - [Linux I2C framework(2)_I2C provider](http://www.wowotech.net/comm/i2c_provider.html)
+
+  - [linux cpufreq framework(4)\_cpufreq governor](http://www.wowotech.net/pm_subsystem/cpufreq_governor.html)
+  - [Process Creation（二）](http://www.wowotech.net/process_management/process-creation-2.html)
+  - [Why Memory Barriers中文翻译（下）](http://www.wowotech.net/kernel_synchronization/why-memory-barrier-2.html)
+  - [mmap在arm64背后的那个深坑](http://www.wowotech.net/linux_kenrel/516.html)
+  - [Linux I2C framework(2)\_I2C provider](http://www.wowotech.net/comm/i2c_provider.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

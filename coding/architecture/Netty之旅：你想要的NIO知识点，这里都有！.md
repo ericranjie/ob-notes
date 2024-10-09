@@ -1,12 +1,10 @@
-
-
 悟空聊架构
 
- _2021年12月07日 18:20_
+_2021年12月07日 18:20_
 
 以下文章来源于一枝花算不算浪漫 ，作者小飞 & 花哥
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6GibzlDRQbzDScog5MYxiblMdd56V8gOlF2F3iaDUuHib6CA/0)
 
@@ -14,17 +12,11 @@
 
 放弃不难，但坚持一定很酷。记录一个普通Javaer成长之路：http://www.cnblogs.com/wang-meng
 
-](https://mp.weixin.qq.com/s?__biz=MzAwMjI0ODk0NA==&mid=2451961617&idx=2&sn=575990a340da00461f75cd4df2765b64&chksm=8d1c0e8eba6b87988cc361a0557185990df7816d787a7c26e948dc6035f46a01c6e3da3f4f02&mpshare=1&scene=24&srcid=1207PRgy5OZmO52zfMYQmXjP&sharer_sharetime=1638890272341&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d028b5423f80ba0ba5812f1ee22f9bc40559f1b1c70686f408fe7ce654abc85653a7017e0ff276647757c966c685b0449196557767def7413923104d6486b7cc20cf4a6677963a0262b3e25282fb1b1cb034e9269fbdce017b3197e185344a1f2434bcda6dd729eaaed56dda67d261ee29c5c12234dcdea573&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQfcsM0MQqeZFyPKcb9wMUcRLmAQIE97dBBAEAAAAAAE2TOHdJOrgAAAAOpnltbLcz9gKNyK89dVj0qn3H7p%2BpQGwyxHCYKSECZDAWTouo9vuzRVbD1KMvClbKeCAj3EsCv3EtxEG9NaHo6UIk3fagH5KK7gg%2FOFDv%2BfXsX3P8c09OgvOKc2pQWDr0LGoe0j54%2Bs3pDJjrfEkQxyP%2FE5WmxtKYf59YFvppOMEL0YaIIioJ5hxPTQlJoZD06FgB7VpY1LOj52FJr7K%2BRUespSU1dGq8TwSiEKuJpJlwafzSIbaSeDCbTNnB0b5pJzYaQyN0AuD6pyOM5ovJ&acctmode=0&pass_ticket=UgBJWls70RGz94nqyrM0lrkpxgAWKbJDfjbOI9yQ3ZlKB9KVDojBFK4Xzl%2FiuER5&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzAwMjI0ODk0NA==&mid=2451961617&idx=2&sn=575990a340da00461f75cd4df2765b64&chksm=8d1c0e8eba6b87988cc361a0557185990df7816d787a7c26e948dc6035f46a01c6e3da3f4f02&mpshare=1&scene=24&srcid=1207PRgy5OZmO52zfMYQmXjP&sharer_sharetime=1638890272341&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d028b5423f80ba0ba5812f1ee22f9bc40559f1b1c70686f408fe7ce654abc85653a7017e0ff276647757c966c685b0449196557767def7413923104d6486b7cc20cf4a6677963a0262b3e25282fb1b1cb034e9269fbdce017b3197e185344a1f2434bcda6dd729eaaed56dda67d261ee29c5c12234dcdea573&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQfcsM0MQqeZFyPKcb9wMUcRLmAQIE97dBBAEAAAAAAE2TOHdJOrgAAAAOpnltbLcz9gKNyK89dVj0qn3H7p%2BpQGwyxHCYKSECZDAWTouo9vuzRVbD1KMvClbKeCAj3EsCv3EtxEG9NaHo6UIk3fagH5KK7gg%2FOFDv%2BfXsX3P8c09OgvOKc2pQWDr0LGoe0j54%2Bs3pDJjrfEkQxyP%2FE5WmxtKYf59YFvppOMEL0YaIIioJ5hxPTQlJoZD06FgB7VpY1LOj52FJr7K%2BRUespSU1dGq8TwSiEKuJpJlwafzSIbaSeDCbTNnB0b5pJzYaQyN0AuD6pyOM5ovJ&acctmode=0&pass_ticket=UgBJWls70RGz94nqyrM0lrkpxgAWKbJDfjbOI9yQ3ZlKB9KVDojBFK4Xzl%2FiuER5&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
-大家好，我是悟空呀~本篇给大家带来的是 Netty 核心知识。建议收藏起来慢慢看~  
-
-  
+大家好，我是悟空呀~本篇给大家带来的是 Netty 核心知识。建议收藏起来慢慢看~
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/SfAHMuUxqJ2uDuAHD45Yryn9ehtufwIxuJVI7k4Y3YwxDnu8ptK0teEopqyfUc7NibgRoEcuZAw6E4Tln2RH0ag/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
-
-  
-
-  
 
 NIO思维导图.png
 
@@ -73,44 +65,40 @@ NIO思维导图.png
 基于以上两个阶段就产生了五种不同的IO模式。
 
 1. 阻塞IO：从进程发起IO操作，一直等待上述两个阶段完成，此时两阶段一起阻塞。
-    
-2. 非阻塞IO：进程一直询问IO准备好了没有，准备好了再发起读取操作，这时才把数据从内核空间拷贝到用户空间。第一阶段不阻塞但要轮询，第二阶段阻塞。
-    
-3. 多路复用IO：多个连接使用同一个select去询问IO准备好了没有，如果有准备好了的，就返回有数据准备好了，然后对应的连接再发起读取操作，把数据从内核空间拷贝到用户空间。两阶段分开阻塞。
-    
-4. 信号驱动IO：进程发起读取操作会立即返回，当数据准备好了会以通知的形式告诉进程，进程再发起读取操作，把数据从内核空间拷贝到用户空间。第一阶段不阻塞，第二阶段阻塞。
-    
-5. 异步IO：进程发起读取操作会立即返回，等到数据准备好且已经拷贝到用户空间了再通知进程拿数据。两个阶段都不阻塞。
-    
+
+1. 非阻塞IO：进程一直询问IO准备好了没有，准备好了再发起读取操作，这时才把数据从内核空间拷贝到用户空间。第一阶段不阻塞但要轮询，第二阶段阻塞。
+
+1. 多路复用IO：多个连接使用同一个select去询问IO准备好了没有，如果有准备好了的，就返回有数据准备好了，然后对应的连接再发起读取操作，把数据从内核空间拷贝到用户空间。两阶段分开阻塞。
+
+1. 信号驱动IO：进程发起读取操作会立即返回，当数据准备好了会以通知的形式告诉进程，进程再发起读取操作，把数据从内核空间拷贝到用户空间。第一阶段不阻塞，第二阶段阻塞。
+
+1. 异步IO：进程发起读取操作会立即返回，等到数据准备好且已经拷贝到用户空间了再通知进程拿数据。两个阶段都不阻塞。
 
 这五种IO模式不难发现存在这两对关系：同步和异步、阻塞和非阻塞。那么稍微解释一下：
 
 #### 同步和异步
 
 - **同步：** 同步就是发起一个调用后，被调用者未处理完请求之前，调用不返回。
-    
+
 - **异步：** 异步就是发起一个调用后，立刻得到被调用者的回应表示已接收到请求，但是被调用者并没有返回结果，此时我们可以处理其他的请求，被调用者通常依靠事件，回调等机制来通知调用者其返回结果。
-    
 
 同步和异步的区别最大在于异步的话调用者不需要等待处理结果，被调用者会通过回调等机制来通知调用者其返回结果。
 
 #### 阻塞和非阻塞
 
 - **阻塞：** 阻塞就是发起一个请求，调用者一直等待请求结果返回，也就是当前线程会被挂起，无法从事其他任务，只有当条件就绪才能继续。
-    
+
 - **非阻塞：** 非阻塞就是发起一个请求，调用者不用一直等着结果返回，可以先去干其他事情。
-    
 
 阻塞和非阻塞是针对进程在访问数据的时候，根据IO操作的就绪状态来采取的不同方式，说白了是一种读取或者写入操作方法的实现方式，阻塞方式下读取或者写入函数将一直等待，而非阻塞方式下，读取或者写入方法会立即返回一个状态值。
 
 如果组合后的同步阻塞(`blocking-IO`)简称`BIO`、同步非阻塞(`non-blocking-IO`)简称`NIO`和异步非阻塞(`asynchronous-non-blocking-IO`)简称`AIO`又代表什么意思呢？
 
 - **BIO** (同步阻塞I/O模式): 数据的读取写入必须阻塞在一个线程内等待其完成。这里使用那个经典的烧开水例子，这里假设一个烧开水的场景，有一排水壶在烧开水，BIO的工作模式就是， 叫一个线程停留在一个水壶那，直到这个水壶烧开，才去处理下一个水壶。但是实际上线程在等待水壶烧开的时间段什么都没有做。
-    
+
 - **NIO**(同步非阻塞): 同时支持阻塞与非阻塞模式，但这里我们以其同步非阻塞I/O模式来说明，那么什么叫做同步非阻塞？如果还拿烧开水来说，NIO的做法是叫一个线程不断的轮询每个水壶的状态，看看是否有水壶的状态发生了改变，从而进行下一步的操作。
-    
+
 - **AIO**(异步非阻塞I/O模型): 异步非阻塞与同步非阻塞的区别在哪里？异步非阻塞无需一个线程去轮询所有IO操作的状态改变，在相应的状态改变后，系统会通知对应的线程来处理。对应到烧开水中就是，为每个水壶上面装了一个开关，水烧开之后，水壶会自动通知我水烧开了。
-    
 
 `java` 中的 `BIO`、`NIO`和`AIO`理解为是 `Java 语言`在操作系统层面对这三种 `IO` 模型的封装。程序员在使用这些 封装API 的时候，不需要关心操作系统层面的知识，也不需要根据不同操作系统编写不同的代码，只需要使用`Java`的API就可以了。由此，为了使读者对这三种模型有个比较具体和递推式的了解，并且和本文主题`NIO`有个清晰的对比，下面继续延伸。
 
@@ -119,8 +107,6 @@ NIO思维导图.png
 `BIO`编程方式通常是是Java的上古产品，自JDK 1.0-JDK1.4就有的东西。编程实现过程为：首先在服务端启动一个`ServerSocket`来监听网络请求，客户端启动`Socket`发起网络请求，默认情况下`SeverSocket`会建立一个线程来处理此请求，如果服务端没有线程可用，客户端则会阻塞等待或遭到拒绝。服务器实现模式为一个连接一个线程，即客户端有连接请求时服务器端就需要启动一个线程进行处理。大致结构如下：
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/TCh3WuejsNRsll4w4D6WuibNEViaU3cb7OuvtjlpN9ictEYaPGdiak9dLQiavh8CtFzMOoLHZ2rp6eicuiaRmeK7kZicYA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-  
 
 如果要让 `BIO` 通信模型能够同时处理多个客户端请求，就必须使用多线程（主要原因是 `socket.accept()`、`socket.read()`、 `socket.write()` 涉及的三个主要函数都是同步阻塞的），也就是说它在接收到客户端连接请求之后为每个客户端创建一个新的线程进行链路处理，处理完成之后，通过输出流返回应答给客户端，线程销毁。这就是典型的 一请求一应答通信模型 。我们可以设想一下如果这个连接不做任何事情的话就会造成不必要的线程开销，不过可以通过**线程池机制**改善，线程池还可以让线程的创建和回收成本相对较低。使用线程池机制改善后的 `BIO` 模型图如下:
 
@@ -140,11 +126,11 @@ NIO思维导图.png
 
 `NIO`提供了与传统BIO模型中的`Socket`和`ServerSocket`相对应的`SocketChannel`和`ServerSocketChannel`两种不同的套接字通道实现，如下图结构所示。这里涉及的`Reactor`设计模式、多路复用`Selector`、`Buffer`等暂时不用管，后面会讲到。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 NIO 方式适用于连接数目多且连接比较短(轻操作)的架构，比如聊天服务器，并发局 限于应用中，编程复杂，JDK1.4 开始支持。同时，`NIO`和普通IO的区别主要可以从存储数据的载体、是否阻塞等来区分：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 NIO和普通IO区别.png
 
@@ -164,18 +150,17 @@ NIO和普通IO区别.png
 
 `read()`表示读取通道中数据到缓冲区，`write()`表示把缓冲区数据写入到通道。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Channel和Buffer互相操作.png
 
 `Channel`有好多实现类，这里有三个最常用：
 
 - `SocketChannel`：一个客户端发起TCP连接的Channel
-    
+
 - `ServerSocketChannel`：一个服务端监听新连接的TCP Channel，对于每一个新的Client连接，都会建立一个对应的SocketChannel
-    
+
 - `FileChannel`：从文件中读写数据
-    
 
 其中`SocketChannel`和`ServerSocketChannel`是网络编程中最常用的，一会在最后的示例代码中会有讲解到具体用法。
 
@@ -187,7 +172,7 @@ Channel和Buffer互相操作.png
 
 `Buffer`在`java.nio`中被定义为抽象类：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Buffer结构体系.png
 
@@ -197,45 +182,39 @@ Buffer结构体系.png
 
 `Buffer`中有4个非常重要的属性：**capacity、limit、position、mark**
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Buffer中基本属性.png
 
 - `capacity`属性：容量，Buffer能够容纳的数据元素的最大值，在Buffer初始化创建的时候被赋值，而且不能被修改。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 capacity.png
 
 上图中，初始化Buffer的容量为8（图中从0~7，共8个元素），所以**capacity = 8**
 
 - `limit`属性：代表Buffer可读可写的上限。
-    
 
-- 写模式下：`limit` 代表能写入数据的上限位置，这个时候`limit = capacity`读模式下：在`Buffer`完成所有数据写入后，通过调用`flip()`方法，切换到读模式，此时`limit`等于`Buffer`中实际已经写入的数据大小。因为`Buffer`可能没有被写满，所以**limit<=capacity**
-    
+- 写模式下：`limit` 代表能写入数据的上限位置，这个时候`limit = capacity`读模式下：在`Buffer`完成所有数据写入后，通过调用`flip()`方法，切换到读模式，此时`limit`等于`Buffer`中实际已经写入的数据大小。因为`Buffer`可能没有被写满，所以**limit\<=capacity**
 
 - `position`属性：代表读取或者写入`Buffer`的位置。默认为0。
-    
 
 - 写模式下：每往`Buffer`中写入一个值，`position`就会自动加1，代表下一次写入的位置。
-    
-- 读模式下：每往`Buffer`中读取一个值，`position`就自动加1，代表下一次读取的位置。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- 读模式下：每往`Buffer`中读取一个值，`position`就自动加1，代表下一次读取的位置。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 NIO属性概念.png
 
 从上图就能很清晰看出，读写模式下**capacity、limit、position**的关系了。
 
 - `mark`属性：代表标记，通过mark()方法，记录当前position值，将position值赋值给mark，在后续的写入或读取过程中，可以通过reset()方法恢复当前position为mark记录的值。
-    
 
 这几个重要属性讲完，我们可以再来回顾下：
 
-> 0 <= mark <= position <= limit <= capacity
+> 0 \<= mark \<= position \<= limit \<= capacity
 
 现在应该很清晰这几个属性的关系了~
 
@@ -244,21 +223,18 @@ NIO属性概念.png
 ##### 创建Buffer
 
 - `allocate(int capacity)`
-    
 
 `ByteBuffer buffer = ByteBuffer.allocate(1024);   int count = channel.read(buffer);   `
 
 例子中创建的`ByteBuffer`是基于堆内存的一个对象。
 
 - `wrap(array)`
-    
 
 `wrap`方法可以将数组包装成一个`Buffer`对象:
 
 `ByteBuffer buffer = ByteBuffer.wrap("hello world".getBytes());   channel.write(buffer);   `
 
 - `allocateDirect(int capacity)`
-    
 
 通过`allocateDirect`方法也可以快速实例化一个`Buffer`对象，和`allocate`很相似，这里区别的是`allocateDirect`创建的是基于**堆外内存**的对象。
 
@@ -276,35 +252,31 @@ NIO属性概念.png
 
 还是同上，我们对`Buffer`的读入操作，反过来说就是对`Channel`的**写操作**。读取`Buffer`中的数据然后写入`Channel`中。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Channel和Buffer互相操作.png
 
 ##### 其他常见方法
 
 - `rewind()`：重置position位置为0，可以重新读取和写入buffer，一般该方法适用于读操作，可以理解为对buffer的重复读。
-    
 
 `public final Buffer rewind() {       position = 0;       mark = -1;       return this;   }   `
 
 - `flip()`：很常用的一个方法，一般在写模式切换到读模式的时候会经常用到。也会将position设置为0，然后设置limit等于原来写入的position。
-    
 
 `public final Buffer flip() {       limit = position;       position = 0;       mark = -1;       return this;   }   `
 
 - `clear()`：重置buffer中的数据，该方法主要是针对于写模式，因为limit设置为了capacity，读模式下会出问题。
-    
 
 `public final Buffer clear() {       position = 0;       limit = capacity;       mark = -1;       return this;   }   `
 
 - `mark()&reset()`: `mark()`方法是保存当前`position`到变量`mark`z中，然后通过`reset()`方法恢复当前`position`为`mark`，实现代码很简单，如下：
-    
 
 `public final Buffer mark() {       mark = position;       return this;   }      public final Buffer reset() {       int m = mark;       if (m < 0)           throw new InvalidMarkException();       position = m;       return this;   }   `
 
 常用的读写方法可以用一张图总结一下：
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Buffer读写操作.png
 
@@ -314,32 +286,29 @@ Buffer读写操作.png
 
 `Selector`是NIO中最为重要的组件之一，我们常常说的`多路复用器`就是指的`Selector`组件。`Selector`组件用于轮询一个或多个`NIO Channel`的状态是否处于可读、可写。通过轮询的机制就可以管理多个Channel，也就是说可以管理多个网络连接。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Selector原理图.png
 
 #### 轮询机制
 
 1. 首先，需要将Channel注册到Selector上，这样Selector才知道需要管理哪些Channel
-    
-2. 接着Selector会不断轮询其上注册的Channel，如果某个Channel发生了读或写的时间，这个Channel就会被Selector轮询出来，然后通过SelectionKey可以获取就绪的Channel集合，进行后续的IO操作。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+1. 接着Selector会不断轮询其上注册的Channel，如果某个Channel发生了读或写的时间，这个Channel就会被Selector轮询出来，然后通过SelectionKey可以获取就绪的Channel集合，进行后续的IO操作。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 轮询机制.png
 
 #### 属性操作
 
 1. 创建Selector
-    
 
 通过`open()`方法，我们可以创建一个`Selector`对象。
 
 `Selector selector = Selector.open();   `
 
 2. 注册Channel到Selector中
-    
 
 我们需要将`Channel`注册到`Selector`中，才能够被`Selector`管理。
 
@@ -352,24 +321,22 @@ Selector原理图.png
 `public static final int OP_READ = 1 << 0;   public static final int OP_WRITE = 1 << ;   public static final int OP_CONNECT = 1 << 3;   public static final int OP_ACCEPT = 1 << 4;   `
 
 - `Connect事件` ：连接完成事件( TCP 连接 )，仅适用于客户端，对应 SelectionKey.OP_CONNECT。
-    
+
 - `Accept事件` ：接受新连接事件，仅适用于服务端，对应 SelectionKey.OP_ACCEPT 。
-    
+
 - `Read事件` ：读事件，适用于两端，对应 SelectionKey.OP_READ ，表示 Buffer 可读。
-    
+
 - `Write事件` ：写时间，适用于两端，对应 SelectionKey.OP_WRITE ，表示 Buffer 可写。
-    
 
 `Channel`触发了一个事件，表明该时间已经准备就绪：
 
 - 一个Client Channel成功连接到另一个服务器，成为“连接就绪”
-    
+
 - 一个Server Socket准备好接收新进入的接，称为“接收就绪”
-    
+
 - 一个有数据可读的Channel，称为“读就绪”
-    
+
 - 一个等待写数据的Channel，称为”写就绪“
-    
 
 当然，`Selector`是可以同时对多个事件感兴趣的，我们使用或运算即可组合多个事件：
 
@@ -420,34 +387,32 @@ Selector原理图.png
 回顾一下使用 `NIO` 开发服务端程序的步骤：
 
 1. 创建 `ServerSocketChannel` 和业务处理线程池。
-    
-2. 绑定监听端口，并配置为非阻塞模式。
-    
-3. 创建 `Selector`，将之前创建的 `ServerSocketChannel` 注册到 `Selector` 上，监听 `SelectionKey.OP_ACCEPT`。
-    
-4. 循环执行 `Selector.select()`` 方法，轮询就绪的`Channel`。
-    
-5. 轮询就绪的 `Channel` 时，如果是处于 `OP_ACCEPT` 状态，说明是新的客户端接入，调用 `ServerSocketChannel.accept` 接收新的客户端。
-    
-6. 设置新接入的 `SocketChannel` 为非阻塞模式，并注册到 `Selector` 上，监听 `OP_READ`。
-    
-7. 如果轮询的 `Channel` 状态是 `OP_READ`，说明有新的就绪数据包需要读取，则构造 `ByteBuffer` 对象，读取数据。
-    
+
+1. 绑定监听端口，并配置为非阻塞模式。
+
+1. 创建 `Selector`，将之前创建的 `ServerSocketChannel` 注册到 `Selector` 上，监听 `SelectionKey.OP_ACCEPT`。
+
+1. 循环执行 ``` Selector.select()`` 方法，轮询就绪的 ```Channel\`。
+
+1. 轮询就绪的 `Channel` 时，如果是处于 `OP_ACCEPT` 状态，说明是新的客户端接入，调用 `ServerSocketChannel.accept` 接收新的客户端。
+
+1. 设置新接入的 `SocketChannel` 为非阻塞模式，并注册到 `Selector` 上，监听 `OP_READ`。
+
+1. 如果轮询的 `Channel` 状态是 `OP_READ`，说明有新的就绪数据包需要读取，则构造 `ByteBuffer` 对象，读取数据。
 
 那从这些步骤中基本知道开发者需要熟悉的知识点有：
 
 1. `jdk-nio`提供的几个关键类：`Selector` , `SocketChannel` , `ServerSocketChannel` , `FileChannel` ,`ByteBuffer` ,`SelectionKey`
-    
-2. 需要知道网络知识：tcp粘包拆包 、网络闪断、包体溢出及重复发送等
-    
-3. 需要知道`linux`底层实现，如何正确的关闭`channel`，如何退出注销`selector` ，如何避免`selector`太过于频繁
-    
-4. 需要知道如何让`client`端获得`server`端的返回值,然后才返回给前端，需要如何等待或在怎样作熔断机制
-    
-5. 需要知道对象序列化，及序列化算法
-    
-6. 省略等等，因为我已经有点不舒服了，作为程序员的我习惯了舒舒服服简单的API，不用太知道底层细节，就能写出比较健壮和没有Bug的代码...
-    
+
+1. 需要知道网络知识：tcp粘包拆包 、网络闪断、包体溢出及重复发送等
+
+1. 需要知道`linux`底层实现，如何正确的关闭`channel`，如何退出注销`selector` ，如何避免`selector`太过于频繁
+
+1. 需要知道如何让`client`端获得`server`端的返回值,然后才返回给前端，需要如何等待或在怎样作熔断机制
+
+1. 需要知道对象序列化，及序列化算法
+
+1. 省略等等，因为我已经有点不舒服了，作为程序员的我习惯了舒舒服服简单的API，不用太知道底层细节，就能写出比较健壮和没有Bug的代码...
 
 **NIO 原生 API 的弊端 :**
 

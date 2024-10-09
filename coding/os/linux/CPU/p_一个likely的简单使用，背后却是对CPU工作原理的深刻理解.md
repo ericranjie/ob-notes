@@ -1,14 +1,14 @@
 # [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
 
-talk is cheap,  
+talk is cheap,\
 show me the code!
 
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
+- [首页](http://kfngxl.cn/index.php)
+- [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
+- [内存篇](https://kfngxl.cn/index.php/category/memory/)
+- [网络篇](https://kfngxl.cn/index.php/category/network/)
+- [关于](https://kfngxl.cn/index.php/about.html)
+-
 
 # [一个likely的简单使用，背后却是对CPU工作原理的深刻理解](https://kfngxl.cn/index.php/archives/618/)
 
@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
 
 图中上面红框内是对 if 的汇编结果，可见它使用的是 jne 指令。它的作用是看它的上一句比较结果，如果不相等则跳转到 4004bc 处，相等的话则继续执行后面的指令。
 
-在 jne 指令后面紧挨着的是 n = n + 2 对应的汇编代码，  
-也就是说它把 `n = n + 2` 这段代码逻辑放在了紧挨着自己身边。而把 n = n - 2 的执行逻辑放在了离当前指令较远的 4004bc 处。 
+在 jne 指令后面紧挨着的是 n = n + 2 对应的汇编代码，\
+也就是说它把 `n = n + 2` 这段代码逻辑放在了紧挨着自己身边。而把 n = n - 2 的执行逻辑放在了离当前指令较远的 4004bc 处。
 
 我们再把 likey 换成 unlikey 看一下，发现结果是正好相反，这次把 n = n - 2 的执行逻辑放在前面了，如图。
 
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
 这里要注意的是，每一次缓存数据的单位都是以一个 CacheLine **64 字节**为单位进行存储的。假如说要查询的数据在 L1 中不存在，那么 CPU 的做法是一次性从 L2 中把要访问的数据及其后面的 **64 个字节**全部缓存进来。
 
-假如下一次再执行的时候要访问的指令在上一次已经在 L1 中存在了，那么就直接访问 L1，就不必再从 L2 来读取了。回到上面的例子，假如说我们执行完了 cmp 对比指令以后，判断确实是要进加法分支，那紧接着就会执行 jne 后面的 mov xor 等指令大概率就可以从 L1 中取到了。 
+假如下一次再执行的时候要访问的指令在上一次已经在 L1 中存在了，那么就直接访问 L1，就不必再从 L2 来读取了。回到上面的例子，假如说我们执行完了 cmp 对比指令以后，判断确实是要进加法分支，那紧接着就会执行 jne 后面的 mov xor 等指令大概率就可以从 L1 中取到了。
 
 ![图1.png](https://kfngxl.cn/usr/uploads/2024/03/1546856130.png "图1.png")
 
@@ -127,13 +127,13 @@ int main(int argc, char *argv[])
 
 Linux 作为一个基础程序，在性能上真的是考虑到了极致。内核的作者们内功都是非常的深厚，都深谙计算机的底层工作原理。为了极致的性能追求精心打磨每一个细节，非常值得我们学习和借鉴。
 
-不过这里要说的一点是，likely 和 unlikely 的概率判断务必准确。如果写反了，反而会起到反作用。  
+不过这里要说的一点是，likely 和 unlikely 的概率判断务必准确。如果写反了，反而会起到反作用。\
 今天分享到此结束，求转发！
 
 写在最后，由于我的这些知识在公众号里文章比较分散，很多人似乎没有理解到我对知识组织的体系结构。而且图文也不像视频那样理解起来更直接。所以我在知识星球上规划了视频系列课程，包括**硬件原理、内存管理、进程管理、文件系统、网络管理、Golang语言、容器原理、性能观测、性能优化九大部分大约 120 节内容**，每周更新。加入方式参见[我要开始搞知识星球啦](https://mp.weixin.qq.com/s/_8ux274sY-As__Xwoqmewg)、[如何才能高效地学习技术,我投“融汇贯通”一票](https://mp.weixin.qq.com/s/z82z9jqnt08gBLYGxLHY2g)
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [一个likely的简单使用，背后却是对CPU工作原理的深刻理解](https://kfngxl.cn/index.php/archives/618/)
@@ -178,7 +178,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36946次
     - 本站运营：0年168天19小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

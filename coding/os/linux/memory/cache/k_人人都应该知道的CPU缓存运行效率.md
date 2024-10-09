@@ -5,6 +5,7 @@
 提到CPU性能，大部分同学想到的都是CPU利用率，这个指标确实应该首先被关注。但是除了利用率之外，还有很容易被人忽视的指标，就是指令的运行效率。如果运行效率不高，那CPU利用率再忙也都是瞎忙，产出并不高。
 
 这就好比人，每天都是很忙，但其实每天的效率并不一样。有的时候一天干了很多事情，但有的时候只是瞎忙了一天，回头一看，啥也没干！
+
 ## 一、CPU 硬件运行效率
 
 那啥是CPU的运行效率呢？介绍这个之前我们得先来简单回顾下CPU的构成和工作原理。CPU在生产过程结束后，在硬件上就被光刻机刻成了各种各样的模块。
@@ -51,7 +52,7 @@ CPI全称是cycle per instruction，指的是平均每条指令的时钟周期�
 
 CPI指标可以让我们从整体上对程序的运行速度有一个把握。假如我们的程序运行缓存命中率高，大部分数据都在缓存中能访问到，那CPI就会比较的低。假如说我们的程序的局部性原理把握的不好，或者是说内核的调度算法有问题，那很有可能执行同样的指令就需要更多的CPU周期，程序的性能也会表现的比较的差，CPI指标也会偏高。
 
-**第二类是缓存命中率**。 
+**第二类是缓存命中率**。
 
 缓存命中率指标分析的是程序运行时读取数据时有多少没有被缓存兜住，而穿透访问到内存中了。穿透到内存中访问速度会慢很多。所以程序运行时的Cachemiss指标就是越低越好了。
 
@@ -417,15 +418,15 @@ static int perf_read_one(struct perf_event *event,
 
 那观察 CPU 使用缓存效率高不高的指标主要有 CPI 和缓存命中率几个指标。CPU 硬件在实现上，定义了专门 PMU 模块，其中包含专门用户计数的寄存器。当CPU执行到 PMC 寄存器所指定的事件时，硬件会自动对计数器加1，而不会对程序的正常执行造成任何干扰。有了底层的支持，上层的 Linux 内核就可以通过读取这些 PMC 寄存器的值来获取想要观察的指标了。
 
-我们可以使用 perf 来观察，也可以直接使用内核提供的 perf_event_open 系统调用获取 perf 文件对象，然后自己来读取。  
+我们可以使用 perf 来观察，也可以直接使用内核提供的 perf_event_open 系统调用获取 perf 文件对象，然后自己来读取。\
 ![图5.png](https://kfngxl.cn/usr/uploads/2024/03/3813197280.png "图5.png")
 
 欢迎把这篇文章分享给你团队的小伙伴，大家一起成长！
 
 更多干货内容，详见：
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [人人都应该知道的CPU缓存运行效率](https://kfngxl.cn/index.php/archives/648/)
@@ -470,7 +471,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36926次
     - 本站运营：0年168天18小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

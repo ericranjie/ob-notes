@@ -1,14 +1,14 @@
 # [![开发内功修炼@张彦飞](https://kfngxl.cn/usr/themes/DUX/img/logo.jpg)开发内功修炼@张彦飞](https://kfngxl.cn/)
 
-talk is cheap,  
+talk is cheap,\
 show me the code!
 
--  [首页](http://kfngxl.cn/index.php)
--  [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
--  [内存篇](https://kfngxl.cn/index.php/category/memory/)
--  [网络篇](https://kfngxl.cn/index.php/category/network/)
--  [关于](https://kfngxl.cn/index.php/about.html)
-- 
+- [首页](http://kfngxl.cn/index.php)
+- [CPU篇](https://kfngxl.cn/index.php/category/cpu/)
+- [内存篇](https://kfngxl.cn/index.php/category/memory/)
+- [网络篇](https://kfngxl.cn/index.php/category/network/)
+- [关于](https://kfngxl.cn/index.php/about.html)
+-
 
 # [Linux 中 CPU 利用率是如何算出来的？](https://kfngxl.cn/index.php/archives/631/)
 
@@ -20,11 +20,11 @@ show me the code!
 
 ![图0.png](https://kfngxl.cn/usr/uploads/2024/03/3078122011.png "图0.png")
 
-这个输出结果说简单也简单，说复杂也不是那么容易就能全部搞明白的。例如： 
+这个输出结果说简单也简单，说复杂也不是那么容易就能全部搞明白的。例如：
 
-问题 1：top 输出的利用率信息是如何计算出来的，它精确吗？   
-问题 2：ni 这一列是 nice，它输出的是 cpu 在处理啥时的开销？   
-问题 3：wa 代表的是 io wait，那么这段时间中 cpu 到底是忙碌还是空闲？ 
+问题 1：top 输出的利用率信息是如何计算出来的，它精确吗？ \
+问题 2：ni 这一列是 nice，它输出的是 cpu 在处理啥时的开销？ \
+问题 3：wa 代表的是 io wait，那么这段时间中 cpu 到底是忙碌还是空闲？
 
 今天我们对 cpu 利用率统计进行深入的学习。通过今天的学习，你不但能了解 cpu 利用率统计实现细节，还能 nice、io wait 等指标有更深入的理解。
 
@@ -47,7 +47,7 @@ show me the code!
 
 好，思考结束。经过思考你会发现，这个看起来很简单的需求，实际还是有点小复杂的。
 
-其中一个思路是把所有进程的执行时间都加起来，然后再除以系统执行总时间*4。
+其中一个思路是把所有进程的执行时间都加起来，然后再除以系统执行总时间\*4。
 
 ![图1_2.png](https://kfngxl.cn/usr/uploads/2024/03/3360362529.png "图1_2.png")
 
@@ -72,7 +72,7 @@ show me the code!
 
 我们引入采用周期的概念，定时比如每 1 毫秒采样一次。如果采样的瞬时，cpu 在运行，就将这 1 ms 记录为使用。这时会得出一个瞬时的 cpu 使用率，把它都存起来。
 
-![图4.png](https://kfngxl.cn/usr/uploads/2024/03/862665333.png "图4.png")  
+![图4.png](https://kfngxl.cn/usr/uploads/2024/03/862665333.png "图4.png")\
 在统计 3 秒内的 cpu 使用率的时候，比如上图中的 t1 和 t2 这段时间范围。那就把这段时间内的所有瞬时值全加一下，取个平均值。这样就能解决上面的问题了，统计相对准确，避免了瞬时值剧烈震荡且粒度过粗（只能以 25 %为单位变化）的问题了。
 
 可能有同学会问了，假如 cpu 在两次采样中间发生变化了呢，如下图这种情况。
@@ -339,7 +339,7 @@ Linux 中的定时器会以某个固定节拍，比如 1 ms 一次采样各个 c
 
 top 命令是读取的 /proc/stat 中输出的 cpu 各项利用率数据，而这个数据在内核中的是根据 kernel_cpustat 来汇总并输出的。
 
-回到开篇问题 1，top 输出的利用率信息是如何计算出来的，它精确吗？ 
+回到开篇问题 1，top 输出的利用率信息是如何计算出来的，它精确吗？
 
 /proc/stat 文件输出的是某个时间点的各个指标所占用的节拍数。如果想像 top 那样输出一个百分比，计算过程是分两个时间点 t1, t2 分别获取一下 stat 文件中的相关输出，然后经过个简单的算术运算便可以算出当前的 cpu 利用率。
 
@@ -349,10 +349,10 @@ Github 地址：[https://github.com/yanfeizhang/coder-kung-fu/blob/main/tests/cp
 
 再说是否精确。这个统计方法是采样的，只要是采样，肯定就不是百分之百精确。但由于我们查看 cpu 使用率的时候往往都是计算 1 秒甚至更长一段时间的使用情况，这其中会包含很多采样点，所以查看整体情况是问题不大的。
 
-另外从本文，我们也学到了 top 中输出的 cpu 时间项目其实大致可以分为三类  
-第一类：用户态消耗时间，包括 user 和 nice。如果想看用户态的消耗，要将 user 和 nice 加起来看才对。   
-第二类：内核态消耗时间，包括 irq、softirq 和 system。   
-第三类：空闲时间，包括 io_wait 和 idle。其中 io_wait 也是 cpu 的空闲状态，只不过是在等 io 完成而已。如果只是想看 cpu 到底有多闲，应该把 io_wait 和 idle 加起来才对。 
+另外从本文，我们也学到了 top 中输出的 cpu 时间项目其实大致可以分为三类\
+第一类：用户态消耗时间，包括 user 和 nice。如果想看用户态的消耗，要将 user 和 nice 加起来看才对。 \
+第二类：内核态消耗时间，包括 irq、softirq 和 system。 \
+第三类：空闲时间，包括 io_wait 和 idle。其中 io_wait 也是 cpu 的空闲状态，只不过是在等 io 完成而已。如果只是想看 cpu 到底有多闲，应该把 io_wait 和 idle 加起来才对。
 
 最后，求转发~
 
@@ -360,8 +360,8 @@ Github 地址：[https://github.com/yanfeizhang/coder-kung-fu/blob/main/tests/cp
 
 更多干货内容，详见：
 
-Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)  
-关注公众号：微信扫描下方二维码  
+Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
+关注公众号：微信扫描下方二维码\
 ![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [Linux 中 CPU 利用率是如何算出来的？](https://kfngxl.cn/index.php/archives/631/)
@@ -406,7 +406,7 @@ Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfe
     - 总访问量：36928次
     - 本站运营：0年168天18小时
 
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)  
+© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
 本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
 
 - ###### 去顶部

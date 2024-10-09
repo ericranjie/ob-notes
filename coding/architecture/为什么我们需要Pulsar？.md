@@ -2,7 +2,7 @@
 
 原创 林琳 博文视点Broadview
 
- _2021年12月02日 19:34_
+_2021年12月02日 19:34_
 
 👆点击“博文视点Broadview”，获取更多书讯
 
@@ -14,7 +14,7 @@
 
 理由有很多，由于篇幅问题，我们不能一一列举，下面列出几个日常使用中比较关注的方面。我们会发现，Pulsar不仅仅是一个消息队列。
 
-**1** **云原生环境的适配**  
+**1** **云原生环境的适配**
 
 基于Kubernetes的整个生态，已经成为事实上的云原生标准，大量的服务都开始与这个标准适配。借助于Kubernetes的动态伸缩能力，企业能够更好地管理计算资源，降低成本、提升效率。
 
@@ -112,7 +112,7 @@ Pulsar支持多协议扩展能力，进而演化出了KOP、ROP、AOP等多协�
 
 Pulsar服务端的基本结构可以分为三层，分别是代理层、Broker层和Bookie层。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 Pulsar的总体架构
 
@@ -128,67 +128,51 @@ Broker主要负责整个Pulsar的业务逻辑，BookKeeper只负责数据的存�
 
 Broker除了可以处理常见的数据流请求，比如发送消息、接收消息，还提供了管理流相关的接口。这些接口分为租户（Tenant）级别、命名空间（Namespace）级别、主题（Topic）级别等，比如创建租户、删除命名空间、查询主题列表等。管理流的接口都基于RESTful的HTTP，数据流的接口则基于Pulsar自定义的二进制协议，使用ProtoBuf作为序列化工具。
 
-**BookKeeper是一个可扩展、容错、低延迟、只可追加数据的存储服务。**Pulsar使用它来存储数据，它不包含任何业务逻辑，我们可以把它看作数据库。整个Pulsar的存储逻辑都由BookKeeper负责，它拥有动态伸缩、自动容错恢复、读/写分离等能力，我们会在后面的存储章节中重点讲解BookKeeper。
+\*\*BookKeeper是一个可扩展、容错、低延迟、只可追加数据的存储服务。\*\*Pulsar使用它来存储数据，它不包含任何业务逻辑，我们可以把它看作数据库。整个Pulsar的存储逻辑都由BookKeeper负责，它拥有动态伸缩、自动容错恢复、读/写分离等能力，我们会在后面的存储章节中重点讲解BookKeeper。
 
 Broker和BookKeeper都会用到ZooKeeper，Broker主要用它存储元数据、选主，使用它的分布式锁，BookKeeper的使用场景也类似。Broker除了使用一个本地的ZooKeeper，还可能用到一个Global ZooKeeper，通常是在多个集群之间需要相互通信的场景中，比如跨地域复制等，多个集群之间的Broker使用Global ZooKeeper来共享相关的元数据配置。
 
 本文摘自《深入解析Apache Pulsar》一书，欢迎阅读此书了解更多关于Apache Pulsar的内容！
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "深入解析Apache Pulsar.jpg")
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "深入解析Apache Pulsar.jpg")
-
-**▊****《****深入解析Apache Pulsar》**
+**▊**\*\*《\*\***深入解析Apache Pulsar》**
 
 林琳 著
 
-  
-
 - 详解ApachePulsar源码，深入分析背后原理与实现，实战Pulsar线上问题处理
-    
 
 本书由浅入深地讲解了Apache Pulsar中各个组件的使用方式及内部实现原理，通过阅读本书，读者可以快速、轻松地了解Apache Pulsar内部的运行机制。
 
 第1章介绍Apache Pulsar的背景，以及如何快速部署一个Apache Pulsar服务。第2章介绍Apache Pulsar客户端的实现机制与原理，包括生产者、消费者、管理流客户端等。第3章介绍Apache Pulsar中最重要的逻辑组件—Broker，读者通过这部分内容可以了解Broker所有的特性。除了最基础的收发消息，Apache Pulsar还能进行轻量级的函数计算、数据流转。第4章详细介绍Apache Pulsar的Function和Pulsar IO （Connector）。第5章介绍Apache Pulsar的存储层—BookKeeper，通过对本章的学习，读者可以了解Apache Pulsar的数据存储模型及流程实现。第6章介绍线上实战的一些经验，包括高可用、扩/缩容、资源隔离等。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "pulsar二维码 (2).png")
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "pulsar二维码 (2).png")
 
 （京东满100减50，快快扫码抢购吧！）
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) 
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 如果喜欢本文
 
 欢迎 **在看**丨**留言**丨**分享至朋友圈** 三连
 
-  
+**热文推荐**
 
- **热文推荐**  
+- [Serverless：微服务架构的终极模式](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143566&idx=1&sn=5e5132acc3c5c9ef8a7df9fbdadf1790&chksm=bd0157a48a76deb2e21727881b11b01aed26a5d4e38e41287f06f0cf1f580560e67e2b24090e&scene=21#wechat_redirect)
 
-  
+- [详解阿里开源分布式事务框架Seata](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143524&idx=1&sn=2a80bad1d101849ce1195e665f3309d8&chksm=bd01574e8a76de58f3b164d35296a80b7dff1c09182ef6152698443d1c45bb67a72820662705&scene=21#wechat_redirect)
 
-- [Serverless：微服务架构的终极模式](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143566&idx=1&sn=5e5132acc3c5c9ef8a7df9fbdadf1790&chksm=bd0157a48a76deb2e21727881b11b01aed26a5d4e38e41287f06f0cf1f580560e67e2b24090e&scene=21#wechat_redirect)  
-    
-- [详解阿里开源分布式事务框架Seata](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143524&idx=1&sn=2a80bad1d101849ce1195e665f3309d8&chksm=bd01574e8a76de58f3b164d35296a80b7dff1c09182ef6152698443d1c45bb67a72820662705&scene=21#wechat_redirect)  
-    
-- [图论算法：稳定婚姻问题](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143435&idx=1&sn=fc5603b9feb4c3e959ae282eeaefa430&chksm=bd0157218a76de37fffa48ddfa25582634f3f1f49327c84c1979427f366f8c3b10dc0974c9a7&scene=21#wechat_redirect)  
-    
+- [图论算法：稳定婚姻问题](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143435&idx=1&sn=fc5603b9feb4c3e959ae282eeaefa430&chksm=bd0157218a76de37fffa48ddfa25582634f3f1f49327c84c1979427f366f8c3b10dc0974c9a7&scene=21#wechat_redirect)
+
 - [60万字诚意续作《腾讯游戏开发精粹Ⅱ》正式发布](http://mp.weixin.qq.com/s?__biz=MjM5NTk0NjMwOQ==&mid=2651143374&idx=1&sn=d1479e02c2d85ee8a41016bd14fb33a1&chksm=bd0156e48a76dff264d5d9fbc0dda278aefe21454346db93ec49ffeb42b0504aa359a01e27ce&scene=21#wechat_redirect)
-    
 
-  
+______________________________________________________________________
 
----
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ▼点击阅读原文，查看本书详情~
 

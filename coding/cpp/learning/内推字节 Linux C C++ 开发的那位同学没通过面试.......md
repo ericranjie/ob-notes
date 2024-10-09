@@ -1,13 +1,12 @@
-
 原创 张小方 CppGuide
 
- _2021年03月24日 12:00_
+_2021年03月24日 12:00_
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_jpg/ic8RqseyjxMPRffmX1RfSpu2FgLzUqZ4k37EraaviaT1IianXjxNpbRlLqaUu376n5iaOqZicEXklbPnYIt1RqQBlmg/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
-##   
+## 
 
-## 最近同事内推了一位 Linux C/C++ 后端开发的同学到我们公司面试，我是一面的面试官，很遗憾这位工作了两年的同学面试表现不是很好。  
+## 最近同事内推了一位 Linux C/C++ 后端开发的同学到我们公司面试，我是一面的面试官，很遗憾这位工作了两年的同学面试表现不是很好。
 
 我问了如下一些问题：
 
@@ -36,42 +35,40 @@
 另外，时至今日，你一定要熟悉 C++11/14/17 常用的语言特性和类库，这里简单地列一下：
 
 - 统一的类成员初始化语法与 std::initializer_list
-    
+
 - 注解标签（attributes）
-    
+
 - final/override/=default/=delete 语法
-    
+
 - auto 关键字
-    
+
 - Range-based 循环语法
-    
+
 - 结构化绑定
-    
+
 - stl 容器新增的实用方法
-    
+
 - std::thread
-    
+
 - 线程局部存储 thread_local
-    
+
 - 线程同步原语 std::mutex、std::condition_variable 等
-    
+
 - 原子操作类
-    
+
 - 智能指针类
-    
+
 - std::bind/std::function
-    
 
 C++11/14 网上的资料已经很多了，C++17 的资料不多，重头戏还是 C++11 引入的各种实用特性，这就给读者推荐一本我读过的：
 
 - **《深入理解 C++11：C++11 新特性解析与应用》**
-    
+
 - **《深入应用 C++11：代码优化与工程级应用》**
-    
+
 - **《C++17 完全指南》**
-    
+
 - **《Cpp 17 in Detail》**
-    
 
 这里网络上也有人分享出来，下载链接：
 
@@ -151,7 +148,7 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 
 7.其他的一些算法
 
-如 A*寻路、霍夫曼编码也偶尔会在某一个领域的公司的面试中被问到。
+如 A\*寻路、霍夫曼编码也偶尔会在某一个领域的公司的面试中被问到。
 
 ## 3. 编码基本功
 
@@ -176,11 +173,10 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 容易疏忽的地方有如下几点：
 
 - 小数点问题，如数字 0.123 和 .123 都是合法的；
-    
+
 - 正负号问题，如 +123 和 -123；
-    
+
 - 考虑如何识别第一个非法字符问题，如 123Z89，则应转换成应该 123。
-    
 
 ## 4. 多线程开发基础
 
@@ -191,11 +187,10 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 对于 C++ 开发者，你需要：
 
 - 对于 Windows 开发者，你需要熟练使用 Interlock系列函数、CriticalSection、Event、Mutex、Semphore等API 函数和两个重要的函数 WaitForSingleObject、WaitForMultipleObjects。
-    
+
 - 对于 Linux 开发者，你需要熟练使用 mutex、semphore、condition_variable、read-write-lock 等操作系统API。
-    
+
 - 可以使用 C++ 实现一个简单的线程池，当然支持优先级、动态创建线程功能就更好了。
-    
 
 ## 5. 数据库
 
@@ -268,11 +263,10 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 时下以 NoSql key-value 为思想的内存数据库大行其道，广泛地用于各种后台项目开发。所以 **熟悉一种或几种内存数据库程序已经是面试后台开发的基本要求，** 而这当中以 Redis 为最典型代表，这里以 Redis 为例。
 
 - 第一层面一般是对 Redis 的基础用法的考察 如考察 Redis 支持的基础数据类型、Redis的数据持久化、事务等。
-    
+
 - 第二层面不仅考察 Redis 的基础用法，还会深入到 Redis 源码层面上，如 Redis 的网络通信模型、Redis 各种数据结构的实现等等。
-    
+
 - Redis 高可用技术、cluster、哨兵策略等。
-    
 
 笔者以为，无论是从找工作应付面试还是从提高技术的角度，Redis 是一个非常值得学习的开源软件，希望广大读者有意识地去了解、学习它。
 
@@ -293,47 +287,30 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 另外我在我的公众号 **『高性能服务器开发』** 也为想做后台开发的同学整理了如下资料（公众号回复“**文章下载**”即可打包带走这些资料），欢迎关注：
 
 - [C++高级进阶](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406722424518967297&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [后端开发面试题](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406847298814050304&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [多线程重难点解析](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406836024357126144&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [网络编程重难点解析](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406695350672523267&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [网络通信协议深度解析](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406825429595553793&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [服务器开发进阶](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406709287187087365&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [面试、offer 与薪资那些事儿](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406623755513856001&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [职业规划](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406488296171208708&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
-      
-    
+
 - [张小方的故事](https://mp.weixin.qq.com/mp/appmsgalbum?action=getalbum&album_id=1406508875423121410&__biz=MzU2MTkwMTE4Nw==#wechat_redirect)
-    
 
 如果对后端开发感兴趣，想加入 **Linux** **服务器开发微信交流群** 进行交流，可以先加我微信 **easy_coder**，备注"加微信群"，我拉你入群，备注不对不加哦。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 原创不易，点在看是最大的支持
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 阅读 7209
 
@@ -344,337 +321,336 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 **留言 41**
 
 - 龙
-    
-    广东2023年4月13日
-    
-    赞1
-    
-    电子书能再分享一下吗![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    置顶
-    
-    CppGuide
-    
-    作者2023年4月13日
-    
-    赞2
-    
-    加微信easy_coder领取。
-    
+
+  广东2023年4月13日
+
+  赞1
+
+  电子书能再分享一下吗![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  置顶
+
+  CppGuide
+
+  作者2023年4月13日
+
+  赞2
+
+  加微信easy_coder领取。
+
 - 范蠡
-    
-    2021年3月24日
-    
-    赞3
-    
-    想知道文中的面试题的答案的小伙伴可以加微信群交流，加我微信easy_coder拉你入群。
-    
-    置顶
-    
+
+  2021年3月24日
+
+  赞3
+
+  想知道文中的面试题的答案的小伙伴可以加微信群交流，加我微信easy_coder拉你入群。
+
+  置顶
+
 - Mr.Renᯤ⁶ᴳ
-    
-    2021年3月24日
-    
-    赞14
-    
-    没能力千万不要找别人内推，对谁都不好，自己有能力才找朋友帮忙内推，对朋友是一份信任，对内推公司是一种态度，对自己也是一份责任
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    说的好。
-    
+
+  2021年3月24日
+
+  赞14
+
+  没能力千万不要找别人内推，对谁都不好，自己有能力才找朋友帮忙内推，对朋友是一份信任，对内推公司是一种态度，对自己也是一份责任
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  说的好。
+
 - 编程指北
-    
-    2021年3月24日
-    
-    赞5
-    
-    👍🏻强
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    小北来了呀![[愉快]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞5
+
+  👍🏻强
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  小北来了呀![[愉快]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 轩辕之风
-    
-    2021年3月24日
-    
-    赞1
-    
-    完了，只能回答90%的问题![/::-|](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞2
-    
-    我每次看我的leader面试，前前后后面了几十人了。结果至今录取了2人。。。。。。
-    
+
+  2021年3月24日
+
+  赞1
+
+  完了，只能回答90%的问题![/::-|](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞2
+
+  我每次看我的leader面试，前前后后面了几十人了。结果至今录取了2人。。。。。。
+
 - A🍀 飞鸟
-    
-    2021年3月24日
-    
-    赞2
-    
-    会这么多，只会累死自己
-    
+
+  2021年3月24日
+
+  赞2
+
+  会这么多，只会累死自己
+
 - 张先生 Enfp 竞选者
-    
-    2021年12月21日
-    
-    赞
-    
-    让面试者利用队列写一个多线程下的生产者和消费者程序，全面考察的多线程的资源同步与竞态问题（下文介绍多线程面试题时详细地介绍） 大佬有写这个吗？没找到
-    
-    CppGuide
-    
-    作者2021年12月21日
-    
-    赞1
-    
-    有的，你看条件变量那篇文章。
-    
-    张先生 Enfp 竞选者
-    
-    2021年12月23日
-    
-    赞
-    
-    看到了 谢谢大佬
-    
+
+  2021年12月21日
+
+  赞
+
+  让面试者利用队列写一个多线程下的生产者和消费者程序，全面考察的多线程的资源同步与竞态问题（下文介绍多线程面试题时详细地介绍） 大佬有写这个吗？没找到
+
+  CppGuide
+
+  作者2021年12月21日
+
+  赞1
+
+  有的，你看条件变量那篇文章。
+
+  张先生 Enfp 竞选者
+
+  2021年12月23日
+
+  赞
+
+  看到了 谢谢大佬
+
 - 安神豆腐脑
-    
-    2021年3月25日
-    
-    赞1
-    
-    基础知识很重要啊
-    
+
+  2021年3月25日
+
+  赞1
+
+  基础知识很重要啊
+
 - 阿秀
-    
-    2021年3月24日
-    
-    赞1
-    
-    范哥良心面试官，问的问题都很常见哈哈
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    楼上的说太难了，你说都很常见，你是高手![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    阿秀
-    
-    2021年3月24日
-    
-    赞1
-    
-    ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)C++基础那些，挺常见的 也就那些有区分度了![[捂脸]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞1
+
+  范哥良心面试官，问的问题都很常见哈哈
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  楼上的说太难了，你说都很常见，你是高手![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  阿秀
+
+  2021年3月24日
+
+  赞1
+
+  ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)C++基础那些，挺常见的 也就那些有区分度了![[捂脸]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 柳阿九。
-    
-    2021年3月24日
-    
-    赞
-    
-    多来点干货
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞1
-    
-    啥都不说了吧，求在看和转发。
-    
+
+  2021年3月24日
+
+  赞
+
+  多来点干货
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞1
+
+  啥都不说了吧，求在看和转发。
+
 - 迪士尼在逃王子
-    
-    2021年3月24日
-    
-    赞1
-    
-    ![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)跟网易面试问题差不多
-    
+
+  2021年3月24日
+
+  赞1
+
+  ![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)跟网易面试问题差不多
+
 - 峰哥。
-    
-    2021年3月24日
-    
-    赞1
-    
-    字节面试不容易啊
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞1
-    
-    我问的就是一些基础。。。。。。大佬这。。
-    
+
+  2021年3月24日
+
+  赞1
+
+  字节面试不容易啊
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞1
+
+  我问的就是一些基础。。。。。。大佬这。。
+
 - 罗登
-    
-    2021年3月24日
-    
-    赞1
-    
-    c++太难了吧
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    任何技术学好都不容易。
-    
+
+  2021年3月24日
+
+  赞1
+
+  c++太难了吧
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  任何技术学好都不容易。
+
 - 可爱一只小小鱼
-    
-    2021年3月25日
-    
-    赞
-    
-    做嵌入式开发的后面想转后台，大佬有啥建议没![[Blush]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月25日
-    
-    赞
-    
-    补一下后台需要的技术栈，然后去面试看看，之前有不少星球球友都是嵌入式转的后台。
-    
+
+  2021年3月25日
+
+  赞
+
+  做嵌入式开发的后面想转后台，大佬有啥建议没![[Blush]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月25日
+
+  赞
+
+  补一下后台需要的技术栈，然后去面试看看，之前有不少星球球友都是嵌入式转的后台。
+
 - 彼岸鱼
-    
-    2021年3月25日
-    
-    赞
-    
-    太真实了 这些问题这次春招问了好多
-    
+
+  2021年3月25日
+
+  赞
+
+  太真实了 这些问题这次春招问了好多
+
 - 涛
-    
-    2021年3月24日
-    
-    赞
-    
-    好家伙！我收藏了！光看封面就知道是大佬，
-    
+
+  2021年3月24日
+
+  赞
+
+  好家伙！我收藏了！光看封面就知道是大佬，
+
 - 雷小帅
-    
-    2021年3月24日
-    
-    赞
-    
-    怒赞![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    看你的VCR，你竟然这么年轻～
-    
+
+  2021年3月24日
+
+  赞
+
+  怒赞![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  看你的VCR，你竟然这么年轻～
+
 - 孤客
-    
-    2021年3月24日
-    
-    赞
-    
-    之前找实习的时候就是问的这些![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    然后呢，实习找到了吗？
-    
-    孤客
-    
-    2021年3月24日
-    
-    赞
-    
-    找到了，已经转正了，过几个月就去报道了![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞
+
+  之前找实习的时候就是问的这些![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  然后呢，实习找到了吗？
+
+  孤客
+
+  2021年3月24日
+
+  赞
+
+  找到了，已经转正了，过几个月就去报道了![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - ManateeLazyCat
-    
-    2021年3月24日
-    
-    赞
-    
-    基础不牢 地动山摇
-    
+
+  2021年3月24日
+
+  赞
+
+  基础不牢 地动山摇
+
 - 张自远
-    
-    2021年3月24日
-    
-    赞
-    
-    ![/:strong](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞
+
+  ![/:strong](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Barney
-    
-    2021年3月24日
-    
-    赞
-    
-    说的好
-    
+
+  2021年3月24日
+
+  赞
+
+  说的好
+
 - 吴少侠，也在江湖
-    
-    2021年3月24日
-    
-    赞
-    
-    目前正在积极转行中。看了群主的面试大部分考察的内容，C++基础部分，数据结构与算法(除了红黑树不是很了解外)，以及基本的数据库基本要求这些都还OK。接下来就要准备开始学习多线程编程网络编程，再做几个项目，就准备去找工作了，加油，给我冲！！！
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    这些内容都不难，高级面试不会问这么基础的。加油！
-    
+
+  2021年3月24日
+
+  赞
+
+  目前正在积极转行中。看了群主的面试大部分考察的内容，C++基础部分，数据结构与算法(除了红黑树不是很了解外)，以及基本的数据库基本要求这些都还OK。接下来就要准备开始学习多线程编程网络编程，再做几个项目，就准备去找工作了，加油，给我冲！！！
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  这些内容都不难，高级面试不会问这么基础的。加油！
+
 - Tudou
-    
-    2021年3月24日
-    
-    赞
-    
-    问题有解答吗
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    加群交流吧。
-    
+
+  2021年3月24日
+
+  赞
+
+  问题有解答吗
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  加群交流吧。
 
 已无更多数据
 
@@ -693,336 +669,335 @@ CppGuide
 **留言 41**
 
 - 龙
-    
-    广东2023年4月13日
-    
-    赞1
-    
-    电子书能再分享一下吗![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    置顶
-    
-    CppGuide
-    
-    作者2023年4月13日
-    
-    赞2
-    
-    加微信easy_coder领取。
-    
+
+  广东2023年4月13日
+
+  赞1
+
+  电子书能再分享一下吗![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  置顶
+
+  CppGuide
+
+  作者2023年4月13日
+
+  赞2
+
+  加微信easy_coder领取。
+
 - 范蠡
-    
-    2021年3月24日
-    
-    赞3
-    
-    想知道文中的面试题的答案的小伙伴可以加微信群交流，加我微信easy_coder拉你入群。
-    
-    置顶
-    
+
+  2021年3月24日
+
+  赞3
+
+  想知道文中的面试题的答案的小伙伴可以加微信群交流，加我微信easy_coder拉你入群。
+
+  置顶
+
 - Mr.Renᯤ⁶ᴳ
-    
-    2021年3月24日
-    
-    赞14
-    
-    没能力千万不要找别人内推，对谁都不好，自己有能力才找朋友帮忙内推，对朋友是一份信任，对内推公司是一种态度，对自己也是一份责任
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    说的好。
-    
+
+  2021年3月24日
+
+  赞14
+
+  没能力千万不要找别人内推，对谁都不好，自己有能力才找朋友帮忙内推，对朋友是一份信任，对内推公司是一种态度，对自己也是一份责任
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  说的好。
+
 - 编程指北
-    
-    2021年3月24日
-    
-    赞5
-    
-    👍🏻强
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    小北来了呀![[愉快]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞5
+
+  👍🏻强
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  小北来了呀![[愉快]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 轩辕之风
-    
-    2021年3月24日
-    
-    赞1
-    
-    完了，只能回答90%的问题![/::-|](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞2
-    
-    我每次看我的leader面试，前前后后面了几十人了。结果至今录取了2人。。。。。。
-    
+
+  2021年3月24日
+
+  赞1
+
+  完了，只能回答90%的问题![/::-|](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞2
+
+  我每次看我的leader面试，前前后后面了几十人了。结果至今录取了2人。。。。。。
+
 - A🍀 飞鸟
-    
-    2021年3月24日
-    
-    赞2
-    
-    会这么多，只会累死自己
-    
+
+  2021年3月24日
+
+  赞2
+
+  会这么多，只会累死自己
+
 - 张先生 Enfp 竞选者
-    
-    2021年12月21日
-    
-    赞
-    
-    让面试者利用队列写一个多线程下的生产者和消费者程序，全面考察的多线程的资源同步与竞态问题（下文介绍多线程面试题时详细地介绍） 大佬有写这个吗？没找到
-    
-    CppGuide
-    
-    作者2021年12月21日
-    
-    赞1
-    
-    有的，你看条件变量那篇文章。
-    
-    张先生 Enfp 竞选者
-    
-    2021年12月23日
-    
-    赞
-    
-    看到了 谢谢大佬
-    
+
+  2021年12月21日
+
+  赞
+
+  让面试者利用队列写一个多线程下的生产者和消费者程序，全面考察的多线程的资源同步与竞态问题（下文介绍多线程面试题时详细地介绍） 大佬有写这个吗？没找到
+
+  CppGuide
+
+  作者2021年12月21日
+
+  赞1
+
+  有的，你看条件变量那篇文章。
+
+  张先生 Enfp 竞选者
+
+  2021年12月23日
+
+  赞
+
+  看到了 谢谢大佬
+
 - 安神豆腐脑
-    
-    2021年3月25日
-    
-    赞1
-    
-    基础知识很重要啊
-    
+
+  2021年3月25日
+
+  赞1
+
+  基础知识很重要啊
+
 - 阿秀
-    
-    2021年3月24日
-    
-    赞1
-    
-    范哥良心面试官，问的问题都很常见哈哈
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    楼上的说太难了，你说都很常见，你是高手![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    阿秀
-    
-    2021年3月24日
-    
-    赞1
-    
-    ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)C++基础那些，挺常见的 也就那些有区分度了![[捂脸]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞1
+
+  范哥良心面试官，问的问题都很常见哈哈
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  楼上的说太难了，你说都很常见，你是高手![[社会社会]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  阿秀
+
+  2021年3月24日
+
+  赞1
+
+  ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)C++基础那些，挺常见的 也就那些有区分度了![[捂脸]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 柳阿九。
-    
-    2021年3月24日
-    
-    赞
-    
-    多来点干货
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞1
-    
-    啥都不说了吧，求在看和转发。
-    
+
+  2021年3月24日
+
+  赞
+
+  多来点干货
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞1
+
+  啥都不说了吧，求在看和转发。
+
 - 迪士尼在逃王子
-    
-    2021年3月24日
-    
-    赞1
-    
-    ![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)跟网易面试问题差不多
-    
+
+  2021年3月24日
+
+  赞1
+
+  ![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)跟网易面试问题差不多
+
 - 峰哥。
-    
-    2021年3月24日
-    
-    赞1
-    
-    字节面试不容易啊
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞1
-    
-    我问的就是一些基础。。。。。。大佬这。。
-    
+
+  2021年3月24日
+
+  赞1
+
+  字节面试不容易啊
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞1
+
+  我问的就是一些基础。。。。。。大佬这。。
+
 - 罗登
-    
-    2021年3月24日
-    
-    赞1
-    
-    c++太难了吧
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    任何技术学好都不容易。
-    
+
+  2021年3月24日
+
+  赞1
+
+  c++太难了吧
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  任何技术学好都不容易。
+
 - 可爱一只小小鱼
-    
-    2021年3月25日
-    
-    赞
-    
-    做嵌入式开发的后面想转后台，大佬有啥建议没![[Blush]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月25日
-    
-    赞
-    
-    补一下后台需要的技术栈，然后去面试看看，之前有不少星球球友都是嵌入式转的后台。
-    
+
+  2021年3月25日
+
+  赞
+
+  做嵌入式开发的后面想转后台，大佬有啥建议没![[Blush]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月25日
+
+  赞
+
+  补一下后台需要的技术栈，然后去面试看看，之前有不少星球球友都是嵌入式转的后台。
+
 - 彼岸鱼
-    
-    2021年3月25日
-    
-    赞
-    
-    太真实了 这些问题这次春招问了好多
-    
+
+  2021年3月25日
+
+  赞
+
+  太真实了 这些问题这次春招问了好多
+
 - 涛
-    
-    2021年3月24日
-    
-    赞
-    
-    好家伙！我收藏了！光看封面就知道是大佬，
-    
+
+  2021年3月24日
+
+  赞
+
+  好家伙！我收藏了！光看封面就知道是大佬，
+
 - 雷小帅
-    
-    2021年3月24日
-    
-    赞
-    
-    怒赞![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    看你的VCR，你竟然这么年轻～
-    
+
+  2021年3月24日
+
+  赞
+
+  怒赞![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  看你的VCR，你竟然这么年轻～
+
 - 孤客
-    
-    2021年3月24日
-    
-    赞
-    
-    之前找实习的时候就是问的这些![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    然后呢，实习找到了吗？
-    
-    孤客
-    
-    2021年3月24日
-    
-    赞
-    
-    找到了，已经转正了，过几个月就去报道了![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞
+
+  之前找实习的时候就是问的这些![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[Facepalm]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  然后呢，实习找到了吗？
+
+  孤客
+
+  2021年3月24日
+
+  赞
+
+  找到了，已经转正了，过几个月就去报道了![[Lol]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  ![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - ManateeLazyCat
-    
-    2021年3月24日
-    
-    赞
-    
-    基础不牢 地动山摇
-    
+
+  2021年3月24日
+
+  赞
+
+  基础不牢 地动山摇
+
 - 张自远
-    
-    2021年3月24日
-    
-    赞
-    
-    ![/:strong](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年3月24日
+
+  赞
+
+  ![/:strong](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - Barney
-    
-    2021年3月24日
-    
-    赞
-    
-    说的好
-    
+
+  2021年3月24日
+
+  赞
+
+  说的好
+
 - 吴少侠，也在江湖
-    
-    2021年3月24日
-    
-    赞
-    
-    目前正在积极转行中。看了群主的面试大部分考察的内容，C++基础部分，数据结构与算法(除了红黑树不是很了解外)，以及基本的数据库基本要求这些都还OK。接下来就要准备开始学习多线程编程网络编程，再做几个项目，就准备去找工作了，加油，给我冲！！！
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    这些内容都不难，高级面试不会问这么基础的。加油！
-    
+
+  2021年3月24日
+
+  赞
+
+  目前正在积极转行中。看了群主的面试大部分考察的内容，C++基础部分，数据结构与算法(除了红黑树不是很了解外)，以及基本的数据库基本要求这些都还OK。接下来就要准备开始学习多线程编程网络编程，再做几个项目，就准备去找工作了，加油，给我冲！！！
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  这些内容都不难，高级面试不会问这么基础的。加油！
+
 - Tudou
-    
-    2021年3月24日
-    
-    赞
-    
-    问题有解答吗
-    
-    CppGuide
-    
-    作者2021年3月24日
-    
-    赞
-    
-    加群交流吧。
-    
+
+  2021年3月24日
+
+  赞
+
+  问题有解答吗
+
+  CppGuide
+
+  作者2021年3月24日
+
+  赞
+
+  加群交流吧。
 
 已无更多数据

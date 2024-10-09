@@ -1,11 +1,12 @@
 甄建勇 Linux阅码场
- _2021年11月20日 07:00_
+_2021年11月20日 07:00_
 作者简介
-甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。感兴趣领域:经济学、心理学、哲学。 
+甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。感兴趣领域:经济学、心理学、哲学。
 
 # **关于Cache的其它内容**
 
 上面我们所描述情况，在访问cache前，已经将虚拟地址转换成了物理地址，其实，不一定，也可是是虚拟地址直接访问cache，倒底是使用物理地址还是虚拟地址，这就是翻译方式的选择。
+
 ## **（1）虚缓存**
 
 一个简单的方案就是缓存的标签和索引均使用虚拟地址。这种缓存称为虚缓存（virtualcache）。这种缓存的优点是仅在缓存失效时才需要进行页面翻译。由于缓存命中率很高，需要翻译的次数也相对较少。
@@ -18,17 +19,20 @@
 
 第三，别名问题（Alias）。由于操作系统可能允许页面别名，即多个虚拟页面映射至同一物理页面，使用虚拟地址做标签将可能导致一份数据在缓存中出现多份拷贝的情形。这种情况下如果对其中一份拷贝作出修改，而其他拷贝没有同步更新，则数据丧失整合性，导致程序错误。有两个解决办法：其一，硬件级反别名。当缓存载入目标数据时，确认缓存内没有缓存块的标签是此地址的别名。如果有则不载入，而直接返回别名缓存块内的数据。其二，页面着色（PageColoring）。这种技术是由操作系统对页面别名作出限制，使指向同一页面的别名页面具有相同的低端地址。这样，只要缓存的索引范围足够小，就能保证在缓存中决不会出现来自不同别名页面的数据。
 
-第四，输入输出问题。由于输入输出系统通常只使用物理地址，虚缓存必须引入一种逆映射技术来实现虚拟地址到物理地址的转换。 
+第四，输入输出问题。由于输入输出系统通常只使用物理地址，虚缓存必须引入一种逆映射技术来实现虚拟地址到物理地址的转换。
+
 ## **（2）实缓存**
 
 实缓存（physicalcache）完全使用物理地址做缓存块的标签和索引，故地址翻译必须在访问缓存之前进行。这种传统方法所以可行的一个重要原因是TLB的访问周期非常短（因为本质上TLB也是一个缓存），因而可以被纳入流水线。
 
 但是，由于地址翻译发生在缓存访问之前，会比虚缓存更加频繁地造成TLB。（相比之下，虚缓存仅在本身失效的前提下才会访问TLB，进而有可能引发TLB失效）实缓存在运行中存在这样一种可能：首先触发了一个TLB失效，然后从页表中更换TLB表项（假定页表中能找到）。然后再重新访问TLB，翻译地址，最后发现数据不在缓存中。
+
 ## **（3）虚索引、实标签缓存**
 
 一个折中方案是同时使用虚索引和实标签（virtuallyindexed, physically tagged）。这种缓存利用了页面技术的一个特征，即虚拟地址和物理地址享有相同的页内偏移值（pageoffset）。这样，可以使用页内偏移作为缓存索引，同时使用物理页面号作为标签。这种混合方式的好处在于，其既能有效消除诸如别名引用等纯虚缓存的固有问题，又可以通过对TLB和缓存的并行访问来缩短流水线延迟。
 
 这种技术的一个缺点是，在使用直接匹配缓存的前提下，缓存大小不能超过页面大小，否则页面偏移范围就不足以覆盖缓存索引范围。这个弊端可以通过提高组相联路数来改善。
+
 ## **（4）多级cache**
 
 介于处理器和内存二者之间的缓存有两个天然冲突的性能指标：速度和容量。如果只向处理器看齐而追求速度，则必然要靠减少容量来换取访问时间；如果只向内存看齐而追求容量，则必然以增加处理器的访问时间为牺牲。这种矛盾促使人们考虑使用多级缓存。
@@ -47,7 +51,8 @@
 
 当然，也可以如内存对缓存般，使用多级包容性（Multilevelinclusion）设计。这种设计的优点是比较容易方便查看缓存和内存间的数据一致性，因为仅检查最低一级缓存即可。对于多级排他性缓存这种检查必须在各级上分别进行。这种设计的一个主要缺点是，一旦低级缓存由于失效而被更新，就必须相应更新在高级缓存上所有对应的数据。因此，通常令各级缓存的缓存块大小一致，从而减少低级对高级的不必要更新。
 
-此外，各级缓存的写策略也不相同。对于一个两级缓存系统，一级缓存可能会使用写通来简化实现，而二级缓存使用写回确保数据一致性。orpsoc正是这样设计的。 
+此外，各级缓存的写策略也不相同。对于一个两级缓存系统，一级缓存可能会使用写通来简化实现，而二级缓存使用写回确保数据一致性。orpsoc正是这样设计的。
+
 ## **（5）关于cache的优化**
 
 优化缓存可从三个方面入手：减少命中时间，降低失效率，减轻失效代价。此外，增加缓存访问带宽也能有效较低AMAT(平均内存访问时间,AverageMemory Access Time)。
@@ -61,11 +66,13 @@
 AMD从K6到Opteron连续三代CPU的一级缓存容量都没有任何增长（均为64KB）正是基于这个原因。
 
 另一方面，考虑使用简单的缓存，如直接匹配缓存，也可较组相联缓存减少命中时间。
+
 ## _路预测：_
 
 所谓路预测（Wayprediction），是指在组相联缓存中，跟踪同一组内不同缓存块的使用情况，然后在访问到来时，不经比较直接返回预测的缓存块。当然，标签比较仍然会进行，并且如果发现比较结果不同于预测结果，就会重新送出正确的缓存块。也就是说，错误预测会造成一个缓存块长度的延迟。
 
-模拟表明路预测的准确率超过85%[6]。这种技术非常适合于投机执行（SpeculativeExecution）处理器，因为这种处理器有完善的机制来保证在投机失败之后取消已经派发的指令。
+模拟表明路预测的准确率超过85%\[6\]。这种技术非常适合于投机执行（SpeculativeExecution）处理器，因为这种处理器有完善的机制来保证在投机失败之后取消已经派发的指令。
+
 ## _追踪缓存：_
 
 与一般的指令缓存存储静态连续地址不同，追踪缓存（TraceCache）存储的是基于执行历史的动态地址序列。这实际上是把分支预测的结果用在了缓存上。由于只存储沿某一特定分支路径才会遇到的指令，这种缓存可比传统缓存更节省空间。
@@ -102,39 +109,31 @@ _高组相联缓存：_
 
 _编译器优化：_
 
-存在多种编译器优化技术来间接影响缓存的使用模式。 
+存在多种编译器优化技术来间接影响缓存的使用模式。
 
 End
 
----
+______________________________________________________________________
 
 精彩回顾
 
-  
-
 [甄建勇：芯片架构方法学](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652671184&idx=1&sn=16bfce9af8d5650a71ab961ea463a2db&chksm=810fca4db678435b634cb431f9dfc1fe805a57409e9b2d2c068ef16b696b978265c46a0c23ea&scene=21#wechat_redirect)
 
-[甄建勇：五分钟搞定MMU](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680376&idx=1&sn=75fb4280dd0b141dd385b4421b958afd&chksm=810ff625b6787f33c75bcd900f0158d927c81fed0267c1b1aa0f8d8ec173e0fa9aef0bfc58cc&scene=21#wechat_redirect)  
+[甄建勇：五分钟搞定MMU](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680376&idx=1&sn=75fb4280dd0b141dd385b4421b958afd&chksm=810ff625b6787f33c75bcd900f0158d927c81fed0267c1b1aa0f8d8ec173e0fa9aef0bfc58cc&scene=21#wechat_redirect)
 
 [甄建勇：五分钟搞定Cache（上）](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652680424&idx=1&sn=c1e23b0347f7ad77af0597f8c0a42038&chksm=810ff675b6787f634e3377adb3a0ae38b05bf5e62dd9f5582c9f29282e430bf30714b9ae495b&scene=21#wechat_redirect)
 
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-**扫码加入社群**  
-
-  
+**扫码加入社群**
 
 更多精彩尽在"Linux阅码场"，扫描下方二维码关注
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **别忘了分享、点赞或者在看哦~**
-
-  
 
 Reads 3623
 

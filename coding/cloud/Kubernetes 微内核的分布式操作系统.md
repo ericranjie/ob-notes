@@ -1,11 +1,12 @@
 # 
+
 Linux阅码场
 
- _2022年03月11日 08:00_
+_2022年03月11日 08:00_
 
 以下文章来源于金融级分布式架构 ，作者蚂蚁集团 沈凋墨
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/AbruuZ3ILCkSywTjG2Aia8xxB5s3nziaicCuPgGVvUjeR4w8jXP76olrnYnjvkPH4sBMS2zHMicjEj4/0)
 
@@ -13,32 +14,25 @@ Linux阅码场
 
 致力于打造一流的分布式技术在金融场景应用实践的技术交流平台，专注于交流金融科技行业内最前沿、可供参考的技术方案与实施路线。
 
-](https://mp.weixin.qq.com/s?__biz=Mzg2OTc0ODAzMw==&mid=2247502886&idx=1&sn=6c5d583fd0e8410f82c2ada7e90d02fa&source=41&key=daf9bdc5abc4e8d03abb4e8b76992ab653ebbfa36b32217b5b26d686c8f6aca203eaaa8e1d2f9086115d73498ece18e0be65c02667a0af8ecd0a3e259eac3fdce0e0ae1b8a4b191e4002a3fefa1feb5394c3cbd17bf986637164dba142e2e61ab84f18352fbddfb95d16022e141a0d68079b74438b87166de479542f13b71f66&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQtwjSRDRIdoo7R0J5phLNUhLmAQIE97dBBAEAAAAAAKm9KduUNlkAAAAOpnltbLcz9gKNyK89dVj0r7QB2IeSpJP%2BKe%2BoQDq7WNrAm6n9R%2BsGFiUZuOUZtEZcZCEqM95Fk%2F3F1Ve7jHuRhYFEGb3O31OJY7f6L4gJzj8h%2F9y0ajxSK%2FfIY0gtaVlfVAH6Vn89wsEkHZtU%2FwABATMqY33C%2B3LZ8SaZWlrkk41u%2Fejbb%2FX2TGu7E%2FwXL64FJp%2Bl7icg4hcZptYW%2Byl4WaX4GKvzivdQfZzS3tIC3ERpa3wK2v4b8YQSHMM5NMJKVN3RBoEmQztQDU0Srn49&acctmode=0&pass_ticket=KEIQGtuqaZX2zg6aI3eoS4LCb1WwL6VX85G%2B1PgtNrfp%2BMKsOdcF9joPrB%2B%2F94%2Bv&wx_header=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247502886&idx=1&sn=6c5d583fd0e8410f82c2ada7e90d02fa&source=41&key=daf9bdc5abc4e8d03abb4e8b76992ab653ebbfa36b32217b5b26d686c8f6aca203eaaa8e1d2f9086115d73498ece18e0be65c02667a0af8ecd0a3e259eac3fdce0e0ae1b8a4b191e4002a3fefa1feb5394c3cbd17bf986637164dba142e2e61ab84f18352fbddfb95d16022e141a0d68079b74438b87166de479542f13b71f66&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQtwjSRDRIdoo7R0J5phLNUhLmAQIE97dBBAEAAAAAAKm9KduUNlkAAAAOpnltbLcz9gKNyK89dVj0r7QB2IeSpJP%2BKe%2BoQDq7WNrAm6n9R%2BsGFiUZuOUZtEZcZCEqM95Fk%2F3F1Ve7jHuRhYFEGb3O31OJY7f6L4gJzj8h%2F9y0ajxSK%2FfIY0gtaVlfVAH6Vn89wsEkHZtU%2FwABATMqY33C%2B3LZ8SaZWlrkk41u%2Fejbb%2FX2TGu7E%2FwXL64FJp%2Bl7icg4hcZptYW%2Byl4WaX4GKvzivdQfZzS3tIC3ERpa3wK2v4b8YQSHMM5NMJKVN3RBoEmQztQDU0Srn49&acctmode=0&pass_ticket=KEIQGtuqaZX2zg6aI3eoS4LCb1WwL6VX85G%2B1PgtNrfp%2BMKsOdcF9joPrB%2B%2F94%2Bv&wx_header=1#)
 
 如今，Kubernetes 已经成为分布式集群管理系统和公有云/私有云的事实标准。实际上，Kubernetes 是一个分布式操作系统，它是 Google 在分布式操作系统领域十余年工程经验和智慧的结晶，而 Google 一直以来都管理着世界上最大的分布式集群，在分布式操作系统领域的研究和认识领先于全世界。因此，2014年发布的 Kubernetes 能在短短几年时间内就超越了诸多前辈，大获成功。
 
 作为分布式操作系统，Kubernetes（包括其前代产品 Google Borg）的出现远远晚于 UNIX、Linux、Windows 等著名的单机操作系统，Kubernetes 架构设计自然地继承了很多单机操作系统的珍贵遗产，微内核架构就是这些遗产中最重要的一份。在本文接下来的部分，我们将专注于微内核（microkernel）这个概念及其对 Kubernetes 架构的影响。
 
-  
-
 **什么是微内核？**
 
-  
-
 在介绍微内核的时候，我们有必要同时回顾一下单机操作系统的历史，以理解其价值所在。本章中以「操作系统」指代「单机操作系统」。
-
-  
-  
 
 **UNIX 的兴起**
 
 电子计算机诞生之后，在上个世纪70年代以前，出现过许许多多的操作系统，DOS、OS/360、Multics 是其中的知名代表，这是操作系统领域的拓荒时代。20年来的拓荒孕育出了伟大的成果：随着 CPU 技术的发展，UNIX 于1969年诞生了，这是一个真正意义上的分时操作系统。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-图片来源：维基百科  
+图片来源：维基百科
 
-借助新的 CPU 技术的支持，UNIX 将软件系统划分为**内核（kernel）**和**用户态程序（userland programs）**两部分。内核是一组中断处理程序的集合，把硬件的能力封装为操作系统功能调用（system calls），用户态程序通过系统调用使用硬件功能，用户态程序运行于各自的进程中，所有用户态进程都共享同一个内核，每当系统调用或中断发生，UNIX 便陷入（trap）内核，内核执行系统调用，与此同时，内核中的分时调度算法将决定把 CPU 交给哪个进程，并管理进程的上下文切换。另外，UNIX 把（几乎）所有硬件都封装为文件。UNIX 还提供了一个特殊的用户态程序 shell，供用户直接使用系统，通过内核提供的进程间通信能力，shell让 用户可以把一系列应用程序组合起来，处理复杂的需求，作者称这个设计思想为「KISS」（Keep It Simple and Stupld）。UNIX 的所有设计思想在当时是都是非常了不起的创举。  
+借助新的 CPU 技术的支持，UNIX 将软件系统划分为\*\*内核（kernel）**和**用户态程序（userland programs）\*\*两部分。内核是一组中断处理程序的集合，把硬件的能力封装为操作系统功能调用（system calls），用户态程序通过系统调用使用硬件功能，用户态程序运行于各自的进程中，所有用户态进程都共享同一个内核，每当系统调用或中断发生，UNIX 便陷入（trap）内核，内核执行系统调用，与此同时，内核中的分时调度算法将决定把 CPU 交给哪个进程，并管理进程的上下文切换。另外，UNIX 把（几乎）所有硬件都封装为文件。UNIX 还提供了一个特殊的用户态程序 shell，供用户直接使用系统，通过内核提供的进程间通信能力，shell让 用户可以把一系列应用程序组合起来，处理复杂的需求，作者称这个设计思想为「KISS」（Keep It Simple and Stupld）。UNIX 的所有设计思想在当时是都是非常了不起的创举。
 
 UNIX 不但自身对业界产生了巨大的直接贡献，还成为所有现代操作系统的蓝本，两位作者 Ken Tompson 和 Dennis Ritchie 因此荣获1983年度的图灵奖。
 
@@ -47,8 +41,6 @@ UNIX 诞生于贝尔实验室，该实验室属于美国国家电信电报公司
 此外，UNIX 诞生之时，还附送了一项比操作系统本身价值更大的副产品：Dennis Ritchie 为开发 UNIX 设计了C语言，C语言成为了所有流行的现代编程语言的主要设计来源，不仅如此，C语言在其诞生近40年后的今天，仍然是最重要的编程语言之一。
 
 值得一提的是，当时 UNIX 的主要开放对象是伯克利、卡内基梅隆等研究型大学，文理学院规模较小，没有研究生项目，不属于 AT&T 的主要开放目标，因此 Olivet College 毕业的一位小哥未受到 UNIX 思潮的影响。这位名叫 David Cutler 的软件天才于1975年在 DEC 设计了 VMS 操作系统，VMS 和最初的 UNIX 一样，运行在 PDP-11 上，但并不是基于 UNIX，而是独立设计的。VMS 在业界没有掀起大浪，以兼容 UNIX 告终。后来 David Cutler 离开 DEC，加入微软，在那里谱写了属于他自己的传奇。有趣的是，乔布斯也曾在文理学院就读，看来美国文理学院的学生是不走寻常路的。
-
-  
 
 **微内核的兴起**
 
@@ -61,24 +53,20 @@ UNIX「一切皆文件」的设计带来了用户程序设计的很多便利，�
 UNIX 开放后，AT&T 继续着版本迭代，而各大学基于 AT&T 的 UNIX 开发了很多新的操作系统内核，其中较为知名的有：
 
 1. BSD，monolithic，由伯克利的传奇人物 Bill Joy 于1974年发布（据说 Bill Joy 花三天便完成了 BSD 内核的第一个版本开发，Bill Joy 的作品还包含第一个 TCP/IP 协议栈、vi、Solaris、SPARK 芯片等等）。该内核对业界影响非常之大，后来发展为 FreeBSD、OpenBSD、NetBSD 等分支。现代操作系统如 Solaris、MacOS X、Windows NT 对其多有借鉴。
-    
-2. Mach，微内核，由卡内基梅隆大学于1984年发布，主要作者是 CMU 的两位研究生 Avie Tevanian 和 Rick Rashid。该内核对业界影响也很大，GNU Hurd、MacOS X 对其多有借鉴，但该项目本身以失败告终。
-    
-3. MINIX，微内核，由阿姆斯特丹自由大学（Vrije Universiteit Amsterdam）的 Andrew Tanenbaum 教授于1987年发布。无数计算机系学生通过 MINIX 及其配套教材掌握了操作系统的设计原理，Linux 的初始版本就是基于 MINIX 复刻的。MINIX 虽然著名，但主要用于教学，从未在工业界获得一席之地。
-    
 
-  
+1. Mach，微内核，由卡内基梅隆大学于1984年发布，主要作者是 CMU 的两位研究生 Avie Tevanian 和 Rick Rashid。该内核对业界影响也很大，GNU Hurd、MacOS X 对其多有借鉴，但该项目本身以失败告终。
+
+1. MINIX，微内核，由阿姆斯特丹自由大学（Vrije Universiteit Amsterdam）的 Andrew Tanenbaum 教授于1987年发布。无数计算机系学生通过 MINIX 及其配套教材掌握了操作系统的设计原理，Linux 的初始版本就是基于 MINIX 复刻的。MINIX 虽然著名，但主要用于教学，从未在工业界获得一席之地。
 
 **微内核的沉寂**
 
 从上世纪90年代至本世纪10年代，UNIX 和 VMS 的后裔们展开了一场混战，从结果来看，微内核的概念虽然美好，但现实非常残酷：
 
 1. MINIX 仅限于教学，而基于 MINIX 设计的 Linux 是 monolithic 系统，反而大获成功。Mach 对业界影响深远，但本身并未得到大规模应用，其继承者 GNU Hurd 一直在开发中，从未能应用。
-    
-2. Windows 的 NTOS 内核是 David Cutler 基于他原来在 DEC 独立设计的系统 VMS 设计的（VMS 和 UNIX 无关）。NTOS 借鉴了微内核的思想和 BSD 的一些代码，但最终 David Cutler 决定将所有服务（如 GUI）都放到内核态而非用户态，因此 Windows NT 在软件架构上和微内核一致，而实际运行和 monolithic 内核一致，被称为 hybrid kernel。
-    
-3. MacOS X 基于 NextStep OS 设计，NextStep 是 Avie Tevanian 设计的，Avie Tevanian 是 Mach 的主要设计者，博士毕业后，盖茨和乔布斯都邀请过他，他去了 Next，他在 CMU 的好友 Rick Rashid 则去微软作为 David Cutler 的首席助手，据说 Avie Tevanian 在 Next 每天用计算器算自己没去微软而损失的股票增值。跟乔布斯回到苹果后，Avie 基于 NextStep 和 BSD 的代码设计了 OS X，巧的是，OS X 也采用了 hybrid kernel 的架构，最终大获成功，还能在 PowerPC 和 x86 两种指令架构间无缝切换。
-    
+
+1. Windows 的 NTOS 内核是 David Cutler 基于他原来在 DEC 独立设计的系统 VMS 设计的（VMS 和 UNIX 无关）。NTOS 借鉴了微内核的思想和 BSD 的一些代码，但最终 David Cutler 决定将所有服务（如 GUI）都放到内核态而非用户态，因此 Windows NT 在软件架构上和微内核一致，而实际运行和 monolithic 内核一致，被称为 hybrid kernel。
+
+1. MacOS X 基于 NextStep OS 设计，NextStep 是 Avie Tevanian 设计的，Avie Tevanian 是 Mach 的主要设计者，博士毕业后，盖茨和乔布斯都邀请过他，他去了 Next，他在 CMU 的好友 Rick Rashid 则去微软作为 David Cutler 的首席助手，据说 Avie Tevanian 在 Next 每天用计算器算自己没去微软而损失的股票增值。跟乔布斯回到苹果后，Avie 基于 NextStep 和 BSD 的代码设计了 OS X，巧的是，OS X 也采用了 hybrid kernel 的架构，最终大获成功，还能在 PowerPC 和 x86 两种指令架构间无缝切换。
 
 在几位操作系统技术巨擎中，除 Linus Torvalds 外，无论是 David Cutler 和 Andrew Tanenbaum，还是 Avie Tevanian 和 Rick Rashid，都是微内核架构的领袖级人物，但最终他们都没有将微内核彻底落地，这是有原因的。
 
@@ -86,15 +74,9 @@ UNIX 开放后，AT&T 继续着版本迭代，而各大学基于 AT&T 的 UNIX �
 
 简单来说，在电脑性能不佳的情况下，我们会发现 Windows 的鼠标箭头更加“跟手”，即使系统接近死机，Windows 系统的鼠标箭头仍然可以活动。Windows XP 能在 Windows 98 这样「珠玉在前」的上代产品后获得更大的成功，和 NTOS 对性能的密切关注是分不开的，相比之下，苹果固然在1980年代中期就有初代 Machintosh 这样的壮举，但因为乔布斯无法说服销售团队换一根更强的内存条，因此初代 Mac 的性能较差，运行程序非常之慢，未能获得应得的蓝海成功。
 
-  
-
 **Kubernetes 和微内核**
 
-  
-
 性能问题对单机操作系统来说可能是至关重要的，但对分布式操作系统并非如此，分布式操作系统作为「幕后功臣」，不需要直接面对用户，而单机性能上的小小损失可以用更多机器来弥补，在这个前提下，更好的架构往往更加重要。
-
-  
 
 **Borg 的诞生**
 
@@ -107,15 +89,12 @@ UNIX 开放后，AT&T 继续着版本迭代，而各大学基于 AT&T 的 UNIX �
 有趣的是，Omega 项目的核心成员之一 Brendan Burns 的职业轨迹和操作系统领域的大前辈 David Cutler 有不少相似之处。
 
 1. 他们同样毕业于文理学院：David Cutler 毕业于 Olivet College，Brendan Burns 毕业于 Williams College。
-    
-2. 他们同样在毕业后加入了一家传统行业的巨头：David Cutler 毕业后加入杜邦，Brendan Burns 毕业后加入汤姆森金融。
-    
-3. 正如教父所说，一个男人只能有一种命运，Cutler 和 Burns 在这两家传统巨头学会了写代码，也许就是在那时，他们发现了自己在软件上的天分，发现了自己的命运是构建新一代操作系统。因此他们同样在第二份工作中选择了当时最炙手可热的科技巨头：David Cutler 加入 DEC，Brendan Burns 加入 Google。
-    
-4. 他们同样在微软到达了职业生涯的顶峰：Brendan Burns 现如今已是微软的 Corporate VP，而 David Cutler 老爷子早已是微软唯一的 Senior Technical Fellow，据传微软甚至有条规定，Cutler 的技术职级必须是全公司最高的，任何人升到 Cutler 的 level，Cutler 就自动升一级。
-    
 
-  
+1. 他们同样在毕业后加入了一家传统行业的巨头：David Cutler 毕业后加入杜邦，Brendan Burns 毕业后加入汤姆森金融。
+
+1. 正如教父所说，一个男人只能有一种命运，Cutler 和 Burns 在这两家传统巨头学会了写代码，也许就是在那时，他们发现了自己在软件上的天分，发现了自己的命运是构建新一代操作系统。因此他们同样在第二份工作中选择了当时最炙手可热的科技巨头：David Cutler 加入 DEC，Brendan Burns 加入 Google。
+
+1. 他们同样在微软到达了职业生涯的顶峰：Brendan Burns 现如今已是微软的 Corporate VP，而 David Cutler 老爷子早已是微软唯一的 Senior Technical Fellow，据传微软甚至有条规定，Cutler 的技术职级必须是全公司最高的，任何人升到 Cutler 的 level，Cutler 就自动升一级。
 
 **Kubernetes 的诞生**
 
@@ -129,7 +108,7 @@ UNIX 开放后，AT&T 继续着版本迭代，而各大学基于 AT&T 的 UNIX �
 
 与此类似，Kubernetes 这样的分布式操作系统对外提供服务是通过 API 的形式，分布式操作系统本身提供的 API 相当于单机操作系统的系统调用，每个 API 也需要能够注册到某个位置。对 Kubernetes 来说，API 会注册到 ectd 里。Kubernetes 本身提供的相当于系统调用的那些 API，通过名为 Controller 的组件来支持，由开发者为 Kubernetes 提供的新的 API，则通过 Operator 来支持，Operator 本身和 Controller 基于同一套机制开发。这和微内核架构的思想一脉相承：Controller 相当于内核态中运行的服务，提供线程、进程管理和调度算法等核心能力，Operator 则相当于微内核架构中 GUI、文件系统、打印机等服务，在用户态运行。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 图片来源：https://mapr.com/products/kubernetes/
 
@@ -143,11 +122,7 @@ Argo 得到 etcd watch 的 http 请求，去 etcd 读出 yaml 中的数据并解
 
 微内核在架构上的优势在 Kubernetes 中显露无遗：在 Borg 中，开发者想要添加新的子系统是非常复杂的，往往需要修改 Borg 底层代码，而新系统也因此会绑定到 Borg 上。而对 Kubernetes 来说，开发者只需要基于 Kubernetes 提供的 SDK 实现一个 Operator，就能够添加一组新的 API，而不需要关注 Kubernetes 的底层代码。Argo、Kubeflow 都是 Operator 的应用。任何已有软件都可以方便地通过 Operator 机制集成到 Kubernetes 中，因而 Kubernetes 非常适合作为公有云的底层分布式操作系统，正因如此，Kubernetes 在2014年年中发布，经过2015年一年的成长，在2016年便成为业界主流，对于没有历史负担的公司，也将 Kubernetes 作为内部云的底层系统使用。
 
-  
-
 **尾声**
-
-  
 
 在这篇文章中，我们介绍了单机操作系统的发展简史，介绍了微内核架构在这个历史进程中从兴起到衰落的过程，也介绍了微内核架构在 Kubernetes 中重新焕发生机的过程。总的来说，显著超前于时代的技术虽然未必能在被提出的时代取得成功，但一定会在多年后，在时代跟上来之后，拿回属于自己的荣耀。微内核架构在单机操作系统的时代和云计算的时代的不同遭遇证明了这一点，深度学习在低算力时代和高算力时代的不同遭遇也证明了这一点。
 

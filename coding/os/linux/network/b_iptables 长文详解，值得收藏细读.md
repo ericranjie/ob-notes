@@ -1,14 +1,14 @@
 Linux云计算网络
- _2021年09月09日 08:13_
+_2021年09月09日 08:13_
 The following article is from 赐我白日梦 Author 赐我白日梦
 
-](https://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247496357&idx=1&sn=561cb194d70bd4f693445c34fdf8b5c2&chksm=ea77c61ddd004f0b35fe9d665da61e19805212da0c995480ddbc2016bfb9a918039b2a9ca3a0&mpshare=1&scene=24&srcid=0909MmqSkBeTIqd1BRM6mkYz&sharer_sharetime=1631147611819&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03ab310529d0689a0e875ecb3473de37d0966f561e62c40aa5970f6e5e3e8589597d0042c6e0efbd1192610e15494bd634e093fd272b63eaf3b5e06eca857032c0a6d4bfce98e1afe21519bc40fbdaa07fc6e891ea1ba6c8846fc3afdbcf8ee9929cf860115f43a1b59f93b6caf3691c554102f7d57a242d8&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_5c352b88aa29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQLbZ1ZrWiEfvSMaQmK3La9xKUAgIE97dBBAEAAAAAAKErMtksEV8AAAAOpnltbLcz9gKNyK89dVj0jWBYF0s8qUI2jfcxjljsHapAYqAwTMy%2FX7qI4on%2FlJwr766sHBk31N0aD5OI0jYOBaJgXSTC6S7Oo7rTIj098W8QdX5do%2FTCgP8koOr8Aa9HFo%2FQcZgkpVXr0Nys6p1Y3n4XU6G4plk6GjjVuPFVysbyNUuDckS%2BVnCEGac6POf8HPR1tYB8mICoen%2F6UseVePYJO496GAemALHmrJYn7nYNlkx6AIZhBbTqixo8aDu277dX2jA%2Becd7gJrALiL1I5pkeZMcmz6PFOOmy4JWbfgLB%2BBe52QUUvFRmFNskjvMJHzIJANmrHyj9frw3Q%3D%3D&acctmode=0&pass_ticket=I18it5ABTV08CuyImy%2BjeOSwwsV%2FqF6iCoQHwwp5g9RGyFVvsA7TKHy7jX5aWDHu&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI1OTY2MzMxOQ==&mid=2247496357&idx=1&sn=561cb194d70bd4f693445c34fdf8b5c2&chksm=ea77c61ddd004f0b35fe9d665da61e19805212da0c995480ddbc2016bfb9a918039b2a9ca3a0&mpshare=1&scene=24&srcid=0909MmqSkBeTIqd1BRM6mkYz&sharer_sharetime=1631147611819&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03ab310529d0689a0e875ecb3473de37d0966f561e62c40aa5970f6e5e3e8589597d0042c6e0efbd1192610e15494bd634e093fd272b63eaf3b5e06eca857032c0a6d4bfce98e1afe21519bc40fbdaa07fc6e891ea1ba6c8846fc3afdbcf8ee9929cf860115f43a1b59f93b6caf3691c554102f7d57a242d8&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_5c352b88aa29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQLbZ1ZrWiEfvSMaQmK3La9xKUAgIE97dBBAEAAAAAAKErMtksEV8AAAAOpnltbLcz9gKNyK89dVj0jWBYF0s8qUI2jfcxjljsHapAYqAwTMy%2FX7qI4on%2FlJwr766sHBk31N0aD5OI0jYOBaJgXSTC6S7Oo7rTIj098W8QdX5do%2FTCgP8koOr8Aa9HFo%2FQcZgkpVXr0Nys6p1Y3n4XU6G4plk6GjjVuPFVysbyNUuDckS%2BVnCEGac6POf8HPR1tYB8mICoen%2F6UseVePYJO496GAemALHmrJYn7nYNlkx6AIZhBbTqixo8aDu277dX2jA%2Becd7gJrALiL1I5pkeZMcmz6PFOOmy4JWbfgLB%2BBe52QUUvFRmFNskjvMJHzIJANmrHyj9frw3Q%3D%3D&acctmode=0&pass_ticket=I18it5ABTV08CuyImy%2BjeOSwwsV%2FqF6iCoQHwwp5g9RGyFVvsA7TKHy7jX5aWDHu&wx_header=0#)
 
 一、iptables是什么？你为啥要学？
 
-            一、`iptables`是什么？你为啥要学？
+一、`iptables`是什么？你为啥要学？
 
-            二、`iptables`、`防火墙`之间有啥关系？                        三、`iptables`安装                       四、`iptables`的五表五链及流量走向                        五、iptables commands                        六、filter表                                    6.1、usage尝鲜 filter表及规则                                    6.2、案例：filter的流量过滤                        七、`iptables`的匹配规则                        八、两个小实验                                   8.1、实验一：理解流量走向                             8.2、实验二：特殊的`-j LOG`                                    8.3、实验总结                        九、`iptables`中的模块                        十、nat表                                    10.1、案例：使用`nat表`完成`SNAT`                                    10.2、案例：通过`nat表`完成`DNAT`                         十一、相关配置文件                        十二、串联 `iptables`、`路由表`                        十三、参考资料
+二、`iptables`、`防火墙`之间有啥关系？                        三、`iptables`安装                       四、`iptables`的五表五链及流量走向                        五、iptables commands                        六、filter表                                    6.1、usage尝鲜 filter表及规则                                    6.2、案例：filter的流量过滤                        七、`iptables`的匹配规则                        八、两个小实验                                   8.1、实验一：理解流量走向                             8.2、实验二：特殊的`-j LOG`                                    8.3、实验总结                        九、`iptables`中的模块                        十、nat表                                    10.1、案例：使用`nat表`完成`SNAT`                                    10.2、案例：通过`nat表`完成`DNAT`                         十一、相关配置文件                        十二、串联 `iptables`、`路由表`                        十三、参考资料
 
 Linux的网络控制模块在内核中，叫做`netfilter`。而`iptables`是位于用户空间的一个命令行工具，它作用在`OIS7层网络模型`中的第四层，用来和内核的`netfilter`交互，配置`netfilter`进而实现对网络的控制、流量的转发 。
 
@@ -16,7 +16,7 @@ Linux的网络控制模块在内核中，叫做`netfilter`。而`iptables`是位
 
 如果你想搞懂docker或者是k8s的网络调度模型，或者是去你自己的机器上查看一下他们自动生成的转发规则，那么肯定要需要对iptables有一定的认知，不然学了半天docker或者是k8s真的是只会停留在使用的这个层面上。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 有人可能会说，哎？现在k8s不是已经不把docker看作是亲儿子了吗？然后流量的调度转发规则也更倾向于用LVS了，巴拉巴拉一大堆。嗯，有道理......   那，你敢不学iptables吗？Hhh.....
 
@@ -26,7 +26,7 @@ Linux的网络控制模块在内核中，叫做`netfilter`。而`iptables`是位
 
 全文较长、建议收藏
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 二、iptables、防火墙之间有啥关系？
 
@@ -36,7 +36,7 @@ Whether you’re a novice Linux geek or a system administrator, there’s probab
 
 简单的说就是：iptables 是一个简单、灵活、实用的命令行工具，可以用来配置、控制 linux 防火墙。
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 三、iptables安装
 
@@ -55,25 +55,24 @@ iptables中总共有4张表还有5条链，我们可以在链上加不同的规�
 五条链：prerouting、input、output、forward、postrouting
 
 你可以通过`iptables -t ${表名} -nL`查看表上的链
-![[Pasted image 20240918114016.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114016.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 整理一下就得到了如下脑图：
-![[Pasted image 20240918114045.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114045.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 先不着急使用iptables命令，大家可以先参考下面这张图，看看如下几种流量的走向。
 
 - 来自本机流量经过了iptables的哪些节点，最终又可以流到哪里去？
-    
+
 - 来自互联网其他主机的流量，经过了本机iptables的哪些节点，最终又可以流到哪里去？
-    
 
 大家打起12分的精神，接下来会出现3张图....
 
 **第一张**：是摘自iptables的wiki百科中的图，如下：
-![[Pasted image 20240918114036.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114036.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我知道很多人都看不懂，没关系，大家只要关注图中的蓝色部分：流量大走向如下：
 
@@ -81,13 +80,13 @@ iptables中总共有4张表还有5条链，我们可以在链上加不同的规�
 
 记住：在wiki百科中的流量走向图中，mangle.prerouting和nat.prerouting之间没有任何判断逻辑就好了。路由选择判断发生在nat.prerouting之后。
 
----
+______________________________________________________________________
 
-**第二张：**摘自github上写的一篇文章：理解 kube-proxy 中 iptables 规则
+\*\*第二张：\*\*摘自github上写的一篇文章：理解 kube-proxy 中 iptables 规则
 
 这张图是一张更为精确的流量走向图，并且他区分好了：`incoming packet`、`locally gennerated packge` 这种来源不同的流量大走向，原图如下：
-![[Pasted image 20240918114057.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114057.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 但是我感觉他这个图稍微有点问题：你可以看下图左上角部分，mange-prerouting和 nat-prerouting之间多了一个 localhost source的判断。但是在iptables维基百科中给出的图中，它俩之间并没有这个判断。
 
@@ -96,8 +95,8 @@ iptables中总共有4张表还有5条链，我们可以在链上加不同的规�
 所以，我总是感觉图应该修改成下面这样，它不一定对，但是起码能自圆其说。对整体理解的影响也不大。
 
 而且图改成这个样子，肯定是方便会我们理解这个过程，而且错也错不了哪里去。
-![[Pasted image 20240918114109.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114109.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 稍微解析一下上图：
 
@@ -110,52 +109,50 @@ iptables中总共有4张表还有5条链，我们可以在链上加不同的规�
 4、上图右上角写的：`locally generated packet`，表示这是本机自己生成的流量。它会一路经过各个表的output链，然后流到output interface（网卡）上。你注意下，流量在被打包成outgoing packet之前，会有个localhost dest的判断，如果它判断流量不是发往本机的话，流量会经过nat表的postrouting阶段。一般会在这里做`DNAT`源地址改写。
 
 > 1、至于什么是DNAT、SNAT后文都会讲
-> 
+>
 > 2、大家看上图以及解析的时候，还是应该有一个存疑态度的哈。
-> 
+>
 > 3、我的理解不一定就对，只不过是在现阶段勉强还能自圆其说。
 
 小结：思考这样一个问题
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 所以经过对上图的简单分析，如果咱想自定义对流量进行控制，**那该怎么办？**
 
 这并不复杂。但是在这想该怎么办之前，我们得先搞清楚，通常情况下我们会对流量做那些控制？无非如下：
 
 1. 丢弃来自xxx的流量
-    
-2. 丢弃去往xxx的流量
-    
-3. 只接收来自xxx的流量
-    
-4. 在刚流量流入时，将目标地址改写成其他地址
-    
-5. 在流量即将流出前，将源地址改写成其他地址
-    
-6. 将发往A的数据包，转发给B
-    
+
+1. 丢弃去往xxx的流量
+
+1. 只接收来自xxx的流量
+
+1. 在刚流量流入时，将目标地址改写成其他地址
+
+1. 在流量即将流出前，将源地址改写成其他地址
+
+1. 将发往A的数据包，转发给B
 
 等等等等，如果你足够敏感，你就能发现，上面这六条干预策略，`filter`、`nat`这两张表已经完全能满足我们的需求了，我们只需要在这两张表的不同链上加自己的规则就行，如下：
 
 1. 丢弃来自xxx的流量（`filter表INPUT链`）
-    
-2. 丢弃去往xxx的流量（`filter表OUTPUT链`）
-    
-3. 只接收来自xxx的流量（`filter表INPUT链`）
-    
-4. 在刚流量流入时，将目标地址改写成其他地址（`nat表prerouting链`）
-    
-5. 在流量即将流出前，将源地址改写成其他地址（`nat表postrouting链`）
-    
-6. 将发往A的数据包，转发给B（`filter表forward链`）
-    
 
----
+1. 丢弃去往xxx的流量（`filter表OUTPUT链`）
+
+1. 只接收来自xxx的流量（`filter表INPUT链`）
+
+1. 在刚流量流入时，将目标地址改写成其他地址（`nat表prerouting链`）
+
+1. 在流量即将流出前，将源地址改写成其他地址（`nat表postrouting链`）
+
+1. 将发往A的数据包，转发给B（`filter表forward链`）
+
+______________________________________________________________________
 
 数据包在iptables中的走向还可以简化成下面这张图
-![[Pasted image 20240918114129.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114129.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 参考：https://zjj2wry.github.io/network/iptables/
 
@@ -207,12 +204,12 @@ iptables -t ${表名}  ${Commands} ${链名}  ${链中的规则号} ${�
 ```
 
 测试一下，结果夯住
-![[Pasted image 20240918114244.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114244.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 查看规则，并显示序列号`iptables -L --line-number`
-![[Pasted image 20240918114252.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114252.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 删除过滤规则，语法:`iptables -t 表名 -D 链名 规则序号`
 
@@ -254,8 +251,8 @@ iptables -t ${表名}  ${Commands} ${链名}  ${链中的规则号} ${�
 #### 8.1、实验一：加深对匹配规则的了解
 
 通过这个实验搞清楚：当数据包命中了该链上的某一个规则后，还会继续往下匹配该链上的其他规则吗？
-![[Pasted image 20240918114314.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114314.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们在`10.4.4.8`的fitler表、INPUT链上添加如下规则
 
@@ -275,15 +272,15 @@ iptables -t filter -A INPUT -s 10.4.4.11 -j ACCEPT
 
 流量的走向如下图，它会挨个经过各表的input链，其中当然也包含我们加了DROP规则的filter表的INPUT链。
 
-而你仔细看上面的规则，第一条是DROP、第三条是ACCEPT。再结合最终实验的结果是ping不通，**所以不难猜出流量确实会依次经过链上的规则，但是当有命中的规则后，会去执行该规则`-j`参数指定的动作。不再往下匹配本链上的其他规则。
-![[Pasted image 20240918114336.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+而你仔细看上面的规则，第一条是DROP、第三条是ACCEPT。再结合最终实验的结果是ping不通，\*\*所以不难猜出流量确实会依次经过链上的规则，但是当有命中的规则后，会去执行该规则`-j`参数指定的动作。不再往下匹配本链上的其他规则。
+!\[\[Pasted image 20240918114336.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 #### 8.2、实验二：特殊的`-j LOG`
 
 实验二思路如下图：
-![[Pasted image 20240918114348.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114348.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们在`10.4.4.8`上添加如下规则
 
@@ -314,13 +311,12 @@ iptables -t filter -A INPUT -s 10.4.4.11 -j LOGiptables -t filter -A�
 iptables中每条链下面的规则处理顺序是从上到下逐条遍历的，除非碰到了`DROP`、`REJECT`、`RETURN`。
 
 还有就是如果定义的行为是JUMP，那就会相应的jump到指定链上的指定规则上，如下：
-![[Pasted image 20240918114413.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114413.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 九、`iptables`中的模块
 
 - 多端口
-    
 
 Case: 可以在命令中像下面这样指定多个连续的端口
 
@@ -337,7 +333,6 @@ multiport match options:[!] --source-ports port[,port:port,port...] --sport
 ```
 
 - ip范围
-    
 
 查看帮助文档
 
@@ -352,7 +347,6 @@ multiport match options:[!] --source-ports port[,port:port,port...] --sport
 ```
 
 - 连接状态
-    
 
 查看帮助文档：
 
@@ -427,11 +421,11 @@ iptables -t nat -A POSTROUTING -s 10.10.10.10 -j SNAT --to 22.22.22.1#
 ```
 
 再查看iptable规则，如下：
-![[Pasted image 20240918114529.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114529.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 > 可以看到有很多的`Chain`比如上面的OUTPUT就是一条链，它是操作系统的一个hook，当请求被发送出去时会经过这个hook。
-> 
+>
 > 还有就是通过iptable的DNAT能力可以做tizi！你仔细琢磨一下，原理就在上面的图中哦～
 
 补充典型应用场景：公司有自己建设的机房，机房中机器的ip都在：`10.10.10.0/24`网段，机房对外提供服务就需要通过网络设备暴露公网一个ip，比如是：`22.22.22.1:80`
@@ -447,8 +441,8 @@ iptables的配置文件在`/etc/sysconfig`目录如下：
 ```
 
 `iptables`启动时会加载这个配置文件中定义好的各表、链中的规则
-![[Pasted image 20240918114538.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114538.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 一般我们会先使用`iptables`修改各种规则，如果想让iptables启动、重启时，继续使用你刚才修改的配置，我们就会考虑使用`iptables-save`命令将规则导出为配置文件。
 
@@ -463,8 +457,8 @@ iptables的配置文件在`/etc/sysconfig`目录如下：
 通过下面的逻辑，串联`iptables`和`路由表`这两个知识点
 
 我们可以试着结合OIS7层网络模型来看这件事
-![[Pasted image 20240918114546.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240918114546.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们着重看下主机B接受收主机A发送给它的数据包都经历了哪些步骤。
 
@@ -500,15 +494,11 @@ if 接受包.mac == 本机mac{    // 流经各表的prerouting链   �
 
 ### 欢迎关注啦！
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-  
-
----
+______________________________________________________________________
 
 后台回复“加群”，带你进入高手如云交流群
-
-  
 
 **推荐阅读：**
 
@@ -516,7 +506,7 @@ if 接受包.mac == 本机mac{    // 流经各表的prerouting链   �
 
 [Page Cache和Buffer Cache关系](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495951&idx=1&sn=8bc76e05a63b8c9c9f05c3ebe3f99b7a&chksm=ea77c5b7dd004ca18c71a163588ccacd33231a58157957abc17f1eca17e5dcb35147b273bc52&scene=21#wechat_redirect)
 
-[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)  
+[深入理解DPDK程序设计|Linux网络2.0](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495791&idx=1&sn=5d9f3bdc29e8ae72043ee63bc16ed280&chksm=ea77c4d7dd004dc1eb0cee7cba6020d33282ead83a5c7f76a82cb483e5243cd082051e355d8a&scene=21#wechat_redirect)
 
 [一文读懂基于Kubernetes打造的边缘计算](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247495291&idx=1&sn=0aebc6ee54af03829e15ac659db923ae&chksm=ea77dac3dd0053d5cd4216e0dc91285ff37607c792d180b946bc09783d1a2032b0dffbcb03f0&scene=21#wechat_redirect)
 
@@ -536,7 +526,7 @@ if 接受包.mac == 本机mac{    // 流经各表的prerouting链   �
 
 [Linux 常用监控指标总结](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493544&idx=1&sn=68d86833cb3934abca18c95da8b1bae6&chksm=ea77d310dd005a06ad7de14d4d9f29d88e1cadebda7ccd975b3a265e5806608ace14ba12c8b4&scene=21#wechat_redirect)
 
-[Kubernetes 集群网络从懵圈到熟悉](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493426&idx=1&sn=e3492cf43c4268c5948d170f4a5d2441&chksm=ea77d38add005a9cdbb5775f2bfd4a2b953e950fcb65c25e91eaea45c68bf5684e3ebc8289e0&scene=21#wechat_redirect)  
+[Kubernetes 集群网络从懵圈到熟悉](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493426&idx=1&sn=e3492cf43c4268c5948d170f4a5d2441&chksm=ea77d38add005a9cdbb5775f2bfd4a2b953e950fcb65c25e91eaea45c68bf5684e3ebc8289e0&scene=21#wechat_redirect)
 
 [使用 GDB+Qemu 调试 Linux 内核](http://mp.weixin.qq.com/s?__biz=MzI1OTY2MzMxOQ==&mid=2247493336&idx=1&sn=268fae00f4f88fe27b24796644186e9e&chksm=ea77d260dd005b76c10f75dafc38428b8357150f3fb63bc49a080fb39130d6590ddea61a98b5&scene=21#wechat_redirect)
 
@@ -564,13 +554,9 @@ if 接受包.mac == 本机mac{    // 流经各表的prerouting链   �
 
 ▼
 
-  
+_\*\*_****喜欢，就给我一个****“在看”\*\*\*\*_\*\*_
 
-_**_****喜欢，就给我一个****“在看”****_**_
-
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **10T 技术资源大放送！包括但不限于：云计算、虚拟化、微服务、大数据、网络、**Linux、**Docker、Kubernetes、Python、Go、C/C++、Shell、PPT 等。在公众号内回复「****1024****」**，即可免费获取！！****
 
@@ -583,69 +569,68 @@ Comment
 **留言 8**
 
 - Janrry丶龙龙
-    
-    2021年9月15日
-    
-    Like1
-    
-    第五章前面那个精简的iptables图，出去的流量是postrouteing链，作者你看看是不是写错了🤤 ，不过真的很实用，你的文章，每天上班地铁必看内容！
-    
+
+  2021年9月15日
+
+  Like1
+
+  第五章前面那个精简的iptables图，出去的流量是postrouteing链，作者你看看是不是写错了🤤 ，不过真的很实用，你的文章，每天上班地铁必看内容！
+
 - cavanxf
-    
-    2021年9月11日
-    
-    Like
-    
-    再一个配置有几百条规则的系统上，如何快速定位一个tcp请求被哪个规则给拦截掉了呢？
-    
+
+  2021年9月11日
+
+  Like
+
+  再一个配置有几百条规则的系统上，如何快速定位一个tcp请求被哪个规则给拦截掉了呢？
+
 - Z
-    
-    2021年9月10日
-    
-    Like
-    
-    我的OpenWRT路由器会丢弃目的MAC是局域网其他设备的DNS请求，查遍了iptables都没找到是为啥
-    
+
+  2021年9月10日
+
+  Like
+
+  我的OpenWRT路由器会丢弃目的MAC是局域网其他设备的DNS请求，查遍了iptables都没找到是为啥
+
 - Ryan Bao
-    
-    2021年9月9日
-    
-    Like
-    
-    我见过最实用的介绍了，大赞👍🏻
-    
+
+  2021年9月9日
+
+  Like
+
+  我见过最实用的介绍了，大赞👍🏻
+
 - 小样儿
-    
-    2021年9月9日
-    
-    Like
-    
-    没看懂，说明文章写的还不够详细
-    
+
+  2021年9月9日
+
+  Like
+
+  没看懂，说明文章写的还不够详细
+
 - 果冻
-    
-    2021年9月9日
-    
-    Like
-    
-    文章开头有错误 OSI7层
-    
+
+  2021年9月9日
+
+  Like
+
+  文章开头有错误 OSI7层
+
 - Jack Cai
-    
-    2021年9月9日
-    
-    Like
-    
-    到底几表几链？
-    
-    Linux云计算网络
-    
-    Author2021年9月9日
-    
-    Like
-    
-    文章都看完了还不知道
-    
+
+  2021年9月9日
+
+  Like
+
+  到底几表几链？
+
+  Linux云计算网络
+
+  Author2021年9月9日
+
+  Like
+
+  文章都看完了还不知道
 
 已无更多数据
 
@@ -664,68 +649,67 @@ Comment
 **留言 8**
 
 - Janrry丶龙龙
-    
-    2021年9月15日
-    
-    Like1
-    
-    第五章前面那个精简的iptables图，出去的流量是postrouteing链，作者你看看是不是写错了🤤 ，不过真的很实用，你的文章，每天上班地铁必看内容！
-    
+
+  2021年9月15日
+
+  Like1
+
+  第五章前面那个精简的iptables图，出去的流量是postrouteing链，作者你看看是不是写错了🤤 ，不过真的很实用，你的文章，每天上班地铁必看内容！
+
 - cavanxf
-    
-    2021年9月11日
-    
-    Like
-    
-    再一个配置有几百条规则的系统上，如何快速定位一个tcp请求被哪个规则给拦截掉了呢？
-    
+
+  2021年9月11日
+
+  Like
+
+  再一个配置有几百条规则的系统上，如何快速定位一个tcp请求被哪个规则给拦截掉了呢？
+
 - Z
-    
-    2021年9月10日
-    
-    Like
-    
-    我的OpenWRT路由器会丢弃目的MAC是局域网其他设备的DNS请求，查遍了iptables都没找到是为啥
-    
+
+  2021年9月10日
+
+  Like
+
+  我的OpenWRT路由器会丢弃目的MAC是局域网其他设备的DNS请求，查遍了iptables都没找到是为啥
+
 - Ryan Bao
-    
-    2021年9月9日
-    
-    Like
-    
-    我见过最实用的介绍了，大赞👍🏻
-    
+
+  2021年9月9日
+
+  Like
+
+  我见过最实用的介绍了，大赞👍🏻
+
 - 小样儿
-    
-    2021年9月9日
-    
-    Like
-    
-    没看懂，说明文章写的还不够详细
-    
+
+  2021年9月9日
+
+  Like
+
+  没看懂，说明文章写的还不够详细
+
 - 果冻
-    
-    2021年9月9日
-    
-    Like
-    
-    文章开头有错误 OSI7层
-    
+
+  2021年9月9日
+
+  Like
+
+  文章开头有错误 OSI7层
+
 - Jack Cai
-    
-    2021年9月9日
-    
-    Like
-    
-    到底几表几链？
-    
-    Linux云计算网络
-    
-    Author2021年9月9日
-    
-    Like
-    
-    文章都看完了还不知道
-    
+
+  2021年9月9日
+
+  Like
+
+  到底几表几链？
+
+  Linux云计算网络
+
+  Author2021年9月9日
+
+  Like
+
+  文章都看完了还不知道
 
 已无更多数据

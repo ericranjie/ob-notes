@@ -2,7 +2,7 @@
 
 苏丙榅 C语言与CPP编程
 
- _2021年12月08日 08:45_
+_2021年12月08日 08:45_
 
 在掌握了基于 TCP 的套接字通信流程之后，为了方便使用，提高编码效率，可以对通信操作进行封装，本着有浅入深的原则，先基于 C 语言进行面向过程的函数封装，然后再基于 C++ 进行面向对象的类封装。
 
@@ -13,28 +13,26 @@
 ### 服务器端
 
 - 创建用于监听的套接字
-    
+
 - 将用于监听的套接字和本地的 IP 以及端口进行绑定
-    
+
 - 启动监听
-    
+
 - 等待并接受新的客户端连接，连接建立得到用于通信的套接字和客户端的 IP、端口信息
-    
+
 - 使用得到的通信的套接字和客户端通信（接收和发送数据）
-    
+
 - 通信结束，关闭套接字（监听 + 通信）
-    
 
 ### 客户端
 
 - 创建用于通信的套接字
-    
+
 - 使用服务器端绑定的 IP 和端口连接服务器
-    
+
 - 使用通信的套接字和服务器通信（发送和接收数据）
-    
+
 - 通信结束，关闭套接字（通信）
-    
 
 ### 1.1 函数声明
 
@@ -63,13 +61,12 @@
 通过对客户端的操作进行封装，我们可以看到有如下的变化：
 
 - 文件描述被隐藏了，封装到了类的内部已经无法进行外部访问
-    
+
 - 功能函数的参数变少了，因为类成员函数可以直接使用类内部的成员变量。
-    
+
 - 创建和销毁套接字的函数去掉了，这两个操作可以分别放到构造和析构函数内部进行处理。
-    
-- 在 C++ 中可以适当的将 char* 替换为 string 类，这样操作字符串就更简便一些。
-    
+
+- 在 C++ 中可以适当的将 char\* 替换为 string 类，这样操作字符串就更简便一些。
 
 ### 2.1.2 服务器端
 
@@ -102,9 +99,8 @@
 `TcpSocket::TcpSocket()   {       m_fd = socket(AF_INET, SOCK_STREAM, 0);   }      TcpSocket::TcpSocket(int socket)   {       m_fd = socket;   }   `
 
 - 其中无参构造一般在客户端使用，通过这个套接字对象再和服务器进行连接，之后就可以通信了
-    
+
 - 有参构造主要在服务器端使用，当服务器端得到了一个用于通信的套接字对象之后，就可以基于这个套接字直接通信，因此不需要再次进行连接操作。
-    
 
 ### 2.2.2 服务器类
 
@@ -149,29 +145,28 @@ Comment
 **留言 3**
 
 - Cui3093
-    
-    2021年12月9日
-    
-    Like1
-    
-    C++23 net要变stl了，以后网络编程就更方便了
-    
+
+  2021年12月9日
+
+  Like1
+
+  C++23 net要变stl了，以后网络编程就更方便了
+
 - 阿秀
-    
-    2021年12月8日
-    
-    Like1
-    
-    ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)学习到了
-    
+
+  2021年12月8日
+
+  Like1
+
+  ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)学习到了
+
 - 谢春平
-    
-    2021年12月8日
-    
-    Like
-    
-    同时支持windows平台就好了
-    
+
+  2021年12月8日
+
+  Like
+
+  同时支持windows平台就好了
 
 已无更多数据
 
@@ -190,28 +185,27 @@ Comment
 **留言 3**
 
 - Cui3093
-    
-    2021年12月9日
-    
-    Like1
-    
-    C++23 net要变stl了，以后网络编程就更方便了
-    
+
+  2021年12月9日
+
+  Like1
+
+  C++23 net要变stl了，以后网络编程就更方便了
+
 - 阿秀
-    
-    2021年12月8日
-    
-    Like1
-    
-    ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)学习到了
-    
+
+  2021年12月8日
+
+  Like1
+
+  ![[旺柴]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)学习到了
+
 - 谢春平
-    
-    2021年12月8日
-    
-    Like
-    
-    同时支持windows平台就好了
-    
+
+  2021年12月8日
+
+  Like
+
+  同时支持windows平台就好了
 
 已无更多数据

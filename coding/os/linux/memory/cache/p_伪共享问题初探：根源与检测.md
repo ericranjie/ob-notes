@@ -2,11 +2,11 @@
 
 Linux内核之旅
 
- _2024年09月05日 12:01_ _陕西_
+_2024年09月05日 12:01_ _陕西_
 
 The following article is from 程栩的性能优化笔记 Author 程栩
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4zuU31ibxk2hXrLSO8s7BlzpZARHVyjr5o3AjCfNU7iabA/0)
 
@@ -14,7 +14,7 @@ The following article is from 程栩的性能优化笔记 Author 程栩
 
 一个专注于性能的大厂程序员，分享包括但不限于计算机体系结构、性能优化、云原生的知识。
 
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664617923&idx=1&sn=8347bae1d2e6f9b3e9dd1bc38eaac0cd&chksm=f1b8d35bbc976781abc34cc5413242c76b1ca2f4d38c6422633364bec774734393a6ef3398ec&mpshare=1&scene=24&srcid=0905YN8kJOP9vbf3UCq5rYhr&sharer_shareinfo=0662d57d64f628efd8d2ea46e0b65cb7&sharer_shareinfo_first=0662d57d64f628efd8d2ea46e0b65cb7&key=daf9bdc5abc4e8d08f506593bdfe16f29044ad7bce4cd7b156546e863d1bef2d22d69f4a07c277d0733c28bb7f94a80f4a84567aab179aa246d37d64f48b8e2329276ba2c5d47377f2034250149c31a9455698b891f22202fbfbfd9c4860646ebf97df734937a152a6cff300a23f59fbb226f78d4d2889c5acc0fa104a88c22d&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQf%2BeR4Rx8ocws3WzbvdCbmRKUAgIE97dBBAEAAAAAAG6gAvVApYsAAAAOpnltbLcz9gKNyK89dVj0stHs0CxOBjURHNZMGqgpLwKO8Ddp6%2BtfBFRWC7VAKU7OazXxwVwqSJHwx5mmwthkz32kj7sa6aJIFnyd3ZvPRhmnSqvbH6%2FMjA%2FU%2BLaVpSjS1ExhinPGEeyKTC2RIeOPbXi3cm6%2FTaE%2FTGJOi2A35UDf1dOsi7qp1ADOyIEq8cQxICYtE4%2FS4RpNYdurxhU8lmVFsWsmukXJfka3i2ii48g62lG8CcfFU8EPseB3W4rYZzxyb5Cw4Qo8HkT554Fpxx7mYVkqhRBrEnhfzgD4Z%2FxsxsFbzprdjjlHX%2FOARbBwgVFU%2FBDD3X1VmnM3Pg%3D%3D&acctmode=0&pass_ticket=Kj2gBxQtkyURGRqNICP0lnNgX1%2FSpg2FTnrrzQHZOL5mu6OhroSTyDUV%2Frznjw2Q&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664617923&idx=1&sn=8347bae1d2e6f9b3e9dd1bc38eaac0cd&chksm=f1b8d35bbc976781abc34cc5413242c76b1ca2f4d38c6422633364bec774734393a6ef3398ec&mpshare=1&scene=24&srcid=0905YN8kJOP9vbf3UCq5rYhr&sharer_shareinfo=0662d57d64f628efd8d2ea46e0b65cb7&sharer_shareinfo_first=0662d57d64f628efd8d2ea46e0b65cb7&key=daf9bdc5abc4e8d08f506593bdfe16f29044ad7bce4cd7b156546e863d1bef2d22d69f4a07c277d0733c28bb7f94a80f4a84567aab179aa246d37d64f48b8e2329276ba2c5d47377f2034250149c31a9455698b891f22202fbfbfd9c4860646ebf97df734937a152a6cff300a23f59fbb226f78d4d2889c5acc0fa104a88c22d&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQf%2BeR4Rx8ocws3WzbvdCbmRKUAgIE97dBBAEAAAAAAG6gAvVApYsAAAAOpnltbLcz9gKNyK89dVj0stHs0CxOBjURHNZMGqgpLwKO8Ddp6%2BtfBFRWC7VAKU7OazXxwVwqSJHwx5mmwthkz32kj7sa6aJIFnyd3ZvPRhmnSqvbH6%2FMjA%2FU%2BLaVpSjS1ExhinPGEeyKTC2RIeOPbXi3cm6%2FTaE%2FTGJOi2A35UDf1dOsi7qp1ADOyIEq8cQxICYtE4%2FS4RpNYdurxhU8lmVFsWsmukXJfka3i2ii48g62lG8CcfFU8EPseB3W4rYZzxyb5Cw4Qo8HkT554Fpxx7mYVkqhRBrEnhfzgD4Z%2FxsxsFbzprdjjlHX%2FOARbBwgVFU%2FBDD3X1VmnM3Pg%3D%3D&acctmode=0&pass_ticket=Kj2gBxQtkyURGRqNICP0lnNgX1%2FSpg2FTnrrzQHZOL5mu6OhroSTyDUV%2Frznjw2Q&wx_header=0#)
 
 ### cache
 
@@ -164,7 +164,7 @@ perf c2c record
 
 查看结果：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqI1V6enj9gYp0HWOxbq3dPOhlf90XJEcw2icm7XI4s8Z5P7ibNhIVo5xUg/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 perf c2c report
 
@@ -172,19 +172,19 @@ perf c2c report
 
 再往下看，我们可以看到缓存行里面具体的数据：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIIxaz7WicGVhW6mZJPcESd9aJ8Xggtex8AawZd0VzfzOeFM8tvrra03A/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cache line具体情况
 
 我们去查看针对的代码地址：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqItCm52VleCgefg8Wwv6AFXHqQ7dV9Ib4FEibU10j7uRuSicPYI5naYW1g/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 相关源代码
 
 这里汇编的逻辑就是先从数组中把数据取到寄存器，然后操作以后再写回到对应的内存地址中去(`data[index].value++`)。这样我们就定位到了伪共享发生的位置，就是我们申明的这个结构体数组：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIbScUibf64UbCXBglAScdOYuMOMqMP3HdZicl0m54PQcp8fkOLFl4dXeA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 伪共享地址
 
@@ -192,41 +192,41 @@ cache line具体情况
 
 知道了是哪里形成了伪共享以后，我们用一张图来直观的展示当前伪共享的过程：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqI5R2Kbx8sjd2rAvjBs99YkGAcEibd0u9BGDoxpBCJvlUbkyNficaYI9IA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 false sharing图示
 
 如果想减少伪共享，最简单的就是将这几个数据放到不同的`cache line`中：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIG5BibaqUGxN2z90W7D2d6AIWVia5oyod9nMolribKjvrRoJuDkibNuq39A/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 分开cache line
 
 为了放到不同的`cache line`中，我们需要先查看系统上缓存行的大小：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIXe3bEvUQnuDLSCT119sM4MqX6oGdJicaTaNfNKWSmJqqfJF9oqtk3uw/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 查看cache line大小
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIOEp8FAicBT2fRunDbvGYicDbowbuTyzG314CY4p1Un5U1MxSYGZiaTCZA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 cache line = 64bytes
 
 接着我们可以进行如下的尝试：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqI2bdjhnACAibKdb5bGZnJeSyiazQyshkjW2iasonxJZpyh9kFh6ShDmJxQ/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 按照64字节对齐
 
 简单来说，就是让数据按照64字节进行对齐，这样每一个进程都可以独享一个缓存行，从而减少伪共享导致的`cache miss`。在完成修改后，我们重新运行尝试：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIicQwibwLSUpia4ibyQIqxE2MgPwuXeuE8Vic2OQPichd7822NbpkJL9YNVoA/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 修改后重新运行
 
 查看`cache miss`情况：
 ![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIxNNKuuDNPicX8EicfkOtlbwaOMPUicQIYZ1RTI5GSndBCvY1gEHNSKCGw/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ipc明显提升
 
@@ -240,8 +240,7 @@ ipc明显提升
 
 ### 参考资料
 
-- perf c2c(https://blog.csdn.net/aolitianya/article/details/138312017)  
-    
+- perf c2c(https://blog.csdn.net/aolitianya/article/details/138312017)
 
 Reads 1339
 

@@ -1,7 +1,6 @@
-
 TrustZone
 
- _2024年03月19日 07:31_ _四川_
+_2024年03月19日 07:31_ _四川_
 
 # 1. TLB介绍
 
@@ -22,9 +21,8 @@ TLB是Translation Lookaside Buffer的简称，可翻译为“地址转换后援�
 TLB其实本质上也是一种cache，既然是一种cache，其目的就是为了提供更高的performance。而与我们知道的指令cache和数据cache又又什么不同呢？
 
 - 1.指令cache：解决cpu获取main memory中的指令数据的速度比较慢的问题而设立
-    
+
 - 2.数据cache：解决cpu获取main memory中的数据的速度比较慢的问题而设立
-    
 
 Cache为了更快的访问main memory中的数据和指令，而TLB是为了更快的进行地址翻译而将部分的页表内容缓存到了Translation lookasid buffer中，避免了从main memory访问页表的过程。
 
@@ -33,62 +31,54 @@ Cache为了更快的访问main memory中的数据和指令，而TLB是为了更�
 TLB中的项由两部分组成：
 
 - 标识区:存放的是虚地址的一部
-    
+
 - 数据区:存放物理页号、存储保护信息以及其他一些辅助信息
-    
 
 对于数据区的辅助信息包括以下内容：
 
 - 有效位(Valid)：对于操作系统，所有的数据都不会加载进内存，当数据不在内存的时候，就需要到硬盘查找并加载到内存。当为1时，表示在内存上，为0时，该页不在内存，就需要到硬盘查找。
-    
-- 引用位(reference):由于TLB中的项数是一定的，所以当有新的TLB项需要进来但是又满了的话，如果根据LRU算法，就将最近最少使用的项替换成新的项。故需要引用位。同时要注意的是，页表中也有引用位。
-    
-- 脏位(dirty):当内存上的某个块需要被新的块替换时，它需要根据脏位判断这个块之前有没有被修改过，如果被修改过，先把这个块更新到硬盘再替换，否则就直接替换。
-    
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+- 引用位(reference):由于TLB中的项数是一定的，所以当有新的TLB项需要进来但是又满了的话，如果根据LRU算法，就将最近最少使用的项替换成新的项。故需要引用位。同时要注意的是，页表中也有引用位。
+
+- 脏位(dirty):当内存上的某个块需要被新的块替换时，它需要根据脏位判断这个块之前有没有被修改过，如果被修改过，先把这个块更新到硬盘再替换，否则就直接替换。
+
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 下面我们来看一下，当存在TLB的访问流程：
 
 - 当CPU收到应用程序发来的虚拟地址后，首先去TLB中根据标志Tag寻找页表数据，假如TLB中正好存放所需的页表并且有效位是1，说明TLB命中了，那么直接就可以从TLB中获取该虚拟页号对应的物理页号。
-    
+
 - 假如有效位是0，说明该页不在内存中，这时候就发生缺页异常，CPU需要先去外存中将该页调入内存并将页表和TLB更新
-    
+
 - 假如在TLB中没有找到，就通过上一章节的方法，通过分页机制来实现虚拟地址到物理地址的查找。
-    
+
 - 如果TLB已经满了，那么还要设计替换算法来决定让哪一个TLB entry失效，从而加载新的页表项。
-    
 
 引用位、脏位何时更新?
 
--   
-    
+-
 
 1. 如果是TLB命中，那么引用位就会被置1，当TLB或页表满时，就会根据该引用位选择适合的替换位置
-    
 
--   
-    
+-
 
 2. 如果TLB命中且这个访存操作是个写操作，那么脏位就会被置1，表明该页被修改过，当该页要从内存中移除时会先执行将该页写会外存的操作，保证数据被正确修改。
-    
 
 # 3. 如何确定TLB match
 
 我们选择Cortex-A72 processor来描述ARMv8的TLB的组成结构以及维护TLB的指令
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 A72实现了2个level的TLB，
 
 - 绿色是L1 TLB，包括L1 instruction TLB（48-entry fully-associative）和L1 data TLB（32-entry fully-associative）。
-    
+
 - 黄色block是L2 unified TLB，它要大一些，可以容纳1024个entry，是4-way set-associative的。当L1 TLB发生TLB miss的时候，L2 TLB是它们坚强的后盾
-    
 
 通过上图，我们还可以看出：对于多核CPU，每个processor core都有自己的TLB。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 假如不做任何的处理，那么在进程A切换到进程B的时候，TLB和Cache中同时存在了A和B进程的数据。
 
@@ -120,14 +110,13 @@ A72实现了2个level的TLB，
 
 完成单核场景下的分析之后，我们一起来看看多核的情况。进程切换相关的TLB逻辑block示意图如下
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 在多核系统中，进程切换的时候，TLB的操作要复杂一些，主要原因有两点：
 
 - 其一是各个cpu core有各自的TLB，因此TLB的操作可以分成两类，一类是flush all，即将所有cpu core上的tlb flush掉，
-    
+
 - 还有一类操作是flush local tlb，**即仅仅flush本cpu core的tlb。**
-    
 
 另外一个原因是进程可以调度到任何一个cpu core上执行（当然具体和cpu affinity的设定相关），**从而导致task处处留情（在各个cpu上留有残余的tlb entry）。**
 
@@ -184,9 +173,6 @@ TLB的引入解决了分页机制的性能问题，但是如何提高TLB的性�
 # 参考资料
 
 - https://zhuanlan.zhihu.com/p/492184589?utm_id=0
-    
-
-  
 
 内存18
 

@@ -1,4 +1,5 @@
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-4-7 7:09 分类：[进程管理](http://www.wowotech.net/sort/process_management)
+
 # 前言
 
 Linux是一个通用操作系统的内核，她的目标是星辰大海，上到网络服务器，下至嵌入式设备都能运行良好。做一款好的linux进程调度器是一项非常具有挑战性的任务，因为设计约束太多了：
@@ -23,7 +24,9 @@ Linux是一个通用操作系统的内核，她的目标是星辰大海，上到
 跟踪任务的utility主要是为任务寻找合适算力的CPU。例如在手机平台上4个大核+4个小核的结构。一个任务本身逻辑复杂，需要有很长的执行时间，也就是说其utility比较大，那么需要将其安排到算力和任务utility匹配的CPU上，例如大核CPU上。PELT算法也会跟踪CPU上的utility，根据CPU utility选择提升或者降低该CPU的频率。CPU load和Task load主要用于负载均衡算法，即让系统中的每一个CPU承担和它的算力匹配的任务负载。
 
 3.8版本之前的内核CFS调度器在负载跟踪算法上比较粗糙，采用的是跟踪每个运行队列上的负载（per-rq load tracking）。它并没有跟踪每一个任务的负载和利用率，只是关注整体CPU的负载。对于per-rq的负载跟踪方法，调度器可以了解到每个运行队列对整个系统负载的贡献。这样的统计信息可以帮助调度器平衡runqueue上的负载，但从整个系统的角度看，我们并不知道当前CPU上的负载来自哪些任务，每个任务施加多少负载，当前CPU的算力是否支撑runqueue上的所有任务，是否需要提频或者迁核来解决当前CPU上负载。因此，为了更好的进行负载均衡和CPU算力调整，调度器需要PELT算法来指引方向。
+
 # 二、PELT算法的基本原理
+
 ## 1、定义
 
 内核用struct sched_avg来抽象一个se或者cfs rq的平均调度负载：
@@ -31,13 +34,14 @@ Linux是一个通用操作系统的内核，她的目标是星辰大海，上到
 |   |   |
 |---|---|
 |成员|描述|
-|last_update_time|sched avg会定期更新，last_update_time是上次更新的时间点，结合当前的时间值，我们可以计算delta并更新*_sum和*_avg。对task se而言，还有一种特殊情况就是迁移到新的CPU，这时候需要将last_update_time设置为0以便新cpu上可以重新开始计算负载，此外，新任务的last_update_time也会设置为0。|
-|load_sum<br><br>runnable_load_sum<br><br>util_sum|*_sum的值是几何级数的累加（按照1ms为一个周期，距离当前点越远，衰减的越厉害，32个周期之后的load衰减50％，load_sum就是这些load的累加）。<br><br>*_sum的值仅考虑时间因素：<br><br>1、load_sum是running+runnable时间<br><br>2、util_sum仅统计running时间<br><br>3、对于task se，其runnable_load_sum等于util_sum，对于group se，runnable_load_sum综合考虑了其所属cfs上所有任务（整个层级结构中的任务）个数和group se处于running+runnable的时间|
+|last_update_time|sched avg会定期更新，last_update_time是上次更新的时间点，结合当前的时间值，我们可以计算delta并更新\*\_sum和\*\_avg。对task se而言，还有一种特殊情况就是迁移到新的CPU，这时候需要将last_update_time设置为0以便新cpu上可以重新开始计算负载，此外，新任务的last_update_time也会设置为0。|
+|load_sum<br><br>runnable_load_sum<br><br>util_sum|*\_sum的值是几何级数的累加（按照1ms为一个周期，距离当前点越远，衰减的越厉害，32个周期之后的load衰减50％，load_sum就是这些load的累加）。<br><br>*\_sum的值仅考虑时间因素：<br><br>1、load_sum是running+runnable时间<br><br>2、util_sum仅统计running时间<br><br>3、对于task se，其runnable_load_sum等于util_sum，对于group se，runnable_load_sum综合考虑了其所属cfs上所有任务（整个层级结构中的任务）个数和group se处于running+runnable的时间|
 |period_contrib|period_contrib是一个中间计算变量，在更新负载的时候分三段，d1（合入上次更新负载的剩余时间，即不足1ms窗口的时间），d2（满窗时间），d3（不足1ms窗口的时间），period_contrib记录了d3窗口的时间，方便合入下次的d1。具体细节下文会进一步描述。|
-|load_avg<br><br>runnable_load_avg<br><br>util_avg|*_avg是根据*_sum计算得到的负载均值。|
+|load_avg<br><br>runnable_load_avg<br><br>util_avg|*\_avg是根据*\_sum计算得到的负载均值。|
 |util_est|任务阻塞后，其负载会不断衰减。如果一个重载任务阻塞太长时间，那么根据标准PELT算法计算出来的负载会非常的小，当该任务被唤醒重新参与调度的时候，由于负载较小会让调度器做出错误的判断。因此引入了这个成员，记录阻塞之前的load avg信息。|
 
 从这个数据结构可以看出，平均调度负载实际上包括了平均负载load_avg、平均运行负载runnable_load_avg和平均利用率util_avg。为了简单，后文省略“平均”二字，称这些术语为负载、运行负载和利用率。
+
 ## 2、基本公式
 
 通过上一章，我们了解到PELT算法把负载跟踪算法从per rq推进到per-entity的层次，从而让调度器有了做更精细控制的前提。这里per-entity中的“entity”指的是调度实体（scheduling entity），其实就是一个进程或者control group中的一组进程。为了做到Per-entity的负载跟踪，时间被分成了1024us的序列，在每一个1024us的周期中，一个entity对系统负载的贡献可以根据该实体处于runnable状态（正在CPU上运行或者等待cpu调度运行）的时间进行计算。任务在1024us的周期窗口内的负载其实就是瞬时负载。如果在该周期内，runnable的时间是t，那么该任务的瞬时负载应该和（t/1024）有正比的关系。类似的概念，任务的瞬时利用率应该通过1024us的周期窗口内的执行时间（不包括runqueue上的等待时间）比率来计算。
@@ -64,7 +68,7 @@ Linux是一个通用操作系统的内核，她的目标是星辰大海，上到
 
 |   |
 |---|
-|L = L0 + L1*y + L2*y2 + L3*y3 + ...|
+|L = L0 + L1*y + L2*y2 + L3\*y3 + ...|
 
 Li表示在周期pi中的瞬时负载，对于过去的负载我们在计算的时候需要乘一个衰减因子y。在目前的内核代码中，y是确定值：y ^32等于0.5。这样选定的y值，一个调度实体的负荷贡献经过32个窗口（32 x 1024us）后，对当前时间的的符合贡献值会衰减一半。
 
@@ -77,6 +81,7 @@ Li表示在周期pi中的瞬时负载，对于过去的负载我们在计算的�
 （3）最近时间点的负荷值拥有最大的权重1，随着时间的推移，权重指数衰减
 
 使用这样序列的好处是计算简单，我们不需要使用数组来记录过去的负荷贡献，只要把上次的总负荷的贡献值乘以y再加上新的L0负荷值就OK了。utility和runnable load的计算也是类似的，不再赘述。
+
 ## 3、关于时间
 
 在上面的公式中，有很多关于时间的部分参与到了运算中，本小节将对PELT算法中的时间进行详细说明。PELT算法中的时间都是来自几个rq clock，如下：
@@ -205,13 +210,13 @@ Group se需要管理若干个sched se（可能是task se，也可能是其下的
 
 |   |
 |---|
-|static inline struct cfs_rq *cfs_rq_of(struct sched_entity *se)<br><br>{<br><br>return se->cfs_rq;<br><br>}|
+|static inline struct cfs_rq \*cfs_rq_of(struct sched_entity \*se)<br><br>{<br><br>return se->cfs_rq;<br><br>}|
 
 另外一个是该group se所属的cfs rq：
 
 |   |
 |---|
-|static inline struct cfs_rq *group_cfs_rq(struct sched_entity *grp)<br><br>{<br><br>return grp->my_q;<br><br>}|
+|static inline struct cfs_rq \*group_cfs_rq(struct sched_entity \*grp)<br><br>{<br><br>return grp->my_q;<br><br>}|
 
 四、关于负载权重（load weight）
 
@@ -251,7 +256,7 @@ CFS调度算法的核心就是在target latency（sched period）时间内，保
 
 ![](http://www.wowotech.net/content/uploadfile/202204/ad191649288137.png)
 
-CFS runqueue也内嵌一个load avg数据结构，用来表示cfs rq的负载信息。CFS rq的load avg定义为其下sched entity的负载之和。这里的负载有两部分，一部分是blocked load，另外一部分是runnable load。我们用一个简单的例子来描述：Cfs rq上挂着B和C两个se，还有一个se A进入阻塞状态。当在se B的tick中更新cfs rq负载的时候，这时候需要重新计算A B C三个se的负载，然后求和就可以得到cfs rq的负载。当然，这样的算法很丑陋，当cfs rq下面有太多的sched se的时候，更新cfs rq的计算量将非常的大。内核采用的算法比较简单，首先衰减上一次cfs rq的load（A B C三个se的负载同时衰减），然后累加新的A和B的负载。因为cfs rq的load weight等于A的load weight加上B的load weight，所以cfs rq的load avg计算和sched entity的load avg计算的基本逻辑是一样的。具体可以参考__update_load_avg_se（更新se负载）和__update_load_avg_cfs_rq（更新cfs rq负载）的代码实现。
+CFS runqueue也内嵌一个load avg数据结构，用来表示cfs rq的负载信息。CFS rq的load avg定义为其下sched entity的负载之和。这里的负载有两部分，一部分是blocked load，另外一部分是runnable load。我们用一个简单的例子来描述：Cfs rq上挂着B和C两个se，还有一个se A进入阻塞状态。当在se B的tick中更新cfs rq负载的时候，这时候需要重新计算A B C三个se的负载，然后求和就可以得到cfs rq的负载。当然，这样的算法很丑陋，当cfs rq下面有太多的sched se的时候，更新cfs rq的计算量将非常的大。内核采用的算法比较简单，首先衰减上一次cfs rq的load（A B C三个se的负载同时衰减），然后累加新的A和B的负载。因为cfs rq的load weight等于A的load weight加上B的load weight，所以cfs rq的load avg计算和sched entity的load avg计算的基本逻辑是一样的。具体可以参考\_\_update_load_avg_se（更新se负载）和\_\_update_load_avg_cfs_rq（更新cfs rq负载）的代码实现。
 
 Cfs rq的平均利用率的思路同上，不再赘述。
 
@@ -263,7 +268,7 @@ struct sched_avg数据结构中有负载（load_sum/load_avg）和运行负载�
 
 |   |
 |---|
-|static inline void se_update_runnable(struct sched_entity *se)<br><br>{<br><br>if (!entity_is_task(se))<br><br>se->runnable_weight = se->my_q->h_nr_running;<br><br>}|
+|static inline void se_update_runnable(struct sched_entity \*se)<br><br>{<br><br>if (!entity_is_task(se))<br><br>se->runnable_weight = se->my_q->h_nr_running;<br><br>}|
 
 只有group se才有runnable weight的概念，其值等于其所属cfs rq上的任务数目。即group se的runnable load是考虑该group se所代表的所有running +runnable task的负载，即该group se所属cfs rq上整个层级结构中的所有任务数量。
 
@@ -278,13 +283,13 @@ struct sched_avg数据结构中有负载（load_sum/load_avg）和运行负载�
 |   |   |
 |---|---|
 |调用函数|场景|
-|enqueue_task_fair<br><br>（UPDATE_TG）<br><br>enqueue_entity<br><br>（UPDATE_TG\|<br><br>DO_ATTACH）|有五个场景如下：<br><br>a. 任务被唤醒（ttwu_do_activate）或新fork任务被唤醒（wake_up_new_task）<br><br>b. 任务在CPU间迁移（deactivate_task，activate_task）<br><br>c. 负载均衡（detach_task，attach_task）<br><br>d. 任务在Cgroup组内迁移（sched_move_task）<br><br>e. 修改任务的调度参数（dequeue_task，enqueue_task）<br><br>在enqueue_task_fair中，task se一定会调用enqueue_entity完成入队操作，但是在向上遍历整个层级结构的时候，不是每一个group se都需要调用enqueue_entity，只有那些gse->on_rq等于false的调度实体才会调用（即该gse是cfs rq中的第一个调度实体）。因此我们在enqueue_entity会更新负载，而在enqueue_task_fair函数中，也会为那些没有enqueue_entity动作的se和cfs rq进行负载更新。|
-|dequeue_task_fair<br><br>（UPDATE_TG）<br><br>dequeue_entity<br><br>（UPDATE_TG）|有五个场景如下：<br><br>a. 进程进入睡眠状态（__schedule--->deactivate_task）<br><br>b. 任务在CPU间迁移（deactivate_task，activate_task）<br><br>c. 负载均衡（detach_task，attach_task）<br><br>d. 任务在Cgroup组内迁移（sched_move_task）<br><br>e. 修改任务的调度参数（dequeue_task，enqueue_task）<br><br>在场景a中，se从running变成阻塞状态。而在其他场景中，se的状态没有发生变化（马上会enqueue），只是从一个cfs rq转移到另外一个而已。和上面的原因类似，没有全部统一在dequeue_entity中是因为在遍历层级结构的时候，虽然task se一定会执行dequeue_entity，然后中间的group se未必会执行dequeue_entity，只有其所属cfs rq上的所有调度实体全部dequeue之后，该group se才能执行dequeue_entity。|
+|enqueue_task_fair<br><br>（UPDATE_TG）<br><br>enqueue_entity<br><br>（UPDATE_TG|<br><br>DO_ATTACH）|有五个场景如下：<br><br>a. 任务被唤醒（ttwu_do_activate）或新fork任务被唤醒（wake_up_new_task）<br><br>b. 任务在CPU间迁移（deactivate_task，activate_task）<br><br>c. 负载均衡（detach_task，attach_task）<br><br>d. 任务在Cgroup组内迁移（sched_move_task）<br><br>e. 修改任务的调度参数（dequeue_task，enqueue_task）<br><br>在enqueue_task_fair中，task se一定会调用enqueue_entity完成入队操作，但是在向上遍历整个层级结构的时候，不是每一个group se都需要调用enqueue_entity，只有那些gse->on_rq等于false的调度实体才会调用（即该gse是cfs rq中的第一个调度实体）。因此我们在enqueue_entity会更新负载，而在enqueue_task_fair函数中，也会为那些没有enqueue_entity动作的se和cfs rq进行负载更新。|
+|dequeue_task_fair<br><br>（UPDATE_TG）<br><br>dequeue_entity<br><br>（UPDATE_TG）|有五个场景如下：<br><br>a. 进程进入睡眠状态（\_\_schedule--->deactivate_task）<br><br>b. 任务在CPU间迁移（deactivate_task，activate_task）<br><br>c. 负载均衡（detach_task，attach_task）<br><br>d. 任务在Cgroup组内迁移（sched_move_task）<br><br>e. 修改任务的调度参数（dequeue_task，enqueue_task）<br><br>在场景a中，se从running变成阻塞状态。而在其他场景中，se的状态没有发生变化（马上会enqueue），只是从一个cfs rq转移到另外一个而已。和上面的原因类似，没有全部统一在dequeue_entity中是因为在遍历层级结构的时候，虽然task se一定会执行dequeue_entity，然后中间的group se未必会执行dequeue_entity，只有其所属cfs rq上的所有调度实体全部dequeue之后，该group se才能执行dequeue_entity。|
 |put_prev_entity<br><br>（0）|有两个用户场景：<br><br>a. 进程切换<br><br>b. 修改任务的调度参数<br><br>这两个用户场景类似，我们以进程切换为例说明。当任务A切换到任务B执行的时候，首先遍历任务A的se hierarchy，执行put prev entity的操作，然后，遍历B的se hierarchy，执行set next entity的操作。<br><br>进程切换又有两中情况：任务被抢占的时候，从running变成runnable状态，更新负载状态。任务阻塞的时候，虽然也执行put prev entity的操作，但是没有进行负载更新，负载更新是在dequeue时候完成的。|
 |set_next_entity<br><br>（UPDATE_TG）|Set_next_entity场景同上，也是进程切换和修改任务的调度参数两种，不再赘述。|
 |sched_group_set_shares<br><br>（UPDATE_TG）|用户空间修改task group的调度参数（share值）|
 |entity_tick函数<br><br>（UPDATE_TG）|被tick命中，状态不变，从running到running。虽然状态不变，但是为了能够及时跟踪running任务的负载，因此需要在tick中更新。|
-|__update_blocked_fair<br><br>（UPDATE_TG）|CPU进入idle状态，并不意味着该CPU上的load avg的负载都是零，原来运行在该CPU的任务负载仍然存在（虽然这些任务阻塞了），只不过是需要不断进行衰减。因此，我们会在下面的场景中对CPU负载进行衰减：<br><br>a. Nohz idle balance（更新所有idle cpu的blocked load）<br><br>b. Newidle balance（更新本CPU的blocked load）<br><br>c. Load balance（更新本CPU的blocked load）|
+|\_\_update_blocked_fair<br><br>（UPDATE_TG）|CPU进入idle状态，并不意味着该CPU上的load avg的负载都是零，原来运行在该CPU的任务负载仍然存在（虽然这些任务阻塞了），只不过是需要不断进行衰减。因此，我们会在下面的场景中对CPU负载进行衰减：<br><br>a. Nohz idle balance（更新所有idle cpu的blocked load）<br><br>b. Newidle balance（更新本CPU的blocked load）<br><br>c. Load balance（更新本CPU的blocked load）|
 |attach_entity_cfs_rq<br><br>（0）|调用场景如下：<br><br>a. 唤醒新创建的任务<br><br>b. 从非cfs任务切换成cfs任务<br><br>c. cfs任务从一个cgroup组切换成另外一个cgroup组<br><br>d. Cgroup online（TODO）|
 |detach_entity_cfs_rq<br><br>（0）|调用场景如下：<br><br>a. Cfs任务切换为其他调度类任务<br><br>b. cfs任务从一个cgroup组切换成另外一个cgroup组|
 |propagate_entity_cfs_rq<br><br>（UPDATE_TG）|负载传播|
@@ -319,7 +324,7 @@ Load avg的初始化分成两个阶段，第一个阶段在创建sched entity的
 
 update_load_avg的主要执行过程如下：
 
-（1）更新本层级sched entity的load avg（__update_load_avg_se）
+（1）更新本层级sched entity的load avg（\_\_update_load_avg_se）
 
 （2）更新该se挂入的cfs rq的load avg（update_cfs_rq_load_avg）
 
@@ -367,7 +372,7 @@ update_cfs_group的主要执行过程如下：
 
 |   |
 |---|
-|update_load_avg(cfs_rq, se, UPDATE_TG \| DO_ATTACH);<br><br>se_update_runnable(se);<br><br>update_cfs_group(se);<br><br>account_entity_enqueue(cfs_rq, se);|
+|update_load_avg(cfs_rq, se, UPDATE_TG | DO_ATTACH);<br><br>se_update_runnable(se);<br><br>update_cfs_group(se);<br><br>account_entity_enqueue(cfs_rq, se);|
 
 和tick对比，这个场景下的update_load_avg多传递了一个DO_ATTACH的flag，当一个任务被唤醒的时候发生了迁移，那么PELT层级结构发生了变化，这时候需要负载的传播过程，具体细节我们在下一小节描述。由于队列中增加了一个任务，se_update_runnable函数用来更新cfs rq的runnable weight。update_cfs_group用来更新group se的load weight。account_entity_enqueue函数会更新cfs rq的load weight。
 
@@ -379,7 +384,7 @@ update_cfs_group的主要执行过程如下：
 
 |   |
 |---|
-|static inline void update_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)<br><br>{<br><br>......<br><br>if (!se->avg.last_update_time && (flags & DO_ATTACH)) {<br><br>attach_entity_load_avg(cfs_rq, se);<br><br>update_tg_load_avg(cfs_rq);<br><br>}<br><br>......<br><br>}|
+|static inline void update_load_avg(struct cfs_rq \*cfs_rq, struct sched_entity \*se, int flags)<br><br>{<br><br>......<br><br>if (!se->avg.last_update_time && (flags & DO_ATTACH)) {<br><br>attach_entity_load_avg(cfs_rq, se);<br><br>update_tg_load_avg(cfs_rq);<br><br>}<br><br>......<br><br>}|
 
 attach_entity_load_avg的主要功能包括：
 
@@ -405,7 +410,7 @@ update_tg_load_avg用来更新task group的负载。
 
 |   |
 |---|
-|static inline int propagate_entity_load_avg(struct sched_entity *se)<br><br>{<br><br>......<br><br>add_tg_cfs_propagate(cfs_rq, gcfs_rq->prop_runnable_sum);-----a<br><br>update_tg_cfs_util(cfs_rq, se, gcfs_rq);-----b<br><br>update_tg_cfs_runnable(cfs_rq, se, gcfs_rq);-----c<br><br>update_tg_cfs_load(cfs_rq, se, gcfs_rq);-----d<br><br>......<br><br>}|
+|static inline int propagate_entity_load_avg(struct sched_entity \*se)<br><br>{<br><br>......<br><br>add_tg_cfs_propagate(cfs_rq, gcfs_rq->prop_runnable_sum);-----a<br><br>update_tg_cfs_util(cfs_rq, se, gcfs_rq);-----b<br><br>update_tg_cfs_runnable(cfs_rq, se, gcfs_rq);-----c<br><br>update_tg_cfs_load(cfs_rq, se, gcfs_rq);-----d<br><br>......<br><br>}|
 
 这里把level 0 cfs rq的prop_runnable_sum传递到level 1 cfs rq的prop_runnable_sum，以便后续可以继续向上传递。
 
@@ -413,7 +418,7 @@ update_tg_load_avg用来更新task group的负载。
 
 |   |
 |---|
-|static inline int propagate_entity_load_avg(struct sched_entity *se)<br><br>{<br><br>......<br><br>update_tg_cfs_util(cfs_rq, se, gcfs_rq);-----A<br><br>update_tg_cfs_runnable(cfs_rq, se, gcfs_rq);-----B<br><br>update_tg_cfs_load(cfs_rq, se, gcfs_rq);-----C<br><br>......<br><br>}|
+|static inline int propagate_entity_load_avg(struct sched_entity \*se)<br><br>{<br><br>......<br><br>update_tg_cfs_util(cfs_rq, se, gcfs_rq);-----A<br><br>update_tg_cfs_runnable(cfs_rq, se, gcfs_rq);-----B<br><br>update_tg_cfs_load(cfs_rq, se, gcfs_rq);-----C<br><br>......<br><br>}|
 
 A、Group se的util跟随其所属cfs rq的util，同时把新增的util加到group se所挂入的cfs rq
 
@@ -431,9 +436,9 @@ update_load_avg函数用来更新调度实体及其cfs rq的平均调度负载�
 
 |   |
 |---|
-|static inline void update_load_avg(struct cfs_rq *cfs_rq, struct sched_entity *se, int flags)<br><br>{<br><br>u64 now = cfs_rq_clock_pelt(cfs_rq);<br><br>int decayed;<br><br>if (se->avg.last_update_time && !(flags & SKIP_AGE_LOAD))<br><br>__update_load_avg_se(now, cfs_rq, se);-------A<br><br>decayed  = update_cfs_rq_load_avg(now, cfs_rq);------B<br><br>decayed \|= propagate_entity_load_avg(se);<br><br>if (!se->avg.last_update_time && (flags & DO_ATTACH)) {-------C<br><br>attach_entity_load_avg(cfs_rq, se);<br><br>update_tg_load_avg(cfs_rq);<br><br>} else if (decayed) {-----------D<br><br>cfs_rq_util_change(cfs_rq, 0);<br><br>if (flags & UPDATE_TG)<br><br>update_tg_load_avg(cfs_rq);<br><br>}<br><br>}|
+|static inline void update_load_avg(struct cfs_rq \*cfs_rq, struct sched_entity \*se, int flags)<br><br>{<br><br>u64 now = cfs_rq_clock_pelt(cfs_rq);<br><br>int decayed;<br><br>if (se->avg.last_update_time && !(flags & SKIP_AGE_LOAD))<br><br>\_\_update_load_avg_se(now, cfs_rq, se);-------A<br><br>decayed  = update_cfs_rq_load_avg(now, cfs_rq);------B<br><br>decayed |= propagate_entity_load_avg(se);<br><br>if (!se->avg.last_update_time && (flags & DO_ATTACH)) {-------C<br><br>attach_entity_load_avg(cfs_rq, se);<br><br>update_tg_load_avg(cfs_rq);<br><br>} else if (decayed) {-----------D<br><br>cfs_rq_util_change(cfs_rq, 0);<br><br>if (flags & UPDATE_TG)<br><br>update_tg_load_avg(cfs_rq);<br><br>}<br><br>}|
 
-A、当last_update_time等于0的时候，基本上不需要更新其se负载，因为都已经设定好了。例如新fork出来的task se，其last_update_time等于0，表示不需要更新se的load avg，是缺省设定好的。此外，当任务迁移到新的cpu的时候，该se过去的负载已经在原CPU更新并且会移动到新CPU上，因此会将last_update_time等于0，这样，在加入到新CPU cfs rq时该se的负载不需要更新，但是需要sync到新的cfs rq上来。SKIP_AGE_LOAD表示丢弃旧的load。例如当一个CFS任务短暂的设置为rt，然后又从rt切换成cfs的时候，那么原来的负载是否可以忽略？SKIP_AGE_LOAD就是用来控制如何处理过去负载的。函数__update_load_avg_se是用来更新se的平均调度负载的，下面会详细描述。
+A、当last_update_time等于0的时候，基本上不需要更新其se负载，因为都已经设定好了。例如新fork出来的task se，其last_update_time等于0，表示不需要更新se的load avg，是缺省设定好的。此外，当任务迁移到新的cpu的时候，该se过去的负载已经在原CPU更新并且会移动到新CPU上，因此会将last_update_time等于0，这样，在加入到新CPU cfs rq时该se的负载不需要更新，但是需要sync到新的cfs rq上来。SKIP_AGE_LOAD表示丢弃旧的load。例如当一个CFS任务短暂的设置为rt，然后又从rt切换成cfs的时候，那么原来的负载是否可以忽略？SKIP_AGE_LOAD就是用来控制如何处理过去负载的。函数\_\_update_load_avg_se是用来更新se的平均调度负载的，下面会详细描述。
 
 B、函数update_cfs_rq_load_avg用来更新cfs rq的平均调度负载的，函数propagate_entity_load_avg是用来在整个PELT hierarchy中传播新加入se带来的负载，下面会详细描述。这里的delay用来跟踪负载更新的状态。我们知道，PELT是按照1ms的窗口来更新平均调度负载的，delay就是表示本次负载更新涉及几个1ms的PELT周期全窗口，如果窗口没有rollover，那么平均调度负载不会更新（仅更新sum值），也就不需要去驱动调频。类似的，如果有传播负载，那么说明CPU上的平均调度负载一定是会发生变化，否则也不需要去驱动调频。
 
@@ -441,14 +446,14 @@ C、当调用enqueue_entity函数将一个Se入队cfs rq时（唤醒或者迁移
 
 D、如果需要驱动调频，那么调用cfs_rq_util_change通知cpufreq模块平均调度负载发生变化，看看是否需要进行频率调整。UPDATE_TG这个标记用来控制是否更新task group的平均负载，如果调用者在外部会调用update_tg_load_avg来更新task group负载，那么在update_load_avg则不需要进行task group负载的更新。
 
-2、__update_load_avg_se和__update_load_avg_cfs_rq
+2、\_\_update_load_avg_se和\_\_update_load_avg_cfs_rq
 
-__update_load_avg_se和__update_load_avg_cfs_rq这两个函数的逻辑基本一样，都是先调用___update_load_sum来求*_sum值，然后调用___update_load_avg求平均值*_avg。不过，在计算se和cfs rq的平均调度负载的时候传递的参数是不一样的。具体的参数设置如下：
+\_\_update_load_avg_se和\_\_update_load_avg_cfs_rq这两个函数的逻辑基本一样，都是先调用\_\_\_update_load_sum来求\*\_sum值，然后调用\_\_\_update_load_avg求平均值\*\_avg。不过，在计算se和cfs rq的平均调度负载的时候传递的参数是不一样的。具体的参数设置如下：
 
 |   |   |   |
 |---|---|---|
 |参数|调度实体se|调度实体队列cfs rq|
-|load|se->on_rq，对于task se而言，表示计算任务的Running + runnable时间。对于group se而言，也是计算其Running+runnable时间，不过group se所属cfs rq上只要一个任务是Running或者Runnable的，那么group se就是处于Running or Runnable的。|cfs_rq->load.weight<br><br>计算的时间是cfs_rq->load.weight x Running+runnable时间。对于cfs rq，sum值包括了load weight，因此调用函数___update_load_avg来计算*_avg的时候，负载参数load传递的是1。|
+|load|se->on_rq，对于task se而言，表示计算任务的Running + runnable时间。对于group se而言，也是计算其Running+runnable时间，不过group se所属cfs rq上只要一个任务是Running或者Runnable的，那么group se就是处于Running or Runnable的。|cfs_rq->load.weight<br><br>计算的时间是cfs_rq->load.weight x Running+runnable时间。对于cfs rq，sum值包括了load weight，因此调用函数\_\_\_update_load_avg来计算\*\_avg的时候，负载参数load传递的是1。|
 |runnable|se_runnable(se)，对于task se而言，和load计算方法是一样的。对于group se，计算的是处于Running+runnable的任务个数 x Running+runnable的时间|cfs_rq->h_nr_running<br><br>等于其对应的group se的runnable load|
 |running|cfs_rq->curr == se。当前正在执行，计算的是running time|cfs_rq->curr != NULL<br><br>只要有属于该cfs rq的任务有在运行就计算其running time|
 
@@ -460,13 +465,13 @@ __update_load_avg_se和__update_load_avg_cfs_rq这两个函数的逻辑基本一
 
 accumulate_sum函数主要用于计算：
 
-（1）调度实体（包括task se和group se两种）的各种load sum（即sched_avg数据结构中的*_sum成员）
+（1）调度实体（包括task se和group se两种）的各种load sum（即sched_avg数据结构中的\*\_sum成员）
 
 （2）Cfs rq的load sum
 
 （3）rt、dl、irq和thermal pressure的load sum
 
-为了方便表述，我们以调度实体为例说明该函数的逻辑。当一个se历经了delta时间的某个状态（load，runnable和running说明了该se的状态），这段时间delta需要累计算入该se平均负载sched_avg的*_sum成员中。
+为了方便表述，我们以调度实体为例说明该函数的逻辑。当一个se历经了delta时间的某个状态（load，runnable和running说明了该se的状态），这段时间delta需要累计算入该se平均负载sched_avg的\*\_sum成员中。
 
 delta时间被分成3段，包括d1、d2、d3：
 
@@ -488,7 +493,7 @@ delta时间被分成3段，包括d1、d2、d3：
 
 （1）调用decay_load，对旧的sum值衰减1个PELT窗口
 
-（2）调用__accumulate_pelt_segments处理delta（d1+d3）
+（2）调用\_\_accumulate_pelt_segments处理delta（d1+d3）
 
 a) 对d1衰减1个PELT窗口
 
@@ -498,7 +503,7 @@ b) d1+d3就是新增的sum值
 
 （1）调用decay_load，对旧的sum值衰减n个PELT窗口
 
-（2）调用__accumulate_pelt_segments处理delta（d1+d2+d3）
+（2）调用\_\_accumulate_pelt_segments处理delta（d1+d2+d3）
 
 a) 对d1衰减n个PELT窗口
 
@@ -522,7 +527,7 @@ decay_load接收两个参数：负载值val和衰减周期n，具体的逻辑如
 
 1、内核源代码
 
-2、linux-5.10.61\Documentation\scheduler\*
+2、linux-5.10.61\\Documentation\\scheduler\*
 
 本文首发在“内核工匠”微信公众号，欢迎扫描以下二维码关注公众号获取最新Linux技术分享：
 
@@ -536,91 +541,91 @@ decay_load接收两个参数：负载值val和衰减周期n，具体的逻辑如
 
 **评论：**
 
-**donbear**  
+**donbear**\
 2022-07-28 10:02
 
-我想我明白了.  
-  
-*_avg 就是在 [1024us, 1024us, ...] 这个时间序列的对应指标统计的加权平均.  
-*_avf 的分母完全是由它的数学定义推导而来的,其原始定义其实就是一个 Exponential Moving Average，分母的推导可以看http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average.
+我想我明白了.
+
+\*\_avg 就是在 \[1024us, 1024us, ...\] 这个时间序列的对应指标统计的加权平均.\
+\*\_avf 的分母完全是由它的数学定义推导而来的,其原始定义其实就是一个 Exponential Moving Average，分母的推导可以看http://en.wikipedia.org/wiki/Moving_average#Exponential_moving_average.
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8658)
 
-**donbear**  
+**donbear**\
 2022-07-17 22:01
 
-感谢分享，很精彩啊。  
-  
-有一个疑问希望能得到博主的解答。  
-  
-在通过 *sum 计算 *avg 的时候，为什么是除以几何级数的最大值？  
-按照linux中源码注释以及各处看到的公式，这里貌似除1024就可以了？:(  
-  
-static __always_inline void  
-___update_load_avg(struct sched_avg *sa, unsigned long load)  
-{  
-        u32 divider = get_pelt_divider(sa);  
-  
-        /*    
-         * Step 2: update *_avg.  
-         */  
-        sa->load_avg = div_u64(load * sa->load_sum, divider);  
-        sa->runnable_avg = div_u64(sa->runnable_sum, divider);  
-        WRITE_ONCE(sa->util_avg, sa->util_sum / divider);  
-}  
-  
-看了博文这里的解释，还是一头雾水：在计算sum值的时候，runnable和running sum都是进行了scale操作（左移10bit），因此在计算avg的时候，直接除以序列最大值就OK了。通过get_pelt_divider可以获得PELT几何序列的最大值。  
-  
+感谢分享，很精彩啊。
+
+有一个疑问希望能得到博主的解答。
+
+在通过 \*sum 计算 \*avg 的时候，为什么是除以几何级数的最大值？\
+按照linux中源码注释以及各处看到的公式，这里貌似除1024就可以了？:(
+
+static \_\_always_inline void\
+\_\_\_update_load_avg(struct sched_avg \*sa, unsigned long load)\
+{\
+u32 divider = get_pelt_divider(sa);
+
+/\*  \
+\* Step 2: update \*\_avg.\
+\*/\
+sa->load_avg = div_u64(load * sa->load_sum, divider);\
+sa->runnable_avg = div_u64(sa->runnable_sum, divider);\
+WRITE_ONCE(sa->util_avg, sa->util_sum / divider);\
+}
+
+看了博文这里的解释，还是一头雾水：在计算sum值的时候，runnable和running sum都是进行了scale操作（左移10bit），因此在计算avg的时候，直接除以序列最大值就OK了。通过get_pelt_divider可以获得PELT几何序列的最大值。
+
 博主能详细解答一下么？非常感谢。
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8644)
 
-**Redsky**  
+**Redsky**\
 2022-07-26 11:14
 
-@donbear：这个问题我是这么理解的，几何最大值，表征的是在衰减期间内，每一个us内se都处于running/runnable状态的sum，实际上也可以理解为某一时刻load在load sum计算中衰减到0的时间，也就是衰减周期的us数量。sum/time，计算出来的是avg。  
-  
+@donbear：这个问题我是这么理解的，几何最大值，表征的是在衰减期间内，每一个us内se都处于running/runnable状态的sum，实际上也可以理解为某一时刻load在load sum计算中衰减到0的时间，也就是衰减周期的us数量。sum/time，计算出来的是avg。
+
 如果理解错了，请博主指正。
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8652)
 
-**learner**  
+**learner**\
 2023-01-05 18:28
 
 @donbear：PELT虽然是按se计算的。但是因为pelt最终是用来衡量cpu超载、cpu负载均衡的，所以时间是从cpu的角度看待的，对于一个cpu来说，统计的都是几何级数最大值时间段内的负载，所以对于每个任务都要计算在这段时间内的负载。
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8729)
 
-**ctwillson**  
+**ctwillson**\
 2022-06-01 20:17
 
 之后有没有分享嵌入式设备的调度，比如 EAS WALT...
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8623)
 
-**abcdefg1324**  
+**abcdefg1324**\
 2022-04-28 17:25
 
 赞！实际移植才能理解深刻，这种尝试也挺有意义
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8599)
 
-**zzz**  
+**zzz**\
 2022-04-20 23:54
 
 文章写的很赞！想问下作者调度和负载均衡这块代码是如何学进去的，因为调度并不像实际一个设备驱动或者其他模块代码那么容易上手和实践，这里如何和实践相结合呢。
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8591)
 
-**[linuxer](http://www.wowotech.net/)**  
+**[linuxer](http://www.wowotech.net/)**\
 2022-04-22 11:38
 
-@zzz：的确如你所言，理论需要结合实际。不过，我目前的工作就是做内核优化的，所以不缺实践，哈哈^_^  
+@zzz：的确如你所言，理论需要结合实际。不过，我目前的工作就是做内核优化的，所以不缺实践，哈哈^\_^\
 有兴趣来做内核优化实践的话可以联系我，微信是Linuxer-at-wowo
 
 [回复](http://www.wowotech.net/process_management/pelt.html#comment-8592)
 
-**cutelinux**  
+**cutelinux**\
 2022-04-07 19:31
 
 逻辑清晰，通俗易懂，赞！
@@ -629,152 +634,155 @@ ___update_load_avg(struct sched_avg *sa, unsigned long load)
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [ARMv8之Observability](http://www.wowotech.net/armv8a_arch/Observability.html)
-    - [内存一致性模型](http://www.wowotech.net/memory_management/456.html)
-    - [Meltdown论文翻译](http://www.wowotech.net/basic_subject/meltdown.html)
-    - [linux usb 摄像头测试](http://www.wowotech.net/162.html)
-    - [DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)
+
+  - [ARMv8之Observability](http://www.wowotech.net/armv8a_arch/Observability.html)
+  - [内存一致性模型](http://www.wowotech.net/memory_management/456.html)
+  - [Meltdown论文翻译](http://www.wowotech.net/basic_subject/meltdown.html)
+  - [linux usb 摄像头测试](http://www.wowotech.net/162.html)
+  - [DRAM 原理 3 ：DRAM Device](http://www.wowotech.net/basic_tech/321.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

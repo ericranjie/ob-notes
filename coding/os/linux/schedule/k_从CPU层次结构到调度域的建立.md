@@ -1,5 +1,5 @@
 爱听音乐的章鱼哥 Linux内核之旅
- _2022年02月17日 00:02_
+_2022年02月17日 00:02_
 
 现代各种处理器采用了许多不同的技术，但从物理结构上，CPU的层次结构却可以被统一的表示如下：
 
@@ -24,6 +24,7 @@
 我们以ARM64下CPU的初始化开始入手。ARM64平台下CPU的初始化需要读取DTS（Device Tree Source，设备树）文件。
 
 随意挑选arm64目录下一个处理器的dtsi文件的部分为例：
+
 ```cpp
  cpus {  
  #address-cells = <1>;  
@@ -54,11 +55,15 @@
     ......  
  };
 ```
+
 以上是DTS文件中CPU定义的一个统一的格式。
+
 ```cpp
 start_kernel --> setup_arch --> smp_init_cpus
 ```
+
 `smp_init_cpus`在系统启动的时候读取DTS文件中CPU信息，获得CPU数量，并调用`smp_cpu_setup`函数进行possible位图的设置。
+
 ```cpp
  static int __init smp_cpu_setup(int cpu)  
  {  
@@ -76,7 +81,9 @@ start_kernel --> setup_arch --> smp_init_cpus
  return 0;  
  }
 ```
+
 这里先了解一下内核中存在的四种CPU的状态表示，分别是`possible`、`online`、`present`和`active`。
+
 ```cpp
  typedef struct cpumask { DECLARE_BITMAP(bits, NR_CPUS); } cpumask_t;  
    
@@ -92,7 +99,9 @@ start_kernel --> setup_arch --> smp_init_cpus
  #define cpu_present_mask ((const struct cpumask *)&__cpu_present_mask)  
  #define cpu_active_mask   ((const struct cpumask *)&__cpu_active_mask)
 ```
+
 可以从`smp_cpu_setup`函数看出，如果一个CPU编号对应的`struct cpu_operations`被建立成功，并且其对应的`init`函数没有执行失败，则将该CPU标记为possible。
+
 ```cpp
  struct cpu_operations {  
  const char*name;  
@@ -112,6 +121,7 @@ start_kernel --> setup_arch --> smp_init_cpus
  #endif  
  };
 ```
+
 `cpu_init`：读取提出一个逻辑CPU的激活方法的必要数据；
 `cpu_prepare`：测试是否可以启动给定CPU；
 `cpu_boot`：启动CPU；
@@ -124,6 +134,7 @@ start_kernel --> setup_arch --> smp_init_cpus
 接下来一直到`smp_prepare_cpus`函数，才到设置present位图的时候。
 
 以下是`smp_prepare_cpus`的部分代码：
+
 ```cpp
  void __init smp_prepare_cpus(unsigned int max_cpus)  
  {  
@@ -154,9 +165,11 @@ start_kernel --> setup_arch --> smp_init_cpus
  }  
  }
 ```
+
 前面看到，possible位图的设置依赖于`cpu_operations`结构体的初始化以及是否读取到正确的CPU信息；那这里present位图的设置则依赖于`cpu_prepare`的执行结果，也就是检测对应CPU是否可以启动。
 
 `kernel_init_freezable --> smp_init --> bringup_nonboot_cpus`。
+
 ```cpp
  void bringup_nonboot_cpus(unsigned int setup_max_cpus)  
  {  
@@ -170,9 +183,11 @@ start_kernel --> setup_arch --> smp_init_cpus
  }  
  }
 ```
+
 `cpu_up --> _cpu_up --> cpuhp_up_callbacks --> cpuhp_invoke_callback --> bringup_cpu --> __cpu_up --> boot_secondary`
 
 `cpu_up`，这里可以这么简单的理解，最开始系统中只有一个CPU，当代码执行到这里的时候，开始启动其他的CPU，其他CPU的启动过程，首先是需要复制主CPU的0号线程（即空闲线程），然后去执行热插拔相关的回调函数，一直执行到`boot_secondary`，在这里最终会执行到`struct cpu_operations`中的回调函数`cpu_boot`。
+
 ```cpp
  static int boot_secondary(unsigned int cpu, struct task_struct *idle)  
  {  
@@ -184,6 +199,7 @@ start_kernel --> setup_arch --> smp_init_cpus
  return -EOPNOTSUPP;  
  }
 ```
+
 而通常在`struct cpu_operations`中的成员`cpu_boot`的执行中，会执行到`secondary_entry --> secondary_startup --> __secondary_switched --> secondary_start_kernel`。
 
 而在`secondary_start_kernel`中会调用`set_cpu_online`函数设置online位图。
@@ -191,6 +207,7 @@ start_kernel --> setup_arch --> smp_init_cpus
 active这个位图的修改函数定义在CPU热插拔的回调函数数组中，也就是`struct cpuhp_step cpuhp_hp_states[]`中，该位图服务于调度器，在开启热插拔的情况下，调度器需要实时监控CPU热插拔的每个信息，因此需要该位图实时将某个CPU移除或添加。
 
 说完了四种位图，突然发现还没有说到CPU的层次结构在代码上的表示，CPU的层次结构使用一个结构体`struct cpu_topology`来表示。
+
 ```cpp
  struct cpu_topology {  
  int thread_id;  
@@ -205,6 +222,7 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
  #ifdef CONFIG_GENERIC_ARCH_TOPOLOGY  
  extern struct cpu_topology cpu_topology[NR_CPUS];
 ```
+
 其实，代码上CPU的层次结构的赋值代码与CPU启动的时间基本一致，主CPU的赋值是在`smp_prepare_cpus`函数中；其余CPU是在`secondary_start_kernel`函数中。
 
 直接来看`cpu_topology`结构体的赋值函数`store_cpu_topology`。在调用该函数之前，已经在`init_cpu_topology`函数中进行过`cpu_topology`数组的初始化了，其中`thread_id`、`core_id`、`package_id`和`llc_id`皆初始化为-1。
@@ -236,16 +254,20 @@ active这个位图的修改函数定义在CPU热插拔的回调函数数组中�
  update_siblings_masks(cpuid);  
  }
 ```
+
 以arm64为例，`thread_id`应该是超线程情况下才有意义，这里不考虑。`core_id`等同于物理核心id，也就是逻辑核心id，二者一致，`package_id`指向了其所属的NUMA的Node号。`update_sibling_masks`则用于更新用于表示各个层级的兄弟关系。
 
 说了这么多，一直在说CPU的物理层次结构在代码上的表示，却还没有说到调度中CPU物理结构的参与。
 
 这里关注`kernel_init_freezable`函数有这样一段代码：
+
 ```cpp
 smp_init();  
 sched_init_smp();
 ```
+
 前面已经了解到`smp_init`函数执行完成时，各个次CPU已经启动完成，此时进入`sched_init_smp`函数。
+
 ```cpp
 sched_init_smp --> sched_init_domains --> build_sched_domains
 
@@ -353,7 +375,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return ret;  
  }
 ```
+
 首先，分析第1个核心函数`__visit_domain_allocation_hell`。
+
 ```cpp
  static enum s_alloc  
  __visit_domain_allocation_hell(struct s_data *d, const struct cpumask *cpu_map) {  
@@ -371,7 +395,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return sa_rootdomain;  
  }
 ```
+
 首先进入`__sdt_alloc`函数。
+
 ```cpp
  static int __sdt_alloc(const struct cpumask *cpu_map)  
  {  
@@ -442,7 +468,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return 0;  
  }
 ```
+
 在这个函数中我们接触到第一个比较关键的数据结构`struct sched_domain_topology_level`。
+
 ```cpp
  struct sched_domain_topology_level {  
  sched_domain_mask_f mask;  
@@ -480,11 +508,13 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  sched_domain_topology = tl;  
  }
 ```
+
 可以看到，`struct sched_domain_topology_level`使用一个数组`default_topology`给出，当然各个体系结构下也可以修改该数组。该数组一般按照CPU层次从低到高排列。
 
 `struct sched_domain_toplogy_level`的前两个成员`mask`和`flag`分别是两个函数，用于指定该CPU层次下的兄弟cpumask和flag标志位。而`struct sd_data`是该数据结构的核心，其成员将在后续完成赋值。
 
 这里简单看下物理核心层的`mask`成员`cpu_coregroup_mask`。
+
 ```cpp
  const struct cpumask *cpu_coregroup_mask(int cpu)  
  {  
@@ -503,7 +533,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return core_mask;  
  }
 ```
+
 可以看到，本质上是利用`cpu_topology`数组来获得`core_sibling`的值，到这里就和物理层级联系起来了。
+
 ```cpp
  struct sd_data {  
  struct sched_domain *__percpu *sd;  
@@ -512,9 +544,11 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  struct sched_group_capacity *__percpu *sgc;  
  };
 ```
+
 分析`__sdt_alloc`，可以看到为每个层次的`struct sched_domain_topology_level`的`sd_data`分配percpu的`sched_domain`、`sched_domain_shared`、`sched_group`和`sched_group_capacity`。这样每个CPU可以通过`default_topology`数组轻易找到自己的`sched_domain`等数据。
 
 接下来，继续分析`build_sched_domains`的第2个核心函数`build_sched_domain`，该函数在每个CPU的每个层次上都要去调用一次。
+
 ```cpp
  static struct sched_domain *build_sched_domain(struct sched_domain_topology_level *tl,  
  const struct cpumask *cpu_map, struct sched_domain_attr *attr,  
@@ -546,7 +580,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return sd;  
  }
 ```
+
 其中`sd_init`函数完成对应`sched_domain_topology_level`对应层次的`sched_domain`的一些数据的填充以及`sd_data`中mask和flag的修改。
+
 ```cpp
  static struct sched_domain *  
  sd_init(struct sched_domain_topology_level *tl,  
@@ -656,11 +692,13 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return sd;  
  }
 ```
+
 这里可以看到，`sched_domain`中的成员往往是与调度中负载均衡操作相关的一些字段，例如`min_interval`是最小的load balance间隔，`max_interval`是最大的load balance间隔等等。
 
 这里应该注意，`sched_domain`的父子关系，高层级的`sched_domain`是低层级的`sched_domain`的parent，低层级的`sched_domain`是高层级的child。`sched_domain`的`span`为自己该层级的兄弟CPU以及下面几个层级的兄弟CPU的并集。
 
 创建完`sched_domain`之后，开始从CPU开始由低到高依次建立`sched_group`，这就是第3个核心函数，`build_sched_groups`。
+
 ```cpp
  static int  
  build_sched_groups(struct sched_domain *sd, int cpu)  
@@ -698,7 +736,9 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return 0;  
  }
 ```
+
 `build_sched_groups`函数的核心是`get_group`函数。
+
 ```cpp
  static struct sched_group *get_group(int cpu, struct sd_data *sdd)  
  {  
@@ -737,6 +777,7 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
  return sg;  
  }
 ```
+
 可以从`get_group`函数看出来，如果是最底层的`sched_domain`，即不存在`child`，那么`get_group`中建立的`sched_group`是该CPU独有的。而如果是非最底层的`sched_domain`，那么`get_group`中建立的`sched_group`是其`child`的`span`成员共享的。这里注意，`sched_group_capacity`和`sched_group`两位一体，表示该调度组的计算能力。
 
 到这里，调度域和调度组的关系基本可以理清楚。在CPU层次结构上，CPU在每个层次都有一个调度域，该CPU在高层次的调度域与该CPU在低层次的调度域互成父子关系。
@@ -747,6 +788,6 @@ sched_init_smp --> sched_init_domains --> build_sched_domains
 
 `rq_attach_root`中有这样的一行代码：`rq->rd = rd;`。至此，从`rq --> root_domain --> sched_domain`的关系已经建立完成。
 
-  
----
+______________________________________________________________________
+
 ​

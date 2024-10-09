@@ -2,17 +2,15 @@
 
 原创 张彦飞allen 开发内功修炼
 
- _2021年11月16日 08:28_
+_2021年11月16日 08:28_
 
-大家好，我是飞哥！  
+大家好，我是飞哥！
 
 如今服务器虚拟化技术已经发展到了深水区。现在业界已经有很多公司都迁移到容器上了。我们的开发写出来的代码大概率是要运行在容器上的。因此深刻理解容器网络的工作原理非常的重要。只有这样将来遇到问题的时候才知道该如何下手处理。
 
 网络虚拟化，其实用一句话来概括就是**用软件来模拟实现真实的物理网络连接**。比如 Docker 就是用纯软件的方式在宿主机上模拟出来的独立网络环境。我们今天来徒手打造一个虚拟网络，实现在这个网络里访问外网资源，同时监听端口提供对外服务的功能。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 看完这一篇后，相信你对 Docker 虚拟网络能有进一步的理解。好了，我们开始！
 
@@ -28,18 +26,17 @@ Linux 下的 **veth** 是一对儿虚拟网卡设备，和我们常见的 lo �
 
 通过 veth、namespace 和 bridge 我们在一台 Linux 上就能虚拟多个网络环境出来。而且它们之间、和宿主机之间都可以互相通信。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 关于这三个技术的详情，可以参考下面这三篇文章：
 
 - [轻松理解 Docker 网络虚拟化基础之 veth 设备！](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247486424&idx=1&sn=d66fe4ebf1cd9e5079606f71a0169697&scene=21#wechat_redirect)
-    
-- [聊聊 Linux 上软件实现的“交换机” - Bridge！](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247486949&idx=1&sn=51bf822b1ee4f6a667d6253965d49201&scene=21#wechat_redirect)
-    
-- [彻底弄懂 Linux 网络命名空间](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247487019&idx=1&sn=a0cbac49913071cd13e64ad5abd16d5c&scene=21#wechat_redirect)
-    
 
-但是这三篇文章过后，我们还剩下一个问题没有解决，那就是虚拟出来的网络环境和外部网络的通信。还拿 Docker 容器来举例，你启动的容器里的服务肯定是需要访问外部的数据库的。还有就是可能需要暴露比如 80 端口对外提供服务。例如在 Docker 中我们通过下面的命令将容器的 80 端口上的 web 服务要能被外网访问的到。  
+- [聊聊 Linux 上软件实现的“交换机” - Bridge！](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247486949&idx=1&sn=51bf822b1ee4f6a667d6253965d49201&scene=21#wechat_redirect)
+
+- [彻底弄懂 Linux 网络命名空间](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247487019&idx=1&sn=a0cbac49913071cd13e64ad5abd16d5c&scene=21#wechat_redirect)
+
+但是这三篇文章过后，我们还剩下一个问题没有解决，那就是虚拟出来的网络环境和外部网络的通信。还拿 Docker 容器来举例，你启动的容器里的服务肯定是需要访问外部的数据库的。还有就是可能需要暴露比如 80 端口对外提供服务。例如在 Docker 中我们通过下面的命令将容器的 80 端口上的 web 服务要能被外网访问的到。
 
 我们今天的文章主要就是解决这两个问题的，一是从虚拟网络中访问外网，二是在虚拟网络中提供服务供外网使用。解决它们需要用到**路由**和 **nat** 技术。
 
@@ -49,7 +46,7 @@ Linux 是在发送数据包的时候，会涉及到路由过程。这个发送�
 
 先来看本机发送数据包。其中本机发送在[25 张图，一万字，拆解 Linux 网络包发送过程](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247485146&idx=1&sn=e5bfc79ba915df1f6a8b32b87ef0ef78&scene=21#wechat_redirect)这一篇我们讨论过。
 
-**所谓路由其实很简单，就是该选择哪张网卡（虚拟网卡设备也算）将数据写进去。**到底该选择哪张网卡呢，规则都是在路由表中指定的。Linux 中可以有多张路由表，最重要和常用的是 local 和 main。
+\*\*所谓路由其实很简单，就是该选择哪张网卡（虚拟网卡设备也算）将数据写进去。\*\*到底该选择哪张网卡呢，规则都是在路由表中指定的。Linux 中可以有多张路由表，最重要和常用的是 local 和 main。
 
 local 路由表中统一记录本地，确切的说是本网络命名空间中的网卡设备 IP 的路由规则。
 
@@ -57,9 +54,9 @@ local 路由表中统一记录本地，确切的说是本网络命名空间中�
 
 其它的路由规则，一般都是在 main 路由表中记录着的。可以用 `ip route list table local` 查看，也可以用更简短的 `route -n`
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-再看途径当前机器的数据包的转发。除了本机发送以外，转发也会涉及路由过程。如果 Linux 收到数据包以后发现目的地址并不是本地的地址的话，就可以选择把这个数据包从自己的某个网卡设备上转发出去。这个时候和本机发送一样，也需要读取路由表。根据路由表的配置来选择从哪个设备将包转走。  
+再看途径当前机器的数据包的转发。除了本机发送以外，转发也会涉及路由过程。如果 Linux 收到数据包以后发现目的地址并不是本地的地址的话，就可以选择把这个数据包从自己的某个网卡设备上转发出去。这个时候和本机发送一样，也需要读取路由表。根据路由表的配置来选择从哪个设备将包转走。
 
 不过值得注意的是，Linux 上转发功能默认是关闭的。也就是发现目的地址不是本机 IP 地址默认是将包直接丢弃。需要做一些简单的配置，然后 Linux 才可以干像路由器一样的活儿，实现数据包的转发。
 
@@ -69,15 +66,15 @@ Linux 内核网络栈在运行上基本上是一个纯内核态的东西，但�
 
 Linux 在接收数据的时候，在 IP 层进入 ip_rcv 中处理。再执行路由判断，发现是本机的话就进入 ip_local_deliver 进行本机接收，最后送往 TCP 协议层。在这个过程中，埋了两个 HOOK，第一个是 PRE_ROUTING。这段代码会执行到 iptables 中 pre_routing 里的各种表。发现是本地接收后接着又会执行到 LOCAL_IN，这会执行到 iptables 中配置的 input 规则。
 
-在发送数据的时候，查找路由表找到出口设备后，依次通过 __ip_local_out、 ip_output 等函数将包送到设备层。在这两个函数中分别过了 OUTPUT 和 POSTROUTING 开的各种规则。
+在发送数据的时候，查找路由表找到出口设备后，依次通过 \_\_ip_local_out、 ip_output 等函数将包送到设备层。在这两个函数中分别过了 OUTPUT 和 POSTROUTING 开的各种规则。
 
 如果是转发过程，Linux 收到数据包发现不是本机的包可以通过查找自己的路由表找到合适的设备把它转发出去。那就先是在 ip_rcv 中将包送到 ip_forward 函数中处理，最后在 ip_output 函数中将包转发出去。在这个过程中分别过了 PREROUTING、FORWARD 和 POSTROUTING 三个规则。
 
 综上所述，iptables 里的五个链在内核网络模块中的位置就可以归纳成如下这幅图。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-数据接收过程走的是 1 和 2，发送过程走的是 4 、5，转发过程是 1、3、5。有了这张图，我们能更清楚地理解 iptable 和内核的关系。  
+数据接收过程走的是 1 和 2，发送过程走的是 4 、5，转发过程是 1、3、5。有了这张图，我们能更清楚地理解 iptable 和内核的关系。
 
 在 iptables 中，根据实现的功能的不同，又分成了四张表。分别是 raw、mangle、nat 和 filter。其中 nat 表实现我们常说的 NAT（Network AddressTranslation） 功能。其中 nat 又分成 SNAT（Source NAT）和 DNAT（Destination NAT）两种。
 
@@ -93,9 +90,9 @@ DNAT 解决的是内网的服务要能够被外部访问到的问题。它在通
 
 我们先来创建一个虚拟的网络环境出来，其命名空间为 net1。宿主机的 IP 是 10.162 的网段，可以访问外部机器。虚拟网络为其分配 192.168.0 的网段，这个网段是私有的，外部机器无法识别。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-这个虚拟网络的搭建过程如下。先创建一个 netns 出来，命名为 net1。  
+这个虚拟网络的搭建过程如下。先创建一个 netns 出来，命名为 net1。
 
 `# ip netns add net1   `
 
@@ -113,11 +110,11 @@ DNAT 解决的是内网的服务要能够被外部访问到的问题。它在通
 
 现在假设我们上面的 net1 这个网络环境中想访问外网。这里的外网是指的虚拟网络宿主机外部的网络。
 
-我们假设它要访问的另外一台机器 IP 是 10.153.*_.*_ ，这个 10.153._*.*_ 后面两段由于是我的内部网络，所以隐藏起来了。你在实验的过程中，用自己的 IP 代替即可。
+我们假设它要访问的另外一台机器 IP 是 10.153.*\_.*\_ ，这个 10.153._*.*_ 后面两段由于是我的内部网络，所以隐藏起来了。你在实验的过程中，用自己的 IP 代替即可。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-我们直接来访问一下试试  
+我们直接来访问一下试试
 
 `# ip netns exec net1 ping 10.153.*.*   connect: Network is unreachable   `
 
@@ -131,11 +128,11 @@ DNAT 解决的是内网的服务要能够被外部访问到的问题。它在通
 
 `# ip netns exec net1 route -n   Kernel IP routing table   Destination     Gateway         Genmask         Flags Metric Ref    Use Iface   192.168.0.0     0.0.0.0         255.255.255.0   U     0      0        0 veth1   `
 
-怪不得，原来 net1 这个 namespace 下默认只有 192.168.0.* 这个网段的路由规则。我们 ping 的 IP 是 10.153.*_.*_ ，根据这个路由表里找不到出口。自然就发送失败了。
+怪不得，原来 net1 这个 namespace 下默认只有 192.168.0.\* 这个网段的路由规则。我们 ping 的 IP 是 10.153.*\_.*\_ ，根据这个路由表里找不到出口。自然就发送失败了。
 
 我们来给 net 添加上默认路由规则，只要匹配不到其它规则就默认送到 veth1 上，同时指定下一条是它所连接的 bridge（192.168.0.1）。
 
-`# ip netns exec net1 route add default gw 192.168.0.1 veth1` 
+`# ip netns exec net1 route add default gw 192.168.0.1 veth1`
 
 再 ping 一下试试。
 
@@ -145,7 +142,7 @@ DNAT 解决的是内网的服务要能够被外部访问到的问题。它在通
 
 `# sysctl net.ipv4.conf.all.forwarding=1   # iptables -P FORWARD ACCEPT   `
 
-不过这个时候，还存在一个问题。那就是外部的机器并不认识 192.168.0.* 这个网段的 ip。它们之间都是通过 10.153.*_.*_ 来进行通信的。设想下我们工作中的电脑上没有外网 IP 的时候是如何正常上网的呢？外部的网络只认识外网 IP。没错，那就是我们上面说的 NAT 技术。
+不过这个时候，还存在一个问题。那就是外部的机器并不认识 192.168.0.\* 这个网段的 ip。它们之间都是通过 10.153.*\_.*\_ 来进行通信的。设想下我们工作中的电脑上没有外网 IP 的时候是如何正常上网的呢？外部的网络只认识外网 IP。没错，那就是我们上面说的 NAT 技术。
 
 我们这次的需求是实现内部虚拟网络访问外网，所以需要使用的是 SNAT。它将 namespace 请求中的 IP（192.168.0.2）换成外部网络认识的 10.153.*.*，进而达到正常访问外部网络的效果。
 
@@ -157,15 +154,15 @@ DNAT 解决的是内网的服务要能够被外部访问到的问题。它在通
 
 这时候我们可以开启 tcpdump 抓包查看一下，在 bridge 上抓到的包我们能看到还是原始的源 IP 和 目的 IP。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-再到 eth0 上查看的话，源 IP 已经被替换成可和外网通信的 eth0 上的 IP 了。  
+再到 eth0 上查看的话，源 IP 已经被替换成可和外网通信的 eth0 上的 IP 了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-至此，容器就可以通过宿主机的网卡来访问外部网络上的资源了。我们来总结一下这个发送过程  
+至此，容器就可以通过宿主机的网卡来访问外部网络上的资源了。我们来总结一下这个发送过程
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 3. 开放容器端口
 
@@ -193,17 +190,17 @@ DNAT 解决的是内网的服务要能够被外部访问到的问题。它在通
 
 开启抓包， `# tcpdump -i eth0 host 10.143.*.*`。可见在请求的时候，目的是宿主机的 IP 的端口。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-但数据包到宿主机协议栈以后命中了我们配置的 DNAT 规则，宿主机把它转发到了 br0 上。在 bridge 上由于没有那么多的网络流量包，所以不用过滤直接抓包就行，`# tcpdump -i br0`。  
+但数据包到宿主机协议栈以后命中了我们配置的 DNAT 规则，宿主机把它转发到了 br0 上。在 bridge 上由于没有那么多的网络流量包，所以不用过滤直接抓包就行，`# tcpdump -i br0`。
 
 在 br0 上抓到的目的 IP 和端口是已经替换过的了。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-bridge 当然知道 192.168.0.2 是 veth 1。于是，在 veth1 上监听 80 的服务就能收到来自外界的请求了！我们来总结一下这个接收过程  
+bridge 当然知道 192.168.0.2 是 veth 1。于是，在 veth1 上监听 80 的服务就能收到来自外界的请求了！我们来总结一下这个接收过程
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ## 三、总结
 
@@ -213,9 +210,9 @@ bridge 当然知道 192.168.0.2 是 veth 1。于是，在 veth1 上监听 80 的
 
 接着基于以上基础知识，我们采用纯手工的方式搭建了一个虚拟网络环境。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-这个虚拟网络可以访问外网资源，也可以提供端口服务供外网来调用。这就是 Docker 容器网络工作的基本原理。  
+这个虚拟网络可以访问外网资源，也可以提供端口服务供外网来调用。这就是 Docker 容器网络工作的基本原理。
 
 整个实验我打包写成一个 Makefile，放到了这里：https://github.com/yanfeizhang/coder-kung-fu/tree/main/tests/network/test07
 
@@ -223,13 +220,13 @@ bridge 当然知道 192.168.0.2 是 veth 1。于是，在 veth1 上监听 80 的
 
 在 Kubernets 中，对跨主网络通信有更高的要求，要**不同宿主机之间的容器可以直接互联互通**。所以 Kubernets 的网络模型也更为复杂。
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ![](https://mmbiz.qlogo.cn/mmbiz_jpg/iaMl8iazctEu93J6Io4KDZQmx03HErmVeXnSnUAQ0MD6Nia3d97E8vmljv5DibLTWSeLES1JHicWVA2mynPVlbt1FAA/0?wx_fmt=jpeg)
 
 张彦飞allen
 
- 赞赏不分多少，头像出现就好！ 
+赞赏不分多少，头像出现就好！
 
 ![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247487294&idx=1&sn=c03e1dfbb98075390d562cabaeac62c8&chksm=a6e30e0591948713ff1e03335d8d6292c5745a6c7044deeee1b054190310e46e995cef003026&mpshare=1&scene=24&srcid=1116LUPnA1mjyF39Me8uGbP4&sharer_sharetime=1637042342312&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d014d41f63c52cffd0fb424f489e9ce93fd6fc7ea4c3363681f8e4ec230c99dfd5346f45c41c0c26ce23f420936a0c45803671d93d8aa38efdaf800952f677356fa7d7ef0077ebe09ec2f2f64b10c26f928af2bd265f3729aacee20b12365b00dae4503404b67c5620dbdd269b6064c477389bc3dd92eeabc2&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQQrsr1l%2F1%2B6m1%2B1EjFxUxThLmAQIE97dBBAEAAAAAAAQgOaerwt8AAAAOpnltbLcz9gKNyK89dVj0EXxii0x7rCYDPk5v9j12MRscu9uoMGq3ppHJoEOwgNVdLXqa36lD97wUV6pday85asx%2FPAo3p%2Bgs3Mxq93Ct%2FjZj4UwQTKgEX5%2BLMa1lRFDE6KyXtiSx6YEApyP0sHsGSNDZ1rliFUG2yWEmKsgyMj1Kp%2BVAQwmBLOzVxO7jMzMk1dCM2Oui4%2Fir7oLMpxRb3Zf1VS9rb%2B3gryAVItrWzdjXP9easqax00VYk%2Bp0%2FjFpDkyUy%2F88SIspWhbdBQD7&acctmode=0&pass_ticket=7zFlKK1V6YGtl89banzDdX1RHk4h1wOtw60R850vh4csPwiklbk75GULbZ7U839k&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1)喜欢作者
 
@@ -258,269 +255,268 @@ linux3
 **留言 33**
 
 - ![[咖啡]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)卡布奇诺
-    
-    2021年11月16日
-    
-    赞4
-    
-    非常强
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞1
-    
-    🤝
-    
+
+  2021年11月16日
+
+  赞4
+
+  非常强
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞1
+
+  🤝
+
 - 周萝卜
-    
-    2021年11月16日
-    
-    赞3
-    
-    太过分了，怎么可以这么强
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞1
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年11月16日
+
+  赞3
+
+  太过分了，怎么可以这么强
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞1
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 晨光
-    
-    2021年11月16日
-    
-    赞2
-    
-    牛牛牛
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞1
-    
-    感谢
-    
+
+  2021年11月16日
+
+  赞2
+
+  牛牛牛
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞1
+
+  感谢
+
 - cheerful_Dustin
-    
-    2021年11月16日
-    
-    赞2
-    
-    很强
-    
+
+  2021年11月16日
+
+  赞2
+
+  很强
+
 - Dr.Huo
-    
-    2021年11月16日
-    
-    赞2
-    
-    沙发。。。
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞2
-    
-    稳了
-    
+
+  2021年11月16日
+
+  赞2
+
+  沙发。。。
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞2
+
+  稳了
+
 - 波
-    
-    2021年12月5日
-    
-    赞
-    
-    容器访问外网需要转发到eth0，并且SNAT，为什么ping的回应到达eth0时，我们不需要手动定义DNAT来转发到br0然后到达容器呢？查了其他网说主机会自动记录映射，不太明白什么映射，icmp头信息什么的？
-    
-    开发内功修炼
-    
-    作者2021年12月6日
-    
-    赞1
-    
-    这个特性叫链接跟踪，你可以理解成snat这次的替换会记录下来，包括端口啥的。等回包到达，就能知道哪个包是需要反替换的。具体源码我还没查，不过大致应该是这么个过程。
-    
+
+  2021年12月5日
+
+  赞
+
+  容器访问外网需要转发到eth0，并且SNAT，为什么ping的回应到达eth0时，我们不需要手动定义DNAT来转发到br0然后到达容器呢？查了其他网说主机会自动记录映射，不太明白什么映射，icmp头信息什么的？
+
+  开发内功修炼
+
+  作者2021年12月6日
+
+  赞1
+
+  这个特性叫链接跟踪，你可以理解成snat这次的替换会记录下来，包括端口啥的。等回包到达，就能知道哪个包是需要反替换的。具体源码我还没查，不过大致应该是这么个过程。
+
 - Xin.Guo
-    
-    2021年11月19日
-    
-    赞
-    
-    飞哥写的很好，不过对于ping报文从br0到eth1有跳跃，我分析了一下，由于东西多，评论区写不下，所以写了一篇文章https://mp.weixin.qq.com/s/uwYO9zJG6NhUMUZ5nkd5Kw，烦请指正。
-    
-    开发内功修炼
-    
-    作者2021年11月22日
-    
-    赞1
-    
-    赞！
-    
+
+  2021年11月19日
+
+  赞
+
+  飞哥写的很好，不过对于ping报文从br0到eth1有跳跃，我分析了一下，由于东西多，评论区写不下，所以写了一篇文章https://mp.weixin.qq.com/s/uwYO9zJG6NhUMUZ5nkd5Kw，烦请指正。
+
+  开发内功修炼
+
+  作者2021年11月22日
+
+  赞1
+
+  赞！
+
 - coincidence
-    
-    2021年11月18日
-    
-    赞1
-    
-    蹲飞哥分析k8s的calico、flannel、canal![[Onlooker]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)。
-    
+
+  2021年11月18日
+
+  赞1
+
+  蹲飞哥分析k8s的calico、flannel、canal![[Onlooker]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)。
+
 - 爱挖辣辣的少年
-    
-    2021年11月17日
-    
-    赞
-    
-    在发送数据的时候，查找路由表找到出口设备后，依次通过 __ip_local_out、 ip_output 等函数将包送到设备层。在这两个函数中分别过了 OUTPUT 和 PREROUTING 开的各种规则。 ——————————- 最后一句，是不是应该是postrouting，而不是prerouting
-    
-    开发内功修炼
-    
-    作者2021年11月17日
-    
-    赞1
-    
-    感谢指出，等我有空看看
-    
-    开发内功修炼
-    
-    作者2021年11月23日
-    
-    赞
-    
-    已经更正
-    
+
+  2021年11月17日
+
+  赞
+
+  在发送数据的时候，查找路由表找到出口设备后，依次通过 \_\_ip_local_out、 ip_output 等函数将包送到设备层。在这两个函数中分别过了 OUTPUT 和 PREROUTING 开的各种规则。 ——————————- 最后一句，是不是应该是postrouting，而不是prerouting
+
+  开发内功修炼
+
+  作者2021年11月17日
+
+  赞1
+
+  感谢指出，等我有空看看
+
+  开发内功修炼
+
+  作者2021年11月23日
+
+  赞
+
+  已经更正
+
 - orz
-    
-    上海2023年11月29日
-    
-    赞
-    
-    非常强，深入浅出![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    作者2023年11月29日
-    
-    赞
-    
-    🤝
-    
+
+  上海2023年11月29日
+
+  赞
+
+  非常强，深入浅出![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  作者2023年11月29日
+
+  赞
+
+  🤝
+
 - gk
-    
-    广东2023年3月20日
-    
-    赞
-    
-    它将 namespace 请求中的 IP（192.168.0.2）换成外部网络认识的 10.153.*.*，进而达到正常访问外部网络的效果。 ———————————————————— 是不是打错了？10.153.*.*改为10.162.*.*？
-    
-    开发内功修炼
-    
-    作者2023年3月20日
-    
-    赞
-    
-    感谢指出，确实应该是这样
-    
+
+  广东2023年3月20日
+
+  赞
+
+  它将 namespace 请求中的 IP（192.168.0.2）换成外部网络认识的 10.153.*.*，进而达到正常访问外部网络的效果。 ———————————————————— 是不是打错了？10.153.*.*改为10.162.*.*？
+
+  开发内功修炼
+
+  作者2023年3月20日
+
+  赞
+
+  感谢指出，确实应该是这样
+
 - 星星不说话
-    
-    北京2022年8月3日
-    
-    赞
-    
-    飞哥，有一点不明白，veth 是一对，宿主机一个，容器内一个，容器内的veth是在哪个网络命名空间呐，在宿主机没有找到
-    
-    开发内功修炼
-    
-    作者2022年8月3日
-    
-    赞
-    
-    容器是一个独立的命名空间，所以得在容器的命名空间里看
-    
-    星星不说话
-    
-    北京2022年8月3日
-    
-    赞
-    
-    飞哥，我还是不明白，如果说 nsenter -t {PID} -n 就已经进入到容器的网络命名空间了，那在宿主机执行ip netns show 命令为何结果为空，不是应该有个类似文章中net1的命名空间吗？
-    
-    开发内功修炼
-    
-    作者2022年8月4日
-    
-    赞
-    
-    新版默认都把命名空间信息文件删了，你搜下"查看 Docker 容器的名字空间"，就能找到查看的办法了
-    
-    星星不说话
-    
-    2022年8月4日
-    
-    赞
-    
-    好的，感谢飞哥![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京2022年8月3日
+
+  赞
+
+  飞哥，有一点不明白，veth 是一对，宿主机一个，容器内一个，容器内的veth是在哪个网络命名空间呐，在宿主机没有找到
+
+  开发内功修炼
+
+  作者2022年8月3日
+
+  赞
+
+  容器是一个独立的命名空间，所以得在容器的命名空间里看
+
+  星星不说话
+
+  北京2022年8月3日
+
+  赞
+
+  飞哥，我还是不明白，如果说 nsenter -t {PID} -n 就已经进入到容器的网络命名空间了，那在宿主机执行ip netns show 命令为何结果为空，不是应该有个类似文章中net1的命名空间吗？
+
+  开发内功修炼
+
+  作者2022年8月4日
+
+  赞
+
+  新版默认都把命名空间信息文件删了，你搜下"查看 Docker 容器的名字空间"，就能找到查看的办法了
+
+  星星不说话
+
+  2022年8月4日
+
+  赞
+
+  好的，感谢飞哥![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - LG
-    
-    2021年11月17日
-    
-    赞
-    
-    太好玩了！
-    
-    LG
-    
-    2021年11月17日
-    
-    赞
-    
-    建议多来，寓教于乐
-    
+
+  2021年11月17日
+
+  赞
+
+  太好玩了！
+
+  LG
+
+  2021年11月17日
+
+  赞
+
+  建议多来，寓教于乐
+
 - 二马
-    
-    2021年11月16日
-    
-    赞
-    
-    无比佩服
-    
-    开发内功修炼
-    
-    作者2021年11月17日
-    
-    赞
-    
-    🤝
-    
+
+  2021年11月16日
+
+  赞
+
+  无比佩服
+
+  开发内功修炼
+
+  作者2021年11月17日
+
+  赞
+
+  🤝
+
 - 钟
-    
-    2021年11月16日
-    
-    赞
-    
-    强大的魔法攻击加成
-    
+
+  2021年11月16日
+
+  赞
+
+  强大的魔法攻击加成
+
 - 淫角大王
-    
-    2021年11月16日
-    
-    赞
-    
-    各位如果在做第二小节实验时发现即使添加SNAT规则自定义的netns还是访问不了外网可能是因为FORWARD链默认是DROP的原因，两种解决办法：1.更改forward链默认处理规则为ACCEPT；2.在forward链中添加规则允许br0和物理网卡接口之间互相转发。
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞
-    
-    👍🏻
-    
+
+  2021年11月16日
+
+  赞
+
+  各位如果在做第二小节实验时发现即使添加SNAT规则自定义的netns还是访问不了外网可能是因为FORWARD链默认是DROP的原因，两种解决办法：1.更改forward链默认处理规则为ACCEPT；2.在forward链中添加规则允许br0和物理网卡接口之间互相转发。
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞
+
+  👍🏻
 
 已无更多数据
 
@@ -539,268 +535,267 @@ linux3
 **留言 33**
 
 - ![[咖啡]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)卡布奇诺
-    
-    2021年11月16日
-    
-    赞4
-    
-    非常强
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞1
-    
-    🤝
-    
+
+  2021年11月16日
+
+  赞4
+
+  非常强
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞1
+
+  🤝
+
 - 周萝卜
-    
-    2021年11月16日
-    
-    赞3
-    
-    太过分了，怎么可以这么强
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞1
-    
-    ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  2021年11月16日
+
+  赞3
+
+  太过分了，怎么可以这么强
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞1
+
+  ![😂](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - 晨光
-    
-    2021年11月16日
-    
-    赞2
-    
-    牛牛牛
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞1
-    
-    感谢
-    
+
+  2021年11月16日
+
+  赞2
+
+  牛牛牛
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞1
+
+  感谢
+
 - cheerful_Dustin
-    
-    2021年11月16日
-    
-    赞2
-    
-    很强
-    
+
+  2021年11月16日
+
+  赞2
+
+  很强
+
 - Dr.Huo
-    
-    2021年11月16日
-    
-    赞2
-    
-    沙发。。。
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞2
-    
-    稳了
-    
+
+  2021年11月16日
+
+  赞2
+
+  沙发。。。
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞2
+
+  稳了
+
 - 波
-    
-    2021年12月5日
-    
-    赞
-    
-    容器访问外网需要转发到eth0，并且SNAT，为什么ping的回应到达eth0时，我们不需要手动定义DNAT来转发到br0然后到达容器呢？查了其他网说主机会自动记录映射，不太明白什么映射，icmp头信息什么的？
-    
-    开发内功修炼
-    
-    作者2021年12月6日
-    
-    赞1
-    
-    这个特性叫链接跟踪，你可以理解成snat这次的替换会记录下来，包括端口啥的。等回包到达，就能知道哪个包是需要反替换的。具体源码我还没查，不过大致应该是这么个过程。
-    
+
+  2021年12月5日
+
+  赞
+
+  容器访问外网需要转发到eth0，并且SNAT，为什么ping的回应到达eth0时，我们不需要手动定义DNAT来转发到br0然后到达容器呢？查了其他网说主机会自动记录映射，不太明白什么映射，icmp头信息什么的？
+
+  开发内功修炼
+
+  作者2021年12月6日
+
+  赞1
+
+  这个特性叫链接跟踪，你可以理解成snat这次的替换会记录下来，包括端口啥的。等回包到达，就能知道哪个包是需要反替换的。具体源码我还没查，不过大致应该是这么个过程。
+
 - Xin.Guo
-    
-    2021年11月19日
-    
-    赞
-    
-    飞哥写的很好，不过对于ping报文从br0到eth1有跳跃，我分析了一下，由于东西多，评论区写不下，所以写了一篇文章https://mp.weixin.qq.com/s/uwYO9zJG6NhUMUZ5nkd5Kw，烦请指正。
-    
-    开发内功修炼
-    
-    作者2021年11月22日
-    
-    赞1
-    
-    赞！
-    
+
+  2021年11月19日
+
+  赞
+
+  飞哥写的很好，不过对于ping报文从br0到eth1有跳跃，我分析了一下，由于东西多，评论区写不下，所以写了一篇文章https://mp.weixin.qq.com/s/uwYO9zJG6NhUMUZ5nkd5Kw，烦请指正。
+
+  开发内功修炼
+
+  作者2021年11月22日
+
+  赞1
+
+  赞！
+
 - coincidence
-    
-    2021年11月18日
-    
-    赞1
-    
-    蹲飞哥分析k8s的calico、flannel、canal![[Onlooker]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)。
-    
+
+  2021年11月18日
+
+  赞1
+
+  蹲飞哥分析k8s的calico、flannel、canal![[Onlooker]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)。
+
 - 爱挖辣辣的少年
-    
-    2021年11月17日
-    
-    赞
-    
-    在发送数据的时候，查找路由表找到出口设备后，依次通过 __ip_local_out、 ip_output 等函数将包送到设备层。在这两个函数中分别过了 OUTPUT 和 PREROUTING 开的各种规则。 ——————————- 最后一句，是不是应该是postrouting，而不是prerouting
-    
-    开发内功修炼
-    
-    作者2021年11月17日
-    
-    赞1
-    
-    感谢指出，等我有空看看
-    
-    开发内功修炼
-    
-    作者2021年11月23日
-    
-    赞
-    
-    已经更正
-    
+
+  2021年11月17日
+
+  赞
+
+  在发送数据的时候，查找路由表找到出口设备后，依次通过 \_\_ip_local_out、 ip_output 等函数将包送到设备层。在这两个函数中分别过了 OUTPUT 和 PREROUTING 开的各种规则。 ——————————- 最后一句，是不是应该是postrouting，而不是prerouting
+
+  开发内功修炼
+
+  作者2021年11月17日
+
+  赞1
+
+  感谢指出，等我有空看看
+
+  开发内功修炼
+
+  作者2021年11月23日
+
+  赞
+
+  已经更正
+
 - orz
-    
-    上海2023年11月29日
-    
-    赞
-    
-    非常强，深入浅出![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
-    开发内功修炼
-    
-    作者2023年11月29日
-    
-    赞
-    
-    🤝
-    
+
+  上海2023年11月29日
+
+  赞
+
+  非常强，深入浅出![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)![[强]](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
+  开发内功修炼
+
+  作者2023年11月29日
+
+  赞
+
+  🤝
+
 - gk
-    
-    广东2023年3月20日
-    
-    赞
-    
-    它将 namespace 请求中的 IP（192.168.0.2）换成外部网络认识的 10.153.*.*，进而达到正常访问外部网络的效果。 ———————————————————— 是不是打错了？10.153.*.*改为10.162.*.*？
-    
-    开发内功修炼
-    
-    作者2023年3月20日
-    
-    赞
-    
-    感谢指出，确实应该是这样
-    
+
+  广东2023年3月20日
+
+  赞
+
+  它将 namespace 请求中的 IP（192.168.0.2）换成外部网络认识的 10.153.*.*，进而达到正常访问外部网络的效果。 ———————————————————— 是不是打错了？10.153.*.*改为10.162.*.*？
+
+  开发内功修炼
+
+  作者2023年3月20日
+
+  赞
+
+  感谢指出，确实应该是这样
+
 - 星星不说话
-    
-    北京2022年8月3日
-    
-    赞
-    
-    飞哥，有一点不明白，veth 是一对，宿主机一个，容器内一个，容器内的veth是在哪个网络命名空间呐，在宿主机没有找到
-    
-    开发内功修炼
-    
-    作者2022年8月3日
-    
-    赞
-    
-    容器是一个独立的命名空间，所以得在容器的命名空间里看
-    
-    星星不说话
-    
-    北京2022年8月3日
-    
-    赞
-    
-    飞哥，我还是不明白，如果说 nsenter -t {PID} -n 就已经进入到容器的网络命名空间了，那在宿主机执行ip netns show 命令为何结果为空，不是应该有个类似文章中net1的命名空间吗？
-    
-    开发内功修炼
-    
-    作者2022年8月4日
-    
-    赞
-    
-    新版默认都把命名空间信息文件删了，你搜下"查看 Docker 容器的名字空间"，就能找到查看的办法了
-    
-    星星不说话
-    
-    2022年8月4日
-    
-    赞
-    
-    好的，感谢飞哥![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
-    
+
+  北京2022年8月3日
+
+  赞
+
+  飞哥，有一点不明白，veth 是一对，宿主机一个，容器内一个，容器内的veth是在哪个网络命名空间呐，在宿主机没有找到
+
+  开发内功修炼
+
+  作者2022年8月3日
+
+  赞
+
+  容器是一个独立的命名空间，所以得在容器的命名空间里看
+
+  星星不说话
+
+  北京2022年8月3日
+
+  赞
+
+  飞哥，我还是不明白，如果说 nsenter -t {PID} -n 就已经进入到容器的网络命名空间了，那在宿主机执行ip netns show 命令为何结果为空，不是应该有个类似文章中net1的命名空间吗？
+
+  开发内功修炼
+
+  作者2022年8月4日
+
+  赞
+
+  新版默认都把命名空间信息文件删了，你搜下"查看 Docker 容器的名字空间"，就能找到查看的办法了
+
+  星星不说话
+
+  2022年8月4日
+
+  赞
+
+  好的，感谢飞哥![🙏](https://res.wx.qq.com/mpres/zh_CN/htmledition/comm_htmledition/images/pic/common/pic_blank.gif)
+
 - LG
-    
-    2021年11月17日
-    
-    赞
-    
-    太好玩了！
-    
-    LG
-    
-    2021年11月17日
-    
-    赞
-    
-    建议多来，寓教于乐
-    
+
+  2021年11月17日
+
+  赞
+
+  太好玩了！
+
+  LG
+
+  2021年11月17日
+
+  赞
+
+  建议多来，寓教于乐
+
 - 二马
-    
-    2021年11月16日
-    
-    赞
-    
-    无比佩服
-    
-    开发内功修炼
-    
-    作者2021年11月17日
-    
-    赞
-    
-    🤝
-    
+
+  2021年11月16日
+
+  赞
+
+  无比佩服
+
+  开发内功修炼
+
+  作者2021年11月17日
+
+  赞
+
+  🤝
+
 - 钟
-    
-    2021年11月16日
-    
-    赞
-    
-    强大的魔法攻击加成
-    
+
+  2021年11月16日
+
+  赞
+
+  强大的魔法攻击加成
+
 - 淫角大王
-    
-    2021年11月16日
-    
-    赞
-    
-    各位如果在做第二小节实验时发现即使添加SNAT规则自定义的netns还是访问不了外网可能是因为FORWARD链默认是DROP的原因，两种解决办法：1.更改forward链默认处理规则为ACCEPT；2.在forward链中添加规则允许br0和物理网卡接口之间互相转发。
-    
-    开发内功修炼
-    
-    作者2021年11月16日
-    
-    赞
-    
-    👍🏻
-    
+
+  2021年11月16日
+
+  赞
+
+  各位如果在做第二小节实验时发现即使添加SNAT规则自定义的netns还是访问不了外网可能是因为FORWARD链默认是DROP的原因，两种解决办法：1.更改forward链默认处理规则为ACCEPT；2.在forward链中添加规则允许br0和物理网卡接口之间互相转发。
+
+  开发内功修炼
+
+  作者2021年11月16日
+
+  赞
+
+  👍🏻
 
 已无更多数据

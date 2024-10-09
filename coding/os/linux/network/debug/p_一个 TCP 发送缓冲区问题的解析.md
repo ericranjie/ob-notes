@@ -1,6 +1,6 @@
-
 Linux云计算网络
- _2024年09月05日 08:13_ _广东_
+_2024年09月05日 08:13_ _广东_
+
 > 原文：https://segmentfault.com/a/1190000021488755
 
 最近遇到一个问题，简化模型如下：
@@ -18,6 +18,7 @@ Phase 3 Client 端的 socket 的发送缓冲区满了，用户进程阻塞在 
 实际执行时，表现出来的现象也"基本"符合预期。
 
 不过当我们在 Client 端通过 `ss -nt` 不时监控 TCP 连接的发送队列长度时，发现这个值竟然从 0 最终增长到 14480，它轻松地超了之前设置的 SO_SNDBUF 值(4096)
+
 ```cpp
 # ss -nt  
 State   Recv-Q   Send-Q         Local Address:Port              Peer Address:Port  
@@ -34,9 +35,10 @@ ESTAB   0        14336          192.168.183.130:52454           192.168.183.130:
 State   Recv-Q   Send-Q         Local Address:Port              Peer Address:Port  
 ESTAB   0        14480          192.168.183.130:52454           192.168.183.130:14465
 ```
+
 有必要解释一下这里的 Send-Q 的含义。我们知道，TCP 是的发送过程是受到滑动窗口限制。
-![[Pasted image 20241003192825.png]]
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "image")
+!\[\[Pasted image 20241003192825.png\]\]
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "image")
 
 这里的 Send-Q 就是发送端滑动窗口的左边沿到所有未发送的报文的总长度。
 
@@ -46,11 +48,11 @@ ESTAB   0        14480          192.168.183.130:52454           192.168.183.130:
 
 当用户通过 SO_SNDBUF 选项设置套接字发送缓冲区时，内核将其记录在 sk->sk_sndbuf 中。
 
-@sock.c: sock_setsockopt  
-{  
-   case SO_SNDBUF:  
-       .....  
-       sk->sk_sndbuf = mat_x(u32, val * 2, SOCK_MIN_SNDBUF)  
+@sock.c: sock_setsockopt\
+{\
+case SO_SNDBUF:\
+.....\
+sk->sk_sndbuf = mat_x(u32, val * 2, SOCK_MIN_SNDBUF)\
 }
 
 注意，内核在这里玩了一个小 trick，它在 sk->sk_sndbuf 记录的的不是用户设置的 val， 而是 val 的两倍！
@@ -67,7 +69,8 @@ ESTAB   0        14480          192.168.183.130:52454           192.168.183.130:
 
 需要注意的是，sk->wmem_queued = 待发送数据占用的内存 + 额外开销占用的内存，所以它应该大于 Send-Q
 
-@sock.h   
+@sock.h
+
 ```cpp
 bool sk_stream_memory_free(const struct sock* sk)  
 {  
@@ -76,11 +79,13 @@ bool sk_stream_memory_free(const struct sock* sk)
     .....  
 }
 ```
+
 sk->wmem_queued 是不断变化的，对 TCP socket 来说，当内核将 skb 塞入发送队列后，这个值增加 skb->truesize (truesize 正如其名，是指包含了额外开销后的报文总大小)；而当该报文被 ACK 后，这个值减小 skb->truesize。
 
 ### tcp_sendmsg
 
 以上都是铺垫，让我们来看看 tcp_sendmsg 是怎么做的。总的来说内核会根据发送队列(write queue)是否有待发送的报文，决定是 创建新的 sk_buff，或是将用户数据追加(append)到 write queue 的最后一个 sk_buff
+
 ```cpp
 int tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)  
 {  
@@ -113,11 +118,13 @@ new_segment：
         ......  
 }
 ```
-#### **Case 1.**创建新的 sk_buff
+
+#### \*\*Case 1.\*\*创建新的 sk_buff
 
 在我们这个问题中，Client 在 Phase 1 是不会累积 sk_buff 的。也就是说，这时每个用户发送的报文都会通过 `sk_stream_alloc_skb` 创建新的 sk_buff。
 
 在这之前，内核会检查发送缓冲区内存是否已经超过限制，而在Phase 1 ，内核也能通过这个检查。
+
 ```cpp
 static inline bool sk_stream_memory_free(const struct sock* sk)  
 {  
@@ -126,21 +133,23 @@ static inline bool sk_stream_memory_free(const struct sock* sk)
     ......      
 }
 ```
-#### **Case 2.**将用户数据追加到最后一个 sk_buff
+
+#### \*\*Case 2.\*\*将用户数据追加到最后一个 sk_buff
 
 而在进入 Phase 2 后，Client 的发送缓冲区已经有了累积的 sk_buff，这时，内核就会尝试将用户数据(msg中的内容)追加到 write queue 的最后一个 sk_buff。
 
 需要注意的是，这种搭便车的数据也是有大小限制的，它用 `copy` 表示
 
-@tcp_sendmsg  
-  
-int max = size_goal;  
-  
+@tcp_sendmsg
+
+int max = size_goal;
+
 copy = max - skb->len;
 
 这里的 size_goal 表示该 sk_buff 最多能容纳的用户数据，减去已经使用的 `skb->len`， 剩下的就是还可以追加的数据长度。
 
 那么 size_goal 是如何计算的呢？
+
 ```cpp
 tcp_sendmsg  
   |-- tcp_send_mss  
@@ -156,12 +165,12 @@ static unsigned  int tcp_xmit_size_goal(struct sock* sk, u32 mss_now, int large_
     return max(size_goal, mss_now);  
 }
 ```
+
 继续追踪下去，可以看到，size_goal 跟使用的网卡是否使能了 GSO 功能有关。
 
 - GSO Enable：size_goal = tp->gso_segs * mss_now
-    
+
 - GSO Disable: size_goal = mss_now
-    
 
 在我的实验环境中，TCP 连接的有效 mss_now 是 1448 字节，用 systemtap 加了探测点后，发现 size_goal 为 14480 字节！是 mss_now 的整整 10 倍。
 
@@ -174,6 +183,7 @@ static unsigned  int tcp_xmit_size_goal(struct sock* sk, u32 mss_now, int large_
 这样看上去，这个 sk_buff 也容纳不下 14480 啊。
 
 再继续看内核的实现，再 skb_copy_to_page_nocache() 拷贝之前，会进行 sk_wmem_schedule()
+
 ```cpp
 tcp_sendmsg  
 {  
@@ -188,11 +198,13 @@ tcp_sendmsg
                                    copy);  
 }
 ```
+
 而在 sk_wmem_schedule 内部，会进行 sk_buff 的扩容(增大可以存放的用户数据长度).
 
-tcp_sendmsg  
-  |--sk_wmem_schedule  
-        |-- __sk_mem_schedule  
+tcp_sendmsg\
+|--sk_wmem_schedule\
+|-- \_\_sk_mem_schedule
+
 ```cpp
 __sk_mem_schedule(struct sock* sk, int size, int kind)  
 {  
@@ -202,14 +214,15 @@ __sk_mem_schedule(struct sock* sk, int size, int kind)
     // 后面有一堆检查，比如如果系统内存足够，就不去看他是否超过 sk_sndbuf  
 }
 ```
+
 通过这种方式，内核可以让 sk->wmem_queued 在超过 sk->sndbuf 的限制。
 
 我并不觉得这样是优雅而合理的行为，因为它让用户设置的 SO_SNDBUF 形同虚设！那么我可以增么修改呢？
 
 - 关掉网卡 GSO 特性
-    
+
 - 修改内核代码, 将检查发送缓冲区限制移动到 while 循环的开头。
-    
+
 ```cpp
     while (msg_data_left(msg)) {  
         int copy = 0;  
@@ -233,7 +246,8 @@ new_segment:
 -            if (!sk_stream_memory_free(sk))  
 -                goto wait_for_sndbuf;
 ```
----
+
+______________________________________________________________________
 
 **Linux云计算网络**
 

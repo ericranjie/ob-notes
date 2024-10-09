@@ -2,11 +2,11 @@
 
 Linux爱好者
 
- _2024年08月23日 14:31_
+_2024年08月23日 14:31_
 
 The following article is from CppPlayer Author CppPlayer
 
-[
+\[
 
 ![](http://wx.qlogo.cn/mmhead/lV0d907m3OW8RDttoJRIK57icaxXwSD2xpzhIH88ibbpbwziaX2xme1zzDibNRgEoZia9nF0gNRC0QNU/0)
 
@@ -14,19 +14,13 @@ The following article is from CppPlayer Author CppPlayer
 
 CPP玩家攻略 分享编程技术以及各种实用免费软件。期待您的关注！
 
-](https://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666570557&idx=2&sn=0e648cf9bb2bdfa179d2edfa12a65bc3&chksm=814a396660e2161aee8cae9687f3154b97f2e0e6a326dbd74e16f4c930d7df1f43c2634aedab&mpshare=1&scene=24&srcid=0824fSBZa1X085yFDOJ7ZJzu&sharer_shareinfo=1186f1799d89589249754c54509ca76c&sharer_shareinfo_first=1186f1799d89589249754c54509ca76c&key=daf9bdc5abc4e8d0e4a27eb5afd5c928587dcb0729f38183cd1de42d0d798688117ce35709e9b67d2bfd529d163689a143db9baf28f5185b8194c6aa0b1e1d6098c5a57ff110a2df661e4237305b0a798032472c1f3df8627e3c0fdd08a418e953f1be57c5877aaf881865077ec3ed448fee955bfad34183e55c4ba22279aff0&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_9f1efcd6f4ab&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQS%2FiJHW53zvMBd2%2F4JqcC2hKUAgIE97dBBAEAAAAAABmFE5DGOx8AAAAOpnltbLcz9gKNyK89dVj0ijagPzSk3X9S7BSnFLC%2BZ5L%2B4CMiXOm5QJU%2Fy5YHuLM8vwHVpjBWBuizY%2Fr4B2wy%2BtsxZsPaVoo1qGJwPyFttquUGgeH368gBH9EX%2FprpQtS6FRHwUMe0GpCtAr16YcRU2TYL2y7aYOmgeLFA9wIc1sKos3ofBoTYoRTZ0dlBL50zNN7Q0tmKISFVjlKLbuz1UG8PzGVZuHLGBTkaUgSdTawYmMq%2BSY9mPs43xn6Ybml8vW8rIssOCViqRz%2FlJxoC%2Bbyj8HVqxgSTiGgB7i9KNSy1NTiuxjpb4P0MmgnPu5nVmRFWV54EMtWwsvUqg%3D%3D&acctmode=0&pass_ticket=39eR6Jovs18SbwKRNZf7ENnGyzp%2BGpCxOeimGgZEqNtXWM2BKSb62qmk1V%2FaH74s&wx_header=0#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzAxODI5ODMwOA==&mid=2666570557&idx=2&sn=0e648cf9bb2bdfa179d2edfa12a65bc3&chksm=814a396660e2161aee8cae9687f3154b97f2e0e6a326dbd74e16f4c930d7df1f43c2634aedab&mpshare=1&scene=24&srcid=0824fSBZa1X085yFDOJ7ZJzu&sharer_shareinfo=1186f1799d89589249754c54509ca76c&sharer_shareinfo_first=1186f1799d89589249754c54509ca76c&key=daf9bdc5abc4e8d0e4a27eb5afd5c928587dcb0729f38183cd1de42d0d798688117ce35709e9b67d2bfd529d163689a143db9baf28f5185b8194c6aa0b1e1d6098c5a57ff110a2df661e4237305b0a798032472c1f3df8627e3c0fdd08a418e953f1be57c5877aaf881865077ec3ed448fee955bfad34183e55c4ba22279aff0&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_9f1efcd6f4ab&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQS%2FiJHW53zvMBd2%2F4JqcC2hKUAgIE97dBBAEAAAAAABmFE5DGOx8AAAAOpnltbLcz9gKNyK89dVj0ijagPzSk3X9S7BSnFLC%2BZ5L%2B4CMiXOm5QJU%2Fy5YHuLM8vwHVpjBWBuizY%2Fr4B2wy%2BtsxZsPaVoo1qGJwPyFttquUGgeH368gBH9EX%2FprpQtS6FRHwUMe0GpCtAr16YcRU2TYL2y7aYOmgeLFA9wIc1sKos3ofBoTYoRTZ0dlBL50zNN7Q0tmKISFVjlKLbuz1UG8PzGVZuHLGBTkaUgSdTawYmMq%2BSY9mPs43xn6Ybml8vW8rIssOCViqRz%2FlJxoC%2Bbyj8HVqxgSTiGgB7i9KNSy1NTiuxjpb4P0MmgnPu5nVmRFWV54EMtWwsvUqg%3D%3D&acctmode=0&pass_ticket=39eR6Jovs18SbwKRNZf7ENnGyzp%2BGpCxOeimGgZEqNtXWM2BKSb62qmk1V%2FaH74s&wx_header=0#)
 
 **free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？**
 
-  
-
 free()函数，要求传入的参数必须是malloc的返回值。在进行malloc函数申请内存时，操作系统实际会申请大于malloc要求的长度。
 
-  
-
 malloc分配的内存为一个个chunk，以下是一个典型的 malloc_chunk 结构定义（以 glibc 为例）：
-
-  
 
 ```
 struct malloc_chunk {
@@ -34,39 +28,25 @@ struct malloc_chunk {
 
 prev_size 字段表示前一个内存块的大小（如果当前内存块与前面的内存块合并在一起）。size 字段表示当前内存块的大小，包括边界标记。fd 和 bk 字段分别表示指向前后空闲内存块的指针，用于维护空闲内存列表。
 
-  
-
 当释放一个内存块时，内存分配器可以检查 prev_size 字段以确定前一个内存块是否为空闲。如果前一个内存块为空闲，内存分配器可以将这两个相邻的空闲内存块合并成一个更大的空闲内存块。这样可以使内存分配更加高效，减少内存碎片
-
-  
 
 图解chunk内存块：
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 malloc返回的指针不是指向了Header，而是指向了Payload开始处。
 
 所以空间的大小记录在参数指针指向地址的前面，free的时候通过这个记录即可知道要释放的内存有多大。
 
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 不同的内存分配器实现不一样，glibc的ptmalloc采用的是这种隐藏头风格，gemalloc采用其他的实现方式。
-
-  
 
 **关于malloc还有几个知识点：**
 
 **malloc是系统调用吗？**
 
-malloc是C语言库函数不是系统函数调用。  
+malloc是C语言库函数不是系统函数调用。
 
 malloc 申请内存的时候，会有两种方式向操作系统申请堆内存。
 
@@ -74,15 +54,9 @@ malloc 申请内存的时候，会有两种方式向操作系统申请堆内存�
 
 方式二：通过 mmap() 系统调用在文件映射区域分配内存；
 
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-![Image](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **malloc****分配的是物理内存吗****？**
 
@@ -90,27 +64,19 @@ malloc 申请内存的时候，会有两种方式向操作系统申请堆内存�
 
 现在的操作系统，内存管理通常是基于虚拟内存的，所以应用程序看到的内存地址（虚拟地址）与实际的物理内存地址（物理地址）是不同的。操作系统通过内存管理单元（MMU）来将虚拟地址转换为物理地址。
 
-  
-
 当应用程序首次访问这块内存时，操作系统发现对应的物理内存尚未分配，它会从可用的物理内存中分配相应的空间，并更新页表项以完成虚拟地址到物理地址的映射。
 
-  
-
-如果这块内存从来没有被访问，那么就不会分配实际的物理内存，节约了内存。  
-
-  
+如果这块内存从来没有被访问，那么就不会分配实际的物理内存，节约了内存。
 
 **调用free后，内存会被操作系统立马回收吗？**
 
-答案：不会。  
+答案：不会。
 
 当程序员使用free函数释放内存后，‌这块内存并不会立即被归还给操作系统。‌相反，‌这些被释放的内存首先会被内存管理器（‌如ptmalloc）‌保存起来，‌以便后续重用。‌这样做的主要目的是减少与操作系统的内存交互次数，‌从而降低系统调用的开销。
 
 ‌
 
 内存管理器会使用双链表等方式来管理这些被释放的内存块，‌当程序再次申请内存时，‌内存管理器会首先尝试从这些已释放的内存块中找到合适的块返回给程序，‌而不是直接向操作系统请求新的内存。‌这种机制有助于减少内存碎片和提高内存使用效率。
-
-  
 
 推荐阅读  点击标题可跳转
 

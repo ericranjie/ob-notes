@@ -83,7 +83,7 @@ catch(std::bad_alloc) {
 new操作背后编译器做的事：
 
 - 第一步通过operator new()操作分配一个目标类型的内存大小，这里是Complex的大小；
-- 第二步通过static_cast将得到的内存块强制转换为目标类型指针，这里是Complex*
+- 第二步通过static_cast将得到的内存块强制转换为目标类型指针，这里是Complex\*
 - 第三版调用目标类型的构造方法，但是需要注意的是，直接通过pc->Complex::Complex(1, 2)这样的方法调用构造函数只有编译器可以做，用户这样做将产生错误。
 
 **注意：operator new()操作的内部是调用了malloc()函数。**
@@ -119,15 +119,15 @@ delete操作步骤：
 
 上图主要展示的是关于array new内存分配的大致情况。
 
-当new一个数组对象时（例如 new Complex[3]），编译器将分配一块内存，这块内存首部是关于对象内存分配的一些标记，然后下面会分配三个连续的对象内存，在使用delete释放内存时需要使用delete[]。
+当new一个数组对象时（例如 new Complex\[3\]），编译器将分配一块内存，这块内存首部是关于对象内存分配的一些标记，然后下面会分配三个连续的对象内存，在使用delete释放内存时需要使用delete\[\]。
 
 **什么情况下发生内存泄露？**
 
-如果不使用delete[]，只是使用delete只会将分配的三块内存空间释放，但不会调用对象的析构函数，如果对象内部还使用了new指向其他空间，如果指向的该空间里的对象的析构函数没有意义，那么不会造成问题，**如果有意义，那么由于该部分对象析构函数不会调用，那么将会导致内存泄漏**。
+如果不使用delete\[\]，只是使用delete只会将分配的三块内存空间释放，但不会调用对象的析构函数，如果对象内部还使用了new指向其他空间，如果指向的该空间里的对象的析构函数没有意义，那么不会造成问题，**如果有意义，那么由于该部分对象析构函数不会调用，那么将会导致内存泄漏**。
 
-图中new string[3]便是一个例子，虽然str[0]、str[1]、str[2]被析构了，但只是调用了str[0]的析构函数，其他对象的析构函数不被调用，这里就会出问题。
+图中new string\[3\]便是一个例子，虽然str\[0\]、str\[1\]、str\[2\]被析构了，但只是调用了str\[0\]的析构函数，其他对象的析构函数不被调用，这里就会出问题。
 
-其中的cookie保存的是delete[]里面的数据，比如delete几次。
+其中的cookie保存的是delete\[\]里面的数据，比如delete几次。
 
 ### 3.2 演示数组对象创建与析构过程
 
@@ -141,7 +141,7 @@ delete操作步骤：
 
 [https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFtZOzmrH3zfvrOJnMAMRuIyu7RqBhoXNmwKpA2iaLCWgXfH9IEB9ia2geg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFtZOzmrH3zfvrOJnMAMRuIyu7RqBhoXNmwKpA2iaLCWgXfH9IEB9ia2geg/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-如果使用new分配十个内存的int，内存空间如上图所示，首先内存块会有一个头和尾，黄色部分为debug信息，灰色部分才是真正使用到的内存，蓝色部分的12bytes是为了让该内存块以16字节对齐。在这个例子中delete pi和delete[] pi效果是一样的，因为int没有析构函数。但是如果释放的对象的析构函数有意义，array delet就必须采用delete[]，否则发生内存泄露。
+如果使用new分配十个内存的int，内存空间如上图所示，首先内存块会有一个头和尾，黄色部分为debug信息，灰色部分才是真正使用到的内存，蓝色部分的12bytes是为了让该内存块以16字节对齐。在这个例子中delete pi和delete\[\] pi效果是一样的，因为int没有析构函数。但是如果释放的对象的析构函数有意义，array delet就必须采用delete\[\]，否则发生内存泄露。
 
 ## 4.placement new
 
@@ -199,11 +199,11 @@ _GLIBCXX_NODISCARD inline void* operator new(std::size_t, void* __p) _GLI
 
 [https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFtr3pAlxdKxCaUDgiaPn1SPOVL05sBVs9DQmwCbrprmfTMZia8WiaZbAn9A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFtr3pAlxdKxCaUDgiaPn1SPOVL05sBVs9DQmwCbrprmfTMZia8WiaZbAn9A/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-如果是在类中重载operator new()方法，那么该方法有N多种形式，但必须保证函数参数列表第一个参数是size_t类型变量；对于operator delete()，第一个参数必须是void* 类型，第二个size_t是可选项，可以去掉。
+如果是在类中重载operator new()方法，那么该方法有N多种形式，但必须保证函数参数列表第一个参数是size_t类型变量；对于operator delete()，第一个参数必须是void\* 类型，第二个size_t是可选项，可以去掉。
 
 data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImWNgYGBgAAAABQABh6FO1AAAAABJRU5ErkJggg==
 
-对于operator new[]和operator delete[]函数的重载，和前面类似。
+对于operator new\[\]和operator delete\[\]函数的重载，和前面类似。
 
 ## **6.pre-class allocator1**
 
@@ -221,7 +221,7 @@ data:image/gif;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQImW
 
 **分配：**`operator new`就是挖一大块，里面主要做的就是指针操作与转型。其中`freeStore`指向头，`operator new`返回的就是`freeStore`表头。
 
-**回收：**当使用者delete一个Scree，就会先调用析构函数，然后调用释放内存函数，`operator delete`接管了这个任务，接收到一个指针。就把这个链表回收到单向链表之中。单向链表始终都有一个头，所以回收动作最快放在链表开头。
+\*\*回收：\*\*当使用者delete一个Scree，就会先调用析构函数，然后调用释放内存函数，`operator delete`接管了这个任务，接收到一个指针。就把这个链表回收到单向链表之中。单向链表始终都有一个头，所以回收动作最快放在链表开头。
 
 [https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFt78MP1RmsD7nEPWIayicy4bPxkIUfgfhX1FLXSMR6Bk9ibiaCQkbQFupTQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFt78MP1RmsD7nEPWIayicy4bPxkIUfgfhX1FLXSMR6Bk9ibiaCQkbQFupTQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
@@ -576,6 +576,6 @@ class X5
 
 [https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFtwfN0kSeqbtDfJxoTiasHSkOK6Kj9Iruc2mVDPUKcsOkzHt54fNVdtww/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1](https://mmbiz.qpic.cn/mmbiz_png/WwIcQHkD5mcpGpZWC00BdwOPWk1hdJFtwfN0kSeqbtDfJxoTiasHSkOK6Kj9Iruc2mVDPUKcsOkzHt54fNVdtww/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
-首先使用了=default对`operator new`与`operator delete`，由于=defalult不能使用在这些函数上面，在侯老师代码中，将这两行注释掉了，保留了=delete的代码，所以在右侧输出，使用new没问题，使用new[]被禁用，自然报错，第二个是`operator new`与`operator delete`被禁用，因此new被禁用，报错，new[]正常。
+首先使用了=default对`operator new`与`operator delete`，由于=defalult不能使用在这些函数上面，在侯老师代码中，将这两行注释掉了，保留了=delete的代码，所以在右侧输出，使用new没问题，使用new\[\]被禁用，自然报错，第二个是`operator new`与`operator delete`被禁用，因此new被禁用，报错，new\[\]正常。
 
 参考资料：[https://www.cnblogs.com/lsgxeva/p/7787438.html](https://www.cnblogs.com/lsgxeva/p/7787438.html)

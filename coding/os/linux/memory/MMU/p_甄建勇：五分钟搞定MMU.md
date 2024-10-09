@@ -1,12 +1,13 @@
 甄建勇 Linux阅码场
- _2021年11月17日 11:56_
+_2021年11月17日 11:56_
 
 作者简介
 甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。
 感兴趣领域:经济学、心理学、哲学。
+
 # **概述**
-  
- 爱因斯坦在他的相对论中告诉我们，没有绝对的时间和空间，在一定条件下时间和空间是可以相互转化的，是否我们的世界有一天能够把空间与时间转化回到历史的时期？
+
+爱因斯坦在他的相对论中告诉我们，没有绝对的时间和空间，在一定条件下时间和空间是可以相互转化的，是否我们的世界有一天能够把空间与时间转化回到历史的时期？
 
 唐代诗仙李白也曾有云：“夫天地者，万物之逆旅；光阴者，百代之过客”。是对空间和时间的另外一种表述。
 
@@ -14,7 +15,7 @@
 
 冯诺依曼结构与他之前的结构的最大不同就在于在计算机中引入了存储部件，也正是这个存储部件是计算机的设计进入了一个全新时代。也正是由于存储部件在计算机体系结构中的重要地位，无论是过去还是现在，无论是体系结构设计中，还是在操作系统设计中，存储组织的设计与管理一直是研究热点。在前面介绍了CPU的数据通路和控制通路之后，本章，我们将介绍举足轻重的存储器组织。
 
-**TLB与cache简介**  
+**TLB与cache简介**
 
 对于computerarchitecture，除了流水线（pipelining）之外，存储器层次组织（memoryhierarchy）是另外一个重要的部分。软件方面，对linuxkernel的研究中，MMU是篇幅最多，也是最复杂的一部分。硬件方面，TLB和cache这两个词就比较常见了。
 
@@ -49,12 +50,12 @@
 
 对于cache，有读，写之分。先说读，如果cache里面有，直接把cache里面的数据返回，即，读操作完成了。由于cache里面只有内存数据的一部分，所以有的数据cache里面没有，这时就只能产生读内存的地址信号，然后从数据线上取数据。然后更新cache（注意，更新算法）。
 
-再说写，如果cache里面有，有两种方式：通写（write-through），写返回（write-back）。由于cache里面只有内存数据的一部分，所以有的数据cache里面没有，这时就只能产生写内存的地址信号，然后把数据放到数据线上。然后更新cache。 
+再说写，如果cache里面有，有两种方式：通写（write-through），写返回（write-back）。由于cache里面只有内存数据的一部分，所以有的数据cache里面没有，这时就只能产生写内存的地址信号，然后把数据放到数据线上。然后更新cache。
 
 数据，可分为指令和普通数据。如果取指令和取普通数据各自使用一套memoryhierarchy，就有了ITLB，DTLB，icache,dcache。这就有点哈佛体系结构的意思了。即core内部采用哈佛体系结构，core外部采用冯-诺依曼体系结构。
 
 下面是整体的流程。
-![[Pasted image 20240914195551.png]]
+!\[\[Pasted image 20240914195551.png\]\]
 _图1 TLB与cache的整体流程_
 
 **TLB**
@@ -82,19 +83,17 @@ MMU，是硬件和软件配合最密切的部分之一，对于RISCCPU而言，�
 
 **代码清单 1** **一个简单的应用层程序**
 
-  
+1. /*demo process, base on OS*/
 
-1. /*demo process, base on OS*/  
+2. int main()
 
-2. int main()  
+3. {
 
-3. {  
+4.     int test;
 
-4.     int test;  
+5.     test = 0x12345678;
 
-5.     test = 0x12345678;  
-
-6. }  
+6. }
 
 （1）假设其进程名称为demo。
 
@@ -108,7 +107,7 @@ MMU，是硬件和软件配合最密切的部分之一，对于RISCCPU而言，�
 
 既然其进程空间是48KB，每页是8K，也就是说OS需要给demo进程生成6个PTE（pagetable entry，页表项）。
 
-（5）假设这6个PTE存放在kernel空间的第0x600个页，即进程demo的PTE存放开始物理地址是0x600000，虚拟地址假设是0x12345000。 
+（5）假设这6个PTE存放在kernel空间的第0x600个页，即进程demo的PTE存放开始物理地址是0x600000，虚拟地址假设是0x12345000。
 
 （6）假设这进程这6页的地址空间的分配方式是：
 
@@ -120,7 +119,7 @@ bss段，1页；
 
 堆，1页；
 
-数据段，2页。 
+数据段，2页。
 
 （7）假设进程demo中的变量test的地址在栈段，并且其页内偏移为0x1。
 
@@ -131,10 +130,10 @@ bss段，1页；
 有了上面的假设，那么MMU是如何工作的呢？
 
 MMU的功能主要是虚实地址转换，PTE的cache（也就是TLB）。其具体过程，如下图所示：
-![[Pasted image 20240914200402.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914200402.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-_图 2 MMU工作的具体过程_ 
+_图 2 MMU工作的具体过程_
 
 其工作过程如下：
 
@@ -151,10 +150,10 @@ _图 2 MMU工作的具体过程_ 
 如果TLB miss（对应的pte_2），那么OS查看异常寄存器，得到具体的异常信息，并最终将pte_2更新到TLB中，重新执行MMU操作，则TLB hit，完成转换过程。
 
 上面的过程，如果用一幅图来展示的话，如下所示：
-![[Pasted image 20240914200408.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914200408.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-_图 3  虚实地址转换_  
+_图 3  虚实地址转换_
 
 上面介绍的OS的页表是单级的，这样的话，在搜索对应的PTE时需要依次遍历所有的PTE表项，显然比较慢，为了加快搜索速度，linux采用了两级PTE页表。
 
@@ -163,10 +162,10 @@ _图 3  虚实地址转换_  
 这样，在搜索时，先确定其所在的页表目录，然后只需要遍历本目录中的PTE就可以了。
 
 其操作过程和单级页表相似，如下图所示：
-![[Pasted image 20240914200414.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[\[Pasted image 20240914200414.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-_图4      两级页表的虚实地址转换_ 
+_图4      两级页表的虚实地址转换_
 
 上面通过一个例子，说明了MMU的工作机制，大体可概括如下：
 
@@ -180,7 +179,7 @@ _图4      两级页表的虚实地址转换_ 
 
 （5）上面描述的过程是一帆风顺的情况，实际可不如此，如果出现TLBmiss，如何处理呢？硬件提供OS事先设置的当前进程的页表存放的起始地址，页表项的偏移地址，OS利用这些信息找到对应的PTE，并将PTE中的信息取出来分别存放到匹配寄存器和转换寄存器的对应位置，完成TLB的更新。
 
-从中可以看出，整个处理过程，需要软件硬件的巧妙的，天衣无缝的配合才行，那么具体是怎么处理的呢？我们通过查CPU的手册可知，比如DTLB miss的异常入口地址是0x900，那么基于某个CPU的linux是如何实现的呢？参考head.S中相关代码（soc-design\linux\arch\openrisc\kernel）。
+从中可以看出，整个处理过程，需要软件硬件的巧妙的，天衣无缝的配合才行，那么具体是怎么处理的呢？我们通过查CPU的手册可知，比如DTLB miss的异常入口地址是0x900，那么基于某个CPU的linux是如何实现的呢？参考head.S中相关代码（soc-design\\linux\\arch\\openrisc\\kernel）。
 
 说到这里，你可能有一个疑问，“你一直说，如果出现TLB miss，OS计算出对应的PTE的地址，然后取出内容，更新TLB”，既然TLB miss之后需要访问内存获得对应的PTE，那么访问这个PTE时，PTE的地址也不在TLB中怎么办呢？！这个你不用担心，原因就是所有的页表项都存放在内存的kseg0段，而这段内存的访问是是不用MMU的。kseg0段除了放这些PTE外，也是存放异常处理程序的地方，你想啊，如果产生了一个异常，假设这个异常的处理入口地址是0x900，这个0x900肯定是物理地址，是不需要MMU的，如果这个0x900也经过MMU处理就乱套了，物理地址转虚拟地址，虚拟地址转物理地址，是一个相向的过程，系统要想正常运行，必须要有一个起源，而物理地址就是起源，虚拟地址只不过是为了达到某种效果而引进的一种手段而已。
 
@@ -193,13 +192,16 @@ _图4      两级页表的虚实地址转换_ 
 MMU，cache确实有它的好处，其重要性也是有目共睹，但并不是适用于所有方面，上面所说的内核空间的kseg0段是禁止MMU的，除此之外，kseg1段，MMU和cache都是禁止的。从这个角度来看，无论是什么事情，都要‘有所为有所不为’，不要跟风，不要认为是好东西就可以随便用，要取其长，补己短，该出手时才出手。
 
 **代码清单 2        DTLB miss异常入口**
+
 ```cpp
 1. /* ---[ 0x900: DTLB miss exception ]------------------------------------- */
 2.     .org 0x900  
 3.     l.j boot_dtlb_miss_handler  
 4.     l.nop  
 ```
+
 **代码清单 3          DTLB miss 异常处理**
+
 ```cpp
 1. /* ---[ boot dtlb miss handler ]----------------------------------------- */
 2.   
@@ -343,23 +345,17 @@ MMU，cache确实有它的好处，其重要性也是有目共睹，但并不是
 93.    l.j _di
 ```
 
-  ---
+______________________________________________________________________
 
 精彩回顾
 
-  
-
-  
-
 [甄建勇：芯片架构方法学](http://mp.weixin.qq.com/s?__biz=MzAwMDUwNDgxOA==&mid=2652671184&idx=1&sn=16bfce9af8d5650a71ab961ea463a2db&chksm=810fca4db678435b634cb431f9dfc1fe805a57409e9b2d2c068ef16b696b978265c46a0c23ea&scene=21#wechat_redirect)
-
-  
 
 更多精彩尽在"Linux阅码场"，扫描下方二维码关注
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **别忘了分享、点赞或者在看哦~**
 
@@ -372,103 +368,102 @@ MMU，cache确实有它的好处，其重要性也是有目共睹，但并不是
 **留言 12**
 
 - 杰克朱
-    
-    2021年11月17日
-    
-    赞
-    
-    总算明白了时间局部性和空间局部性的主体或对象是内存页表项，是在cache和TLB过程中产生的有OS来管理的
-    
-    置顶
-    
+
+  2021年11月17日
+
+  赞
+
+  总算明白了时间局部性和空间局部性的主体或对象是内存页表项，是在cache和TLB过程中产生的有OS来管理的
+
+  置顶
+
 - 何旻隆
-    
-    2021年11月17日
-    
-    赞5
-    
-    别人的5分钟＝我的半小时
-    
+
+  2021年11月17日
+
+  赞5
+
+  别人的5分钟＝我的半小时
+
 - 苟利国
-    
-    2021年11月17日
-    
-    赞3
-    
-    这是五分钟能看完的？
-    
+
+  2021年11月17日
+
+  赞3
+
+  这是五分钟能看完的？
+
 - QY.
-    
-    2021年11月20日
-    
-    赞1
-    
-    这是五分钟能干的事![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年11月20日
+
+  赞1
+
+  这是五分钟能干的事![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 葡萄
-    
-    2021年11月24日
-    
-    赞
-    
-    "将虚拟地址转换成物理地址，就需要虚拟地址到物理地址的一个映射表（具体映射方法有直接映射，组相联，全相联）" , 我的理解页表是没组相联，全相联的， 这个是cache映射到memory里的概念。
-    
+
+  2021年11月24日
+
+  赞
+
+  "将虚拟地址转换成物理地址，就需要虚拟地址到物理地址的一个映射表（具体映射方法有直接映射，组相联，全相联）" , 我的理解页表是没组相联，全相联的， 这个是cache映射到memory里的概念。
+
 - R&K
-    
-    2021年11月21日
-    
-    赞
-    
-    很硬 向大佬学习
-    
+
+  2021年11月21日
+
+  赞
+
+  很硬 向大佬学习
+
 - Moonriver
-    
-    2021年11月20日
-    
-    赞
-    
-    局部性原理太到位了
-    
+
+  2021年11月20日
+
+  赞
+
+  局部性原理太到位了
+
 - 陶恒
-    
-    2021年11月18日
-    
-    赞
-    
-    对TLB和Cache刷新的时机梳理的非常清楚，MMU的那张图工作流程图能更清楚就好了。对OS开发来理解内存管理更底层的处理很有帮助，感谢分享。
-    
+
+  2021年11月18日
+
+  赞
+
+  对TLB和Cache刷新的时机梳理的非常清楚，MMU的那张图工作流程图能更清楚就好了。对OS开发来理解内存管理更底层的处理很有帮助，感谢分享。
+
 - Samaritan.
-    
-    2021年11月18日
-    
-    赞
-    
-    好复杂呀，好厉害哦
-    
+
+  2021年11月18日
+
+  赞
+
+  好复杂呀，好厉害哦
+
 - 大灰狼
-    
-    2021年11月17日
-    
-    赞
-    
-    大佬签名的书还存着，还在努力追赶大佬。
-    
+
+  2021年11月17日
+
+  赞
+
+  大佬签名的书还存着，还在努力追赶大佬。
+
 - 冰
-    
-    2021年11月17日
-    
-    赞
-    
-    老朋友了，必须顶。写的很实用![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年11月17日
+
+  赞
+
+  老朋友了，必须顶。写的很实用![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 特洛伊
-    
-    2021年11月17日
-    
-    赞
-    
-    NVDIA的大佬
-    
+
+  2021年11月17日
+
+  赞
+
+  NVDIA的大佬
 
 已无更多数据
 
@@ -487,102 +482,101 @@ Linux阅码场
 **留言 12**
 
 - 杰克朱
-    
-    2021年11月17日
-    
-    赞
-    
-    总算明白了时间局部性和空间局部性的主体或对象是内存页表项，是在cache和TLB过程中产生的有OS来管理的
-    
-    置顶
-    
+
+  2021年11月17日
+
+  赞
+
+  总算明白了时间局部性和空间局部性的主体或对象是内存页表项，是在cache和TLB过程中产生的有OS来管理的
+
+  置顶
+
 - 何旻隆
-    
-    2021年11月17日
-    
-    赞5
-    
-    别人的5分钟＝我的半小时
-    
+
+  2021年11月17日
+
+  赞5
+
+  别人的5分钟＝我的半小时
+
 - 苟利国
-    
-    2021年11月17日
-    
-    赞3
-    
-    这是五分钟能看完的？
-    
+
+  2021年11月17日
+
+  赞3
+
+  这是五分钟能看完的？
+
 - QY.
-    
-    2021年11月20日
-    
-    赞1
-    
-    这是五分钟能干的事![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年11月20日
+
+  赞1
+
+  这是五分钟能干的事![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)![[苦涩]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 葡萄
-    
-    2021年11月24日
-    
-    赞
-    
-    "将虚拟地址转换成物理地址，就需要虚拟地址到物理地址的一个映射表（具体映射方法有直接映射，组相联，全相联）" , 我的理解页表是没组相联，全相联的， 这个是cache映射到memory里的概念。
-    
+
+  2021年11月24日
+
+  赞
+
+  "将虚拟地址转换成物理地址，就需要虚拟地址到物理地址的一个映射表（具体映射方法有直接映射，组相联，全相联）" , 我的理解页表是没组相联，全相联的， 这个是cache映射到memory里的概念。
+
 - R&K
-    
-    2021年11月21日
-    
-    赞
-    
-    很硬 向大佬学习
-    
+
+  2021年11月21日
+
+  赞
+
+  很硬 向大佬学习
+
 - Moonriver
-    
-    2021年11月20日
-    
-    赞
-    
-    局部性原理太到位了
-    
+
+  2021年11月20日
+
+  赞
+
+  局部性原理太到位了
+
 - 陶恒
-    
-    2021年11月18日
-    
-    赞
-    
-    对TLB和Cache刷新的时机梳理的非常清楚，MMU的那张图工作流程图能更清楚就好了。对OS开发来理解内存管理更底层的处理很有帮助，感谢分享。
-    
+
+  2021年11月18日
+
+  赞
+
+  对TLB和Cache刷新的时机梳理的非常清楚，MMU的那张图工作流程图能更清楚就好了。对OS开发来理解内存管理更底层的处理很有帮助，感谢分享。
+
 - Samaritan.
-    
-    2021年11月18日
-    
-    赞
-    
-    好复杂呀，好厉害哦
-    
+
+  2021年11月18日
+
+  赞
+
+  好复杂呀，好厉害哦
+
 - 大灰狼
-    
-    2021年11月17日
-    
-    赞
-    
-    大佬签名的书还存着，还在努力追赶大佬。
-    
+
+  2021年11月17日
+
+  赞
+
+  大佬签名的书还存着，还在努力追赶大佬。
+
 - 冰
-    
-    2021年11月17日
-    
-    赞
-    
-    老朋友了，必须顶。写的很实用![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
-    
+
+  2021年11月17日
+
+  赞
+
+  老朋友了，必须顶。写的很实用![[强]](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=)
+
 - 特洛伊
-    
-    2021年11月17日
-    
-    赞
-    
-    NVDIA的大佬
-    
+
+  2021年11月17日
+
+  赞
+
+  NVDIA的大佬
 
 已无更多数据

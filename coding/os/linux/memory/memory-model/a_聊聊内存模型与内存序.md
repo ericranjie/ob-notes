@@ -1,5 +1,5 @@
 C语言与CPP编程
- _2022年07月01日 08:40_
+_2022年07月01日 08:40_
 以下文章来源于高性能架构探索 ，作者我是雨乐
 
 最近群里聊到了`Memory Order`相关知识，恰好自己对这块的理解是模糊的、不成体系的，所以借助本文，重新整理下相关知识。
@@ -66,19 +66,18 @@ lfence (asm), void _mm_lfence(void)sfence (asm), void _mm_sfence(void)mfen
 **Herb Sutter**在其文章中这样来评价C++11引入的内存模型：
 
 > The memory model means that C++ code now has a standardized library to call regardless of who made the compiler and on what platform it's running. There's a standard way to control how different threads talk to the processor's memory.
-> 
-> "When you are talking about splitting [code] across different cores that's in the standard, we are talking about the memory model. We are going to optimize it without breaking the following assumptions people are going to make in the code," **Sutter** said
+>
+> "When you are talking about splitting \[code\] across different cores that's in the standard, we are talking about the memory model. We are going to optimize it without breaking the following assumptions people are going to make in the code," **Sutter** said
 
 从内容可以看出，C++11引入Memory model的意义在于有了一个语言层面的、与运行平台和编译器无关的标准库，可以使得开发人员更为便捷高效地控制内存访问顺序。
 
 一言以蔽之，引入内存模型的原因，有以下几个原因：
 
 - • 编译器优化：在某些情况下，即使是简单的语句，也不能保证是原子操作
-    
+
 - • CPU out-of-order：CPU为了提升计算性能，可能会调整指令的执行顺序
-    
+
 - • CPU Cache不一致：在CPU Cache的影响下，在某个CPU下执行了指令，不会立即被其它CPU所看到
-    
 
 ## 关系术语
 
@@ -93,9 +92,8 @@ sequenced-before是一种单线程上的关系，这是一个非对称，可传�
 对一个表达式进行求值(evaluation)，包含以下两部分：
 
 - • value computations: calculation of the value that is returned by the expression. This may involve determination of the identity of the object (glvalue evaluation, e.g. if the expression returns a reference to some object) or reading the value previously assigned to an object (prvalue evaluation, e.g. if the expression returns a number, or some other value)
-    
+
 - • Initiation of side effects: access (read or write) to an object designated by a volatile glvalue, modification (writing) to an object, calling a library I/O function, or calling a function that does any of those operations.
-    
 
 上述内容简单理解就是，value computation就是计算表达式的值，side effect就是对对象进行读写。
 
@@ -112,11 +110,10 @@ i = i++ + i;
 sequenced-before就是对在`同一个线程内`，求值顺序关系的描述：
 
 - • 如果A sequenced-before B，代表A的求值会先完成，才进行对B的求值
-    
+
 - • 如果A not sequenced-before B，而B sequenced-before A，则代表先对B进行求值，然后对A进行求值
-    
+
 - • 如果A not sequenced-before B，而B not sequenced-before A，则A和B都有可能先执行，甚至可以同时执行
-    
 
 ### happens-before
 
@@ -125,10 +122,10 @@ happens-before是sequenced-before的扩展，因为它还包含了不同线程�
 看下`cppreference`对happens-before关系的定义，如下：
 
 > Regardless of threads, evaluation A happens-before evaluation B if any of the following is true:
-> 
-> 1) A is sequenced-before B
-> 
-> 2) A inter-thread happens before B
+>
+> 1. A is sequenced-before B
+>
+> 1. A inter-thread happens before B
 
 从上述定义可以看出，happens-before包含两种情况，一种是同一线程内的happens-before关系(等同于sequenced-before)，另一种是不同线程的happens-before关系。
 
@@ -147,15 +144,14 @@ int x = 0;
 C++中定义了5种能够建立跨线程的happens-before的场景，如下：
 
 - • A synchronizes-with B
-    
+
 - • A is dependency-ordered before B
-    
+
 - • A synchronizes-with some evaluation X, and X is sequenced-before B
-    
+
 - • A is sequenced-before some evaluation X, and X inter-thread happens-before B
-    
+
 - • A inter-thread happens-before some evaluation X, and X inter-thread happens-before B
-    
 
 ### synchronizes-with
 
@@ -180,11 +176,10 @@ typedef enum memory_order {    memory_order_relaxed,    memory_order_
 这六种内存约束符从读/写的角度进行划分的话，可以分为以下三种：
 
 - • 读操作(memory_order_acquire memory_order_consume)
-    
+
 - • 写操作(memory_order_release)
-    
+
 - • 读-修改-写操作(memory_order_acq_rel memory_order_seq_cst)
-    
 
 ps: 因为memory_order_relaxed没有定义同步和排序约束，所以它不适合这个分类。
 
@@ -193,11 +188,10 @@ ps: 因为memory_order_relaxed没有定义同步和排序约束，所以它不�
 从访问控制的角度可以分为以下三种：
 
 - • Sequential consistency模型(memory_order_seq_cst)
-    
+
 - • Relax模型(memory_order_relaxed)
-    
+
 - • Acquire-Release模型(memory_order_consume memory_order_acquire memory_order_release memory_order_acq_rel)
-    
 
 从从访问控制的强弱排序，Sequential consistency模型最强，Acquire-Release模型次之，Relax模型最弱。
 
@@ -218,9 +212,8 @@ Sequential consistency模型又称为顺序一致性模型，是控制粒度最�
 假设有两个线程，分别是线程A和线程B，那么这两个线程的执行情况有三种：第一种是线程A先执行，然后再执行线程B；第二种情况是线程 B 先执行，然后再执行线程A；第三种情况是线程A和线程B同时并发执行，即线程A的代码序列和线程B的代码序列交替执行。尽管可能存在第三种代码交替执行的情况，但是单纯从线程A或线程B的角度来看，每个线程的代码执行应该是按照代码顺序执行的，这就顺序一致性模型。总结起来就是：
 
 - • 每个线程的执行顺序与代码顺序严格一致
-    
+
 - • 线程的执行顺序可能会交替进行，但是从单个线程的角度来看，仍然是顺序执行
-    
 
 为了便于理解上述内容，举例如下：
 
@@ -231,17 +224,16 @@ x = y = 0;thread1:x = 1;r1 = y;thread2:y = 1;r2 = x;
 因为多线程执行顺序有可能是交错执行的，所以上述示例执行顺序有可能是:
 
 - • x = 1; r1 = y; y = 1; r2 = x
-    
+
 - • y = 1; r2 = x; x = 1; r1 = y
-    
+
 - • x = 1; y = 1; r1 = y; r2 = x
-    
+
 - • x = 1; r2 = x; y = 1; r1 = y
-    
+
 - • y = 1; x = 1; r1 = y; r2 = x
-    
+
 - • y = 1; x = 1; r2 = x; r1 = y
-    
 
 也就是说，虽然多线程环境下，执行顺序是乱的，但是单纯从线程1的角度来看，执行顺序是`x = 1; r1 = y`；从线程2角度来看，执行顺序是`y = 1; r2 = x`。
 
@@ -283,9 +275,8 @@ std::atomic<int> cnt = {0};void fun1() {  for (int n = 0; n < 100;
 Acquire-Release模型的控制力度介于Relax模型和Sequential consistency模型之间。其定义如下：
 
 - • Acquire：如果一个操作X带有acquire语义，那么在操作X后的所有读写指令都不会被重排序到操作X之前
-    
+
 - • Relase：如果一个操作X带有release语义，那么在操作X前的所有读写指令操作都不会被重排序到操作X之后
-    
 
 结合上面的定义，重新解释下该模型：假设有一个原子变量A，对A的写操作(Release)和读操作(Acquire)之间进行同步，并建立排序约束关系，即对于写操作(release)X，在写操作X之前的所有读写指令都不能放到写操作X之后；对于读操作(acquire)Y，在读操作Y之后的所有读写指令都不能放到读操作Y之前。
 
@@ -403,30 +394,28 @@ y.store(1, memory_order_release); // D
 C++11提供的6种内存访问约束符中：
 
 - • memory_order_release：在当前线程T1中，该操作X之前的任何读写操作指令都不能放在操作X之后。如果其它线程对同一变量使用了memory_order_acquire或者memory_order_consume约束符，则当前线程写操作之前的任何读写操作都对其它线程可见(注意consume的话是依赖关系可见)
-    
+
 - • memory_order_acquire：在当前线程中，load操作之后的读和写操作都不能被重排到当前指令前。如果有其他线程使用memory_order_release内存模型对此原子变量进行store操作，在当前线程中是可见的。
-    
+
 - • memory_order_relaxed：没有同步或顺序制约，仅对此操作要求原子性
-    
+
 - • memory_order_consume：在当前线程中，load操作之后的依赖于此原子变量的读和写操作都不能被重排到当前指令前。如果有其他线程使用memory_order_release内存模型对此原子变量进行store操作，在当前线程中是可见的。
-    
+
 - • memory_order_acq_rel：等同于对原子变量同时使用memory_order_release和memory_order_acquire约束符
-    
+
 - • memory_order_seq_cst：从宏观角度看，线程的执行顺序与代码顺序严格一致
-    
 
 C++的内存模型则是依赖上面六种内存约束符来实现的：
 
 - • Relax模型：对应的是memory_order中的memory_order_relaxed。从其字面意思就能看出，其对于内存序的限制最小，也就是说这种方式只能保证当前的数据访问是原子操作(不会被其他线程的操作打断)，但是对内存访问顺序没有任何约束，也就是说对不同的数据的读写可能会被重新排序
-    
+
 - • Acquire-Release模型：对应的memory_order_consume memory_order_acquire memory_order_release memory_order_acq_rel约束符(需要互相配合使用)；对于一个原子变量A，对A的写操作(Release)和读操作(Acquire)之间进行同步，并建立排序约束关系，即对于写操作(release)X，在写操作X之前的所有读写指令都不能放到写操作X之后；对于读操作(acquire)Y，在读操作Y之后的所有读写指令都不能放到读操作Y之前。
-    
+
 - • Sequential consistency模型：对应的memory_order_seq_cst约束符；程序的执行顺序与代码顺序严格一致，也就是说，在顺序一致性模型中，不存在指令乱序。
-    
 
 下面这幅图大致梳理了内存模型的核心概念，可以帮我们快速回顾。
-![[Pasted image 20240915164551.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+!\[\[Pasted image 20240915164551.png\]\]
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
 
 ## 后记
 

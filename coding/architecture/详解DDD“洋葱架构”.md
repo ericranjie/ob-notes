@@ -1,16 +1,10 @@
-
-
 架构之家
 
- _2022年08月05日 08:00_ _北京_
+_2022年08月05日 08:00_ _北京_
 
 领域驱动设计（Domain-driven design，DDD）是一种为复杂需求开发软件的方法，它将软件的实现与不断发展的核心业务概念模型紧密地结合在一起。
 
-  
-
 领域是一个知识的范畴。它指的是我们的软件所要模拟的业务知识。领域驱动设计的中心是领域模型，它对一个领域的流程和规则有着深刻的理解。洋葱架构实现了这一概念，并极大地改善了代码的品质，降低了复杂性，并且支持不断发展的企业系统。
-
-  
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/UHKG18j8iasYI8LeNTbHfZgPib3E9jAfdjFBQfaHfYyl6n19rLgHvRiapfJVhkwULuvcDrPtOGmpWLSTJgyV2Uz9Q/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -19,15 +13,14 @@
 领域实体是核心和中心部分。洋葱架构是建立在一个领域模型上的，其中各层是通过接口连接的。其背后的思想是，在领域实体和业务规则构成架构的核心部分时，尽可能将外部依赖性保持在外。
 
 - 它提供了灵活、可持续和可移植的架构。
-    
+
 - 各层之间没有紧密的耦合，并且有关注点的分离。
-    
+
 - 由于所有的代码都依赖于更深的层或者中心，所以提供了更好的可维护性。
-    
+
 - 提高了整体代码的可测试性，因为单元测试可以为单独的层创建，而不会影响到其他的模块。
-    
+
 - 框架/技术可以很容易地改变而不影响核心领域。例如，RabbitMQ 可以被 ActiveMQ 取代，SQL 可以被 MongoDB 取代。
-    
 
 ## 原则
 
@@ -43,9 +36,7 @@
 
 每个层/圈封装或隐藏内部的实现细节，并向外层公开接口。所有的层也需要提供便于内层消费的信息。其目的是**最小化层与层之间的耦合，最大化跨层垂直切面内的耦合**。我们在较深的层定义抽象接口，并在最外层提供其具体实现。这样可以确保我们专注于领域模型，而不必过多地担心实现细节。我们还可以使用依赖性注入框架，比如 Spring，在运行时将接口与实现连接起来。例如，领域中使用的存储库和应用服务中使用的外部服务在基础设施层实现。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 洋葱架构中的数据封装
 
@@ -61,25 +52,17 @@
 
 让我们通过一个创建订单的用例来了解架构的不同层和它们的职责。当收到一个创建订单的请求时，我们会对这个订单进行验证，将这个订单保存在数据库中，更新所有订单项目的库存，借记订单金额，最后向客户发送订单完成的通知。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 说明各层之间的依赖关系的包图
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ### 领域模型/实体
 
 领域实体是领域驱动设计的基本构件，它们被用来在代码中为通用语言的概念建模。实体是在问题域中具有唯一身份的领域概念。领域实体封装了属性和实体行为。它应该是独立于数据库或网络 API 等特定技术的。例如，在订单领域，订单是一个实体，并具有像 OrderId、Address、UserInfo、OrderItems、PricingInfo 这样的属性以及像 AddOrderItems、GetPricingInfo、ValidateOrder 这样的行为。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 订单实体类
 
@@ -102,11 +85,10 @@
 可观察性服务负责监控应用。这些服务有助于执行以下任务：
 
 - 数据收集（指标、日志、痕迹）：主要使用库/侧线来收集代码执行期间的各种数据。
-    
+
 - 数据存储：使用能够集中存储所收集的数据的工具（分类、索引等）。
-    
+
 - 可视化：使用允许你对收集的数据进行可视化的工具。
-    
 
 一些例子包括 Splunk、ELK、Grafana、Graphite、Datadog。
 
@@ -114,9 +96,7 @@
 
 洋葱架构的不同层有不同的职责，相应地也有不同的测试策略。测试金字塔是一个很好的框架，它规定了不同类型的测试。属于领域模型、领域服务和应用服务的业务规则应通过单元测试进行测试。当我们移动到外层时，在基础设施服务中进行集成测试更有意义。对于我们的应用，端到端测试和 BDD 是最合适的测试策略。
 
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 针对不同层的测试策略
 
@@ -126,13 +106,9 @@
 
 ## 应用结构和层数
 
-  
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-  
-
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 应用结构和层，包括层如何映射到模块以及它们之间的依赖关系。它还描述了对不同层使用什么样的测试策略
 
@@ -160,7 +136,7 @@
 
 Ritesh Kapoor，软件工程师，热衷于研究算法、架构设计、敏捷方法。
 
-出处：https://www.infoq.cn/article/zOlhF7uu455xOVvQwWv3  
+出处：https://www.infoq.cn/article/zOlhF7uu455xOVvQwWv3
 
 阅读 1265
 

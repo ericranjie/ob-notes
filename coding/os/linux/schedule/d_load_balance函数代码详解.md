@@ -1,15 +1,19 @@
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-2-16 7:29 分类：[进程管理](http://www.wowotech.net/sort/process_management)
+
 # 前言
 
 我们描述CFS任务负载均衡的系列文章一共三篇，第一篇是框架部分，第二篇描述了task placement和active upmigration两个典型的负载均衡场景，第三篇是负载均衡的情景分析，包括tick balance、nohz idle balance和new idle balance。在负载均衡情景分析文档最后，我们给出了结论：tick balancing、nohz idle balancing、new idle balancing都是万法归宗，汇聚到load_balance函数来完成具体的负载均衡工作。本文就是第三篇负载均衡情景分析的附加篇，重点给大家展示load_balance函数的精妙。
 
 本文出现的内核代码来自Linux5.10.61，为了减少篇幅，我们对引用的代码进行了删减（例如去掉了NUMA的代码，毕竟手机平台上我们暂时不关注这个特性），如果有兴趣，读者可以配合完整的源代码代码阅读本文。
+
 # 一、概述
 
 本文主要分成三个部分，第一个部分就是本章，简单的描述了本文的结构和阅读前提条件。第二章是对load_balance函数设计的数据结构进行描述。这一章不需要阅读，只是在有需要的时候可以查阅几个主要数据结构的各个成员的具体功能。随后的若干个章节是以load_balance函数为主线，对各个逻辑过程进行逐行分析。
 
 需要强调的是本文不是独立成文的，很多负载均衡的基础知识（例如sched domain、sched group，什么是负载、运行负载、利用率utility，什么是均衡......）在CFS任务负载均衡系列文章的第一篇已经描述，如果没有阅读过，强烈建议提前阅读。如果已经具体负载均衡的基础概念，那么希望本文能够给你带来研读代码的快乐。
+
 # 二、load_balance函数使用的数据结构
+
 ## 1、struct lb_env
 
 在负载均衡的时候，通过 lb_env数据结构来表示本次负载均衡的上下文：
@@ -17,14 +21,14 @@
 |                                      |                                                                                                                                                                                                        |
 | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 成员                                   | 描述                                                                                                                                                                                                     |
-| struct sched_domain *sd              | 要进行负载均衡的sched domain                                                                                                                                                                                   |
-| struct rq *dst_rq<br><br>int dst_cpu | 本次均衡的目标CPU。均衡操作试图从该sched domain的busiest cpu的runqueue拉取任务到 dest CPU rq，从而完成本次sched domain的均衡动作。第一轮均衡的dst cpu和dst rq一般设置为发起均衡的cpu及其runqueue，后续如果需要，可以重新设定为local group中的其他cpu，具体可以参考后文的描述。                |
-| struct cpumask *dst_grpmask          | Dst_cpu所在sched group的cpu mask，即本次均衡dest cpu所在的范围。                                                                                                                                                      |
-| struct rq *src_rq<br><br>int src_cpu | 该sched domain中最繁忙的那个cpu及其runqueue，均衡的目标就是从该cpu的runqueue拉取任务出来                                                                                                                                          |
+| struct sched_domain \*sd              | 要进行负载均衡的sched domain                                                                                                                                                                                   |
+| struct rq \*dst_rq<br><br>int dst_cpu | 本次均衡的目标CPU。均衡操作试图从该sched domain的busiest cpu的runqueue拉取任务到 dest CPU rq，从而完成本次sched domain的均衡动作。第一轮均衡的dst cpu和dst rq一般设置为发起均衡的cpu及其runqueue，后续如果需要，可以重新设定为local group中的其他cpu，具体可以参考后文的描述。                |
+| struct cpumask \*dst_grpmask          | Dst_cpu所在sched group的cpu mask，即本次均衡dest cpu所在的范围。                                                                                                                                                      |
+| struct rq \*src_rq<br><br>int src_cpu | 该sched domain中最繁忙的那个cpu及其runqueue，均衡的目标就是从该cpu的runqueue拉取任务出来                                                                                                                                          |
 | int new_dst_cpu                      | 一般而言，均衡的dst cpu是发起均衡的cpu，但是，如果因为affinity的原因，src上有任务无法迁移到dst cpu，从而不能完成均衡操作的时候，我们会选择一个新的（仍然在local group内）CPU作为dst cpu，发起第二轮均衡。                                                                          |
 | enum cpu_idle_type idle              | 在进行均衡的时候，dst_cpu的idle状态，这个状态会影响均衡的走向                                                                                                                                                                   |
 | long imbalance                       | 对这个成员的解释需要结合migration_type：<br><br>migrate_load---表示要迁移的负载量<br><br>migrate_util----表示要迁移的utility<br><br>migrate_task---表示要迁移的任务个数<br><br>migrate_misfit---设定为1                                         |
-| struct cpumask *cpus                 | Load_balance的过程中会有多轮的均衡操作，不同轮次的均衡会涉及不同的cpus，这个成员指明了本次均衡有哪些CPUs参与。                                                                                                                                      |
+| struct cpumask \*cpus                 | Load_balance的过程中会有多轮的均衡操作，不同轮次的均衡会涉及不同的cpus，这个成员指明了本次均衡有哪些CPUs参与。                                                                                                                                      |
 | unsigned int flags                   | 标记负载均衡的标志。LBF_NOHZ_STATS和LBF_NOHZ_AGAIN主要用于负载均衡过程中更新nohz状态使用。当选中的busiest cpu上的所有任务都因为affinity无法进行迁移，这时会设置LBF_ALL_PINNED，负载均衡会寻找次忙CPU进行下一轮的均衡。LBF_NEED_BREAK主要用来减少均衡过程中关中断时间的。其他的flag的含义可以参考下面对代码的具体解释。 |
 | unsigned int loop                    | 如果确定需要通过迁移任务来保持负载均衡，那么load_balance函数会通过循环遍历src rq上的cfs task链表来确定迁移的任务数量。Loop会跟踪循环的次数，其值不能大于Loop_max。                                                                                                   |
 | unsigned int loop_break              | 如果一次迁移任务数量比较多，那么每迁移sched_nr_migrate_break个任务就休息一下，让关中断的临界区小一点。                                                                                                                                         |
@@ -39,8 +43,8 @@
 |   |   |
 |---|---|
 |成员|描述|
-|struct sched_group *busiest|该sched domain中，最繁忙的那个sched group（非local group）|
-|struct sched_group *local|在该sched domain上进行均衡的时候，标记该sd中哪一个group是local group，即dest cpu所在的group|
+|struct sched_group \*busiest|该sched domain中，最繁忙的那个sched group（非local group）|
+|struct sched_group \*local|在该sched domain上进行均衡的时候，标记该sd中哪一个group是local group，即dest cpu所在的group|
 |unsigned long total_load|该sched domain中所有sched group的负载之和。如果没有特别说明，本文说的负载都是指cfs任务的负载。|
 |unsigned long total_capacity|该sched domain中所有sched group的CPU算力之和（可以用于cfs task的算力）|
 |unsigned long avg_load|该sched domain中sched groups的平均负载|
@@ -79,7 +83,7 @@
 | unsigned long max_capacity | 该sched group中最大的可用于cfs任务的capacity（对单个CPU而言）         |
 | unsigned long next_update  | 下一次更新算力的时间点                                         |
 | int imbalance              | 该group中是否有由于affinity原因产生的不均衡问题                      |
-| unsigned long cpumask[]    | Balance mask                                        |
+| unsigned long cpumask\[\]    | Balance mask                                        |
 
 # 三、load_balance函数整体逻辑
 
@@ -87,7 +91,7 @@
 
 |   |
 |---|
-|static int load_balance(int this_cpu, struct rq *this_rq,<br><br>struct sched_domain *sd, enum cpu_idle_type idle,<br><br>int *continue_balancing)---------------------A<br><br>{<br><br>    struct lb_env env = {---------------------------B<br><br>    .sd = sd,<br><br>    .dst_cpu = this_cpu,<br><br>    .dst_rq = this_rq,<br><br>    .dst_grpmask    = sched_group_span(sd->groups),<br><br>    .idle = idle,<br><br>    .loop_break = sched_nr_migrate_break,<br><br>    .cpus = cpus,<br><br>    .fbq_type = all,<br><br>    .tasks = LIST_HEAD_INIT(env.tasks),<br><br>};|
+|static int load_balance(int this_cpu, struct rq \*this_rq,<br><br>struct sched_domain \*sd, enum cpu_idle_type idle,<br><br>int \*continue_balancing)---------------------A<br><br>{<br><br>    struct lb_env env = {---------------------------B<br><br>    .sd = sd,<br><br>    .dst_cpu = this_cpu,<br><br>    .dst_rq = this_rq,<br><br>    .dst_grpmask    = sched_group_span(sd->groups),<br><br>    .idle = idle,<br><br>    .loop_break = sched_nr_migrate_break,<br><br>    .cpus = cpus,<br><br>    .fbq_type = all,<br><br>    .tasks = LIST_HEAD_INIT(env.tasks),<br><br>};|
 
 A、对load_balance函数的参数以及返回值解释如下：
 
@@ -107,7 +111,7 @@ B、初始化本次负载均衡的上下文信息。具体可以参考对struct 
 
 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| cpumask_and(cpus, sched_domain_span(sd), cpu_active_mask);-------A<br><br>redo:<br><br>if (!should_we_balance(&env)) {<br><br>    *continue_balancing = 0;<br><br>    goto out_balanced;-------------------B<br><br>}<br><br>group = find_busiest_group(&env);<br><br>if (!group) {<br><br>    goto out_balanced;------------------C<br><br>}<br><br>busiest = find_busiest_queue(&env, group);<br><br>if (!busiest) {<br><br>    goto out_balanced;-----------------D<br><br>} |
+| cpumask_and(cpus, sched_domain_span(sd), cpu_active_mask);-------A<br><br>redo:<br><br>if (!should_we_balance(&env)) {<br><br>    \*continue_balancing = 0;<br><br>    goto out_balanced;-------------------B<br><br>}<br><br>group = find_busiest_group(&env);<br><br>if (!group) {<br><br>    goto out_balanced;------------------C<br><br>}<br><br>busiest = find_busiest_queue(&env, group);<br><br>if (!busiest) {<br><br>    goto out_balanced;-----------------D<br><br>} |
 
 A、确定本轮负载均衡涉及的cpu，因为是第一轮均衡，所以所有的sched domain中的cpu都参与均衡（cpu_active_mask用来剔除无法参与均衡的CPU）。后续如果发现一些异常状况（例如由于affinity原因无法完成任务迁移），那么会清除选定的busiest cpu，跳转到redo进行全新一轮的均衡。
 
@@ -121,7 +125,7 @@ D、在最繁忙的sched group寻找最繁忙的CPU。具体逻辑后文会详�
 
 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| if (busiest->nr_running > 1) {-------------------A<br><br>    env.flags \|= LBF_ALL_PINNED;<br><br>    env.loop_max = min(sysctl_sched_nr_migrate, busiest->nr_running);-----B<br><br>more_balance:-----------------------C<br><br>    rq_lock_irqsave(busiest, &rf);<br><br>    update_rq_clock(busiest);<br><br>    cur_ld_moved = detach_tasks(&env);----------D<br><br>    rq_unlock(busiest, &rf);<br><br>    if (cur_ld_moved) {<br><br>        attach_tasks(&env);--------------------E<br><br>        ld_moved += cur_ld_moved;<br><br>    }<br><br>    local_irq_restore(rf.flags);<br><br>    if (env.flags & LBF_NEED_BREAK) {<br><br>        env.flags &= ~LBF_NEED_BREAK;<br><br>        goto more_balance;-------------------F<br><br>    }<br><br>.......<br><br>} |
+| if (busiest->nr_running > 1) {-------------------A<br><br>    env.flags |= LBF_ALL_PINNED;<br><br>    env.loop_max = min(sysctl_sched_nr_migrate, busiest->nr_running);-----B<br><br>more_balance:-----------------------C<br><br>    rq_lock_irqsave(busiest, &rf);<br><br>    update_rq_clock(busiest);<br><br>    cur_ld_moved = detach_tasks(&env);----------D<br><br>    rq_unlock(busiest, &rf);<br><br>    if (cur_ld_moved) {<br><br>        attach_tasks(&env);--------------------E<br><br>        ld_moved += cur_ld_moved;<br><br>    }<br><br>    local_irq_restore(rf.flags);<br><br>    if (env.flags & LBF_NEED_BREAK) {<br><br>        env.flags &= ~LBF_NEED_BREAK;<br><br>        goto more_balance;-------------------F<br><br>    }<br><br>.......<br><br>} |
 
 A、如果要从busiest cpu迁移任务到this cpu，那么至少要有可以拉取的任务。在拉取任务之前，我们先设定all pinned标志。当然后续如果发现不是all pinned的状况就会清除这个标志。
 
@@ -139,7 +143,7 @@ F、在任务迁移过程中，src cpu的中断是关闭的，为了降低这个
 
 |   |
 |---|
-|if ((env.flags & LBF_DST_PINNED) && env.imbalance > 0) {<br><br>    __cpumask_clear_cpu(env.dst_cpu, env.cpus);<br><br>    env.dst_rq  = cpu_rq(env.new_dst_cpu);<br><br>    env.dst_cpu  = env.new_dst_cpu;<br><br>    env.flags &= ~LBF_DST_PINNED;<br><br>    env.loop  = 0;<br><br>    env.loop_break  = sched_nr_migrate_break;<br><br>    goto more_balance;-----------------------A<br><br>}<br><br>if (sd_parent) {----------------------B<br><br>    int *group_imbalance = &sd_parent->groups->sgc->imbalance;<br><br>    if ((env.flags & LBF_SOME_PINNED) && env.imbalance > 0)<br><br>        *group_imbalance = 1;<br><br>}<br><br>if (unlikely(env.flags & LBF_ALL_PINNED)) {<br><br>    __cpumask_clear_cpu(cpu_of(busiest), cpus);<br><br>    if (!cpumask_subset(cpus, env.dst_grpmask)) {<br><br>        env.loop = 0;<br><br>        env.loop_break = sched_nr_migrate_break;<br><br>        goto redo;-------------C<br><br>    }<br><br>    goto out_all_pinned;<br><br>}|
+|if ((env.flags & LBF_DST_PINNED) && env.imbalance > 0) {<br><br>    \_\_cpumask_clear_cpu(env.dst_cpu, env.cpus);<br><br>    env.dst_rq  = cpu_rq(env.new_dst_cpu);<br><br>    env.dst_cpu  = env.new_dst_cpu;<br><br>    env.flags &= ~LBF_DST_PINNED;<br><br>    env.loop  = 0;<br><br>    env.loop_break  = sched_nr_migrate_break;<br><br>    goto more_balance;-----------------------A<br><br>}<br><br>if (sd_parent) {----------------------B<br><br>    int \*group_imbalance = &sd_parent->groups->sgc->imbalance;<br><br>    if ((env.flags & LBF_SOME_PINNED) && env.imbalance > 0)<br><br>        \*group_imbalance = 1;<br><br>}<br><br>if (unlikely(env.flags & LBF_ALL_PINNED)) {<br><br>    \_\_cpumask_clear_cpu(cpu_of(busiest), cpus);<br><br>    if (!cpumask_subset(cpus, env.dst_grpmask)) {<br><br>        env.loop = 0;<br><br>        env.loop_break = sched_nr_migrate_break;<br><br>        goto redo;-------------C<br><br>    }<br><br>    goto out_all_pinned;<br><br>}|
 
 A、如果sched domain仍然未达均衡均衡状态，并且在之前的均衡过程中，有因为affinity的原因导致任务无法迁移到dest cpu，这时候要继续在src rq上搜索任务，迁移到备选的dest cpu，因此，这里再次发起均衡操作。这里的均衡上下文的dest cpu设定为备选的cpu，loop也被清零，重新开始扫描。
 
@@ -151,7 +155,7 @@ C、如果选中的busiest cpu上的任务全部都是通过affinity锁定在了
 
 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| if (!ld_moved) {<br><br>    if (idle != CPU_NEWLY_IDLE)<br><br>        sd->nr_balance_failed++;-----------------------A<br><br>    if (need_active_balance(&env)) {-------------------B<br><br>        unsigned long flags;<br><br>        raw_spin_lock_irqsave(&busiest->lock, flags);<br><br>        if (!cpumask_test_cpu(this_cpu, busiest->curr->cpus_ptr)) {<br><br>            raw_spin_unlock_irqrestore(&busiest->lock,    flags);<br><br>            env.flags \|= LBF_ALL_PINNED;<br><br>            goto out_one_pinned;------------------C<br><br>        }<br><br>        if (!busiest->active_balance) {--------------D<br><br>            busiest->active_balance = 1;<br><br>            busiest->push_cpu = this_cpu;<br><br>            active_balance = 1;<br><br>        }<br><br>        raw_spin_unlock_irqrestore(&busiest->lock, flags);<br><br>        if (active_balance) {--------------------E<br><br>            stop_one_cpu_nowait(cpu_of(busiest),<br><br>                        active_load_balance_cpu_stop, busiest,<br><br>                        &busiest->active_balance_work);<br><br>        }<br><br>        sd->nr_balance_failed = sd->cache_nice_tries+1;<br><br>    }<br><br>} else<br><br>sd->nr_balance_failed = 0;-----------F |
+| if (!ld_moved) {<br><br>    if (idle != CPU_NEWLY_IDLE)<br><br>        sd->nr_balance_failed++;-----------------------A<br><br>    if (need_active_balance(&env)) {-------------------B<br><br>        unsigned long flags;<br><br>        raw_spin_lock_irqsave(&busiest->lock, flags);<br><br>        if (!cpumask_test_cpu(this_cpu, busiest->curr->cpus_ptr)) {<br><br>            raw_spin_unlock_irqrestore(&busiest->lock,    flags);<br><br>            env.flags |= LBF_ALL_PINNED;<br><br>            goto out_one_pinned;------------------C<br><br>        }<br><br>        if (!busiest->active_balance) {--------------D<br><br>            busiest->active_balance = 1;<br><br>            busiest->push_cpu = this_cpu;<br><br>            active_balance = 1;<br><br>        }<br><br>        raw_spin_unlock_irqrestore(&busiest->lock, flags);<br><br>        if (active_balance) {--------------------E<br><br>            stop_one_cpu_nowait(cpu_of(busiest),<br><br>                        active_load_balance_cpu_stop, busiest,<br><br>                        &busiest->active_balance_work);<br><br>        }<br><br>        sd->nr_balance_failed = sd->cache_nice_tries+1;<br><br>    }<br><br>} else<br><br>sd->nr_balance_failed = 0;-----------F |
 
 A、经过上面的一系列操作，没有完成任何任务的迁移，那么就需要累计sched domain的均衡失败次数。这个失败次数会导致后续进行更激进的均衡，例如迁移cache hot的任务、启动active balance。此外，这里过滤掉了new idle balance的失败，仅统计周期性均衡失败的次数，这是因为系统中new idle balance次数太多，累计其失败次数会导致nr_balance_failed过大，容易触发后续激进的均衡。
 
@@ -173,7 +177,7 @@ Load_balance最后一段的程序逻辑主要是进行一些清理工作和设�
 
 |   |
 |---|
-|update_sd_lb_stats(env, &sds);--------------A<br><br>if (sched_energy_enabled()) {<br><br>    struct root_domain *rd = env->dst_rq->rd;<br><br>    if (rcu_dereference(rd->pd) && !READ_ONCE(rd->overutilized))<br><br>        goto out_balanced;-----------------B<br><br>}|
+|update_sd_lb_stats(env, &sds);--------------A<br><br>if (sched_energy_enabled()) {<br><br>    struct root_domain \*rd = env->dst_rq->rd;<br><br>    if (rcu_dereference(rd->pd) && !READ_ONCE(rd->overutilized))<br><br>        goto out_balanced;-----------------B<br><br>}|
 
 A、负载信息都是不断的在变化，在寻找最繁忙group的时候，我们首先要更新sched domain负载均衡信息，以便可以根据最新的负载情况来搜寻。update_sd_lb_stats会更新该sched domain上各个sched group的负载和算力，得到local group以及非local group最忙的那个group的均衡信息，以便后续给出最适合的均衡决策。具体的逻辑后面的章节会详述
 
@@ -197,7 +201,7 @@ D、如果local group比busiest group还要忙，那么不需要进行均衡（�
 
 |   |
 |---|
-|if (local->group_type == group_overloaded) {---------A<br><br>    if (local->avg_load >= busiest->avg_load)<br><br>        goto out_balanced;----------------------------B<br><br>    if (local->avg_load >= sds.avg_load)<br><br>        goto out_balanced;-----------------------------C<br><br>    if (100 * busiest->avg_load <= env->sd->imbalance_pct * local->avg_load)<br><br>        goto out_balanced;----------------------------D<br><br>}|
+|if (local->group_type == group_overloaded) {---------A<br><br>    if (local->avg_load >= busiest->avg_load)<br><br>        goto out_balanced;----------------------------B<br><br>    if (local->avg_load >= sds.avg_load)<br><br>        goto out_balanced;-----------------------------C<br><br>    if (100 * busiest->avg_load \<= env->sd->imbalance_pct * local->avg_load)<br><br>        goto out_balanced;----------------------------D<br><br>}|
 
 A、如果local group和busiest group都比较繁忙（group_overloaded），那么需要通过avg_load的比拼来做均衡决策
 
@@ -211,7 +215,7 @@ D、虽然busiest group的平均负载高于local group，但是高的不多，�
 
 |   |
 |---|
-|if (busiest->group_type != group_overloaded) {-----------A<br><br>    if (env->idle == CPU_NOT_IDLE)<br><br>        goto out_balanced;-------------------------B<br><br>    if (busiest->group_weight > 1 &&<br><br>        local->idle_cpus <= (busiest->idle_cpus + 1))<br><br>        goto out_balanced;-------------------------C<br><br>    if (busiest->sum_h_nr_running == 1)<br><br>        goto out_balanced;-------------------------D<br><br>}<br><br>force_balance:<br><br>calculate_imbalance(env, &sds);---------------------E<br><br>return env->imbalance ? sds.busiest : NULL;|
+|if (busiest->group_type != group_overloaded) {-----------A<br><br>    if (env->idle == CPU_NOT_IDLE)<br><br>        goto out_balanced;-------------------------B<br><br>    if (busiest->group_weight > 1 &&<br><br>        local->idle_cpus \<= (busiest->idle_cpus + 1))<br><br>        goto out_balanced;-------------------------C<br><br>    if (busiest->sum_h_nr_running == 1)<br><br>        goto out_balanced;-------------------------D<br><br>}<br><br>force_balance:<br><br>calculate_imbalance(env, &sds);---------------------E<br><br>return env->imbalance ? sds.busiest : NULL;|
 
 A、这里处理busiest group没有overload的场景，这时候说明该sched domain中其他的group的算力都是cover当前的任务负载，是否要进行均衡，主要看idle cpu的情况。
 
@@ -248,7 +252,7 @@ Sched domain的负载统计更新主要在update_sd_lb_stats函数中，其逻�
 
 |   |
 |---|
-|do {<br><br>    local_group = cpumask_test_cpu(env->dst_cpu, sched_group_span(sg));<br><br>    if (local_group) {---------------------A<br><br>        sds->local = sg;<br><br>        sgs = local;<br><br>        if (env->idle != CPU_NEWLY_IDLE \|<br><br>            time_after_eq(jiffies, sg->sgc->next_update))<br><br>             update_group_capacity(env->sd, env->dst_cpu);<br><br>    }<br><br>    update_sg_lb_stats(env, sg, sgs, &sg_status);------------B<br><br>    if (local_group)-----------------C<br><br>        goto next_group;<br><br>    if (update_sd_pick_busiest(env, sds, sg, sgs)) {-----------D<br><br>        sds->busiest = sg;<br><br>        sds->busiest_stat = *sgs;<br><br>    }<br><br>next_group:<br><br>    sds->total_load += sgs->group_load;--------------E<br><br>    sds->total_capacity += sgs->group_capacity;<br><br>    sg = sg->next;<br><br>} while (sg != env->sd->groups);<br><br>if (!env->sd->parent) {----------------------F<br><br>    struct root_domain *rd = env->dst_rq->rd;<br><br>    WRITE_ONCE(rd->overload, sg_status & SG_OVERLOAD);<br><br>    WRITE_ONCE(rd->overutilized, sg_status & SG_OVERUTILIZED);<br><br>} else if (sg_status & SG_OVERUTILIZED) {<br><br>    struct root_domain *rd = env->dst_rq->rd;<br><br>    WRITE_ONCE(rd->overutilized, SG_OVERUTILIZED);<br><br>}|
+|do {<br><br>    local_group = cpumask_test_cpu(env->dst_cpu, sched_group_span(sg));<br><br>    if (local_group) {---------------------A<br><br>        sds->local = sg;<br><br>        sgs = local;<br><br>        if (env->idle != CPU_NEWLY_IDLE |<br><br>            time_after_eq(jiffies, sg->sgc->next_update))<br><br>             update_group_capacity(env->sd, env->dst_cpu);<br><br>    }<br><br>    update_sg_lb_stats(env, sg, sgs, &sg_status);------------B<br><br>    if (local_group)-----------------C<br><br>        goto next_group;<br><br>    if (update_sd_pick_busiest(env, sds, sg, sgs)) {-----------D<br><br>        sds->busiest = sg;<br><br>        sds->busiest_stat = \*sgs;<br><br>    }<br><br>next_group:<br><br>    sds->total_load += sgs->group_load;--------------E<br><br>    sds->total_capacity += sgs->group_capacity;<br><br>    sg = sg->next;<br><br>} while (sg != env->sd->groups);<br><br>if (!env->sd->parent) {----------------------F<br><br>    struct root_domain \*rd = env->dst_rq->rd;<br><br>    WRITE_ONCE(rd->overload, sg_status & SG_OVERLOAD);<br><br>    WRITE_ONCE(rd->overutilized, sg_status & SG_OVERUTILIZED);<br><br>} else if (sg_status & SG_OVERUTILIZED) {<br><br>    struct root_domain \*rd = env->dst_rq->rd;<br><br>    WRITE_ONCE(rd->overutilized, SG_OVERUTILIZED);<br><br>}|
 
 这一段主要是遍历该sched domain的所有group，对其负载统计进行更新。更新完负载之后，我们选定两个sched group：其一是local group，另外一个是最繁忙的non local group。具体逻辑过程解释如下：
 
@@ -272,7 +276,7 @@ F、更新root domain的overload和overutil状态。对于顶层的sched domain�
 
 |   |
 |---|
-|for_each_cpu_and(i, sched_group_span(group), env->cpus) {<br><br>    struct rq *rq = cpu_rq(i);<br><br>    sgs->group_load += cpu_load(rq);<br><br>    sgs->group_util += cpu_util(i);<br><br>    sgs->group_runnable += cpu_runnable(rq);<br><br>    sgs->sum_h_nr_running += rq->cfs.h_nr_running;<br><br>    nr_running = rq->nr_running;<br><br>    sgs->sum_nr_running += nr_running;-------------------A<br><br>    if (nr_running > 1)<br><br>        *sg_status \|= SG_OVERLOAD;------------------B<br><br>    if (cpu_overutilized(i))<br><br>        *sg_status \|= SG_OVERUTILIZED;-------------C<br><br>     if (!nr_running && idle_cpu(i)) {-----------------D<br><br>        sgs->idle_cpus++;<br><br>        continue;<br><br>    }<br><br>    if (local_group)------------E<br><br>        continue;<br><br>    if (env->sd->flags & SD_ASYM_CPUCAPACITY &&<br><br>        sgs->group_misfit_task_load < rq->misfit_task_load) {<br><br>        sgs->group_misfit_task_load = rq->misfit_task_load;<br><br>        *sg_status \|= SG_OVERLOAD;<br><br>    }<br><br>}|
+|for_each_cpu_and(i, sched_group_span(group), env->cpus) {<br><br>    struct rq \*rq = cpu_rq(i);<br><br>    sgs->group_load += cpu_load(rq);<br><br>    sgs->group_util += cpu_util(i);<br><br>    sgs->group_runnable += cpu_runnable(rq);<br><br>    sgs->sum_h_nr_running += rq->cfs.h_nr_running;<br><br>    nr_running = rq->nr_running;<br><br>    sgs->sum_nr_running += nr_running;-------------------A<br><br>    if (nr_running > 1)<br><br>        \*sg_status |= SG_OVERLOAD;------------------B<br><br>    if (cpu_overutilized(i))<br><br>        \*sg_status |= SG_OVERUTILIZED;-------------C<br><br>     if (!nr_running && idle_cpu(i)) {-----------------D<br><br>        sgs->idle_cpus++;<br><br>        continue;<br><br>    }<br><br>    if (local_group)------------E<br><br>        continue;<br><br>    if (env->sd->flags & SD_ASYM_CPUCAPACITY &&<br><br>        sgs->group_misfit_task_load \< rq->misfit_task_load) {<br><br>        sgs->group_misfit_task_load = rq->misfit_task_load;<br><br>        \*sg_status |= SG_OVERLOAD;<br><br>    }<br><br>}|
 
 A、sched group负载有三种，load、runnable load和util，把所有cpu上load、runnable load和util累计起来就是sched group的负载。除了PELT跟踪的load avg信息，我们还统计了sched group中的cfs任务和总任务数量。
 
@@ -362,7 +366,7 @@ B、如果group中有多个CPU，那么我们的目标就是让local group和bus
 
 |   |
 |---|
-|if (local->group_type < group_overloaded) {<br><br>    local->avg_load = (local->group_load * SCHED_CAPACITY_SCALE) /<br><br>        local->group_capacity;<br><br>    sds->avg_load = (sds->total_load * SCHED_CAPACITY_SCALE) /<br><br>        sds->total_capacity;<br><br>    if (local->avg_load >= busiest->avg_load) {<br><br>        env->imbalance = 0;<br><br>        return;<br><br>    }<br><br>}|
+|if (local->group_type \< group_overloaded) {<br><br>    local->avg_load = (local->group_load * SCHED_CAPACITY_SCALE) /<br><br>        local->group_capacity;<br><br>    sds->avg_load = (sds->total_load * SCHED_CAPACITY_SCALE) /<br><br>        sds->total_capacity;<br><br>    if (local->avg_load >= busiest->avg_load) {<br><br>        env->imbalance = 0;<br><br>        return;<br><br>    }<br><br>}|
 
 如果local group没有空闲算力，但是也没有overloaded，可以从busiest group迁移一些负载过来，但是这也许会导致local group进入overloaded状态。因此这里使用了avg_load来进一步确认是否进行负载迁移。具体的判断方法是local group的平均负载是否大于sched domain的平均负载。如果local group和busiest group都overloaded并且走入calculate imbalance，那么早就确认了busiest group的平均负载大于local group的平均负载。当local group或者busiest group都进入（或者即将进入）overloaded状态，这时候采用迁移负载的方式进行均衡，具体代码如下：
 
@@ -392,7 +396,7 @@ find_busiest_queue函数用来寻找busiest group中最繁忙的cpu。代码逻�
 
 |   |
 |---|
-|while (!list_empty(tasks)) {----------A<br><br>    if (env->idle != CPU_NOT_IDLE && env->src_rq->nr_running <= 1)<br><br>        break;-----------------B<br><br>    p = list_last_entry(tasks, struct task_struct, se.group_node);------C<br><br>    env->loop++;<br><br>    if (env->loop > env->loop_max)<br><br>        break;--------------------------D<br><br>    if (env->loop > env->loop_break) {<br><br>        env->loop_break += sched_nr_migrate_break;<br><br>        env->flags \|= LBF_NEED_BREAK;<br><br>        break;------------------------E<br><br>    }<br><br>    if (!can_migrate_task(p, env))-----------F<br><br>        goto next;<br><br>......<br><br>next:<br><br>    list_move(&p->se.group_node, tasks);<br><br>}|
+|while (!list_empty(tasks)) {----------A<br><br>    if (env->idle != CPU_NOT_IDLE && env->src_rq->nr_running \<= 1)<br><br>        break;-----------------B<br><br>    p = list_last_entry(tasks, struct task_struct, se.group_node);------C<br><br>    env->loop++;<br><br>    if (env->loop > env->loop_max)<br><br>        break;--------------------------D<br><br>    if (env->loop > env->loop_break) {<br><br>        env->loop_break += sched_nr_migrate_break;<br><br>        env->flags |= LBF_NEED_BREAK;<br><br>        break;------------------------E<br><br>    }<br><br>    if (!can_migrate_task(p, env))-----------F<br><br>        goto next;<br><br>......<br><br>next:<br><br>    list_move(&p->se.group_node, tasks);<br><br>}|
 
 A、src rq的cfs_tasks链表就是该队列上的全部cfs任务，detach_tasks函数的主要逻辑就是遍历这个cfs_tasks链表，找到最适合迁移到目标cpu rq的任务，并挂入lb_env->tasks链表
 
@@ -410,7 +414,7 @@ F、如果该任务不适合迁移，那么将其移到cfs_tasks链表头部。
 
 |   |
 |---|
-|switch (env->migration_type) {<br><br>case migrate_load:<br><br>    load = max_t(unsigned long, task_h_load(p), 1);-------A<br><br>    if (sched_feat(LB_MIN) &&<br><br>        load < 16 && !env->sd->nr_balance_failed)<br><br>        goto next;-------------------B<br><br>    if (shr_bound(load, env->sd->nr_balance_failed) > env->imbalance)<br><br>        goto next;<br><br>    env->imbalance -= load;-----------------------------C<br><br>    break;<br><br>case migrate_util:<br><br>    util = task_util_est(p);<br><br>    if (util > env->imbalance)<br><br>        goto next;<br><br>    env->imbalance -= util;------------------D<br><br>    break;<br><br>case migrate_task:<br><br>    env->imbalance--;------------E<br><br>    break;<br><br>case migrate_misfit:<br><br>    if (task_fits_capacity(p, capacity_of(env->src_cpu)))<br><br>        goto next;<br><br>    env->imbalance = 0;----------F<br><br>    break;<br><br>}|
+|switch (env->migration_type) {<br><br>case migrate_load:<br><br>    load = max_t(unsigned long, task_h_load(p), 1);-------A<br><br>    if (sched_feat(LB_MIN) &&<br><br>        load \< 16 && !env->sd->nr_balance_failed)<br><br>        goto next;-------------------B<br><br>    if (shr_bound(load, env->sd->nr_balance_failed) > env->imbalance)<br><br>        goto next;<br><br>    env->imbalance -= load;-----------------------------C<br><br>    break;<br><br>case migrate_util:<br><br>    util = task_util_est(p);<br><br>    if (util > env->imbalance)<br><br>        goto next;<br><br>    env->imbalance -= util;------------------D<br><br>    break;<br><br>case migrate_task:<br><br>    env->imbalance--;------------E<br><br>    break;<br><br>case migrate_misfit:<br><br>    if (task_fits_capacity(p, capacity_of(env->src_cpu)))<br><br>        goto next;<br><br>    env->imbalance = 0;----------F<br><br>    break;<br><br>}|
 
 A、计算该任务的负载。这里设定任务的最小负载是1。
 
@@ -428,7 +432,7 @@ detach_tasks函数最后一段的代码逻辑如下：
 
 |   |
 |---|
-|detach_task(p, env);---------------------------------A<br><br>list_add(&p->se.group_node, &env->tasks);<br><br>detached++;<br><br>#ifdef CONFIG_PREEMPTION<br><br>if (env->idle == CPU_NEWLY_IDLE)-----B<br><br>    break;<br><br>#endif<br><br>if (env->imbalance <= 0)----------C<br><br>    break;<br><br>continue;|
+|detach_task(p, env);---------------------------------A<br><br>list_add(&p->se.group_node, &env->tasks);<br><br>detached++;<br><br>#ifdef CONFIG_PREEMPTION<br><br>if (env->idle == CPU_NEWLY_IDLE)-----B<br><br>    break;<br><br>#endif<br><br>if (env->imbalance \<= 0)----------C<br><br>    break;<br><br>continue;|
 
 A、程序执行至此，说明任务P需要被迁移（不能迁移的都跳转到next符号了），因此需要从src rq上摘下，挂入env->tasks链表
 
@@ -444,7 +448,7 @@ can_migrate_task函数用来判断一个任务是否可以迁移至目标CPU，�
 
 |   |
 |---|
-|if (throttled_lb_pair(task_group(p), env->src_cpu, env->dst_cpu))<br><br>    return 0;----------------------------A<br><br>if ((p->flags & PF_KTHREAD) && kthread_is_per_cpu(p))<br><br>    return 0;----------------------------B<br><br>if (!cpumask_test_cpu(env->dst_cpu, p->cpus_ptr)) {<br><br>    int cpu;<br><br>    env->flags \|= LBF_SOME_PINNED;------C<br><br>    if (env->idle == CPU_NEWLY_IDLE \| (env->flags & LBF_DST_PINNED))<br><br>        return 0;-----------------D<br><br>    for_each_cpu_and(cpu, env->dst_grpmask, env->cpus) {<br><br>        if (cpumask_test_cpu(cpu, p->cpus_ptr)) {<br><br>            env->flags \|= LBF_DST_PINNED;<br><br>            env->new_dst_cpu = cpu;<br><br>            break;------------------E<br><br>        }<br><br>    }<br><br>    return 0;<br><br>}|
+|if (throttled_lb_pair(task_group(p), env->src_cpu, env->dst_cpu))<br><br>    return 0;----------------------------A<br><br>if ((p->flags & PF_KTHREAD) && kthread_is_per_cpu(p))<br><br>    return 0;----------------------------B<br><br>if (!cpumask_test_cpu(env->dst_cpu, p->cpus_ptr)) {<br><br>    int cpu;<br><br>    env->flags |= LBF_SOME_PINNED;------C<br><br>    if (env->idle == CPU_NEWLY_IDLE | (env->flags & LBF_DST_PINNED))<br><br>        return 0;-----------------D<br><br>    for_each_cpu_and(cpu, env->dst_grpmask, env->cpus) {<br><br>        if (cpumask_test_cpu(cpu, p->cpus_ptr)) {<br><br>            env->flags |= LBF_DST_PINNED;<br><br>            env->new_dst_cpu = cpu;<br><br>            break;------------------E<br><br>        }<br><br>    }<br><br>    return 0;<br><br>}|
 
 A、如果任务p所在的task group在src或者dest cpu上被限流了，那么不能迁移该任务，否者限流的逻辑会有问题
 
@@ -460,7 +464,7 @@ can_migrate_task函数第二段代码逻辑如下：
 
 |   |
 |---|
-|env->flags &= ~LBF_ALL_PINNED;--------A<br><br>if (task_running(env->src_rq, p))<br><br>    return 0;---------------------------------B<br><br>tsk_cache_hot = task_hot(p, env);-------C<br><br>if (tsk_cache_hot <= 0 \|<br><br>    env->sd->nr_balance_failed > env->sd->cache_nice_tries) {<br><br>    return 1;-------------------------------D<br><br>}|
+|env->flags &= ~LBF_ALL_PINNED;--------A<br><br>if (task_running(env->src_rq, p))<br><br>    return 0;---------------------------------B<br><br>tsk_cache_hot = task_hot(p, env);-------C<br><br>if (tsk_cache_hot \<= 0 |<br><br>    env->sd->nr_balance_failed > env->sd->cache_nice_tries) {<br><br>    return 1;-------------------------------D<br><br>}|
 
 A、至少有一个任务是可以运行在dest cpu上（从affinity角度），因此清除all pinned标记
 
@@ -474,7 +478,7 @@ D、一般而言，我们只迁移cache cold的任务。但是如果进行了太
 
 1、内核源代码
 
-2、linux-5.10.61\Documentation\scheduler\*
+2、linux-5.10.61\\Documentation\\scheduler\*
 
 本文首发在“内核工匠”微信公众号，欢迎扫描以下二维码关注公众号获取最新Linux技术分享：
 
@@ -488,163 +492,166 @@ D、一般而言，我们只迁移cache cold的任务。但是如果进行了太
 
 **评论：**
 
-**Ren Zhijie**  
+**Ren Zhijie**\
 2022-11-17 15:27
 
-E、将detach_tasks函数摘下的任务挂入到src rq上去。由于detach_tasks、attach_tasks会进行多轮，ld_moved记录了总共迁移的任务数量，cur_ld_moved是本轮迁移的任务数  
-  
+E、将detach_tasks函数摘下的任务挂入到src rq上去。由于detach_tasks、attach_tasks会进行多轮，ld_moved记录了总共迁移的任务数量，cur_ld_moved是本轮迁移的任务数
+
 将detach_tasks函数摘下的任务挂入到*dst_rq*上去。
 
 [回复](http://www.wowotech.net/process_management/load_balance_function.html#comment-8700)
 
 **发表评论：**
 
- 昵称
+昵称
 
- 邮件地址 (选填)
+邮件地址 (选填)
 
- 个人主页 (选填)
+个人主页 (选填)
 
-![](http://www.wowotech.net/include/lib/checkcode.php) 
+![](http://www.wowotech.net/include/lib/checkcode.php)
 
 - ### 站内搜索
-    
-       
-     蜗窝站内  互联网
-    
+
+  蜗窝站内  互联网
+
 - ### 功能
-    
-    [留言板  
-    ](http://www.wowotech.net/message_board.html)[评论列表  
-    ](http://www.wowotech.net/?plugin=commentlist)[支持者列表  
-    ](http://www.wowotech.net/support_list)
+
+  [留言板\
+  ](http://www.wowotech.net/message_board.html)[评论列表\
+  ](http://www.wowotech.net/?plugin=commentlist)[支持者列表\
+  ](http://www.wowotech.net/support_list)
+
 - ### 最新评论
-    
-    - ja  
-        [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
-    - 元神高手  
-        [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
-    - 十七  
-        [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
-    - lw  
-        [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
-    - 肥饶  
-        [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
-    - orange  
-        [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
+  - ja\
+    [@dream：我看完這段也有相同的想法，引用 @dream ...](http://www.wowotech.net/kernel_synchronization/spinlock.html#8922)
+  - 元神高手\
+    [围观首席power managerment专家](http://www.wowotech.net/pm_subsystem/device_driver_pm.html#8921)
+  - 十七\
+    [内核空间的映射在系统启动时就已经设定好，并且在所有进程的页表...](http://www.wowotech.net/process_management/context-switch-arch.html#8920)
+  - lw\
+    [sparse模型和disconti模型没看出来有什么本质区别...](http://www.wowotech.net/memory_management/memory_model.html#8919)
+  - 肥饶\
+    [一个没设置好就出错](http://www.wowotech.net/linux_kenrel/516.html#8918)
+  - orange\
+    [点赞点赞，对linuxer的文章总结到位](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html#8917)
+
 - ### 文章分类
-    
-    - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
-        - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
-        - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
-        - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
-        - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
-        - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
-        - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
-        - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
-        - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
-        - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
-        - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
-        - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
-        - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
-    - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
-    - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
-    - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
-    - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
-        - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
-        - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
-        - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
-        - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
-    - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
-    - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
-    - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
-        - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
+  - [Linux内核分析(25)](http://www.wowotech.net/sort/linux_kenrel) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=4)
+    - [统一设备模型(15)](http://www.wowotech.net/sort/device_model) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=12)
+    - [电源管理子系统(43)](http://www.wowotech.net/sort/pm_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=13)
+    - [中断子系统(15)](http://www.wowotech.net/sort/irq_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=14)
+    - [进程管理(31)](http://www.wowotech.net/sort/process_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=15)
+    - [内核同步机制(26)](http://www.wowotech.net/sort/kernel_synchronization) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=16)
+    - [GPIO子系统(5)](http://www.wowotech.net/sort/gpio_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=17)
+    - [时间子系统(14)](http://www.wowotech.net/sort/timer_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=18)
+    - [通信类协议(7)](http://www.wowotech.net/sort/comm) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=20)
+    - [内存管理(31)](http://www.wowotech.net/sort/memory_management) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=21)
+    - [图形子系统(2)](http://www.wowotech.net/sort/graphic_subsystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=23)
+    - [文件系统(5)](http://www.wowotech.net/sort/filesystem) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=26)
+    - [TTY子系统(6)](http://www.wowotech.net/sort/tty_framework) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=27)
+  - [u-boot分析(3)](http://www.wowotech.net/sort/u-boot) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=25)
+  - [Linux应用技巧(13)](http://www.wowotech.net/sort/linux_application) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=3)
+  - [软件开发(6)](http://www.wowotech.net/sort/soft) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=1)
+  - [基础技术(13)](http://www.wowotech.net/sort/basic_tech) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=6)
+    - [蓝牙(16)](http://www.wowotech.net/sort/bluetooth) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=10)
+    - [ARMv8A Arch(15)](http://www.wowotech.net/sort/armv8a_arch) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=19)
+    - [显示(3)](http://www.wowotech.net/sort/display) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=22)
+    - [USB(1)](http://www.wowotech.net/sort/usb) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=28)
+  - [基础学科(10)](http://www.wowotech.net/sort/basic_subject) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=7)
+  - [技术漫谈(12)](http://www.wowotech.net/sort/tech_discuss) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=8)
+  - [项目专区(0)](http://www.wowotech.net/sort/project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=9)
+    - [X Project(28)](http://www.wowotech.net/sort/x_project) [![订阅该分类](http://www.wowotech.net/content/templates/default/images/rss.png)](http://www.wowotech.net/rss.php?sort=24)
+
 - ### 随机文章
-    
-    - [内存初始化代码分析（二）：内存布局](http://www.wowotech.net/memory_management/memory-layout.html)
-    - [Linux PM QoS framework(3)_per-device PM QoS](http://www.wowotech.net/pm_subsystem/per_device_pm_qos.html)
-    - [process credentials](http://www.wowotech.net/process_management/19.html)
-    - [X-023-KERNEL-Linux pinctrl driver的移植](http://www.wowotech.net/x_project/kernel_pinctrl_driver_porting.html)
-    - [Windows系统结合MinGW搭建软件开发环境](http://www.wowotech.net/soft/6.html)
+
+  - [内存初始化代码分析（二）：内存布局](http://www.wowotech.net/memory_management/memory-layout.html)
+  - [Linux PM QoS framework(3)\_per-device PM QoS](http://www.wowotech.net/pm_subsystem/per_device_pm_qos.html)
+  - [process credentials](http://www.wowotech.net/process_management/19.html)
+  - [X-023-KERNEL-Linux pinctrl driver的移植](http://www.wowotech.net/x_project/kernel_pinctrl_driver_porting.html)
+  - [Windows系统结合MinGW搭建软件开发环境](http://www.wowotech.net/soft/6.html)
+
 - ### 文章存档
-    
-    - [2024年2月(1)](http://www.wowotech.net/record/202402)
-    - [2023年5月(1)](http://www.wowotech.net/record/202305)
-    - [2022年10月(1)](http://www.wowotech.net/record/202210)
-    - [2022年8月(1)](http://www.wowotech.net/record/202208)
-    - [2022年6月(1)](http://www.wowotech.net/record/202206)
-    - [2022年5月(1)](http://www.wowotech.net/record/202205)
-    - [2022年4月(2)](http://www.wowotech.net/record/202204)
-    - [2022年2月(2)](http://www.wowotech.net/record/202202)
-    - [2021年12月(1)](http://www.wowotech.net/record/202112)
-    - [2021年11月(5)](http://www.wowotech.net/record/202111)
-    - [2021年7月(1)](http://www.wowotech.net/record/202107)
-    - [2021年6月(1)](http://www.wowotech.net/record/202106)
-    - [2021年5月(3)](http://www.wowotech.net/record/202105)
-    - [2020年3月(3)](http://www.wowotech.net/record/202003)
-    - [2020年2月(2)](http://www.wowotech.net/record/202002)
-    - [2020年1月(3)](http://www.wowotech.net/record/202001)
-    - [2019年12月(3)](http://www.wowotech.net/record/201912)
-    - [2019年5月(4)](http://www.wowotech.net/record/201905)
-    - [2019年3月(1)](http://www.wowotech.net/record/201903)
-    - [2019年1月(3)](http://www.wowotech.net/record/201901)
-    - [2018年12月(2)](http://www.wowotech.net/record/201812)
-    - [2018年11月(1)](http://www.wowotech.net/record/201811)
-    - [2018年10月(2)](http://www.wowotech.net/record/201810)
-    - [2018年8月(1)](http://www.wowotech.net/record/201808)
-    - [2018年6月(1)](http://www.wowotech.net/record/201806)
-    - [2018年5月(1)](http://www.wowotech.net/record/201805)
-    - [2018年4月(7)](http://www.wowotech.net/record/201804)
-    - [2018年2月(4)](http://www.wowotech.net/record/201802)
-    - [2018年1月(5)](http://www.wowotech.net/record/201801)
-    - [2017年12月(2)](http://www.wowotech.net/record/201712)
-    - [2017年11月(2)](http://www.wowotech.net/record/201711)
-    - [2017年10月(1)](http://www.wowotech.net/record/201710)
-    - [2017年9月(5)](http://www.wowotech.net/record/201709)
-    - [2017年8月(4)](http://www.wowotech.net/record/201708)
-    - [2017年7月(4)](http://www.wowotech.net/record/201707)
-    - [2017年6月(3)](http://www.wowotech.net/record/201706)
-    - [2017年5月(3)](http://www.wowotech.net/record/201705)
-    - [2017年4月(1)](http://www.wowotech.net/record/201704)
-    - [2017年3月(8)](http://www.wowotech.net/record/201703)
-    - [2017年2月(6)](http://www.wowotech.net/record/201702)
-    - [2017年1月(5)](http://www.wowotech.net/record/201701)
-    - [2016年12月(6)](http://www.wowotech.net/record/201612)
-    - [2016年11月(11)](http://www.wowotech.net/record/201611)
-    - [2016年10月(9)](http://www.wowotech.net/record/201610)
-    - [2016年9月(6)](http://www.wowotech.net/record/201609)
-    - [2016年8月(9)](http://www.wowotech.net/record/201608)
-    - [2016年7月(5)](http://www.wowotech.net/record/201607)
-    - [2016年6月(8)](http://www.wowotech.net/record/201606)
-    - [2016年5月(8)](http://www.wowotech.net/record/201605)
-    - [2016年4月(7)](http://www.wowotech.net/record/201604)
-    - [2016年3月(5)](http://www.wowotech.net/record/201603)
-    - [2016年2月(5)](http://www.wowotech.net/record/201602)
-    - [2016年1月(6)](http://www.wowotech.net/record/201601)
-    - [2015年12月(6)](http://www.wowotech.net/record/201512)
-    - [2015年11月(9)](http://www.wowotech.net/record/201511)
-    - [2015年10月(9)](http://www.wowotech.net/record/201510)
-    - [2015年9月(4)](http://www.wowotech.net/record/201509)
-    - [2015年8月(3)](http://www.wowotech.net/record/201508)
-    - [2015年7月(7)](http://www.wowotech.net/record/201507)
-    - [2015年6月(3)](http://www.wowotech.net/record/201506)
-    - [2015年5月(6)](http://www.wowotech.net/record/201505)
-    - [2015年4月(9)](http://www.wowotech.net/record/201504)
-    - [2015年3月(9)](http://www.wowotech.net/record/201503)
-    - [2015年2月(6)](http://www.wowotech.net/record/201502)
-    - [2015年1月(6)](http://www.wowotech.net/record/201501)
-    - [2014年12月(17)](http://www.wowotech.net/record/201412)
-    - [2014年11月(8)](http://www.wowotech.net/record/201411)
-    - [2014年10月(9)](http://www.wowotech.net/record/201410)
-    - [2014年9月(7)](http://www.wowotech.net/record/201409)
-    - [2014年8月(12)](http://www.wowotech.net/record/201408)
-    - [2014年7月(6)](http://www.wowotech.net/record/201407)
-    - [2014年6月(6)](http://www.wowotech.net/record/201406)
-    - [2014年5月(9)](http://www.wowotech.net/record/201405)
-    - [2014年4月(9)](http://www.wowotech.net/record/201404)
-    - [2014年3月(7)](http://www.wowotech.net/record/201403)
-    - [2014年2月(3)](http://www.wowotech.net/record/201402)
-    - [2014年1月(4)](http://www.wowotech.net/record/201401)
+
+  - [2024年2月(1)](http://www.wowotech.net/record/202402)
+  - [2023年5月(1)](http://www.wowotech.net/record/202305)
+  - [2022年10月(1)](http://www.wowotech.net/record/202210)
+  - [2022年8月(1)](http://www.wowotech.net/record/202208)
+  - [2022年6月(1)](http://www.wowotech.net/record/202206)
+  - [2022年5月(1)](http://www.wowotech.net/record/202205)
+  - [2022年4月(2)](http://www.wowotech.net/record/202204)
+  - [2022年2月(2)](http://www.wowotech.net/record/202202)
+  - [2021年12月(1)](http://www.wowotech.net/record/202112)
+  - [2021年11月(5)](http://www.wowotech.net/record/202111)
+  - [2021年7月(1)](http://www.wowotech.net/record/202107)
+  - [2021年6月(1)](http://www.wowotech.net/record/202106)
+  - [2021年5月(3)](http://www.wowotech.net/record/202105)
+  - [2020年3月(3)](http://www.wowotech.net/record/202003)
+  - [2020年2月(2)](http://www.wowotech.net/record/202002)
+  - [2020年1月(3)](http://www.wowotech.net/record/202001)
+  - [2019年12月(3)](http://www.wowotech.net/record/201912)
+  - [2019年5月(4)](http://www.wowotech.net/record/201905)
+  - [2019年3月(1)](http://www.wowotech.net/record/201903)
+  - [2019年1月(3)](http://www.wowotech.net/record/201901)
+  - [2018年12月(2)](http://www.wowotech.net/record/201812)
+  - [2018年11月(1)](http://www.wowotech.net/record/201811)
+  - [2018年10月(2)](http://www.wowotech.net/record/201810)
+  - [2018年8月(1)](http://www.wowotech.net/record/201808)
+  - [2018年6月(1)](http://www.wowotech.net/record/201806)
+  - [2018年5月(1)](http://www.wowotech.net/record/201805)
+  - [2018年4月(7)](http://www.wowotech.net/record/201804)
+  - [2018年2月(4)](http://www.wowotech.net/record/201802)
+  - [2018年1月(5)](http://www.wowotech.net/record/201801)
+  - [2017年12月(2)](http://www.wowotech.net/record/201712)
+  - [2017年11月(2)](http://www.wowotech.net/record/201711)
+  - [2017年10月(1)](http://www.wowotech.net/record/201710)
+  - [2017年9月(5)](http://www.wowotech.net/record/201709)
+  - [2017年8月(4)](http://www.wowotech.net/record/201708)
+  - [2017年7月(4)](http://www.wowotech.net/record/201707)
+  - [2017年6月(3)](http://www.wowotech.net/record/201706)
+  - [2017年5月(3)](http://www.wowotech.net/record/201705)
+  - [2017年4月(1)](http://www.wowotech.net/record/201704)
+  - [2017年3月(8)](http://www.wowotech.net/record/201703)
+  - [2017年2月(6)](http://www.wowotech.net/record/201702)
+  - [2017年1月(5)](http://www.wowotech.net/record/201701)
+  - [2016年12月(6)](http://www.wowotech.net/record/201612)
+  - [2016年11月(11)](http://www.wowotech.net/record/201611)
+  - [2016年10月(9)](http://www.wowotech.net/record/201610)
+  - [2016年9月(6)](http://www.wowotech.net/record/201609)
+  - [2016年8月(9)](http://www.wowotech.net/record/201608)
+  - [2016年7月(5)](http://www.wowotech.net/record/201607)
+  - [2016年6月(8)](http://www.wowotech.net/record/201606)
+  - [2016年5月(8)](http://www.wowotech.net/record/201605)
+  - [2016年4月(7)](http://www.wowotech.net/record/201604)
+  - [2016年3月(5)](http://www.wowotech.net/record/201603)
+  - [2016年2月(5)](http://www.wowotech.net/record/201602)
+  - [2016年1月(6)](http://www.wowotech.net/record/201601)
+  - [2015年12月(6)](http://www.wowotech.net/record/201512)
+  - [2015年11月(9)](http://www.wowotech.net/record/201511)
+  - [2015年10月(9)](http://www.wowotech.net/record/201510)
+  - [2015年9月(4)](http://www.wowotech.net/record/201509)
+  - [2015年8月(3)](http://www.wowotech.net/record/201508)
+  - [2015年7月(7)](http://www.wowotech.net/record/201507)
+  - [2015年6月(3)](http://www.wowotech.net/record/201506)
+  - [2015年5月(6)](http://www.wowotech.net/record/201505)
+  - [2015年4月(9)](http://www.wowotech.net/record/201504)
+  - [2015年3月(9)](http://www.wowotech.net/record/201503)
+  - [2015年2月(6)](http://www.wowotech.net/record/201502)
+  - [2015年1月(6)](http://www.wowotech.net/record/201501)
+  - [2014年12月(17)](http://www.wowotech.net/record/201412)
+  - [2014年11月(8)](http://www.wowotech.net/record/201411)
+  - [2014年10月(9)](http://www.wowotech.net/record/201410)
+  - [2014年9月(7)](http://www.wowotech.net/record/201409)
+  - [2014年8月(12)](http://www.wowotech.net/record/201408)
+  - [2014年7月(6)](http://www.wowotech.net/record/201407)
+  - [2014年6月(6)](http://www.wowotech.net/record/201406)
+  - [2014年5月(9)](http://www.wowotech.net/record/201405)
+  - [2014年4月(9)](http://www.wowotech.net/record/201404)
+  - [2014年3月(7)](http://www.wowotech.net/record/201403)
+  - [2014年2月(3)](http://www.wowotech.net/record/201402)
+  - [2014年1月(4)](http://www.wowotech.net/record/201401)
 
 [![订阅Rss](http://www.wowotech.net/content/templates/default/images/rss.gif)](http://www.wowotech.net/rss.php "RSS订阅")
 

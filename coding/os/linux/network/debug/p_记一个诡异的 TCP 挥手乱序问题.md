@@ -1,19 +1,17 @@
-
 Linux内核之旅
 
- _2024年05月01日 13:12_ _陕西_
+_2024年05月01日 13:12_ _陕西_
 
 以下文章来源于云巅论剑 ，作者卢烈
-
 
 **云巅论剑**.
 
 发掘Linux相关内核技术，探索操作系统未来发展方向。
 
-](https://mp.weixin.qq.com/s?__biz=MzI3NzA5MzUxNA==&mid=2664617582&idx=1&sn=2842836429faab0c0fdea9bac2959363&chksm=f04dfb8bc73a729d40155c5863cb116ab9f6dac72dd61e4e522cc81f94f2d05674c7a4e0d0c5&mpshare=1&scene=24&srcid=0502qZCYBeKNtBWuONZVIdnG&sharer_shareinfo=fe468619fb57e1c1b337d1d2108d3bd3&sharer_shareinfo_first=fe468619fb57e1c1b337d1d2108d3bd3&key=daf9bdc5abc4e8d0787aefccf840cbd8ef2cf6e893e92008f36d3936c048ca1d40e61cefed19017ab238e3c37ee4e2601f99bec0879d59f5c0dde178b301506ada33aae36cc7f91d652f17bb45a9bdbf3b00dcc7c2e0b3ac3da4ae1cff922f7bc23d1427f0927d18fd9a544b72dd5564e39a5ad2212ab69fe674119f736afcd0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090621&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ8gAjaN5UEHabuDXAL5ReSBLmAQIE97dBBAEAAAAAAAkeLyq%2BBZ8AAAAOpnltbLcz9gKNyK89dVj0XBuGXFr%2FKp1U4p6tNEMlut%2BYoa2Hx6L2ECtJBGPIGW4MTrt8WQwUL87V2e4frtX3Ic9R6c9H2ntbwcsSOx%2BPOiXh%2FH%2BswcsGlyfym6OVB5RrXVOtZzuchODFS3jdaqGClqvrtePpt8wDFVmjd62WXbHCCewja1Dg000O%2FHWrHTSzXJC9pmLRDmpqA21c1ydwnKnj4pcdeTSYb2TexjPWaWQ6yTS6utHGU8EGcG8QeSskfcuEAbEykWlSJmyNJje3&acctmode=0&pass_ticket=yibkohbe0bO3Mc2IZ2laS0BHAG4rUIlnlZs9jToI3W5If2ONMJBlj2Th9YWv7ZBv&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664617582&idx=1&sn=2842836429faab0c0fdea9bac2959363&chksm=f04dfb8bc73a729d40155c5863cb116ab9f6dac72dd61e4e522cc81f94f2d05674c7a4e0d0c5&mpshare=1&scene=24&srcid=0502qZCYBeKNtBWuONZVIdnG&sharer_shareinfo=fe468619fb57e1c1b337d1d2108d3bd3&sharer_shareinfo_first=fe468619fb57e1c1b337d1d2108d3bd3&key=daf9bdc5abc4e8d0787aefccf840cbd8ef2cf6e893e92008f36d3936c048ca1d40e61cefed19017ab238e3c37ee4e2601f99bec0879d59f5c0dde178b301506ada33aae36cc7f91d652f17bb45a9bdbf3b00dcc7c2e0b3ac3da4ae1cff922f7bc23d1427f0927d18fd9a544b72dd5564e39a5ad2212ab69fe674119f736afcd0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090621&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ8gAjaN5UEHabuDXAL5ReSBLmAQIE97dBBAEAAAAAAAkeLyq%2BBZ8AAAAOpnltbLcz9gKNyK89dVj0XBuGXFr%2FKp1U4p6tNEMlut%2BYoa2Hx6L2ECtJBGPIGW4MTrt8WQwUL87V2e4frtX3Ic9R6c9H2ntbwcsSOx%2BPOiXh%2FH%2BswcsGlyfym6OVB5RrXVOtZzuchODFS3jdaqGClqvrtePpt8wDFVmjd62WXbHCCewja1Dg000O%2FHWrHTSzXJC9pmLRDmpqA21c1ydwnKnj4pcdeTSYb2TexjPWaWQ6yTS6utHGU8EGcG8QeSskfcuEAbEykWlSJmyNJje3&acctmode=0&pass_ticket=yibkohbe0bO3Mc2IZ2laS0BHAG4rUIlnlZs9jToI3W5If2ONMJBlj2Th9YWv7ZBv&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 > tcp 四次挥手是超经典的网络知识，但是网络中的异常状况千奇百怪，说不定会“偷袭”到标准流程的盲区。最近笔者遇到了一个罕见的挥手乱序问题，经过对内核代码的分析和试验，最后终于找到了原因，角度可谓刁钻。
-> 
+>
 > 本文从技术视角，将排查过程记录下来，既是对整个过程的小小总结，将事情彻底完结掉，也是对 tcp 实现的一些细节的学习记录。
 
 ⚠️本文内容包括但不限于：tcp 四次挥手（同时关闭），tcp 包的 seq/ack 号规则，tcp 状态机，内核 tcp 代码，tcp 发送窗口等知识。
@@ -29,15 +27,14 @@ _**01**_
 过程细节：
 
 - 同时关闭的场景，server 和 client **几乎同时**向对方发送 fin 包。
-    
+
 - client 先收到了 server 的 fin 包，并回传 ack 包。
-    
+
 - 然而 server 处发生乱序，**先收到了 client 的 ack 包，后收到了 fin 包**。
-    
+
 - 结果表现为 server **未能正确处理 client 的 fin 包**，未能返回正确的 ack 包。
-    
+
 - client 没收到（针对 fin 的）ack 包，因此**等待超时后重传 fin 包**，之后才回归正常关闭连接的流程。
-    
 
 ### **问题抓包具体分析**
 
@@ -48,22 +45,20 @@ _**01**_
 重点关注 ID 为**14913、14914、20622、20623** 这四个包，后面为了方便分析，对 seq 和 ack 号取后四位：
 
 - 20622（seq=4416，ack=753），client 发送的 fin 包：client 主动关闭连接，向 server 发送 fin 包。
-    
+
 - 14913（seq=753，ack=4416），server 发送的 fin 包：server 主动关闭连接，向 client 发送 fin 包。
-    
+
 - 20623（seq=4417，ack=754），client 响应的 ack 包：client 收到 server 的 fin，响应一个 ack 包。
-    
+
 - 14914（seq=754，ack=4416），server 发送的 ack 包。
-    
 
 问题发生在 server 处（红框位置），发送 14913 后：
 
-- 先收到 **20623**（seq=4417），但此时期望收到的 seq 为 4416，所以被标记为[previous segment not captured]。
-    
+- 先收到 **20623**（seq=4417），但此时期望收到的 seq 为 4416，所以被标记为\[previous segment not captured\]。
+
 - 然后收到 **20622**，回传了一个 ack 包，ID 为 14914，问题就出现在这里：这个数据包的 ack=4416，这意味着 server 还在等待 seq=4416 的数据包，换言之，fin-20622 没有被 server 真正接收到。
-    
+
 - client 发现 20622 没有被正确接收，因此在等到 timeout 后，重新发送了 fin 包（id=20624），此后连接正常关闭。
-    
 
 （这里再次强调一下ack-20623 和 fin-20622，后面会经常提到这两个包）
 
@@ -82,13 +77,12 @@ server 处的抓包结果如下：
 注意看 No.为 5、6、7、8 的包：
 
 - 5：server 向 client 发送 fin（这里不知为何有一次重传，但是不影响后面的效果，没有深究）。
-    
+
 - 6：client 先传回了 seq=1002 的 ack 包。
-    
+
 - 7：client 后传回了 seq=1001 的 fin 包。
-    
+
 - 8：server 传回了ack=1002 的 ack 包，ack=1002 意味着 client 的 fin 包被正常接收了！（如果在问题场景下，此时回传的 ack 包，ack 应当为 1001）
-    
 
 之后，为了保持内核版本一致，把相同的程序转移到本地虚拟机上运行，得到同样的结果。换言之，复现失败了。
 
@@ -97,7 +91,7 @@ server 处的抓包结果如下：
 工具：python + scapy
 
 > 这里用 scapy 伪造 client，发送乱序的 ack 和 fin，是为了观察 server 回传的 ack包。
-> 
+>
 > 因为 client 并未真的走了 tcp 协议，所以无论复现成功与否，都不能观察到超时重传。
 
 （1）server 处正常 socket 监听：
@@ -119,15 +113,14 @@ server 处连接关闭的时间变长了（额外增加 200ms），对时延敏�
 ## **本文要解决什么问题？**
 
 - 该现象是否是内核的合法行为？（先剧透一下，是合法行为）
-    
+
 - 为什么本地复现失败了？
-    
 
 _**02**_
 
 **问题排查**
 
-经过了大约 6 个周末的间断式[看代码-试验]循环，终于找到了问题所在！
+经过了大约 6 个周末的间断式\[看代码-试验\]循环，终于找到了问题所在！
 
 下面将简要描述问题排查的过程，也包括我们的一些失败尝试。
 
@@ -138,9 +131,8 @@ _**02**_
 简单来说：
 
 - 本地复现-乱序不影响挥手；
-    
+
 - 问题场景-乱序导致超时重传。
-    
 
 可以确定，问题很大概率出现在 server 对 ack-20623 和 fin-20622 的处理上。
 
@@ -155,9 +147,9 @@ _**02**_
 我们结合复现过程，利用 ss 和 eBPF ，监控 tcp 的状态变化。确定了 server 在收到ack-20623后，由FIN_WAIT_1进入了FIN_WAIT_2状态，这意味着 ack-20623 被正确处理了。那么问题大概率出现在 fin-20622 的处理上，这也证实了我们最初的猜测。
 
 > 这里还有一个奇怪的点：按照正确的挥手流程，server 在FIN_WAIT_2收到fin后应当进入TIMEWAIT 状态。我们在 ss 中观察到了这个状态转移，但是使用ebpf监控时，并没有捕捉到这个状态转移。
-> 
+>
 > 当时我们并未关注这个问题，后来才知晓原因：eBPF 实现中，只记录tcp_set_state()引发的状态转移。而此处虽然进入了 TIMEWAIT 状态，却并未经过tcp_set_state()，因此 eBPF 中无法看到。
-> 
+>
 > 关于这里如何进入TIMEWAIT，请看末尾的“番外”一节。
 
 **附：eBPF 监控结果**
@@ -185,13 +177,12 @@ _**02**_
 总结一下：fin-20622 有一种可能的处理路径，符合问题场景的表现。从 server 的视角：
 
 - 首先收到ack-20623，更新了 snd_una 的值为该包的 ack 值，即 754。
-    
+
 - 然后收到 fin-20622，在检查 ack 值的阶段，由于该包的 ack=753，小于此时的 snd_nxt，因此被判定为 old_ack，非法。之后 acceptable 返回值为 0。
-    
+
 - 由于 ack 值被判定为非法，内核传回一个 challenge ack 包， 然后直接丢掉fin-20622。
-    
+
 - 因此，最终 fin-20622 被 tcp_rcv_state_process 丢弃，没有进入 fin 包处理的流程。
-    
 
 这样，相当于 server 并没有收到 fin 信号，与问题场景吻合。
 
@@ -209,14 +200,13 @@ _**02**_
 
 1. 收到 ack-20623 时，snd_una 确实被更新了，这符合上面的假设，为 fin 包丢弃提供了条件。
 
-2. 乱序的 fin 包根本没有进入 tcp_rcv_state_process()函数，而是被外层的tcp_v4_rcv()函数按照 TIMEWAIT 流程直接处理，最终关闭连接。
+1. 乱序的 fin 包根本没有进入 tcp_rcv_state_process()函数，而是被外层的tcp_v4_rcv()函数按照 TIMEWAIT 流程直接处理，最终关闭连接。
 
 显然，第二点很可能是导致复现失败的关键。
 
 - 更加证明了我们先前的假设，如果fin能进入 tcp_rcv_state_process()函数，应该就能复现出问题。但可能因为线上场景与复现场景存在某些配置差异，导致代码路径分歧。
-    
+
 - 另外这个发现也颠覆了我们的认知，按照 tcp 的挥手流程，在收到 fin-20622前，server 发送 fin 后收到了 ack，那么应当处于 FIN_WAIT_2 状态，工具监控结果也是如此，为何这里是 TIMEWAIT 呢。
-    
 
 带着这些问题，我们回到代码中，继续分析。在 ack 检查和 fin处理之间，找到一处最可疑的位置：
 
@@ -257,26 +247,22 @@ _**03**_
 最后，回答最初的两个问题作为总结：
 
 - 该现象是否是内核的合法行为？
-    
 
 - 是合法行为，是内核检查 ack 的逻辑导致的。
-    
+
 - 内核会根据收到的 ack 值，更新发送窗口参数 snd_una，并由 snd_una 判断 ack 包是否需要处理。
-    
+
 - 由于 fin-20622 的 ack 值小于 ack-20623，且 ack-20623 先到达，更新了snd_una。后到达的fin在ack检查过程中，对比snd_una时被认为是已经ack过的包，不需要再处理，结果被直接丢弃，并回传一个challenge_ack。导致了问题场景。
-    
 
 - 为什么本地复现失败了？
-    
 
 - 关闭 tcp 连接时，使用了 close()接口，而线上环境使用的是 shutdown()。
-    
+
 - shutdown 不会设置SOCK_DEAD，而 close 则相反，导致复现时的代码路径与问题场景出现分歧。
-    
 
 _**04**_
 
-**番****外：close()下的tcp状态转移**
+**番\*\*\*\*外：close()下的tcp状态转移**
 
 其实还遗留了一个问题：
 
