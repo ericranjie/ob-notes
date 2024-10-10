@@ -131,7 +131,7 @@ early_param("mem", early_mem);
 
 保留内存的定义主要在fixmap_remap_fdt和arm64_memblock_init函数中进行，我们会按照代码顺序逐一进行各种各样reserved type的memory region的构建。
 
-1、保留fdt占用的内存，代码如下：
+## 1、保留fdt占用的内存，代码如下：
 
 ```cpp
 void init fixmap_remap_fdt(phys_addr_t dt_phys)  
@@ -144,7 +144,7 @@ memblock_reserve(dt_phys, size);
 
 fixmap_remap_fdt主要是为fdt建立地址映射，在该函数的最后，顺便就调用memblock_reserve保留了该段内存。
 
-2、保留内核和initrd占用的内容，代码如下：
+## 2、保留内核和initrd占用的内容，代码如下：
 
 ```cpp
 void init arm64_memblock_init(void)  
@@ -164,77 +164,77 @@ endif
 
 （3）保留initital ramdisk image区域（从initrd_start到initrd_end区域）
 
-3、通过early_init_fdt_scan_reserved_mem函数来分析dts中的节点，从而进行保留内存的动作，代码如下：
+## 3、通过early_init_fdt_scan_reserved_mem函数来分析dts中的节点，从而进行保留内存的动作，代码如下：
+```cpp
+void \_\_init early_init_fdt_scan_reserved_mem(void)\
+{\
+int n;\
+u64 base, size;
 
-> void \_\_init early_init_fdt_scan_reserved_mem(void)\
-> {\
-> int n;\
-> u64 base, size;
->
-> if (!initial_boot_params)－－－－－－－－－－－－－－－－－－－－－－－－（1）\
-> return;
->
-> /\* Process header /memreserve/ fields \*/\
-> for (n = 0; ; n++) {\
-> fdt_get_mem_rsv(initial_boot_params, n, &base, &size);－－－－－－－－（2）\
-> if (!size)\
-> break;\
-> early_init_dt_reserve_memory_arch(base, size, 0);－－－－－－－－－－－（3）\
-> }
->
-> of_scan_flat_dt(\_\_fdt_scan_reserved_mem, NULL);－－－－－－－－－－－－（4）\
-> fdt_init_reserved_mem();\
-> }
+if (!initial_boot_params)－－－－－－－－－－－－－－－－－－－－－－－－（1）\
+return;
 
+/\* Process header /memreserve/ fields \*/\
+for (n = 0; ; n++) {\
+fdt_get_mem_rsv(initial_boot_params, n, &base, &size);－－－－－－－－（2）\
+if (!size)\
+break;\
+early_init_dt_reserve_memory_arch(base, size, 0);－－－－－－－－－－－（3）\
+}
+
+of_scan_flat_dt(\_\_fdt_scan_reserved_mem, NULL);－－－－－－－－－－－－（4）\
+fdt_init_reserved_mem();\
+}
+```
 （1）initial_boot_params实际上就是fdt对应的虚拟地址。在early_init_dt_verify中设定的。如果系统中都没有有效的fdt，那么没有什么可以scan的，return，走人。
 
 （2）分析fdt中的 /memreserve/ fields ，进行内存的保留。在fdt的header中定义了一组memory reserve参数，其具体的位置是fdt base address + off_mem_rsvmap。off_mem_rsvmap是fdt header中的一个成员，如下：
-
-> struct fdt_header {\
-> ……\
-> fdt32_t off_mem_rsvmap;－－－－－－/memreserve/ fields offset\
-> ……};
-
+```cpp
+struct fdt_header {\
+……\
+fdt32_t off_mem_rsvmap;－－－－－－/memreserve/ fields offset\
+……};
+```
 fdt header中的memreserve可以定义多个，每个都是（address，size）二元组，最后以0，0结束。
 
 （3）保留每一个/memreserve/ fields定义的memory region，底层是通过memblock_reserve接口函数实现的。
 
 （4）对fdt中的每一个节点调用\_\_fdt_scan_reserved_mem函数，进行reserved-memory节点的扫描，之后调用fdt_init_reserved_mem函数进行内存预留的动作，具体参考下一小节描述。
 
-4、解析reserved-memory节点的内存，代码如下：
+## 4、解析reserved-memory节点的内存，代码如下：
+```cpp
+static int \_\_init \_\_fdt_scan_reserved_mem(unsigned long node, const char \*uname,\
+int depth, void \*data)\
+{\
+static int found;\
+const char \*status;\
+int err;
 
-> static int \_\_init \_\_fdt_scan_reserved_mem(unsigned long node, const char \*uname,\
-> int depth, void \*data)\
-> {\
-> static int found;\
-> const char \*status;\
-> int err;
->
-> if (!found && depth == 1 && strcmp(uname, "reserved-memory") == 0) { －－－－－－－（1）\
-> if (\_\_reserved_mem_check_root(node) != 0) {\
-> pr_err("Reserved memory: unsupported node format, ignoring\\n"); \
-> return 1;\
-> }\
-> found = 1; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）\
-> return 0;\
-> } else if (!found) { \
-> return 0; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）\
-> } else if (found && depth \< 2) { －－－－－－－－－－－－－－－－－－－－－－－－－（4）\
-> return 1;\
-> }
->
-> status = of_get_flat_dt_prop(node, "status", NULL); －－－－－－－－－－－－－－－－（5）\
-> if (status && strcmp(status, "okay") != 0 && strcmp(status, "ok") != 0)\
-> return 0;
->
-> err = \_\_reserved_mem_reserve_reg(node, uname); －－－－－－－－－－－－－－－－（6）\
-> if (err == -ENOENT && of_get_flat_dt_prop(node, "size", NULL))\
-> fdt_reserved_mem_save_node(node, uname, 0, 0); －－－－－－－－－－－－－－－（7）
->
-> /\* scan next node \*/\
-> return 0;\
-> }
+if (!found && depth == 1 && strcmp(uname, "reserved-memory") == 0) { －－－－－－－（1）\
+if (\_\_reserved_mem_check_root(node) != 0) {\
+pr_err("Reserved memory: unsupported node format, ignoring\\n"); \
+return 1;\
+}\
+found = 1; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（2）\
+return 0;\
+} else if (!found) { \
+return 0; －－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）\
+} else if (found && depth \< 2) { －－－－－－－－－－－－－－－－－－－－－－－－－（4）\
+return 1;\
+}
 
+status = of_get_flat_dt_prop(node, "status", NULL); －－－－－－－－－－－－－－－－（5）\
+if (status && strcmp(status, "okay") != 0 && strcmp(status, "ok") != 0)\
+return 0;
+
+err = \_\_reserved_mem_reserve_reg(node, uname); －－－－－－－－－－－－－－－－（6）\
+if (err == -ENOENT && of_get_flat_dt_prop(node, "size", NULL))\
+fdt_reserved_mem_save_node(node, uname, 0, 0); －－－－－－－－－－－－－－－（7）
+
+/\* scan next node \*/\
+return 0;\
+}
+```
 （1）found 变量记录了是否搜索到一个reserved-memory节点，如果没有，我们的首要目标是找到一个reserved-memory节点。reserved-memory节点的特点包括：是root node的子节点（depth == 1），node name是"reserved-memory"，这可以过滤掉一大票无关节点，从而加快搜索速度。
 
 （2）reserved-memory节点应该包括#address-cells、#size-cells和range属性，并且#address-cells和#size-cells的属性值应该等于根节点对应的属性值，如果检查通过（\_\_reserved_mem_check_root），那么说明找到了一个正确的reserved-memory节点，可以去往下一个节点了。当然，下一个节点往往是reserved-memory节点的subnode，也就是真正的定义各段保留内存的节点。更详细的关于reserved-memory的设备树定义可以参考Documentation\\devicetree\\bindings\\reserved-memory\\reserved-memory.txt文件。
@@ -252,34 +252,34 @@ fdt header中的memreserve可以定义多个，每个都是（address，size）�
 5、预留reserved-memory节点的内存
 
 device tree中的reserved-memory节点及其子节点静态或者动态定义了若干的reserved memory region，静态定义的memory region起始地址和size都是确定的，因此可以立刻调用memblock的模块进行内存区域的预留，但是对于动态定义的memory region，\_\_fdt_scan_reserved_mem只是将信息保存在了reserved_mem全局变量中，并没有进行实际的内存预留动作，具体的操作在fdt_init_reserved_mem函数中，代码如下：
+```cpp
+void \_\_init fdt_init_reserved_mem(void)\
+{\
+int i;
 
-> void \_\_init fdt_init_reserved_mem(void)\
-> {\
-> int i;
->
-> \_\_rmem_check_for_overlap(); －－－－－－－－－－－－－－－－－－－－－－－－－（1）
->
-> for (i = 0; i \< reserved_mem_count; i++) {－－遍历每一个reserved memory region\
-> struct reserved_mem \*rmem = &reserved_mem\[i\];\
-> unsigned long node = rmem->fdt_node;\
-> int len;\
-> const \_\_be32 \*prop;\
-> int err = 0;
->
-> prop = of_get_flat_dt_prop(node, "phandle", &len);－－－－－－－－－－－－－－－（2）\
-> if (!prop)\
-> prop = of_get_flat_dt_prop(node, "linux,phandle", &len);\
-> if (prop)\
-> rmem->phandle = of_read_number(prop, len/4);
->
-> if (rmem->size == 0)－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）\
-> err = \_\_reserved_mem_alloc_size(node, rmem->name,\
-> &rmem->base, &rmem->size);\
-> if (err == 0)\
-> \_\_reserved_mem_init_node(rmem);－－－－－－－－－－－－－－－－－－－－（4）\
-> }\
-> }
+\_\_rmem_check_for_overlap(); －－－－－－－－－－－－－－－－－－－－－－－－－（1）
 
+for (i = 0; i \< reserved_mem_count; i++) {－－遍历每一个reserved memory region\
+struct reserved_mem \*rmem = &reserved_mem\[i\];\
+unsigned long node = rmem->fdt_node;\
+int len;\
+const \_\_be32 \*prop;\
+int err = 0;
+
+prop = of_get_flat_dt_prop(node, "phandle", &len);－－－－－－－－－－－－－－－（2）\
+if (!prop)\
+prop = of_get_flat_dt_prop(node, "linux,phandle", &len);\
+if (prop)\
+rmem->phandle = of_read_number(prop, len/4);
+
+if (rmem->size == 0)－－－－－－－－－－－－－－－－－－－－－－－－－－－－（3）\
+err = __reserved_mem_alloc_size(node, rmem->name,\
+&rmem->base, &rmem->size);\
+if (err == 0)\
+__reserved_mem_init_node(rmem);－－－－－－－－－－－－－－－－－－－－（4）\
+}\
+}
+```
 （1）检查静态定义的 reserved memory region之间是否有重叠区域，如果有重叠，这里并不会对reserved memory region的base和size进行调整，只是打印出错信息而已。
 
 （2）每一个需要被其他node引用的node都需要定义"phandle", 或者"linux,phandle"。虽然在实际的device tree source中看不到这个属性，实际上dtc会完美的处理这一切的。
@@ -288,11 +288,11 @@ device tree中的reserved-memory节点及其子节点静态或者动态定义了
 
 （4）保留内存有两种使用场景，一种是被特定的驱动使用，这时候在特定驱动的初始化函数（probe函数）中自然会进行处理。还有一种场景就是被所有驱动或者内核模块使用，例如CMA，per-device Coherent DMA的分配等，这时候，我们需要借用device tree的匹配机制进行这段保留内存的初始化动作。有兴趣的话可以看看RESERVEDMEM_OF_DECLARE的定义，这里就不再描述了。
 
-6、通过命令行参数保留CMA内存
+## 6、通过命令行参数保留CMA内存
 
 arm64_memblock_init--->dma_contiguous_reserve函数中会根据命令行参数进行CMA内存的保留，本文暂不描述之，留给CMA文档吧。
 
-四、总结
+# 四、总结
 
 物理内存布局是归于memblock模块进行管理的，该模块定义了struct memblock memblock这样的一个全局变量保存了memory type和reserved type的memory region list。而通过这两个memory region的数组，我们就知道了操作系统需要管理的所有系统内存的布局情况。
 
@@ -300,7 +300,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [Memory](http://www.wowotech.net/tag/Memory) [内存布局](http://www.wowotech.net/tag/%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80) [layout](http://www.wowotech.net/tag/layout)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [X-018-KERNEL-串口驱动开发之serial console](http://www.wowotech.net/x_project/serial_driver_porting_3.html) | [X-017-KERNEL-串口驱动开发之uart driver框架](http://www.wowotech.net/x_project/serial_driver_porting_2.html)»
 
