@@ -1,3 +1,4 @@
+
 Linux云计算网络
 _2024年04月01日 08:14_ _广东_
 来源公众号：twt社区IT社区\
@@ -14,8 +15,6 @@ Linux系统的性能是指操作系统完成任务的有效性、稳定性和响
 本文根据社区探讨，整理出**企业Linux系统性能优化的7个实战经验**，来自社区专家和会员分享，希望对大家有所帮助。
 
 ## **1、影响Linux系统性能的因素一般有哪些？**
-
-@zhaoxiaoyong081 平安科技 资深工程师：
 
 Linux系统的性能受多个因素的影响。以下是一些常见的影响Linux系统性能的因素：
 
@@ -38,8 +37,6 @@ Linux系统的性能受多个因素的影响。以下是一些常见的影响Lin
 这些因素之间相互关联，对系统性能产生综合影响。为了优化Linux系统性能，需要综合考虑并适当调整这些因素，以满足特定的需求和使用情况。
 
 ## **2、工作中有没有快速排除故障的办法？**
-
-@zhaoxiaoyong081 平安科技 资深工程师：
 
 1.CPU 性能分析
 
@@ -73,10 +70,6 @@ Linux系统的性能受多个因素的影响。以下是一些常见的影响Lin
 
 ## **3、Linux环境下，怎么排查os中系统负载过高的原因瓶颈？**
 
-______________________________________________________________________
-
-## @zhaoxiaoyong081 平安科技 资深工程师：
-
 在Linux环境下排查系统负载过高的原因和瓶颈，可以采取以下步骤：
 
 - 使用top或htop命令观察系统整体负载情况。查看load average的值，分别表示系统在1分钟、5分钟和15分钟内的平均负载。如果负载值超过CPU核心数量的70-80%，表示系统负载过高。
@@ -98,10 +91,6 @@ ______________________________________________________________________
 综合上述步骤，可以帮助你定位系统负载过高的原因和瓶颈，并进一步采取相应的措施来优化系统性能。
 
 ## **4、Linux怎么找出占用负载top5的进程及主要瓶颈在哪个资源（CPU or 内容 or 磁盘 IO）？**
-
-______________________________________________________________________
-
-## @zhaoxiaoyong081 平安科技 资深工程师：
 
 CPU 使用排名
 
@@ -129,12 +118,6 @@ io
 
 iostat 1 10看哪个磁盘busy高
 
-## **5、Linux的内存计算不准如何解决？**
-
-______________________________________________________________________
-
-## @Acdante HZTYYJ 技术总监：
-
 free是执行时间的瞬时计数，/proc/memory内存是实时变化的。
 
 而且free会把缓存和缓冲区内存都计入使用内存，所以会导致看到的可用内存少很多。
@@ -143,8 +126,6 @@ free是执行时间的瞬时计数，/proc/memory内存是实时变化的。
 
 如：htop 、 nmon 、 syssta、top等，可以结合运维软件和平台，而非站在某个时间点，最好是有一定时间的性能数据积累，从整体趋势和具体问题点位去分析。\
 内存只是一个资源指标，使用内存的调用才是问题根源。
-
-## @zhaoxiaoyong081 平安科技 资深工程师：
 
 在一些情况下，通过ps或top命令查看的内存使用累计值与free命令或/proc/meminfo文件中的内存统计值之间可能存在较大差异。这可以由以下原因导致：
 
@@ -172,10 +153,6 @@ free是执行时间的瞬时计数，/proc/memory内存是实时变化的。
 
 ## _**6、**_**Swap现在的应用场景还有哪些？**
 
-______________________________________________________________________
-
-## @zhaoxiaoyong081 平安科技 资深工程师：
-
 虽然现代计算机的内存容量越来越大，但交换分区（swap）仍然在某些场景下具有重要的应用。以下是一些使用交换分区的常见场景：
 
 - 内存不足：交换分区作为内存不足时的后备机制，用于将不经常使用或暂时不需要的内存页面转移到磁盘上。当物理内存（RAM）不足以容纳所有活动进程和数据时，交换分区可以提供额外的虚拟内存空间，以避免系统发生内存耗尽错误（Out of Memory）。
@@ -189,36 +166,457 @@ ______________________________________________________________________
 尽管交换分区在上述场景中发挥作用，但需要注意的是，过度依赖交换分区可能会导致性能下降。频繁的交换操作可能会增加I/O负载，并导致响应时间延迟。因此，在现代系统中，通常建议合理配置物理内存，以尽量减少对交换分区的依赖，并保持足够的内存可用性。
 
 ## **7、在Linux tcp方面有什么调优经验或案例？**
-
-______________________________________________________________________
-
-## @zhanxuechao 数字研究院 咨询专家：
-
 centos7-os-init.sh
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`#!/bin/sh`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`#Name:centos7-os-init.sh`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`# Write by:Jan`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`# Last Modify:2019-09-20`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`# DESC:Linux系统优化和安全加固`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`#CMD:sh centos7-os-init.sh`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`#CMD说明:该脚本主要用于centos调优，作为相对通用的模板，有一定的普适性，但是一般在实际生产环境##########中会根据系统的不同功能，进行不同的参数优化，请各位注意。`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`#0 添加epel的yum源`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`##echo"[epel]">>/etc/yum.repos.d/epel.repo`
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+`##echo "name=Extra Packages for Centos 7 - 1$basearch">> /etc/yum.repos.d/epel.repo`
 
-## @zhaoxiaoyong081 平安科技 资深工程师：
+`##echo "baseurl=http://centos.ustc.edu.cn/epel/7Server$basearch " >> /etc/yum.repos.d/epel.repo`
+
+`##echo "failovermethod=priority">>/etc/yum.repos.d/epel.repo`
+
+`##echo "enabled=1">>/etc/yum.repos.d/epel.repo`
+
+`##echo "gpgcheck=0">>/etc/yum.repos.d/epel.repo`
+
+`###使配置生效`
+
+`##yum clean all`
+
+`##yum makecache`
+
+`##yum repolist`
+
+`yum` `install` `-y wget`
+
+`wget -P` `/etc/yum``.repos.d/ http:``//mirrors``.aliyun.com``/repo/epel-7``.repo`
+
+`yum clean all`
+
+`yum makecache`
+
+`yum repolist`
+
+`##或者直接安装rpm -ivh http://mirrors.aliyun.com/epel/epel-release-latest-7.noarch.rpm`
+
+`#1 设定时区，自动同步时间,定义为每天自动同步一次`
+
+`yum` `install` `-y ntpdate`
+
+`cp` `/usr/share/zoneinfo/Asia/Shanghai` `/etc/localtime`
+
+`ntp path=``'which ntpdate'`
+
+`$ntp path 172.16.2.89`
+
+`hwclock -w`
+
+`echo` `"10 1***$ntp path 172.16.2.89"``>>` `/varspool/cron/root`
+
+`#设置hostname,一般安装的时候就会设置好`
+
+`#2 创建系统默认目录:`
+
+`##脚本存放目录`
+
+`mkdir` `-p` `/u01/shell`
+
+`##软件安装介质存放位置`
+
+`mkdir` `-p` `/u01/src`
+
+`##日志存放位置`
+
+`mkdir` `-p` `/u02/og`
+
+`##备份存放位置，般也会挂载nas存储盘`
+
+`mkdir` `-p` `/u03/bak`
+
+`mkdir` `-p` `/u03/nas`
+
+`#mount -t cifs -o username="jan",password="123456a?" //172.16.2.78/DB bak /u03/nas`
+
+`#3 优化内核参数`
+
+`##3.1 修改最大系统最大打开文件数和最大进程数,`
+
+`echo` `"*soft nproc 65536 "``>>``/etc/security/limits``.conf`
+
+`echo` `"* hard nproc 65536 "``>>``/etc/security/limits``.conf`
+
+`echo` `"* soft nofile 65536"``>>``/etc/security/limits``.conf`
+
+`echo` `"* hard nofile 65536 "``>>``/etc/security/limits``.conf`
+
+`echo` `"* soft nproc 65536"``>``/etc/security/limits``.d``/20-nproc``.conf`
+
+`echo` `"root soft nproc unlimited"``>>``/etc/security/limits``.d``/20-nproc``.conf`
+
+`echo``"测试方式:当前session退出后重新登录执行:``ulimit` `-Sn` `ulimit` `-Hn”`
+
+`##3.2 调整内核参数、网络参数、安全参数以应对高并发环境。`
+
+`cp` `/etc/sysctl``.conf` `/etc/sysctl``.conf.bk`
+
+`echo` `">``/etc/sysctl``.conf`
+
+`#关闭ipv6`
+
+`echo` `"net.ipv6.conf.all.disable ipv6 = 1"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv6.conf.default.disable ipv6 =1"``>>``/etc/sysctl``.conf`
+
+`# 避免放大攻击`
+
+`echo` `"net.ipv4.icmp echo ignore broadcasts =1"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.all.send redirects = 0"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.default.send redirects =0"``>>``/etc/sysctl``.conf`
+
+`#开启反向路径过滤`
+
+`echo` `"net.ipv4.conf.all.rp filter = 1"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.default.rp filter=1"``>>``/etc/sysctl``.conf`
+
+`#处理无源路由的包`
+
+`echo` `"net.ipv4.conf.all.accept source route =0"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.default.accept source route = 0"``>>``/etclsysctl``.conf`
+
+`#关闭sysrq功能`
+
+`echo` `"kernel.sysrg =0"``>>``/etc/sysctl``.conf`
+
+`#core文件名中添加pid作为扩展名`
+
+`echo` `"kernel.core uses pid =1"``>>``/etc/sysctl``.conf`
+
+`# 开启SYN洪水攻击保护`
+
+`echo` `"net.ipv4.tcp_syncookies = 1"``>>``/etc/sysctl``.conf`
+
+`#修改消息队列长度`
+
+`echo` `"kernel.msgmnb= 65536"``>>``/etc/sysctl``.conf`
+
+`echo` `"kernel.msgmax=65536"``>>``/etc/sysctl``.conf`
+
+`#设置最大内存共享段大小bytes，这两个参数主要在安装oracle数据库的时候，结合SGA使用echo"kernel.shmmax=17179869184">>/etc/sysctl.conf #建议修改为内存大小例如16G内存`
+
+`echo` `"kernel.shmall = 4194304"``>>``/etc/sysctl``.conf` `#默认=kemel.shmmax/4KB(4096)`
+
+`#timewait的数量，默认180000`
+
+`echo` `"net.ipv4.tcp max tw buckets =6000"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.tcp sack = 1"``>>``/etc/sysct``.conf`
+
+`echo` `"net.ipv4,tcp window scaling =1"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.tcp rmem = 4096 87380 4194304"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.tcp wmem = 4096 16384 4194304"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.core.wmem default = 8388608"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.core.rmem default =8388608"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.core.rmem max=16777216"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.core.wmem max=16777216"``>>``/etc/sysctl``.conf`
+
+`#每个网络接口接收数据包的速率比内核处理这些包的速率快时，允许送到队列的数据包的最大数目`
+
+`echo` `"net.core.netdev max backlog = 262144"``>>``/etc/sysctl``.conf`
+
+`#限制仅仅是为了防止简单的Dos 攻击`
+
+`echo` `"net.ipv4.tcp max orphans=3276800"``>>``/etc/sysctl``.conf`
+
+`#未收到客户端确认信息的连接请求的最大值`
+
+`echo` `"net.ipv4.tcp max syn backlog = 262144"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.tcp timestamps = 0"``>>``/etc/sysctl``.conf`
+
+`#内核放弃建立连接之前发送SYNACK 包的数量`
+
+`echo` `"net.ipv4.tcp synack retries =1"``>>``/etc/sysctl``.conf`
+
+`#内核放弃建立连接之前发送SYN 包的数量`
+
+`echo` `"net.ipv4.tcp syn retries = 1"``>>``/etc/sysctl``.conf`
+
+`#启用timewait 快速回收`
+
+`echo` `"net.ipv4.tcp tw recycle = 1"``>>``/etc/sysctl``.conf`
+
+`#开启重用。允许将TIME-WAIT sockets 重新用于新的TCP 连接`
+
+`echo` `"net.ipv4.tcp_syn retries = 1"``>>``/etc/sysctl``.conf`
+
+`#启用timewait 快速回收`
+
+`echo` `"net.ipv4.tcp tw recycle =1"``>>``/etc/sysctl``.conf`
+
+`#开启重用。允许将TIME-WAIT sockets 重新用于新的TCP 连接`
+
+`echo` `"net.ipv4.tcp tw reuse =1"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.tcp mem= 94500000 915000000 927000000"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.tcp fin timeout = 1"``>>``/etc/sysctl``.conf`
+
+`#当keepalive 起用的时候，TCP 发送keepalive 消息的频度。缺省是2 小时`
+
+`echo` `"net.ipv4.tcp keepalive time = 30"``>>``/etc/sysctl``.conf`
+
+`#允许系统打开的端口范国`
+
+`echo` `"net.ipv4.ip local port range = 32768 65000"``>>``/etc/sysctl``.conf`
+
+`#修改防火墙表大小，默认65536`
+
+`#net.netfilter.nf conntrack max=655350`
+
+`#net.netfilter.nf conntrack tcp timeout established=1200`
+
+`# 确保无人能修改路由表`
+
+`echo` `"net.ipv4.conf.all.accept redirects =0"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.default.accept redirects = 0"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.all.secure redirects = 0"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.default.secure redirects = 0"``>>``/etc/sysctl``.conf`
+
+`# 开启并记录欺骗，源路由和重定向包`
+
+`echo` `"net.ipv4.conf.all.log martians =1"``>>``/etc/sysctl``.conf`
+
+`echo` `"net.ipv4.conf.default.log martians =1"``>>``/etc/sysctl``.conf`
+
+`echo` `"fs.file-max= 6815744"``>>``/etc/sysctl``.conf`
+
+`#启用内核中的SYN cookie保护:(一般情况下操作系统已经默认开启)`
+
+`echo` `"1"``>``/procsys/net/ipv4/tcp` `syncookies`
+
+`#优化swap`
+
+`echo``"'vm.swappiness=10"``>>``/etc/sysctl``.conf`
+
+`sysctl -p`
+
+`#4 安全加固相关:`
+
+`#4.1 关闭selinux`
+
+`sed` `-i``'s/SELINUX=enforcing/SELINUX=disabled/g'` `/etc/selinuxconfig`
+
+`#4.2 关闭不常用服务。根据服务器的用途和安装系统时候的选择进行优化，将不必要的服务关闭，提高性能`
+
+`#chkconfig iptables     off`
+
+`#chkconfig ip6tables   off`
+
+`#chkconfig abrt-ccpp   off`
+
+`#chkconfig abrtd        off`
+
+`#chkconfig acpid        off`
+
+`#chkconfig atd            off`
+
+`#chkconfig auditd        off`
+
+`#chkconfig autofs        off`
+
+`#chkconfig blk-availability   off`
+
+`#chkconfig bluetooth          off`
+
+`#chkconfig certmonger        off`
+
+`#chkconfig cpuspeed          off`
+
+`#chkconfig cups                off`
+
+`#chkconfig dnsmasq           off`
+
+`#chkconfig firstboot            off`
+
+`#chkconfig kdump              off`
+
+`#chkconfig mdmonitor        off`
+
+`fchkconfig netconsole         off`
+
+`#chkconfig postfix             off`
+
+`#chkconfig quota nld         off`
+
+`#chkconfig rdisc                off`
+
+`fchkconfig restorecond       off`
+
+`fchkconfig saslauthd          off`
+
+`fchkconfig smartd              off`
+
+`#chkconfig wpa_supplicant   off`
+
+`#fchkconfig ypbind              off`
+
+`#4.3 安装监控客户端`
+
+`##安装监控客户端`
+
+`#4.4 清除不必要的系统帐户`
+
+`userdel adm`
+
+`userdel lp`
+
+`userdel` `sync`
+
+`userdel` `shutdown`
+
+`userdel halt`
+
+`userdel operator`
+
+`userdel` `ftp`
+
+`#4 5 隐藏linux版本号`
+
+`f>``/etc/issue`
+
+`#>/etc/issue.net`
+
+`#4.6 系统关闭Ping`
+
+`#关闭ping，使系统对ping不做反应，对网络安全大有好处。`
+
+`techo 1>``/proclsys/netipv4/icmp` `echo` `ignore all`
+
+`techo` `"echo 1>/procsys/net/ipv4/icmp echo ignore all"` `>>` `/etclrc``.dirc.``local`
+
+`#恢复系统的Ping响应:`
+
+`#echo 0>/procsys/netipv4/icmp_echo_ignore_all`
+
+`###4.7 升级OpenSSH OpenSSL至安全版本`
+
+`######禁止root账户远程登录,更改ssh端口`
+
+`##sed -i 's/#Port 22/Port 2022'g'/etcissh/sshd_config`
+
+`##sed -i 's/#PermitRootLogin yes/PermitRootLogin no/g' /etc/ssh/sshd_config`
+
+`#4.8 安装telnet`
+
+`yum` `install` `-y telnet`
+
+`###4.9 创建普通用户,指定/u01 u02 u03所属`
+
+`#groupadd gapp`
+
+`##useradd -g gapp appuser`
+
+`##echo "apuserPWD" |passwd --stdin appuser`
+
+`##chown -R appuser.gapp /u01`
+
+`##chown -R appuser.gapp /u02`
+
+`##chown -R appuser.gapp /u03`
+
+`##chown -R appuser.gapp /etc/rc.local`
+
+`##chown -R appuser.gapp /etc/rc.d/rc.local`
+
+`##chown -R appuser.gapp /etc/profile`
+
+`##chown -R appuser.gapp /var/spool/'cron`
+
+`##chown -R root.root /varispool/cron/root`
+
+`###4.10 锁定关键文件系统禁止被修改`
+
+`##chattr +i /etc/passwd`
+
+`##chattr +i /etc/inittab`
+
+`##chattr +i /etc/group`
+
+`##chattr +i /etc/shadow`
+
+`##chattr +i /etc/gshadow`
+
+`##chattr +a /var/log/messages`
+
+`###使用chattr命令后，为了安全我们需要将其改名`
+
+`##mv /usr/bin/chattr /usr/bin/lockkeyfile`
+
+`#4.11 history命令加入时间和操作者IP的属性`
+
+`#echo"HISTFILESIZE=4000">>/etc/profile`
+
+`#echo"HISTSIZE=4000">>/etc/profile`
+
+```#echo 'HISTTIMEFORMAT="%F %T 'who am i|cut -d\\( -f2|cut -d\\) -f1``whoami` ">>/etc/profile```
+
+`#echo "export HISTTIMEFORMAT">>/etc/profile`
+
+`echo` `"`
+
+`HISTFILESIZE=4000`
+
+`HISTSIZE=4000`
+
+`HISTTIMEFORMAT=\\```"%F %T \\ 'who am i|cut -d\\( -f2|cut -d\\) -f1\\`\\`whoami\\`\\"``
+
+`export` `HISTTIMEFORMAT`
+
+`">>``/etc/profile`
+
+`source` `/etc/profile`
+
+`systemctl stop firewalld.service`
+
+`systemctl disable firewalld.service`
+
+`#5 系统重启`
+
+`yum` `install` `-y` `gcc`
+
+reboot
 
 TCP 优化，分三类情况详细说明：
 
@@ -252,19 +650,8 @@ TCP 优化，分三类情况详细说明：
 
 企业linux 性能优化从来不是一件容易的事，对于运维工程师来说是绕不过去的坎，这也是运维知识体系中最底层并且最难的一部分。想要学习好性能分析和优化，需要建立整体系统性能的全局观，需要理解CPU、内存、磁盘、网络的原理，掌握需要收集哪些监控的指标，以及熟练使用各种工具来分析和追踪以及定位问题。
 
-![](http://mmbiz.qpic.cn/mmbiz_png/1TDxR6xkRSFD7ibPKdP9JOqxFxp199B6LLCw80xbTAicxIQPgpsq5ib8kvx7eKfq6erLb1CAT4ZKa3RSnl9IWfELw/300?wx_fmt=png&wxfrom=19)
+---
 
-**Linux云计算网络**
-
-专注于 「Linux」 「云计算」「网络」技术栈，分享的干货涉及到 Linux、网络、虚拟化、Docker、Kubernetes、SDN、Python、Go、编程等，后台回复「1024」，送你一套 10T 资源学习大礼包，期待与你相遇。
-
-93篇原创内容
-
-公众号
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-阅读 989
 
 ​
 
