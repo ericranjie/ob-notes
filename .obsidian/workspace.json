@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
+                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
+                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
+                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md"
+                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md"
               }
             }
           }
@@ -148,11 +148,16 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/performance/t_性能优化的路有多远？.md",
+    "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
+    "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+    "zx99-image/Pasted image 20241010225439.png",
+    "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
+    "coding/os/linux/performance/k_一文说清linux system load.md",
     "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "zx99-image/Pasted image 20241010222743.png",
     "zx99-image/Pasted image 20241010222858.png",
-    "coding/os/linux/performance/k_n_从纳秒级优化谈CPU眼里的好代码.md",
     "zx99-image/Pasted image 20241010223426.png",
     "zx99-image/Pasted image 20241010223414.png",
     "zx99-image/Pasted image 20241010223401.png",
@@ -160,8 +165,6 @@
     "zx99-image/Pasted image 20241010223324.png",
     "zx99-image/Pasted image 20241010223315.png",
     "zx99-image/Pasted image 20241010223256.png",
-    "zx99-image/Pasted image 20241010223246.png",
-    "coding/os/linux/performance/t_性能优化的路有多远？.md",
     "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
     "README.md",
@@ -188,9 +191,6 @@
     "interview/leetcode/huawei",
     "coding/os/linux/BPF/a_BPF内核实现详解.md",
     "coding/os/linux/BPF/c_Linux eBPF学习路径.md",
-    "coding/os/linux/BPF/a_浅谈一下，Linux中基于eBPF的恶意利用与检测机制.md",
-    "coding/os/linux/BPF/b_BPF C 编程入门.md",
-    "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
     "ztrash",
     "coding/cpp/schedule/coroutine",
     "coding/cpp/schedule",

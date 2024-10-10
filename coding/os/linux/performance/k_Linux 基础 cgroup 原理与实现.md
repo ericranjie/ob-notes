@@ -1,8 +1,9 @@
-CPP开发者
-_2022年01月19日 11:55_
-以下文章来源于Linux内核那些事 ，作者songsong001
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651170173&idx=1&sn=b6e4974e3a871c55519694d124c52e01&chksm=80647422b713fd347379c7f626e270d457cae59c600cd5a99e2c89dac84b0736723a5fa275ea&mpshare=1&scene=24&srcid=0120Mo30LDcgQ4jb6rWB3cvx&sharer_sharetime=1642640351758&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0519fb95cd017bad5065115f61fb823341e21c132cb23bfa1b8dd674658308e59dea49252b5102ac160b7cc8754b8bab973f7bd28b69d6b549d5d929412c2deab8a90f76d0ec38154a8e277d8fc3951b2d029f68bd6f36fba4e4d98cbd79dbd12594faffa5353abe66ad63644f6575ab71ecfae3daeb6e8bf&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQkWiIguhR8d5%2Blj08juApPRLmAQIE97dBBAEAAAAAAF1fExA76NsAAAAOpnltbLcz9gKNyK89dVj09Q%2FKUeBA8yUe88RsjBpCzFzdp97tQHknrzU8swESrxEQ3yKZ6uPMwqFatQr7jFFn1YqJhMo6HvQhRD%2B5RcTWh%2BjDdqXSK3xSnZAIZUXuCltsfGz6rkRXmr5SNb%2By9Qqxoxvf%2FOgPC%2BmwjbC8Vm4aa6VosK5k4ZW4doXIIUH25ZKdYk9eVQbRE%2Bb4Cy%2F39U1Irm6UCXgM%2F0l6Au3HTh5t5WPLb1WkuYEc0ca46uot27vKj89sfSXixRiEykTsH9wO&acctmode=0&pass_ticket=QlKY08gowgF%2B61ooIJ4Q6SOpdGoVSLVlqLuu8mJmOmYIy7xfPUvze38WPto3j2vF&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+CPP开发者
+
+_2022年01月19日 11:55_
+
+以下文章来源于Linux内核那些事 ，作者songsong001
 
 本文将通过分析源码（本文使用的 Linux2.6.25 版本）来介绍 `CGroup` 的实现原理。在分析源码前，我们先介绍几个重要的数据结构，因为 `CGroup` 就是通过这几个数据结构来控制进程组对各种资源的使用。
 
@@ -25,8 +26,7 @@ struct cgroup {    unsigned long flags;        /* "unsigned lo
 1. `top_cgroup`: `层级` 的根节点（根cgroup）。
 
 我们通过下面图片来描述 `层级` 中各个 `cgroup` 组成的树状关系：
-!\[\[Pasted image 20240920124925.png\]\]
-
+![[Pasted image 20240920124925.png]]
 cgroup-links
 
 ## `cgroup_subsys_state` 结构体
@@ -70,7 +70,7 @@ cgroup-state-memory
 
 `cgroup` 结构与 `cgroup_subsys_state` 结构之间的关系如下图：
 
-!\[\[Pasted image 20240920124951.png\]\]
+![[Pasted image 20240920124951.png]]
 cgroup-subsys-state
 
 ## `css_set` 结构体
@@ -97,7 +97,7 @@ struct task_struct {    ...    struct css_set *cgroups;    struc
 可以看出，`task_struct` 结构的 `cgroups` 字段就是指向 `css_set` 结构的指针，而 `cg_list` 字段用于连接所有使用此 `css_set` 结构的进程列表。
 
 `task_struct` 结构与 `css_set` 结构的关系如下图：
-!\[\[Pasted image 20240920125058.png\]\]
+![[Pasted image 20240920125058.png]]
 
 cgroup-task-cssset
 
@@ -147,13 +147,13 @@ $ mount -t cgroup -o memory memory /sys/fs/cgroup/memory
 
 挂载过程最终会调用内核函数 `cgroup_get_sb()` 完成，由于 `cgroup_get_sb()` 函数比较长，所以我们只分析重要部分：
 
-```
+```cpp
 static int cgroup_get_sb(struct file_system_type *fs_type,     int flags, const char *unused_dev_name,     void *data, struct vfsmount *mnt){    ...    struct cgroupfs_root *root;    ...    root = kzalloc(sizeof(*root), GFP_KERNEL);    ...    ret = rebind_subsystems(root, root->subsys_bits);    ...    struct cgroup *cgrp = &root->top_cgroup;    cgroup_populate_dir(cgrp);    ...}
 ```
 
 `cgroup_get_sb()` 函数会调用 `kzalloc()` 函数创建一个 `cgroupfs_root` 结构。`cgroupfs_root` 结构主要用于描述这个挂载点的信息，其定义如下：
 
-```
+```cpp
 struct cgroupfs_root {    struct super_block *sb;    unsigned long subsys_bits;    unsigned long actual_subsys_bits;    struct list_head subsys_list;    struct cgroup top_cgroup;    int number_of_cgroups;    struct list_head root_list;    unsigned long flags;    char release_agent_path[PATH_MAX];};
 ```
 
@@ -249,18 +249,7 @@ static int mem_cgroup_charge_common(struct page *page, struct mm_struct *
 
 看精选C/C++技术文章
 
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
-
 **CPP开发者**
 
 我们在 Github 维护着 9000+ star 的C语言/C++开发资源。日常分享 C语言 和 C++ 开发相关技术文章，每篇文章都经过精心筛选，一篇文章讲透一个知识点，让读者读有所获～
 
-24篇原创内容
-
-公众号
-
-点赞和在看就是最大的支持❤️
-
-阅读 2244
-
-​

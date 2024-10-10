@@ -1,17 +1,13 @@
+
 Linux阅码场
+
 _2021年11月25日 07:03_
 
 以下文章来源于OpenAnolis龙蜥 ，作者闻茂泉、李靖轩
 
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4bZCboj0qz7G2rqBCKMh4iblVGkMN9XKUxiaECBVF6nj1g/0)
-
 **OpenAnolis龙蜥**.
 
 龙蜥社区（OpenAnolis）是立足中国面向国际的 Linux 服务器操作系统开源根社区及创新平台。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247502803&idx=1&sn=709db7f06081af73177c2d2993f03fd2&source=41&key=daf9bdc5abc4e8d05fb4e1ce7572f25187a4bdf98413b11d17b7d296f7c0a8ead604c6279a5fdc68478baa7056dee6a816daa68b46e5cdc4e37745850ad62e5357353015561bc164d341f170d52442b4b02c0bb549c68cd7a48b61bce09700aaac63756dce0f6e0cf64664b4acb121f6bafbbd8632110d1fefe34c04c6975f96&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQtCZB%2F0EQCYtZ7uiQ0Ev0BhLmAQIE97dBBAEAAAAAAP3vDB3ExKUAAAAOpnltbLcz9gKNyK89dVj04ViatOwdSkycmFBjVcmREhqJCODXY7lk1RZ2l107J018vWUj9hem%2FgMFch4ofXHzNgUtYIuCgi%2Bhf%2BPG2SSkuh%2BeWlFKYt0V0WSLdujTDX0fepp7tDCLIlVrCXOSEAJ%2BwnxhfSgokYFjPrs3%2Bfiw2%2Faq6L47gRHiytmXavHH19yxs6bLtVnQtjBugG1L6XyKGjtEAi9b%2BbsHwH7643c9GVv7q0g7mcd34cE0Ev%2FGudYavSkKhGgKZkUJKroyzqQ%2F&acctmode=0&pass_ticket=tH4V4QcsOMmoMNwUPvizh7Af8SbvIXUpGf3p4CXyc4Fsi2qaI4b1YcA%2Bpfv8%2B5TK&wx_header=1#)
 
 **跟踪诊断技术 SIG 致力于为操作系统生态提供系统性，工具化，并以数据为支撑的发现、跟踪和诊断问题的能力。**
 
@@ -25,8 +21,6 @@ _2021年11月25日 07:03_
 网址：_https://openanolis.cn/sig/tracing_
 
 邮件列表：_cloud-kernel@lists.openanolis.cn_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/xHicTWic3y1DskJOic8Wjfg87ib4ZtSljR5oF5hzgfqNVM5wus6BUic16kmrib746FgMNf6ZEKMs3TRJMVPLibbX7dXyg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 ### **前言**
 
