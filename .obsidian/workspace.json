@@ -148,8 +148,9 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "mine/cpp-idiom/如何自己实现C++的各个库函数？（思路 or 实作）.md",
+    "mine/cpp-idiom/常见库函数与头文件对应关系.md",
     "Welcome.md",
+    "mine/cpp-idiom/如何自己实现C++的各个库函数？（思路 or 实作）.md",
     "README.md",
     "mine/cpp-idiom/initialized_list.md",
     "mine/cpp-idiom/iostream.md",
@@ -183,7 +184,6 @@
     "zx99-image/Pasted image 20241009122102.png",
     "zx99-image/Pasted image 20241009122052.png",
     "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
-    "coding/os/linux/performance/a_n _微信工程师：常见性能优化方案与实用工具.md",
     "ztrash",
     "zx99-image/Pasted image 20241009114447.png",
     "zx99-image/Pasted image 20241009113121.png",
