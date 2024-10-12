@@ -13,13 +13,26 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
+                "file": "Welcome.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "cd2f984ed21aa3fb",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "code-griding-note.md",
                 "mode": "source",
                 "source": false
               }
             }
           }
-        ]
+        ],
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -85,7 +98,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
+                "file": "code-griding-note.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +115,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
+                "file": "code-griding-note.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +138,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md"
+                "file": "code-griding-note.md"
               }
             }
           }
@@ -146,8 +159,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "cd2f984ed21aa3fb",
   "lastOpenFiles": [
+    "Welcome.md",
+    "code-griding-note.md",
+    "README.md",
+    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
     "coding/os/linux/performance/t_性能优化的路有多远？.md",
     "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
     "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
@@ -167,11 +184,9 @@
     "zx99-image/Pasted image 20241010223256.png",
     "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
-    "README.md",
     "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
     "interview/内核内存错误检测工具KFENCE.md",
     "interview/leetcode/bytedance/字节跳动春招研发部分编程题汇总.md",
-    "Welcome.md",
     "interview/leetcode/bytedance",
     "mine/cpp-idiom/常见库函数与头文件对应关系.md",
     "mine/cpp-idiom/如何自己实现C++的各个库函数？（思路 or 实作）.md",
@@ -189,8 +204,6 @@
     "0x01-leetcode/1-dimensional/string/anagram",
     "coding/os/linux/BPF/b_eBPF 简史.md",
     "interview/leetcode/huawei",
-    "coding/os/linux/BPF/a_BPF内核实现详解.md",
-    "coding/os/linux/BPF/c_Linux eBPF学习路径.md",
     "ztrash",
     "coding/cpp/schedule/coroutine",
     "coding/cpp/schedule",
