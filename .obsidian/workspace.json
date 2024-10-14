@@ -31,7 +31,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "Welcome.md",
                 "mode": "source",
                 "source": false
               }
@@ -78,7 +78,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "palindrome",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -115,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "Welcome.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -132,7 +132,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "Welcome.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -155,7 +155,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "code-griding-note.md"
+                "file": "Welcome.md"
               }
             }
           }
@@ -178,6 +178,17 @@
   },
   "active": "66b25e7d06fd3de4",
   "lastOpenFiles": [
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_5. Longest Palindromic Substring.md",
+    "0x01-leetcode/1-dimensional/double-pointer/h_1147. Longest Chunked Palindrome Decomposition.md",
+    "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_132. Palindrome Partitioning II.md",
+    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/h_47. Permutations II.md",
+    "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
+    "0x01-leetcode/1-dimensional/stack/e_234. Palindrome Linked List.md",
+    "0x01-leetcode/1-dimensional/linked-list/reverse/e_206. Reverse Linked List.md",
+    "0x01-leetcode/math-logic/e_9. Palindrome Number.md",
+    "code-griding-note.md",
     "Welcome.md",
     "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
     "interview/leetcode/codetop/1-dimensional/string.md",
@@ -187,26 +198,15 @@
     "interview/leetcode/codetop/1-dimensional/stack.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop/codetop-main-entrance.md",
-    "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
     "0x01-leetcode/1-dimensional/queue/m_950. Reveal Cards In Increasing Order.md",
     "interview/leetcode/codetop",
-    "code-griding-note.md",
     "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
     "coding/Coding-Quote.md",
     "coding/cpp/lock/b_n_详解C++高性能无锁队列的原理与实现.md",
     "coding/cpp/learning/c_月薪2万+的C C++工程师需要掌握哪些技能？.md",
     "coding/cpp/learning/c_C++，YYDS！.md",
     "coding/cpp/learning/c_内推字节 Linux C C++ 开发的那位同学没通过面试.......md",
-    "README.md",
-    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
-    "coding/os/linux/performance/t_性能优化的路有多远？.md",
-    "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
-    "coding/os/linux/performance/k_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "zx99-image/Pasted image 20241010225439.png",
-    "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
-    "coding/os/linux/performance/k_一文说清linux system load.md",
-    "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
-    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "zx99-image/Pasted image 20241010222743.png",
     "zx99-image/Pasted image 20241010222858.png",
     "zx99-image/Pasted image 20241010223426.png",
