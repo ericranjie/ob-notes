@@ -31,7 +31,19 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
+                "mode": "source",
+                "source": false
+              }
+            }
+          },
+          {
+            "id": "84c121b88e85ed9f",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "interview/leetcode/codetop/1-dimensional/queue.md",
                 "mode": "source",
                 "source": false
               }
@@ -103,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -120,7 +132,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -143,7 +155,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "code-griding-note.md"
+                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md"
               }
             }
           }
@@ -166,9 +178,20 @@
   },
   "active": "66b25e7d06fd3de4",
   "lastOpenFiles": [
+    "interview/leetcode/codetop/1-dimensional/string.md",
+    "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
+    "interview/leetcode/codetop/1-dimensional/queue.md",
+    "0x01-leetcode/1-dimensional/array/rotate/e_189. Rotate Array.md",
+    "interview/leetcode/codetop/1-dimensional/array.md",
+    "interview/leetcode/codetop/1-dimensional/stack.md",
+    "interview/leetcode/codetop/1-dimensional",
+    "interview/leetcode/codetop/codetop-main-entrance.md",
+    "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
+    "0x01-leetcode/1-dimensional/queue/m_950. Reveal Cards In Increasing Order.md",
+    "interview/leetcode/codetop",
+    "code-griding-note.md",
     "Welcome.md",
     "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
-    "code-griding-note.md",
     "coding/Coding-Quote.md",
     "coding/cpp/lock/b_n_详解C++高性能无锁队列的原理与实现.md",
     "coding/cpp/learning/c_月薪2万+的C C++工程师需要掌握哪些技能？.md",
@@ -193,16 +216,7 @@
     "zx99-image/Pasted image 20241010223324.png",
     "zx99-image/Pasted image 20241010223315.png",
     "zx99-image/Pasted image 20241010223256.png",
-    "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "interview/内核内存错误检测工具KFENCE.md",
-    "interview/leetcode/bytedance/字节跳动春招研发部分编程题汇总.md",
     "interview/leetcode/bytedance",
-    "mine/cpp-idiom/常见库函数与头文件对应关系.md",
-    "mine/cpp-idiom/如何自己实现C++的各个库函数？（思路 or 实作）.md",
-    "mine/cpp-idiom/initialized_list.md",
-    "mine/cpp-idiom/iostream.md",
     "mine/cpp-idiom/Untitled",
     "mine/cpp-idiom/algorithms",
     "mine/cpp-idiom",
@@ -210,8 +224,6 @@
     "0x01-leetcode/1-dimensional/string/anagram",
     "interview/leetcode/huawei",
     "ztrash",
-    "coding/cpp/schedule/coroutine",
-    "coding/cpp/schedule",
     "Untitled.canvas",
     "0x01-leetcode/math-logic/Untitled.canvas",
     "0x01-leetcode/1-dimensional/linked-list/Untitled.canvas"
