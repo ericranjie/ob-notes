@@ -31,7 +31,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
+                "file": "code-griding-note.md",
                 "mode": "source",
                 "source": false
               }
@@ -99,7 +99,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 359.50390243530273
+    "width": 200
   },
   "right": {
     "id": "0ed372e18b255e27",
@@ -115,7 +115,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
+                "file": "code-griding-note.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -132,7 +132,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
+                "file": "code-griding-note.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -155,7 +155,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md"
+                "file": "code-griding-note.md"
               }
             }
           }
@@ -178,8 +178,9 @@
   },
   "active": "66b25e7d06fd3de4",
   "lastOpenFiles": [
-    "interview/leetcode/codetop/1-dimensional/string.md",
+    "Welcome.md",
     "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
+    "interview/leetcode/codetop/1-dimensional/string.md",
     "interview/leetcode/codetop/1-dimensional/queue.md",
     "0x01-leetcode/1-dimensional/array/rotate/e_189. Rotate Array.md",
     "interview/leetcode/codetop/1-dimensional/array.md",
@@ -190,7 +191,6 @@
     "0x01-leetcode/1-dimensional/queue/m_950. Reveal Cards In Increasing Order.md",
     "interview/leetcode/codetop",
     "code-griding-note.md",
-    "Welcome.md",
     "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
     "coding/Coding-Quote.md",
     "coding/cpp/lock/b_n_详解C++高性能无锁队列的原理与实现.md",
