@@ -2,11 +2,7 @@
 
 _2021年03月24日 12:00_
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/ic8RqseyjxMPRffmX1RfSpu2FgLzUqZ4k37EraaviaT1IianXjxNpbRlLqaUu376n5iaOqZicEXklbPnYIt1RqQBlmg/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
-## 
-
-## 最近同事内推了一位 Linux C/C++ 后端开发的同学到我们公司面试，我是一面的面试官，很遗憾这位工作了两年的同学面试表现不是很好。
+最近同事内推了一位 Linux C/C++ 后端开发的同学到我们公司面试，我是一面的面试官，很遗憾这位工作了两年的同学面试表现不是很好。
 
 我问了如下一些问题：
 
@@ -306,15 +302,7 @@ TeamTalk 是蘑菇街开源的一款用于企业内部的即时通信工具，�
 
 如果对后端开发感兴趣，想加入 **Linux** **服务器开发微信交流群** 进行交流，可以先加我微信 **easy_coder**，备注"加微信群"，我拉你入群，备注不对不加哦。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-### 原创不易，点在看是最大的支持
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-阅读 7209
-
-​
+---
 
 写留言
 

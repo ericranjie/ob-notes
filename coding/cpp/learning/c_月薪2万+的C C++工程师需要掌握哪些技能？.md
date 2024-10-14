@@ -4,13 +4,9 @@ _2024年03月26日 20:29_ _湖南_
 
 如果你想要拿到月薪2万+，那么你在C/C++领域需要具备什么样的专业能力呢？
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0y1tyicyGd1jVicLvW21FwZxQnZl4gkdwV81b16KnwAqibUDicBnJCLsBmah6e5xqsSeO1IuULPdPt3OQ/640?wx_fmt=png&from=appmsg&wxfrom=13)
-
 （一）C语言
 
 作为一名C程序员，熟练掌握C语言是最基本的一项技能。关于如何学好C语言，以及C语言话题的讨论，网上有很多经典的文章。很多人工作一段时间以后都自认为自己的C语言水平已经很高了。可实际在工作中，接触的东西也多了，开源项目多了以后，才发现自己的C语言能力太一般了。宏函数千变万化的写法，指针百花缭乱的用法…等等。写代码时，应常常问自己：这个行为是C语言规范定义的吗？如果是，是C89还是C99？我现在用的编译器支持吗？如果不是C语言规范定义的，那么在程序运行的这个平台，行为是确定的吗？所以建议大家平时可以多想想这些问题，查查资料，相信一定会对C语言有更深的理解。
-
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0y1tyicyGd1jVicLvW21FwZxQjdtR0FdUyv1JE2xGbkuE3NibFsa316ug2ia8bXdmuwmGTcCAXTf8709Q/640?wx_fmt=png&from=appmsg&wxfrom=13)
 
 （二）UNIX/Linux系统编程
 

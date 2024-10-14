@@ -13,14 +13,20 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Welcome.md",
+                "file": "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
                 "mode": "source",
                 "source": false
               }
             }
-          },
+          }
+        ]
+      },
+      {
+        "id": "7836a256026997eb",
+        "type": "tabs",
+        "children": [
           {
-            "id": "cd2f984ed21aa3fb",
+            "id": "66b25e7d06fd3de4",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -31,8 +37,7 @@
               }
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -159,10 +164,16 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "cd2f984ed21aa3fb",
+  "active": "66b25e7d06fd3de4",
   "lastOpenFiles": [
     "Welcome.md",
+    "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
     "code-griding-note.md",
+    "coding/Coding-Quote.md",
+    "coding/cpp/lock/b_n_详解C++高性能无锁队列的原理与实现.md",
+    "coding/cpp/learning/c_月薪2万+的C C++工程师需要掌握哪些技能？.md",
+    "coding/cpp/learning/c_C++，YYDS！.md",
+    "coding/cpp/learning/c_内推字节 Linux C C++ 开发的那位同学没通过面试.......md",
     "README.md",
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
     "coding/os/linux/performance/t_性能优化的路有多远？.md",
@@ -193,16 +204,10 @@
     "mine/cpp-idiom/initialized_list.md",
     "mine/cpp-idiom/iostream.md",
     "mine/cpp-idiom/Untitled",
-    "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
-    "mine/cpp-idiom/algorithms/hashmap.md",
     "mine/cpp-idiom/algorithms",
     "mine/cpp-idiom",
     "mine",
-    "interview/leetcode/huawei/huawei-leetcode-quote.md",
-    "0x01-leetcode/data-structure/treeset-treemap/h_732. My Calendar III.md",
-    "0x01-leetcode/1-dimensional/string/anagram/m_49. Group Anagrams.md",
     "0x01-leetcode/1-dimensional/string/anagram",
-    "coding/os/linux/BPF/b_eBPF 简史.md",
     "interview/leetcode/huawei",
     "ztrash",
     "coding/cpp/schedule/coroutine",
