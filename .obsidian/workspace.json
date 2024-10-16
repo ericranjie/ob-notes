@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md"
+                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md"
               }
             }
           }
@@ -148,8 +148,10 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "README.md",
+    "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
+    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
     "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+    "README.md",
     "coding/os/linux/network/i_向左向右 网络IO卸载.md",
     "code-griding-note.md",
     "coding/os/linux/network/an_深入理解 Linux socket.md",
@@ -182,8 +184,6 @@
     "0x01-leetcode/1-dimensional/double-pointer/h_1147. Longest Chunked Palindrome Decomposition.md",
     "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_132. Palindrome Partitioning II.md",
-    "0x01-leetcode/2-dimensional/BFS-DFS/permutation/h_47. Permutations II.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

@@ -323,739 +323,332 @@ struct net_device \*ndev;这里对net_device进行初始化，分配内存
 
 一些初始化动作，fec_enet_init(ndev);由于代码注释写的很好，上代码：
 
-1. /\*
+```cpp
+1. /*
+2. * XXX: We need to clean up on failure exits here.
+3. *
+4. */
+5. static int fec_enet_init(struct net_device *ndev)
+6. {
+7. struct fec_enet_private *fep = netdev_priv(ndev);
+8. struct fec_enet_priv_tx_q *txq;
+9. struct fec_enet_priv_rx_q *rxq;
+10. struct bufdesc *cbd_base;
+11. dma_addr_t bd_dma;
+12. int bd_size;
+13. unsigned int i;
+
+15. #if defined(CONFIG_ARM)
+16. fep->rx_align = 0xf;
+17. fep->tx_align = 0xf;
+18. #else
+19. fep->rx_align = 0x3;
+20. fep->tx_align = 0x3;
+21. #endif
+
+23. fec_enet_alloc_queue(ndev);
+
+25. if (fep->bufdesc_ex)
+26. fep->bufdesc_size = sizeof(struct bufdesc_ex);
+27. else
+28. fep->bufdesc_size = sizeof(struct bufdesc);
+29. bd_size = (fep->total_tx_ring_size + fep->total_rx_ring_size) *
+30. fep->bufdesc_size;
+
+32. /* Allocate memory for buffer descriptors. */
+33. cbd_base = dma_alloc_coherent(NULL, bd_size, &bd_dma,
+34. GFP_KERNEL);
+35. if (!cbd_base) {
+36. return -ENOMEM;
+37. }
+
+39. memset(cbd_base, 0, bd_size);
+
+41. /* Get the Ethernet address */
+42. fec_get_mac(ndev);
+43. /* make sure MAC we just acquired is programmed into the hw */
+44. fec_set_mac_address(ndev, NULL);
+
+46. /* Set receive and transmit descriptor base. */
+47. for (i = 0; i < fep->num_rx_queues; i++) {
+48. rxq = fep->rx_queue[i];
+49. rxq->index = i;
+50. rxq->rx_bd_base = (struct bufdesc *)cbd_base;
+51. rxq->bd_dma = bd_dma;
+52. if (fep->bufdesc_ex) {
+53. bd_dma += sizeof(struct bufdesc_ex) * rxq->rx_ring_size;
+54. cbd_base = (struct bufdesc *)
+55. (((struct bufdesc_ex *)cbd_base) + rxq->rx_ring_size);
+56. } else {
+57. bd_dma += sizeof(struct bufdesc) * rxq->rx_ring_size;
+58. cbd_base += rxq->rx_ring_size;
+59. }
+60. }
+
+62. for (i = 0; i < fep->num_tx_queues; i++) {
+63. txq = fep->tx_queue[i];
+64. txq->index = i;
+65. txq->tx_bd_base = (struct bufdesc *)cbd_base;
+66. txq->bd_dma = bd_dma;
+67. if (fep->bufdesc_ex) {
+68. bd_dma += sizeof(struct bufdesc_ex) * txq->tx_ring_size;
+69. cbd_base = (struct bufdesc *)
+70. (((struct bufdesc_ex *)cbd_base) + txq->tx_ring_size);
+71. } else {
+72. bd_dma += sizeof(struct bufdesc) * txq->tx_ring_size;
+73. cbd_base += txq->tx_ring_size;
+74. }
+75. }
+
+78. /* The FEC Ethernet specific entries in the device structure */
+79. ndev->watchdog_timeo = TX_TIMEOUT;
+80. ndev->netdev_ops = &fec_netdev_ops;
+81. ndev->ethtool_ops = &fec_enet_ethtool_ops;
+
+83. writel(FEC_RX_DISABLED_IMASK, fep->hwp + FEC_IMASK);
+84. netif_napi_add(ndev, &fep->napi, fec_enet_rx_napi, NAPI_POLL_WEIGHT);
+
+86. if (fep->quirks & FEC_QUIRK_HAS_VLAN)
+87. /* enable hw VLAN support */
+88. ndev->features |= NETIF_F_HW_VLAN_CTAG_RX;
+
+90. if (fep->quirks & FEC_QUIRK_HAS_CSUM) {
+91. ndev->gso_max_segs = FEC_MAX_TSO_SEGS;
+
+93. /* enable hw accelerator */
+94. ndev->features |= (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM
+95. | NETIF_F_RXCSUM | NETIF_F_SG | NETIF_F_TSO);
+96. fep->csum_flags |= FLAG_RX_CSUM_ENABLED;
+97. }
+
+99. if (fep->quirks & FEC_QUIRK_HAS_AVB) {
+100. fep->tx_align = 0;
+101. fep->rx_align = 0x3f;
+102. }
 
-1. - XXX:  We need to clean up on failure exits here.
+104. ndev->hw_features = ndev->features;
 
-1. -
+106. fec_restart(ndev);
 
-1. \*/
-
-1. static int fec_enet_init(struct net_device \*ndev)
-
-1. {
-
-1. struct fec_enet_private \*fep = netdev_priv(ndev);
-
-1. struct fec_enet_priv_tx_q \*txq;
-
-1. struct fec_enet_priv_rx_q \*rxq;
-
-1. ```
-   struct bufdesc *cbd_base;
-   ```
-
-1. ```
-   dma_addr_t bd_dma;
-   ```
-
-1. ```
-   int bd_size;
-   ```
-
-1. ```
-   unsigned int i;
-   ```
-
-1. #if defined(CONFIG_ARM)
-
-1. ```
-   fep->rx_align = 0xf;
-   ```
-
-1. ```
-   fep->tx_align = 0xf;
-   ```
-
-1. #else
-
-1. ```
-   fep->rx_align = 0x3;
-   ```
-
-1. ```
-   fep->tx_align = 0x3;
-   ```
-
-1. #endif
-
-1. ```
-   fec_enet_alloc_queue(ndev);
-   ```
-
-1. ```
-   if (fep->bufdesc_ex)
-   ```
-
-1. ```
-   	fep->bufdesc_size = sizeof(struct bufdesc_ex);
-   ```
-
-1. ```
-   else
-   ```
-
-1. ```
-   	fep->bufdesc_size = sizeof(struct bufdesc);
-   ```
-
-1. ```
-   bd_size = (fep->total_tx_ring_size + fep->total_rx_ring_size) *
-   ```
-
-1. ```
-   		fep->bufdesc_size;
-   ```
-
-1. ```
-   /* Allocate memory for buffer descriptors. */
-   ```
-
-1. ```
-   cbd_base = dma_alloc_coherent(NULL, bd_size, &bd_dma,
-   ```
-
-1. ```
-   			      GFP_KERNEL);
-   ```
-
-1. ```
-   if (!cbd_base) {
-   ```
-
-1. ```
-   	return -ENOMEM;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   memset(cbd_base, 0, bd_size);
-   ```
-
-1. ```
-   /* Get the Ethernet address */
-   ```
-
-1. ```
-   fec_get_mac(ndev);
-   ```
-
-1. ```
-   /* make sure MAC we just acquired is programmed into the hw */
-   ```
-
-1. ```
-   fec_set_mac_address(ndev, NULL);
-   ```
-
-1. ```
-   /* Set receive and transmit descriptor base. */
-   ```
-
-1. ```
-   for (i = 0; i < fep->num_rx_queues; i++) {
-   ```
-
-1. ```
-   	rxq = fep->rx_queue[i];
-   ```
-
-1. ```
-   	rxq->index = i;
-   ```
-
-1. ```
-   	rxq->rx_bd_base = (struct bufdesc *)cbd_base;
-   ```
-
-1. ```
-   	rxq->bd_dma = bd_dma;
-   ```
-
-1. ```
-   	if (fep->bufdesc_ex) {
-   ```
-
-1. ```
-   		bd_dma += sizeof(struct bufdesc_ex) * rxq->rx_ring_size;
-   ```
-
-1. ```
-   		cbd_base = (struct bufdesc *)
-   ```
-
-1. ```
-   			(((struct bufdesc_ex *)cbd_base) + rxq->rx_ring_size);
-   ```
-
-1. ```
-   	} else {
-   ```
-
-1. ```
-   		bd_dma += sizeof(struct bufdesc) * rxq->rx_ring_size;
-   ```
-
-1. ```
-   		cbd_base += rxq->rx_ring_size;
-   ```
-
-1. ```
-   	}
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   for (i = 0; i < fep->num_tx_queues; i++) {
-   ```
-
-1. ```
-   	txq = fep->tx_queue[i];
-   ```
-
-1. ```
-   	txq->index = i;
-   ```
-
-1. ```
-   	txq->tx_bd_base = (struct bufdesc *)cbd_base;
-   ```
-
-1. ```
-   	txq->bd_dma = bd_dma;
-   ```
-
-1. ```
-   	if (fep->bufdesc_ex) {
-   ```
-
-1. ```
-   		bd_dma += sizeof(struct bufdesc_ex) * txq->tx_ring_size;
-   ```
-
-1. ```
-   		cbd_base = (struct bufdesc *)
-   ```
-
-1. ```
-   		 (((struct bufdesc_ex *)cbd_base) + txq->tx_ring_size);
-   ```
-
-1. ```
-   	} else {
-   ```
-
-1. ```
-   		bd_dma += sizeof(struct bufdesc) * txq->tx_ring_size;
-   ```
-
-1. ```
-   		cbd_base += txq->tx_ring_size;
-   ```
-
-1. ```
-   	}
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   /* The FEC Ethernet specific entries in the device structure */
-   ```
-
-1. ```
-   ndev->watchdog_timeo = TX_TIMEOUT;
-   ```
-
-1. ```
-   ndev->netdev_ops = &fec_netdev_ops;
-   ```
-
-1. ```
-   ndev->ethtool_ops = &fec_enet_ethtool_ops;
-   ```
-
-1. ```
-   writel(FEC_RX_DISABLED_IMASK, fep->hwp + FEC_IMASK);
-   ```
-
-1. ```
-   netif_napi_add(ndev, &fep->napi, fec_enet_rx_napi, NAPI_POLL_WEIGHT);
-   ```
-
-1. ```
-   if (fep->quirks & FEC_QUIRK_HAS_VLAN)
-   ```
-
-1. ```
-   	/* enable hw VLAN support */
-   ```
-
-1. ```
-   	ndev->features |= NETIF_F_HW_VLAN_CTAG_RX;
-   ```
-
-1. ```
-   if (fep->quirks & FEC_QUIRK_HAS_CSUM) {
-   ```
-
-1. ```
-   	ndev->gso_max_segs = FEC_MAX_TSO_SEGS;
-   ```
-
-1. ```
-   	/* enable hw accelerator */
-   ```
-
-1. ```
-   	ndev->features |= (NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM
-   ```
-
-1. ```
-   			| NETIF_F_RXCSUM | NETIF_F_SG | NETIF_F_TSO);
-   ```
-
-1. ```
-   	fep->csum_flags |= FLAG_RX_CSUM_ENABLED;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   if (fep->quirks & FEC_QUIRK_HAS_AVB) {
-   ```
-
-1. ```
-      fep->tx_align = 0;
-   ```
-
-1. ```
-      fep->rx_align = 0x3f;
-   ```
-
-1. }
-
-1. ndev->hw_features = ndev->features;
-
-1. fec_restart(ndev);
-
-1. return 0;
-
-1. }
+108. return 0;
+109. }
+```
 
 ## 1.2 获取以太网mac地址
 
-1. /\* Get the Ethernet address \*/
+```cpp
+1. /* Get the Ethernet address */
 1. fec_get_mac(ndev);
-1. /\* make sure MAC we just acquired is programmed into the hw \*/
+1. /* make sure MAC we just acquired is programmed into the hw */
 1. fec_set_mac_address(ndev, NULL);
+```
 
 这里获取mac 地址的流程我要说一下，之前有讲过流程，我这里再提一下：
 
 1）  模块化参数设置，如果没有跳到步骤2
 
-1. static void fec_get_mac(struct net_device \*ndev)
+```cpp
+1. static void fec_get_mac(struct net_device *ndev)
+2. {
+3. struct fec_enet_private *fep = netdev_priv(ndev);
+4. struct fec_platform_data *pdata = dev_get_platdata(&fep->pdev->dev);
+5. unsigned char *iap, tmpaddr[ETH_ALEN];
 
-1. {
-
-1. struct fec_enet_private \*fep = netdev_priv(ndev);
-
-1. struct fec_platform_data \*pdata = dev_get_platdata(&fep->pdev->dev);
-
-1. unsigned char \*iap, tmpaddr\[ETH_ALEN\];
-
-1. /\*
-
-1. - try to get mac address in following order:
-
-1. -
-
-1. ```
-    * 1) module parameter via kernel command line in form
-   ```
-
-1. ```
-    *    fec.macaddr=0x00,0x04,0x9f,0x01,0x30,0xe0
-   ```
-
-1. ```
-    */
-   ```
-
-1. ```
-   iap = macaddr;
-   ```
+7. /*
+8. * try to get mac address in following order:
+9. *
+10. * 1) module parameter via kernel command line in form
+11. * fec.macaddr=0x00,0x04,0x9f,0x01,0x30,0xe0
+12. */
+13. iap = macaddr;
+```
 
 2）  device tree中设置，如果没有跳到步骤3；
 
-1. 1. /\*
-
-1. - 2. from device tree data
-
-1. \*/
-
-1. if (!is_valid_ether_addr(iap)) {
-
-1. ```
-    struct device_node *np = fep->pdev->dev.of_node;
-   ```
-
-1. ```
-    if (np) {
-   ```
-
-1. ```
-    	const char *mac = of_get_mac_address(np);
-   ```
-
-1. ```
-    	if (mac)
-   ```
-
-1. ```
-    		iap = (unsigned char *) mac;
-   ```
-
-1. ```
-   	}
-   ```
-
-1. ```
-   }
-   ```
+```cpp
+1. /*
+2. 	 * 2) from device tree data
+3. 	 */
+4. 	if (!is_valid_ether_addr(iap)) {
+5. 		struct device_node *np = fep->pdev->dev.of_node;
+6. 		if (np) {
+7. 			const char *mac = of_get_mac_address(np);
+8. 			if (mac)
+9. 				iap = (unsigned char *) mac;
+10. 		}
+11. 	}
+```
 
 3）  from flash / fuse / via platform data，如果没有跳到步骤4；
 
-1. /\*
-1. - 3. from flash or fuse (via platform data)
-1. \*/
-1. if (!is_valid_ether_addr(iap)) {
-1. #ifdef CONFIG_M5272
-1. ```
-    if (FEC_FLASHMAC)
-   ```
-1. ```
-    	iap = (unsigned char *)FEC_FLASHMAC;
-   ```
-1. #else
-1. ```
-    if (pdata)
-   ```
-1. ```
-   		iap = (unsigned char *)&pdata->mac;
-   ```
-1. #endif
-1. ```
-   }
-   ```
+```cpp
+1. /*
+2. * 3) from flash or fuse (via platform data)
+3. */
+4. if (!is_valid_ether_addr(iap)) {
+5. #ifdef CONFIG_M5272
+6. if (FEC_FLASHMAC)
+7. iap = (unsigned char *)FEC_FLASHMAC;
+8. #else
+9. if (pdata)
+10. iap = (unsigned char *)&pdata->mac;
+11. #endif
+12. }
+```
 
 4）  FEC mac registers set by bootloader===》即靠usb方式下载mac address ，如果没有跳到步骤5；
 
-1. /\*
-1. - 4. FEC mac registers set by bootloader
-1. \*/
-1. if (!is_valid_ether_addr(iap)) {
-1. ```
-    *((__be32 *) &tmpaddr[0]) =
-   ```
-1. ```
-    	cpu_to_be32(readl(fep->hwp + FEC_ADDR_LOW));
-   ```
-1. ```
-    *((__be16 *) &tmpaddr[4]) =
-   ```
-1. ```
-    	cpu_to_be16(readl(fep->hwp + FEC_ADDR_HIGH) >> 16);
-   ```
-1. ```
-    iap = &tmpaddr[0];
-   ```
-1. ```
-   }
-   ```
+```cpp
+1. /*
+2. * 4) FEC mac registers set by bootloader
+3. */
+4. if (!is_valid_ether_addr(iap)) {
+5. *((__be32 *) &tmpaddr[0]) =
+6. cpu_to_be32(readl(fep->hwp + FEC_ADDR_LOW));
+7. *((__be16 *) &tmpaddr[4]) =
+8. cpu_to_be16(readl(fep->hwp + FEC_ADDR_HIGH) >> 16);
+9. iap = &tmpaddr[0];
+10. }
+```
 
 5）靠kernel算一个随机数mac address出来，然后写入mac
 
-1. /\*
+```cpp
+1. /*
+2. * 5) random mac address
+3. */
+4. if (!is_valid_ether_addr(iap)) {
+5. /* Report it and use a random ethernet address instead */
+6. netdev_err(ndev, "Invalid MAC address: %pM\n", iap);
+7. eth_hw_addr_random(ndev);
+8. netdev_info(ndev, "Using random MAC address: %pM\n",
+9. ndev->dev_addr);
+10. return;
+11. }
 
-1. - 5. random mac address
+13. memcpy(ndev->dev_addr, iap, ETH_ALEN);
 
-1. \*/
+15. /* Adjust MAC if using macaddr */
+16. if (iap == macaddr)
+17. ndev->dev_addr[ETH_ALEN-1] = macaddr[ETH_ALEN-1] + fep->dev_id;
+```
 
-1. if (!is_valid_ether_addr(iap)) {
-
-1. ```
-    /* Report it and use a random ethernet address instead */
-   ```
-
-1. ```
-    netdev_err(ndev, "Invalid MAC address: %pM\n", iap);
-   ```
-
-1. ```
-    eth_hw_addr_random(ndev);
-   ```
-
-1. ```
-    netdev_info(ndev, "Using random MAC address: %pM\n",
-   ```
-
-1. ```
-    	    ndev->dev_addr);
-   ```
-
-1. ```
-   	return;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   memcpy(ndev->dev_addr, iap, ETH_ALEN);
-   ```
-
-1. ```
-   /* Adjust MAC if using macaddr */
-   ```
-
-1. ```
-   if (iap == macaddr)
-   ```
-
-1. ```
-   	 ndev->dev_addr[ETH_ALEN-1] = macaddr[ETH_ALEN-1] + fep->dev_id;
-   ```
 
 所以最后一种方式就是kernel会自己算一个mac地址出来，我这里有个前提是这个是freescale（现在被nxp收购了）的控制器代码这样写的，我不确定其他厂商的控制器是否也是这样的流程，技术讲究严谨，所以这里不能一概而论。当然这个mac 地址也是可以用户自己在dts中进行自行配置的。
 
-2. 1. /\*\*
-
-1. - eth_hw_addr_random - Generate software assigned random Ethernet and
-
-1. - set device flag
-
-1. - @dev: pointer to net_device structure
-
-1. -
-
-1. - Generate a random Ethernet address (MAC) to be used by a net device
-
-1. - and set addr_assign_type so the state can be read by sysfs and be
-
-1. - used by userspace.
-
-1. \*/
-
-1. static inline void eth_hw_addr_random(struct net_device \*dev)
-
-1. {
-
-1. ```
-   dev->addr_assign_type = NET_ADDR_RANDOM;
-   ```
-
-1. ```
-   eth_random_addr(dev->dev_addr);
-   ```
-
-1. }
-
-1. 1. /\*\*
-
-1. - eth_random_addr - Generate software assigned random Ethernet address
-
-1. - @addr: Pointer to a six-byte array containing the Ethernet address
-
-1. -
-
-1. - Generate a random Ethernet address (MAC) that is not multicast
-
-1. - and has the local assigned bit set.
-
-1. \*/
-
-1. static inline void eth_random_addr(u8 \*addr)
-
-1. {
-
-1. ```
-   get_random_bytes(addr, ETH_ALEN);
-   ```
-
-1. ```
-   addr[0] &= 0xfe;	/* clear multicast bit */
-   ```
-
-1. ```
-   addr[0] |= 0x02;	/* set local assignment bit (IEEE802) */
-   ```
-
-1. }
+```cpp
+1. 1. /**
+2.  * eth_hw_addr_random - Generate software assigned random Ethernet and
+3.  * set device flag
+4.  * @dev: pointer to net_device structure
+5.  *
+6.  * Generate a random Ethernet address (MAC) to be used by a net device
+7.  * and set addr_assign_type so the state can be read by sysfs and be
+8.  * used by userspace.
+9.  */
+10. static inline void eth_hw_addr_random(struct net_device *dev)
+11. {
+12. 	dev->addr_assign_type = NET_ADDR_RANDOM;
+13. 	eth_random_addr(dev->dev_addr);
+14. }
+15. 1. /**
+16.  * eth_random_addr - Generate software assigned random Ethernet address
+17.  * @addr: Pointer to a six-byte array containing the Ethernet address
+18.  *
+19.  * Generate a random Ethernet address (MAC) that is not multicast
+20.  * and has the local assigned bit set.
+21.  */
+22. static inline void eth_random_addr(u8 *addr)
+23. {
+24. 	get_random_bytes(addr, ETH_ALEN);
+25. 	addr[0] &= 0xfe;	/* clear multicast bit */
+26. 	addr[0] |= 0x02;	/* set local assignment bit (IEEE802) */
+27. }
+```
 
 这里就是kernel随机数的接口了，会总随机池中获取一个随机数并返回。
 
-1. /\*
-1. - This function is the exported kernel interface.  It returns some
-1. - number of good random numbers, suitable for key generation, seeding
-1. - TCP sequence numbers, etc.  It does not rely on the hardware random
-1. - number generator.  For random bytes direct from the hardware RNG
-1. - (when available), use get_random_bytes_arch().
-1. \*/
-1. void get_random_bytes(void \*buf, int nbytes)
-1. {
-1. #if DEBUG_RANDOM_BOOT > 0
-1. ```
-   if (unlikely(nonblocking_pool.initialized == 0))
-   ```
-1. ```
-   	printk(KERN_NOTICE "random: %pF get_random_bytes called "
-   ```
-1. ```
-   	       "with %d bits of entropy available\n",
-   ```
-1. ```
-   	       (void *) _RET_IP_,
-   ```
-1. ```
-   	       nonblocking_pool.entropy_total);
-   ```
-1. #endif
-1. ```
-   trace_get_random_bytes(nbytes, _RET_IP_);
-   ```
-1. ```
-   extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
-   ```
-1. }
-1. EXPORT_SYMBOL(get_random_bytes);
+```cpp
+1. /*
+2. * This function is the exported kernel interface. It returns some
+3. * number of good random numbers, suitable for key generation, seeding
+4. * TCP sequence numbers, etc. It does not rely on the hardware random
+5. * number generator. For random bytes direct from the hardware RNG
+6. * (when available), use get_random_bytes_arch().
+7. */
+8. void get_random_bytes(void *buf, int nbytes)
+9. {
+10. #if DEBUG_RANDOM_BOOT > 0
+11. if (unlikely(nonblocking_pool.initialized == 0))
+12. printk(KERN_NOTICE "random: %pF get_random_bytes called "
+13. "with %d bits of entropy available\n",
+14. (void *) _RET_IP_,
+15. nonblocking_pool.entropy_total);
+16. #endif
+17. trace_get_random_bytes(nbytes, _RET_IP_);
+18. extract_entropy(&nonblocking_pool, buf, nbytes, 0, 0);
+19. }
+20. EXPORT_SYMBOL(get_random_bytes);
+```
 
 大家看到那些获取mac address的步骤中有这样的函数
 
 is_valid_ether_addr，用来检测以太网地址是否正确的
 
-1. /\*\*
-1. - is_valid_ether_addr - Determine if the given Ethernet address is valid
-1. - @addr: Pointer to a six-byte array containing the Ethernet address
-1. -
-1. - Check that the Ethernet address (MAC) is not 00:00:00:00:00:00, is not
-1. - a multicast address, and is not FF:FF:FF:FF:FF:FF.
-1. -
-1. - Return true if the address is valid.
-1. -
-1. - Please note: addr must be aligned to u16.
-1. \*/
-1. static inline bool is_valid_ether_addr(const u8 \*addr)
-1. {
-1. ```
-   /* FF:FF:FF:FF:FF:FF is a multicast address so we don't need to
-   ```
-1. ```
-    * explicitly check for it here. */
-   ```
-1. ```
-   return !is_multicast_ether_addr(addr) && !is_zero_ether_addr(addr);
-   ```
-1. }
+```cpp
+1. /**
+2. * is_valid_ether_addr - Determine if the given Ethernet address is valid
+3. * @addr: Pointer to a six-byte array containing the Ethernet address
+4. *
+5. * Check that the Ethernet address (MAC) is not 00:00:00:00:00:00, is not
+6. * a multicast address, and is not FF:FF:FF:FF:FF:FF.
+7. *
+8. * Return true if the address is valid.
+9. *
+10. * Please note: addr must be aligned to u16.
+11. */
+12. static inline bool is_valid_ether_addr(const u8 *addr)
+13. {
+14. /* FF:FF:FF:FF:FF:FF is a multicast address so we don't need to
+15. * explicitly check for it here. */
+16. return !is_multicast_ether_addr(addr) && !is_zero_ether_addr(addr);
+17. }
+```
 
 因此我们从代码中可以看出，内核认为全0或者是全FF的以太网地址是不正确的，
 
 获取了mac 地址后，就会通过寄存器写入mac中
 
-1. /\* Set a MAC change in hardware. \*/
+```cpp
+1. /* Set a MAC change in hardware. */
+2. static int
+3. fec_set_mac_address(struct net_device *ndev, void *p)
+4. {
+5. struct fec_enet_private *fep = netdev_priv(ndev);
+6. struct sockaddr *addr = p;
 
-1. static int
+8. if (addr) {
+9. if (!is_valid_ether_addr(addr->sa_data))
+10. return -EADDRNOTAVAIL;
+11. memcpy(ndev->dev_addr, addr->sa_data, ndev->addr_len);
+12. }
 
-1. fec_set_mac_address(struct net_device \*ndev, void \*p)
+14. /* Add netif status check here to avoid system hang in below case:
+15. * ifconfig ethx down; ifconfig ethx hw ether xx:xx:xx:xx:xx:xx;
+16. * After ethx down, fec all clocks are gated off and then register
+17. * access causes system hang.
+18. */
+19. if (!netif_running(ndev))
+20. return 0;
 
-1. {
-
-1. struct fec_enet_private \*fep = netdev_priv(ndev);
-
-1. struct sockaddr \*addr = p;
-
-1. if (addr) {
-
-1. ```
-    if (!is_valid_ether_addr(addr->sa_data))
-   ```
-
-1. ```
-   		return -EADDRNOTAVAIL;
-   ```
-
-1. ```
-   	memcpy(ndev->dev_addr, addr->sa_data, ndev->addr_len);
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   /* Add netif status check here to avoid system hang in below case:
-   ```
-
-1. ```
-    * ifconfig ethx down; ifconfig ethx hw ether xx:xx:xx:xx:xx:xx;
-   ```
-
-1. ```
-    * After ethx down, fec all clocks are gated off and then register
-   ```
-
-1. ```
-    * access causes system hang.
-   ```
-
-1. ```
-    */
-   ```
-
-1. ```
-   if (!netif_running(ndev))
-   ```
-
-1. ```
-   	return 0;
-   ```
-
-1. ```
-   writel(ndev->dev_addr[3] | (ndev->dev_addr[2] << 8) |
-   ```
-
-1. ```
-   	(ndev->dev_addr[1] << 16) | (ndev->dev_addr[0] << 24),
-   ```
-
-1. ```
-   	fep->hwp + FEC_ADDR_LOW);
-   ```
-
-1. ```
-   writel((ndev->dev_addr[5] << 16) | (ndev->dev_addr[4] << 24),
-   ```
-
-1. ```
-   	fep->hwp + FEC_ADDR_HIGH);
-   ```
-
-1. ```
-   return 0;
-   ```
-
-1. }
+22. writel(ndev->dev_addr[3] | (ndev->dev_addr[2] << 8) |
+23. (ndev->dev_addr[1] << 16) | (ndev->dev_addr[0] << 24),
+24. fep->hwp + FEC_ADDR_LOW);
+25. writel((ndev->dev_addr[5] << 16) | (ndev->dev_addr[4] << 24),
+26. fep->hwp + FEC_ADDR_HIGH);
+27. return 0;
+28. }
+```
 
 CONFIG_ARCH_MXC因为我们使用的是这个宏，因此：
 
