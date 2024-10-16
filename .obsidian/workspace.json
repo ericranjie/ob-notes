@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
+                "file": "code-griding-note.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
+                "file": "code-griding-note.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
+                "file": "code-griding-note.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/performance/k_一文说清linux system load.md"
+                "file": "code-griding-note.md"
               }
             }
           }
@@ -148,9 +148,10 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/performance/a_n _微信工程师：常见性能优化方案与实用工具.md",
+    "coding/os/linux/performance/k_一文说清linux system load.md",
     "coding/os/linux/performance/i_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
-    "coding/os/linux/performance/k_一文说清linux system load.md",
     "coding/os/linux/performance/t_性能优化的路有多远？.md",
     "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
     "zx99-image/Pasted image 20241016095759.png",
@@ -180,7 +181,6 @@
     "0x01-leetcode/math-logic/e_9. Palindrome Number.md",
     "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
     "interview/leetcode/codetop/1-dimensional/string.md",
-    "0x01-leetcode/1-dimensional/array/rotate/e_189. Rotate Array.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "zx99-image/Pasted image 20241010225439.png",
