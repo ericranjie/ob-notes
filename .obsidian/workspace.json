@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
+                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
+                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
+                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/an_深入理解 Linux socket.md"
+                "file": "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md"
               }
             }
           }
@@ -148,6 +148,11 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "README.md",
+    "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
+    "code-griding-note.md",
+    "coding/os/linux/network/an_深入理解 Linux socket.md",
     "coding/os/linux/performance/b_微信工程师：常见性能优化方案与实用工具.md",
     "zx99-image/Pasted image 20241016150257.png",
     "zx99-image/Pasted image 20241016150408.png",
@@ -156,9 +161,7 @@
     "zx99-image/Pasted image 20241016150314.png",
     "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
     "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
-    "README.md",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
-    "code-griding-note.md",
     "coding/os/linux/performance/k_一文说清linux system load.md",
     "coding/os/linux/performance/i_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
@@ -181,8 +184,6 @@
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_132. Palindrome Partitioning II.md",
     "0x01-leetcode/2-dimensional/BFS-DFS/permutation/h_47. Permutations II.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
-    "0x01-leetcode/1-dimensional/stack/e_234. Palindrome Linked List.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

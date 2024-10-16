@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[heaven](http://www.wowotech.net/author/532) 发布于：2020-1-7 14:25 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
@@ -29,6 +13,7 @@
 
 ## 1.1 以太网初始化
 
+```cpp
 fec_main.c   fec_probe
 
 =>fec_enet_mii_init
@@ -42,716 +27,295 @@ of_mdiobus_register(fep->mii_bus, node);
 => phy = get_phy_device(mdio, addr, is_c45);
 
 rc = phy_device_register(phy);
+```
 
 [![图像 6.jpg](http://www.wowotech.net/content/uploadfile/202001/a6731578378528.jpg "点击查看原图")](http://www.wowotech.net/content/uploadfile/202001/a6731578378528.jpg)
 
 搞驱动的都知道，probe是drvier的入口函数：
 
+```cpp
 1. static int
-
-1. fec_probe(struct platform_device \*pdev)
-
-1. {
-
-1. struct fec_enet_private \*fep;
-
-1. struct fec_platform_data \*pdata;
-
-1. struct net_device \*ndev;
-
-1. int i, irq, ret = 0;
-
-1. struct resource \*r;
-
-1. const struct of_device_id \*of_id;
-
-1. ```
-   static int dev_id;
-   ```
-
-1. ```
-   struct device_node *np = pdev->dev.of_node, *phy_node;
-   ```
-
-1. ```
-   int num_tx_qs;
-   ```
-
-1. ```
-   int num_rx_qs;
-   ```
-
-1. ```
-   fec_enet_get_queue_num(pdev, &num_tx_qs, &num_rx_qs);
-   ```
-
-1. ```
-   /* Init network device */
-   ```
-
-1. ```
-   ndev = alloc_etherdev_mqs(sizeof(struct fec_enet_private),
-   ```
-
-1. ```
-   			  num_tx_qs, num_rx_qs);
-   ```
-
-1. ```
-   if (!ndev)
-   ```
-
-1. ```
-   	return -ENOMEM;
-   ```
-
-1. ```
-   SET_NETDEV_DEV(ndev, &pdev->dev);
-   ```
-
-1. ```
-   /* setup board info structure */
-   ```
-
-1. ```
-   fep = netdev_priv(ndev);
-   ```
-
-1. ```
-   of_id = of_match_device(fec_dt_ids, &pdev->dev);
-   ```
-
-1. ```
-   if (of_id)
-   ```
-
-1. ```
-   	pdev->id_entry = of_id->data;
-   ```
-
-1. ```
-   fep->quirks = pdev->id_entry->driver_data;
-   ```
-
-1. ```
-   fep->netdev = ndev;
-   ```
-
-1. ```
-   fep->num_rx_queues = num_rx_qs;
-   ```
-
-1. ```
-   fep->num_tx_queues = num_tx_qs;
-   ```
-
-1. #if !defined(CONFIG_M5272)
-
-1. ```
-   /* default enable pause frame auto negotiation */
-   ```
-
-1. ```
-   if (fep->quirks & FEC_QUIRK_HAS_GBIT)
-   ```
-
-1. ```
-   	fep->pause_flag |= FEC_PAUSE_FLAG_AUTONEG;
-   ```
-
-1. #endif
-
-1. ```
-   /* Select default pin state */
-   ```
-
-1. ```
-   pinctrl_pm_select_default_state(&pdev->dev);
-   ```
-
-1. ```
-   r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-   ```
-
-1. ```
-   fep->hwp = devm_ioremap_resource(&pdev->dev, r);
-   ```
-
-1. ```
-   if (IS_ERR(fep->hwp)) {
-   ```
-
-1. ```
-   	ret = PTR_ERR(fep->hwp);
-   ```
-
-1. ```
-   	goto failed_ioremap;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   fep->pdev = pdev;
-   ```
-
-1. ```
-   fep->dev_id = dev_id++;
-   ```
-
-1. ```
-   platform_set_drvdata(pdev, ndev);
-   ```
-
-1. ```
-   fec_enet_of_parse_stop_mode(pdev);
-   ```
-
-1. ```
-   if (of_get_property(np, "fsl,magic-packet", NULL))
-   ```
-
-1. ```
-   	fep->wol_flag |= FEC_WOL_HAS_MAGIC_PACKET;
-   ```
-
-1. ```
-   phy_node = of_parse_phandle(np, "phy-handle", 0);
-   ```
-
-1. ```
-   if (!phy_node && of_phy_is_fixed_link(np)) {
-   ```
-
-1. ```
-   	ret = of_phy_register_fixed_link(np);
-   ```
-
-1. ```
-   	if (ret < 0) {
-   ```
-
-1. ```
-   		dev_err(&pdev->dev,
-   ```
-
-1. ```
-   			"broken fixed-link specification\n");
-   ```
-
-1. ```
-   		goto failed_phy;
-   ```
-
-1. ```
-   	}
-   ```
-
-1. ```
-   	phy_node = of_node_get(np);
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   fep->phy_node = phy_node;
-   ```
-
-1. ```
-   ret = of_get_phy_mode(pdev->dev.of_node);
-   ```
-
-1. ```
-   if (ret < 0) {
-   ```
-
-1. ```
-   	pdata = dev_get_platdata(&pdev->dev);
-   ```
-
-1. ```
-   	if (pdata)
-   ```
-
-1. ```
-   		fep->phy_interface = pdata->phy;
-   ```
-
-1. ```
-   	else
-   ```
-
-1. ```
-   		fep->phy_interface = PHY_INTERFACE_MODE_MII;
-   ```
-
-1. ```
-   } else {
-   ```
-
-1. ```
-   	fep->phy_interface = ret;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   fep->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
-   ```
-
-1. ```
-   if (IS_ERR(fep->clk_ipg)) {
-   ```
-
-1. ```
-   	ret = PTR_ERR(fep->clk_ipg);
-   ```
-
-1. ```
-   	goto failed_clk;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   fep->clk_ahb = devm_clk_get(&pdev->dev, "ahb");
-   ```
-
-1. ```
-   if (IS_ERR(fep->clk_ahb)) {
-   ```
-
-1. ```
-   	ret = PTR_ERR(fep->clk_ahb);
-   ```
-
-1. ```
-   	goto failed_clk;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   fep->itr_clk_rate = clk_get_rate(fep->clk_ahb);
-   ```
-
-1. /\* enet_out is optional, depends on board \*/
-
-1. fep->clk_enet_out = devm_clk_get(&pdev->dev, "enet_out");
-
-1. if (IS_ERR(fep->clk_enet_out))
-
-1. ```
-      fep->clk_enet_out = NULL;
-   ```
-
-1. fep->ptp_clk_on = false;
-
-1. mutex_init(&fep->ptp_clk_mutex);
-
-1. /\* clk_ref is optional, depends on board \*/
-
-1. fep->clk_ref = devm_clk_get(&pdev->dev, "enet_clk_ref");
-
-1. if (IS_ERR(fep->clk_ref))
-
-1. ```
-      fep->clk_ref = NULL;
-   ```
-
-1. fep->bufdesc_ex = fep->quirks & FEC_QUIRK_HAS_BUFDESC_EX;
-
-1. fep->clk_ptp = devm_clk_get(&pdev->dev, "ptp");
-
-1. if (IS_ERR(fep->clk_ptp)) {
-
-1. ```
-      fep->clk_ptp = NULL;
-   ```
-
-1. ```
-      fep->bufdesc_ex = false;
-   ```
-
-1. }
-
-1. pm_runtime_enable(&pdev->dev);
-
-1. ret = fec_enet_clk_enable(ndev, true);
-
-1. if (ret)
-
-1. ```
-      goto failed_clk;
-   ```
-
-1. fep->reg_phy = devm_regulator_get(&pdev->dev, "phy");
-
-1. if (!IS_ERR(fep->reg_phy)) {
-
-1. ```
-      ret = regulator_enable(fep->reg_phy);
-   ```
-
-1. ```
-      if (ret) {
-   ```
-
-1. ```
-      	dev_err(&pdev->dev,
-   ```
-
-1. ```
-      		"Failed to enable phy regulator: %d\n", ret);
-   ```
-
-1. ```
-      	goto failed_regulator;
-   ```
-
-1. ```
-      }
-   ```
-
-1. } else {
-
-1. ```
-      fep->reg_phy = NULL;
-   ```
-
-1. }
-
-1. fec_reset_phy(pdev);
-
-1. if (fep->bufdesc_ex)
-
-1. ```
-      fec_ptp_init(pdev);
-   ```
-
-1. ret = fec_enet_init(ndev);
-
-1. if (ret)
-
-1. ```
-      goto failed_init;
-   ```
-
-1. for (i = 0; i \< FEC_IRQ_NUM; i++) {
-
-1. ```
-      irq = platform_get_irq(pdev, i);
-   ```
-
-1. ```
-      if (irq < 0) {
-   ```
-
-1. ```
-      	if (i)
-   ```
-
-1. ```
-      		break;
-   ```
-
-1. ```
-      	ret = irq;
-   ```
-
-1. ```
-      	goto failed_irq;
-   ```
-
-1. ```
-      }
-   ```
-
-1. ```
-      ret = devm_request_irq(&pdev->dev, irq, fec_enet_interrupt,
-   ```
-
-1. ```
-      		       0, pdev->name, ndev);
-   ```
-
-1. ```
-      if (ret)
-   ```
-
-1. ```
-      	goto failed_irq;
-   ```
-
-1. ```
-      fep->irq[i] = irq;
-   ```
-
-1. }
-
-1. ret = of_property_read_u32(np, "fsl,wakeup_irq", &irq);
-
-1. if (!ret && irq \< FEC_IRQ_NUM)
-
-1. ```
-      fep->wake_irq = fep->irq[irq];
-   ```
-
-1. else
-
-1. ```
-      fep->wake_irq = fep->irq[0];
-   ```
-
-1. init_completion(&fep->mdio_done);
-
-1. ret = fec_enet_mii_init(pdev);
-
-1. if (ret)
-
-1. ```
-      goto failed_mii_init;
-   ```
-
-1. /\* Carrier starts down, phylib will bring it up \*/
-
-1. netif_carrier_off(ndev);
-
-1. fec_enet_clk_enable(ndev, false);
-
-1. pinctrl_pm_select_sleep_state(&pdev->dev);
-
-1. ret = register_netdev(ndev);
-
-1. if (ret)
-
-1. ```
-      goto failed_register;
-   ```
-
-1. device_init_wakeup(&ndev->dev, fep->wol_flag &
-
-1. ```
-      	   FEC_WOL_HAS_MAGIC_PACKET);
-   ```
-
-1. if (fep->bufdesc_ex && fep->ptp_clock)
-
-1. ```
-      netdev_info(ndev, "registered PHC device %d\n", fep->dev_id);
-   ```
-
-1. fep->rx_copybreak = COPYBREAK_DEFAULT;
-
-1. INIT_WORK(&fep->tx_timeout_work, fec_enet_timeout_work);
-
-1. return 0;
-
-1. failed_register:
-
-1. fec_enet_mii_remove(fep);
-
-1. failed_mii_init:
-
-1. failed_irq:
-
-1. failed_init:
-
-1. if (fep->reg_phy)
-
-1. ```
-      regulator_disable(fep->reg_phy);
-   ```
-
-1. failed_regulator:
-
-1. fec_enet_clk_enable(ndev, false);
-
-1. failed_clk:
-
-1. failed_phy:
-
-1. of_node_put(phy_node);
-
-1. failed_ioremap:
-
-1. free_netdev(ndev);
-
-1. return ret;
-
-1. }
+2. fec_probe(struct platform_device *pdev)
+3. {
+4. struct fec_enet_private *fep;
+5. struct fec_platform_data *pdata;
+6. struct net_device *ndev;
+7. int i, irq, ret = 0;
+8. struct resource *r;
+9. const struct of_device_id *of_id;
+10. static int dev_id;
+11. struct device_node *np = pdev->dev.of_node, *phy_node;
+12. int num_tx_qs;
+13. int num_rx_qs;
+
+15. fec_enet_get_queue_num(pdev, &num_tx_qs, &num_rx_qs);
+
+17. /* Init network device */
+18. ndev = alloc_etherdev_mqs(sizeof(struct fec_enet_private),
+19. num_tx_qs, num_rx_qs);
+20. if (!ndev)
+21. return -ENOMEM;
+
+23. SET_NETDEV_DEV(ndev, &pdev->dev);
+
+25. /* setup board info structure */
+26. fep = netdev_priv(ndev);
+
+28. of_id = of_match_device(fec_dt_ids, &pdev->dev);
+29. if (of_id)
+30. pdev->id_entry = of_id->data;
+31. fep->quirks = pdev->id_entry->driver_data;
+
+33. fep->netdev = ndev;
+34. fep->num_rx_queues = num_rx_qs;
+35. fep->num_tx_queues = num_tx_qs;
+
+37. #if !defined(CONFIG_M5272)
+38. /* default enable pause frame auto negotiation */
+39. if (fep->quirks & FEC_QUIRK_HAS_GBIT)
+40. fep->pause_flag |= FEC_PAUSE_FLAG_AUTONEG;
+41. #endif
+
+43. /* Select default pin state */
+44. pinctrl_pm_select_default_state(&pdev->dev);
+
+46. r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+47. fep->hwp = devm_ioremap_resource(&pdev->dev, r);
+48. if (IS_ERR(fep->hwp)) {
+49. ret = PTR_ERR(fep->hwp);
+50. goto failed_ioremap;
+51. }
+
+53. fep->pdev = pdev;
+54. fep->dev_id = dev_id++;
+
+56. platform_set_drvdata(pdev, ndev);
+
+58. fec_enet_of_parse_stop_mode(pdev);
+
+60. if (of_get_property(np, "fsl,magic-packet", NULL))
+61. fep->wol_flag |= FEC_WOL_HAS_MAGIC_PACKET;
+
+63. phy_node = of_parse_phandle(np, "phy-handle", 0);
+64. if (!phy_node && of_phy_is_fixed_link(np)) {
+65. ret = of_phy_register_fixed_link(np);
+66. if (ret < 0) {
+67. dev_err(&pdev->dev,
+68. "broken fixed-link specification\n");
+69. goto failed_phy;
+70. }
+71. phy_node = of_node_get(np);
+72. }
+73. fep->phy_node = phy_node;
+
+75. ret = of_get_phy_mode(pdev->dev.of_node);
+76. if (ret < 0) {
+77. pdata = dev_get_platdata(&pdev->dev);
+78. if (pdata)
+79. fep->phy_interface = pdata->phy;
+80. else
+81. fep->phy_interface = PHY_INTERFACE_MODE_MII;
+82. } else {
+83. fep->phy_interface = ret;
+84. }
+
+86. fep->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
+87. if (IS_ERR(fep->clk_ipg)) {
+88. ret = PTR_ERR(fep->clk_ipg);
+89. goto failed_clk;
+90. }
+
+92. fep->clk_ahb = devm_clk_get(&pdev->dev, "ahb");
+93. if (IS_ERR(fep->clk_ahb)) {
+94. ret = PTR_ERR(fep->clk_ahb);
+95. goto failed_clk;
+96. }
+
+98. fep->itr_clk_rate = clk_get_rate(fep->clk_ahb);
+
+100. /* enet_out is optional, depends on board */
+101. fep->clk_enet_out = devm_clk_get(&pdev->dev, "enet_out");
+102. if (IS_ERR(fep->clk_enet_out))
+103. fep->clk_enet_out = NULL;
+
+105. fep->ptp_clk_on = false;
+106. mutex_init(&fep->ptp_clk_mutex);
+
+108. /* clk_ref is optional, depends on board */
+109. fep->clk_ref = devm_clk_get(&pdev->dev, "enet_clk_ref");
+110. if (IS_ERR(fep->clk_ref))
+111. fep->clk_ref = NULL;
+
+113. fep->bufdesc_ex = fep->quirks & FEC_QUIRK_HAS_BUFDESC_EX;
+114. fep->clk_ptp = devm_clk_get(&pdev->dev, "ptp");
+115. if (IS_ERR(fep->clk_ptp)) {
+116. fep->clk_ptp = NULL;
+117. fep->bufdesc_ex = false;
+118. }
+
+120. pm_runtime_enable(&pdev->dev);
+121. ret = fec_enet_clk_enable(ndev, true);
+122. if (ret)
+123. goto failed_clk;
+
+125. fep->reg_phy = devm_regulator_get(&pdev->dev, "phy");
+126. if (!IS_ERR(fep->reg_phy)) {
+127. ret = regulator_enable(fep->reg_phy);
+128. if (ret) {
+129. dev_err(&pdev->dev,
+130. "Failed to enable phy regulator: %d\n", ret);
+131. goto failed_regulator;
+132. }
+133. } else {
+134. fep->reg_phy = NULL;
+135. }
+
+137. fec_reset_phy(pdev);
+
+139. if (fep->bufdesc_ex)
+140. fec_ptp_init(pdev);
+
+142. ret = fec_enet_init(ndev);
+143. if (ret)
+144. goto failed_init;
+
+146. for (i = 0; i < FEC_IRQ_NUM; i++) {
+147. irq = platform_get_irq(pdev, i);
+148. if (irq < 0) {
+149. if (i)
+150. break;
+151. ret = irq;
+152. goto failed_irq;
+153. }
+154. ret = devm_request_irq(&pdev->dev, irq, fec_enet_interrupt,
+155. 0, pdev->name, ndev);
+156. if (ret)
+157. goto failed_irq;
+
+159. fep->irq[i] = irq;
+160. }
+
+162. ret = of_property_read_u32(np, "fsl,wakeup_irq", &irq);
+163. if (!ret && irq < FEC_IRQ_NUM)
+164. fep->wake_irq = fep->irq[irq];
+165. else
+166. fep->wake_irq = fep->irq[0];
+
+168. init_completion(&fep->mdio_done);
+169. ret = fec_enet_mii_init(pdev);
+170. if (ret)
+171. goto failed_mii_init;
+
+173. /* Carrier starts down, phylib will bring it up */
+174. netif_carrier_off(ndev);
+175. fec_enet_clk_enable(ndev, false);
+176. pinctrl_pm_select_sleep_state(&pdev->dev);
+
+178. ret = register_netdev(ndev);
+179. if (ret)
+180. goto failed_register;
+
+182. device_init_wakeup(&ndev->dev, fep->wol_flag &
+183. FEC_WOL_HAS_MAGIC_PACKET);
+
+185. if (fep->bufdesc_ex && fep->ptp_clock)
+186. netdev_info(ndev, "registered PHC device %d\n", fep->dev_id);
+
+188. fep->rx_copybreak = COPYBREAK_DEFAULT;
+189. INIT_WORK(&fep->tx_timeout_work, fec_enet_timeout_work);
+190. return 0;
+
+192. failed_register:
+193. fec_enet_mii_remove(fep);
+194. failed_mii_init:
+195. failed_irq:
+196. failed_init:
+197. if (fep->reg_phy)
+198. regulator_disable(fep->reg_phy);
+199. failed_regulator:
+200. fec_enet_clk_enable(ndev, false);
+201. failed_clk:
+202. failed_phy:
+203. of_node_put(phy_node);
+204. failed_ioremap:
+205. free_netdev(ndev);
+
+207. return ret;
+208. }
+```
 
 这个 probe中主要做了哪些事情呢？以下我只写主要的一些，不是全部的。
 
 struct net_device \*ndev;这里对net_device进行初始化，分配内存
 
-1. /\* Init network device \*/
-1. ndev = alloc_etherdev_mqs(sizeof(struct fec_enet_private),
-1. ```
-    		  num_tx_qs, num_rx_qs);
-   ```
-1. if (!ndev)
-1. ```
-    return -ENOMEM;
-   ```
+```cpp
+1. /* Init network device */
+2. ndev = alloc_etherdev_mqs(sizeof(struct fec_enet_private),
+3. num_tx_qs, num_rx_qs);
+4. if (!ndev)
+5. return -ENOMEM;
+```
 
 接下来做如下动作，注释都很明显，我就不解释了，
 
-struct fec_enet_private \*fep;
-
-2. struct fec_enet_private \*fep;
-
-1. 1. /\* setup board info structure \*/
-
-1. fep = netdev_priv(ndev);
-
-1. 1. /\*\*
-
-1. - netdev_priv - access network device private data
-
-1. - @dev: network device
-
-1. -
-
-1. - Get network device private data
-
-1. \*/
-
-1. static inline void \*netdev_priv(const struct net_device \*dev)
-
-1. {
-
-1. ```
-   return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
-   ```
-
-1. }
+```cpp
+1. struct fec_enet_private *fep;
+4. /* setup board info structure */
+5. 	fep = netdev_priv(ndev);
+6. /**
+7.  *	netdev_priv - access network device private data
+8.  *	@dev: network device
+9.  *
+10.  * Get network device private data
+11.  */
+12. static inline void *netdev_priv(const struct net_device *dev)
+13. {
+14. 	return (char *)dev + ALIGN(sizeof(struct net_device), NETDEV_ALIGN);
+15. }
+```
 
 获取时钟：
 
+```cpp
 1. fep->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
+2. if (IS_ERR(fep->clk_ipg)) {
+3. ret = PTR_ERR(fep->clk_ipg);
+4. goto failed_clk;
+5. }
 
-1. if (IS_ERR(fep->clk_ipg)) {
+7. fep->clk_ahb = devm_clk_get(&pdev->dev, "ahb");
+8. if (IS_ERR(fep->clk_ahb)) {
+9. ret = PTR_ERR(fep->clk_ahb);
+10. goto failed_clk;
+11. }
 
-1. ```
-    ret = PTR_ERR(fep->clk_ipg);
-   ```
+13. fep->itr_clk_rate = clk_get_rate(fep->clk_ahb);
 
-1. ```
-    goto failed_clk;
-   ```
+15. /* enet_out is optional, depends on board */
+16. fep->clk_enet_out = devm_clk_get(&pdev->dev, "enet_out");
+17. if (IS_ERR(fep->clk_enet_out))
+18. fep->clk_enet_out = NULL;
 
-1. }
+20. fep->ptp_clk_on = false;
+21. mutex_init(&fep->ptp_clk_mutex);
 
-1. fep->clk_ahb = devm_clk_get(&pdev->dev, "ahb");
+23. /* clk_ref is optional, depends on board */
+24. fep->clk_ref = devm_clk_get(&pdev->dev, "enet_clk_ref");
+25. if (IS_ERR(fep->clk_ref))
+26. fep->clk_ref = NULL;
 
-1. if (IS_ERR(fep->clk_ahb)) {
+28. fep->bufdesc_ex = fep->quirks & FEC_QUIRK_HAS_BUFDESC_EX;
+29. fep->clk_ptp = devm_clk_get(&pdev->dev, "ptp");
+30. if (IS_ERR(fep->clk_ptp)) {
+31. fep->clk_ptp = NULL;
+32. fep->bufdesc_ex = false;
+33. }
 
-1. ```
-    ret = PTR_ERR(fep->clk_ahb);
-   ```
-
-1. ```
-   	goto failed_clk;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   fep->itr_clk_rate = clk_get_rate(fep->clk_ahb);
-   ```
-
-1. ```
-   /* enet_out is optional, depends on board */
-   ```
-
-1. ```
-   fep->clk_enet_out = devm_clk_get(&pdev->dev, "enet_out");
-   ```
-
-1. ```
-   if (IS_ERR(fep->clk_enet_out))
-   ```
-
-1. ```
-   	fep->clk_enet_out = NULL;
-   ```
-
-1. ```
-   fep->ptp_clk_on = false;
-   ```
-
-1. ```
-   mutex_init(&fep->ptp_clk_mutex);
-   ```
-
-1. ```
-   /* clk_ref is optional, depends on board */
-   ```
-
-1. ```
-   fep->clk_ref = devm_clk_get(&pdev->dev, "enet_clk_ref");
-   ```
-
-1. ```
-   if (IS_ERR(fep->clk_ref))
-   ```
-
-1. ```
-   	fep->clk_ref = NULL;
-   ```
-
-1. ```
-   fep->bufdesc_ex = fep->quirks & FEC_QUIRK_HAS_BUFDESC_EX;
-   ```
-
-1. ```
-   fep->clk_ptp = devm_clk_get(&pdev->dev, "ptp");
-   ```
-
-1. ```
-   if (IS_ERR(fep->clk_ptp)) {
-   ```
-
-1. ```
-   	fep->clk_ptp = NULL;
-   ```
-
-1. ```
-   	fep->bufdesc_ex = false;
-   ```
-
-1. ```
-   }
-   ```
-
-1. ```
-   pm_runtime_enable(&pdev->dev);
-   ```
-
-1. ```
-   ret = fec_enet_clk_enable(ndev, true);
-   ```
-
-1. ```
-   if (ret)
-   ```
-
-1. ```
-   	goto failed_clk;
-   ```
+35. pm_runtime_enable(&pdev->dev);
+36. ret = fec_enet_clk_enable(ndev, true);
+37. if (ret)
+38. goto failed_clk;
+```
 
 使能clk，fec_enet_clk_enable(ndev, true);
 
