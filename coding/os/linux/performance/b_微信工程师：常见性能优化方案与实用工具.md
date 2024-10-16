@@ -1,8 +1,7 @@
-高可用架构
-*2024 年 03 月 06 日 08:19* *广东*
-以下文章来源于腾讯云开发者  ，作者张江涛
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAwMDU1MTE1OQ==&mid=2653562914&idx=1&sn=2d323c1eed2fd3e5870a7f15dea44237&chksm=8139b9bab64e30acbe7cee5c0ba0b5ce18c3cd1499dc53d5d92b2dcf9adb1dbe4659cbfee26b&mpshare=1&scene=24&srcid=0306PiwJ26g4tBzAalAFqZ3C&sharer_shareinfo=12b20ed0c86342c3e2541fe4823fbd9b&sharer_shareinfo_first=12b20ed0c86342c3e2541fe4823fbd9b&key=daf9bdc5abc4e8d0224d824ab0f15e3fe410b4d7ad060a071367539e786f45f213cc374130ca13ee3645bbc5e1469163e4d6e60971cec8ab9ae9eb653f8c0e1a6f3f9625f3c9d2a1e8a79815e0373154b4c4158af0f79fee5357f402f03ab9a812c45c54dc6769c604b0a1ea2612dabf310fc4edb4a28f8aacc9d6abcb0b2e26&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQcbYWwaW0aIYiLCIkcPbPExLmAQIE97dBBAEAAAAAAO%2FIK48bZFIAAAAOpnltbLcz9gKNyK89dVj0hUCzBaTe0RzHf3USdNpazxIS3qoTMtLAGuYjKtx%2BmiOim1C4m3MBXnc8er7D7dLCwVfm6S0rjaRvA48%2FlLTiUaqMB4to2mRtM2h8qw%2FKuPjRVIUlwal%2FDEh8e1Keb%2BcNO12shKQNqK6OD4mnclWBBzDwRJnb%2FAvKjRT4oqnYzcqGixKxaz3Ug6sTY20zzLU6qqBKURf%2B38SbA6LU%2FNNLcviGwr4FrQzJgLg5Ph1lP89EFX6EjAll3QWOYcL6fger&acctmode=0&pass_ticket=Q4VrPmg%2Fpqw9wgGdCLcn2FDa14aPpxoHJknq4dLU3QR2Md8oqXvll3GAiqHVa1vN&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+高可用架构 *2024 年 03 月 06 日 08:19* *广东*
+
+以下文章来源于腾讯云开发者  ，作者张江涛
 
 性能优化是降本增效路上必不可少的手段之一，在合适的时机采用合理的手段进行性能优化，一方面可以实现系统性能提升的目标，另一方面也可以借机对腐化的代码进行清理。在程序员的面试环节中，性能优化的问题也几乎是必考题。
 
@@ -16,13 +15,13 @@
 
 **ProtoBuf**  协议：
 
-```c
+```cpp
 message Param {    optional string name = 1;    optional string value = 2;}message ParamHit {    enum Type {        Unknown = 0;        WhiteList = 1;        LaunchLayer = 2;        BaseAB = 3;        DefaultParam = 4;    }    optional Param param = 1;    optional uint64 group_id = 2;    optional uint64 expt_id = 3;    optional uint64 launch_layer_id = 4;    optional string hash_key_used = 5;    optional string hash_key_val_used = 6;    optional Type type = 7;    optional bool is_hit_mbox = 8;}
 ```
 
 改写的  **Class ：**
 
-```c
+```cpp
 class ParamHitInfo {public:class Param {public:    Param() = default;    ~Param() = default;        const std::string & name() const {        return name_;    }    void set_name(const std::string &name) {        name_ = name;    }    void clear_name() {        name_.clear();    }    const std::string & value() const {        return value_;    }    void set_value(const std::string &value) {        value_ = value;    }    void clear_value() {        value_.clear();    }    void Clear() {        clear_name();        clear_value();    }private:    std::string name_, value_;};    ParamHitInfo() {        expt_id_ = group_id_ = launch_layer_id_ = 0u;        is_hit_mbox_ = false;        type_ = ParamHit::Unknown;    }    ~ParamHitInfo() = default;    void Clear() {        clear_group_id();        clear_expt_id();        clear_launch_layer_id();        clear_is_hit_mbox();        clear_hash_key_used();        clear_hash_key_val_used();        clear_type();        param_.Clear();    }    const ParamHit ToProtobuf() const {        ParamHit ans;        ans.set_expt_id(expt_id_);        ans.set_group_id(group_id_);        ans.set_launch_layer_id(launch_layer_id_);        ans.set_is_hit_mbox(is_hit_mbox_);        ans.set_hash_key_used(hash_key_used_);        ans.set_hash_key_val_used(hash_key_val_used_);        ans.set_type(type_);        ans.mutable_param()->set_name(param_.name());        ans.mutable_param()->set_value(param_.value());        return ans;    }    uint64_t group_id() const {        return group_id_;    }    void set_group_id(const uint64_t group_id) {        group_id_ = group_id;    }    void clear_group_id() {        group_id_ = 0u;    }    uint64_t expt_id() const {        return expt_id_;    }    void set_expt_id(const uint64_t expt_id) {        expt_id_ = expt_id;    }    void clear_expt_id() {        expt_id_ = 0u;    }    uint64_t launch_layer_id() const {        return launch_layer_id_;    }    void set_launch_layer_id(const uint64_t launch_layer_id) {        launch_layer_id_ = launch_layer_id;    }    void clear_launch_layer_id() {        launch_layer_id_ = 0u;    }    bool is_hit_mbox() const {        return is_hit_mbox_;    }    void set_is_hit_mbox(const bool is_hit_mbox) {        is_hit_mbox_ = is_hit_mbox;    }    void clear_is_hit_mbox() {        is_hit_mbox_ = false;    }    const std::string & hash_key_used() const {        return hash_key_used_;    }    void set_hash_key_used(const std::string &hash_key_used) {        hash_key_used_ = hash_key_used;    }    void clear_hash_key_used() {        hash_key_used_.clear();    }    const std::string & hash_key_val_used() const {        return hash_key_val_used_;    }    void set_hash_key_val_used(const std::string &hash_key_val_used) {        hash_key_val_used_ = hash_key_val_used;    }    void clear_hash_key_val_used() {        hash_key_val_used_.clear();    }    ParamHit_Type type() const {        return type_;    }    void set_type(const ParamHit_Type type) {        type_ = type;    }    void clear_type() {        type_ = ParamHit::Unknown;    }    const Param & param() const {        return param_;    }    Param * mutable_param() {        return &param_;    }    std::string ShortDebugString() const {        std::string ans = "type: " + std::to_string(type_);        ans.append(", group_id: ").append(std::to_string(group_id_));        ans.append(", expt_id: ").append(std::to_string(expt_id_));        ans.append(", launch_layer_id: ").append(std::to_string(launch_layer_id_));        ans.append(", hash_key_used: ").append(hash_key_used_);        ans.append(", hash_key_val_used: ").append(hash_key_val_used_);        ans.append(", param_name: ").append(param_.name());        ans.append(", param_val: ").append(param_.value());        ans.append(", is_hit_mbox: ").append(std::to_string(is_hit_mbox_));        return ans;    }    int ByteSize() {        int ans = 0;        ans += sizeof(uint64_t) * 3 + sizeof(bool) + sizeof(ParamHit_Type);        ans += hash_key_used_.size() + hash_key_val_used_.size() + param_.name().size() + param_.value().size();        return ans;    }private:    ParamHit_Type type_;    uint64_t group_id_, expt_id_, launch_layer_id_;    std::string hash_key_used_, hash_key_val_used_;    bool is_hit_mbox_;    Param param_;};
 ```
 
@@ -34,13 +33,11 @@ TEST(ParamHitDestructorPerf, test) {    vector<ParamHit> hits;    vector
 
 性能对比结果：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016150257.png]]
 
 可以看到使用 C++的 Class 相比于 ProtoBuf 可以提升 3 倍的性能。
 
-# 02
-
-使用 Cache Friendly 的数据结构
+# 02 使用 Cache Friendly 的数据结构
 
 这里想先抛出一个问题：使用哈希表的查找一定比使用数组的查找快吗？
 
@@ -50,7 +47,7 @@ A：其实是不一定的，由于数组具有较高的缓存局部性，可提�
 
 这里给出一个常见操作耗时的数据（2020 年）：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016150314.png]]
 
 下面也给出一个项目中的使用 Cache Friendly 优化的例子：
 
@@ -74,11 +71,9 @@ TEST(HitContext, test) {    const int keycnt = 264;    std::vector<st
 
 性能对比结果：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016150323.png]]
 
-# 03
-
-使用 jemalloc/tcmalloc 代替普通的 malloc 方式
+# 03 使用 jemalloc/tcmalloc 代替普通的 malloc 方式
 
 由于代码中大量使用了 C++的 STL，所以会出现以下几种缺点：
 
@@ -94,13 +89,11 @@ cc_library(name = "mmexpt_dye_api",srcs = ["mmexpt_dye_api.cc",],hdrs = ["mmexp
 
 使用 jemalloc 与不使用 jemalloc 前后性能对比（这里的测试场景是在 loadbusiness 的时候，具体涉及到了一些业务代码）
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016150339.png]]
 
 可以发现使用 jemalloc 可以提升 20%多的性能，还是优化了很大的，很小的开发成本（只需要加一个编译依赖）带来不错的收益。
 
-# 04
-
-使用无锁数据结构
+# 04 使用无锁数据结构
 
 在过去项目开发的时候使用过一种双 buffer 的无锁数据结构，之所以使用双 buffer 是因为 API 有大约 26 亿/s 的调用量，这么高的调用量对性能的要求是很高的。数据结构的定义：
 
@@ -122,9 +115,7 @@ int InitExptNewShmData(expt_api_new_shm *pstShmData, void *pData) {  int 
 
 我们平台的场景主要是读，而且由于拉取实验配置采用的都是增量的拉取方式，所以配置的改变也不是很频繁，也就很少有写操作的出现。采用双 buffer 无锁数据结构的优势在于可以提高并发性能，由于读写操作在不同的 buffer 上同时进行，所以不需要额外加锁，减少了数据竞争和锁冲突的可能性。当然这种数据结构也有相应的缺点，就是会多用了一倍的内存，用空间换时间。
 
-# 05
-
-对于特定的场景采用特定的处理方式
+# 05 对于特定的场景采用特定的处理方式
 
 这其实也很容易理解，有很多场景是需要定制化优化的，所以不能从主体代码的层面去优化了，那换个思路，是不是可以从返回的数据格式进行优化呢？举个我们过去遇到的一个例子：我们平台有一个染色场景，就是需要对当天登录的所有微信用户计算命中情况，旧的数据格式其实返回了一堆本身染色场景不需要的字段，所以这里其实是可以优化的。
 
@@ -142,13 +133,11 @@ struct DyeHitInfo {    int expt_id, group_id;    uint64_t bucket_src
 
 优化前后性能对比：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016150408.png]]
 
 所以其实针对某些特殊场景做一些定制化的开发成本也没有很高，但是带来的收益却是巨大的。
 
-# 06
-
-善用性能测试工具
+# 06 善用性能测试工具
 
 这里列举一些常见的性能测试工具：linux 提供的 perf、GNU 编译器提供的 gprof、Valgrind、strace 等等。
 
@@ -162,13 +151,13 @@ https://godbolt.org/（可以查看代码对应的汇编代码）
 
 https://github.com/brendangregg/FlameGraph （生成火焰图的工具）
 
-# 07
-
-总结
+# 07 总结
 
 其实还有一些性能优化的地方，比如使用合适的数据结构和算法，减少大对象的拷贝，减少无效的计算，IO 与计算分离，分支预测等等，后续如果有时间的话可以再更新一篇新的文章。性能优化不是一锤子买卖，所以需要一直监控，一直优化。需要注意的一点是不要过度优化，在提升程序性能的时候不要丢掉代码的可维护性，而且还要评估下性能提升带来的收益是否与花费的时间成正比。总之，性能优化，长路漫漫。如果觉得本篇文章的内容对你有帮助，欢迎转发分享。
 
 -End-
+
+---
 
 原创作者｜张江涛
 

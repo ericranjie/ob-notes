@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "code-griding-note.md"
+                "file": "coding/os/linux/network/an_深入理解 Linux socket.md"
               }
             }
           }
@@ -148,7 +148,17 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "coding/os/linux/performance/a_n _微信工程师：常见性能优化方案与实用工具.md",
+    "coding/os/linux/performance/b_微信工程师：常见性能优化方案与实用工具.md",
+    "zx99-image/Pasted image 20241016150257.png",
+    "zx99-image/Pasted image 20241016150408.png",
+    "zx99-image/Pasted image 20241016150339.png",
+    "zx99-image/Pasted image 20241016150323.png",
+    "zx99-image/Pasted image 20241016150314.png",
+    "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
+    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
+    "README.md",
+    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
+    "code-griding-note.md",
     "coding/os/linux/performance/k_一文说清linux system load.md",
     "coding/os/linux/performance/i_系统性能监控工具ssar实例精选 龙蜥SIG.md",
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
@@ -159,15 +169,11 @@
     "zx99-image/Pasted image 20241016095928.png",
     "zx99-image/Pasted image 20241016095904.png",
     "zx99-image/Pasted image 20241016095848.png",
-    "zx99-image/Pasted image 20241016095829.png",
-    "zx99-image/Pasted image 20241016095814.png",
     "coding/compiler/k_从编译器的角度来看循环优化.md",
     "coding/compiler/b_编译乱序(Compiler Reordering).md",
     "coding/compiler/k_利用Makfile给多文件、多目录C源码建立工程.md",
     "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
-    "code-griding-note.md",
     "interview/leetcode/codetop/1-dimensional/queue.md",
-    "README.md",
     "Welcome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_5. Longest Palindromic Substring.md",
     "0x01-leetcode/1-dimensional/double-pointer/h_1147. Longest Chunked Palindrome Decomposition.md",
@@ -177,15 +183,8 @@
     "0x01-leetcode/2-dimensional/BFS-DFS/permutation/h_47. Permutations II.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/e_459. Repeated Substring Pattern.md",
     "0x01-leetcode/1-dimensional/stack/e_234. Palindrome Linked List.md",
-    "0x01-leetcode/1-dimensional/linked-list/reverse/e_206. Reverse Linked List.md",
-    "0x01-leetcode/math-logic/e_9. Palindrome Number.md",
-    "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
-    "interview/leetcode/codetop/1-dimensional/string.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
-    "zx99-image/Pasted image 20241010225439.png",
-    "zx99-image/Pasted image 20241010222743.png",
-    "zx99-image/Pasted image 20241010222858.png",
     "interview/leetcode/bytedance",
     "mine/cpp-idiom/Untitled",
     "mine/cpp-idiom/algorithms",

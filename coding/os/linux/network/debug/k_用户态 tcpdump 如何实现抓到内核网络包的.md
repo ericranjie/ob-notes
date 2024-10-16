@@ -1,7 +1,6 @@
-CPP开发者
-_2021年10月13日 11:57_
+CPP开发者 _2021年10月13日 11:57_
+
 The following article is from 开发内功修炼 Author 张彦飞allen
-飞哥有鹅厂、搜狗 10 年多的开发工作经验。通过本号，我把多年中对于性能的一些深度思考分享给大家。
 
 今天聊聊大家工作中经常用到的 tcpdump。
 
@@ -18,7 +17,7 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 ## 一、网络包接收过程
 
 在[图解Linux网络包接收过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666548640&idx=1&sn=7e6dcbbcd569ad4f3c20e915b78b3bac&chksm=80dc890bb7ab001d4cd880c773b3e7b3b9ee4d7d9d4fac0ebbeaa6d247c70084d8cde829bcf2&scene=21#wechat_redirect)一文中我们详细介绍了网络包是如何从网卡到达用户进程中的。这个过程我们可以简单用如下这个图来表示。
-!\[\[Pasted image 20241003161545.png\]\]
+![[Pasted image 20241003161545.png]]
 
 ### 找到 tcpdump 抓包点
 
@@ -58,7 +57,7 @@ int ip_rcv(...)   {    ......    return NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_R
 如果你用 NF_HOOK 作为关键词来搜索，还能搜到不少 netfilter 的过滤点。不过所有的过滤点都是位于 IP 协议层的。
 
 在接收包的过程中，数据包是先经过网络设备层然后才到协议层的。
-!\[\[Pasted image 20241003161556.png\]\]
+![[Pasted image 20241003161556.png]]
 
 那么我们开篇中的一个问题就有了答案了。假如我们设置了 netfilter 规则，在接收包的过程中，工作在网络设备层的 tcpdump 先开始工作。还没等 netfilter 过滤，tcpdump 就抓到包了！
 
@@ -67,7 +66,7 @@ int ip_rcv(...)   {    ......    return NF_HOOK(NFPROTO_IPV4, NF_INET_PRE_R
 ## 二、网络包发送过程
 
 我们接着再来看网络包发送过程。在[25 张图，一万字，拆解 Linux 网络包发送过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666554809&idx=1&sn=31381caf815f6b0dc266b6dc432959da&chksm=80dca112b7ab2804efc8a99772fc17a1217f791a988c5087a703b10c4bf3d27fee55abfbcd85&scene=21#wechat_redirect)一文中，我们详细描述过网络包的发送过程。发送过程可以汇总成简单的一张图。
-!\[\[Pasted image 20241003161602.png\]\]
+![[Pasted image 20241003161602.png]]
 
 ### 找到 netfilter 过滤点
 
@@ -90,8 +89,7 @@ err = __ip_local_out(skb);   }      int __ip_local_out(struct sk_buff *skb)
 在上述代码中我们看到，在 dev_queue_xmit_nit 中遍历 ptype_all 中的协议，并依次调用 deliver_skb。这就会执行到 tcpdump 挂在上面的虚拟协议。
 
 在网络包的发送过程中，和接收过程恰好相反，是协议层先处理、网络设备层后处理。
-!\[\[Pasted image 20241003161609.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003161609.png]]
 
 **如果 netfilter 设置了过滤规则，那么在协议层就直接过滤掉了。在下层网络设备层工作的 tcpdump 将无法再捕获到该网络包**。
 
@@ -107,31 +105,37 @@ socket 系统调用的第一个参数表示创建的 socket 所属的地址簇�
 
 > 协议族和地址族：每一种协议族都有其对应的地址族。比如 IPV4 的协议族定义叫 PF_INET，其地址族的定义是 AF_INET。它们是一一对应的，而且值也完全一样，所以经常混用。
 
-`//file: include/linux/socket.h   #define AF_UNSPEC 0   #define AF_UNIX  1 /* Unix domain sockets   */   #define AF_LOCAL 1 /* POSIX name for AF_UNIX */   #define AF_INET  2 /* Internet IP Protocol  */   #define AF_INET6 10 /* IP version 6   */   #define AF_PACKET 17 /* Packet family  */   ......   `
+```cpp
+//file: include/linux/socket.h
+#define AF_UNSPEC 0   #define AF_UNIX  1 /* Unix domain sockets   */   #define AF_LOCAL 1 /* POSIX name for AF_UNIX */   #define AF_INET  2 /* Internet IP Protocol  */   #define AF_INET6 10 /* IP version 6   */   #define AF_PACKET 17 /* Packet family  */   ......   
+```
 
 另外上面第三个参数 768 代表的是 ETH_P_ALL，socket.htons(ETH_P_ALL) = 768。
 
 我们来展开看这个 packet 类型的 socket 创建的过程中都干了啥，找到 socket 创建源码。
-
-`//file: net/socket.c   SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)    {    ......    retval = sock_create(family, type, protocol, &sock);    }      int __sock_create(struct net *net, int family, int type, ...)   {    ......    pf = rcu_dereference(net_families[family]);    err = pf->create(net, sock, protocol, kern);   }   `
-
+```cpp
+//file: net/socket.c   
+SYSCALL_DEFINE3(socket, int, family, int, type, int, protocol)    {    ......    retval = sock_create(family, type, protocol, &sock);    }      int __sock_create(struct net *net, int family, int type, ...)   {    ......    pf = rcu_dereference(net_families[family]);    err = pf->create(net, sock, protocol, kern);   }   
+```
 在 \_\_sock_create 中，从 net_families 中获取了指定协议。并调用了它的 create 方法来完成创建。
 
 net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，还支持很多种协议族。比如 PF_UNIX、PF_INET6（ipv6）、PF_PACKET等等。每一种协议族在 net_families 数组的特定位置都可以找到其 family 类型。在这个 family 类型里，成员函数 create 指向该协议族的对应创建函数。
-!\[\[Pasted image 20241003161616.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003161616.png]]
 
 根据上图，我们看到对于 packet 类型的 socket，pf->create 实际调用到的是 packet_create 函数。我们进入到这个函数中来一探究竟，这是理解 tcpdump 工作原理的关键！
-
-`//file: packet/af_packet.c   static int packet_create(struct net *net, struct socket *sock, int protocol,       int kern)   {    ...    po = pkt_sk(sk);    po->prot_hook.func = packet_rcv;       //注册钩子    if (proto) {     po->prot_hook.type = proto;     register_prot_hook(sk);    }   }      static void register_prot_hook(struct sock *sk)   {    struct packet_sock *po = pkt_sk(sk);    dev_add_pack(&po->prot_hook);   }   `
-
+```cpp
+//file: packet/af_packet.c   
+static int packet_create(struct net *net, struct socket *sock, int protocol,       int kern)   {    ...    po = pkt_sk(sk);    po->prot_hook.func = packet_rcv;       //注册钩子    if (proto) {     po->prot_hook.type = proto;     register_prot_hook(sk);    }   }      static void register_prot_hook(struct sock *sk)   {    struct packet_sock *po = pkt_sk(sk);    dev_add_pack(&po->prot_hook);   }   
+```
 在 packet_create 中设置回调函数为 packet_rcv，再通过 register_prot_hook => dev_add_pack 完成注册。注册完后，是在全局协议 ptype_all 链表中添加了一个虚拟的协议进来。
-!\[\[Pasted image 20241003161623.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003161623.png]]
 
 我们再来看下 dev_add_pack 是如何注册协议到 ptype_all 中的。回顾我们开头看到的 socket 函数调用，第三个参数 proto 传入的是 ETH_P_ALL。那 dev_add_pack 其实最后是把 hook 函数添加到了 ptype_all 里了，代码如下。
 
-`//file: net/core/dev.c   void dev_add_pack(struct packet_type *pt)   {    struct list_head *head = ptype_head(pt);    list_add_rcu(&pt->list, head);   }      static inline struct list_head *ptype_head(const struct packet_type *pt)   {    if (pt->type == htons(ETH_P_ALL))     return &ptype_all;    else     return &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];   }   `
+```cpp
+//file: net/core/dev.c   
+void dev_add_pack(struct packet_type *pt)   {    struct list_head *head = ptype_head(pt);    list_add_rcu(&pt->list, head);   }      static inline struct list_head *ptype_head(const struct packet_type *pt)   {    if (pt->type == htons(ETH_P_ALL))     return &ptype_all;    else     return &ptype_base[ntohs(pt->type) & PTYPE_HASH_MASK];   }   
+```
 
 > 我们整篇文章都以 ETH_P_ALL 为例，但其实有的时候也会有其它情况。在别的情况下可能会注册协议到 ptype_base 里了，而不是 ptype_all。同样， ptype_base 中的协议也会在发送和接收的过程中被执行到。
 
@@ -147,12 +151,11 @@ net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，�
 
 **2. netfilter 过滤的包 tcpdump是否可以抓的到**\
 关于这个问题，得分接收和发送过程分别来看。在网络包接收的过程中，由于 tcpdump 近水楼台先得月，所以完全可以捕获到命中 netfilter 过滤规则的包。
-!\[\[Pasted image 20241003161633.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003161633.png]]
 
 但是在发送的过程中，恰恰相反。网络包先经过协议层，这时候被 netfilter 过滤掉的话，底层工作的 tcpdump 还没等看见就啥也没了。\
-!\[\[Pasted image 20241003161638.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003161638.png]]
+
 
 **3. 让你自己写一个抓包程序的话该如何下手**\
 如果你想自己写一段类似 tcpdump 的抓包程序的话，使用 packet socket 就可以了。我用 c 写了一段抓包，并且解析源 IP 和目的 IP 的简单 demo。
@@ -167,10 +170,11 @@ net_families 是一个数组，除了我们常用的 PF_INET（ ipv4 ） 外，�
 ```
 
 运行结果预览如下。
-!\[\[Pasted image 20241003161644.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003161644.png]]
 
 - EOF -
+
+---
 
 推荐阅读  点击标题可跳转
 
