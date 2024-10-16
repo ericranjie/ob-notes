@@ -1,18 +1,13 @@
+
 Linux内核之旅
 
 _2021年12月24日 18:09_
 
 以下文章来源于极客重生 ，作者极客重生
 
-**极客重生**.
-
-技术学习分享，一起进步
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664610436&idx=1&sn=1927a965f1ecf4e76f44e0ce4f482c68&chksm=f04d9761c73a1e77f4b16d98bd2b92320344c03f2cd465446ccfcf79908742f3d58a6f39050f&mpshare=1&scene=24&srcid=1224j6OgGI6Iz91jYbSiYCpX&sharer_sharetime=1640351457458&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0e20d730ebdbb67b779caa30b66d45b8b6176c75b9200fccc278885501adaa4a22ca63b3a20e309eb11651ffd9098b0458403825c4c654c4bb1710b10d4f267a0fcd531054296b687286716380338bb5154594d523f59b44e7fa4e207336303856855923712e55d6d48ed96cb9d023c96b1b9d948f8b96c90&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQJTTo9YPktXiu2knfPeGk6hLmAQIE97dBBAEAAAAAAPAIIjBYye8AAAAOpnltbLcz9gKNyK89dVj01l5iV7SBn6oLwS3EQvpS0ZR5A5HjjC5yot03Yf4WYoRK3f52USWdJVecvoVCppMWX%2FllPFYPQ%2B%2BjDft0ftticBNQ1FTxZ3ii8IN2ZAmeY3x8Eq7J%2FfZu0B3ORwOuW4x8TlEnOaM1Br4Zg9j8oy%2FFsEyhx6gA9GQI4%2BcVa%2B7k4r%2FGf8HeNbZ2Pbyz81Ew%2BKoQYEi0nf2N6cG2DUhhRl3PYXOG7nE60UfVYB07H%2B0rW%2F1t6V1Kf0AIf04mWJQvWFt%2F&acctmode=0&pass_ticket=NQYoTNtxIGt9AoL2K4oSvwN0OGM7Bll8RHilX8xuRSpWASK5NKWGi1hbnjL7jZ1m&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
-
 hi ，大家好，今天分享一篇**后台服务器性能优化**之**网络性能优化**，希望大家对Linux网络有更深的理解。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6mezaHSCJFePuA4aXKV1oejhq0RYvdEMM0B2mFniaAIMibCQlicEEU2NGXSKm8sVVomibtb7r8f5SvHdw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241016223553.png]]
 
 曾几何时，一切都是那么简单。网卡很慢，只有一个队列。当数据包到达时，网卡通过**DMA**复制数据包并发送中断，Linux内核收集这些数据包并完成中断处理。随着网卡越来越快，基于中断的模型可能会因大量传入数据包而导致 IRQ 风暴。这将消耗大部分 CPU 功率并冻结系统。
 
@@ -20,13 +15,11 @@ hi ，大家好，今天分享一篇**后台服务器性能优化**之**网络�
 
 幸运的是，现在多核 CPU 很流行，那么为什么不并行处理数据包呢？
 
-## 
-
-**!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)**
+![[Pasted image 20241016223705.png]]
 
 ## **RSS：接收端缩放**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "RSS")
+![[Pasted image 20241016223723.png]]
 
 **R**eceive **S**ide **S**caling（RSS）是所述机构具有多个RX / TX队列过程的数据包。当带有RSS 的网卡接收到数据包时，它会对数据包应用过滤器并将数据包分发到RX 队列。过滤器通常是一个哈希函数，可以通过“ethtool -X”进行配置。如果你想在前 3 个队列中均匀分布流量：
 
@@ -44,22 +37,24 @@ hi ，大家好，今天分享一篇**后台服务器性能优化**之**网络�
 
 ## **RPS：接收数据包控制**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "RPS")
+![[Pasted image 20241016223803.png]]
+
 
 **RSS**提供硬件队列，一个称为软件队列机制**Receive Packet Steering** （**RPS**）在Linux内核实现。
 
 当驱动程序接收到数据包时，它会将数据包包装在套接字缓冲区 ( sk_buff ) 中，其中包含数据包的u32哈希值。散列是所谓的第 4 层散列（l4 散列），它基于源 IP、源端口、目的 IP 和目的端口，由网卡或\_\_skb_set_sw_hash() 计算。由于相同 TCP/UDP 连接（流）的每个数据包共享相同的哈希值，因此使用相同的 CPU 处理它们是合理的。
 
-**RPS** 的基本思想是根据每个队列的 rps_map 将同一流的数据包发送到特定的 CPU。这是 rps_map 的结构：映射根据 CPU 位掩码动态更改为/sys/class/net/<dev>/queues/rx-<n>/rps_cpus。比如我们要让队列使用前3个CPU，在8个CPU的系统中，我们先构造位掩码，0 0 0 0 0 1 1 1，到0x7，然后
+**RPS** 的基本思想是根据每个队列的 rps_map 将同一流的数据包发送到特定的 CPU。这是 rps_map 的结构：映射根据 CPU 位掩码动态更改为
+`/sys/class/net/<dev>/queues/rx-<n>/rps_cpus`。比如我们要让队列使用前3个CPU，在8个CPU的系统中，我们先构造位掩码，0 0 0 0 0 1 1 1，到0x7，然后
 
-```
+```c
 #echo 7 > /sys/class/net /eth0/queues/rx-0/rps_cpus
 ```
 
 这将保证从 eth0 中队列 0 接收的数据包进入 CPU 1~3。驱动程序在 sk_buff 中包装一个数据包后，它将到达netif_rx_internal()或netif_receive_skb_internal()，然后到达 get_rps_cpu()
 
-```
-struct rps_map {
+```c
+  struct rps_map { unsigned int len; struct rcu_head rcu;     u16 cpus[0]; };
 ```
 
 将被调用以将哈希映射到 rps_map 中的条目，即 CPU id。得到CPU id后，enqueue_to_backlog()将sk_buff放到特定的CPU队列中进行进一步处理。每个 CPU 的队列在 per-cpu 变量softnet_data 中分配。
@@ -68,12 +63,15 @@ struct rps_map {
 
 ## **RFS: Receive Flow Steering**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "消防服务")尽管 **RPS** 基于流分发数据包，但它没有考虑用户空间应用程序。应用程序可能在 CPU A 上运行，而内核将数据包放入 CPU B 的队列中。由于 CPU A 只能使用自己的缓存，因此 CPU B 中缓存的数据包变得无用。\*\*Receive Flow Steering（RFS）\*\*进一步延伸为RPS的应用程序。
+![[Pasted image 20241016223927.png]]
+
+
+尽管 **RPS** 基于流分发数据包，但它没有考虑用户空间应用程序。应用程序可能在 CPU A 上运行，而内核将数据包放入 CPU B 的队列中。由于 CPU A 只能使用自己的缓存，因此 CPU B 中缓存的数据包变得无用。\*\*Receive Flow Steering（RFS）\*\*进一步延伸为RPS的应用程序。
 
 代替每个队列的哈希至CPU地图，**RFS**维护全局flow-to-CPU的表，rps_sock_flow_table：该掩模用于将散列值映射成所述表的索引。由于表大小将四舍五入到 2 的幂，因此掩码设置为table_size - 1。
 
-```
-struct rps_sock_flow_table {
+```c
+struct rps_sock_flow_table {     u32 mask;     u32 ents[0]; };
 ```
 
 并且很容易找到索引：a sk_buff与hash & scok_table->mask。
@@ -82,17 +80,15 @@ struct rps_sock_flow_table {
 
 当数据包到来时，将调用**get_rps_cpu**()来决定使用哪个 CPU 队列。下面是get_rps_cpu()如何决定数据包的 CPU
 
-## 
-
-```
-ident = sock_flow_table->ents[hash & sock_flow_table->mask];
+```c
+ident = sock_flow_table->ents[hash & sock_flow_table->mask]; if ((ident ^ hash) & ~rps_cpu_mask)      goto try_rps; next_cpu = ident & rps_cpu_mask;
 ```
 
 使用流表掩码找到条目的索引，并检查散列的高位是否与条目匹配。如果是，它会从条目中检索 CPU id 并为数据包分配该 CPU。如果散列不匹配任何条目，它会回退到使用 RPS 映射。
 
 可以通过**rps_sock_flow_entries**调整 sock 流表的大小。例如，如果我们要将表大小设置为 32768：
 
-```
+```c
 #echo 32768 > /proc/sys/net/core/rps_sock_flow_entries
 ```
 
@@ -100,15 +96,15 @@ ident = sock_flow_table->ents[hash & sock_flow_table->mask];
 
 下面是该结构**rps_dev_flow_table**：到袜子流表中，类似的rps_dev_flow_table也使用table_size - 1作为掩模而表的大小也必须被向上舍入到2的幂当流量分组被入队，last_qtail被更新
 
-```
-struct rps_dev_flow {
+```c
+struct rps_dev_flow {     u16 cpu;     u16 filter; /* For aRFS */ unsigned int last_qtail; }; struct rps_dev_flow_table { unsigned int mask; struct rcu_head rcu; struct rps_dev_flow flows[0]; };
 ```
 
 到 CPU 队列的尾部。如果应用程序迁移到新 CPU，则 sock 流表将反映更改，并且get_rps_cpu()将为流设置新 CPU。在设置新 CPU 之前，get_rps_cpu() 会检查当前队列的头部是否已经通过 last_qtail。如果是这样，这意味着队列中没有更多未完成的数据包，并且可以安全地更改 CPU。否则，get_rps_cpu()仍将使用rps_dev_flow->cpu 中记录的旧 CPU 。
 
 每个队列的流表（**rps_dev_flow_table**）的大小可以通过 sysfs 接口进行配置：
 
-```
+```c
 /sys/class/net/<dev>/queues/rx-<n>/rps_flow_cnt
 ```
 
@@ -116,7 +112,9 @@ struct rps_dev_flow {
 
 ## **ARFS：加速接收流量转向**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "区域性FSS")\*\*Accelerated Receive Flow Steering（aRFS）\*\*进一步延伸RFS为RX队列硬件过滤。要启用 aRFS，它需要具有可编程元组过滤器和驱动程序支持的网卡。要启用ntuple 过滤器。
+![[Pasted image 20241016224158.png]]
+
+\*\*Accelerated Receive Flow Steering（aRFS）\*\*进一步延伸RFS为RX队列硬件过滤。要启用 aRFS，它需要具有可编程元组过滤器和驱动程序支持的网卡。要启用ntuple 过滤器。
 
 ```
 # ethtool -K eth0 ntuple on
@@ -128,9 +126,7 @@ struct rps_dev_flow {
 
 除了实现ndo_rx_flow_steer() 外，驱动程序还必须调用rps_may_expire_flow() 定期检查过滤器是否仍然有效并删除过期的过滤器。
 
-### \*\*
-
-SO_REUSEPORT\*\*
+### \*\*SO_REUSEPORT\*\*
 
 **linux man**文档中一段文字描述其作用：
 
@@ -140,7 +136,7 @@ The new socket option allows multiple sockets on the same host to bind to the sa
 
 Linux系统上后台应用程序，为了利用**多核**的优势，一般使用以下比较典型的多进程/多线程服务器模型：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016224350.png]]
 
 - 单线程listen/accept，多个工作线程接收任务分发，虽CPU的工作负载不再是问题，但会存在：
 
@@ -259,6 +255,8 @@ Linux网络堆栈所存在问题
 **RSS**\*\*、RPS、\*\***RFS** 和 **aRFS**，这些机制是在 Linux 3.0 之前引入的，`SO_REUSEPORT`选项在Linux 3.9被引入内核，因此大多数发行版已经包含并启用了它们。深入了解它们，以便为我们的服务器系统找到最佳性能配置。
 
 性能优化无极限，我们下期再继续分享！
+
+---
 
 **扩展与参考**
 

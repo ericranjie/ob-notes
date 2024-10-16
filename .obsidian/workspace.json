@@ -11,11 +11,9 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241016223553.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
+                "file": "zx99-image/Pasted image 20241016223553.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
+                "file": "zx99-image/Pasted image 20241016223553.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md"
+                "file": "zx99-image/Pasted image 20241016223553.png"
               }
             }
           }
@@ -146,8 +144,17 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
+    "zx99-image/Pasted image 20241016224350.png",
+    "zx99-image/Pasted image 20241016224158.png",
+    "zx99-image/Pasted image 20241016223927.png",
+    "zx99-image/Pasted image 20241016223803.png",
+    "zx99-image/Pasted image 20241016223723.png",
+    "zx99-image/Pasted image 20241016223705.png",
+    "zx99-image/Pasted image 20241016223553.png",
+    "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
     "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
     "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
@@ -159,8 +166,6 @@
     "zx99-image/Pasted image 20241016150257.png",
     "zx99-image/Pasted image 20241016150408.png",
     "zx99-image/Pasted image 20241016150339.png",
-    "zx99-image/Pasted image 20241016150323.png",
-    "zx99-image/Pasted image 20241016150314.png",
     "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
     "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
@@ -169,11 +174,6 @@
     "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
     "coding/os/linux/performance/t_性能优化的路有多远？.md",
     "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
-    "zx99-image/Pasted image 20241016095759.png",
-    "zx99-image/Pasted image 20241016100028.png",
-    "zx99-image/Pasted image 20241016095928.png",
-    "zx99-image/Pasted image 20241016095904.png",
-    "zx99-image/Pasted image 20241016095848.png",
     "coding/compiler/k_从编译器的角度来看循环优化.md",
     "coding/compiler/b_编译乱序(Compiler Reordering).md",
     "coding/compiler/k_利用Makfile给多文件、多目录C源码建立工程.md",
@@ -182,8 +182,6 @@
     "Welcome.md",
     "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/m_5. Longest Palindromic Substring.md",
     "0x01-leetcode/1-dimensional/double-pointer/h_1147. Longest Chunked Palindrome Decomposition.md",
-    "0x01-leetcode/1-dimensional/string/KMP/h_214. Shortest Palindrome.md",
-    "0x01-leetcode/algorithm/dynamic-programming/string/palindrome/h_214. Shortest Palindrome.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
