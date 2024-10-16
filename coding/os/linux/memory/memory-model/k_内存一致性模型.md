@@ -1,3 +1,4 @@
+
 作者：[passerby](http://www.wowotech.net/author/257) 发布于：2019-3-24 14:22 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 早期的CPU是通过提高主频来提升CPU的性能，但是随着频率“红利”越来越困难的情况下，厂商开始用多核来提高CPU的计算能力。多核是指一个CPU里有多个核心，在同一时间一个CPU能够同时运行多个线程，通过这样提高CPU的并发能力。
@@ -12,7 +13,7 @@
 在后面我们会分析这几个一致性模型的特性
 
 在分析之前，我们先定义一个基本的内存模型，以这个内存模型为基础进行分析
-![](http://www.wowotech.net/content/uploadfile/201903/3b101553410032.png)
+![[Pasted image 20241016095759.png]]
 
 上图是现代CPU的基本内存模型，CPU内部有多级缓存来提高CPU的load/store访问速度（因为对于CPU而言，主存的访问速度太慢了，上百个时钟周期的内存访问延迟会极大的降低CPU的使用效率，所以CPU内部往往使用多级缓存来提升内存访问效率。）
 
@@ -24,7 +25,7 @@ C1与C2是CPU的2个核心，这两个核心有私有缓存L1，以及共享缓�
 
 下面分析这段代码的执行结果
 
-![](http://www.wowotech.net/content/uploadfile/201903/f0511553410041.png)
+![[Pasted image 20241016095814.png]]
 
 在顺序存储器模型里，MP（多核）会严格严格按照代码指令流来执行代码
 
@@ -44,7 +45,7 @@ S1 S2 L1 L2
 
 相比于以前的内存模型而言，store的时候数据会先被放到store buffer里面，然后再被写到L1 cache里。
 
-![](http://www.wowotech.net/content/uploadfile/201903/c21b1553410047.png)
+![[Pasted image 20241016095829.png]]
 
 首先我们思考单核上的两条指令：
 
@@ -62,7 +63,7 @@ S3：store b=set
 
 我们继续看下面的一段代码
 
-![](http://www.wowotech.net/content/uploadfile/201903/723e1553410054.png)
+![[Pasted image 20241016095848.png]]
 
 在SC模型里，C1与C2是严格按照顺序执行的
 
@@ -92,7 +93,7 @@ L1 S1 L2 S2
 
 那我们继续分析下面的代码
 
-![](http://www.wowotech.net/content/uploadfile/201903/ce491553410061.png)
+![[Pasted image 20241016095904.png]]
 
 S1与S2是地址无关的store指令，cpu执行的时候都会将其推到store buffer中。如果这个时候flag在C1的cahe中存在，那么CPU会优先将S2的store执行完，然后等data缓存到C1的cache之后，再执行store data=NEW指令。
 
@@ -110,7 +111,7 @@ S2 L1 L2 S1
 
 我们再看看上面分析过的代码
 
-![](http://www.wowotech.net/content/uploadfile/201903/f31e1553410067.png)
+![[Pasted image 20241016095928.png]]
 
 在PSO模型里，由于S2可能会比S1先执行，从而会导致C2的r2寄存器获取到的data值为0。在RMO模型里，不仅会出现PSO的store-store乱序，C2本身执行指令的时候，由于L1与L2是地址无关的，所以L2可能先比L1执行，这样即使C1没有出现store-store乱序，C2本身的load-load乱序也会导致我们看到的r2为0。从上面的分析可以看出，RMO内存模型里乱序出现的可能性会非常大，这是一种乱序随可见的内存一致性模型。
 
@@ -126,7 +127,7 @@ S2 L1 L2 S1
 
 我们继续看下面的例子：
 
-![](http://www.wowotech.net/content/uploadfile/201903/78b71553410074.png)
+![[Pasted image 20241016100028.png]]
 
 例如C1执行S1与S2的时候，我们在S1与S2之间加上写屏障指令，要求C1按照顺序存储模型来进行store的执行，而在C2端的L1与L2之间加入读内存屏障，要求C2也按照顺序存储模型来进行load操作，这样就能够实现内存数据的一致性，从而解决乱序的问题。
 
@@ -142,7 +143,7 @@ SY              any-any
 
 标签: [内存一致性模型](http://www.wowotech.net/tag/%E5%86%85%E5%AD%98%E4%B8%80%E8%87%B4%E6%80%A7%E6%A8%A1%E5%9E%8B)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [浅谈Cache Memory](http://www.wowotech.net/memory_management/458.html) | [copy\_{to,from}\_user()的思考](http://www.wowotech.net/memory_management/454.html)»
 

@@ -1,4 +1,6 @@
+
 原创 土豆居士 一口Linux
+
  _2021年10月18日 11:50_
 
 ## 0. 前言
@@ -10,7 +12,6 @@
 为了让大家有个更加直观的感受，一口君将之前写的一个小项目，本篇在该项目基础上进行修改。
 该项目详细设计和代码，见下文：
 《[从0写一个《电话号码管理系统》的C入门项目【适合初学者】](https://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247497355&idx=1&sn=34acdc6014924551d67f3aeb477ecca5&chksm=f96b847fce1c0d698109845db171eeb37b2774b9cb7a2a392145e4ed180afc05ef8cf5c7d91d&token=1108558673&lang=zh_CN&scene=21#wechat_redirect)》
-
 ## 一、文件
 
 好了，开始吧!
@@ -26,8 +27,6 @@
 ```
 运行结果如下：
 ![[Pasted image 20240929113949.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 ## 二、Makefile常用基础知识点
 
 ### [0] 符号`'@' '$' '$$' '-' '-n '`的说明
@@ -46,7 +45,6 @@
 ```
 3. `' $ '`美元符号`$`，主要扩展打开makefile中定义的变量
 4. `' $$ '``$$` 符号主要扩展打开makefile中定义的shell变量
-    
 ### [1] wildcard
 
 说明: 列出当前目录下所有符合模式“ PATTERN”格式的文件名,并且以空格分开。“ PATTERN”使用shell可识别的通配符，包括“ ?”（单字符）、“ *”（多字符）等。示例：
@@ -54,7 +52,6 @@
 `$(wildcard *.c)` 
 
 返回值为当前目录下所有.c 源文件列表。
-
 ### [2] patsubst
 
 说明：把字串“ x.c.c bar.c”中以.c 结尾的单词替换成以.o 结尾的字符。示例：
@@ -64,7 +61,6 @@
 函数的返回结果 是
 
  `x.c.o bar.o`
-
 ### [3] notdir
 
 说明：去除文件名中的路径信息 示例：
@@ -80,7 +76,6 @@
 `INCLUDES = -I./inc   `
 
 `$(CC) -c $(INCLUDES) $(SRC)   `
-
 ### [5] addsuffix
 
 函数名称：加后缀函数—addsuffix。语法：
@@ -94,7 +89,6 @@
 返回值为
 
 `foo.c bar.c   `
-
 ### [6] 包含另外一个文件：include
 
 在Makefile使用include关键字可以把别的Makefile包含进来，这很像C语言的#include，被包含的文件会原模原样的放在当前文件的包含位置。比如命令
@@ -104,7 +98,6 @@
 即把file.dep文件在当前Makefile文件中展开，亦即把file.dep文件的内容包含进当前Makefile文件
 
 > 在 include前面可以有一些空字符，但是绝不能是[Tab]键开始。
-
 ### [7] foreach
 
 foreach函数和别的函数非常的不一样。因为这个函数是用来做循环用的 语法是：
@@ -119,7 +112,6 @@ foreach函数和别的函数非常的不一样。因为这个函数是用来做�
 上面的例子中，`$(name)`中的单词会被挨个取出，并存到变量“n”中，“`$(n).o`”每次根据“`$(n)`”计算出一个值，这些值以空格分隔，最后作为foreach函数的返回，所以，`$(files)`的值是“a.o b.o c.o d.o”。
 
 注意，foreach中的参数是一个临时的局部变量，foreach函数执行完后，参数的变量将不在作用，其作用域只在foreach函数当中。
-
 ### [8] call
 
 “ call”函数是唯一一个可以创建定制化参数函数的引用函数。使用这个函数可以实现对用户自己定义函数引用。我们可以将一个变量定义为一个复杂的表达式，用“ call”函数根据不同的参数对它进行展开来获得不同的结果。
@@ -148,10 +140,8 @@ foreach函数和别的函数非常的不一样。因为这个函数是用来做�
 `foo=ba   `
 
 即a替代了替代了(2)
-
 ## 三、编译详细说明
 ![[Pasted image 20240929114001.png]]
-![图片](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 我们在根目录下执行make命令后，详细步骤如下：
 

@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
+                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
                 "mode": "source",
                 "source": false
               }
@@ -69,7 +69,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 200
+    "width": 302.50390243530273
   },
   "right": {
     "id": "0ed372e18b255e27",
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
+                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
+                "file": "coding/os/linux/performance/k_一文说清linux system load.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/leetcode/huawei/c_华为OD笔试面试参考.md"
+                "file": "coding/os/linux/performance/k_一文说清linux system load.md"
               }
             }
           }
@@ -148,6 +148,22 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/performance/i_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
+    "coding/os/linux/performance/k_一文说清linux system load.md",
+    "coding/os/linux/performance/t_性能优化的路有多远？.md",
+    "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
+    "zx99-image/Pasted image 20241016095759.png",
+    "zx99-image/Pasted image 20241016100028.png",
+    "zx99-image/Pasted image 20241016095928.png",
+    "zx99-image/Pasted image 20241016095904.png",
+    "zx99-image/Pasted image 20241016095848.png",
+    "zx99-image/Pasted image 20241016095829.png",
+    "zx99-image/Pasted image 20241016095814.png",
+    "coding/compiler/k_从编译器的角度来看循环优化.md",
+    "coding/compiler/b_编译乱序(Compiler Reordering).md",
+    "coding/compiler/k_利用Makfile给多文件、多目录C源码建立工程.md",
+    "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
     "code-griding-note.md",
     "interview/leetcode/codetop/1-dimensional/queue.md",
     "README.md",
@@ -165,27 +181,11 @@
     "interview/leetcode/codetop/1-dimensional/1-dimensional-main-entrance.md",
     "interview/leetcode/codetop/1-dimensional/string.md",
     "0x01-leetcode/1-dimensional/array/rotate/e_189. Rotate Array.md",
-    "interview/leetcode/codetop/1-dimensional/array.md",
-    "interview/leetcode/codetop/1-dimensional/stack.md",
     "interview/leetcode/codetop/1-dimensional",
-    "interview/leetcode/codetop/codetop-main-entrance.md",
-    "0x01-leetcode/1-dimensional/queue/m_950. Reveal Cards In Increasing Order.md",
     "interview/leetcode/codetop",
-    "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
-    "coding/Coding-Quote.md",
-    "coding/cpp/lock/b_n_详解C++高性能无锁队列的原理与实现.md",
-    "coding/cpp/learning/c_月薪2万+的C C++工程师需要掌握哪些技能？.md",
-    "coding/cpp/learning/c_C++，YYDS！.md",
     "zx99-image/Pasted image 20241010225439.png",
     "zx99-image/Pasted image 20241010222743.png",
     "zx99-image/Pasted image 20241010222858.png",
-    "zx99-image/Pasted image 20241010223426.png",
-    "zx99-image/Pasted image 20241010223414.png",
-    "zx99-image/Pasted image 20241010223401.png",
-    "zx99-image/Pasted image 20241010223349.png",
-    "zx99-image/Pasted image 20241010223324.png",
-    "zx99-image/Pasted image 20241010223315.png",
-    "zx99-image/Pasted image 20241010223256.png",
     "interview/leetcode/bytedance",
     "mine/cpp-idiom/Untitled",
     "mine/cpp-idiom/algorithms",

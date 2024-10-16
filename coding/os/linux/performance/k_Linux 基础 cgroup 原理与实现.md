@@ -187,7 +187,7 @@ $ echo 123012 > /sys/fs/cgroup/memory/test/tasks
 
 向 `tasks` 文件写入进程PID是通过 `attach_task_by_pid()` 函数实现的，代码如下：
 
-```
+```cpp
 static int attach_task_by_pid(struct cgroup *cgrp, char *pidbuf){    pid_t pid;    struct task_struct *tsk;    int ret;    if (sscanf(pidbuf, "%d", &pid) != 1) // 读取进程pid        return -EIO;    if (pid) { // 如果有指定进程pid        ...        tsk = find_task_by_vpid(pid); // 通过pid查找对应进程的进程描述符        if (!tsk || tsk->flags & PF_EXITING) {            rcu_read_unlock();            return -ESRCH;        }        ...    } else {        tsk = current; // 如果没有指定进程pid, 就使用当前进程        ...    }    ret = cgroup_attach_task(cgrp, tsk); // 调用 cgroup_attach_task() 把进程添加到cgroup中    ...    return ret;}
 ```
 
@@ -195,7 +195,7 @@ static int attach_task_by_pid(struct cgroup *cgrp, char *pidbuf){    p
 
 我们接着看看 `cgroup_attach_task()` 函数的实现：
 
-```
+```cpp
 int cgroup_attach_task(struct cgroup *cgrp, struct task_struct *tsk){    int retval = 0;    struct cgroup_subsys *ss;    struct cgroup *oldcgrp;    struct css_set *cg = tsk->cgroups;    struct css_set *newcg;    struct cgroupfs_root *root = cgrp->root;    ...    newcg = find_css_set(cg, cgrp); // 根据新的cgroup查找css_set对象    ...    rcu_assign_pointer(tsk->cgroups, newcg); // 把进程的cgroups字段设置为新的css_set对象    ...    // 把进程添加到css_set对象的tasks列表中    write_lock(&css_set_lock);    if (!list_empty(&tsk->cg_list)) {        list_del(&tsk->cg_list);        list_add(&tsk->cg_list, &newcg->tasks);    }    write_unlock(&css_set_lock);    // 调用各个子系统的attach函数    for_each_subsys(root, ss) {        if (ss->attach)            ss->attach(ss, cgrp, oldcgrp, tsk);    }    ...    return 0;}
 ```
 
@@ -217,7 +217,7 @@ $ echo 1048576 > /sys/fs/cgroup/memory/test/memory.limit_in_bytes
 
 向 `memory.limit_in_bytes` 写入数据主要通过 `mem_cgroup_write()` 函数实现的，其实现如下：
 
-```
+```cpp
 static ssize_t mem_cgroup_write(struct cgroup *cont, struct cftype *cft,                struct file *file, const char __user *userbuf,                size_t nbytes, loff_t *ppos){    return res_counter_write(&mem_cgroup_from_cont(cont)->res,                cft->private, userbuf, nbytes, ppos,                mem_cgroup_write_strategy);}
 ```
 
@@ -229,13 +229,15 @@ static ssize_t mem_cgroup_write(struct cgroup *cont, struct cftype *cft,�
 
 当进程要使用内存时，会调用 `do_anonymous_page()` 来申请一些内存页，而 `do_anonymous_page()` 函数会调用 `mem_cgroup_charge()` 函数来检测进程是否超过了 `cgroup` 设置的资源限制。而 `mem_cgroup_charge()` 最终会调用 `mem_cgroup_charge_common()` 函数进行检测，`mem_cgroup_charge_common()` 函数实现如下：
 
-```
+```cpp
 static int mem_cgroup_charge_common(struct page *page, struct mm_struct *mm,                gfp_t gfp_mask, enum charge_type ctype){    struct mem_cgroup *mem;    ...    mem = rcu_dereference(mm->mem_cgroup); // 获取进程对应的内存限制对象    ...    while (res_counter_charge(&mem->res, PAGE_SIZE)) { // 判断进程使用内存是否超出限制        if (!(gfp_mask & __GFP_WAIT))            goto out;        if (try_to_free_mem_cgroup_pages(mem, gfp_mask)) // 如果超出限制, 就释放一些不用的内存            continue;        if (res_counter_check_under_limit(&mem->res))            continue;        if (!nr_retries--) {            mem_cgroup_out_of_memory(mem, gfp_mask); // 如果尝试过5次后还是超出限制, 那么发出oom信号            goto out;        }        ...    }    ...}
 ```
 
 `mem_cgroup_charge_common()` 函数会对进程内存使用情况进行检测，如果进程已经超过了 `cgroup` 设置的限制，那么就会尝试进行释放一些不用的内存，如果还是超过限制，那么就会发出 `OOM (out of memory)` 的信号。
 
 - EOF -
+
+---
 
 推荐阅读  点击标题可跳转
 

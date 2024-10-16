@@ -1,20 +1,7 @@
-# 
 
-一口Linux
-
- _2024年09月02日 11:50_ _河北_
+一口Linux _2024年09月02日 11:50_ _河北_
 
 The following article is from 程栩的性能优化笔记 Author 程栩
-
-[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4zuU31ibxk2hXrLSO8s7BlzpZARHVyjr5o3AjCfNU7iabA/0)
-
-**程栩的性能优化笔记**.
-
-一个专注于性能的大厂程序员，分享包括但不限于计算机体系结构、性能优化、云原生的知识。
-
-](https://mp.weixin.qq.com/s?__biz=MzUxMjEyNDgyNw==&mid=2247521243&idx=1&sn=facd51462238108b23ee05ce2885d831&chksm=f8c2bedcdd4015c96638abea6b1c7e2584ee781b35934abd42c659f3e45915130df70e183d52&mpshare=1&scene=24&srcid=09021z6RQ2rT74XEK2kjsz8R&sharer_shareinfo=c0ecc52ac5ce78eb6cd4172c879506fb&sharer_shareinfo_first=c0ecc52ac5ce78eb6cd4172c879506fb&key=daf9bdc5abc4e8d074e8ad918c40b06bf0b16f3b39aac353dbd13085ce346142f948979d651dbb85daa02defef20fd6814ae78bb10d70266822b4163cd6150021e324036854973f81c349cac28b354f94ccb5cc5f399cbd29bb59ea3c526e3eb71c9aa318bb2aa32db9565300dfdabf386367e906ab33b2b96fa27fa5e82f52f&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_fc2c47bdbd29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQ8x2gtLCj3Kv%2Fca8f19kktRKUAgIE97dBBAEAAAAAACppBnB87XoAAAAOpnltbLcz9gKNyK89dVj0hWVOCx6Lv2VbBoxSeYHAIiXqGK99tXvwz5hv62VQ2lNlYrHC%2FCl9fWw0%2BGjKOMS1Kh%2BUpgU%2BaoyLGrved5afbUTTNX1hQbIUji6AaFnasFiKEkd9wnF1uFg4t9BS3GKm3C3CGw3NmBuAwAxHkf6qyWZKaXFN9XF9W7TSrN8oYevAs1MqeflPKUmgYgXoZPRKe1O6Vao7IbJ8Z3qIlDmoiNCrOLpZpgwh5%2F0fBgXW0UmLQLfxA4blAC18%2BjSFvkGSRqrfR8fzpCn1%2FPgzPtrlhO%2FissB9ktQM1S7HeGEttuqiCLXBXBCQ%2F38hfRd1dQ%3D%3D&acctmode=0&pass_ticket=sHyUhxn3Oc7AZiTriEjSfPYmfo9T%2FimiJHHokxIBpfwbNThYK8a330YjXRIrGO16&wx_header=0#)
 
 今天我们来聊一聊循环优化，看看编译器是如何来做循环优化的，以及我们可以如何做循环优化。
 
@@ -51,8 +38,6 @@ The following article is from 程栩的性能优化笔记 Author 程栩
 
 `if (debug) {       for (int i = 0; i < n; i++) {        A;           printf("The data is NaN\n");        }   } else {       for (int i = 0; i < n; i++) {        B;       }   }   `
 
-> ❝
-> 
 > 如果能确定debug的值可以在编译时直接变成单循环。
 
 然而，编译器并不知道这个`debug`变量是否会发生变化，所以其会假设函数`printf()`可能会修改`debug`的值，因此，编译器不会像上面那样去进行优化。我们可以通过设置局部变量的方式让编译器了解到这个变量并不会发生变化：
@@ -67,8 +52,6 @@ The following article is from 程栩的性能优化笔记 Author 程栩
 
 如果编译器能够将`add`函数进行内联，那么编译器就可以尝试做更多的优化；但是如果`add`函数无法被内联，编译器就只能进行标量版本的循环，每次都去调用`add`函数。而一旦涉及到函数的调用，就需要进行跳转，过多的跳转会影响到程序的性能。
 
-> ❝
-> 
 > 可以通过LTO(Link Time Optimization)来进行优化。
 
 #### 指针别名
@@ -105,15 +88,10 @@ The following article is from 程栩的性能优化笔记 Author 程栩
     
 - 指针别名：如果存在指向标量A的指针B，那么我们可以通过直接修改A或者通过指针B来修改A的值。寄存器不会将A放在寄存器中，因为通过指针对其进行的修改将会丢失。针对这类标量的操作，都会遵循加载、修改、存储的流程进行修改。
     
-
-> ❝
-> 
 > 这里修改丢失是因为如果通过指针修改了A的值，仍然会使用寄存器中存储的值去进行操作，这就导致了丢失现象的发生。
 
 针对寄存器溢出现象，我们可以将循环拆分成多个循环来进行操作。那么我们该如何判断是否存在寄存器溢出现象呢？我们可以通过使用编译器优化报告来判断是否存在这种现象。
 
-> ❝
-> 
 > 后续将有文章介绍编译器优化报告相关内容。
 
 C和C++都有严格的别名机制，这意味着当循环中同时存在标量和指向标量的指针时，比如存在`int *p`和`int i`时，除非我们能够保证`p`不会指向`i`，否则寄存器会假设`p`可能指向`i`从而将`i`存储在内存中。那么我们该如何让编译器知道变量不会被指针指向呢？对于全局变量、静态变量和类成员等，我们可以通过复制成局部变量来让编译器意识到该变量不会被指针指向和修改。
