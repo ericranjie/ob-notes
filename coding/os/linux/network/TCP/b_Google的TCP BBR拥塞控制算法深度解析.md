@@ -1,7 +1,7 @@
-原创 dog250 极客重生
-_2021年09月22日 08:05_
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6kR09L8CIjicKy1TBBtDcpsKeGRNyy6KTbDl7URx9iakdhHs3vw9lOqbibGL4m086mUBVuwexkFp43jw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+dog250 极客重生 _2021年09月22日 08:05_
+
+![[Pasted image 20241016225836.png]]
 
 hi ，大家好，今天推荐一篇我认为在TCP BBR技术里面分析非常透彻的文章，希望大家可以学习到一些真正的知识，理解其背后的设计原理，才能应对各种面试和工作挑战！
 
@@ -9,7 +9,7 @@ hi ，大家好，今天推荐一篇我认为在TCP BBR技术里面分析非常�
 
 1980年代的拥塞崩溃导致了1980年代的拥塞控制机制的出炉，某种意义上这属于见招拆招的策略，针对1980年代的拥塞，提出了1980年代的**拥塞控制算法**，分为四个部分：**慢启动、拥塞避免、快速重传、快速恢复**：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/cYSwmJQric6l1HvYsCdpkibg0DvC6aofRxXSHV2M8Uds2JYmuxnbXuvaQUIaDTQEnXSu8OWP9A0cJib5sNn5Ul67A/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
+![[Pasted image 20241016230117.png]]
 
 说实话，这些机制完美适应了1980年代的网络特征，**低带宽**，**浅缓存队列**，美好持续到了2000年代。
 

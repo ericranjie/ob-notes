@@ -21,8 +21,6 @@ USE从系统资源的角度, 包括但不限于CPU, 内存, 磁盘, 网络等, �
 
 - Errors (E). scalar counts. eg, "this network interface has had fifty late collisions". Errors相对直观
 
-### 
-
 ### **CPU**
 
 对于CPU, 主要关注以下指标:
@@ -67,7 +65,9 @@ load average: 433.52, 422.54, 438.70
 #dstat -tp 
 ----system---- ---procs---
 time     |run blk new 
-07-03 17:56:50|204 1.0 202 07-03 17:56:51|212   0 238 07-03 17:56:52|346 1.0 266 07-03 17:56:53|279 5.0 262 07-03 17:56:54|435 7.0 177 07-03 17:56:55|442 3.0 251 07-03 17:56:56|792 8.0 419 07-03 17:56:57|504  16 152 07-03 17:56:58|547 3.0 156 07-03 17:56:59|606 2.0 212 07-03 17:57:00|770   0 186
+07-03 17:56:50|204 1.0 202 
+07-03 17:56:51|212   0 238 
+07-03 17:56:52|346 1.0 266 07-03 17:56:53|279 5.0 262 07-03 17:56:54|435 7.0 177 07-03 17:56:55|442 3.0 251 07-03 17:56:56|792 8.0 419 07-03 17:56:57|504  16 152 07-03 17:56:58|547 3.0 156 07-03 17:56:59|606 2.0 212 07-03 17:57:00|770   0 186
 ```
 
 ### **内存**
@@ -101,8 +101,9 @@ Swap:             0           0           0
 
 更详细的信息可以直接去读/proc/meminfo:
 
-```
-#cat /proc/meminfo
+```c
+#cat /proc/meminfo 
+MemTotal:       527624224 kB MemFree:         8177852 kB MemAvailable:   316023388 kB Buffers:        23920716 kB Cached:         275403332 kB SwapCached:            0 kB Active:         59079772 kB Inactive:       431064908 kB Active(anon):    1593580 kB Inactive(anon): 191649352 kB Active(file):   57486192 kB Inactive(file): 239415556 kB Unevictable:      249700 kB Mlocked:          249700 kB SwapTotal:             0 kB SwapFree:              0 kB [...]
 ```
 
 再来看下内存回收相关的信息, sar的数据主要从/proc/vmstat采集, 主要关注:
@@ -115,8 +116,9 @@ Swap:             0           0           0
 
 要理解这些数据的具体含义, 需要对内存管理算法有一定了解, 比如这里的pgscan/pgsteal只是针对inactive list而言的, 在内存回收的时候可能还需要先把页面从active list搬到inactive list等. 如果这里有异常, 我们可以先把这当成入口, 再慢慢深入, 具体到这里的%vmeff, 最好情况就是每个扫描的page都能回收, 也就是vmeff越高越好。
 
-```
+```c
 #sar -B 1
+11:00:16 AM     pgscank/s pgscand/s pgsteal/s    %vmeff     11:00:17 AM          0.00      0.00   3591.00      0.00     11:00:18 AM          0.00      0.00  10313.00      0.00     11:00:19 AM          0.00      0.00   8452.00      0.00
 ```
 
 ### **I/O**
@@ -141,32 +143,35 @@ Swap:             0           0           0
 
 - rMB/s, wMB/s, r/s, w/s - 基本语义
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/Z6bicxIx5naLWDtJqic2GxXwNic5iahNyRMbNXSJ2J6TaqOfvWeOibMKibyL1eW8tuO4kspBtgOBXu55zyBp8QFgahUA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-### 
+![[Pasted image 20241016224531.png]]
 
 ### **资源粒度**
 
 当我们判断资源是否是瓶颈的时候, 只看系统级别的资源是不够的, 比如可以用htop看下每个CPU的利用率, 目标任务运行在不同CPU上的性能可能相差很大。
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/Z6bicxIx5naLWDtJqic2GxXwNic5iahNyRMbGQSJfFOibDZKOSWad3dicsPicUb9nWPkibISBH3H8PCBF5bnKhosiamtesQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241016224545.png]]
 
 内存也有类似情况, 运行numastat -m
 
-```
-                          Node 0          Node 1          Node 2          Node 3
+```c
+                          Node 0          Node 1          Node 2          Node 3                  --------------- --------------- --------------- --------------- 
+MemTotal                31511.92        32255.18        32255.18        32255.18 
+MemFree                  2738.79          131.89          806.50        10352.02 MemUsed                 28773.12        32123.29        31448.69        21903.16 Active                   7580.58          419.80         9597.45         5780.64 Inactive                17081.27        26844.28        19806.99        13504.79 Active(anon)                6.63            0.93            2.08            5.64 Inactive(anon)          12635.75        25560.53        12754.29         9053.80 Active(file)             7573.95          418.87         9595.37         5775.00 Inactive(file)           4445.52         1283.75         7052.70 
 ```
 
 系统不一定就是物理机, 如果产品跑在cgroup, 那么这个cgroup是更需要关注的系统, 比如在空闲系统上执行如下命令:
 
-```
-#mkdir /sys/fs/cgroup/cpuset/overloaded
+```c
+#mkdir /sys/fs/cgroup/cpuset/overloaded 
+#echo 0-1 > /sys/fs/cgroup/cpuset/cpuset.cpus #echo 0 > /sys/fs/cgroup/cpuset/cpuset.mems #echo $$ 
+#for i in {0..1023}; do /tmp/busy & done
 ```
 
 此时从物理机级别看, 系统的load很高, 但是因为cpuset的限制, 竞争约束在cpu 0和1上, 对运行在其他cpu上的产品影响并不大。
 
-```
+```c
 #uptime
+14:10:54 up 6 days, 18:52, 10 users, load average: 920.92, 411.61, 166.95
 ```
 
 ## 2  应用角度
@@ -179,8 +184,10 @@ Swap:             0           0           0
 
 以下面的myserv为例, 它的4个线程%cpu都达到了100, 这个时候再去分析整个系统的load什么用处不大, 系统有再多的空闲cpu对myserv来说已经没有意义。
 
-```
-#pidstat -p `pgrep myserv` -t 1
+```c
+#pidstat -p `pgrep myserv` -t 1 
+15:47:05      UID      TGID       TID    %usr %system  %guest    %CPU   CPU  Command 
+15:47:06        0     71942         -  415.00    0.00    0.00  415.00    22  myserv 15:47:06        0         -     71942    0.00    0.00    0.00    0.00    22  |__myserv ... 15:47:06        0         -     72079    7.00   94.00    0.00  101.00    21  |__myserv 15:47:06        0         -     72080   10.00   90.00    0.00  100.00    19  |__myserv 15:47:06        0         -     72081    9.00   91.00    0.00  100.00    35  |__myserv 15:47:06        0         -     72082    5.00   95.00    0.00  100.00    29  |__myserv
 ```
 
 ## 3  常用命令
@@ -215,8 +222,9 @@ Swap:             0           0           0
 
 这里举个ps的例子, 我们监控mysqld服务, 当该进程使用的内存超过系统内存70%的时候, 通过gdb调用jemalloc的malloc_stats_print函数来分析可能的内存泄漏。
 
-```
-largest=70
+```c
+largest=70  
+while :; do     mem=$(ps -p `pidof mysqld` -o %mem | tail -1)     imem=$(printf %.0f $mem)     if [ $imem -gt $largest ]; then         echo 'p malloc_stats_print(0,0,0)' | gdb --quiet -nx -p `pidof mysqld`     fi     sleep 10 done
 ```
 
 ### **perf**

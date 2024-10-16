@@ -1,4 +1,3 @@
-# 
 
 苏丙榅 C语言与CPP编程
 
@@ -62,11 +61,17 @@ TCP 协议是优势非常明显，但是有时也会给我们造成困扰，正�
 
 由于发送端每次都需要将这个数据包完整的发送出去，因此可以设计一个发送函数，如果当前数据包中的数据没有发送完就让它一直发送，处理代码如下：
 
-`/*   函数描述: 发送指定的字节数   函数参数:       - fd: 通信的文件描述符(套接字)       - msg: 待发送的原始数据       - size: 待发送的原始数据的总字节数   函数返回值: 函数调用成功返回发送的字节数, 发送失败返回-1   */   int writen(int fd, const char* msg, int size)   {       const char* buf = msg;       int count = size;       while (count > 0)       {           int len = send(fd, buf, count, 0);           if (len == -1)           {               close(fd);               return -1;           }           else if (len == 0)           {               continue;           }           buf += len;           count -= len;       }       return size;   }   `
+```cpp
+/*   函数描述: 发送指定的字节数   函数参数:       - fd: 通信的文件描述符(套接字)       - msg: 待发送的原始数据       - size: 待发送的原始数据的总字节数   函数返回值: 函数调用成功返回发送的字节数, 发送失败返回-1   */   int writen(int fd, const char* msg, int size)   {       const char* buf = msg;       int count = size;       while (count > 0)       {           int len = send(fd, buf, count, 0);           if (len == -1)           {               close(fd);               return -1;           }           else if (len == 0)           {               continue;           }           buf += len;           count -= len;       }       return size;   }   
+```
 
 有了这个功能函数之后就可以发送带有包头的数据块了，具体处理动作如下：
 
-`/*   函数描述: 发送带有数据头的数据包   函数参数:       - cfd: 通信的文件描述符(套接字)       - msg: 待发送的原始数据       - len: 待发送的原始数据的总字节数   函数返回值: 函数调用成功返回发送的字节数, 发送失败返回-1   */   int sendMsg(int cfd, char* msg, int len)   {      if(msg == NULL || len <= 0 || cfd <=0)      {          return -1;      }      // 申请内存空间: 数据长度 + 包头4字节(存储数据长度)      char* data = (char*)malloc(len+4);      int bigLen = htonl(len);      memcpy(data, &bigLen, 4);      memcpy(data+4, msg, len);      // 发送数据      int ret = writen(cfd, data, len+4);      // 释放内存      free(data);      return ret;   }   `
+```cpp
+`/*   函数描述: 发送带有数据头的数据包   函数参数:       - cfd: 通信的文件描述符(套接字)       - msg: 待发送的原始数据       - len: 待发送的原始数据的总字节数   函数返回值: 函数调用成功返回发送的字节数, 发送失败返回-1   */   int sendMsg(int cfd, char* msg, int len)   {      if(msg == NULL || len <= 0 || cfd <=0)      {          return -1;      }
+// 申请内存空间: 数据长度 + 包头4字节(存储数据长度)   
+char* data = (char*)malloc(len+4);      int bigLen = htonl(len);      memcpy(data, &bigLen, 4);      memcpy(data+4, msg, len);      // 发送数据      int ret = writen(cfd, data, len+4);      // 释放内存      free(data);      return ret;   }
+```
 
 > 关于数据的发送最后再次强调：**字符串没有字节序问题，但是数据头不是字符串是整形，因此需要从主机字节序转换为网络字节序再发送**。
 
@@ -86,19 +91,23 @@ TCP 协议是优势非常明显，但是有时也会给我们造成困扰，正�
 
 从数据包头解析出要接收的数据长度之后，还需要将这个数据块完整的接收到本地才能进行后续的数据处理，因此需要编写一个接收数据的功能函数，保证能够得到一个完整的数据包数据，处理函数实现如下：
 
-`/*   函数描述: 接收指定的字节数   函数参数:       - fd: 通信的文件描述符(套接字)       - buf: 存储待接收数据的内存的起始地址       - size: 指定要接收的字节数   函数返回值: 函数调用成功返回发送的字节数, 发送失败返回-1   */   int readn(int fd, char* buf, int size)   {       char* pt = buf;       int count = size;       while (count > 0)       {           int len = recv(fd, pt, count, 0);           if (len == -1)           {               return -1;           }           else if (len == 0)           {               return size - count;           }           pt += len;           count -= len;       }       return size;   }   `
+```cpp
+/*   函数描述: 接收指定的字节数   函数参数:       - fd: 通信的文件描述符(套接字)       - buf: 存储待接收数据的内存的起始地址       - size: 指定要接收的字节数   函数返回值: 函数调用成功返回发送的字节数, 发送失败返回-1   */   int readn(int fd, char* buf, int size)   {       char* pt = buf;       int count = size;       while (count > 0)       {           int len = recv(fd, pt, count, 0);           if (len == -1)           {               return -1;           }           else if (len == 0)           {               return size - count;           }           pt += len;           count -= len;       }       return size;   }   
+```
 
 这个函数搞定之后，就可以轻松地接收带包头的数据块了，接收函数实现如下：
 
-`/*   函数描述: 接收带数据头的数据包   函数参数:       - cfd: 通信的文件描述符(套接字)       - msg: 一级指针的地址，函数内部会给这个指针分配内存，用于存储待接收的数据，这块内存需要使用者释放   函数返回值: 函数调用成功返回接收的字节数, 发送失败返回-1   */   int recvMsg(int cfd, char** msg)   {       // 接收数据       // 1. 读数据头       int len = 0;       readn(cfd, (char*)&len, 4);       len = ntohl(len);       printf("数据块大小: %d\n", len);          // 根据读出的长度分配内存，+1 -> 这个字节存储\0       char *buf = (char*)malloc(len+1);       int ret = readn(cfd, buf, len);       if(ret != len)       {           close(cfd);           free(buf);           return -1;       }       buf[len] = '\0';       *msg = buf;          return ret;   }   `
+```cpp
+/*   函数描述: 接收带数据头的数据包   函数参数:       - cfd: 通信的文件描述符(套接字)       - msg: 一级指针的地址，函数内部会给这个指针分配内存，用于存储待接收的数据，这块内存需要使用者释放   函数返回值: 函数调用成功返回接收的字节数, 发送失败返回-1   */   int recvMsg(int cfd, char** msg)   {       // 接收数据       // 1. 读数据头       int len = 0;       readn(cfd, (char*)&len, 4);       len = ntohl(len);       printf("数据块大小: %d\n", len);          // 根据读出的长度分配内存，+1 -> 这个字节存储\0       char *buf = (char*)malloc(len+1);       int ret = readn(cfd, buf, len);       if(ret != len)       {           close(cfd);           free(buf);           return -1;       }       buf[len] = '\0';       *msg = buf;          return ret;   }   
+```
 
 这样，在进行套接字通信的时候通过调用封装的 sendMsg() 和 recvMsg() 就可以发送和接收带数据头的数据包了，而且完美地解决了粘包的问题。
 
 > 文章链接：https://subingwen.cn/linux/tcp-data-package/#2-2-%E6%8E%A5%E6%94%B6%E7%AB%AF
 
-![](https://res.wx.qq.com/op_res/NN_GToMiIjsXzgPzF9-74ZzwR3cA9-fv3o9eWo8f5gQWqx71CmGlY8kFxuIxZaG0TB1bFeMCmh1DGN_pWMRg0A)
 
-**帐号已迁移**
+---
+
 
 公众号
 

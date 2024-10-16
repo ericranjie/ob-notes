@@ -1,3 +1,4 @@
+
 Original 网络小菜鸟 网络小菜鸟
 
 _2023年04月16日 12:51_ _广东_
@@ -6,7 +7,7 @@ TCP是一个基础协议，这里相关的十八个问题也都是常见的问�
 
 **一：TCP三次握手双方都交换了哪些东西？**
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/3b18mYWI7bXwBT25IbVNun5e3kJ98libWZOS9k0HJ9icwv337MDib769GTZU6FoJicADOkE6TWbwRAibhTxSBgYwYibg/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1&tp=wxpic)
+![[Pasted image 20241016225527.png]]
 
 三次握手的流程如上图，不再赘述。除了确认了双方ip及port的连通性（使用syn+ack机制），我们还需要关注到以下内容：
 

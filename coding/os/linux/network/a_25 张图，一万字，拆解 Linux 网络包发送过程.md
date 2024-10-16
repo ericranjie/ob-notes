@@ -1,3 +1,4 @@
+
 Original 张彦飞allen 开发内功修炼
 
 _2021年05月12日 08:28_
@@ -18,21 +19,13 @@ _2021年05月12日 08:28_
 
 带着这三个问题，我们开始今天对 Linux 内核网络发送过程的深度剖析。还是按照我们之前的传统，先从一段简单的代码作为切入。如下代码是一个典型服务器程序的典型的缩微代码：
 
-`int main(){    fd = socket(AF_INET, SOCK_STREAM, 0);    bind(fd, ...);    listen(fd, ...);       cfd = accept(fd, ...);       // 接收用户请求    read(cfd, ...);       // 用户请求处理    dosometing();        // 给用户返回结果    send(cfd, buf, sizeof(buf), 0);   }   `
-
+```cpp
+int main(){    fd = socket(AF_INET, SOCK_STREAM, 0);    bind(fd, ...);    listen(fd, ...);       cfd = accept(fd, ...);       // 接收用户请求    read(cfd, ...);       // 用户请求处理    dosometing();        // 给用户返回结果    send(cfd, buf, sizeof(buf), 0);   }
+```
+			
 今天我们来讨论上述代码中，调用 send 之后内核是怎么样把数据包发送出去的。本文基于Linux 3.10，网卡驱动采用Intel的igb网卡举例。
 
 **预警：本文共有一万多字，25 张图，长文慎入！**
-
-![](http://mmbiz.qpic.cn/mmbiz_png/BBjAFF4hcwqciaicnxpic7g4KKVZKSeQTzic5FoaXsQeLG979y9iaTNVPKTSO9BzSM7zXoJzibbBtEyb6Df5OTj0Yw3Q/300?wx_fmt=png&wxfrom=19)
-
-**开发内功修炼**
-
-飞哥有鹅厂、搜狗 10 年多的开发工作经验。通过本号，我把多年中对于性能的一些深度思考分享给大家。
-
-161篇原创内容
-
-公众号
 
 ## 一、Linux 网络发送过程总览
 
@@ -40,19 +33,22 @@ _2021年05月12日 08:28_
 
 我这里先给大家准备了一个总的流程图，简单阐述下 send 发送了的数据是如何一步一步被发送到网卡的。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016231050.png]]
+
 
 在这幅图中，我们看到用户数据被拷贝到内核态，然后经过协议栈处理后进入到了 RingBuffer 中。随后网卡驱动真正将数据发送了出去。当发送完成的时候，是通过硬中断来通知 CPU，然后清理 RingBuffer。
 
 因为文章后面要进入源码，所以我们再从源码的角度给出一个流程图。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016231101.png]]
+
 
 虽然数据这时已经发送完毕，但是其实还有一件重要的事情没有做，那就是释放缓存队列等内存。
 
 那内核是如何知道什么时候才能释放内存的呢，当然是等网络发送完毕之后。网卡在发送完毕的时候，会给 CPU 发送一个硬中断来通知 CPU。更完整的流程看图：
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016231117.png]]
+
 
 注意，我们今天的主题虽然是发送数据，但是硬中断最终触发的软中断却是 NET_RX_SOFTIRQ，而并不是 NET_TX_SOFTIRQ ！！！（T 是 transmit 的缩写，R 表示 receive）
 
@@ -70,21 +66,32 @@ _2021年05月12日 08:28_
 
 现在的服务器上的网卡一般都是支持多队列的。每一个队列上都是由一个 RingBuffer 表示的，开启了多队列以后的的网卡就会对应有多个 RingBuffer。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016231133.png]]
+
 
 网卡在启动时最重要的任务之一就是分配和初始化 RingBuffer，理解了 RingBuffer 将会非常有助于后面我们掌握发送。因为今天的主题是发送，所以就以传输队列为例，我们来看下网卡启动时分配 RingBuffer 的实际过程。
 
 在网卡启动的时候，会调用到 \_\_igb_open 函数，RingBuffer 就是在这里分配的。
 
-`//file: drivers/net/ethernet/intel/igb/igb_main.c   static int __igb_open(struct net_device *netdev, bool resuming)   {    struct igb_adapter *adapter = netdev_priv(netdev);       //分配传输描述符数组    err = igb_setup_all_tx_resources(adapter);       //分配接收描述符数组    err = igb_setup_all_rx_resources(adapter);       //开启全部队列    netif_tx_start_all_queues(netdev);   }   `
+```cpp
+//file: drivers/net/ethernet/intel/igb/igb_main.c   
+static int __igb_open(struct net_device *netdev, bool resuming)   {    struct igb_adapter *adapter = netdev_priv(netdev);       //分配传输描述符数组    err = igb_setup_all_tx_resources(adapter);       //分配接收描述符数组    err = igb_setup_all_rx_resources(adapter);       //开启全部队列    netif_tx_start_all_queues(netdev);   }   
+```
 
 在上面 \_\_igb_open 函数调用 igb_setup_all_tx_resources 分配所有的传输 RingBuffer, 调用 igb_setup_all_rx_resources 创建所有的接收 RingBuffer。
 
-`//file: drivers/net/ethernet/intel/igb/igb_main.c   static int igb_setup_all_tx_resources(struct igb_adapter *adapter)   {    //有几个队列就构造几个 RingBuffer    for (i = 0; i < adapter->num_tx_queues; i++) {     igb_setup_tx_resources(adapter->tx_ring[i]);    }   }   `
+```cpp
+//file: drivers/net/ethernet/intel/igb/igb_main.c   
+static int igb_setup_all_tx_resources(struct igb_adapter *adapter)   {    //有几个队列就构造几个 RingBuffer    for (i = 0; i < adapter->num_tx_queues; i++) {     igb_setup_tx_resources(adapter->tx_ring[i]);    }   }   
+```
 
 真正的 RingBuffer 构造过程是在 igb_setup_tx_resources 中完成的。
 
-`//file: drivers/net/ethernet/intel/igb/igb_main.c   int igb_setup_tx_resources(struct igb_ring *tx_ring)   {    //1.申请 igb_tx_buffer 数组内存    size = sizeof(struct igb_tx_buffer) * tx_ring->count;    tx_ring->tx_buffer_info = vzalloc(size);       //2.申请 e1000_adv_tx_desc DMA 数组内存    tx_ring->size = tx_ring->count * sizeof(union e1000_adv_tx_desc);    tx_ring->size = ALIGN(tx_ring->size, 4096);    tx_ring->desc = dma_alloc_coherent(dev, tx_ring->size,           &tx_ring->dma, GFP_KERNEL);       //3.初始化队列成员    tx_ring->next_to_use = 0;    tx_ring->next_to_clean = 0;   }   `
+```cpp
+//file: drivers/net/ethernet/intel/igb/igb_main.c   
+int igb_setup_tx_resources(struct igb_ring *tx_ring)   {    //1.申请 igb_tx_buffer 数组内存    
+size = sizeof(struct igb_tx_buffer) * tx_ring->count;    tx_ring->tx_buffer_info = vzalloc(size);       //2.申请 e1000_adv_tx_desc DMA 数组内存    tx_ring->size = tx_ring->count * sizeof(union e1000_adv_tx_desc);    tx_ring->size = ALIGN(tx_ring->size, 4096);    tx_ring->desc = dma_alloc_coherent(dev, tx_ring->size,           &tx_ring->dma, GFP_KERNEL);       //3.初始化队列成员    tx_ring->next_to_use = 0;    tx_ring->next_to_clean = 0;   }   
+```
 
 从上述源码可以看到，实际上一个 RingBuffer 的内部不仅仅是一个环形队列数组，而是有两个。
 
@@ -93,7 +100,7 @@ _2021年05月12日 08:28_
 
 这个时候它们之间还没有啥联系。将来在发送的时候，这两个环形数组中相同位置的指针将都将指向同一个 skb。这样，内核和硬件就能共同访问同样的数据了，内核往 skb 里写数据，网卡硬件负责发送。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232539.png]]
 
 最后调用 netif_tx_start_all_queues 开启队列。另外，对于硬中断的处理函数 igb_msix_ring 其实也是在 \_\_igb_open 中注册的。
 
@@ -105,11 +112,13 @@ _2021年05月12日 08:28_
 
 假设服务器进程通过 accept 和客户端建立了两条连接，我们来简单看一下这两条连接和进程的关联关系。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232551.png]]
+
 
 其中代表一条连接的 socket 内核对象更为具体一点的结构图如下。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232603.png]]
+
 
 为了避免喧宾夺主，accept 详细的源码过程这里就不介绍了，感兴趣请参考 [《图解 | 深入揭秘 epoll 是如何实现 IO 多路复用的！》](https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247484905&idx=1&sn=a74ed5d7551c4fb80a8abe057405ea5e&scene=21#wechat_redirect)。一文中的第一部分。
 
@@ -127,7 +136,8 @@ send 系统调用的源码位于文件 net/socket.c 中。在这个系统调用�
 
 剩下的事情就交给下一层，协议栈里的函数 inet_sendmsg 了，其中 inet_sendmsg 函数的地址是通过 socket 内核对象里的 ops 成员找到的。大致流程如图。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232615.png]]
+
 
 有了上面的了解，我们再看起源码就要容易许多了。源码如下：
 
@@ -151,7 +161,8 @@ send 系统调用的源码位于文件 net/socket.c 中。在这个系统调用�
 
 在这个函数中，内核会申请一个内核态的 skb 内存，将用户待发送的数据拷贝进去。注意这个时候不一定会真正开始发送，如果没有达到发送条件的话很可能这次调用直接就返回了。大概过程如图：
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232630.png]]
+
 
 我们来看 inet_sendmsg 函数的源码。
 
@@ -167,7 +178,8 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 理解对 socket 调用 tcp_write_queue_tail 是理解发送的前提。如上所示，这个函数是在获取 socket 发送队列中的最后一个 skb。skb 是 struct sk_buff 对象的简称，用户的发送队列就是该对象组成的一个链表。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232651.png]]
+
 
 我们再接着看 tcp_sendmsg 的其它部分。
 
@@ -175,7 +187,8 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 这个函数比较长，不过其实逻辑并不复杂。其中 msg->msg_iov 存储的是用户态内存的要发送的数据的 buffer。接下来在内核态申请内核内存，比如 skb，并把用户内存里的数据拷贝到内核态内存中。**这就会涉及到一次或者几次内存拷贝的开销**。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232700.png]]
+
 
 至于内核什么时候真正把 skb 发送出去。在 tcp_sendmsg 中会进行一些判断。
 
@@ -191,7 +204,8 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 所以我们直接从 tcp_write_xmit 看起，这个函数处理了传输层的拥塞控制、滑动窗口相关的工作。满足窗口要求的时候，设置一下 TCP 头然后将 skb 传到更低的网络层进行处理。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232711.png]]
+
 
 我们来看下 tcp_write_xmit 的源码。
 
@@ -207,7 +221,8 @@ tcp_sendmsg 这个函数比较长，我们分多次来看它。先看这一段
 
 第二件事是修改 skb 中的 TCP header，根据实际情况把 TCP 头设置好。这里要介绍一个小技巧，skb 内部其实包含了网络协议中所有的 header。在设置 TCP 头的时候，只是把指针指向 skb 的合适位置。后面再设置 IP 头的时候，在把指针挪一挪就行，避免频繁的内存申请和拷贝，效率很高。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232727.png]]
+
 
 tcp_transmit_skb 是发送数据位于传输层的最后一步，接下来就可以进入到网络层进行下一层的操作了。调用了网络层提供的发送接口icsk->icsk_af_ops->queue_xmit()。
 
@@ -223,7 +238,8 @@ Linux 内核网络层的发送的实现位于 net/ipv4/ip_output.c 这个文件�
 
 在网络层里主要处理路由项查找、IP 头设置、netfilter 过滤、skb 切分（大于 MTU 的话）等几项工作，处理完这些工作后会交给更下层的邻居子系统来处理。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232736.png]]
+
 
 我们来看网络层入口函数 ip_queue_xmit 的源码：
 
@@ -233,7 +249,7 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 在 Linux 上通过 route 命令可以看到你本机的路由配置。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232752.png]]
 
 在路由表中，可以查到某个目的网络应该通过哪个 Iface（网卡），哪个 Gateway（网卡）发送出去。查找出来以后缓存到 socket 上，下次再发送数据就不用查了。
 
@@ -243,7 +259,7 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 接下来就是定位到 skb 里的 IP 头的位置上，然后开始按照协议规范设置 IP header。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232804.png]]
 
 再通过 ip_local_out 进入到下一步的处理。
 
@@ -277,11 +293,12 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 而且这个邻居子系统并不位于协议栈 net/ipv4/ 目录内，而是位于 net/core/neighbour.c。因为无论是对于 IPv4 还是 IPv6 ，都需要使用该模块。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232819.png]]
+
 
 在邻居子系统里主要是查找或者创建邻居项，在创造邻居项的时候，有可能会发出实际的 arp 请求。然后封装一下 MAC 头，将发送过程再传递到更下层的网络设备子系统。大致流程如图。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232829.png]]
 
 理解了大致流程，我们再回头看源码。在上面小节 ip_finish_output2 源码中调用了 \_\_ipv4_neigh_lookup_noref。它是在 arp 缓存中进行查找，其第二个参数传入的是路由下一跳 IP 信息。
 
@@ -303,7 +320,7 @@ ip_queue_xmit 已经到了网络层，在这个函数里我们看到了网络层
 
 ### 4.5 网络设备子系统
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232841.png]]
 
 邻居子系统通过 dev_queue_xmit 进入到网络设备子系统中来。
 
@@ -347,7 +364,8 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 软中断是由内核线程来运行的，该线程会进入到 net_tx_action 函数，在该函数中能获取到发送队列，并也最终调用到驱动程序里的入口函数 dev_hard_start_xmit。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232859.png]]
+
 
 `//file: net/core/dev.c   static inline void __netif_reschedule(struct Qdisc *q)   {    sd = &__get_cpu_var(softnet_data);    q->next_sched = NULL;    *sd->output_queue_tailp = q;    sd->output_queue_tailp = &q->next_sched;       ......    raise_softirq_irqoff(NET_TX_SOFTIRQ);   }   `
 
@@ -375,7 +393,7 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 在驱动函数里，将 skb 会挂到 RingBuffer上，驱动调用完毕后，数据包将真正从网卡发送出去。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232931.png]]
 
 我们来看看实际的源码：
 
@@ -397,7 +415,7 @@ qdisc_restart 从队列中取出一个 skb，并调用 sch_direct_xmit 继续发
 
 在这里从网卡的发送队列的 RingBuffer 中取下来一个元素，并将 skb 挂到元素上。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232944.png]]
 
 igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区域。
 
@@ -413,7 +431,7 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 在发送完成硬中断里，会执行 RingBuffer 内存的清理工作，如图。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016232955.png]]
 
 再回头看一下硬中断触发软中断的源码。
 
@@ -437,7 +455,7 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 用一张图总结一下整个发送过程
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016233006.png]]
 
 了解了整个发送过程以后，我们回头再来回顾开篇提到的几个问题。
 
@@ -453,7 +471,7 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 之前我认为 NET_RX 是读取，NET_TX 是传输。对于一个既收取用户请求，又给用户返回的 Server 来说。这两块的数字应该差不多才对，至少不会有数量级的差异。但事实上，飞哥手头的一台服务器是这样的：
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241016233016.png]]
 
 经过今天的源码分析，发现这个问题的原因有两个。
 
@@ -481,37 +499,10 @@ igb_tx_map 函数处理将 skb 数据映射到网卡可访问的内存 DMA 区�
 
 \*\*Github:\*\*https://github.com/yanfeizhang/coder-kung-fu
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 ______________________________________________________________________
 
 由于本文比较长，在公众号上看起来确实是有点费劲。所以飞哥搞了个 pdf，带目录结构，可快速跳转，看起来更方便。
-
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-不过获取方式仍然有点小门槛：**带任意推荐语转发本文到朋友圈，加飞哥微信知会**即可。
-
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-![](https://mmbiz.qlogo.cn/mmbiz_jpg/iaMl8iazctEu93J6Io4KDZQmx03HErmVeXnSnUAQ0MD6Nia3d97E8vmljv5DibLTWSeLES1JHicWVA2mynPVlbt1FAA/0?wx_fmt=jpeg)
-
-张彦飞allen
-
-赞赏不分多少，头像出现就好！
-
-![赞赏二维码](<https://mp.weixin.qq.com/s?__biz=MjM5Njg5NDgwNA==&mid=2247485146&idx=1&sn=e5bfc79ba915df1f6a8b32b87ef0ef78&chksm=a6e307e191948ef748dc73a4b9a862a22ce1db806a486afce57475d4331d905827d6ca161711&mpshare=1&scene=24&srcid=1108sK0v3IIBiCK6Zjom0uCx&sharer_sharetime=1636360606821&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0d6efa3ba7e6fb27c7ddc1d99146febd02e2b9c8327016d50f9acca4501b49a64f971c57f0ca01038ace35fb9b33232a3b09415b3973a356fa2f79d80f530d1148208af6a8f307ab059d6ae0b7ca4e6957d4152dbbd3feed0b16ce3d41169bbadba335097959295cc4ba52d7a3c98f475c2d0bae441a7b154&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQyhWCQOm2kbjcRe1HBktJdhKPAgIE97dBBAEAAAAAAL1YLQtlTxIAAAAOpnltbLcz9gKNyK89dVj0mXgMJVySvBtYiO2e8hXmRmvGd4qVFZscX2aG7dCXOvzwx5CQy6I4UH%2FydJVS8TEKgB9ROvziETa%2F1lphuZh8Hcf%2FnR5NTLm8%2B1OT%2B8xmjxBZSsbIAOnlf%2B5Rh4oCViWLOMf6CwPVj7TtNDGYTS1UuzGhhOWewynUzf0ABjbz%2FqzpQO9ihZmAKR0yF%2BxO%2BW%2FjcWBq2pfGFwx0klZ4YQzOKor6gdY4W5BYNziF%2FLw4rGnumJoRaWdCBDbEErQiSuQ01flW6T2oVOOgtL5C3B8sAUyMt6vjvRsX7klnYfqxGzyXf2wAq17xKC8%3D&acctmode=0&pass_ticket=EISml2p1%2BUu2hhr6qSfNHR6tvl%2B%2BgVLsCwy5t8b9qczJgYoJ4M1YiWU2Mxfriq7x&wx_header=0>)Like the Author
-
-42 like(s)
-
-![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqnto7YhF2qSqzABiaFM9wwDsz6LtoNibmZcs4Yohcct09uRV0tPzWTdSL3RMf0icNSpyFKibKE5kHJhB80/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023miaFeYq0R9CUJP0lP4Mt2fmndX6plHI5YYAfe1opo9XFJGyJibr4btfuia5KucvxatKPPw75auTfjsa7SZiaxtKXXK/64)![](http://wx.qlogo.cn/mmopen/Q3auHgzwzM5VWH2J6E0PKYNia9uN1LThZacg8RzibOs05iaITtLCNXU7EBkx9NGT6XnuR5GcVfOiciczg5iaWicmnZ4slpq3ib2ThmnsUuoLea9uUGE/64)![](http://wx.qlogo.cn/mmopen/PiajxSqBRaEKwTDiaPkHQUibp9JrDhx0b6YEeWYFkles0Pg6Cp071XZ4UClHeBc3DibVLqyulibe482pJA8YrGuGIFTB0CNjsnggaCWCuPfb7yMY3nqZ44notSQqp8FbsibKLR/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOlA33mwCDv824W92LRVjFAicXd3m2K9TlyNfZdJ8LLtCqULoDaksktj2tgX2dw29cKt1LHcnky71BQ/64)![](http://wx.qlogo.cn/mmopen/WAibKjHvK5nFlC9BnZSeyVtVGmy5fSgsM4vDaDUOkwfHLo7oEiaWHGT5f4TibHnplETzK2vNE7oKoRicYslsFgBglF7TmDXIJdicic/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqntldotnEjHqzE2ngnKEgIJ8MGHCj6Rd7cfCeSoYibk5yibkmCzKSjI1b0ERI6icmHwvadAib1ZzDPsSef/64)![](http://wx.qlogo.cn/mmopen/WwHUcQkhoNZV0Mz7OAyKz17jJaPzE1ehyrnnxuNqHzX2cYNnLx2oIdKChwbnsVXRjpTPibQt140H3abkKJoLZbNaYOx1Utfko/64)![](http://wx.qlogo.cn/mmopen/Q3auHgzwzM5VWH2J6E0PKYNia9uN1LThZvpeDg6EXUFia5T5NUhjGnEcBqW0oOOgLo8dbY3gHss4icM1jKiaNQ0yqNr4POFfL8f9KHOibmPjZFHw/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc2ySChZEGzR2PjIe6XQcQdKJqzEYUVsxmUTB987BJ4Z7StSUstMiaDV2uf1VM0llicwOkTwRy3jZVAAbAZmQfYnPy/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1EYg3PxSSCApL6mM3bOcRE9s2CsVqwAcLvwq67lzNUTkSrLicGO574L85MrLnStbA3oMiaVxy7C3MMhkjLpj86GI/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOnSKqfdegbxMrz4omK12HYibsOppl8GeicTuoyiaibg1kiclwQ6rgtXHJ5tDlIto3xSWD49yUT1ToKtvdBdSUDERz64Josic1bLuGyfqLRB3K94OZahGjtJraxYHZ/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023miaFeYq0R9CUAX0Wl2TzKYJiaeJC8qA0Bh4MlT6ONg82C38ZDfOUqXoGiaq8JwHtYdTyzzic3QHaZVAsdNChRib3Ot0/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqnttlNZPayicWQPuYxAgBc8RYYDygfgfu0Hc4Gx8icXBMBFuQfFYWSNNazp7R08jEgVNmbrNbLLAU264/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqntvYfeJWsiczAj38oWibYGaBeYEoEGbEzmBhNVPDtu7KDPHvopnWfVpO57sLbnrFFyS5jxEic8Ic6Ylj/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc2DfCNWDjcic3IibnRbJ7muouqOY4spMcTSzt0punUW9uic2pGezH4VSe3QMOqRJxOZsNCdSQJA604FmUmgXKhcrfct65icbWhnaMnro88JLj85OvQDLr8fztls/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023m4yVoFhHZdpQ7ibMl4hnHGGUNj4FWBLZpkdUH6UA2CmW1KXtpbAefibqQQbzsNQqob9pvYl7sZicKnHRBQu6ibeyUT/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1ehGRxHaibPRRfPXQCdJXX41CrriaoFJ1B9Lkg0Gib7wjGmdrAicKwiakpq45VX8rSndv81tFP2GCTDPa3R0S5cC3oM/64)![](http://wx.qlogo.cn/mmopen/WAibKjHvK5nEeJeIpfulb3QFFUmwmFF2X3vVu5wDRZNsdslN0IdXdxgyo9D7BCic18IQSib6ic6B8Jbib5dGyWPrAtjDWoSWaEoq2szesvkZDSdDibEdTmbSlAtwO70WwJAYW3/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1EYg3PxSSCAjW950NGXboVsPoKoiczdfvxY0YJadQPpTXmjP2ticibCeekJupLwHXiaYCkm2B6J9nIjcXP6bL37bTT/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023lugo9fgRgKrmGiau3ib2pSymI5dCTNYGCXUchVzvsKFr3DZmHn0I3Wia9l6V8GntAdM0ZFmYicsH7I3LaUFWRO6nvd/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1ehGRxHaibPRQLtc3lD39cSLBuibI4SILcGRBY7orbZ2tQcGSiaGyhmYGRB8icd0Mh9j8cqdw2hgrI6uwRUib6Prmld/64)![](http://wx.qlogo.cn/mmopen/Q3auHgzwzM51BVTPzab7k6xKbszOeuX93B3PnB2ibXr67iaKfIIAOCUAv8lXJxkjfkpeYBicW8FHDcbmbCuU8UPSPricqRVLrwcibLeCK4RLb8Gw/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqntq7dZtWSqzJXZDon2I5YkRaRtxX3DVak8Nx7HOrY5tAnqovURQcDickcibn8rHsRtvPkfTAQicT4nuJ/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1ehGRxHaibPRZYTk7hyDT4XB6pTM5FiaD4LthxMNFujGrPLDL0HlDgiaBs2yEMfcbVWiaia97rhHq5qoLkv3D9oCeGo/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOn2sv4HhOFaxEP7tbgg830cIUJFoD9adr2ibHGsHxz75JXuibZicaU2SWhdibiaKyrz9I2g1WIlicukb0THJhXn6cLY6ibGwAx3y1IEk4deSXicIsk6AEoCkjoOgticD/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOnnsziaKtDxiaOYAxUxj8qo2YWYtyyAn3Rzh3HpVEhqYVEP40K6Mib2TRfjx2vGCOaInVOCNWANoubtTuHpEBkribrK/64)![](http://wx.qlogo.cn/mmopen/WAibKjHvK5nFUtJEFkq3aH7icaicJBSyicpiaibRe70jJUr0icI9HPeBGKCwd9LItPZR6gSMgGeMwk5LgjdygyVHiaEHkTSYqNwKve7G/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqntribmgn5R3C94aA6ic6olNIrQmcp9Pz8mzicMx0zK36jnyASSFNGLCp78Cxy4vk8LZLias0x0O8G8JRM/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1ehGRxHaibPRc3FMJ5nYicicqwdAMicA4xjgruFvKaMGrnuZicrwj3iaPhsJnXERZbTSgXkSCQawoF7VXc1C5OxFsrSE/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc1ehGRxHaibPRU7JcwC9icvqX20AiapQSPhlCtW32CGyEnhx6gibqiaOFyAX0sFExDzUmNgzv7hB02TMOoxOpHVecEZia/64)![](http://wx.qlogo.cn/mmopen/ajNVdqHZLLBl04l15GxHp1c3Tj1x7xjjzn6cQhtianEACH2o7ibNJIXBLCcSicZsicVmENkvMO6ho04kLEmlwfqTT0MicCfnkRYM0vibNtq0DTBkrDQvBVLSeToOiaialwwOdhFW/64)![](http://wx.qlogo.cn/mmopen/WwHUcQkhoNZV0Mz7OAyKzzsKn5jlOw8CGFaicZIhAsPAjJE4OzqoJ1Y0nA97HYU7lvHKvbFqwH4dTDXl66EyUOujaPuppyunm/64)![](http://wx.qlogo.cn/mmopen/ajNVdqHZLLAwsgYCfp6Nia0SHJRlPre6hibIDyNNfjwicKmXhSCdfItibq14HyxcP25FUs38ZX8jQaibewW4dRkEagw/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023lzPaMgJiaB5micGbw9GaiasGo20TnsOOlrOtTaQQnT8KD7WTqGWap6OGvlvDVfgDdGbI4UtuFiaIEfZSBwwgwzAhwj/64)![](http://wx.qlogo.cn/mmopen/Sb650G6FHc3UH93SRauDy39GfsCS1MoUrvYRs18NJPnRTlzMbhutsdnMiad2eaScRl2iaq1gjF97ibhUZMPbu0RM0KX4PwjibDGG/64)![](http://wx.qlogo.cn/mmopen/Q3auHgzwzM4JGAibQVNOAqF3O8bqvzZQ1LJ7Tj5ib6F2VB3HGxlAeJrl4y2EPkJ4rDqprDico2kUKEhqYj0hHQq5Q/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023miaFeYq0R9CUPYLjyqaCloWJ26JLGFXibX3or1HTavVIMia9jUibvAbCuvE98ryNa1vHjkXARTuia5iamicEVfiaN1QRNq/64)![](http://wx.qlogo.cn/mmopen/ajNVdqHZLLC1qXIcnE2LJh2uEibQibFX9ypFmcFKNU16fmBlyzFwHeibzROwtWdt96pVHWNo6eicFyHlvspvEb6SgxRJLNUPLEcOWuByib7bmjtY/64)![](http://wx.qlogo.cn/mmopen/ukUXYlZ023lzPaMgJiaB5m8lHPHsjnkuLTBKRcVeRPdZmp9x1LK5vlRj7m3pm1K34A06dbL9rd8AwUX4MibFOEF2eEKKsTBwQN/64)![](http://wx.qlogo.cn/mmopen/PbIBsQGgFOncNakLtcqntrI0MuJEDiagliaQ4gqHQ7UibkjAxVGSe4EUU0PRS09puH06KicSuDVUVMaQRt2EUIStTA4wH7SwMa6r/64)![](http://wx.qlogo.cn/mmopen/WAibKjHvK5nFWQdx3z4S8n7pVAZiaLKQz75A2024Wang5S7RQLtt5sA5T98eicZFmC3dRbW2sick5mSTnINdZvBdILvSlEEg1jKm/64)
-
-开发内功修炼之网络篇42
-
-开发内功修炼之网络篇 · 目录
-
-上一篇漫画 | 看进程小 P 讲述它的网络性能故事！下一篇127.0.0.1 之本机网络通信过程知多少 ?！
-
-Reads 13.1k
 
 ​
 
