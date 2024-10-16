@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md"
+                "file": "coding/os/linux/memory/memory-init/k_内存初始化（上）.md"
               }
             }
           }
@@ -148,6 +148,10 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "Pasted image 20241016233826.png",
+    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
+    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
+    "README.md",
     "zx99-image/Pasted image 20241016232539.png",
     "coding/os/linux/network/a_25 张图，一万字，拆解 Linux 网络包发送过程.md",
     "zx99-image/Pasted image 20241016233016.png",
@@ -159,9 +163,7 @@
     "zx99-image/Pasted image 20241016232841.png",
     "zx99-image/Pasted image 20241016232829.png",
     "zx99-image/Pasted image 20241016232819.png",
-    "zx99-image/Pasted image 20241016232804.png",
     "code-griding-note.md",
-    "README.md",
     "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
     "coding/os/linux/network/TCP/TCP粘包 硬核图解.md",
     "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
@@ -182,8 +184,6 @@
     "coding/os/linux/network/an_深入理解 Linux socket.md",
     "coding/os/linux/performance/b_微信工程师：常见性能优化方案与实用工具.md",
     "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
-    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
-    "coding/os/linux/performance/k_一文说清linux system load.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

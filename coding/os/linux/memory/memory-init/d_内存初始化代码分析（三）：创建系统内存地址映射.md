@@ -181,46 +181,48 @@ phys += next - addr;
 
 1G block mapping虽好，不一定适合所有的系统，下面我一起看看PUD entry中填充的是block descriptor的情况（描述符指向PMD translation table）：
 
-> static void alloc_init_pmd(struct mm_struct \*mm, pud_t \*pud,\
-> unsigned long addr, unsigned long end,\
-> phys_addr_t phys, pgprot_t prot,\
-> void \*(\*alloc)(unsigned long size))\
-> {\
-> pmd_t \*pmd;\
-> unsigned long next;
->
-> if (pud_none(\*pud) || pud_sect(\*pud)) {－－－－－－－－－－－－－－－－－－－（1）\
-> pmd = alloc(PTRS_PER_PMD * sizeof(pmd_t));－－－分配pmd页表内存\
-> if (pud_sect(\*pud)) {－－－－－－－－－－－－－－－－－－－－－－－－－－（2）\
-> split_pud(pud, pmd);\
-> }\
-> pud_populate(mm, pud, pmd);－－－－－－－－－－－－－－－－－－－－－（3）\
-> flush_tlb_all();\
-> }\
-> BUG_ON(pud_bad(\*pud));
->
-> pmd = pmd_offset(pud, addr);－－－－－－－－－－－－－－－－－－－－－－－（4）\
-> do {\
-> next = pmd_addr_end(addr, end);\
-> if (((addr | next | phys) & ~SECTION_MASK) == 0) {－－－－－－－－－－－－（5）\
-> pmd_t old_pmd =\*pmd;\
-> set_pmd(pmd, \_\_pmd(phys | pgprot_val(mk_sect_prot(prot))));
->
-> if (!pmd_none(old_pmd)) {－－－－－－－－－－－－－－－－－－－－－－（6）\
-> flush_tlb_all();\
-> if (pmd_table(old_pmd)) {\
-> phys_addr_t table = \_\_pa(pte_offset_map(&old_pmd, 0));\
-> if (!WARN_ON_ONCE(slab_is_available()))\
-> memblock_free(table, PAGE_SIZE);\
-> }\
-> }\
-> } else {\
-> alloc_init_pte(pmd, addr, next, \_\_phys_to_pfn(phys),\
-> prot, alloc);\
-> }\
-> phys += next - addr;\
-> } while (pmd++, addr = next, addr != end);\
-> }
+```cpp
+static void alloc_init_pmd(struct mm_struct \*mm, pud_t \*pud,\
+unsigned long addr, unsigned long end,\
+phys_addr_t phys, pgprot_t prot,\
+void \*(\*alloc)(unsigned long size))\
+{\
+pmd_t \*pmd;\
+unsigned long next;
+
+if (pud_none(\*pud) || pud_sect(\*pud)) {－－－－－－－－－－－－－－－－－－－（1）\
+pmd = alloc(PTRS_PER_PMD * sizeof(pmd_t));－－－分配pmd页表内存\
+if (pud_sect(\*pud)) {－－－－－－－－－－－－－－－－－－－－－－－－－－（2）\
+split_pud(pud, pmd);\
+}\
+pud_populate(mm, pud, pmd);－－－－－－－－－－－－－－－－－－－－－（3）\
+flush_tlb_all();\
+}\
+BUG_ON(pud_bad(\*pud));
+
+pmd = pmd_offset(pud, addr);－－－－－－－－－－－－－－－－－－－－－－－（4）\
+do {\
+next = pmd_addr_end(addr, end);\
+if (((addr | next | phys) & ~SECTION_MASK) == 0) {－－－－－－－－－－－－（5）\
+pmd_t old_pmd =\*pmd;\
+set_pmd(pmd, \_\_pmd(phys | pgprot_val(mk_sect_prot(prot))));
+
+if (!pmd_none(old_pmd)) {－－－－－－－－－－－－－－－－－－－－－－（6）\
+flush_tlb_all();\
+if (pmd_table(old_pmd)) {\
+phys_addr_t table = \_\_pa(pte_offset_map(&old_pmd, 0));\
+if (!WARN_ON_ONCE(slab_is_available()))\
+memblock_free(table, PAGE_SIZE);\
+}\
+}\
+} else {\
+alloc_init_pte(pmd, addr, next, \_\_phys_to_pfn(phys),\
+prot, alloc);\
+}\
+phys += next - addr;\
+} while (pmd++, addr = next, addr != end);\
+}
+```
 
 （1）有两个场景需要分配PMD的页表内存，一个是该pud entry是空的，我们需要分配后续的PMD页表内存。另外一个是旧的pud entry是section 描述符，映射了1G的address block。但是现在由于种种原因，我们需要修改它，故需要remove这个1G block的section mapping。
 
@@ -236,28 +238,30 @@ phys += next - addr;
 
 七、分配PTE页表内存并填充相应的描述符
 
-> static void alloc_init_pte(pmd_t \*pmd, unsigned long addr,\
-> unsigned long end, unsigned long pfn,\
-> pgprot_t prot,\
-> void \*(\*alloc)(unsigned long size))\
-> {\
-> pte_t \*pte;
->
-> if (pmd_none(\*pmd) || pmd_sect(\*pmd)) {－－－－－－－－－－－－－－－－（1）\
-> pte = alloc(PTRS_PER_PTE * sizeof(pte_t));\
-> if (pmd_sect(\*pmd))\
-> split_pmd(pmd, pte);－－－－－－－－－－－－－－－－－－－－－－（2）\
-> \_\_pmd_populate(pmd, \_\_pa(pte), PMD_TYPE_TABLE);－－－－－－－－（3）\
-> flush_tlb_all();\
-> }\
-> BUG_ON(pmd_bad(\*pmd));
->
-> pte = pte_offset_kernel(pmd, addr);\
-> do {\
-> set_pte(pte, pfn_pte(pfn, prot));－－－－－－－－－－－－－－－－－－－（4）\
-> pfn++;\
-> } while (pte++, addr += PAGE_SIZE, addr != end);\
-> }
+```cpp
+static void alloc_init_pte(pmd_t \*pmd, unsigned long addr,\
+unsigned long end, unsigned long pfn,\
+pgprot_t prot,\
+void \*(\*alloc)(unsigned long size))\
+{\
+pte_t \*pte;
+
+if (pmd_none(\*pmd) || pmd_sect(\*pmd)) {－－－－－－－－－－－－－－－－（1）\
+pte = alloc(PTRS_PER_PTE * sizeof(pte_t));\
+if (pmd_sect(\*pmd))\
+split_pmd(pmd, pte);－－－－－－－－－－－－－－－－－－－－－－（2）\
+\_\_pmd_populate(pmd, \_\_pa(pte), PMD_TYPE_TABLE);－－－－－－－－（3）\
+flush_tlb_all();\
+}\
+BUG_ON(pmd_bad(\*pmd));
+
+pte = pte_offset_kernel(pmd, addr);\
+do {\
+set_pte(pte, pfn_pte(pfn, prot));－－－－－－－－－－－－－－－－－－－（4）\
+pfn++;\
+} while (pte++, addr += PAGE_SIZE, addr != end);\
+}
+```
 
 （1）走到这个函数，说明后续需要建立PTE这一个level的页表描述符，因此，需要分配PTE页表内存，场景有两个，一个是从来没有进行过映射，另外一个是已经建立映射，但是是section mapping，不符合要求。
 
@@ -277,7 +281,8 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [create_mapping](http://www.wowotech.net/tag/create_mapping)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+
+---
 
 « [蓝牙协议分析(9)\_BLE安全机制之LL Privacy](http://www.wowotech.net/bluetooth/ble_ll_privacy.html) | [X-018-KERNEL-串口驱动开发之serial console](http://www.wowotech.net/x_project/serial_driver_porting_3.html)»
 

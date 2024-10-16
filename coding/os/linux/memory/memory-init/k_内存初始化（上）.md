@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-10-13 12:05 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 一、前言
@@ -12,7 +13,7 @@
 
 bootloader有自己的方法来了解系统中memory的布局，然后，它会将绿色的kernel image和蓝色dtb image copy到了指定的内存位置上。kernel image最好是位于main memory起始地址偏移TEXT_OFFSET的位置，当然，TEXT_OFFSET需要和kernel协商好。kernel image是否一定位于起始的main memory（memory address最低）呢？也不一定，但是对于kernel而言，低于kernel image的内存，kernel是不会纳入到自己的内存管理系统中的。对于dtb image的位置，linux并没有特别的要求。由于这时候MMU是turn off的，因此CPU只能看到物理地址空间。对于cache的要求也比较简单，只有一条：kernel image对应的cache必须clean to PoC，即系统中所有的observer在访问kernel image对应内存地址的时候是一致性的。
 
-三、汇编时代
+# 三、汇编时代
 
 一旦跳转到linux kernel执行，内核则完全掌控了内存系统的控制权，它需要做的事情首先就是要打开MMU，而为了打开MMU，必须要创建linux kernel正常运行需要的页表，这就是本节的主要内容。
 
@@ -42,7 +43,7 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 
 系统对dtb的size有要求，不能大于2M，这个要求主要是要确保在创建地址映射（create_mapping）的时候不能分配其他的translation table page，也就是说，所有的translation table都必须静态定义。为什么呢？因为这时候内存管理模块还没有初始化，即便是memblock模块（初始化阶段分配内存的模块）都尚未初始化（没有内存布局的信息），不能动态分配内存。
 
-五、early ioremap
+# 五、early ioremap
 
 除了DTB，在启动阶段，还有其他的模块也想要创建地址映射，当然，对于这些需求，内核统一采用了fixmap的机制来应对，fixmap的具体信息如下图所示：
 
@@ -54,7 +55,7 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 
 结论：如果想要在伙伴系统初始化之前进行设备寄存器的访问，那么可以考虑early IO remap机制。
 
-六、内存布局
+# 六、内存布局
 
 完成DTB的映射之后，内核可以访问这一段的内存了，通过解析DTB中的内容，内核可以勾勒出整个内存布局的情况，为后续内存管理初始化奠定基础。收集内存布局的信息主要来自下面几条途径：
 
@@ -68,11 +69,11 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 
 通过对DTB中上述信息的解析，其实内核已经基本对内存布局有数了，但是如何来管理这些信息呢？这也就是著名的memblock模块，主要负责在初始化阶段用来管理物理内存。一个参考性的示意图如下：
 
-![](http://www.wowotech.net/content/uploadfile/201610/47b01476331686.gif)
+![[Pasted image 20241016233826.png]]
 
 内核在收集了若干和memory相关的信息后，会调用memblock模块的接口API（例如：memblock_add、memblock_reserve、memblock_remove等）来管理这些内存布局的信息。内核需要动态管理起来的内存资源被保存在memblock的memory type的数组中（上图中的绿色block，按照地址的大小顺序排列），而那些需要预留的，不需要内核管理的内存被保存在memblock的reserved type的数组中（上图中的青色block，也是按照地址的大小顺序排列）。要想了解进一步的信息，请参考内核代码中的setup_machine_fdt和arm64_memblock_init这两个函数的实现。
 
-七、看到内存
+# 七、看到内存
 
 了解到了当前的物理内存的布局，但是内核仍然只是能够访问部分内存（kernel image mapping和DTB那两段内存，上图中黄色block），大部分的内存仍然处于黑暗中，等待光明的到来，也就是说需要创建这些内存的地址映射。
 
