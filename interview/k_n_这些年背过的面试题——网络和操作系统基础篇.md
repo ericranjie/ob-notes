@@ -1,5 +1,5 @@
-阿里巴巴技术质量 阿里云开发者
-_2024年04月18日 08:31_ _浙江_
+
+阿里巴巴技术质量 阿里云开发者 _2024年04月18日 08:31_ _浙江_
 
 阿里妹导读
 
@@ -79,12 +79,11 @@ TCP/IP五层：物理层、数据链路层、网络层、传输层、应用层
 
 #### 3、TCP与UDP区别及场景
 
-!\[\[Pasted image 20241003144941.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003144941.png]]
 
-\*\*基于UDP的协议：\*\*RIP、DNS、SNMP
+**基于UDP的协议：RIP、DNS、SNMP
 
-\*\*基于TCP的协议：\*\*HTTP、FTP、SMTP
+**基于TCP的协议：HTTP、FTP、SMTP
 
 #### 4、TCP滑动窗口，拥塞控制
 
@@ -121,8 +120,7 @@ TCP将接收到的数据包保存在接收缓存里，如果TCP接收数据包�
 #### 6、TCP、UDP报文格式
 
 **TCP报文格式：**
-!\[\[Pasted image 20241003144949.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003144949.png]]
 
 **源端口号和目的端口号：**
 
@@ -168,8 +166,7 @@ TCP的流量控制由连接的每一端通过声明的窗口大小来提供。�
 最常见的可选字段是最长报文大小，又称为MSS(Maximum Segment Size)。每个连接方通常都在通信的第一个报文段（为建立连接而设置SYN标志的那个段）中指明这个选项。它指明本端所能接收的最大长度的报文段。
 
 **UDP报文格式：**
-!\[\[Pasted image 20241003145005.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145005.png]]
 
 **端口号：**
 
@@ -184,8 +181,7 @@ UDP长度字段指的是UDP首部和UDP数据的字节长度。该字段的最�
 UDP检验和是一个端到端的检验和。它由发送端计算，然后由接收端验证。其目的是为了发现UDP首部和数据在发送端到接收端之间发生的任何改动。
 
 \*\*IP报文格式：\*\*普通的IP首部长为20个字节，除非含有可选项字段。
-!\[\[Pasted image 20241003145010.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145010.png]]
 
 **4位版本：**
 
@@ -216,8 +212,7 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 首部检验和字段是根据IP首部计算的检验和码。它不对首部后面的数据进行计算。ICMP、IGMP、UDP和TCP在它们各自的首部中均含有同时覆盖首部和数据检验和码。
 
 **以太网报文格式：**
-!\[\[Pasted image 20241003145017.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145017.png]]
 
 **目的地址和源地址：**
 
@@ -255,8 +250,7 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 #### 2、HTTP与HTTPS之间的区别
 
 **HTTP与HTTPS之间的区别：**
-!\[\[Pasted image 20241003145025.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145025.png]]
 
 **HTTPS链接建立的过程：**
 
@@ -281,12 +275,10 @@ TTL（time-to-live）生存时间字段设置了数据报可以经过的最多�
 #### 3、Get和Post请求区别
 
 **HTTP请求：**
-!\[\[Pasted image 20241003145030.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145030.png]]
 
 **get和Post区别：**
-!\[\[Pasted image 20241003145035.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145035.png]]
 
 #### 4、HTTP常见响应状态码
 
@@ -339,8 +331,7 @@ Cookie⼀般⽤来保存⽤户信息，Session的主要作⽤就是通过服务�
 **浏览器输入URL过程**
 
 \*\*过程：\*\*DNS解析、TCP连接、发送HTTP请求、服务器处理请求并返回HTTP报文、浏览器渲染、结束。
-!\[\[Pasted image 20241003145043.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241003145043.png]]
 
 操作系统基础
 
@@ -466,13 +457,36 @@ public class LRUCache {
         cache = new LinkedHashMap<>(capacity);
         this.capacity = capacity;
     }
-
-
+	public int get(int key) {         
+		//缓存中不存在此key，直接返回         
+		if(!cache.containsKey(key)) {
+		    return -1;         
+		}
+        int res = cache.get(key);
+        cache.remove(key);   //先从链表中删除         
+        cache.put(key,res);  //再把该节点放到链表末尾处
+        return res;     
+    }
+	public void put(int key,int value) {     
+		if(cache.containsKey(key)) {
+		    cache.remove(key); //已经存在，在当前链表移除
+		}         
+		if(capacity == cache.size()) {
+			// cache已满，删除链表头位置
+		    Set<Integer> keySet = cache.keySet();             
+		    Iterator<Integer> iterator = keySet.iterator();
+		    cache.remove(iterator.next());
+		}        
+		cache.put(key,value);  //插入到链表末尾
+		} 
+	}
+/** 
+ * @program: Java 
+ * @description: LRU最近最久未使用置换算法，通过LinkedHashMap内部removeEldestEntry方法实现
+* @author: Mr.Li  * @create: 2020-07-17 10:59  **/ class LRUCache {     private Map<Integer, Integer> map;     private int capacity;          /**      *初始化构造函数      * @param capacity      */     public LRUCache(int capacity) {         this.capacity = capacity;         map = new LinkedHashMap<Integer, Integer>(capacity, 0.75f, true) {             @Override             protected boolean removeEldestEntry(Map.Entry eldest) {                 return size() > capacity;  // 容量大于capacity 时就删除             }         };     }     public int get(int key) {         //返回key对应的value值，若不存在，返回-1         return map.getOrDefault(key, -1);     }
+    public void put(int key, int value) {         map.put(key, value);     } }
 ```
 
-```
-/**
-```
 
 **最佳置换算法OPT:**
 

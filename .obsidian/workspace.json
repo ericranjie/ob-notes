@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "auxiliary/test/self_notes.md",
+                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "auxiliary/test/self_notes.md",
+                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "auxiliary/test/self_notes.md",
+                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "auxiliary/test/self_notes.md"
+                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md"
               }
             }
           }
@@ -148,6 +148,9 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "interview/k_n_这些年背过的面试题——网络和操作系统基础篇.md",
+    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+    "auxiliary/test/self_notes.md",
     "auxiliary/test/关于实施就业优先战略促进高质量充分就业的意见.md",
     "auxiliary/test/豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
     "auxiliary/test/阿卡西记录.md",
@@ -181,9 +184,6 @@
     "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
     "coding/os/linux/performance/a_n_系统性能分析从入门到进阶.md",
     "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
-    "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
-    "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
-    "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
