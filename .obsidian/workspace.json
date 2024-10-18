@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md"
+                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md"
               }
             }
           }
@@ -148,8 +148,14 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "interview/k_n_这些年背过的面试题——网络和操作系统基础篇.md",
+    "zx99-image/Pasted image 20241018115000.png",
+    "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
+    "zx99-image/Pasted image 20241018115334.png",
+    "zx99-image/Pasted image 20241018115317.png",
+    "zx99-image/Pasted image 20241018115010.png",
+    "interview/大疆常见C++面试题，重点难点全方位解析.md",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+    "interview/k_n_这些年背过的面试题——网络和操作系统基础篇.md",
     "auxiliary/test/self_notes.md",
     "auxiliary/test/关于实施就业优先战略促进高质量充分就业的意见.md",
     "auxiliary/test/豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
@@ -169,10 +175,6 @@
     "zx99-image/Pasted image 20241016233006.png",
     "zx99-image/Pasted image 20241016232955.png",
     "zx99-image/Pasted image 20241016232944.png",
-    "zx99-image/Pasted image 20241016232931.png",
-    "zx99-image/Pasted image 20241016232859.png",
-    "zx99-image/Pasted image 20241016232841.png",
-    "zx99-image/Pasted image 20241016232829.png",
     "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
     "coding/os/linux/network/TCP/TCP粘包 硬核图解.md",
     "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
@@ -181,9 +183,6 @@
     "coding/os/linux/network/TCP/a_n_告别 TCP！.md",
     "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
     "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
-    "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
-    "coding/os/linux/performance/a_n_系统性能分析从入门到进阶.md",
-    "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

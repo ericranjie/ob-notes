@@ -1,5 +1,5 @@
-宋远征、李佳伟 人人极客社区
-_2022年01月17日 23:28_
+ 
+宋远征、李佳伟 人人极客社区 _2022年01月17日 23:28_
 
 在终端多媒体业务中，CMA 内存的使用对业务功能和性能至关重要。本文将从入门开始，带你深入理解 CMA 的设计初衷和工作原理。
 
@@ -90,7 +90,7 @@ CMA 业务通过 cma_alloc() 接口申请 CMA 区域内存。CMA 区域内存的
 
 （2）将涉及该页面范围的 pageblock 从 buddy 系统中隔离。由于 buddy 系统不会从 MIGRATE_ISOLATE 迁移类型的 pageblock 分配页面，所以 CMA 将 pageblock 的迁移类型由 MIGRATE_CMA 变更为 MIGRATE_ISOLATE，从而实现隔离。如图 1 所示。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018115000.png]]
 
 图1  分配步骤（1）
 
@@ -98,7 +98,7 @@ CMA 业务通过 cma_alloc() 接口申请 CMA 区域内存。CMA 区域内存的
 
 （4）迁移完成后，pageblock 的迁移类型从 MIGRATE_ISOLATE 恢复为 MIGRATE_CMA，最后将这些页面返回给调用者。如图 2 所示。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018115010.png]]
 
 图2  分配步骤（2）
 
@@ -118,8 +118,17 @@ CMA 业务通过 cma_release () 接口释放 CMA 区域内存。释放过程就�
 
 CMA 区域抽象为 struct cma 结构：
 
-```
+```cpp
 struct cma {
+        unsigned long   base_pfn;   // 区域的起始页帧号
+        unsigned long   count;      // 区域所包含的总页面数量
+        unsigned long   *bitmap;    // 位图，用于描述区域的分配单元的分配情况
+        unsigned int order_per_bit; // 表示位图中一个bit所代表的页面数量（2^order_per_bit）
+        char name[CMA_MAX_NAME];    // 区域名称
+};
+
+extern struct cma cma_areas[MAX_CMA_AREAS]; // CMA区域数组
+extern unsigned cma_area_count;             // CMA区域总个数
 ```
 
 CMA 区域通过 bitmap 进行管理，每个 bit 表示 2^order_per_bit 个页面。bit 为 0 则表示空闲，为 1 表示已占用。
@@ -142,8 +151,15 @@ CMA 区域的创建常用两种方式：
 
 在内核启动过程中会解析 cmdline 中 CMA 区域配置参数，最后通过 cma_init_reserved_mem() 函数完成 CMA 区域的创建，具体代码流程如下（以 ARM 为例）：
 
-```
+```cpp
 start_kernel()
+`-|setup_arch()
+  `-|arm_memblock_init()
+    `-|dma_contiguous_reserve()
+      `-|dma_contiguous_reserve_area()
+        `-|cma_declare_contiguous()
+          `-|cma_declare_contiguous_nid()
+            `-|cma_init_reserved_mem()
 ```
 
 2. 使用 DTS 方式
@@ -152,8 +168,22 @@ start_kernel()
 
 首先，使用 DTS（Device Tree Source）描述当前要创建的 CMA 区域。
 
-```
+```cpp
 Reserved-memory {
+  #address-cells = <1>;
+  #size-cells = <1>;
+  ranges;
+
+  /* global autoconfigured region for contiguous allocations */
+  linux,cma {
+    compatible = "shared-dma-pool";
+    reusable;
+    size = <0x04000000>;
+    alignment = <0x2000>;
+    alloc-ranges = <0x00000000 0x20000000>;
+    linux,cma-default;
+  };
+};
 ```
 
 •“linux,cma”为创建的 CMA 区域名称。
@@ -172,16 +202,25 @@ Reserved-memory {
 
 然后，通过 rmem_cma_setup() 函数中解析 DTS 中的 CMA 区域配置信息，传递参数给 cma_init_reserved_mem() 函数进行 CMA 区域的创建
 
-```
-RESERVEDMEM_OF_DECLARE(dma, "shared-dma-pool", rmem_dma_setup);
+```cpp
+rmem_cma_setup()
+`-|cma_init_reserved_mem()
 ```
 
 创建完成后，由于暂时没有设备驱动使用，为了提升内存利用率，需要将这部分内存标记后，归还给 buddy 系统，供 buddy 系统满足可移动页面内存申请。
 
 标记和返还 buddy 系统的过程如下：
 
-```
+```cpp
 core_initcall(cma_init_reserved_areas);
+
+cma_init_reserved_areas()
+`-|for (i = 0; i < cma_area_count; i++)
+  `-|cma_activate_area()
+    `-|for (pfn = base_pfn; pfn < base_pfn + cma->count; pfn += pageblock_nr_pages)
+      `-|init_cma_reserved_pageblock()
+  `-|set_pageblock_migratetype(page, MIGRATE_CMA);
+          |__free_pages(page, pageblock_order);
 ```
 
 通过 cma_init_reserved_areas() 迭代所有的 CMA 区域，将 CMA 区域以 pageblock 为单位分割，设置 pageblock 为 MIGRATE_CMA 迁移类型，然后通过 \_free_pages() 函数将内存页面返还给 buddy 系统。
@@ -190,8 +229,14 @@ core_initcall(cma_init_reserved_areas);
 
 现在 CMA 区域属于可用状态，我们来看一下如何分配 CMA 区域内存。
 
-```
+```cpp
 cma_alloc()
+  `-|for (;;)
+`-|alloc_contig_range()
+  `-|start_isolate_page_range()
+    |__alloc_contig_migrate_range()
+    |isolate_freepages_range()
+    |undo_isolate_page_range()
 ```
 
 这部分流程和前面叙述的工作原理是相对应的。cma_alloc() 函数在 bitmap 中查找满足分配要求的内存区域，使用 alloc_contig_range() 函数进行分配处理。alloc_contig_range() 函数作为分配内存的主要函数，进行如下处理：
@@ -208,8 +253,10 @@ cma_alloc()
 
 设备驱动在不使用 CMA 区域内存时，可以通过 cma_release () 函数进行释放。释放后的内存又重新回到 buddy 系统，可以继续为整个系统服务。
 
-```
+```cpp
 cma_release()
+  `-|free_contig_range(pfn, count);
+    |cma_clear_bitmap(cma, pfn, count);
 ```
 
 cma_release() 函数通过 free_contig_range() 函数将不使用的内存页面归还到 buddy 系统，再通过 cma_clear_bitmap() 更新 CMA 区域内存使用情况。
@@ -230,7 +277,7 @@ cma_release() 函数通过 free_contig_range() 函数将不使用的内存页面
 
 CMA 区域的使用策略主要是指图 3 中的 ① 处。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018115317.png]]
 
 图3 CMA和buddy系统的关系
 
@@ -254,7 +301,7 @@ OpenHarmony 采用了方案 2 的思路规避该问题，仅将 Movable 申请�
 
 图 4 从系统架构的角度展示了 OpenHarmony 中 CMA 内存的使用策略。（图中C/M/U/R分别表示CMA/Movable/Unmovable/Reclaimable。）
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018115334.png]]
 
 图4  OpenHarmony 的CMA内存使用策略示意图
 
@@ -300,7 +347,9 @@ Linux · 目录
 
 阅读 2024
 
-​
+
+​----
+
 
 写留言
 
