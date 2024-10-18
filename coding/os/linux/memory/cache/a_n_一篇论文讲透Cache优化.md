@@ -1,6 +1,5 @@
-首发于[分布式和存储的那些事](https://www.zhihu.com/column/distributed-storage)
 
-![一篇论文讲透Cache优化](https://picx.zhimg.com/70/v2-8a4e110041f8c1667958caa2abb119bd_1440w.awebp?source=172ae18b&biz_tag=Post)
+首发于[分布式和存储的那些事](https://www.zhihu.com/column/distributed-storage)
 
 [红星闪闪](https://www.zhihu.com/people/hong-xing-shan-shan-17-75)
 数据库资深工程师。在后台开发，高性能计算，分布式领域深耕。
@@ -13,9 +12,9 @@
 
 ## 1.1 Cache架构
 
-![](https://pica.zhimg.com/80/v2-db76f92d9a8a56c74d1f64ef1f90e764_1440w.jpg)
+![[Pasted image 20241018130714.png]]
 
-![](https://pic2.zhimg.com/80/v2-9771fed8a54f17697f91b4dc9f7ad713_1440w.webp)
+![[Pasted image 20241018130819.png]]
 
 - 浅灰色代表一个Processor，代表一个CPU的物理封装，通过总线和内存相连。
 
@@ -29,27 +28,29 @@
 
 真实场景：
 
-![](https://pic4.zhimg.com/80/v2-a5ea71f84ae7486c2e1e3a20059b023b_1440w.webp)
+![[Pasted image 20241018130832.png]]
+
 
 1个物理CPU，里面有4个core，每个core有两个H-Thread。对上层一共暴露1*4*2=8个CPU
 
-![](https://pic1.zhimg.com/80/v2-49ec26a955bc8fa702d834ff54e50dfc_1440w.webp)
+![[Pasted image 20241018130843.png]]
 
-![](https://picx.zhimg.com/80/v2-4777e75437e0c30cbe35c547477039f5_1440w.webp)
+![[Pasted image 20241018130851.png]]
+
 
 L1的Data和Instruction Cache被同一个Core的两个H-Thread共用
 
-![](https://pic4.zhimg.com/80/v2-28d10e4967238c2756c1e8523ddc9cf9_1440w.webp)
+![[Pasted image 20241018130900.png]]
 
-![](https://picx.zhimg.com/80/v2-00f16c9fa7cbf99c262b2fd490459867_1440w.webp)
+![[Pasted image 20241018130910.png]]
 
 L2和L3都是Unified类型，可以同时存指令和数据。L3被同一个CPU封装里的所有Core共享，和论文所述一致。但是L2有点不一样，只被同一个Core的两个H-Thread共享，不跨Core共享。
 
 ## 1.2 Cache速度差距
 
-![](https://pic3.zhimg.com/80/v2-9bcc7186a94080ca9d1c5a0048896128_1440w.webp)
+![[Pasted image 20241018130920.png]]
 
-![](https://picx.zhimg.com/80/v2-f7ea4e112e0d45b5ca88ac11d41ff1eb_1440w.webp)
+![[Pasted image 20241018130935.png]]
 
 L1d：2^13 L2：2^20
 
@@ -57,7 +58,7 @@ L1d：2^13 L2：2^20
 
 ### 1.3.1 Cache的Key
 
-![](https://pic3.zhimg.com/80/v2-f5873c14a04bd7bb4cfc372884970b8c_1440w.webp)
+![[Pasted image 20241018130946.png]]
 
 - T和S一起，唯一标识一个CacheLine，将Cache的组织想象成一个二维数组，通过两个角标T和S定位
 - Offset标识CacheLine里的具体数据位置。一个CacheLine通常是64Byte，所以需要6bit的Offset来定位里面的每个Byte
@@ -66,28 +67,28 @@ L1d：2^13 L2：2^20
 
 - 全路组相连：最朴素的思想，没有Set位，Cache用一维数组的方式组织。查询时直接通过Tag拿到数据。但是当Cache较大时，需要大量的Comp原件，成本高。
 
-![](https://pic4.zhimg.com/80/v2-367c5e3775d78370e31c1646c468dba9_1440w.webp)
+![[Pasted image 20241018130958.png]]
 
 - 直接组相连。一个Set里面只有一个CacheLine，给定Set值可以唯一选择（MUX）出一个Tag
 
-![](https://pic2.zhimg.com/80/v2-0bf15e9972db4a7ecfe10196b00b568d_1440w.webp)
+![[Pasted image 20241018131010.png]]
 
 - 多路组相连。一个Set里面有多个CacheLine，给定Set值可以选择出多个Tag，再通过Tag，拿到数据。
 
-!\[\[Pasted image 20240913120135.png\]\]
+![[Pasted image 20240913120135.png]]
 
 下图是各种组相连的性能数据：
 
 - Cache越大CacheMiss越小
 - 组数的提升有利于CacheMiss的减少
 
-!\[\[Pasted image 20240913120141.png\]\]
+![[Pasted image 20240913120141.png]]
 
 ## 1.4 Cache实验
 
 ### 1.4.1 实验设计
 
-!\[\[Pasted image 20240913120148.png\]\]
+![[Pasted image 20240913120148.png]]
 
 在内存中开辟一块连续的内存初始化成结构体数组，每个结构体如上图所示。有两个变化点：
 

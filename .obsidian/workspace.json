@@ -11,9 +11,11 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241018120346.png"
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241018120346.png",
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241018120346.png",
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241018120346.png"
+                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md"
               }
             }
           }
@@ -144,44 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "coding/os/linux/filesystem/k_F2FS技术拆解.md",
-    "zx99-image/Pasted image 20241018120427.png",
-    "zx99-image/Pasted image 20241018120346.png",
-    "coding/os/linux/filesystem/i_t_文件缓存回写简述.md",
-    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
-    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
-    "zx99-image/Pasted image 20241018115637.png",
-    "zx99-image/Pasted image 20241018115757.png",
-    "zx99-image/Pasted image 20241018115709.png",
-    "zx99-image/Pasted image 20241018115700.png",
-    "zx99-image/Pasted image 20241018115649.png",
-    "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
-    "zx99-image/Pasted image 20241018115000.png",
-    "zx99-image/Pasted image 20241018115334.png",
-    "zx99-image/Pasted image 20241018115317.png",
-    "interview/大疆常见C++面试题，重点难点全方位解析.md",
-    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
-    "interview/k_n_这些年背过的面试题——网络和操作系统基础篇.md",
-    "auxiliary/test/self_notes.md",
-    "auxiliary/test/关于实施就业优先战略促进高质量充分就业的意见.md",
-    "auxiliary/test/豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
-    "auxiliary/test/阿卡西记录.md",
-    "auxiliary/test/x.md",
+    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
+    "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
+    "zx99-image/Pasted image 20241018130714.png",
+    "zx99-image/Pasted image 20241018130832.png",
+    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+    "zx99-image/Pasted image 20241018131010.png",
+    "zx99-image/Pasted image 20241018130958.png",
+    "zx99-image/Pasted image 20241018130946.png",
+    "zx99-image/Pasted image 20241018130935.png",
+    "zx99-image/Pasted image 20241018130920.png",
+    "zx99-image/Pasted image 20241018130910.png",
+    "zx99-image/Pasted image 20241018130900.png",
+    "zx99-image/Pasted image 20241018130851.png",
+    "coding/os/linux/memory/cache/a_t_cache的58问，您能回答上来几个？.md",
+    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
+    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
+    "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
+    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
+    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
+    "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
+    "coding/os/linux/network/TCP/b_深入理解 Linux 的 TCP 三次握手.md",
     "code-griding-note.md",
     "README.md",
-    "Welcome.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
-    "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
-    "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
-    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/os/linux/network/a_25 张图，一万字，拆解 Linux 网络包发送过程.md",
-    "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
-    "coding/os/linux/network/TCP/TCP粘包 硬核图解.md",
+    "coding/os/linux/network/TCP/k_n_TCP粘包 硬核图解.md",
     "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
     "coding/os/linux/network/TCP/k_TCP数据粘包的处理.md",
     "coding/os/linux/network/TCP/b_Google的TCP BBR拥塞控制算法深度解析.md",
+    "coding/os/linux/network/TCP/a_n_告别 TCP！.md",
+    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
+    "coding/os/linux/memory/memory-model/i_ARMv8之memory model.md",
+    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
+    "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
+    "coding/os/linux/filesystem/k_F2FS技术拆解.md",
+    "coding/os/linux/filesystem/i_t_文件缓存回写简述.md",
+    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
+    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

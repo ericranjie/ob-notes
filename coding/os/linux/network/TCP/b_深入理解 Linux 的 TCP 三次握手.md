@@ -1,10 +1,5 @@
-张彦飞allen 腾讯技术工程
 
-_2022年07月14日 18:00_ _广东_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
-
-作者：yanfeizhang，腾讯 PCG 后台开发工程师
+张彦飞allen 腾讯技术工程 _2022年07月14日 18:00_ _广东_
 
 在后端相关岗位的入职面试中，三次握手的出场频率非常的高，甚至说它是必考题也不为过。一般的答案都是说客户端如何发起 SYN 握手进入 SYN_SENT 状态，服务器响应 SYN 并回复 SYNACK，然后进入 SYN_RECV 等诸如此类。但今天我想给出一份不一样的答案。
 
@@ -12,15 +7,21 @@ _2022年07月14日 18:00_ _广东_
 
 在基于 TCP 的服务开发中，三次握手的主要流程图如下：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvavQONQuiazK7T1oHqvNTNU9ncES0VS6ibcZibAesKia9nSDC0P24IFnqknoHZqUZR7BswEvgnbsjicgtJw/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
+![[Pasted image 20241018125154.png]]
 
 服务器中的核心代码是创建 socket，绑定端口，listen 监听，最后 accept 接收客户端的请求。
 
-`//服务端核心代码   int main(int argc, char const *argv[])   {    int fd = socket(AF_INET, SOCK_STREAM, 0);    bind(fd, ...);    listen(fd, 128);    accept(fd, ...);    ...   }   `
+```cpp
+//服务端核心代码   
+int main(int argc, char const *argv[])   {    int fd = socket(AF_INET, SOCK_STREAM, 0);    bind(fd, ...);    listen(fd, 128);    accept(fd, ...);    ...   }   
+```
 
 客户端的相关代码是创建 socket，然后调用 connect 连接 server。
 
-`//客户端核心代码   int main(){    fd = socket(AF_INET,SOCK_STREAM, 0);    connect(fd, ...);    ...   }   `
+```cpp
+//客户端核心代码   
+int main(){    fd = socket(AF_INET,SOCK_STREAM, 0);    connect(fd, ...);    ...   }
+```
 
 看起来简单的几个系统调用，实际上却包含了非常复杂的内核底层操作。根据内核工作原理，我深度展开一下三次握手过程中的内部操作。
 
@@ -32,7 +33,11 @@ _2022年07月14日 18:00_ _广东_
 
 今天就让我们详细来看看，直接上一段 listen 时执行到的内核代码。
 
-`//file: net/core/request_sock.c   int reqsk_queue_alloc(struct request_sock_queue *queue,        unsigned int nr_table_entries)   {    size_t lopt_size = sizeof(struct listen_sock);    struct listen_sock *lopt;       //计算半连接队列的长度    nr_table_entries = min_t(u32, nr_table_entries, sysctl_max_syn_backlog);    nr_table_entries = ......       //为半连接队列申请内存    lopt_size += nr_table_entries * sizeof(struct request_sock *);    if (lopt_size > PAGE_SIZE)     lopt = vzalloc(lopt_size);    else     lopt = kzalloc(lopt_size, GFP_KERNEL);       //全连接队列头初始化    queue->rskq_accept_head = NULL;       //半连接队列设置    lopt->nr_table_entries = nr_table_entries;    queue->listen_opt = lopt;    ......   }   `
+```cpp
+//file: net/core/request_sock.c
+int reqsk_queue_alloc(struct request_sock_queue *queue,        unsigned int nr_table_entries)   {           size_t lopt_size = sizeof(struct listen_sock);    struct listen_sock *lopt;       //计算半连接队列的长度
+														nr_table_entries = min_t(u32, nr_table_entries, sysctl_max_syn_backlog);    nr_table_entries = ......       //为半连接队列申请内存    lopt_size += nr_table_entries * sizeof(struct request_sock *);    if (lopt_size > PAGE_SIZE)     lopt = vzalloc(lopt_size);    else     lopt = kzalloc(lopt_size, GFP_KERNEL);       //全连接队列头初始化    queue->rskq_accept_head = NULL;       //半连接队列设置    lopt->nr_table_entries = nr_table_entries;    queue->listen_opt = lopt;    ......   }
+```
 
 在这段代码里，内核计算了半连接队列的长度。然后据此算出半连接队列所需要的实际内存大小，开始申请用于管理半连接队列对象的内存（半连接队列需要快速查找，所以内核是用哈希表来管理半连接队列的，具体在 listen_sock 下的 syn_table 下）。最后将半连接队列挂到了接收队列 queue 上。
 
@@ -40,7 +45,8 @@ _2022年07月14日 18:00_ _广东_
 
 当全连接队列和半连接队列中有元素的时候，他们在内核中的结构图大致如下。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125253.png]]
+
 
 **在服务器 listen 的时候，主要是进行了全/半连接队列的长度限制计算，以及相关的内存申请和初始化**。全/连接队列初始化了以后才可以相应来自客户端的握手请求。
 
@@ -182,7 +188,8 @@ reqsk_queue_remove 这个操作很简单，就是从全连接队列的链表里�
 
 全文洋洋洒洒上万字字，其实可以用一幅图总结起来。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125313.png]]
+
 
 - 服务器 listen 时，计算了全/半连接队列的长度，还申请了相关内存并初始化。
 
@@ -202,12 +209,7 @@ reqsk_queue_remove 这个操作很简单，就是从全连接队列的链表里�
 
 以上就是三次握手中一些更详细的内部操作。深度理解这个握手过程对于你排查线上问题会有极大的帮助的。下一讲我们来介绍三次握手中常见的异常问题。
 
-腾讯程序员
-
-，赞430
-
-阅读 9476
-
+---
 ​
 
 写留言

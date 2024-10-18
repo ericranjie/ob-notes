@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-5-18 12:09 分类：[ARMv8A Arch](http://www.wowotech.net/sort/armv8a_arch)
 
 # 一、前言
@@ -42,7 +43,7 @@ memory consistency model的规则影响了一大票人：使用高级语言的�
 
 程序员当然喜欢简单、直观的sequential consistency模型，但是，这也限制了CPU硬件和编译器的优化，从而影响了整个系统的性能。怎么办？答案是显而易见的，云计算、大数据等等这些真实用户的需求（要求更好的performance）无情的碾压了程序员的“小确幸”，因此，骚年们，直面“惨淡的人生”吧，这也就是relaxed consistency model。
 
-四、什么是relaxed consistency model?
+# 四、什么是relaxed consistency model?
 
 通过上一节，我们了解到sequential consistency模型中的各种要求，这些对内存操作顺序的要求实际上是对性能的限制和束缚，为了性能，能不能放松（relax）这些要求呢？当然没有问题，否则也就不会有relaxed consistency model的商业化应用了。这些发送内存操作的要求可以被分成两个类别：
 

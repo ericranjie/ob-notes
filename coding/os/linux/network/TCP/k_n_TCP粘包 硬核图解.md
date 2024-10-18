@@ -1,34 +1,15 @@
-# 
 
-捡田螺的小男孩
-
-_2021年11月17日 08:50_
+捡田螺的小男孩 _2021年11月17日 08:50_
 
 The following article is from 小白debug Author 咏春警告的胖虎
-
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM48bREm0nO6wjhCe2nwp7NUf2azfKAxCbDz9ZYLcvcxng/0)
-
-**小白debug**.
-
-答应我，关注之后，好好学技术，别只是收藏我的表情包。。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMzU5Mzk1NQ==&mid=2247506304&idx=2&sn=e7821d8547ead13330155020183f08be&source=41&key=daf9bdc5abc4e8d0b631cf19b02e0c7f551554c9399863dc360c12e10b6fc1ffb0e8ad85de45ba3a1cf735010a0d9ed7894aaf5bbb9ca14c238e44f449c417cf96795b5c5d1d2f31c39ee0515f285a72dd66ae8e6ab188360bb3e587ff792c497f6117c7110fe952e08009cf3043b19db25f1bc82a3b98f11fcadc30c2f76e00&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_51e0e901a289&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQ%2BvcUFen2s1ud09dG82utahKUAgIE97dBBAEAAAAAAPAZBhADFKAAAAAOpnltbLcz9gKNyK89dVj0TpF9eXfSKat4ESVIpq3EEwb4cGvmoExkXZT9DeARFLgzc%2BP4E%2FAgkg6x9TX0asqd1JiSQGgT3lblpGlsGPezuU99fyf7LQKdwlYaaIrDGYEBKKTasHkdVtWxRcEADyypo8kPSdNbktfLimRA7MZ8I3AxDdoEkLkvGYkZENDHbHWLNj1iYNB%2F%2FgjJVAiuigVfeB2BQGRpr4NgG45%2Bq%2Fh4PdQ7eJNoTz25ZdO9U2tu5V3gIyQPFHKrrpmKLeXNnRD8wWJh%2BS5lSpBgOWZ5uMUKC1yuuT9X6TjhcM0lRiR4oxRA25VqjG%2BzZSoG2jOZ%2FQ%3D%3D&acctmode=0&pass_ticket=Zrsv%2FDAmv6Vjvyv17QDkoFMnN0qe5kYxjXiFfpxfANZ5IoP2%2BTG7ClkYLzpEc2pT&wx_header=0#)
-
-事情从一个健身教练说起吧。
-
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/FmVWPHrDdnlnuLFPj8NI57ZdUQiaibNt61jQ3dr7Y2AI5BR2MnESeGyTXvmcjwrhvbM8N7bhYADqIEVlUgU8offw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
 
 李东，自称亚健康终结者，尝试使用互联网+的模式拓展自己的业务。在某款新开发的聊天软件**琛琛**上发布广告。
 
 键盘说来就来。疯狂发送"李东"，回车发送！，"亚健康终结者"，再回车发送！
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
 还记得**四层网络协议**长什么样子吗？
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "四层网络协议")
+![[Pasted image 20241018124921.png]]
 
 四层网络协议
 
@@ -36,7 +17,7 @@ The following article is from 小白debug Author 咏春警告的胖虎
 
 在从消息发到网络的时候给消息带上报头，消息和纷繁复杂的网络中通过这些信息在路由器间流转，最后到达目的机器上，接受者再通过这些报头，一步一步还原出发送者最原始要发送的消息。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "四层网络协议 (1)")
+![[Pasted image 20241018124941.png]]
 
 四层网络协议 (1)
 
@@ -48,13 +29,13 @@ The following article is from 小白debug Author 咏春警告的胖虎
 
 可以把网络比喻为一个水管，是有一定的**粗细**的，这个粗细由**网络接口层（数据链路层）**提供给**网络层**，一般认为是的`MTU`（1500），直接传入整个消息，会超过水管的最大承受范围，那么，就需要进行切片，成为一个个数据包，这样消息才能正常通过“水管”。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "数据分片")
+![[Pasted image 20241018124959.png]]
 
 数据分片
 
 ### MTU 和 MSS 有什么区别
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "MSS和MTU的区别")
+![[Pasted image 20241018125019.png]]
 
 MSS和MTU的区别
 
@@ -68,19 +49,19 @@ MSS和MTU的区别
 
 那么当李东在手机上键入"李东""亚健康终结者"的时候，在 TCP 中把消息分成 MSS 大小后，消息顺着网线顺利发出。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "发送消息到网络")
+![[Pasted image 20241018125032.png]]
 
 发送消息到网络
 
 网络稳得很，将消息分片传到了对端手机 B 上。经过 TCP 层消息重组。变成"李东亚健康终结者"这样的**字节流（stream）**。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "消息从网络接收")
+![[Pasted image 20241018125045.png]]
 
 消息从网络接收
 
 但由于聊天软件**琛琛**是新开发的，而且开发者叫**小白**，完了，是个**臭名昭著的造 bug 工程师**。经过他的代码，在处理**字节流**的时候消息从"李东"，"亚健康终结者"变成了"李东亚"，"健康终结者"。"李东"作为上一个包的内容与下一个包里的"亚"粘在了一起被错误地当成了一个数据包解析了出来。这就是所谓的**粘包**。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "消息对比")
+![[Pasted image 20241018125057.png]]
 
 消息对比
 
@@ -92,7 +73,7 @@ MSS和MTU的区别
 
 **TCP，Transmission Control Protocol**。传输控制协议，是一种面向连接的、可靠的、基于**字节流**的传输层通信协议。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "TCP是什么")
+![[Pasted image 20241018125112.png]]
 
 TCP是什么
 

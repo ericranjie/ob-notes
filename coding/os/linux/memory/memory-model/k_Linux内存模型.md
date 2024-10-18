@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-8-31 12:01 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 一、前言
@@ -20,29 +21,29 @@
 
 PFN是page frame number的缩写，所谓page frame，就是针对物理内存而言的，把物理内存分成一个个的page size的区域，并且给每一个page 编号，这个号码就是PFN。假设物理内存从0地址开始，那么PFN等于0的那个页帧就是0地址（物理地址）开始的那个page。假设物理内存从x地址开始，那么第一个页帧号码就是（x>>PAGE_SHIFT）。
 
-3、什么是NUMA？
+## 3、什么是NUMA？
 
 在为multiprocessors系统设计内存架构的时候有两种选择：一种就是UMA（Uniform memory access），系统中的所有的processor共享一个统一的，一致的物理内存空间，无论从哪一个processor发起访问，对内存地址的访问时间都是一样的。NUMA（Non-uniform memory access）和UMA不同，对某个内存地址的访问是和该memory与processor之间的相对位置有关的。例如，对于某个节点（node）上的processor而言，访问local memory要比访问那些remote memory的速度要快。
 
-三、Linux 内核中的三种memory model
+# 三、Linux 内核中的三种memory model
 
-1、什么是FLAT memory model？
+## 1、什么是FLAT memory model？
 
 如果从系统中任意一个processor的角度来看，当它访问物理内存的时候，物理地址空间是一个连续的，没有空洞的地址空间，那么这种计算机系统的内存模型就是Flat memory。这种内存模型下，物理内存的管理比较简单，每一个物理页帧都会有一个page数据结构来抽象，因此系统中存在一个struct page的数组（mem_map），每一个数组条目指向一个实际的物理页帧（page frame）。在flat memory的情况下，PFN（page frame number）和mem_map数组index的关系是线性的（有一个固定偏移，如果内存对应的物理地址等于0，那么PFN就是数组index）。因此从PFN到对应的page数据结构是非常容易的，反之亦然，具体可以参考page_to_pfn和pfn_to_page的定义。此外，对于flat memory model，节点（struct pglist_data）只有一个（为了和Discontiguous Memory Model采用同样的机制）。下面的图片描述了flat memory的情况：
 
-![](http://www.wowotech.net/content/uploadfile/201608/60521472616211.gif)
+![[Pasted image 20241018122358.png]]
 
 需要强调的是struct page所占用的内存位于直接映射（directly mapped）区间，因此操作系统不需要再为其建立page table。
 
-2、什么是Discontiguous Memory Model？
+## 2、什么是Discontiguous Memory Model？
 
 如果cpu在访问物理内存的时候，其地址空间有一些空洞，是不连续的，那么这种计算机系统的内存模型就是Discontiguous memory。一般而言，NUMA架构的计算机系统的memory model都是选择Discontiguous Memory，不过，这两个概念其实是不同的。NUMA强调的是memory和processor的位置关系，和内存模型其实是没有关系的，只不过，由于同一node上的memory和processor有更紧密的耦合关系（访问更快），因此需要多个node来管理。Discontiguous memory本质上是flat memory内存模型的扩展，整个物理内存的address space大部分是成片的大块内存，中间会有一些空洞，每一个成片的memory address space属于一个node（如果局限在一个node内部，其内存模型是flat memory）。下面的图片描述了Discontiguous memory的情况：
 
-![](http://www.wowotech.net/content/uploadfile/201608/aa841472616206.gif)
+![[Pasted image 20241018122418.png]]
 
 因此，这种内存模型下，节点数据（struct pglist_data）有多个，宏定义NODE_DATA可以得到指定节点的struct pglist_data。而，每个节点管理的物理内存保存在struct pglist_data 数据结构的node_mem_map成员中（概念类似flat memory中的mem_map）。这时候，从PFN转换到具体的struct page会稍微复杂一点，我们首先要从PFN得到node ID，然后根据这个ID找到对于的pglist_data 数据结构，也就找到了对应的page数组，之后的方法就类似flat memory了。
 
-3、什么是Sparse Memory Model？
+## 3、什么是Sparse Memory Model？
 
 Memory model也是一个演进过程，刚开始的时候，使用flat memory去抽象一个连续的内存地址空间（mem_maps\[\]），出现NUMA之后，整个不连续的内存空间被分成若干个node，每个node上是连续的内存地址空间，也就是说，原来的单一的一个mem_maps\[\]变成了若干个mem_maps\[\]了。一切看起来已经完美了，但是memory hotplug的出现让原来完美的设计变得不完美了，因为即便是一个node中的mem_maps\[\]也有可能是不连续了。其实，在出现了sparse memory之后，Discontiguous memory内存模型已经不是那么重要了，按理说sparse memory最终可以替代Discontiguous memory的，这个替代过程正在进行中，4.4的内核仍然是有3中内存模型可以选择。
 
@@ -50,7 +51,7 @@ Memory model也是一个演进过程，刚开始的时候，使用flat memory去
 
 下面的图片说明了sparse memory是如何管理page frame的（配置了SPARSEMEM_EXTREME）：
 
-![](http://www.wowotech.net/content/uploadfile/201608/b6231472616208.gif)
+![[Pasted image 20241018122444.png]]
 
 （注意：上图中的一个mem_section指针应该指向一个page，而一个page中有若干个struct mem_section数据单元）
 
@@ -66,11 +67,13 @@ Memory model也是一个演进过程，刚开始的时候，使用flat memory去
 
 对于经典的sparse memory模型，一个section的struct page数组所占用的内存来自directly mapped区域，页表在初始化的时候就建立好了，分配了page frame也就是分配了虚拟地址。但是，对于SPARSEMEM_VMEMMAP而言，虚拟地址一开始就分配好了，是vmemmap开始的一段连续的虚拟地址空间，每一个page都有一个对应的struct page，当然，只有虚拟地址，没有物理地址。因此，当一个section被发现后，可以立刻找到对应的struct page的虚拟地址，当然，还需要分配一个物理的page frame，然后建立页表什么的，因此，对于这种sparse memory，开销会稍微大一些（多了个建立映射的过程）。
 
-四、代码分析
+# 四、代码分析
 
 我们的代码分析主要是通过include/asm-generic/memory_model.h展开的。
 
-1、flat memory。代码如下：
+## 1、flat memory。
+
+代码如下：
 
 ```cpp
 define pfn_to_page(pfn)    (mem_map + ((pfn) - ARCH_PFN_OFFSET))  
@@ -79,7 +82,9 @@ define __page_to_pfn(page)    ((unsigned long)((page) - mem_map) + ARCH_PFN_O
 
 由代码可知，PFN和struct page数组（mem_map）index是线性关系，有一个固定的偏移就是ARCH_PFN_OFFSET，这个偏移是和估计的architecture有关。对于ARM64，定义在arch/arm/include/asm/memory.h文件中，当然，这个定义是和内存所占据的物理地址空间有关（即和PHYS_OFFSET的定义有关）。
 
-2、Discontiguous Memory Model。代码如下：
+## 2、Discontiguous Memory Model。
+
+代码如下：
 
 ```cpp
 define pfn_to_page(pfn)            \  
@@ -98,7 +103,9 @@ __pgdat->node_start_pfn;                    \
 
 Discontiguous Memory Model需要获取node id，只要找到node id，一切都好办了，比对flat memory model进行就OK了。因此对于\_\_pfn_to_page的定义，可以首先通过arch_pfn_to_nid将PFN转换成node id，通过NODE_DATA宏定义可以找到该node对应的pglist_data数据结构，该数据结构的node_start_pfn记录了该node的第一个page frame number，因此，也就可以得到其对应struct page在node_mem_map的偏移。\_\_page_to_pfn类似，大家可以自己分析。
 
-3、Sparse Memory Model。经典算法的代码我们就不看了，一起看看配置了SPARSEMEM_VMEMMAP的代码，如下：
+# 3、Sparse Memory Model
+
+经典算法的代码我们就不看了，一起看看配置了SPARSEMEM_VMEMMAP的代码，如下：
 
 ```cpp
 define pfn_to_page(pfn)    (vmemmap + (pfn))  

@@ -2,9 +2,9 @@
 Linux阅码场 _2022年01月27日 08:02_
 
 以下文章来源于大魏分享 ，作者魏新宇
+
 https://github.com/davidsajare/david-share.git
 
-\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247502844&idx=1&sn=c07bb9790134e838e9155da7fdcc107e&source=41&key=daf9bdc5abc4e8d0d378999a7bf5d061a81b269f1f3efcf6926b00068b94bbb8e8be33f32645ad1597bc90b3da5050e046c839adcc8a0a695d51963d397cf23dc13db14b15ea6edf673a8da0735b26c680ebfa218b4dbe1d5caeb45511f2b7a9b7e81ccb467f984be449a8856a64e8317066aef1d7e3db74871c2b3e931ae271&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQdwlUSuCyKJPGnvG2sd4kWBLmAQIE97dBBAEAAAAAAKKZMgYbXDgAAAAOpnltbLcz9gKNyK89dVj0RwsiC2h5AYV0cUsQOch%2B7ZoBj1QFa4TQfSZxkRPwOw01iUTLMEUbO0mgTlbfEb2zzuuk%2Fmqn0YoCd6aqxPABJNEY6oWVxhhoDEG%2BXy1laG9OQNkzL3PBdT46GrzQTJE5ajxDpNQC6EUX8E6kQXJar%2BwoQiTMflVl0q7sgre7Vvq9MrS4kPmm8iEdR%2FrjUl2ERolxhyZjIHwUHYFBGDtJAr1eoQV1zKbb7sxuPKnWlkTeYPJ5Y2hTRsdMe1zgl%2F7F&acctmode=0&pass_ticket=S3YLSDm0Cu9LqfedoHJMm9c4NJXKmSB3o9oiHlwcZ3z9u0lDMg6BzoRbkBkKohw8&wx_header=1#)
 
 \*\*Statement:
 
@@ -26,7 +26,7 @@ https://github.com/davidsajare/david-share.git
 
 http://fast.dpdk.org/doc/perf/DPDK_21_08_Mellanox_NIC_performance_report.pdf
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/akGXyic486nUVIygKGcSNsbn1Gl08eEXwrBr1aeVXcQWA7s2CjuGBtGCBa8NwyIyXql1NXZz66VyliaKFEsjwfsA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241018125607.png]]
 
 Mellanox是RDMA的发起者之一，不再赘述。在DPDK方面，每个网卡厂商自己的PMD驱动。NVIDIA Mellanox的PMD驱动有两个： mlx4 和mlx5。
 
@@ -41,7 +41,7 @@ https://developer.nvidia.com/networking/dpdk
 
 NVIDIA Mellanox网卡能做网络I/O卸载，本质上是因为它内嵌了一个硬件的e-switch。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/akGXyic486nUFKNrI2PhyhNJg74rP0AQic7RyHzRfsROt9C7oickVWMNAo5amiacHYGicO7tmgdSuO9L5Wpxefgib66A/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241018125622.png]]
 
 我们先介绍一下e-switch的工作原理：
 
@@ -57,11 +57,11 @@ NVIDIA Mellanox网卡能做网络I/O卸载，本质上是因为它内嵌了一�
 
 1.SRIOV，以VF的形式呈现给host。每个VF直接通VM。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125729.png]]
 
 2.通过VirtIO的形式呈现。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125737.png]]
 
 上面这两种使用方式，对于报文的处理没有任何区别。但对于Guest的使用有区别。
 
@@ -69,7 +69,7 @@ NVIDIA Mellanox网卡能做网络I/O卸载，本质上是因为它内嵌了一�
 
 如果driver访问网卡，如果按照virtIO方式，实际上需要在ASIC里转成普通硬件识别的格式，然后再到ASIC进一步处理，反之亦然。这一次转换决定了性能的上限是40Mpps左右，而VF是直通的，可以近似达到PF的性能。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125747.png]]
 
 除了性能角度，SR-IOV和VirtIO最大的功能差异点是：是否需要做热迁移。需要做热迁移，目前virtI/O会比较成熟。VirtI/O不需要对GuestOS进行更改，比较适合云环境。SRIOV需要Mellanox的Driver。
 
@@ -77,7 +77,7 @@ NVIDIA Mellanox网卡能做网络I/O卸载，本质上是因为它内嵌了一�
 
 **RDMA**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125757.png]]
 
 应用场景
 
@@ -97,15 +97,15 @@ RDMA/RoCE优势：
 
 写应用大多数调用的都是VPI Verbs API。早期Mellanox对于API的划分方案是按照下图四种划分，新的划分方式是按照libibverbs和librdmacm两种划分。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125806.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125817.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125823.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125836.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125840.png]]
 
 具体VPI Verbs API的使用，详见：
 
@@ -121,7 +121,7 @@ RDMA/RoCE优势：
 
 https://openucx.org/
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125858.png]]
 
 由于篇幅有限，本文对UCX不展开介绍，后续会详细说明。
 
@@ -170,7 +170,7 @@ RoCE/RDMA通过rdma verbs bypass kernel到网卡硬件；
 
 数据平面如果卸载到网卡的e-switch，尤其是长链接，DPDK没有明显的加速作用。对于首包，DPDK可以发挥作用。此外，控制面也可以通过DPDK发挥作用。在OFED的安装的时候指定DPDK，但这时候并没有给DPDK指定Core。这时候请求还是需要CPU中断响应。所以最好是配置1个Core。但如果只是PoC的话，不配置也可以。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241018125910.png]]
 
 DPDK应用场景：
 
@@ -240,9 +240,9 @@ https://developer.nvidia.com/networking/dpdk
 
 https://www.openvswitch.org/support/ovscon2020/slides/ovs-offload-design-challenges.pdf
 
-阅读 2873
 
-​
+---
+
 
 写留言
 
