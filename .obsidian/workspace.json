@@ -11,11 +11,9 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241018120346.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
+                "file": "zx99-image/Pasted image 20241018120346.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
+                "file": "zx99-image/Pasted image 20241018120346.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md"
+                "file": "zx99-image/Pasted image 20241018120346.png"
               }
             }
           }
@@ -146,13 +144,23 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "zx99-image/Pasted image 20241018115000.png",
+    "coding/os/linux/filesystem/k_F2FS技术拆解.md",
+    "zx99-image/Pasted image 20241018120427.png",
+    "zx99-image/Pasted image 20241018120346.png",
+    "coding/os/linux/filesystem/i_t_文件缓存回写简述.md",
+    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
+    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
+    "zx99-image/Pasted image 20241018115637.png",
+    "zx99-image/Pasted image 20241018115757.png",
+    "zx99-image/Pasted image 20241018115709.png",
+    "zx99-image/Pasted image 20241018115700.png",
+    "zx99-image/Pasted image 20241018115649.png",
     "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
+    "zx99-image/Pasted image 20241018115000.png",
     "zx99-image/Pasted image 20241018115334.png",
     "zx99-image/Pasted image 20241018115317.png",
-    "zx99-image/Pasted image 20241018115010.png",
     "interview/大疆常见C++面试题，重点难点全方位解析.md",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
     "interview/k_n_这些年背过的面试题——网络和操作系统基础篇.md",
@@ -166,23 +174,14 @@
     "Welcome.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
-    "zx99-image/Pasted image 20241016233826.png",
     "coding/os/linux/memory/memory-init/i_Linux 物理内存初始化.md",
     "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "zx99-image/Pasted image 20241016232539.png",
     "coding/os/linux/network/a_25 张图，一万字，拆解 Linux 网络包发送过程.md",
-    "zx99-image/Pasted image 20241016233016.png",
-    "zx99-image/Pasted image 20241016233006.png",
-    "zx99-image/Pasted image 20241016232955.png",
-    "zx99-image/Pasted image 20241016232944.png",
     "coding/os/linux/network/（超）低延迟视频流传输的未来.md",
     "coding/os/linux/network/TCP/TCP粘包 硬核图解.md",
     "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
     "coding/os/linux/network/TCP/k_TCP数据粘包的处理.md",
     "coding/os/linux/network/TCP/b_Google的TCP BBR拥塞控制算法深度解析.md",
-    "coding/os/linux/network/TCP/a_n_告别 TCP！.md",
-    "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
-    "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

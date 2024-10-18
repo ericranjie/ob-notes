@@ -1,23 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2016-8-24 9:51 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
-**1** **文件缓存回写的时机**
+# **1** **文件缓存回写的时机**
 
 (1)周期性回写，周期为dirty_writeback_interval，默认5s；
 
