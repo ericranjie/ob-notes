@@ -56,7 +56,7 @@ Original 往事敬秋风 深度Linux _2024年08月23日 09:10_ _湖南_
 
 一般来说，我们观察系统的内存占用喜欢用top命令，然后输入m，对系统中整体的内存占用情况做个排序，然后在重点观察，内存占用排在前几位的进程，再逐步的分析。
 
-```
+```cpp
 [root@VM-0-2-centos ~]# top -p 5576top - 18:21:46 up 198 days, 20:07,  2 users,  load average: 0.10, 0.04, 0.05Tasks:   1 total,   0 running,   1 sleeping,   0 stopped,   0 zombie%Cpu(s):  0.7 us,  0.3 sy,  0.0 ni, 99.0 id,  0.0 wa,  0.0 hi,  0.0 si,  0.0 stKiB Mem :  1882008 total,    78532 free,   116516 used,  1686960 buff/cacheKiB Swap:        0 total,        0 free,        0 used.  1606660 avail Mem  PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND                                                                                                                  5576 root      20   0  184064  11248   1124 S  0.0  0.6  10:34.98 nginx   
 ```
 

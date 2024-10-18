@@ -110,19 +110,19 @@ MESI 是指4中状态的首字母。每个Cache line有4个状态，可用2个bi
 #### 双核读取
 
 那么执行流程是：CPU A发出了一条指令，从主内存中读取x。CPU A从主内存通过bus读取到 cache a中并将该cache line 设置为E状态。CPU B发出了一条指令，从主内存中读取x。CPU B试图从主内存中读取x时，CPU A检测到了地址冲突。这时CPU A对相关数据做出响应。此时x 存储于cache a和cache b中，x在chche a和cache b中都被设置为S状态(共享)。
-!\[\[Pasted image 20241009081456.png\]\]
+![[Pasted image 20241009081456.png]]
 
 #### 修改数据
 
 那么执行流程是：CPU A 计算完成后发指令需要修改x. CPU A 将x设置为M状态（修改）并通知缓存了x的CPU B, CPU B将本地cache  b中的x设置为I状态(无效) CPU A 对x进行赋值。
-!\[\[Pasted image 20241009081518.png\]\]
+![[Pasted image 20241009081518.png]]
 
 #### 同步数据
 
 那么执行流程是：
 
 CPU B 发出了要读取x的指令。CPU B 通知CPU A,CPU A将修改后的数据同步到主内存时cache a 修改为E（独享） CPU A同步CPU B的x,将cache a和同步后cache b中的x设置为S状态（共享）。
-!\[\[Pasted image 20241009081537.png\]\]
+![[Pasted image 20241009081537.png]]
 
 ## MESI优化和他们引入的问题
 

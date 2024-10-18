@@ -1,5 +1,6 @@
-原创 甄建勇 Linux阅码场
-_2021年11月19日 07:03_
+
+原创 甄建勇 Linux阅码场 _2021年11月19日 07:03_
+
 作者简介
 甄建勇，高级架构师（某国际大厂），十年以上半导体从业经验。主要研究领域:CPU/GPU/NPU架构与微架构设计。感兴趣领域:经济学、心理学、哲学。
 本系列为甄建勇“五分钟系列”——用五分钟把计算机系统中一个关键的概念讲清楚，如果你也对计算机系统某些模块有独到的理解，欢迎赐稿“Linux阅码场”，投稿将获惊喜礼物一份，投稿请扫码加微信。
@@ -12,7 +13,7 @@ _2021年11月19日 07:03_
 
 为了便于理解，现在假设一个例子，比如咱们的内存只有16bytes，而cache只有4bytes（cacheline是1byte），那么对于分别采用三种不同的映射方式，会是什么情况呢？如下图所示：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/Ass1lsY6byvxseviccopU8U1ecCX3SZtgqm93g5adnXgoibKnsfeNlXrxDS0JNbZgXblUgDib6tJablz4tic54Gfsw/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241018131637.png]]
 
 _图1      Cache的映射_
 

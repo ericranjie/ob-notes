@@ -1,7 +1,7 @@
-安谋科技学堂 _2023年10月24日 20:00_
-以下文章来源于Arm精选 ，作者baron
 
-\](https://mp.weixin.qq.com/s?src=11&timestamp=1725920686&ver=5497&signature=ZubSUaKtq9u3P*TilCzOB4FOYOIciJJDFAX2YLDYhlEzAskaV23Ujd*zg3taNYqEfXngthVZgpyleoHqJW2Zrr0lg9vqetqwX06tJBPnWHJU2ncz3yWIlqYWDZQ48msx&new=1#)
+安谋科技学堂 _2023年10月24日 20:00_
+
+以下文章来源于Arm精选 ，作者baron
 
 本文授权转自微信公众号Arm精选，本篇主要分享一个使用perf分析cache的示例。
 

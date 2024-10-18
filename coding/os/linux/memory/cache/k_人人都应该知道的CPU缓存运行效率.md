@@ -1,4 +1,3 @@
-2024-03-29 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(217) 评论(0)
 
 大家好，我是飞哥！
 
@@ -187,7 +186,7 @@ CPU的硬件开发者们也想到了软件同学们会有统计观察硬件指�
 
 有了底层的支持，上层的 Linux 内核就可以通过读取这些 PMC 寄存器的值来获取想要观察的指标了。整体的工作流程图如下
 
-![图5.png](https://kfngxl.cn/usr/uploads/2024/03/4052039379.png "图5.png")
+![[Pasted image 20241018131752.png]]
 
 接下来我们再从源码的视角展开看一下这个过程。
 
@@ -205,8 +204,7 @@ static struct pmu pmu = {
     ...
 }
 
-static int __init init_hw_perf_events(void)
-{
+static int __init init_hw_perf_events(void) {
     ...
     err = perf_pmu_register(&pmu, "cpu", PERF_TYPE_RAW);
 }
@@ -418,16 +416,18 @@ static int perf_read_one(struct perf_event *event,
 
 那观察 CPU 使用缓存效率高不高的指标主要有 CPI 和缓存命中率几个指标。CPU 硬件在实现上，定义了专门 PMU 模块，其中包含专门用户计数的寄存器。当CPU执行到 PMC 寄存器所指定的事件时，硬件会自动对计数器加1，而不会对程序的正常执行造成任何干扰。有了底层的支持，上层的 Linux 内核就可以通过读取这些 PMC 寄存器的值来获取想要观察的指标了。
 
-我们可以使用 perf 来观察，也可以直接使用内核提供的 perf_event_open 系统调用获取 perf 文件对象，然后自己来读取。\
-![图5.png](https://kfngxl.cn/usr/uploads/2024/03/3813197280.png "图5.png")
+我们可以使用 perf 来观察，也可以直接使用内核提供的 perf_event_open 系统调用获取 perf 文件对象，然后自己来读取。
+![[Pasted image 20241018131828.png]]
 
 欢迎把这篇文章分享给你团队的小伙伴，大家一起成长！
 
 更多干货内容，详见：
 
 Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
-关注公众号：微信扫描下方二维码\
-![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
+
+
+---
+
 
 本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [人人都应该知道的CPU缓存运行效率](https://kfngxl.cn/index.php/archives/648/)
 

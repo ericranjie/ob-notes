@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md"
+                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md"
               }
             }
           }
@@ -148,6 +148,16 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
+    "zx99-image/Pasted image 20241018131637.png",
+    "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
+    "zx99-image/Pasted image 20241018131828.png",
+    "zx99-image/Pasted image 20241018131752.png",
+    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
+    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
+    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
+    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
+    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
     "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
     "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
     "zx99-image/Pasted image 20241018130714.png",
@@ -158,9 +168,6 @@
     "zx99-image/Pasted image 20241018130946.png",
     "zx99-image/Pasted image 20241018130935.png",
     "zx99-image/Pasted image 20241018130920.png",
-    "zx99-image/Pasted image 20241018130910.png",
-    "zx99-image/Pasted image 20241018130900.png",
-    "zx99-image/Pasted image 20241018130851.png",
     "coding/os/linux/memory/cache/a_t_cache的58问，您能回答上来几个？.md",
     "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
@@ -177,13 +184,6 @@
     "coding/os/linux/network/TCP/b_Google的TCP BBR拥塞控制算法深度解析.md",
     "coding/os/linux/network/TCP/a_n_告别 TCP！.md",
     "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
-    "coding/os/linux/memory/memory-model/i_ARMv8之memory model.md",
-    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
-    "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
-    "coding/os/linux/filesystem/k_F2FS技术拆解.md",
-    "coding/os/linux/filesystem/i_t_文件缓存回写简述.md",
-    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
-    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
