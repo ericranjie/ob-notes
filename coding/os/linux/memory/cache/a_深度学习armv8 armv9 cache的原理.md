@@ -1,5 +1,5 @@
-原创 baron Arm精选
-_2024年03月28日 07:41_ _上海_
+
+原创 baron Arm精选 _2024年03月28日 07:41_ _上海_
 
 ### 目录
 
@@ -40,11 +40,11 @@ _2024年03月28日 07:41_ _上海_
 ARM 架构刚开始开发时，处理器的时钟速度和内存的访问速度大致相似。今天的处理器内核要复杂得多，并且时钟频率可以快几个数量级。然而，外部总线和存储设备的频率并没有达到同样的程度。可以实现可以与内核以相同速度运行的小片上 SRAM块，但与标准 DRAM 块相比，这种 RAM 非常昂贵，标准 DRAM 块的容量可能高出数千倍。在许多基于 ARM 处理器的系统中，访问外部存储器需要数十甚至数百个内核周期。
 
 缓存是位于核心和主内存之间的小而快速的内存块。它在主内存中保存项目的副本。对高速缓冲存储器的访问比对主存储器的访问快得多。每当内核读取或写入特定地址时，它首先会在缓存中查找。如果它在高速缓存中找到地址，它就使用高速缓存中的数据，而不是执行对主存储器的访问。通过减少缓慢的外部存储器访问时间的影响，这显着提高了系统的潜在性能。通过避免驱动外部信号的需要，它还降低了系统的功耗\
-!\[\[Pasted image 20240913161953.png\]\]
+![[Pasted image 20240913161953.png]]
 
 #### 2、背景:架构的变化?
 
-!\[\[Pasted image 20240913161958.png\]\]
+![[Pasted image 20240913161958.png]]
 
 - DynamIQ是Arm公司2017年发表的新一代多核心微架构(microarchitecture)技术，正式名称为DynamIQ big.LITTLE(以下简称为DynamIQ)，取代使用多年的big.LITTLE技术
 - big.LITTLE技术将多核心处理器IP分为两个clusters，每个cluster最多4个核，两个cluster最多4+4=8核，而DynamIQ的一个cluster，最多支持8个核
@@ -55,13 +55,13 @@ ARM 架构刚开始开发时，处理器的时钟速度和内存的访问速度�
 
 #### 2、cache的层级关系 ––big.LITTLE架构（A53为例)
 
-!\[\[Pasted image 20240913162018.png\]\]
+![[Pasted image 20240913162018.png]]
 
-!\[\[Pasted image 20240913162023.png\]\]
+![[Pasted image 20240913162023.png]]
 
 #### 3、cache的层级关系 –-- DynamIQ架构（A76为例)
 
-!\[\[Pasted image 20240913162038.png\]\]
+![[Pasted image 20240913162038.png]]
 
 #### 4、DSU / L3 cache
 
@@ -83,12 +83,12 @@ L3 cache
 
 需要参考ARM文档，其实每一个core的cache大小都是固定的或可配置的。
 
-!\[\[Pasted image 20240913162050.png\]\]
+![[Pasted image 20240913162050.png]]
 
 #### 6、cache相关的术语介绍
 
 思考 ：什么是Set、way、TAG 、index、cache line、entry？\
-!\[\[Pasted image 20240913162055.png\]\]
+![[Pasted image 20240913162055.png]]
 
 #### 7、cache的分配策略(alocation,write-through, write-back)
 
@@ -101,11 +101,11 @@ L3 cache
 - 读分配(read allocation)写回(write back)\
   当CPU执行store指令并在cache命中时，我们只更新cache中的数据。并且每个cache line中会有一个bit位记录数据是否被修改过，称之为dirty bit（翻翻前面的图片，cache line旁边有一个D就是dirty bit）。我们会将dirty bit置位。主存中的数据只会在cache line被替换或者显示的clean操作时更新。因此，主存中的数据可能是未修改的数据，而修改的数据躺在cache中。cache和主存的数据可能不一致
 
-!\[\[Pasted image 20240913162101.png\]\]
+![[Pasted image 20240913162101.png]]
 
 #### 8、架构中内存的类型
 
-!\[\[Pasted image 20240913162106.png\]\]
+![[Pasted image 20240913162106.png]]
 
 #### 9、架构中定义的cache的范围(inner, outer)
 
@@ -120,13 +120,13 @@ L3 cache
 
 - 配置 inner Non-cacheable 、配置 inner Write-Through Cacheable 、配置 inner Write-back Cacheable
 - 配置 outer Non-cacheable 、配置 outer Write-Through Cacheable 、配置 outer Write-back Cacheable\
-  !\[\[Pasted image 20240913162118.png\]\]
+![[Pasted image 20240913162118.png]]
 
 对于shareable属性，inner和outer描述的是cache的范围。比如inner是指L1/L2范围内的cache，outer是指L1/L2/L3范围内的cache
-!\[\[Pasted image 20240913162148.png\]\]
+![[Pasted image 20240913162148.png]]
 
 以下再次对Inner/Outer属性做了一个小小的总结：
-!\[\[Pasted image 20240913162154.png\]\]
+![[Pasted image 20240913162154.png]]
 
 - 如果将block的内存属性配置成Non-cacheable，那么数据就不会被缓存到cache，那么所有observer看到的内存是一致的，也就说此时也相当于Outer Shareable。\
   其实官方文档，也有这一句的描述：\
@@ -144,7 +144,7 @@ L3 cache
 
 #### 10、架构中内存的类型 （mair_elx寄存器）
 
-!\[\[Pasted image 20240913162351.png\]\]
+![[Pasted image 20240913162351.png]]
 
 #### 11、cache的种类(VIVT,PIPT,VIPT)
 
@@ -153,18 +153,18 @@ MMU由TLB和Address Translation 组成:
 - Translation Lookaside Buffer
 - TAddress Translation
 
-!\[\[Pasted image 20240913162421.png\]\]\
+![[Pasted image 20240913162421.png]]
 cache又分为；
 
 - PIPT
 - VIVT
 - VIPT
 
-!\[\[Pasted image 20240913162430.png\]\]
+![[Pasted image 20240913162430.png]]
 
 #### 12、Inclusive and exclusive caches
 
-!\[\[Pasted image 20240913162435.png\]\]
+![[Pasted image 20240913162435.png]]
 
 先讨论一个简单的内存读取,单核的. 如LDR X0, \[X1\], 假设X1指向main memory，且是cacheable.\
 (1)、Core先去L1 cache读取，hit了，直接返回数据给Core\
@@ -181,7 +181,7 @@ cache又分为；
 
 #### 13、cache的查询过程(非官方,白话)
 
-!\[\[Pasted image 20240913162441.png\]\]\
+![[Pasted image 20240913162441.png]]
 假设一个4路相连的cache，大小64KB, cache line = 64bytes，那么 1 way = 16KB，indexs = 16KB / 64bytes = 256 (注: 0x4000 = 16KB、0x40 = 64 bytes)
 
 > 0x4000 – index 0\
@@ -198,13 +198,13 @@ cache又分为；
 
 #### 14、cache的组织形式(index, way, set)
 
-!\[\[Pasted image 20240913162454.png\]\]
+![[Pasted image 20240913162454.png]]
 
 - 全相连
 - 直接相连
 - 4路组相连
 
-!\[\[Pasted image 20240913162502.png\]\]
+![[Pasted image 20240913162502.png]]
 
 例如 A76
 
@@ -216,7 +216,7 @@ cache又分为；
 
 #### 15、cache line里都有什么
 
-!\[\[Pasted image 20240913162508.png\]\]
+![[Pasted image 20240913162508.png]]
 
 > Each line in the cache includes:\
 > • A tag value from the associated Physical Address.\
@@ -224,31 +224,29 @@ cache又分为；
 > Valid bits can also be state bits for MESI state if the cache is coherent across multiple cores.\
 > • Dirty data bits to indicate whether the data in the cache line is not coherent with external memory\
 > • data\
-> !\[\[Pasted image 20240913162525.png\]\]
+> ![[Pasted image 20240913162525.png]]
 
 那么TAG里又都有什么呢？？(S13 才会说这里的TAG等于物理地址里的TAG)\
 如下以A78为例，展示了TAG里都有什么
-!\[\[Pasted image 20240913162533.png\]\]
+![[Pasted image 20240913162533.png]]
 
 补充一点：TLB里都有什么？同样以为A78为例;\
-!\[\[Pasted image 20240913162543.png\]\]
-!\[\[Pasted image 20240913162553.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)\
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913162543.png]]
+![[Pasted image 20240913162553.png]]
 
 #### 16、cache查询示例
 
-!\[\[Pasted image 20240913162649.png\]\]
+![[Pasted image 20240913162649.png]]
 
 #### 17、cache查询原理
 
 先使用index去查询cache，然后再比较TAG，比较tag的时候还会检查valid标志位
 
-!\[\[Pasted image 20240913162655.png\]\]
+![[Pasted image 20240913162655.png]]
 
 #### 18、cache maintenance
 
-!\[\[Pasted image 20240913162701.png\]\]
+![[Pasted image 20240913162701.png]]
 
 软件维护操作cache的指令有三类:
 
@@ -265,31 +263,31 @@ mmu的开启和关闭，影响了内存的permissions, cache policies
 
 #### 19、软件中维护内存一致性 – invalid cache
 
-!\[\[Pasted image 20240913162708.png\]\]
+![[Pasted image 20240913162708.png]]
 
 #### 20、软件中维护内存一致性 – flush cache
 
-!\[\[Pasted image 20240913162713.png\]\]
+![[Pasted image 20240913162713.png]]
 
 #### 21、cache一致性指令介绍
 
 > `<cache> <operation>{, <Xt>}`
-> !\[\[Pasted image 20240913162724.png\]\]
+> ![[Pasted image 20240913162724.png]]
 
 #### 22、PoC/PoU point介绍
 
-!\[\[Pasted image 20240913162730.png\]\]
+![[Pasted image 20240913162730.png]]
 
 - PoC is the point at which all observers, for example, cores, DSPs, or DMA engines, that can access memory, are guaranteed to see the same copy of a memory location
 - PoU for a core is the point at which the instruction and data caches and translation table walks of the core are guaranteed to see the same copy of a memory location
 
 #### 23、cache一致性指令的总结
 
-!\[\[Pasted image 20240913162736.png\]\]
+![[Pasted image 20240913162736.png]]
 
 #### 24、Kernel中使用cache一致性指令的示例
 
-!\[\[Pasted image 20240913162741.png\]\]
+![[Pasted image 20240913162741.png]]
 
 #### 25、Linux Kernel Cache API
 
@@ -312,7 +310,7 @@ A76
   1.5MB的cache 12路组相连\
   512KB, 1MB, 2MB, and 4MB的caches 16路组相连
 
-!\[\[Pasted image 20240913162752.png\]\]
+![[Pasted image 20240913162752.png]]
 
 #### 27、A78的cache介绍
 
@@ -329,15 +327,15 @@ A78
   1.5MB的cache 12路组相连\
   512KB, 1MB, 2MB, and 4MB的caches 16路组相连
 
-!\[\[Pasted image 20240913162759.png\]\]
+![[Pasted image 20240913162759.png]]
 
 #### 28、armv8/armv9中的cache相关的系统寄存器
 
-ID Register\
-!\[\[Pasted image 20240913162808.png\]\]
+ID Register
+![[Pasted image 20240913162808.png]]
 
 CTR_EL0, Cache Type Register\
-!\[\[Pasted image 20240913162815.png\]\]
+![[Pasted image 20240913162815.png]]
 
 - IminLine, bits \[3:0\]\
   Log2 of the number of words in the smallest cache line of all the instruction caches that are controlled by the PE.
@@ -347,17 +345,17 @@ CTR_EL0, Cache Type Register\
 #### 29、多核之间的cache一致性
 
 对于 Big.LITTLE架构\
-!\[\[Pasted image 20240913162823.png\]\]
+![[Pasted image 20240913162823.png]]
 对于 DynamIQ架构
-!\[\[Pasted image 20240913162828.png\]\]
+![[Pasted image 20240913162828.png]]
 
 #### 30、MESI/MOESI的介绍
 
-!\[\[Pasted image 20240913162834.png\]\]
+![[Pasted image 20240913162834.png]]
 
-!\[\[Pasted image 20240913162839.png\]\]
+![[Pasted image 20240913162839.png]]
 
-!\[\[Pasted image 20240913162844.png\]\]\
+![[Pasted image 20240913162844.png]]
 Events:
 
 - RH = Read Hit

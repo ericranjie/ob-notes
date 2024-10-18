@@ -7,7 +7,7 @@
 
 先提出几个问题，之后我们逐个击破：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_gif/9lFFFiaKpEriceh1CAmQFpQSKm0aSAgt5QthMQibTKnEzmgxPmc2wnNlbD1zbYhP2XJnCTxgQfic0ibVbFicMpJze18g/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
+---
 
 初入宝地：什么是CPU Cache？
 
@@ -23,7 +23,7 @@
 
 更上一层：如何巧妙利用CPU Cache编程？
 
-**1. 什么是CPU Cache？**
+# **1. 什么是CPU Cache？**
 
 如图所示：
 
@@ -31,36 +31,32 @@
 
 CPU Cache可以理解为CPU内部的高速缓存，当CPU从内存中读取数据时，并不是只读自己想要的那一部分，而是读取更多的字节到CPU高速缓存中。当CPU继续访问相邻的数据时，就不必每次都从内存中读取，可以直接从高速缓存行读取数据，而访问高速缓存比访问内存速度要快的多，所以速度会得到极大提升。
 
-**2. 为什么要有Cache？为什么要有多级Cache？**\
-!\[\[Pasted image 20240913160716.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+# **2. 为什么要有Cache？为什么要有多级Cache？**
+
+![[Pasted image 20240913160716.png]]
 
 为什么要有Cache这个问题想必大家心里都已经有了答案了吧，CPU直接访问距离较远，容量较大，性能较差的主存速度很慢，所以在CPU和内存之间插入了Cache，CPU访问Cache的速度远高于访问主存的速度。
 
 CPU Cache是位于CPU和内存之间的临时存储器，它的容量比内存小很多但速度极快，可以将内存中的一小部分加载到Cache中，当CPU需要访问这一小部分数据时可以直接从Cache中读取，加快了访问速度。
 
 想必大家都听说过程序局部性原理，这也是CPU引入Cache的理论基础，程序局部性分为时间局部性和空间局部性。时间局部性是指被CPU访问的数据，短期内还要被继续访问，比如循环、递归、方法的反复调用等。空间局部性是指被CPU访问的数据相邻的数据，CPU短期内还要被继续访问，比如顺序执行的代码、连续创建的两个对象、数组等。因为如果将刚刚访问的数据和相邻的数据都缓存到Cache时，那下次CPU访问时，可以直接从Cache中读取，提高CPU访问数据的速度。
-!\[\[Pasted image 20240913160723.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160723.png]]
 
 一个存储器层次大体结构如图所示，速度越快的存储设备自然价格也就越高，随着数据访问量的增大，单纯的增加一级缓存的成本太高，性价比太低，所以才有了二级缓存和三级缓存，他们的容量越来越大，速度越来越慢（但还是比内存的速度快），成本越来越低。
 
-**3. Cache的大小和速度如何？**
+# **3. Cache的大小和速度如何？**
 
-!\[\[Pasted image 20240913160730.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160730.png]]
 
 通常越接近CPU的缓存级别越低，容量越小，速度越快。不同的处理器Cache大小不同，通常现在的处理器的L1 Cache大小都是64KB。
 
 那CPU访问各个Cache的速度如何呢？
-!\[\[Pasted image 20240913160738.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160738.png]]
 
 如图所示，级别越低的高速缓存，CPU访问的速度越快。
 
 CPU多级缓存架构大体如下：
-!\[\[Pasted image 20240913160743.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160743.png]]
 
 L1 Cache是最离CPU最近的，它容量最小，速度最快，每个CPU都有L1 Cache，见上图，其实每个CPU都有两个L1 Cache，一个是L1D Cache，用于存取数据，另一个是L1I Cache，用于存取指令。
 
@@ -69,18 +65,17 @@ L2 Cache容量较L1大，速度较L1较慢，每个CPU也都有一个L2 Cache。
 L3 Cache容量较L2大，速度较L2慢，L3 Cache不同于L1 Cache和L2 Cache，它是所有CPU共享的，可以把它理解为速度更快，容量更小的内存。
 
 当CPU需要数据时，整体流程如下：
-!\[\[Pasted image 20240913160750.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160750.png]]
 
 会最先去CPU的L1 Cache中寻找相关的数据，找到了就返回，找不到就去L2 Cache，再找不到就去L3 Cache，再找不到就从内存中读取数据，寻找的距离越长，自然速度也就越慢。
 
-**4. Cache Line？**
+# **4. Cache Line？**
 
 Cache Line可以理解为CPU Cache中的最小缓存单位。Main Memory-Cache或Cache-Cache之间的数据传输不是以字节为最小单位，而是以Cache Line为最小单位，称为缓存行。
 
 目前主流的Cache Line大小都是64字节，假设有一个64K字节的Cache，那这个Cache所能存放的Cache Line的个数就是1K个。
 
-**5. 写入策略**
+# **5. 写入策略**
 
 Cache的写入策略有两种，分别是**WriteThrough（直写模式）**和**WriteBack（回写模式）**。
 
@@ -88,7 +83,7 @@ Cache的写入策略有两种，分别是**WriteThrough（直写模式）**和**
 
 \*\*回写模式：\*\*在数据更新时，只将数据写入到Cache中，只有在数据被替换出Cache时，被修改的数据才会被写入到内存中，该策略因为不需要写入到内存中，所以速度较快。但数据仅写在了Cache中，Cache数据和内存数据不一致，此时如果有其它CPU访问数据，就会读到脏数据，出现bug，所以这里需要用到Cache的一致性协议来保证CPU读到的是最新的数据。
 
-**6. 什么是Cache一致性呢？**
+# **6. 什么是Cache一致性呢？**
 
 多个CPU对某块内存同时读写，就会引起冲突的问题，被称为Cache一致性问题。
 
@@ -115,66 +110,55 @@ MESI协议是通过四种状态的控制来解决Cache一致性的问题：
 ■ \*\*I：\*\*代表已失效（Invalidated） 缓存行是脏的（dirty），无效的。
 
 四种状态的相容关系如下：
-!\[\[Pasted image 20240913160805.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160805.png]]
 
 这里我们只需要知道它是通过这四种状态的切换解决的Cache一致性问题就好，具体状态机的控制实现太繁琐，就不多介绍了，这是状态机转换图，是不是有点懵。
-!\[\[Pasted image 20240913160812.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160812.png]]
 
-**7. Cache与主存的映射关系？**
+# **7. Cache与主存的映射关系？**
 
 **直接映射**
-!\[\[Pasted image 20240913160818.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160818.png]]
 
 直接映射如图所示，每个主存块只能映射Cache的一个特定块。直接映射是最简单的地址映射方式，它的硬件简单，成本低，地址转换速度快，但是这种方式不太灵活，Cache的存储空间得不到充分利用，每个主存块在Cache中只有一个固定位置可存放，容易产生冲突，使Cache效率下降，因此只适合大容量Cache采用。
-!\[\[Pasted image 20240913160853.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160853.png]]
 
 例如，如果一个程序需要重复引用主存中第0块与第16块，最好将主存第0块与第16块同时复制到Cache中，但由于它们都只能复制到Cache的第0块中去，即使Cache中别的存储空间空着也不能占用，因此这两个块会不断地交替装入Cache中，导致命中率降低。
-!\[\[Pasted image 20240913160859.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160859.png]]
 
 直接映射方式下主存地址格式如图，主存地址为s+w位，Cache空间有2的r次方行，每行大小有2的w次方字节，则Cache地址有w+r位。通过Line确定该内存块应该在Cache中的位置，确定位置后比较标记是否相同，如果相同则表示Cache命中，从Cache中读取。
 
 **全相连映射**
-!\[\[Pasted image 20240913160904.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160904.png]]
 
 全相连映射如图所示，主存中任何一块都可以映射到Cache中的任何一块位置上。
 
 全相联映射方式比较灵活，主存的各块可以映射到Cache的任一块中，Cache的利用率高，块冲突概率低，只要淘汰Cache中的某一块，即可调入主存的任一块。但是，由于Cache比较电路的设计和实现比较困难，这种方式只适合于小容量Cache采用。
-!\[\[Pasted image 20240913160909.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160909.png]]
 
 全相连映射的主存结构就很简单啦，将CPU发出的内存地址的块号部分与Cache所有行的标记进行比较，如果有相同的，则Cache命中，从Cache中读取，如果找不到，则没有命中，从主存中读取。
 
 **组相连映射**
-!\[\[Pasted image 20240913160913.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160913.png]]
 
 组相联映射实际上是直接映射和全相联映射的折中方案，其组织结构如图3-16所示。主存和Cache都分组，主存中一个组内的块数与Cache中的分组数相同，组间采用直接映射，组内采用全相联映射。也就是说，将Cache分成u组，每组v块，主存块存放到哪个组是固定的，至于存到该组哪一块则是灵活的。例如，主存分为256组，每组8块，Cache分为8组，每组2块。
 
 主存中的各块与Cache的组号之间有固定的映射关系，但可自由映射到对应Cache组中的任何一块。例如，主存中的第0块、第8块……均映射于Cache的第0组，但可映射到Cache第0组中的第0块或第1块；主存的第1块、第9块……均映射于Cache的第1组，但可映射到Cache第1组中的第2块或第3块。
-!\[\[Pasted image 20240913160918.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160918.png]]
 
 常采用的组相联结构Cache，每组内有2、4、8、16块，称为2路、4路、8路、16路组相联Cache。组相联结构Cache是前两种方法的折中方案，适度兼顾二者的优点，尽量避免二者的缺点，因而得到普遍采用。
-!\[\[Pasted image 20240913160926.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160926.png]]
 
 组相连映射方式下的主存地址格式如图，先确定主存应该在Cache中的哪一个组，之后组内是全相联映射，依次比较组内的标记，如果有标记相同的Cache，则命中，否则不命中。
 
 在网上找到了三种映射方式下的主存格式对比图，大家也可以看下：
-!\[\[Pasted image 20240913160931.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240913160931.png]]
 
-**8. Cache的替换策略？**
+# **8. Cache的替换策略？**
 
 Cache的替换策略想必大家都知道，就是LRU策略，即最近最少使用算法，选择未使用时间最长的Cache替换。
 
-**9. 如何巧妙利用CPU Cache编程？**
+# **9. 如何巧妙利用CPU Cache编程？**
 
 ```c
 const int row = 1024; const int col = 1024; int matrix[row][col];  //按行遍历
@@ -220,20 +204,7 @@ int sum_col = 0; for (int c = 0; c < col; c++) {     for (int r = 0; r < row; r+
 
 文中图片来自网络
 
-往期推荐
-
-[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzI3NjA1OTEzMg==&mid=2247484234&idx=1&sn=40df2edd1dd42d95cb1e56752d471424&chksm=eb7a05d9dc0d8ccf6343ea977bd0fecf539a1b0885eda2545bd1939e07e40453f021161da03c&scene=21#wechat_redirect)
-
-[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzI3NjA1OTEzMg==&mid=2247484131&idx=1&sn=c49df1d90d5b4daf7059f443038d3b7b&chksm=eb7a0470dc0d8d6672caaf461dd3310c921f0dabd08186ea6940c435be0602ba52210070e192&scene=21#wechat_redirect)
-
-[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzI3NjA1OTEzMg==&mid=2247483885&idx=1&sn=ba3342f7807d347747946df4b9bb4b4c&chksm=eb7a077edc0d8e68f9bde2e39e64e18f5c2e2d85bd9abeb44986fe64a8c7dcbceb5333b78298&scene=21#wechat_redirect)
-
-[!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)](http://mp.weixin.qq.com/s?__biz=MzI3NjA1OTEzMg==&mid=2247483996&idx=1&sn=83a15a7e7ce6a3999920e5ea8bb454b6&chksm=eb7a04cfdc0d8dd9d7e0400fd251e486ead533617e90d1c88fc747c0ba0c5a55e2e754f9ccd0&scene=21#wechat_redirect)
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-阅读 2670
-
+---
 ​
 
 写留言

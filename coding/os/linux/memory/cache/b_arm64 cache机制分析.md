@@ -1,5 +1,5 @@
-原创 LoyenWang LoyenWang
-_2022年04月09日 23:29_
+
+原创 LoyenWang LoyenWang _2022年04月09日 23:29_
 
 # 背景
 
@@ -37,7 +37,7 @@ _2022年04月09日 23:29_
 ## 2.1 cache结构
 
 先看一下cache的内部结构图：
-!\[\[Pasted image 20241008183012.png\]\]
+![[Pasted image 20241008183012.png]]
 
 - `cache line`：cache按行来组织，它是访问cache的最小单位，通常为16、32、64或128字节，`cache line`的大小通常在架构设计阶段确定；
 - `64-bit address`：CPU访问cache的地址编码，分成三部分：`Tag`、`Index`、`Offset`；
@@ -52,7 +52,7 @@ _2022年04月09日 23:29_
 ### 2.2.1 direct mapped
 
 直接映射的方式如下：
-!\[\[Pasted image 20241008183028.png\]\]
+![[Pasted image 20241008183028.png]]
 
 - 图中的示例cache只有四个缓存行，内存中`index域`相同的地址，都会映射到cache中的同一行上；
 - 图中所示，`0x00,0x40,0x80`三个地址会映射到cache的第一行，而同一时刻只能允许1行；
@@ -62,7 +62,7 @@ _2022年04月09日 23:29_
 ### 2.2.2 set associative
 
 组相连的映射方式如下：
-!\[\[Pasted image 20241008183043.png\]\]
+![[Pasted image 20241008183043.png]]
 
 - 组相联方式在现代处理器中得到广泛的使用；
 - 图中示例有两路cache，因此每组有两个缓存行；
@@ -72,7 +72,7 @@ _2022年04月09日 23:29_
 ### 2.2.3 fully associative
 
 全相连的映射方式如下：
-!\[\[Pasted image 20241008183052.png\]\]
+![[Pasted image 20241008183052.png]]
 
 - 内存地址不需要`index域`，全相连缓存相当是N路集中的所有缓存行，因此需要大量的比较器；
 - 优点是最大程度降低cache颠簸，缺点依然是复杂度和成本问题；
@@ -83,16 +83,16 @@ _2022年04月09日 23:29_
 - Write allocation(WA) 当写操作`cache miss`时，会触发一个burst读，通过读的方式来分配`cache line`，然后再将数据写入cache；
 - Write-back(WB) WB方式下，数据只写入cache，并标记为dirty，当`cache line`被换出或者显式的clean操作才会更新到外部内存中，如下图：
 
-!\[\[Pasted image 20241008183105.png\]\]
+![[Pasted image 20241008183105.png]]
 
 - Write-through(WT) WT方式下，数据同时写入cache和外部内存，不会将`cache line`标记为dirty，如下图：
-  !\[\[Pasted image 20241008183127.png\]\]
+  ![[Pasted image 20241008183127.png]]
 
 ## 2.4 cache分类
 
 先来看看cache中的重名(`aliasing`)问题和同名(`homonyms`)问题：
 
-!\[\[Pasted image 20241008183135.png\]\]
+![[Pasted image 20241008183135.png]]
 
 - `aliasing`：多个不同的虚拟地址可能映射到相同的物理地址；
 - 引入的问题包括：1）浪费cache的空间，造成性能下降；2）写操作时可能造成cache数据更新不一致，造成物理地址在cache中维护多个不同的数据；
@@ -101,14 +101,14 @@ _2022年04月09日 23:29_
 
 ### 2.4.1 `VIVT`(`Virtually-Indexed Virtually-Tagged`)
 
-!\[\[Pasted image 20241008183158.png\]\]
+![[Pasted image 20241008183158.png]]
 
 - VIVT：处理器使用虚拟地址来进行cache的寻址操作，使用虚拟地址的`Tag域`和`Index域`进行判断是否hit；
 - 导致cache重名问题（Index域导致）与同名问题（Tag域导致），当改变虚拟地址到物理地址映射时，需要`flush`和`invalidate`操作，导致性能下降；
 
 ### 2.4.2 `PIPT`(`Physically-Indexed Physically-Tagged`)
 
-!\[\[Pasted image 20241008183212.png\]\]
+![[Pasted image 20241008183212.png]]
 
 - PIPT：处理器使用物理地址进行cache的寻址操作，使用物理地址的`Tag域`和`Index域`进行判断是否hit；
 - 处理器在查询cache时，需要先查询MMU/TLB后才能访问，增加了pipeline的时间；
@@ -116,7 +116,7 @@ _2022年04月09日 23:29_
 
 ### 2.4.3 `VIPT`(`Virtually-Indexed Physically-Tagged`)
 
-!\[\[Pasted image 20241008183225.png\]\]
+![[Pasted image 20241008183225.png]]
 
 - VIPT：使用虚拟地址的`Index域`和物理地址的`Tag域`进行判断是否cache hit；
 - 使用物理地址的`Tag域`(物理Tag唯一)，能有效的避免同名问题；
@@ -125,7 +125,7 @@ _2022年04月09日 23:29_
 # 3. mesi
 
 先来看问题的引入：
-!\[\[Pasted image 20241008183238.png\]\]
+![[Pasted image 20241008183238.png]]
 
 - 图中的cluster，不同CPU core的cache和DDR中可能维护了同一个数据的多个副本；
 - 维护cache的一致性，需要跟踪cache行的状态，ARM采用MESI协议（`snooping protocol`）来维护cache的一致性；
@@ -142,23 +142,23 @@ _2022年04月09日 23:29_
 1. M和E状态，数据都是本地独有的，不同点在于M状态的数据是脏的，而E状态的数据是干净的，M状态的cache line写回内存后，状态变成了S；
 1. S状态的cache line，数据和其他cache共享，只有干净的数据才能被多个cache共享；
 
-!\[\[Pasted image 20241008183259.png\]\]
+![[Pasted image 20241008183259.png]]
 
 MESI协议在总线上的操作分为两大类：CPU请求和总线请求，如下图：
 
-!\[\[Pasted image 20241008183310.png\]\]
+![[Pasted image 20241008183310.png]]
 
 MESI协议中涉及到各个状态的转换：
 
 1. 本地CPU操作，状态转换如下图：
 
-!\[\[Pasted image 20241008183317.png\]\]
+![[Pasted image 20241008183317.png]]
 
 - 操作为本地CPU读写
 
 2. 总线监听到其他CPU的操作请求，状态转换如下图：
 
-!\[\[Pasted image 20241008183324.png\]\]
+![[Pasted image 20241008183324.png]]
 
 - 操作类型为总线读写，来自其他CPU的请求，或者DMA的操作等；
 

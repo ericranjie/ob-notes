@@ -1,5 +1,5 @@
-Original 往事敬秋风 深度Linux
-_2024年09月26日 08:22_ _湖南_
+
+Original 往事敬秋风 深度Linux _2024年09月26日 08:22_ _湖南_
 
 CPU作为计算机的核心部件，其缓存结构犹如一座高效的数据桥梁，在提升计算机性能方面发挥着关键作用。而原子操作，则以其独特的不可分割性，为程序的正确性和稳定性提供了坚实的保障。
 
@@ -11,7 +11,7 @@ CPU作为计算机的核心部件，其缓存结构犹如一座高效的数据�
 
 现代 CPU 为了弥合处理器与主内存之间巨大的速度差异，引入了多级缓存体系。
 
-!\[\[Pasted image 20241009082503.png\]\]
+![[Pasted image 20241009082503.png]]
 
 **L1 缓存距离 CPU 核心最近，速度最快但容量较小。** 它通常可以在几个 CPU 时钟周期内完成数据的读取和写入，能够为 CPU 核心提供最快速的数据访问。这就像是 CPU 的贴身助手，随时准备着为其提供最急需的数据。
 
@@ -29,7 +29,7 @@ CPU作为计算机的核心部件，其缓存结构犹如一座高效的数据�
 
 当CPU访问内存时，如果所需数据在缓存中已经存在于一个Cache Line中，那么CPU可以直接从缓存中读取数据，而无需访问主存，从而提高了数据传输的速度。
 
-!\[\[Pasted image 20241009082533.png\]\]
+![[Pasted image 20241009082533.png]]
 
 - 标志位（flag）：用于指示Cache Line当前是否有效。当一个Cache Line中存储的数据被更新或替换时，标志位会被清除，表示该Cache Line不再有效。（存MESI 的状态）
 - 标记（tag）：用于标识数据区域中存储的数据块是来自哪个主存地址。当CPU需要读取或写入特定地址的数据时，它会将该地址的一部分作为标记，并与Cache Line中存储的标记进行比较，以确定是否命中缓存。
@@ -63,7 +63,7 @@ CPU作为计算机的核心部件，其缓存结构犹如一座高效的数据�
 
 例如，当一个程序首次访问某个数据时，CPU 会从主内存中读取该数据，并将包含该数据的缓存行加载到 L1 缓存中。如果后续再次访问这个数据，由于数据已经在缓存中，就可以直接从 L1 缓存中快速读取，大大提高了访问速度。
 
-!\[\[Pasted image 20241009082619.png\]\]
+![[Pasted image 20241009082619.png]]
 
 这种策略的主要优势在于减少了向主内存写入数据的次数。相比于每次数据修改都直接写入主内存（写直达，Write Through），写回策略可以将多次对同一块数据的修改累积起来，一次性地写回主内存，减少了对主内存的访问，提高了效率。
 
@@ -252,8 +252,13 @@ int a = 0;int b = 0;void thread1() {    a = 1;    b = 2;}void thread2() {    if 
 
 内存屏障，也称为内存栅栏（memory barrier），是一种用于确保在多线程环境下内存操作顺序的机制。创建一个内存屏障，用于限制内存访问的重新排序和优化。它可以保证在屏障之前的所有内存操作都在屏障完成之前完成。
 
-```
-#include <iostream>#include <thread>#include <atomic>std::atomic<bool> flag(false);std::atomic<int> data(0);void writerThread() {    data.store(42, std::memory_order_relaxed);    std::atomic_thread_fence(std::memory_order_release);    flag.store(true, std::memory_order_relaxed);}void readerThread() {    while (!flag.load(std::memory_order_relaxed)) {        // 等待 flag 被设置    }    std::atomic_thread_fence(std::memory_order_acquire);    int value = data.load(std::memory_order_relaxed);    std::cout << "Read value: " << value << std::endl;}int main() {    std::thread t1(writerThread);    std::thread t2(readerThread);    t1.join();    t2.join();    return 0;}
+```cpp
+#include <iostream>
+#include <thread>
+#include <atomic>
+std::atomic<bool> flag(false);std::atomic<int> data(0);void writerThread() {    data.store(42, std::memory_order_relaxed);    std::atomic_thread_fence(std::memory_order_release);    flag.store(true, std::memory_order_relaxed);}
+void readerThread() {    while (!flag.load(std::memory_order_relaxed)) {        // 等待 flag 被设置    }
+std::atomic_thread_fence(std::memory_order_acquire);    int value = data.load(std::memory_order_relaxed);    std::cout << "Read value: " << value << std::endl;}int main() {    std::thread t1(writerThread);    std::thread t2(readerThread);    t1.join();    t2.join();    return 0;}
 ```
 
 在这个例子中，writerThread先写入data，然后设置flag。通过使用内存屏障，确保在readerThread中，当flag被读取为true时，data的读取一定能看到writerThread中对data的写入结果。
@@ -298,8 +303,11 @@ int a = 0;int b = 0;void thread1() {    a = 1;    b = 2;}void thread2() {    if 
 
 在多线程编程中，加锁是一种常用的同步机制，用于确保多个线程对共享资源的互斥访问，避免数据竞争和不一致的问题。以下是用 C++ 语言演示多线程加锁的示例代码：
 
-```
-#include <iostream>#include <thread>#include <mutex>std::mutex mutexLock;int sharedData = 0;void incrementData() {    for (int i = 0; i < 1000; ++i) {        std::lock_guard<std::mutex> guard(mutexLock);        sharedData++;    }}int main() {    std::thread t1(incrementData);    std::thread t2(incrementData);    t1.join();    t2.join();    std::cout << "Final value of sharedData: " << sharedData << std::endl;    return 0;}
+```cpp
+#include <iostream>
+#include <thread>
+#include <mutex>
+std::mutex mutexLock;int sharedData = 0;void incrementData() {    for (int i = 0; i < 1000; ++i) {        std::lock_guard<std::mutex> guard(mutexLock);        sharedData++;    }}int main() {    std::thread t1(incrementData);    std::thread t2(incrementData);    t1.join();    t2.join();    std::cout << "Final value of sharedData: " << sharedData << std::endl;    return 0;}
 ```
 
 在这个例子中，`std::mutex` 用于创建一个互斥锁，`std::lock_guard` 是一个 RAII（Resource Acquisition Is Initialization，资源获取即初始化）风格的类，在构造时自动获取锁，在析构时自动释放锁，确保了锁的正确使用和及时释放，即使在函数执行过程中发生异常也能保证锁被正确释放。
@@ -312,15 +320,18 @@ int a = 0;int b = 0;void thread1() {    a = 1;    b = 2;}void thread2() {    if 
 
 内存序问题在多线程编程中至关重要，它涉及到不同线程对共享内存的访问顺序以及编译器和处理器对内存操作的优化。在没有明确指定内存序的情况下，编译器和处理器可能会对内存操作进行重排序，以提高程序的性能。例如，一个线程可能会先执行对变量的写入操作，然后执行另一个无关的操作，但在另一个线程看来，这两个操作的顺序可能被颠倒了。这种重排序在单线程环境下通常不会影响程序的正确性，但在多线程环境下，可能会导致数据不一致和难以调试的错误。以下是一个 C++ 代码案例，用于分析内存序问题：
 
-```
-#include <iostream>#include <atomic>#include <thread>std::atomic<bool> x(false), y(false);std::atomic<int> z(0);void write_x() {    x.store(true, std::memory_order_relaxed);}void write_y() {    y.store(true, std::memory_order_relaxed);}void read_x_then_y() {    while (!x.load(std::memory_order_relaxed)) {}    if (y.load(std::memory_order_relaxed))        z++;}void read_y_then_x() {    while (!y.load(std::memory_order_relaxed)) {}    if (x.load(std::memory_order_relaxed))        z++;}int main() {    std::thread a(write_x);    std::thread b(write_y);    std::thread c(read_x_then_y);    std::thread d(read_y_then_x);    a.join();    b.join();    c.join();    d.join();    std::cout << "z = " << z << std::endl;    return 0;}
+```cpp
+#include <iostream>
+#include <atomic>
+#include <thread>
+std::atomic<bool> x(false), y(false);std::atomic<int> z(0);void write_x() {    x.store(true, std::memory_order_relaxed);}void write_y() {    y.store(true, std::memory_order_relaxed);}void read_x_then_y() {    while (!x.load(std::memory_order_relaxed)) {}    if (y.load(std::memory_order_relaxed))        z++;}void read_y_then_x() {    while (!y.load(std::memory_order_relaxed)) {}    if (x.load(std::memory_order_relaxed))        z++;}int main() {    std::thread a(write_x);    std::thread b(write_y);    std::thread c(read_x_then_y);    std::thread d(read_y_then_x);    a.join();    b.join();    c.join();    d.join();    std::cout << "z = " << z << std::endl;    return 0;}
 ```
 
 在这个例子中，有四个线程：a和b分别写入原子变量x和y，c先读取x再读取y，如果y为真则增加z，d先读取y再读取x，如果x为真则增加z。如果没有明确的内存序约束，c和d线程中的读取操作可能会以不同的顺序执行，导致z的最终值不确定。如果使用std::memory_order_seq_cst顺序一致性内存序，那么所有线程看到的内存操作顺序将是一致的，z的结果将更加可预测。
 
 例如，如果使用std::memory_order_seq_cst来存储和加载原子变量：
 
-```
+```cpp
 void write_x() {    x.store(true, std::memory_order_seq_cst);}void write_y() {    y.store(true, std::memory_order_seq_cst);}void read_x_then_y() {    while (!x.load(std::memory_order_seq_cst)) {}    if (y.load(std::memory_order_seq_cst))        z++;}void read_y_then_x() {    while (!y.load(std::memory_order_seq_cst)) {}    if (x.load(std::memory_order_seq_cst))        z++;}
 ```
 
@@ -340,16 +351,21 @@ void write_x() {    x.store(true, std::memory_order_seq_cst);}void write_y() {  
 
 **(1)没有同步机制的情况**
 
-```
-#include <iostream>#include <thread>int sharedVariable = 0;void incrementWithoutSync() {    for (int i = 0; i < 1000; ++i) {        sharedVariable++;    }}int main() {    std::thread t1(incrementWithoutSync);    std::thread t2(incrementWithoutSync);    t1.join();    t2.join();    std::cout << "Shared variable value without synchronization: " << sharedVariable << std::endl;    return 0;}
+```cpp
+#include <iostream>
+#include <thread>
+int sharedVariable = 0;void incrementWithoutSync() {    for (int i = 0; i < 1000; ++i) {        sharedVariable++;    }}int main() {    std::thread t1(incrementWithoutSync);    std::thread t2(incrementWithoutSync);    t1.join();    t2.join();    std::cout << "Shared variable value without synchronization: " << sharedVariable << std::endl;    return 0;}
 ```
 
 在这个例子中，两个线程同时对sharedVariable进行递增操作。由于没有同步机制，可能会出现数据竞争问题。不同的运行环境下，sharedVariable的最终值可能不是预期的 2000，因为两个线程对sharedVariable的读写操作可能会交错进行，导致部分操作被覆盖。
 
 **(2)使用互斥锁进行同步**
 
-```
-#include <iostream>#include <thread>#include <mutex>int sharedVariable = 0;std::mutex mutexLock;void incrementWithSync() {    for (int i = 0; i < 1000; ++i) {        std::lock_guard<std::mutex> guard(mutexLock);        sharedVariable++;    }}int main() {    std::thread t1(incrementWithSync);    std::thread t2(incrementWithSync);    t1.join();    t2.join();    std::cout << "Shared variable value with synchronization: " << sharedVariable << std::endl;    return 0;}
+```cpp
+#include <iostream>
+#include <thread>
+#include <mutex>
+int sharedVariable = 0;std::mutex mutexLock;void incrementWithSync() {    for (int i = 0; i < 1000; ++i) {        std::lock_guard<std::mutex> guard(mutexLock);        sharedVariable++;    }}int main() {    std::thread t1(incrementWithSync);    std::thread t2(incrementWithSync);    t1.join();    t2.join();    std::cout << "Shared variable value with synchronization: " << sharedVariable << std::endl;    return 0;}
 ```
 
 这里使用了std::mutex和std::lock_guard来确保在任何时候只有一个线程可以访问和修改sharedVariable。这样就避免了数据竞争问题，sharedVariable的最终值将是预期的 2000。

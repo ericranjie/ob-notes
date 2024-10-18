@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
+                "file": "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
+                "file": "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
+                "file": "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md"
+                "file": "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md"
               }
             }
           }
@@ -148,6 +148,17 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
+    "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
+    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
+    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
+    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
+    "coding/os/linux/memory/cache/b_深入理解CPU缓存：性能优化的关键.md",
+    "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
+    "coding/os/linux/memory/cache/a_t_cache的58问，您能回答上来几个？.md",
+    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
+    "code-griding-note.md",
+    "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
     "zx99-image/Pasted image 20241018131637.png",
     "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
@@ -156,10 +167,6 @@
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
     "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
     "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
-    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
-    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
-    "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
     "zx99-image/Pasted image 20241018130714.png",
     "zx99-image/Pasted image 20241018130832.png",
     "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
@@ -168,7 +175,6 @@
     "zx99-image/Pasted image 20241018130946.png",
     "zx99-image/Pasted image 20241018130935.png",
     "zx99-image/Pasted image 20241018130920.png",
-    "coding/os/linux/memory/cache/a_t_cache的58问，您能回答上来几个？.md",
     "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
@@ -176,14 +182,8 @@
     "coding/os/linux/network/i_向左向右 网络IO卸载.md",
     "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
     "coding/os/linux/network/TCP/b_深入理解 Linux 的 TCP 三次握手.md",
-    "code-griding-note.md",
     "README.md",
     "coding/os/linux/network/TCP/k_n_TCP粘包 硬核图解.md",
-    "coding/os/linux/network/TCP/k_面试必问的十八个TCP协议问题（汇总版）.md",
-    "coding/os/linux/network/TCP/k_TCP数据粘包的处理.md",
-    "coding/os/linux/network/TCP/b_Google的TCP BBR拥塞控制算法深度解析.md",
-    "coding/os/linux/network/TCP/a_n_告别 TCP！.md",
-    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
