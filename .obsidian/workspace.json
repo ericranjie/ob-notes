@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "auxiliary/test/self_notes.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "auxiliary/test/self_notes.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "auxiliary/test/self_notes.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "code-griding-note.md"
+                "file": "auxiliary/test/self_notes.md"
               }
             }
           }
@@ -148,9 +148,13 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "auxiliary/test/关于实施就业优先战略促进高质量充分就业的意见.md",
+    "auxiliary/test/豆瓣开分9.8，上市即售罄，这本顶级微积分教材彻底颠覆了国内教学的思路！.md",
+    "auxiliary/test/阿卡西记录.md",
+    "auxiliary/test/x.md",
+    "code-griding-note.md",
     "README.md",
     "Welcome.md",
-    "code-griding-note.md",
     "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
     "interview/leetcode/huawei/c_华为OD笔试面试参考.md",
     "zx99-image/Pasted image 20241016233826.png",
@@ -180,10 +184,6 @@
     "coding/os/linux/network/k_服务器性能优化之网络性能优化.md",
     "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
     "coding/os/linux/network/kn_Linux 虚拟网络设备之 bridge.md",
-    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
-    "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
-    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
-    "coding/os/linux/network/an_深入理解 Linux socket.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
