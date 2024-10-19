@@ -1,22 +1,15 @@
-Linux云计算网络
-_2021年09月09日 08:13_
+
+Linux云计算网络 _2021年09月09日 08:13_
+
 The following article is from 赐我白日梦 Author 赐我白日梦
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzI1OTY2MzMxOQ==&mid=2247496357&idx=1&sn=561cb194d70bd4f693445c34fdf8b5c2&chksm=ea77c61ddd004f0b35fe9d665da61e19805212da0c995480ddbc2016bfb9a918039b2a9ca3a0&mpshare=1&scene=24&srcid=0909MmqSkBeTIqd1BRM6mkYz&sharer_sharetime=1631147611819&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03ab310529d0689a0e875ecb3473de37d0966f561e62c40aa5970f6e5e3e8589597d0042c6e0efbd1192610e15494bd634e093fd272b63eaf3b5e06eca857032c0a6d4bfce98e1afe21519bc40fbdaa07fc6e891ea1ba6c8846fc3afdbcf8ee9929cf860115f43a1b59f93b6caf3691c554102f7d57a242d8&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_5c352b88aa29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQLbZ1ZrWiEfvSMaQmK3La9xKUAgIE97dBBAEAAAAAAKErMtksEV8AAAAOpnltbLcz9gKNyK89dVj0jWBYF0s8qUI2jfcxjljsHapAYqAwTMy%2FX7qI4on%2FlJwr766sHBk31N0aD5OI0jYOBaJgXSTC6S7Oo7rTIj098W8QdX5do%2FTCgP8koOr8Aa9HFo%2FQcZgkpVXr0Nys6p1Y3n4XU6G4plk6GjjVuPFVysbyNUuDckS%2BVnCEGac6POf8HPR1tYB8mICoen%2F6UseVePYJO496GAemALHmrJYn7nYNlkx6AIZhBbTqixo8aDu277dX2jA%2Becd7gJrALiL1I5pkeZMcmz6PFOOmy4JWbfgLB%2BBe52QUUvFRmFNskjvMJHzIJANmrHyj9frw3Q%3D%3D&acctmode=0&pass_ticket=I18it5ABTV08CuyImy%2BjeOSwwsV%2FqF6iCoQHwwp5g9RGyFVvsA7TKHy7jX5aWDHu&wx_header=0#)
-
-一、iptables是什么？你为啥要学？
-
-一、`iptables`是什么？你为啥要学？
-
-二、`iptables`、`防火墙`之间有啥关系？                        三、`iptables`安装                       四、`iptables`的五表五链及流量走向                        五、iptables commands                        六、filter表                                    6.1、usage尝鲜 filter表及规则                                    6.2、案例：filter的流量过滤                        七、`iptables`的匹配规则                        八、两个小实验                                   8.1、实验一：理解流量走向                             8.2、实验二：特殊的`-j LOG`                                    8.3、实验总结                        九、`iptables`中的模块                        十、nat表                                    10.1、案例：使用`nat表`完成`SNAT`                                    10.2、案例：通过`nat表`完成`DNAT`                         十一、相关配置文件                        十二、串联 `iptables`、`路由表`                        十三、参考资料
+# 一、iptables是什么？你为啥要学？
 
 Linux的网络控制模块在内核中，叫做`netfilter`。而`iptables`是位于用户空间的一个命令行工具，它作用在`OIS7层网络模型`中的第四层，用来和内核的`netfilter`交互，配置`netfilter`进而实现对网络的控制、流量的转发 。
 
 > 毫不夸张的说，整个linux系统的网络安全就是基于netfilter构建起来的。
 
 如果你想搞懂docker或者是k8s的网络调度模型，或者是去你自己的机器上查看一下他们自动生成的转发规则，那么肯定要需要对iptables有一定的认知，不然学了半天docker或者是k8s真的是只会停留在使用的这个层面上。
-
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 有人可能会说，哎？现在k8s不是已经不把docker看作是亲儿子了吗？然后流量的调度转发规则也更倾向于用LVS了，巴拉巴拉一大堆。嗯，有道理......   那，你敢不学iptables吗？Hhh.....
 
@@ -26,9 +19,7 @@ Linux的网络控制模块在内核中，叫做`netfilter`。而`iptables`是位
 
 全文较长、建议收藏
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-### 二、iptables、防火墙之间有啥关系？
+# 二、iptables、防火墙之间有啥关系？
 
 Iptables is an extremely flexible firewall utility built for Linux operating systems.
 
@@ -36,9 +27,7 @@ Whether you’re a novice Linux geek or a system administrator, there’s probab
 
 简单的说就是：iptables 是一个简单、灵活、实用的命令行工具，可以用来配置、控制 linux 防火墙。
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-### 三、iptables安装
+# 三、iptables安装
 
 安装、启动、查看、开启启动
 
@@ -46,7 +35,7 @@ Whether you’re a novice Linux geek or a system administrator, there’s probab
  ~]# yum install -y iptables-services ~]# yum start|restart|reload|stop|status iptables
 ```
 
-### 四、iptables的五表五链及流量走向
+# 四、iptables的五表五链及流量走向
 
 iptables中总共有4张表还有5条链，我们可以在链上加不同的规则。
 
@@ -55,8 +44,8 @@ iptables中总共有4张表还有5条链，我们可以在链上加不同的规�
 五条链：prerouting、input、output、forward、postrouting
 
 你可以通过`iptables -t ${表名} -nL`查看表上的链
-!\[\[Pasted image 20240918114016.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240918114016.png]]
+
 
 整理一下就得到了如下脑图：
 !\[\[Pasted image 20240918114045.png\]\]

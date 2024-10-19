@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
+                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
+                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
+                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md"
+                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md"
               }
             }
           }
@@ -148,6 +148,13 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/network/a_n_深入理解 Linux socket.md",
+    "zx99-image/Pasted image 20241019131130.png",
+    "zx99-image/Pasted image 20241019132017.png",
+    "zx99-image/Pasted image 20241019131936.png",
+    "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
+    "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
+    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
     "coding/os/linux/init/i_linux 启动es init heap not equal.md",
     "coding/os/linux/init/d_systemd：为何要创建一个新的init系统软件.md",
     "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
@@ -171,19 +178,11 @@
     "zx99-image/Pasted image 20241018190400.png",
     "zx99-image/Pasted image 20241018190344.png",
     "zx99-image/Pasted image 20241018190326.png",
-    "zx99-image/Pasted image 20241018190311.png",
-    "zx99-image/Pasted image 20241018190147.png",
-    "zx99-image/Pasted image 20241018190131.png",
     "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
     "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
     "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
     "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
     "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
-    "coding/os/linux/memory/cache/b_深入理解CPU缓存：性能优化的关键.md",
-    "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
-    "coding/os/linux/memory/cache/a_t_cache的58问，您能回答上来几个？.md",
-    "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
-    "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
