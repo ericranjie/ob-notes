@@ -1,7 +1,5 @@
 
-原创 Chaobowx 软硬件融合
-
-_2024年06月04日 21:00_
+原创 Chaobowx 软硬件融合 _2024年06月04日 21:00_
 
 编者按
 
@@ -17,7 +15,7 @@ _2024年06月04日 21:00_
 
 ## **1.1 网络性能参数**
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/ezFXiawTIBGfvMibKPhVxgzvpibgicWIulGIXUCCia9biag2QEd6RTAKiagpOExnZxicE4v3pY9Up0J2ukaEefibKNAjYfQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241019191628.png]]
 
 网络性能主要关心三个参数，带宽、吞吐量和延迟：
 
