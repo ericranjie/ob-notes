@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
+                "file": "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
+                "file": "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
+                "file": "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md"
+                "file": "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md"
               }
             }
           }
@@ -146,44 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "zx99-image/Pasted image 20241019174452.png",
-    "coding/os/linux/network/p_n_通过实验深入了解 TCP 连接的建立和关闭.md",
-    "zx99-image/Pasted image 20241019174217.png",
+    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
+    "zx99-image/Pasted image 20241019190050.png",
+    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(11)_BLE安全机制之SM.md",
+    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(10)_BLE安全机制之LE Encryption.md",
+    "zx99-image/Pasted image 20241019190737.png",
+    "zx99-image/Pasted image 20241019190721.png",
     "coding/os/linux/filesystem/k_n_Linux文件系统十问.md",
+    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
+    "coding/os/linux/filesystem/i_t_文件缓存回写简述.md",
+    "coding/os/linux/filesystem/i_Linux加密文件系统eCryptfs介绍.md",
+    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
+    "zx99-image/Pasted image 20241019185619.png",
+    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
+    "coding/os/linux/network/i_最后一天，继续卷！.md",
+    "zx99-image/Pasted image 20241019185706.png",
+    "zx99-image/Pasted image 20241019185644.png",
+    "coding/os/linux/network/i_比 netstat 好用？Linux 网络状态工具 ss 详解.md",
+    "coding/os/linux/network/i_聊聊 Cookie、Session、Token 背后的故事.md",
+    "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
+    "coding/os/linux/network/k_n_Linux 虚拟网络设备之 bridge.md",
+    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
+    "coding/os/linux/network/n_深入理解CNI（容器网络接口）.md",
+    "coding/os/linux/network/p_n_通过实验深入了解 TCP 连接的建立和关闭.md",
+    "coding/os/linux/network/t_linux loop device 机制介绍.md",
+    "zx99-image/Pasted image 20241019174452.png",
+    "zx99-image/Pasted image 20241019174217.png",
     "zx99-image/Pasted image 20241019174325.png",
     "zx99-image/Pasted image 20241019174300.png",
-    "zx99-image/Pasted image 20241019174251.png",
-    "zx99-image/Pasted image 20241019174231.png",
-    "coding/os/linux/filesystem/i_Linux加密文件系统eCryptfs介绍.md",
     "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
-    "zx99-image/Pasted image 20241019173136.png",
-    "zx99-image/Pasted image 20241019173411.png",
-    "zx99-image/Pasted image 20241019173359.png",
-    "zx99-image/Pasted image 20241019173351.png",
-    "zx99-image/Pasted image 20241019173343.png",
     "coding/os/linux/filesystem/k_F2FS技术拆解.md",
-    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
     "auxiliary/science/math-x-quote.md",
     "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
     "coding/os/linux/network/a_n_深入理解 Linux socket.md",
     "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
-    "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
     "coding/os/linux/init/i_linux 启动es init heap not equal.md",
-    "coding/os/linux/init/d_systemd：为何要创建一个新的init系统软件.md",
-    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
-    "README.md",
-    "code-griding-note.md",
-    "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
-    "coding/os/linux/memory/C&DMA/i_Linux DMA Engine framework(1)_概述.md",
-    "coding/os/linux/memory/C&DMA/k_应读者要求讲讲 DMA.md",
-    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
-    "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
-    "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
-    "interview/k_n_求职必备！！面试题答案合集 已付费.md",
-    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

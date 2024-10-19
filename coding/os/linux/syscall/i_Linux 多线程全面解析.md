@@ -19,7 +19,7 @@
 
 在Linux中线程编程符合Posix.1标准，称为Pthreads。所有的pthread函数都以pthread_开头。在调用它们前均要包括pthread.h头文件，一个函数库libpthread实现。
 
-## 1.线程基础介绍：
+# 1.线程基础介绍：
 
 - 数据结构：
 

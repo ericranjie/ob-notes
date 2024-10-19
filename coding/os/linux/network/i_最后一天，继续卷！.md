@@ -1,5 +1,5 @@
-原创 小林coding 小林coding
-_2021年12月31日 17:23_
+
+原创 小林coding 小林coding _2021年12月31日 17:23_
 
 大家好，我是小林。
 
@@ -7,7 +7,7 @@ _2021年12月31日 17:23_
 
 早上有个读者问了我图解网络 PDF 里的问题：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZeTv8Rdia3CXDjIiahGsYyFe4Q8ib2vrrUYsRz47gia03MiaB5p0SowLqCso4XUd1UVT5VMx0cAK59d3xA/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241019185619.png]]
 
 就是他不明白「**为什么 TCP 三次握手期间，为什么客户端和服务端的初始化序列号要求不一样的呢？**」
 
@@ -17,7 +17,7 @@ _2021年12月31日 17:23_
 
 我是一步一步把他讲明白的，我觉得应该有不少人会有类似的问题，所以今天在肝一篇！
 
-### 正文
+# 正文
 
 > 为什么 TCP 三次握手期间，为什么客户端和服务端的初始化序列号要求不一样的呢？
 
@@ -31,7 +31,7 @@ _2021年12月31日 17:23_
 
 假设每次建立连接，客户端和服务端的初始化序列号都是从 0 开始：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZeTv8Rdia3CXDjIiahGsYyFe40zNET3UtTTGUkftr5dBaud5liaiaXkulTAYA2e0lfjNVk8M99vg3UItA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241019185644.png]]
 
 过程如下：
 
@@ -51,7 +51,7 @@ _2021年12月31日 17:23_
 
 如果每次建立连接客户端和服务端的初始化序列号都「不一样」，就有大概率因为历史报文的序列号「不在」对方接收窗口，从而很大程度上避免了历史报文，比如下图：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/J0g14CUwaZeTv8Rdia3CXDjIiahGsYyFe4gxib4HrGn6MOXqjvcoaBmEq9B9BQlxVaqP5HquZN9rQrJR6E2tyy9Cg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241019185706.png]]
 
 相反，如果每次建立连接客户端和服务端的初始化序列号都「一样」，就有大概率遇到历史报文的序列号刚「好在」对方的接收窗口内，从而导致历史报文被新连接成功接收。
 
@@ -78,10 +78,7 @@ RFC793 提到初始化序列号 ISN 随机生成算法：ISN = M + F(localhost, 
 - **初始序列号**，在 TCP 建立连接的时候，客户端和服务端都会各自生成一个初始序列号，它是基于时钟生成的一个随机数，来保证每个连接都拥有不同的初始序列号。**初始化序列号可被视为一个 32 位的计数器，该计数器的数值每 4 微秒加 1，循环一次需要 4.55 小时**。
 
 给大家抓了一个包，下图中的 Seq 就是序列号，其中红色框住的分别是客户端和服务端各自生成的初始序列号。
-!\[\[Pasted image 20240919095426.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "图片")
-
-图片
+![[Pasted image 20240919095426.png]]
 
 通过前面我们知道，**序列号和初始化序列号并不是无限递增的，会发生回绕为初始值的情况，这意味着无法根据序列号来判断新老数据**。
 
@@ -90,8 +87,7 @@ RFC793 提到初始化序列号 ISN 随机生成算法：ISN = M + F(localhost, 
 为了解决这个问题，就需要有 TCP 时间戳。tcp_timestamps 参数是默认开启的，开启了 tcp_timestamps 参数，TCP 头部就会使用时间戳选项，它有两个好处，**一个是便于精确计算 RTT ，另一个是能防止序列号回绕（PAWS）**。
 
 试看下面的示例，假设 TCP 的发送窗口是 1 GB，并且使用了时间戳选项，发送方会为每个 TCP 报文分配时间戳数值，我们假设每个报文时间加 1，然后使用这个连接传输一个 6GB 大小的数据流。
-!\[\[Pasted image 20240919095434.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "图片")
+![[Pasted image 20240919095434.png]]
 
 32 位的序列号在时刻 D 和 E 之间回绕。假设在时刻B有一个报文丢失并被重传，又假设这个报文段在网络上绕了远路并在时刻 F 重新出现。如果 TCP 无法识别这个绕回的报文，那么数据完整性就会遭到破坏。
 

@@ -5,8 +5,7 @@ Linux阅码场 _2022年01月27日 08:02_
 
 https://github.com/davidsajare/david-share.git
 
-
-\*\*Statement:
+**Statement:
 
 **This views and opinions expressed in this account are those of my own and do not represent those of my employer, NVIDIA.**
 

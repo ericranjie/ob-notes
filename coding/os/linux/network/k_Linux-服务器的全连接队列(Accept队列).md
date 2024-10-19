@@ -170,7 +170,7 @@ Send-Q：当前全连接最大队列长度(从0开始计数)，上面服务器�
 
 END
 
-![](http://mmbiz.qpic.cn/mmbiz_png/EjWxxIM2EQI0YHzCpIYYwO0iaqh08EGCibYEjLqIqYm2CXPzmicQTkxqF453q1d9RcSicSLGjjCNyBsjDXdx8oDhcA/300?wx_fmt=png&wxfrom=19)
+---
 
 **技术简说**
 

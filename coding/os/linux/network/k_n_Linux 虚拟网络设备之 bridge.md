@@ -5,7 +5,7 @@ Linux爱好者 _2021年09月19日 11:50_
 
 本文将通过实际的例子来一步一步解释bridge是如何工作的。
 
-## 什么是bridge？
+# 什么是bridge？
 
 首先，bridge是一个虚拟网络设备，所以具有网络设备的特征，可以配置IP、MAC地址等；其次，bridge是一个虚拟交换机，和物理交换机有类似的功能。
 
@@ -74,13 +74,14 @@ dev@debian:~$ ping -c 1 -I veth0 192.168.3.102PING 192.168.2.1 (192.168.
 
 为什么veth0加入了bridge之后，就ping不通veth2了呢？先抓包看看：
 
-```
-#由于veth0的arp缓存里面没有veth1的mac地址，所以ping之前先发arp请求#从veth1上抓包来看，veth1收到了arp请求，并且返回了应答dev@debian:~$ sudo tcpdump -n -i veth1tcpdump: verbose output suppressed, use -v or -vv for full protocol decodelistening on veth1, link-type EN10MB (Ethernet), capture size 262144 bytes21:43:48.353509 ARP, Request who-has 192.168.3.102 tell 192.168.3.101, length 2821:43:48.353518 ARP, Reply 192.168.3.102 is-at 26:58:a2:57:37:e9, length 28#从veth0上抓包来看，数据包也发出去了，并且也收到了返回dev@debian:~$ sudo tcpdump -n -i veth0tcpdump: verbose output suppressed, use -v or -vv for full protocol decodelistening on veth0, link-type EN10MB (Ethernet), capture size 262144 bytes21:44:09.775392 ARP, Request who-has 192.168.3.102 tell 192.168.3.101, length 2821:44:09.775400 ARP, Reply 192.168.3.102 is-at 26:58:a2:57:37:e9, length 28#再看br0上的数据包，发现只有应答dev@debian:~$ sudo tcpdump -n -i br0tcpdump: verbose output suppressed, use -v or -vv for full protocol decodelistening on br0, link-type EN10MB (Ethernet), capture size 262144 bytes21:45:48.225459 ARP, Reply 192.168.3.102 is-at 26:58:a2:57:37:e9, length 28
+```c
+#由于veth0的arp缓存里面没有veth1的mac地址，所以ping之前先发arp请求#从veth1上抓包来看，veth1收到了arp请求，并且返回了应答
+dev@debian:~$ sudo tcpdump -n -i veth1tcpdump: verbose output suppressed, use -v or -vv for full protocol decodelistening on veth1, link-type EN10MB (Ethernet), capture size 262144 bytes21:43:48.353509 ARP, Request who-has 192.168.3.102 tell 192.168.3.101, length 2821:43:48.353518 ARP, Reply 192.168.3.102 is-at 26:58:a2:57:37:e9, length 28#从veth0上抓包来看，数据包也发出去了，并且也收到了返回dev@debian:~$ sudo tcpdump -n -i veth0tcpdump: verbose output suppressed, use -v or -vv for full protocol decodelistening on veth0, link-type EN10MB (Ethernet), capture size 262144 bytes21:44:09.775392 ARP, Request who-has 192.168.3.102 tell 192.168.3.101, length 2821:44:09.775400 ARP, Reply 192.168.3.102 is-at 26:58:a2:57:37:e9, length 28#再看br0上的数据包，发现只有应答dev@debian:~$ sudo tcpdump -n -i br0tcpdump: verbose output suppressed, use -v or -vv for full protocol decodelistening on br0, link-type EN10MB (Ethernet), capture size 262144 bytes21:45:48.225459 ARP, Reply 192.168.3.102 is-at 26:58:a2:57:37:e9, length 28
 ```
 
 从上面的抓包可以看出，去和回来的流程都没有问题，问题就出在veth0收到应答包后没有给协议栈，而是给了br0，于是协议栈得不到veth1的mac地址，从而通信失败。
 
-## 给bridge配上IP
+# 给bridge配上IP
 
 通过上面的分析可以看出，给veth0配置IP没有意义，因为就算协议栈传数据包给veth0，应答包也回不来。这里我们就将veth0的IP让给bridge。
 

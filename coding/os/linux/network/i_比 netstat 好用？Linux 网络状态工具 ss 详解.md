@@ -1,5 +1,6 @@
-Linux云计算网络
-_2022年01月17日 08:13_
+
+Linux云计算网络 _2022年01月17日 08:13_
+
 原文链接：www.ttlsa.com/linux-command/ss-replace-netstat/
 
 ss命令用于显示socket状态。他可以显示 PACKET sockets，TCP sockets，UDP sockets，DCCP sockets，RAW sockets，Unix domain sockets等等统计。它比其他工具展示等多tcp和state信息。

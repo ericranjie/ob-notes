@@ -1,10 +1,11 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-3-28 11:52 分类：[蓝牙](http://www.wowotech.net/sort/bluetooth)
 
-## 1. 前言
+# 1. 前言
 
 前面文章介绍了两种BLE的安全机制：白名单\[4\]和LL privacy\[3\]。说实话，在这危机四伏的年代，这两种“捂着脸讲话（其它人不知道是谁在讲话，因而不能插话、不能假传圣旨，但讲话的内容却听得一清二楚）”的方法，实在是小儿科。对于物联网的应用场景来说，要做到安全，就必须对传输的数据进行加密，这就是LE Encryption要完成的事情（当然，只针对面向连接的数据），具体请参考本文的介绍。
 
-## 2. 基本概念
+# 2. 基本概念
 
 从字面理解，Encryption是一个名词，意思是“加密术”，因此LE Encryption就是“BLE所使用的加密技术”的意思。了解加密概念的同学应该都知道，通信过程中的加密无非就是如下简单的流程：
 
@@ -20,11 +21,11 @@
 
 对问题1来说，很好回答：无论是从安全的角度，还是从通信效率的角度，都应该由链路层（LL，Link Layer\[1\]）在发送/接收数据的时候，完成加密/解密动作（具体可参考）。而问题2呢，到底要使用什么的算法，这是蓝牙标准化组织的事情，我们在本文只需要了解最终的结论即可（具体可参考）。
 
-## 3. packet的加密/解密过程
+# 3. packet的加密/解密过程
 
 LE加密/解密的过程如下面图片1所示：
 
-[![LE加密解密](http://www.wowotech.net/content/uploadfile/201703/e7b0bba362d92ccda866ce74cffcada720170328035225.gif "LE加密解密")](http://www.wowotech.net/content/uploadfile/201703/fb35af6a4e96b398c26682018083d25a20170328035225.gif)
+![[Pasted image 20241019190721.png]]
 
 图片1 LE加密/解密过程
 
@@ -46,11 +47,11 @@ LE加密/解密的过程如下面图片1所示：
 
 对于问题1，需要由SMP解答（也就是我们常说的配对过程），具体可参考后续的文章。问题3比较单纯，就是一个由Bluetooth specifiction所规定的加密算法，后面会单独写一篇文章介绍。而问题2，则涉及到LE Encryption的操作流程，具体可参考后面第4章的介绍。
 
-## 4. Encryption Procedure
+# 4. Encryption Procedure
 
 LE Encryption的过程主要由Link Layer控制（具体可参考“BLUETOOTH SPECIFICATION Version 4.2 \[Vol 6, Part B\] 5.1.3 Encryption Procedure”）：当连接建立之后，Link Layer可以应Host的请求，使能对数据包的Encryption操作，过程如下（具体可参考“BLUETOOTH SPECIFICATION Version 4.2 \[Vol 6, Part D\]  6.6 START ENCRYPTION”）：
 
-[![LE encryption](http://www.wowotech.net/content/uploadfile/201703/0a35e18ba0960f0f8e6468123668b5ab20170328035226.gif "LE encryption")](http://www.wowotech.net/content/uploadfile/201703/77a80593c0ea43f0ed5d3ee944b0365320170328035226.gif)
+![[Pasted image 20241019190737.png]]
 
 图片2 Start Encryption
 

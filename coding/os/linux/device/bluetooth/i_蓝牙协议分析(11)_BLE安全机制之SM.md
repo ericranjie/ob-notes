@@ -1,6 +1,7 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-9-7 19:49 分类：[蓝牙](http://www.wowotech.net/sort/bluetooth)
 
-## 1. 前言
+# 1. 前言
 
 注1：此SM是Security Manager的缩写，非彼SM，大家不要理解歪了！
 

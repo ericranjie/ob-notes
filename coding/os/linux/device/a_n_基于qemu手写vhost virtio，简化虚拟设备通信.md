@@ -1,24 +1,13 @@
-原创 往事敬秋风 深度Linux
 
-_2024年03月29日 21:01_ _湖南_
+原创 往事敬秋风 深度Linux _2024年03月29日 21:01_ _湖南_
 
 Vhost / virtio是一种半虚拟化的设备抽象接口规范，已广泛应用于QEMU \*和基于内核的虚拟机（KVM）。当它在来宾操作系统中用作前端驱动程序时，通常称为virtio；当在主机中用作后端驱动程序时，则称为vhost。与在主机上进行纯软件输入/输出（I / O）仿真相比，virtio可以实现更好的性能，并广泛用于数据中心。Linux \*内核提供了相应的设备驱动程序，分别是virtio-net和vhost-net。
-
-![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
-
-**深度Linux**
-
-拥有15年项目开发经验及丰富教学经验，曾就职国内知名企业项目经理，部门负责人等职务。研究领域：Windows&Linux平台C/C++后端开发、Linux系统内核等技术。
-
-181篇原创内容
-
-公众号
 
 virtio 是对半虚拟化 hypervisor 中的一组通用模拟设备的抽象。该设置还允许 hypervisor 导出一组通用的模拟设备，并通过一个通用的应用编程接口（API）让它们变得可用。有了半虚拟化 hypervisor 之后，来宾操作系统能够实现一组通用的接口，在一组后端驱动程序之后采用特定的设备模拟。后端驱动程序不需要是通用的，因为它们只实现前端所需的行为。\[1\]
 
 除了前端驱动程序（在来宾操作系统中实现）和后端驱动程序（在 hypervisor 中实现）之外，virtio 还定义了两个层来支持来宾操作系统到 hypervisor 的通信。在顶级（称为 virtio）的是虚拟队列接口，它在概念上将前 端驱动程序附加到后端驱动程序。驱动程序可以使用 0 个或多个队列，具体数量取决于需求。例如，virtio 网络驱动程序使用两个虚拟队列（一个用于接收，另一个用于发送），而 virtio 块驱动程序仅使用一个虚拟队列。虚拟队列实际上被实现为跨越来宾操作系统和 hypervisor 的衔接点。但这可以通过任意方式实现，前提是来宾操作系统和 hypervisor 以相同的方式实现它。
 
-## 一、QEMU后端驱动
+# 一、QEMU后端驱动
 
 VIRTIO设备的前端是GUEST的内核驱动，后端由QEMU或者DPU实现。不论是原来的QEMU-VIRTIO框架还是现在的DPU，VIRTIO的控制面和数据面都是相对独立的设计。本文主要针对QEMU的VIRTIO后端进行分析。
 
@@ -30,11 +19,11 @@ QEMU负责设备控制面的实现，而数据面由VHOST框架接管。VHOST又
 
 QEMU设备管理是非常重要的部分，后来引入了专门的设备树管理机制。而其参照了C++的类、继承的一些概念，但又不是完全一致，对于非科班出身的作者阅读起来有些吃力。因为框架相关的代码中时常使用内部数据指针cast的一些宏定义，非常影响可读性。
 
-### 1.1VIRTIO设备创建流程
+## 1.1 VIRTIO设备创建流程
 
 从实际的命令行示例入手，查看设备是如何创建的。
 
-(1)virtio-net-pci设备命令行
+(1) virtio-net-pci设备命令行
 
 首先从QEMU的命令行入手，创建一个使用virtio设备的虚拟机，可使用如下命令行：
 
@@ -60,7 +49,7 @@ gdb --args ./x86_64-softmmu/qemu-system-x86_64 \    -machine accel=kvm -cpu host
 -chardev socket,id=char1,path=/tmp/vhostsock0,server
 ```
 
-(2)命令行解析处理
+(2) 命令行解析处理
 
 QEMU的命令行解析在main函数进行，解析后按照qemu标准格式存储到本地。然后通过qemu_find_opts(“”)接口可以获取本地结构体中具有相应关键字的所有命令列表，对解析后的命令列表使用qemu_opts_foreach依次执行处理函数。
 
@@ -90,7 +79,7 @@ device后跟的第一个参数qemu称为driver，其实就是根据不同的设�
 Breakpoint 2, virtio_net_pci_instance_init (obj=0x5555575b8740) at hw/virtio/virtio-pci.c:33643364    {(gdb) bt#0  0x0000555555ab0c10 in virtio_net_pci_instance_init (obj=0x5555575b8740) at hw/virtio/virtio-pci.c:3364#1  0x0000555555b270bf in object_initialize_with_type (data=data@entry=0x5555575b8740, size=<optimized out>, type=type@entry=0x5555563c3070) at qom/object.c:384#2  0x0000555555b271e1 in object_new_with_type (type=0x5555563c3070) at qom/object.c:546#3  0x0000555555b27385 in object_new (typename=typename@entry=0x5555563d2310 "virtio-net-pci") at qom/object.c:556#4  0x000055555593b5c5 in qdev_device_add (opts=0x5555563d22a0, errp=errp@entry=0x7fffffffddd0) at qdev-monitor.c:625#5  0x000055555593db17 in device_init_func (opaque=<optimized out>, opts=<optimized out>, errp=<optimized out>) at vl.c:2289#6  0x0000555555c1ab6a in qemu_opts_foreach (list=<optimized out>, func=func@entry=0x55555593daf0 <device_init_func>, opaque=opaque@entry=0x0, errp=errp@entry=0x0) at util/qemu-option.c:1106#7  0x00005555557d85d6 in main (argc=<optimized out>, argv=<optimized out>, envp=<optimized out>) at vl.c:4593
 ```
 
-(3)设备实例初始化
+(3) 设备实例初始化
 
 在qdev_device_add函数中，首先会调用object_new，创建object（object是所有instance实例的根结构），最终是通过调用每个virtio-pci-net相应DeviceClass里的instance_init创建实例。
 
@@ -104,7 +93,7 @@ VirtioNetPci结构体中包含其父类的实例VirtIOPCIProxy，其拥有的设
 struct VirtIONetPCI {    VirtIOPCIProxy parent_obj;  //virtio-pci类<----继承pci-device<----继承device    VirtIONet vdev;    //virtio-net<----继承virtio-device<----继承device};
 ```
 
-(4)virtio-net-pci设备realize流程
+(4) virtio-net-pci设备realize流程
 
 qdev_device_add接口中，还会调用realize接口，前面的instance_init只是实例的简单初始化，真实的设备相关的具体初始化动作都是从设备realize之后进行的。也就是相应class的realize接口。
 
