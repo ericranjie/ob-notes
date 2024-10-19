@@ -1,10 +1,11 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-5-18 21:56 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
-## 1. 前言
+# 1. 前言
 
 本文将从provider的角度，介绍怎样在linux kernel dmaengine的框架下，编写dma controller驱动。
 
-## 2. dma controller驱动的软件框架
+# 2. dma controller驱动的软件框架
 
 设备驱动的本质是描述并抽象硬件，然后为consumer提供操作硬件的友好接口。dma controller驱动也不例外，它要做的事情无外乎是：
 
@@ -69,9 +70,28 @@
 
 struct dma_chan用于抽象dma channel，其内容为：
 
-|   |
-|---|
-|struct dma_chan {  <br>        struct dma_device *device;  <br>        dma_cookie_t cookie;  <br>        dma_cookie_t completed_cookie;<br><br>        /* sysfs \*/  <br>        int chan_id;  <br>        struct dma_chan_dev \*dev;<br><br>        struct list_head device_node;  <br>        struct dma_chan_percpu \_\_percpu *local;  <br>        int client_count;  <br>        int table_count;<br><br>        /* DMA router \*/  <br>        struct dma_router \*router;  <br>        void \*route_data;<br><br>        void \*private;  <br>};|
+```cpp
+struct dma_chan {  
+        struct dma_device *device;  
+        dma_cookie_t cookie;  
+        dma_cookie_t completed_cookie;
+
+        /* sysfs \*/  
+        int chan_id;  
+        struct dma_chan_dev \*dev;
+
+        struct list_head device_node;  
+        struct dma_chan_percpu \_\_percpu *local;  
+        int client_count;  
+        int table_count;
+
+        /* DMA router \*/  
+        struct dma_router \*router;  
+        void \*route_data;
+
+        void \*private;  
+};
+```
 
 需要dma controller driver关心的字段包括：
 

@@ -234,8 +234,7 @@ SM通过[宏定义](https://zhida.zhihu.com/search?q=%E5%AE%8F%E5%AE%9A%E4%B9%89
 
 对如上结构体，使用pahole分析出具体的内存布局：
 
-!\[\[Pasted image 20240913120351.png\]\]
-!\[\](data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='1576' height='640'></svg>)
+![[Pasted image 20240913120351.png]]
 
 - 结构体内部按照操作系统位数对齐，32bit系统按照4Byte对齐，64bit系统按照8Byte对齐
 - 最右边的注释表示数据的起始位置，和占用的数据大小，比如第一个成员int a，在结构体偏移为0的地方开始，占用了4Byte

@@ -1,5 +1,5 @@
-原创 程序喵大人 程序喵大人
-_2022年04月26日 10:26_
+
+原创 程序喵大人 程序喵大人 _2022年04月26日 10:26_
 
 # 前言
 
@@ -23,11 +23,11 @@ volatile有一点一定要注意，它和多线程一点关系都没有，它的
 
 不对变量加volatile，编译器会对变量做一些优化：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JeibBY5FJRBGraDdbA07L3HKZMKzlAfv2sFicGxZylaCnXtGCaQTtFgg14u5kwf88C49ZorH85Bq7sDVYTEKiaO0A/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241019112746.png]]
 
 而加了volatile修饰，生成的汇编是这样：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/JeibBY5FJRBGraDdbA07L3HKZMKzlAfv2U7v1zHU2PfU9zjf492QZ82r1EK7QAzjW0gic5ChZ9T4jehzCXqiaXFNg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241019112754.png]]
 
 C++的volatile一般只会用在与硬件通信，平时我们编程几乎用不到。
 

@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-3-17 18:27 分类：[Linux应用技巧](http://www.wowotech.net/sort/linux_application)
 
@@ -33,7 +17,7 @@ This blog story is long, so even though I can only recommend reading the long st
 
 代码在这里：[https://github.com/systemd/systemd](https://github.com/systemd/systemd "https://github.com/systemd/systemd")。下面是关于这个新init系统软件的故事。
 
-**Process Identifier 1**
+# **Process Identifier 1**
 
 On every Unix system there is one process with the special process identifier 1. It is started by the kernel before all other processes and is the parent process for all those other processes that have nobody else to be child of. Due to that it can do a lot of stuff that other processes cannot do. And it is also responsible for some things that other processes are not responsible for, such as bringing up and maintaining userspace during boot.
 
@@ -50,7 +34,7 @@ What does that mean? Starting less means starting fewer services or deferring th
 
 Starting more in parallel means that if we have to run something, we should not serialize its start-up (as sysvinit does), but run it all at the same time, so that the available CPU and disk IO bandwidth is maxed out, and hence the overall start-up time minimized.
 
-**PID等于1的那个进程是什么呢？**
+# **PID等于1的那个进程是什么呢？**
 
 在每一个Unix的系统上都有一个PID等于1的特殊进程，它是由内核启动的第一个用户空间进程，是在所有其他用户空间进程启动之前就存在了，如果系统中的用户进程找不到其父进程（例如父进程退出），那么这个PID等义1的进程会收养该进程，成为该进程的父进程。正因为如此，这个PID等于1的进程很特殊，能够做一些其他普通进程不能完成的杂七杂八的事情，也承担了一些其它进程无法负担的任务，例如在系统启动过程中负责将用户空间的进程一个个的启动起来并且对其进行维护。
 
@@ -66,19 +50,19 @@ Starting more in parallel means that if we have to run something, we should not 
 
 让更多的进程并行化启动是什么意思呢？就是说，如果我们必须要启动一些进程，那么我们尽量不要一个一个串行化启动进程（sysVinit就是这么做的），而是同时启动它们，这样CPU和DISK IO可以发挥它们最大的带宽，从而减少启动时间。
 
-**Hardware and Software Change Dynamically**
+# **Hardware and Software Change Dynamically**
 
 Modern systems (especially general purpose OS) are highly dynamic in their configuration and use: they are mobile, different applications are started and stopped, different hardware added and removed again. An init system that is responsible for maintaining services needs to listen to hardware and software changes. It needs to dynamically start (and sometimes stop) services as they are needed to run a program or enable some hardware.
 
 Most current systems that try to parallelize boot-up still synchronize the start-up of the various daemons involved: since Avahi needs D-Bus, D-Bus is started first, and only when D-Bus signals that it is ready, Avahi is started too. Similar for other services: livirtd and X11 need HAL (well, I am considering the Fedora 13 services here, ignore that HAL is obsolete), hence HAL is started first, before livirtd and X11 are started. And libvirtd also needs Avahi, so it waits for Avahi too. And all of them require syslog, so they all wait until Syslog is fully started up and initialized. And so on.
 
-**动态变化的软件和硬件**
+# **动态变化的软件和硬件**
 
 现代操作系统（特别是通用操作系统）要面对不断动态变化的配置和应用场景：软件和硬件模块都是变化的，不同的应用程序被启动，被停止，不同的硬件去去又来。负责维护各种service状态的init系统软件必要要监听各种硬件和软件的变化，并且根据这些变化启动（或者停止）某些service，而这些service又会执行某些程序或者enable某些硬件。
 
 对于那些想要并行化启动的操作系统，它们的init系统软件需要对启动过程所设计的各种daemon进行进行同步：由于Avahi需要D-Bus，因此D-Bus daemon需要首先启动，只有在收到D-Bus的ready信号之后，Avahi进程再被启动起来。其他的各种服务进程也类似：livirtd和X11需要HAL（好吧，其实HAL服务已经过时了，现在被udev取代了，不过这里只是举例，就当我们回到了古老的Fedora 13好了），因此HAL服务进程先于livirtd和X11启动，通话四livirtd也需要Avahi服务，因此它也会等待Avahi服务。这些所有的服务进程都需要syslog，这些进程都要等待syslog服务完全ready之后才开始进行初始化过程，其他的过程也大概类似如此。
 
-**Parallelizing Socket Services**
+# **Parallelizing Socket Services**
 
 This kind of start-up synchronization results in the serialization of a significant part of the boot process. Wouldn't it be great if we could get rid of the synchronization and serialization cost? Well, we can, actually. For that, we need to understand what exactly the daemons require from each other, and why their start-up is delayed. For traditional Unix daemons, there's one answer to it: they wait until the socket the other daemon offers its services on is ready for connections. Usually that is an AF_UNIX socket in the file-system, but it could be AF_INET\[6\], too. For example, clients of D-Bus wait that /var/run/dbus/system_bus_socket can be connected to, clients of syslog wait for /dev/log, clients of CUPS wait for /var/run/cups/cups.sock and NFS mounts wait for /var/run/rpcbind.sock and the portmapper IP port, and so on. And think about it, this is actually the only thing they wait for!
 

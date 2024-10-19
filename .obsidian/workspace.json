@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md"
+                "file": "coding/os/linux/filesystem/f_为什么会有文件系统(二).md"
               }
             }
           }
@@ -148,7 +148,25 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/init/i_linux 启动es init heap not equal.md",
+    "coding/os/linux/init/d_systemd：为何要创建一个新的init系统软件.md",
+    "coding/os/linux/memory/C&DMA/d_Dynamic DMA mapping Guide.md",
+    "README.md",
+    "code-griding-note.md",
+    "coding/os/linux/memory/C&DMA/b_如何提升CMA利用率？.md",
+    "coding/os/linux/memory/C&DMA/i_Linux DMA Engine framework(1)_概述.md",
+    "coding/os/linux/memory/C&DMA/k_应读者要求讲讲 DMA.md",
+    "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
+    "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
+    "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
+    "zx99-image/Pasted image 20241019112746.png",
+    "interview/k_n_求职必备！！面试题答案合集 已付费.md",
+    "zx99-image/Pasted image 20241019112754.png",
+    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
     "coding/os/linux/memory/a_s_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
+    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
+    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
+    "zx99-image/Pasted image 20241019092009.png",
     "zx99-image/Pasted image 20241018184357.png",
     "zx99-image/Pasted image 20241018190400.png",
     "zx99-image/Pasted image 20241018190344.png",
@@ -156,10 +174,6 @@
     "zx99-image/Pasted image 20241018190311.png",
     "zx99-image/Pasted image 20241018190147.png",
     "zx99-image/Pasted image 20241018190131.png",
-    "zx99-image/Pasted image 20241018190117.png",
-    "zx99-image/Pasted image 20241018190102.png",
-    "zx99-image/Pasted image 20241018190046.png",
-    "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
     "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
     "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
     "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
@@ -168,21 +182,8 @@
     "coding/os/linux/memory/cache/b_深入理解CPU缓存：性能优化的关键.md",
     "coding/os/linux/memory/cache/a_p_一个较复杂dcache问题.md",
     "coding/os/linux/memory/cache/a_t_cache的58问，您能回答上来几个？.md",
-    "code-griding-note.md",
     "interview/盘点近几年腾讯的精选面试题（c c++研发岗）.md",
     "interview/k_大疆嵌入式一面：Linux如何查找内存泄露和内存占用过大？.md",
-    "coding/os/linux/memory/cache/k_人人都应该知道的CPU缓存运行效率.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（下）.md",
-    "coding/os/linux/memory/cache/i_甄建勇：五分钟搞定Cache（上）.md",
-    "coding/os/linux/memory/cache/c_写一个使用perf分析cache的示例.md",
-    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
-    "coding/os/linux/memory/memory-init/d_内存初始化代码分析（三）：创建系统内存地址映射.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
-    "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
-    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
-    "coding/os/linux/network/i_向左向右 网络IO卸载.md",
-    "coding/os/linux/network/d_以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取.md",
-    "coding/os/linux/network/TCP/b_深入理解 Linux 的 TCP 三次握手.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

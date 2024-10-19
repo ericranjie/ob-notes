@@ -1,3 +1,4 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-3-30 22:01 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 ## 1. 前言

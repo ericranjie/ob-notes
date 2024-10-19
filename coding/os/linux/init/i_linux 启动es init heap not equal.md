@@ -1,10 +1,5 @@
-# 
-
-转载
 
 [mob6454cc73e9a6](https://blog.51cto.com/u_16099296)2024-09-08 09:02:57
-
-**_文章标签_[操作系统](https://blog.51cto.com/topic/caozuoxitong.html)[硬链接](https://blog.51cto.com/topic/yinglianjie.html)[文件系统](https://blog.51cto.com/topic/wenjianxitong.html)[软连接](https://blog.51cto.com/search/result?q=%E8%BD%AF%E8%BF%9E%E6%8E%A5)****_文章分类_[架构](https://blog.51cto.com/nav/architecture)[后端开发](https://blog.51cto.com/nav/program)****_阅读数_**7****
 
 我整理的一些关于【IT人转架构设计】的项目学习资料+视频（附讲解～～）和大家一起分享、学习一下：
 

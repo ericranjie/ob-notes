@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-7-20 19:23 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 一、前言
@@ -17,7 +18,8 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 从设备的角度来看，DMA控制器使用总线地址空间，不过可能仅限于总线空间的一个子集。例如：即便是一个系统支持64位地址内存和64 位地址的PCI bar，但是DMA可以不使用全部的64 bit地址，通过IOMMU的映射，PCI设备上的DMA可以只使用32位DMA地址。
 
 我们用下面这样的系统结构来说明各种地址的概念：
-!\[\[Pasted image 20241007190209.png\]\]
+
+![[Pasted image 20241007190209.png]]
 
 在PCI设备枚举（初始化）过程中，内核了解了所有的IO device及其对应的MMIO地址空间（MMIO是物理地址空间的子集），并且也了解了是PCI主桥设备将这些PCI device和系统连接在一起。PCI设备会有BAR（base address register），表示自己在PCI总线上的地址，CPU并不能通过总线地址A（位于BAR范围内）直接访问总线上的PCI设备，PCI host bridge会在MMIO（即物理地址）和总线地址之间进行mapping。因此，对于CPU，它实际上是可以通过B地址（位于MMIO地址空间）访问PCI设备（反正PCI host bridge会进行翻译）。地址B的信息保存在struct resource变量中，并可以通过/proc/iomem开放给用户空间。对于驱动程序，它往往是通过ioremap()把物理地址B映射成虚拟地址C，这时候，驱动程序就可以通过ioread32(C)来访问PCI总线上的地址A了。
 
@@ -81,31 +83,35 @@ I/O设备使用第三种地址：“总线地址”。如果设备在MMIO地址�
 
 一个可以寻址32 bit的设备，其初始化的示例代码如下：
 
-> if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32))) {\
-> dev_warn(dev, "mydev: No suitable DMA available\\n");\
-> goto ignore_this_device;\
-> }
+```cpp
+if (dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32))) {
+	dev_warn(dev, "mydev: No suitable DMA available\\n");
+	goto ignore_this_device;
+}
+```
 
 另一个常见的场景是有64位寻址能力的设备。一般来说我们会首先尝试设定64位的地址掩码，但是这时候有可能会失败，从而将掩码降低为32位。内核之所以会在设定64位掩码的时候失败，这并不是因为平台不能进行64位寻址，而仅仅是因为32位寻址比64位寻址效率更高。例如，SPARC64 平台上，PCI SAC寻址比DAC寻址性能更好。
 
 下面的代码描述了如何确定streaming类型DMA的地址掩码：
 
-> int using_dac;
->
-> if (!dma_set_mask(dev, DMA_BIT_MASK(64))) {\
-> using_dac = 1;\
-> } else if (!dma_set_mask(dev, DMA_BIT_MASK(32))) {\
-> using_dac = 0;\
-> } else {\
-> dev_warn(dev, "mydev: No suitable DMA available\\n");\
-> goto ignore_this_device;\
-> }
+```cpp
+int using_dac;
+
+if (!dma_set_mask(dev, DMA_BIT_MASK(64))) {
+	using_dac = 1;
+} else if (!dma_set_mask(dev, DMA_BIT_MASK(32))) {
+	using_dac = 0;
+} else {
+	dev_warn(dev, "mydev: No suitable DMA available\\n");
+	goto ignore_this_device;
+}
+```
 
 设定coherent 类型的DMA地址掩码也是类似的，不再赘述。需要说明的是：coherent地址掩码总是等于或者小于streaming地址掩码，因此，一般来说，我们只要设定了streaming地址掩码成功了，那么使用同样的掩码或者小一些的掩码来设定coherent地址掩码总是会成功，因此这时候我们一般就不检查dma_set_coherent_mask的返回值了，当然，有些设备很奇怪，只能使用coherent DMA，那么这种情况下，驱动需要检查dma_set_coherent_mask的返回值。
 
-五、两种类型的DMA mapping
+# 五、两种类型的DMA mapping
 
-1、一致性DMA映射（Consistent DMA mappings ）
+## 1、一致性DMA映射（Consistent DMA mappings ）
 
 Consistent DMA mapping有下面两种特点：
 
@@ -127,15 +133,17 @@ Consistent DMA mapping有下面两种特点：
 
 需要注意的是：一致性的DMA映射并不意味着不需要memory barrier这样的工具来保证memory order，CPU有可能为了性能而重排对consistent memory上内存访问指令。例如：如果在DMA consistent memory上有两个word，分别是word0和word1，对于device一侧，必须保证word0先更新，然后才有对word1的更新，那么你需要这样写代码：
 
-> desc->word0 = address;\
-> wmb();\
-> desc->word1 = DESC_VALID;
+```cpp
+desc->word0 = address;
+wmb();
+desc->word1 = DESC_VALID;
+```
 
 只有这样才能保证在所有的平台上，给设备驱动可以正常的工作。
 
 此外，在有些平台上，修改了DMA Consistent buffer后，你的驱动可能需要flush write buffer，以便让device侧感知到memory的变化。这个动作类似在PCI桥中的flush write buffer的动作。
 
-2、流式DMA映射（streaming DMA mapping）
+## 2、流式DMA映射（streaming DMA mapping）
 
 流式DMA映射是一次性的，一般是需要进行DMA传输的时候才进行mapping，一旦DMA传输完成，就立刻ummap（除非你使用dma_sync\_\*的接口，下面会描述）。并且硬件可以为顺序化访问进行优化。
 
@@ -151,15 +159,16 @@ Consistent DMA mapping有下面两种特点：
 
 无论哪种类型的DMA映射都有对齐的限制，这些限制来自底层的总线，当然也有可能是某些总线上的设备有这样的限制。此外，如果系统中的cache并不是DMA coherent的，而且底层的DMA buffer不合其他数据共享cacheline，这样的系统将工作的更好。
 
-六、如何使用coherent DMA mapping的接口？
+# 六、如何使用coherent DMA mapping的接口？
 
-1、分配并映射dma buffer
+## 1、分配并映射dma buffer
 
 为了分配并映射一个较大（page大小或者类似）的coherent DMA memory，你需要调用下面的接口：
 
-> dma_addr_t dma_handle;
->
-> cpu_addr = dma_alloc_coherent(dev, size, &dma_handle, gfp);
+```cpp
+dma_addr_t dma_handle;
+cpu_addr = dma_alloc_coherent(dev, size, &dma_handle, gfp);
+```
 
 DMA操作总是会涉及具体设备上的DMA controller，而dev参数就是执行该设备的struct device对象的。size参数指明了你想要分配的DMA Buffer的大小，byte为单位。dma_alloc_coherent这个接口也可以在中断上下文调用，当然，gfp参数要传递GFP_ATOMIC标记，gfp是内存分配的flag，dma_alloc_coherent仅仅是透传该flag到内存管理模块。
 
@@ -171,7 +180,7 @@ dma_alloc_coherent函数返回两个值，一个是从CPU角度访问DMA buffer�
 
 即便是请求的DMA buffer的大小小于PAGE SIZE，dma_alloc_coherent返回的cpu虚拟地址和DMA总线地址都保证对齐在最小的PAGE_SIZE上，这个特性确保了分配的DMA buffer有这样的特性：如果page size是64K，即便是驱动分配一个小于或者等于64K的dma buffer，那么DMA buffer不会越过64K的边界。
 
-2、umap并释放dma buffer
+## 2、umap并释放dma buffer
 
 当驱动需要umap并释放dma buffer的时候，需要调用下面的接口：
 
@@ -179,11 +188,11 @@ dma_alloc_coherent函数返回两个值，一个是从CPU角度访问DMA buffer�
 
 这个接口函数的dev、size参数上面已经描述过了，而cpu_addr和dma_handle这两个参数就是dma_alloc_coherent() 接口的那两个地址返回值。需要强调的一点就是：和dma_alloc_coherent不同，dma_free_coherent不能在中断上下文中调用。（因为在有些平台上，free DMA的操作会引发TLB维护的操作（从而引发cpu core之间的通信），如果关闭了IRQ会锁死在SMP IPI 的代码中）。
 
-3、dma pool
+## 3、dma pool
 
 如果你的驱动需非常多的小的dma buffer，那么dma pool是最适合你的机制。这个概念类似kmem_cache，\_\_get_free_pages往往获取的是连续的page frame，而kmem_cache是批发了一大批page frame，然后自己“零售”。dma pool就是通过dma_alloc_coherent接口获取大块一致性的DMA内存，然后驱动可以调用dma_pool_alloc从那个大块DMA内存中分一个小块的dma buffer供自己使用。具体接口描述就不说了，大家可以自行阅读。
 
-七、DMA操作方向
+# 七、DMA操作方向
 
 由于下面的章节会用到DMA操作方向这个概念，因此我们先简单的描述一下，DMA操作方向定义如下：
 
@@ -204,23 +213,25 @@ DMA_NONE主要是用于调试。在驱动知道精确的DMA方向之前，可以
 
 只有streaming mappings才会指明DMA操作方向，一致性DMA映射隐含的DMA操作方向是DMA_BIDIRECTIONAL。我们举一个streaming mappings的例子：在网卡驱动中，如果要发送数据，那么在map/umap的时候需要指明DMA_TO_DEVICE的操作方向，而在接受数据包的时候，map/umap需要指明DMA操作方向是DMA_FROM_DEVICE。
 
-八、如何使用streaming DMA mapping的接口？
+# 八、如何使用streaming DMA mapping的接口？
 
 streaming DMA mapping的接口函数可以在中断上下文中调用。streaming DMA mapping有两个版本的接口函数，一个是用来map/umap单个的dma buffer，另外一个是用来map/umap形成scatterlist的多个dma buffer。
 
-1、map/umap单个的dma buffer
+## 1、map/umap单个的dma buffer
 
 map单个的dma buffer的示例如下：
 
-> struct device \*dev = &my_dev->dev;\
-> dma_addr_t dma_handle;\
-> void \*addr = buffer->ptr;\
-> size_t size = buffer->len;
->
-> dma_handle = dma_map_single(dev, addr, size, direction);\
-> if (dma_mapping_error(dev, dma_handle)) {\
-> goto map_error_handling;\
-> }
+```cpp
+struct device *dev = &my_dev->dev;
+dma_addr_t dma_handle;
+void *addr = buffer->ptr;
+size_t size = buffer->len;
+
+dma_handle = dma_map_single(dev, addr, size, direction);
+if (dma_mapping_error(dev, dma_handle)) {
+goto map_error_handling;
+}
+```
 
 umap单个的dma buffer可以使用下面的接口：
 
