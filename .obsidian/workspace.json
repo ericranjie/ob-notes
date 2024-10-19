@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/compiler/k_从编译器的角度来看循环优化.md",
+                "file": "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/compiler/k_从编译器的角度来看循环优化.md",
+                "file": "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/compiler/k_从编译器的角度来看循环优化.md",
+                "file": "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/compiler/k_从编译器的角度来看循环优化.md"
+                "file": "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md"
               }
             }
           }
@@ -148,6 +148,7 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/compiler/k_从编译器的角度来看循环优化.md",
     "coding/compiler/b_编译乱序(Compiler Reordering).md",
     "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
     "zx99-image/Pasted image 20241019191628.png",
@@ -183,7 +184,6 @@
     "coding/os/linux/filesystem/k_F2FS技术拆解.md",
     "auxiliary/science/math-x-quote.md",
     "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
-    "coding/os/linux/network/a_n_深入理解 Linux socket.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
