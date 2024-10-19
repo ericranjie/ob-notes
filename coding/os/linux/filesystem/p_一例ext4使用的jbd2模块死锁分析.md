@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2021-5-8 8:36 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
@@ -85,34 +69,22 @@ Apr 16 19:46:22 [ERR] :  - [26652536.550467] INFO: task java:12610 bl
 
 ```
 
-#### 二、故障现象分析
+# 二、故障现象分析
 
 既然最早报hung的进程为jbd2/dm-12-8:547025，那就需要先看下该进程的堆栈，
 
 ```c
-
 crash> bt 547025
-
 PID: 547025  TASK: ffff91792aff1040  CPU: 16  COMMAND: "jbd2/dm-12-8"
-
  #0 [ffff91a907247b68] __schedule at ffffffff8a769a72
-
  #1 [ffff91a907247bf8] schedule_preempt_disabled at ffffffff8a76ae39
-
  #2 [ffff91a907247c08] __mutex_lock_slowpath at ffffffff8a768db7
-
  #3 [ffff91a907247c60] mutex_lock at ffffffff8a76819f
-
  #4 [ffff91a907247c78] jbd2_update_log_tail at ffffffffc03f17b8 [jbd2]
-
  #5 [ffff91a907247ca8] jbd2_journal_commit_transaction at ffffffffc03ea5dd [jbd2]
-
  #6 [ffff91a907247e48] kjournald2 at ffffffffc03efe89 [jbd2]
-
  #7 [ffff91a907247ec8] kthread at ffffffff8a0c2e81
-
  #8 [ffff91a907247f50] ret_from_fork_nospec_begin at ffffffff8a776c1d
-
 crash> ps -m 547025
 
 [  2 19:52:41.384] [UN]  PID: 547025  TASK: ffff91792aff1040  CPU: 16  COMMAND: "jbd2/dm-12-8"

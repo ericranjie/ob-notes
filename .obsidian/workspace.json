@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md",
+                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md",
+                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md",
+                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md"
+                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md"
               }
             }
           }
@@ -148,14 +148,23 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "zx99-image/Pasted image 20241019173136.png",
+    "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
+    "zx99-image/Pasted image 20241019173411.png",
+    "zx99-image/Pasted image 20241019173359.png",
+    "zx99-image/Pasted image 20241019173351.png",
+    "zx99-image/Pasted image 20241019173343.png",
+    "zx99-image/Pasted image 20241019173334.png",
+    "zx99-image/Pasted image 20241019173322.png",
+    "zx99-image/Pasted image 20241019173309.png",
+    "zx99-image/Pasted image 20241019173258.png",
+    "zx99-image/Pasted image 20241019173247.png",
+    "coding/os/linux/filesystem/k_F2FS技术拆解.md",
+    "coding/os/linux/filesystem/k_Linux文件系统十问.md",
+    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
     "auxiliary/science/math-x-quote.md",
-    "zx99-image/Pasted image 20241019134939.png",
-    "zx99-image/Pasted image 20241019134840.png",
     "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
     "coding/os/linux/network/a_n_深入理解 Linux socket.md",
-    "zx99-image/Pasted image 20241019131130.png",
-    "zx99-image/Pasted image 20241019132017.png",
-    "zx99-image/Pasted image 20241019131936.png",
     "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
     "coding/os/linux/filesystem/f_为什么会有文件系统(二).md",
@@ -170,19 +179,10 @@
     "coding/os/linux/memory/C&DMA/k_Linux DMA Engine framework(3)_dma controller驱动.md",
     "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
     "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
-    "zx99-image/Pasted image 20241019112746.png",
     "interview/k_n_求职必备！！面试题答案合集 已付费.md",
-    "zx99-image/Pasted image 20241019112754.png",
     "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
     "coding/os/linux/memory/a_s_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
-    "coding/os/linux/memory/C&DMA/k_CMA模块学习笔记.md",
-    "zx99-image/Pasted image 20241019092009.png",
-    "zx99-image/Pasted image 20241018184357.png",
-    "zx99-image/Pasted image 20241018190400.png",
-    "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
-    "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
-    "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

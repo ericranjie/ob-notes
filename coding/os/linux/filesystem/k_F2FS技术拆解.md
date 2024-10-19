@@ -92,7 +92,7 @@ F2FS从问世至今曾不被看好，某乎历史上有很多对各个手机厂�
 
 标签: [F2FS](http://www.wowotech.net/tag/F2FS)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Binder从入门到放弃（上）](http://www.wowotech.net/linux_kenrel/binder1.html) | [以太网驱动的流程浅析(五)-mii_bus初始化以及phy id的获取](http://www.wowotech.net/linux_kenrel/470.html)»
 
