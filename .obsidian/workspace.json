@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
+                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
+                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
+                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md"
+                "file": "coding/os/linux/filesystem/k_F2FS技术拆解.md"
               }
             }
           }
@@ -148,6 +148,10 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "auxiliary/science/math-x-quote.md",
+    "zx99-image/Pasted image 20241019134939.png",
+    "zx99-image/Pasted image 20241019134840.png",
+    "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
     "coding/os/linux/network/a_n_深入理解 Linux socket.md",
     "zx99-image/Pasted image 20241019131130.png",
     "zx99-image/Pasted image 20241019132017.png",
@@ -176,13 +180,9 @@
     "zx99-image/Pasted image 20241019092009.png",
     "zx99-image/Pasted image 20241018184357.png",
     "zx99-image/Pasted image 20241018190400.png",
-    "zx99-image/Pasted image 20241018190344.png",
-    "zx99-image/Pasted image 20241018190326.png",
     "coding/os/linux/memory/cache/b_arm64 cache机制分析.md",
     "coding/os/linux/memory/cache/b_多级cache之间的替换(缓存)策略.md",
     "coding/os/linux/memory/cache/b_如何利用CPU Cache写出高性能代码，看这些图就够了！.md",
-    "coding/os/linux/memory/cache/b_这篇 CPU Cache，估计也没人看.md",
-    "coding/os/linux/memory/cache/b_深入理解CPU缓存一致性协议MESI（建议收藏）.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
