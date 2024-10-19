@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
+                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
+                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
+                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md"
+                "file": "coding/os/linux/network/k_Linux-服务器的全连接队列(Accept队列).md"
               }
             }
           }
@@ -146,21 +146,24 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "zx99-image/Pasted image 20241019174452.png",
+    "coding/os/linux/network/p_n_通过实验深入了解 TCP 连接的建立和关闭.md",
+    "zx99-image/Pasted image 20241019174217.png",
+    "coding/os/linux/filesystem/k_n_Linux文件系统十问.md",
+    "zx99-image/Pasted image 20241019174325.png",
+    "zx99-image/Pasted image 20241019174300.png",
+    "zx99-image/Pasted image 20241019174251.png",
+    "zx99-image/Pasted image 20241019174231.png",
+    "coding/os/linux/filesystem/i_Linux加密文件系统eCryptfs介绍.md",
+    "coding/os/linux/filesystem/p_一例ext4使用的jbd2模块死锁分析.md",
     "zx99-image/Pasted image 20241019173136.png",
-    "coding/os/linux/filesystem/Linux加密文件系统eCryptfs介绍.md",
     "zx99-image/Pasted image 20241019173411.png",
     "zx99-image/Pasted image 20241019173359.png",
     "zx99-image/Pasted image 20241019173351.png",
     "zx99-image/Pasted image 20241019173343.png",
-    "zx99-image/Pasted image 20241019173334.png",
-    "zx99-image/Pasted image 20241019173322.png",
-    "zx99-image/Pasted image 20241019173309.png",
-    "zx99-image/Pasted image 20241019173258.png",
-    "zx99-image/Pasted image 20241019173247.png",
     "coding/os/linux/filesystem/k_F2FS技术拆解.md",
-    "coding/os/linux/filesystem/k_Linux文件系统十问.md",
     "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
     "auxiliary/science/math-x-quote.md",
     "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
@@ -181,8 +184,6 @@
     "coding/os/linux/modules/timer/i_n_“做时间的朋友” – 浅谈linux kernel中形形色色的cputime.md",
     "interview/k_n_求职必备！！面试题答案合集 已付费.md",
     "coding/os/linux/memory/cache/a_深度学习armv8 armv9 cache的原理.md",
-    "coding/os/linux/memory/a_s_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
-    "coding/os/linux/memory/cache/a_n_一篇论文讲透Cache优化.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",
