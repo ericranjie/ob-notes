@@ -1,6 +1,7 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-2-27 17:01 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-#### 1. 前言
+# 1. 前言
 
 在“[Linux内核的整体架构](http://www.wowotech.net/linux_kenrel/11.html)”中，蜗蜗有提到，由于Linux支持世界上几乎所有的、不同功能的硬件设备（这是Linux的优点），导致Linux内核中有一半的代码是设备驱动，而且随着硬件的快速升级换代，设备驱动的代码量也在快速增长。个人意见，这种现象打破了“简洁就是美”的理念，是丑陋的。它导致Linux内核看上去非常臃肿、杂乱、不易维护。但蜗蜗也知道，这不是Linux的错，Linux是一个宏内核，它必须面对设备的多样性，并实现对应的驱动。
 
@@ -8,12 +9,13 @@
 
 本文将会从设备模型的基本概念开始，通过分析内核相应的代码，一步一步解析Linux设备模型的实现及使用方法。
 
-#### 2. Linux设备模型的基本概念
+# 2. Linux设备模型的基本概念
 
-##### 2.1 Bus, Class, Device和Device Driver的概念
+## 2.1 Bus, Class, Device和Device Driver的概念
 
-下图是嵌入式系统常见的硬件拓扑的一个示例：\
-[![device_toplogy](http://www.wowotech.net/content/uploadfile/201402/e960493a2c0e405ae9b2fefaf869334220140227080147.gif "device_toplogy")](http://www.wowotech.net/content/uploadfile/201402/861308c496428d7590deccd7507b61f720140227080145.gif)
+下图是嵌入式系统常见的硬件拓扑的一个示例：
+
+![[Pasted image 20241019223247.png]]
 
 硬件拓扑描述Linux设备模型中四个重要概念中三个：Bus，Class和Device（第四个为Device Driver，后面会说）。
 
@@ -28,7 +30,7 @@ Device Driver（驱动）：Linux设备模型用Driver抽象硬件设备的驱�
 注：什么是Platform Bus？\
 在计算机中有这样一类设备，它们通过各自的设备控制器，直接和CPU连接，CPU可以通过常规的寻址操作访问它们（或者说访问它们的控制器）。这种连接方式，并不属于传统意义上的总线连接。但设备模型应该具备普适性，因此Linux就虚构了一条Platform Bus，供这些设备挂靠。
 
-##### 2.2 设备模型的核心思想
+## 2.2 设备模型的核心思想
 
 Linux设备模型的核心思想是（通过xxx手段，实现xxx目的）：
 

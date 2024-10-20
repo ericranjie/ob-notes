@@ -1,6 +1,7 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-6-6 16:03 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-一、前言
+# 一、前言
 
 Device Tree总共有三篇，分别是：
 
@@ -16,9 +17,9 @@ Device Tree总共有三篇，分别是：
 
 注：本文中的linux kernel使用的是3.14版本。
 
-二、如何通过Device Tree完成运行时参数传递以及platform的识别功能？
+# 二、如何通过Device Tree完成运行时参数传递以及platform的识别功能？
 
-1、汇编部分的代码分析
+## 1、汇编部分的代码分析
 
 linux/arch/arm/kernel/head.S文件定义了bootloader和kernel的参数传递要求：
 
@@ -26,36 +27,31 @@ linux/arch/arm/kernel/head.S文件定义了bootloader和kernel的参数传递要
 
 目前的kernel支持旧的tag list的方式，同时也支持device tree的方式。r2可能是device tree binary file的指针（bootloader要传递给内核之前要copy到memory中），也可以能是tag list的指针。在ARM的汇编部分的启动代码中（主要是head.S和head-common.S），machine type ID和指向DTB或者atags的指针被保存在变量\_\_machine_arch_type和\_\_atags_pointer中，这么做是为了后续c代码进行处理。
 
-2、和device tree相关的setup_arch代码分析
+## 2、和device tree相关的setup_arch代码分析
 
 具体的c代码都是在setup_arch中处理，这个函数是一个总的入口点。具体代码如下（删除了部分无关代码）：
 
 ```cpp
-void init setup_arch(char **cmdline_p)  
-{  
+void init setup_arch(char **cmdline_p) {  
 const struct machine_desc mdesc;
-
 ……
-
 mdesc = setup_machine_fdt(__atags_pointer);  
 if (!mdesc)  
 mdesc = setup_machine_tags(__atags_pointer, __machine_arch_type);  
 machine_desc = mdesc;  
 machine_name = mdesc->name;
-
 ……  
 }
 ```
 
 对于如何确定HW platform这个问题，旧的方法是静态定义若干的machine描述符（struct machine_desc ），在启动过程中，通过machine type ID作为索引，在这些静态定义的machine描述符中扫描，找到那个ID匹配的描述符。在新的内核中，首先使用setup_machine_fdt来setup machine描述符，如果返回NULL，才使用传统的方法setup_machine_tags来setup machine描述符。传统的方法需要给出\_\_machine_arch_type（bootloader通过r1寄存器传递给kernel的）和tag list的地址（用来进行tag parse）。\_\_machine_arch_type用来寻找machine描述符；tag list用于运行时参数的传递。随着内核的不断发展，相信有一天linux kernel会完全抛弃tag list的机制。
 
-3、匹配platform（machine描述符）
+## 3、匹配platform（machine描述符）
 
 setup_machine_fdt函数的功能就是根据Device Tree的信息，找到最适合的machine描述符。具体代码如下：
 
 ```cpp
-const struct machine_desc * init setup_machine_fdt(unsigned int dt_phys)  
-{  
+const struct machine_desc * init setup_machine_fdt(unsigned int dt_phys) {  
 const struct machine_desc mdesc, *mdesc_best = NULL;
 
 if (!dt_phys || !early_init_dt_scan(phys_to_virt(dt_phys)))  
@@ -103,7 +99,7 @@ nr成员就是过去使用的machine type ID。内核machine描述符的table有
 
 \_\_arch_info_begin指向machine描述符列表第一个entry。通过mdesc++不断的移动machine描述符指针（Note：mdesc是static的）。match返回了该machine描述符的compatible string list。具体匹配的算法倒是很简单，就是比较字符串而已，一个是root node的compatible字符串列表，一个是machine描述符的compatible字符串列表，得分最低的（最匹配的）就是我们最终选定的machine type。
 
-4、运行时参数传递
+## 4、运行时参数传递
 
 运行时参数是在扫描DTB的chosen node时候完成的，具体的动作就是获取chosen node的bootargs、initrd等属性的value，并将其保存在全局变量（boot_command_line，initrd_start、initrd_end）中。使用tag list方法是类似的，通过分析tag list，获取相关信息，保存在同样的全局变量中。具体代码位于early_init_dt_scan函数中：
 
@@ -143,18 +139,20 @@ nr成员就是过去使用的machine type ID。内核machine描述符的table有
 
 目前当然是推荐使用Device Tree的方式来传递物理内存布局信息。
 
-三、初始化流程
+# 三、初始化流程
 
 在系统初始化的过程中，我们需要将DTB转换成节点是device_node的树状结构，以便后续方便操作。具体的代码位于setup_arch->unflatten_device_tree中。
 
-> void \_\_init unflatten_device_tree(void)\
-> {\
-> \_\_unflatten_device_tree(initial_boot_params, &of_allnodes,\
-> early_init_dt_alloc_memory_arch);
->
-> /\* Get pointer to "/chosen" and "/aliases" nodes for use everywhere \*/\
-> of_alias_scan(early_init_dt_alloc_memory_arch);\
-> }
+```cpp
+void __init unflatten_device_tree(void)
+{
+__unflatten_device_tree(initial_boot_params, &of_allnodes,
+early_init_dt_alloc_memory_arch);
+
+/* Get pointer to "/chosen" and "/aliases" nodes for use everywhere */
+of_alias_scan(early_init_dt_alloc_memory_arch);
+}
+```
 
 我们用struct device_node 来抽象设备树中的一个节点，具体解释如下：
 

@@ -1,83 +1,45 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-4-15 19:21 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-#### 1. 概述
+# 1. 概述
 
 在Linux设备模型中，Bus（总线）是一类特殊的设备，它是连接处理器和其它设备之间的通道（channel）。为了方便设备模型的实现，内核规定，系统中的每个设备都要连接在一个Bus上，这个Bus可以是一个内部Bus、虚拟Bus或者Platform Bus。
 
 内核通过struct bus_type结构，抽象Bus，它是在include/linux/device.h中定义的。本文会围绕该结构，描述Linux内核中Bus的功能，以及相关的实现逻辑。最后，会简单的介绍一些标准的Bus（如Platform），介绍它们的用途、它们的使用场景。
 
-#### 2. 功能说明
+# 2. 功能说明
 
 按照老传统，描述功能前，先介绍一下该模块的一些核心数据结构，对bus模块而言，核心数据结构就是struct bus_type，另外，还有一个sub system相关的结构，会一并说明。
 
-##### 2.1 struct bus_type
+## 2.1 struct bus_type
 
+```cpp
 1: /\* inlcude/linux/device.h, line 93 \*/
-
 2: struct bus_type {
-
 3:     const char \*name;
-
 4:     const char \*dev_name;
-
 5:     struct device       \*dev_root;
-
 6:     struct bus_attribute    \*bus_attrs;
-
 7:     struct device_attribute \*dev_attrs;
-
 8:     struct driver_attribute \*drv_attrs;
-
 9:
-
 10:    int (\*match)(struct device \*dev, struct device_driver \*drv);
-
 11:    int (\*uevent)(struct device \*dev, struct kobj_uevent_env \*env);
-
 12:    int (\*probe)(struct device \*dev);
-
 13:    int (\*remove)(struct device \*dev);
-
 14:    void (\*shutdown)(struct device \*dev);
-
 15:
-
 16:    int (\*suspend)(struct device \*dev, pm_message_t state);
-
 17:    int (\*resume)(struct device \*dev);
-
 18:
-
 19:    const struct dev_pm_ops \*pm;
-
 20:
-
 21:    struct iommu_ops \*iommu_ops;
-
 22:
-
 23:    struct subsys_private \*p;
-
 24:    struct lock_class_key lock_key;
-
 25: };
+```
 
 > name，该bus的名称，会在sysfs中以目录的形式存在，如platform bus在sysfs中表现为"/sys/bus/platform”。
 >
@@ -102,45 +64,31 @@
 >
 > p，一个struct subsys_private类型的指针，后面我们会用一个小节说明。
 
-##### 2.2 struct subsys_private
+## 2.2 struct subsys_private
 
 该结构和[device_driver](http://www.wowotech.net/linux_kenrel/device_and_driver.html)中的struct driver_private类似，在"[Linux设备模型(5)\_device和device driver](http://www.wowotech.net/linux_kenrel/device_and_driver.html)”章节中有提到它，但没有详细说明。
 
 要说明subsys_private的功能，让我们先看一下该结构的定义：
 
+```cpp
 1: /\* drivers/base/base.h, line 28 \*/
-
 2: struct subsys_private {
-
 3:     struct kset subsys;
-
 4:     struct kset \*devices_kset;
-
 5:     struct list_head interfaces;
-
 6:     struct mutex mutex;
-
 7:
-
 8:     struct kset \*drivers_kset;
-
 9:     struct klist klist_devices;
-
 10:    struct klist klist_drivers;
-
 11:    struct blocking_notifier_head bus_notifier;
-
 12:    unsigned int drivers_autoprobe:1;
-
 13:    struct bus_type \*bus;
-
 14:
-
 15:    struct kset glue_dirs;
-
 16:    struct class \*class;
-
 17: };
+```
 
 看到结构内部的字段，就清晰多了，没事不要乱起名字嘛！什么subsys啊，看的晕晕的！不过还是试着先理解一下为什么起名为subsys吧：
 
@@ -160,7 +108,7 @@
 >
 > bus和class指针，分别保存上层的bus或者class指针。
 
-##### 2.3 功能总结
+## 2.3 功能总结
 
 根据上面的核心数据结构，可以总结出bus模块的功能包括：
 

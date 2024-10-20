@@ -1,23 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-4-28 10:24 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-#### 1. 前言
+# 1. 前言
 
 在Linux设备模型的抽象中，存在着一类称作“Platform Device”的设备，内核是这样描述它们的（Documentation/driver-model/platform.txt）：
 
@@ -29,7 +13,7 @@
 
 可以说，paltform设备对Linux驱动工程师是非常重要的，因为我们编写的大多数设备驱动，都是为了驱动plaftom设备。本文我们就来看看Platform设备在内核中的实现。
 
-#### 2. Platform模块的软件架构
+# 2. Platform模块的软件架构
 
 内核中Platform设备有关的实现位于include/linux/platform_device.h和drivers/base/platform.c两个文件中，它的软件架构如下：
 
@@ -43,47 +27,33 @@ Platform Driver，基于底层device_driver模块，抽象出Platform Driver，�
 
 其中Platform Device和Platform Driver会会其它Driver提供封装好的API，具体可参考后面的描述。
 
-#### 3. Platform模块向其它模块提供的API汇整
+# 3. Platform模块向其它模块提供的API汇整
 
 Platform提供的接口包括：Platform Device和Platform Driver两个数据结构，以及它们的操作函数。
 
-##### 3.1 数据结构
+## 3.1 数据结构
 
 1. 用于抽象Platform设备的数据结构----“struct platform_device”：
 
-   1: /\* include/linux/platform_device.h, line 22 \*/
-
-   2: struct platform_device {
-
-   3:         const char      \*name;
-
-   4:         int             id;
-
-   5:         bool            id_auto;
-
-   6:         struct device   dev;
-
-   7:         u32             num_resources;
-
-   8:         struct resource \*resource;
-
-   9:
-
+```cpp
+1: /\* include/linux/platform_device.h, line 22 \*/
+2: struct platform_device {
+3:         const char      \*name;
+4:         int             id;
+5:         bool            id_auto;
+6:         struct device   dev;
+7:         u32             num_resources;
+8:         struct resource \*resource;
+9:
 10:         const struct platform_device_id \*id_entry;
-
 11:
-
 12:         /\* MFD cell pointer \*/
-
 13:         struct mfd_cell \*mfd_cell;
-
 14:
-
 15:         /\* arch specific additions \*/
-
 16:         struct pdev_archdata    archdata;
-
 17: };
+```
 
 > 该结构的解释如下：
 >
@@ -109,112 +79,69 @@ Platform提供的接口包括：Platform Device和Platform Driver两个数据结
 
 2. 用于抽象Platform设备驱动的数据结构----“struct platform_driver”：
 
-   1: /\* include/linux/platform_device.h, line 173 \*/
-
-   2: struct platform_driver {
-
-   3:         int (\*probe)(struct platform_device \*);
-
-   4:         int (\*remove)(struct platform_device \*);
-
-   5:         void (\*shutdown)(struct platform_device \*);
-
-   6:         int (\*suspend)(struct platform_device \*, pm_message_t state);
-
-   7:         int (\*resume)(struct platform_device \*);
-
-   8:         struct device_driver driver;
-
-   9:         const struct platform_device_id \*id_table;
-
+```cpp
+1: /* include/linux/platform_device.h, line 173 */
+2: struct platform_driver {
+3:         int (*probe)(struct platform_device *);
+4:         int (*remove)(struct platform_device *);
+5:         void (*shutdown)(struct platform_device *);
+6:         int (*suspend)(struct platform_device *, pm_message_t state);
+7:         int (*resume)(struct platform_device *);
+8:         struct device_driver driver;
+9:         const struct platform_device_id *id_table;
 10: };
+```
 
 > struct platform_driver结构和struct device_driver非常类似，无非就是提供probe、remove、suspend、resume等回调函数，这里不再细说。
 >
 > 另外这里有一个id_table的指针，该指针和"[Linux设备模型(5)\_device和device driver](http://www.wowotech.net/linux_kenrel/device_and_driver.html)”所描述的of_match_table、acpi_match_table的功能类似：提供其它方式的设备probe。\
 > 我们在"[Linux设备模型(5)\_device和device driver](http://www.wowotech.net/linux_kenrel/device_and_driver.html)”讲过，内核会在合适的时机检查device和device_driver的名字，如果匹配，则执行probe。其实除了名称之外，还有一些宽泛的匹配方式，例如这里提到的各种match table，具体原理就先不罗嗦了，徒添烦恼！就当没看见，呵呵。
 
-##### 3.2 Platform Device提供的API
+## 3.2 Platform Device提供的API
 
 Platform Device主要提供设备的分配、注册等接口，供其它driver使用，具体包括：
 
+```cpp
 1: /\* include/linux/platform_device.h \*/
-
 2: extern int platform_device_register(struct platform_device \*);
-
 3: extern void platform_device_unregister(struct platform_device \*);
-
 4:
-
 5: extern void arch_setup_pdev_archdata(struct platform_device \*);
-
 6: extern struct resource \*platform_get_resource(struct platform_device \*,
-
 7:                                               unsigned int, unsigned int);
-
 8: extern int platform_get_irq(struct platform_device \*, unsigned int);
-
 9: extern struct resource \*platform_get_resource_byname(struct platform_device \*,
-
 10:                                                      unsigned int,
-
 11:                                                      const char \*);
-
 12: extern int platform_get_irq_byname(struct platform_device \*, const char \*);
-
 13: extern int platform_add_devices(struct platform_device \*\*, int);
-
 14:
-
 15: extern struct platform_device \*platform_device_register_full(
-
 16:                 const struct platform_device_info \*pdevinfo);
-
 17:
-
 18: static inline struct platform_device \*platform_device_register_resndata(
-
 19:                 struct device \*parent, const char \*name, int id,
-
 20:                 const struct resource \*res, unsigned int num,
-
 21:                 const void \*data, size_t size)
-
 22:
-
 23: static inline struct platform_device \*platform_device_register_simple(
-
 24:                 const char \*name, int id,
-
 25:                 const struct resource \*res, unsigned int num)
-
 26:
-
 27: static inline struct platform_device \*platform_device_register_data(
-
 28:                 struct device \*parent, const char \*name, int id,
-
 29:                 const void \*data, size_t size)
-
 30:
-
 31: extern struct platform_device \*platform_device_alloc(const char \*name, int id);
-
 32: extern int platform_device_add_resources(struct platform_device \*pdev,
-
 33:                                          const struct resource \*res,
-
 34:                                          unsigned int num);
-
 35: extern int platform_device_add_data(struct platform_device \*pdev,
-
 36:                                     const void \*data, size_t size);
-
 37: extern int platform_device_add(struct platform_device \*pdev);
-
 38: extern void platform_device_del(struct platform_device \*pdev);
-
 39: extern void platform_device_put(struct platform_device \*pdev);
+```
 
 > platform_device_register、platform_device_unregister，Platform设备的注册/注销接口，和底层的device_register等接口类似。
 >
@@ -232,7 +159,7 @@ Platform Device主要提供设备的分配、注册等接口，供其它driver�
 >
 > platform_device_add、platform_device_del、platform_device_put，其它操作接口。
 
-##### 3.3 Platform Driver提供的API
+## 3.3 Platform Driver提供的API
 
 Platform Driver提供struct platform_driver的分配、注册等功能，具体如下：
 

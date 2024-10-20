@@ -162,26 +162,28 @@
 
 然后编译并运行kernel，输出的日志如下：
 
-> …
->
-> \[    0.093281\] Failed to find cpu0 device node
->
-> \[    0.097437\] Unable to detect cache hierarchy from DT for CPU 0
->
-> \[    0.103562\] Warning: unable to open an initial console.
->
-> \[    0.108531\] Freeing unused kernel memory: 116K (ffffff80081a0000 - ffffff80081bd000)
->
-> \[    0.116156\] This architecture does not have kernel memory protection.
->
-> \[    0.122593\] Kernel panic - not syncing: No working init found.  Try passing init= option to kernel. See Linux Documentation/init.txt for guidance.
->
-> \[    0.135656\] Kernel Offset: disabled
->
-> \[    0.139124\] Memory Limit: none
->
-> \[    0.142156\] ---\[ end Kernel panic - not syncing: No working init found.  Try passing init= option to kernel. See Linux Documentation/init.txt for guidance.
+```cpp
+…
 
+\[    0.093281\] Failed to find cpu0 device node
+
+\[    0.097437\] Unable to detect cache hierarchy from DT for CPU 0
+
+\[    0.103562\] Warning: unable to open an initial console.
+
+\[    0.108531\] Freeing unused kernel memory: 116K (ffffff80081a0000 - ffffff80081bd000)
+
+\[    0.116156\] This architecture does not have kernel memory protection.
+
+\[    0.122593\] Kernel panic - not syncing: No working init found.  Try passing init= option to kernel. See Linux Documentation/init.txt for guidance.
+
+\[    0.135656\] Kernel Offset: disabled
+
+\[    0.139124\] Memory Limit: none
+
+\[    0.142156\] ---\[ end Kernel panic - not syncing: No working init found.  Try passing init= option to kernel. See Linux Documentation/init.txt for guidance.
+```
+					
 成功了。
 
 ## 5. 参考文档

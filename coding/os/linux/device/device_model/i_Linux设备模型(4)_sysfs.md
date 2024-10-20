@@ -1,23 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-3-14 18:31 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-#### 1. 前言
+# 1. 前言
 
 sysfs是一个基于RAM的文件系统，它和Kobject一起，可以将Kernel的数据结构导出到用户空间，以文件目录结构的形式，提供对这些数据结构（以及数据结构的属性）的访问支持。
 
@@ -27,7 +11,7 @@ sysfs具备文件系统的所有属性，而本文主要侧重其设备模型的
 - attribute的概念
 - sysfs的文件系统操作接口
 
-#### 2. sysfs和Kobject的关系
+# 2. sysfs和Kobject的关系
 
 在"[Linux设备模型_Kobject](http://www.wowotech.net/linux_kenrel/kobject.html)”文章中，有提到过，每一个Kobject，都会对应sysfs中的一个目录。因此在将Kobject添加到Kernel时，create_dir接口会调用sysfs文件系统的创建目录接口，创建和Kobject对应的目录，相关的代码如下：
 
@@ -60,9 +44,9 @@ sysfs具备文件系统的所有属性，而本文主要侧重其设备模型的
  26: }
 ```
 
-#### 3. attribute
+# 3. attribute
 
-##### 3.1 attribute的功能概述
+## 3.1 attribute的功能概述
 
 在sysfs中，为什么会有attribute的概念呢？其实它是对应kobject而言的，指的是kobject的“属性”。我们知道，
 
@@ -107,11 +91,11 @@ Kernel怎么把attribute变成sysfs中的文件呢？
 
 下面来看看这个过程。
 
-##### 3.2 attibute文件的创建
+## 3.2 attibute文件的创建
 
 在linux内核中，attibute文件的创建是由fs/sysfs/file.c中sysfs_create_file接口完成的，该接口的实现没有什么特殊之处，大多是文件系统相关的操作，和设备模型没有太多的关系，这里先略过不提。
 
-##### 3.3 attibute文件的read和write
+## 3.3 attibute文件的read和write
 
 看到3.1章节struct attribute的原型时，也许我们会犯嘀咕，该结构很简单啊，name表示文件名称，mode表示文件模式，其它的字段都是内核用于debug Kernel Lock的，那文件操作的接口在哪里呢？
 
@@ -227,7 +211,7 @@ attribute文件的write过程和read类似，这里就不再多说。另外，�
 
 讲到这里，应该已经结束了，事实却不是如此。上面read/write的数据流，只到kobject（也就是目录）级别哦，而真正需要操作的是attribute（文件）啊！这中间一定还有一层转换！确实，不过又交给其它模块了。 下面我们通过一个例子，来说明如何转换的。
 
-#### 4. sysfs在设备模型中的应用总结
+# 4. sysfs在设备模型中的应用总结
 
 让我们通过设备模型class.c中有关sysfs的实现，来总结一下sysfs的应用方式。
 

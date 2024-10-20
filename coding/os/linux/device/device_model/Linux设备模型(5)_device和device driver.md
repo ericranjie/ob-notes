@@ -1,6 +1,7 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-4-2 19:28 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-**1. 前言**
+# **1. 前言**
 
 device和device driver是Linux驱动开发的基本概念。Linux kernel的思路很简单：驱动开发，就是要开发指定的软件（driver）以驱动指定的设备，所以kernel就为设备和驱动它的driver定义了两个数据结构，分别是device和device_driver。因此本文将会围绕这两个数据结构，介绍Linux设备模型的核心逻辑，包括：
 
@@ -12,7 +13,7 @@ device和device driver是Linux驱动开发的基本概念。Linux kernel的思�
 
 注：在介绍device和device_driver的过程中，会遇到很多额外的知识点，如Class、Bus、DMA、电源管理等等，这些知识点都很复杂，任何一个都可以作为一个单独的专题区阐述，因此本文不会深入解析它们，而会在后续的文章中专门描述。
 
-**2. struct device和struct device_driver**
+# **2. struct device和struct device_driver**
 
 在阅读Linux内核源代码时，通过核心数据结构，即可理解某个模块60%以上的逻辑，设备模型部分尤为明显。
 
@@ -20,135 +21,73 @@ device和device driver是Linux驱动开发的基本概念。Linux kernel的思�
 
 - struct device
 
+```cpp
 1: /\* include/linux/device.h, line 660 \*/
-
 2: struct device {
-
 3:     struct device       \*parent;
-
 4:
-
 5:     struct device_private   \*p;
-
 6:
-
 7:     struct kobject kobj;
-
 8:     const char *init_name; /* initial name of the device \*/
-
 9:     const struct device_type \*type;
-
 10:
-
 11:    struct mutex        mutex; /\* mutex to synchronize calls to
-
 12:                             * its driver.
-
 13:                             \*/
-
 14:
-
 15:    struct bus_type *bus; /* type of bus device is on \*/
-
 16:    struct device_driver *driver; /* which driver has allocated this
-
 17:                                 device \*/
-
 18:    void *platform_data; /* Platform specific data, device
-
 19:                         core doesn't touch it \*/
-
 20:    struct dev_pm_info  power;
-
 21:    struct dev_pm_domain    \*pm_domain;
-
 22:
-
 23: #ifdef CONFIG_PINCTRL
-
 24:    struct dev_pin_info \*pins;
-
 25: #endif
-
 26:
-
 27: #ifdef CONFIG_NUMA
-
 28:    int numa_node; /\* NUMA node this device is close to \*/
-
 29: #endif
-
 30:    u64     *dma_mask; /* dma mask (if dma'able device) \*/
-
 31:    u64     coherent_dma_mask;/\* Like dma_mask, but for
-
 32:                             alloc_coherent mappings as
-
 33:                             not all hardware supports
-
 34:                             64 bit addresses for consistent
-
 35:                             allocations such descriptors. \*/
-
 36:
-
 37:    struct device_dma_parameters \*dma_parms;
-
 38:
-
 39:    struct list_head    dma_pools; /\* dma pools (if dma'ble) \*/
-
 40:
-
 41:    struct dma_coherent_mem *dma_mem; /* internal for coherent mem
-
 42:                            override \*/
-
 43: #ifdef CONFIG_CMA
-
 44:    struct cma *cma_area; /* contiguous memory area for dma
-
 45:                            allocations \*/
-
 46: #endif
-
 47:    /\* arch specific additions \*/
-
 48:    struct dev_archdata archdata;
-
 49:
-
 50:    struct device_node  *of_node; /* associated device tree node \*/
-
 51:    struct acpi_dev_node    acpi_node; /\* associated ACPI device node \*/
-
 52:
-
 53:    dev_t           devt; /\* dev_t, creates the sysfs "dev" \*/
-
 54:    u32         id; /\* device instance \*/
-
 55:
-
 56:    spinlock_t      devres_lock;
-
 57:    struct list_head    devres_head;
-
 58:
-
 59:    struct klist_node   knode_class;
-
 60:    struct class \*class;
-
 61:    const struct attribute_group \**groups; /* optional groups \*/
-
 62:
-
 63:    void (\*release)(struct device \*dev);
-
 64:    struct iommu_group  \*iommu_group;
-
 65: };
+```
 
 > device结构很复杂（不过linux内核的开发人员素质是很高的，该接口的注释写的非常详细，感兴趣的同学可以参考内核源代码），这里将会选一些对理解设备模型非常关键的字段进行说明。
 >
@@ -193,53 +132,32 @@ device和device driver是Linux驱动开发的基本概念。Linux kernel的思�
 
 - struct device_driver
 
+```cpp
 1: /\* include/linux/device.h, line 213 \*/
-
 2: struct device_driver {
-
 3:     const char \*name;
-
 4:     struct bus_type     \*bus;
-
 5:
-
 6:     struct module       \*owner;
-
 7:     const char *mod_name; /* used for built-in modules \*/
-
 8:
-
 9:     bool suppress_bind_attrs; /\* disables bind/unbind via sysfs \*/
-
 10:
-
 11:    const struct of_device_id   \*of_match_table;
-
 12:    const struct acpi_device_id \*acpi_match_table;
-
 13:
-
 14:    int (\*probe) (struct device \*dev);
-
 15:    int (\*remove) (struct device \*dev);
-
 16:    void (\*shutdown) (struct device \*dev);
-
 17:    int (\*suspend) (struct device \*dev, pm_message_t state);
-
 18:    int (\*resume) (struct device \*dev);
-
 19:    const struct attribute_group \*\*groups;
-
 20:
-
 21:    const struct dev_pm_ops \*pm;
-
 22:
-
 23:    struct driver_private \*p;
-
 24: };
+```
 
 > device_driver就简单多了（在早期的内核版本中driver的数据结构为"struct driver”，不知道从哪个版本开始，就改成device_driver了）：
 >
@@ -260,7 +178,7 @@ device和device driver是Linux驱动开发的基本概念。Linux kernel的思�
 >
 > p，driver core的私有数据指针，其它模块不能访问。
 
-**3. 设备模型框架下驱动开发的基本步骤**
+# **3. 设备模型框架下驱动开发的基本步骤**
 
 在设备模型框架下，设备驱动的开发是一件很简单的事情，主要包括2个步骤：
 
@@ -282,7 +200,7 @@ device和device driver是Linux驱动开发的基本概念。Linux kernel的思�
 >
 > 1. driver开发者可以在struct device变量中，保存描述设备特征的信息，如寻址空间、依赖的GPIOs等，因为device指针会在执行probe等接口时传入，这时driver就可以根据这些信息，执行相应的逻辑操作了。
 
-**4. 设备驱动probe的时机**
+# **4. 设备驱动probe的时机**
 
 所谓的"probe”，是指在Linux内核中，如果存在相同名称的device和device_driver（注：还存在其它方式，我们先不关注了），内核就会执行device_driver中的probe回调函数，而该函数就是所有driver的入口，可以执行诸如硬件设备初始化、字符设备注册、设备文件操作ops注册等动作（"remove”是它的反操作，发生在device或者device_driver任何一方从内核注销时，其原理类似，就不再单独说明了）。
 

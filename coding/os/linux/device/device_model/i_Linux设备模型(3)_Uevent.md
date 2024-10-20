@@ -1,31 +1,32 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2014-3-10 20:39 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
-#### 1. Uevent的功能
+# 1. Uevent的功能
 
 Uevent是Kobject的一部分，用于在Kobject状态发生改变时，例如增加、移除等，通知用户空间程序。用户空间程序收到这样的事件后，会做相应的处理。
 
 该机制通常是用来支持热拔插设备的，例如U盘插入后，USB相关的驱动软件会动态创建用于表示该U盘的device结构（相应的也包括其中的kobject），并告知用户空间程序，为该U盘动态的创建/dev/目录下的设备节点，更进一步，可以通知其它的应用程序，将该U盘设备mount到系统中，从而动态的支持该设备。
 
-#### 2. Uevent在kernel中的位置
+# 2. Uevent在kernel中的位置
 
 下面图片描述了Uevent模块在内核中的位置：
 
-[![uevent](http://www.wowotech.net/content/uploadfile/201403/430b8239af589fedfe6ecffbd26dcbae20140311063954.gif "uevent")](http://www.wowotech.net/content/uploadfile/201403/272229a8f5b5912c352e857e119e516320140311063951.gif)
+![[Pasted image 20241019223333.png]]
 
 由此可知，Uevent的机制是比较简单的，设备模型中任何设备有事件需要上报时，会触发Uevent提供的接口。Uevent模块准备好上报事件的格式后，可以通过两个途径把事件上报到用户空间：一种是通过kmod模块，直接调用用户空间的可执行文件；另一种是通过netlink通信机制，将事件从内核空间传递给用户空间。
 
 注1：有关kmod和netlink，会在其它文章中描述，因此本文就不再详细说明了。
 
-#### 3. Uevent的内部逻辑解析
+# 3. Uevent的内部逻辑解析
 
-##### 3.1 Source Code位置
+## 3.1 Source Code位置
 
 Uevent的代码比较简单，主要涉及kobject.h和kobject_uevent.c两个文件，如下：
 
 - include/linux/kobject.h
 - lib/kobject_uevent.c
 
-##### 3.2 数据结构描述
+## 3.2 数据结构描述
 
 kobject.h定义了uevent相关的常量和数据结构，如下：
 
@@ -60,25 +61,15 @@ CHANGE，如果设备驱动需要上报的事件不再上面事件的范围内�
 
 ```cpp
  1: /* include/linux/kobject.h, line 31 */
-
  2: #define UEVENT_NUM_ENVP         32 /* number of env pointers */
-
  3: #define UEVENT_BUFFER_SIZE      2048 /* buffer for the variables */
-
  4:  
-
  5: /* include/linux/kobject.h, line 116 */
-
  6: struct kobj_uevent_env {
-
  7:     char *envp[UEVENT_NUM_ENVP];
-
  8:     int envp_idx;
-
  9:     char buf[UEVENT_BUFFER_SIZE];
-
  10:    int buflen;
-
  11: }
 ```
 
@@ -112,7 +103,7 @@ kset_uevent_ops是为kset量身订做的一个数据结构，里面包含filter�
 >
 > uevent，当任何Kobject需要上报uevent时，它所属的kset可以通过该接口统一为这些event添加环境变量。因为很多时候上报uevent时的环境变量都是相同的，因此可以由kset统一处理，就不需要让每个Kobject独自添加了。
 
-##### 3.3 内部动作
+## 3.3 内部动作
 
 通过kobject.h，uevent模块提供了如下的API（这些API的实现是在"lib/kobject_uevent.c”文件中）：
 
@@ -152,9 +143,9 @@ kset_uevent_ops是为kset量身订做的一个数据结构，里面包含filter�
 >
 > kobject_action_type，将enum kobject_action类型的Action，转换为字符串。
 
-|   |
-|---|
-|**说明：怎么指定处理uevent的用户空间程序(简称uevent helper)？  <br>  <br>上面介绍kobject_uevent_env的内部动作时，有提到，Uevent模块通过Kmod上报Uevent时，会通过call_usermodehelper函数，调用用户空间的可执行文件（或者脚本，简称**uevent helper\*\* ）处理该event。而该uevent helper的路径保存在\*\*uevent_helper数组中。  <br>  <br>可以在编译内核时，通过CONFIG_UEVENT_HELPER_PATH配置项，静态指定uevent helper。但这种方式会为每个event fork一个进程，随着内核支持的设备数量的增多，这种方式在系统启动时将会是致命的（可以导致内存溢出等）。因此只有在早期的内核版本中会使用这种方式，现在内核不再推荐使用该方式。因此内核编译时，需要把该配置项留空。  <br>  <br>在系统启动后，大部分的设备已经ready，可以根据需要，重新指定一个uevent helper，以便检测系统运行过程中的热拔插事件。这可以通过把helper的路径写入到"/sys/kernel/uevent_helper”文件中实现。实际上，内核通过sysfs文件系统的形式，将****uevent_helper数组开放到用户空间，供用户空间程序修改访问，具体可参考"****./kernel/ksysfs.c”中相应的代码，这里不再详细描述。\*\*\*\*|
+|                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **说明：怎么指定处理uevent的用户空间程序(简称uevent helper)？  <br>  <br>上面介绍kobject_uevent_env的内部动作时，有提到，Uevent模块通过Kmod上报Uevent时，会通过call_usermodehelper函数，调用用户空间的可执行文件（或者脚本，简称**uevent helper\*\* ）处理该event。而该uevent helper的路径保存在\*\*uevent_helper数组中。  <br>  <br>可以在编译内核时，通过CONFIG_UEVENT_HELPER_PATH配置项，静态指定uevent helper。但这种方式会为每个event fork一个进程，随着内核支持的设备数量的增多，这种方式在系统启动时将会是致命的（可以导致内存溢出等）。因此只有在早期的内核版本中会使用这种方式，现在内核不再推荐使用该方式。因此内核编译时，需要把该配置项留空。  <br>  <br>在系统启动后，大部分的设备已经ready，可以根据需要，重新指定一个uevent helper，以便检测系统运行过程中的热拔插事件。这可以通过把helper的路径写入到"/sys/kernel/uevent_helper”文件中实现。实际上，内核通过sysfs文件系统的形式，将****uevent_helper数组开放到用户空间，供用户空间程序修改访问，具体可参考"****./kernel/ksysfs.c”中相应的代码，这里不再详细描述。\*\*\*\* |
 
 _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http://www.wowotech.net/linux_kenrel/uevent.html)。_
 

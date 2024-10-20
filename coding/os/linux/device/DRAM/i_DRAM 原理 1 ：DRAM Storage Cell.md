@@ -1,12 +1,13 @@
+
 作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2016-6-8 16:41 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
 
-## 1. Storage Capacitor
+# 1. Storage Capacitor
 
 DRAM Storage Cell 使用 Storage Capacitor 来存储 Bit 信息。
 
 从原理层面上看，一个最简单的，存储一个 Bit 信息的 DRAM Storage Cell 的结构如下图所示：
 
-![](http://linux.codingbelief.com/zh/memory/dram/dram_storage_cell.png)
+![[Pasted image 20241020120501.png]]
 
 由以下 4 个部分组成：
 
@@ -24,7 +25,7 @@ Q = +Vcc/2 / C
 
 Q = -Vcc/2 / C
 
-### 1.1 数据读写原理
+## 1.1 数据读写原理
 
 从上面的结构图上分析，我们可以很容易的推测出 DRAM Storage Cell 的数据读写流程：
 
@@ -48,7 +49,7 @@ Q = -Vcc/2 / C
 
 Differential Sense Amplifier 包含 Sensing Circuit 和 Voltage Equalization Circuit 两个主要部分。它主要的功能就是将 Storage Capacitor 存储的信息转换为逻辑 1 或者 0 所对应的电压，并且呈现到 Bitline 上。同时，在完成一次读取操作后，通过 Bitline 将 Storage Capacitor 中的电荷恢复到读取之前的状态。
 
-![](http://linux.codingbelief.com/zh/memory/dram/differential_sense_amplifier.png)
+![[Pasted image 20241020120525.png]]
 
 在后面的小节中，我们通过完整的数据读取和写入过程，来了解 Differential Sense Amplifier 工作原理。
 
@@ -60,13 +61,13 @@ Differential Sense Amplifier 包含 Sensing Circuit 和 Voltage Equalization Cir
 
 在这个阶段，首先会通过控制 EQ 信号，让 Te1、Te2、Te3 晶体管处于导通状态，将 Bitline 和 /Bitline 线上的电压稳定在 Vref 上, Vref = Vcc/2。然后进入到下一个阶段。
 
-![](http://linux.codingbelief.com/zh/memory/dram/precharge.png)
+![[Pasted image 20241020120547.png]]
 
 ### 2.1.2 Access
 
 经过 Precharge 阶段， Bitline 和 /Bitline 线上的电压已经稳定在 Vref 上了，此时，通过控制 Wordline 信号，将 Ta 晶体管导通。Storage Capacitor 中存储正电荷会流向 Bitline，继而将 Bitline 的电压拉升到 Vref+。然后进入到下一个阶段。
 
-![](http://linux.codingbelief.com/zh/memory/dram/access.png)
+![[Pasted image 20241020120604.png]]
 
 ### 2.1.3 Sense
 
@@ -74,13 +75,13 @@ Differential Sense Amplifier 包含 Sensing Circuit 和 Voltage Equalization Cir
 此时，SAN (Sense-Amplifier N-Fet Control) 会被设定为逻辑 0 的电压，SAP (Sense-Amplifier P-Fet Control) 则会被设定为逻辑 1 的电压，即 Vcc。由于 Tn2 会比 Tn1 更具导通性，/Bitline 上的电压会更快被 SAN 拉到逻辑 0 电压，同理，Bitline 上的电压也会更快被 SAP 拉到逻辑 1 电压。接着 Tp1 和 Tn2 进入导通状态，Tp2 和 Tn1 进入截止状态。\
 最后，Bitline 和 /Bitline 的电压都进入稳定状态，正确的呈现了 Storage Capacitor 所存储的信息 Bit。
 
-![](http://linux.codingbelief.com/zh/memory/dram/sense.png)
+![[Pasted image 20241020120629.png]]
 
 ### 2.1.4 Restore
 
 在完成 Sense 阶段的操作后，Bitline 线处于稳定的逻辑 1 电压 Vcc，此时 Bitline 会对 Storage Capacitor 进行充电。经过特定的时间后，Storage Capacitor 的电荷就可以恢复到读取操作前的状态。
 
-![](http://linux.codingbelief.com/zh/memory/dram/restore.png)
+![[Pasted image 20241020120643.png]]
 
 最后，通过 CSL 信号，让 Tc1 和 Tc2 进入导通状态，外界就可以从 Bitline 上读取到具体的信息。
 
@@ -88,7 +89,7 @@ Differential Sense Amplifier 包含 Sensing Circuit 和 Voltage Equalization Cir
 
 整个 Read Operation 的时序如下图所示，其中的 Vcc 即为逻辑 1 所对应的电压，Gnd 为逻辑 0。
 
-![](http://linux.codingbelief.com/zh/memory/dram/read_operation_timing.png)
+![[Pasted image 20241020120658.png]]
 
 ## 3. Write Operation
 

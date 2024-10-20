@@ -1,3 +1,4 @@
+
 作者：[codingbelief](http://www.wowotech.net/author/5) 发布于：2016-8-29 22:42 分类：[基础技术](http://www.wowotech.net/sort/basic_tech)
 
 在 [DRAM Device](http://www.wowotech.net/basic_tech/321.html) 章节中，我们简单介绍了 SDRAM 的 Active、Read、Write 等的操作，在本中，我们将详细的介绍各个操作的时序。
