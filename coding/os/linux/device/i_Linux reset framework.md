@@ -1,6 +1,7 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-9-1 10:46 分类：[电源管理子系统](http://www.wowotech.net/sort/pm_subsystem)
 
-## 1. 前言
+# 1. 前言
 
 大家都知道，复杂IC内部有很多具有独立功能的硬件模块，例如CPU cores、GPU cores、USB控制器、MMC控制器、等等，出于功耗、稳定性等方面的考虑，有些IC在内部为这些硬件模块设计了复位信号（reset signals），软件可通过寄存器（一般1个bit控制1个硬件）控制这些硬件模块的复位状态。
 
@@ -8,7 +9,7 @@ Linux kernel为了方便设备驱动的编写，抽象出一个简单的软件�
 
 reset framework的思路、实现和使用都非常简单、易懂（参考kernel有关的API--include/linux/reset-controller.h、include/linux/reset.h可知），不过麻雀虽小，五脏俱全，通过它可以加深对Linux kernel的设备模型、驱动框架、分层设计、provider/consumer等设计思想的理解，因此本文将对其进行一个简单的罗列和总结。
 
-## 2. 从consumer的角度看
+# 2. 从consumer的角度看
 
 从某一个硬件模块的驱动设计者来看，他的要求很简单：我只是想复位我的硬件，而不想知道到底用什么手段才能复位（例如控制哪个寄存器的哪个bit位，等等）。
 
@@ -47,7 +48,7 @@ int reset_control_assert(struct reset_control *rstc);             �
 int reset_control_deassert(struct reset_control *rstc);
 ```
 
-## 3. 从provider的角度看
+# 3. 从provider的角度看
 
 kernel为reset provider提供的API位于“include/linux/reset-controller.h”中，很简单，无非就是：创建并填充reset controller设备（struct reset_controller_dev），并调用相应的接口（reset_controller_register/reset_controller_unregister）注册或者注销之。
 
@@ -83,7 +84,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [Kernel](http://www.wowotech.net/tag/Kernel) [内核](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8) [framework](http://www.wowotech.net/tag/framework) [reset](http://www.wowotech.net/tag/reset)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [蓝牙协议分析(11)\_BLE安全机制之SM](http://www.wowotech.net/bluetooth/le_security_manager.html) | [页面回收的基本概念](http://www.wowotech.net/memory_management/page_reclaim_basic.html)»
 

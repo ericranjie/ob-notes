@@ -40,7 +40,7 @@
 
 驱动按照以上代码实现的话，如果修改中断触发类型或者电平有效状态只需要修改dts即可。例如不同的IC复位电平是不一样的，有的IC是高电平复位，有的IC却是低电平复位。其实这就是一个电平有效状态的例子。
 
-**如何调试gpio**
+# **如何调试gpio**
 
 移植驱动阶段或者调试阶段的工程中，难免想知道当前gpio的电平状态。当然很easy。万用表戳上去不就行了。是啊！硬件工程师的思维。作为软件工程师自然是要软件的方法。下面介绍两个api接口。自己摸索使用吧。点到为止。
 
@@ -52,7 +52,7 @@
 
 在你的driver中调用以上api后，编译下载。去/sys/class/gpio目录看看有什么发现。
 
-**如何调试irq**
+# **如何调试irq**
 
 调试的时候也难免会确定硬件是否产生中断。我们该怎么办呢？也很easy。
 
@@ -62,7 +62,7 @@
 
 1. cd /proc/irq/irq_num
 
-**dts和sysfs有什么关联**
+# **dts和sysfs有什么关联**
 
 曾经写过一篇dts解析的文章[http://www.wowotech.net/device_model/dt-code-file-struct-parse.html](http://www.wowotech.net/device_model/dt-code-file-struct-parse.html)。最后一节其实说了一个很有意思的东西。但是仅仅是寥寥结尾。并没有展开。因为他不关乎我写的文章的的主题。但是，他却和调试息息相关。
 
@@ -72,7 +72,7 @@
 
 远不止我所说的这个功能，还可以判断当前的硬件是匹配哪个dts文件。你还不去探索一波源码的设计与实现吗？节点为什么出现在某些目录？为什么有些节点的属性cat却是乱码？就是乱码，你没看错。至于为什么。点到为止。
 
-**sysfs可以看出什么猫腻**
+# **sysfs可以看出什么猫腻**
 
 sysfs有什么用？sysfs可以看出device是否注册成功、存在哪些device、driver是否注册、device和driver是都匹配、device匹配的driver是哪个等等。先说第一项技能。deivce是否注册。
 
@@ -80,7 +80,7 @@ sysfs有什么用？sysfs可以看出device是否注册成功、存在哪些devi
 
 你以为就这些简单的功能了吗？其实不是，还有很多待你探讨。主要是各种目录之间的关系，device注册会出现什么目录？那么driver呢？各种符号链接会在那些目录？等等。
 
-**如何排查driver的probe没有执行问题**
+# **如何排查driver的probe没有执行问题**
 
 我想这类问题是移植过程中极容易出现的第一个拦路虎。这里需要声明一点。可能有些驱动工程师认为probe没有执行就是driver没有注册成功。其实这两个没有半毛钱关系。probe是否执行只和device和driver的是否匹配成功有关。我们有什么思路排查这类问题呢？主要排查方法可以如下。
 
@@ -94,11 +94,11 @@ sysfs有什么用？sysfs可以看出device是否注册成功、存在哪些devi
 
 最后一点的compatible属性的值只需要cat一下，然后compare即可。不多说。
 
-**后记**
+# **后记**
 
 sysfs还有很多的其他的调试信息可以查看。因此，我建议驱动工程师都应该掌握sysfs的使用和原理。看看代码实现。我始终坚信只有更好地掌握技术的原理才能更好地利用技术。文章内容不想展开。我告诉你的结果，你永远记忆不深刻，而且我说的也不一定对。还是需要自己专研。我只是给你指条明路，剩下的就需要自己去走。最后说一句，代码不会骗你，还会告诉你别人不能告诉你的。
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [ftrace时间精度issue修复](http://www.wowotech.net/linux_kenrel/ftrace-clock-issue.html) | [SLUB DEBUG原理](http://www.wowotech.net/memory_management/427.html)»
 

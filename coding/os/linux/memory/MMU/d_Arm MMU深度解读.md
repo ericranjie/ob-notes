@@ -29,7 +29,7 @@ Enable the MMU
 
 # 二、虚拟地址空间和物理地址空间
 
-2.1、(虚拟/物理)地址空间的范围
+## 2.1 (虚拟/物理)地址空间的范围
 内核虚拟地址空间的范围是什么？应用程序的虚拟地址空间的范围是什么？
 以前我们在学习操作系统时，最常看到的一句话是：内核的虚拟地址空间范围是3G-4G地址空间，应用程序的虚拟地址空间的范围是0-3G地址空间； 到了aarch64上，则为 ： 内核的虚拟地址空间是0xffff_0000_0000_0000 - 0xffff_ffff_ffff_ffff , 应用程序的虚拟地址空间是: 0x0000_0000_0000_0000 - 0x0000_ffff_ffff_ffff.
 做为一名杠精，必需告诉你这句话是错误的。错误主要有两点：
@@ -41,7 +41,7 @@ Enable the MMU
 高位是1的虚拟地址空间，使用TTBR1_ELx基地址寄存器进行页表翻译；高位是0的虚拟地址空间，使用TTBR0_ELx基地址寄存器页表翻译。 所以不应该说，因为你使用了哪个寄存器(TTBR0/TTBR1)，然后决定了你使用的哪套虚拟地址空间；应该说，你操作系统(或userspace软件)使用了哪套虚拟地址空间，决定了使用哪个哪个基地址寄存器(TTBR0/TTBR1)进行翻译。
 
 如下便是两套虚拟地址空间和TTBRn_ELx的对应关系，其中高位的位数不是固定的16(即T1SZ和T0SZ不一定等于16)
-!\[\[Pasted image 20240909130008.png\]\]
+![[Pasted image 20240909130008.png]]
 
 以下摘自ARM文档的官方描述：
 
@@ -54,20 +54,22 @@ In an implementation that includes ARMv8.2-LVA and is using Secure EL3 the 64KB 
 Which TTBR_ELx is used depends only on the VA presented for translation. The most significant bits of the VA must all be the same value and:
 • If the most significant bits of the VA are zero, then TTBR0_ELx is used.
 • If the most significant bits of the VA are one, then TTBR1_ELx is used.
-2.2、物理地址空间有效位(范围)
+
+## 2.2 物理地址空间有效位(范围)
+
 具体每一个core的物理地址是多少位，其实都是定死的，虚拟地址是多少位，是编译或开发的时候根据自己的需要自己配置的。如下表格摘出了部分arm core的物理地址有效位，所以你具体使用多少有效位的物理地址，可以查询core TRM手册。
-!\[\[Pasted image 20240909130025.png\]\]
+![[Pasted image 20240909130025.png]]
 
 页表翻译相关寄存器的配置
 
 ID_AA64MMFR0_EL1.PARange : Physical address size : 读取arm寄存器，得到当前系统支持的有效物理地址是多少位
-!\[\[Pasted image 20240909130036.png\]\]
+![[Pasted image 20240909130036.png]]
 
 TCR_EL1.IPS : Output address size : 告诉mmu，你需要给我输出多少位的物理地址
-!\[\[Pasted image 20240909130041.png\]\]
+![[Pasted image 20240909130041.png]]
 
 TCR_EL1.T0SZ和TCR_EL1.T1SZ : Input address size : 告诉mmu，我输入的是多少有效位的虚拟地址
-!\[\[Pasted image 20240909130047.png\]\]
+![[Pasted image 20240909130047.png]]
 
 # 三、Translation regimes
 

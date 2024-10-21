@@ -1,12 +1,11 @@
-原创 布道师Peter 人人极客社区
 
-_2021年11月25日 08:26_
+原创 布道师Peter 人人极客社区 _2021年11月25日 08:26_
 
 内核启动的过程中会通过函数 **do_initcalls**，将按顺序从 \_\_initcall_start 开始，到 \_\_initcall_end 结束的 section 中以函数指针的形式取出这些编译到内核的驱动模块中初始化函数起始地址，来依次完成相应的初始化。这些初始化函数由 \_\_define_initcall(level,fn) 指示编译器在编译的时候，将这些初始化函数的起始地址值按照一定的顺序放在这个section中。
 
 \_\_initcall_start 到 \_\_initcall_end 之间的 section，通过 vmlinux.lds 可以看到：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021183912.png]]
 
 宏 INIT_CALLS 中定义的这些 section 中放了一系列的函数，这些函数是用 pure_initcall，core_initcall 等宏定义的。如下所示：
 
@@ -56,37 +55,9 @@ static char *initcall_level_names[] __initdata = {    "early",    "core",
 
 通过查找内核映射表 System.map，可以看到 \_\_initcall_gpu_init6 函数指针:
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021183940.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "虚线阴影分割线")
-
-![](http://mmbiz.qpic.cn/mmbiz_png/9sNwsXcN68pL55XIyzTrCHZTbIUdTibQcuzuCaYeGTXNMyn6ACmicUrpoDC0xZSap46XJ59sKysPg9Rg379f32cA/300?wx_fmt=png&wxfrom=19)
-
-**人人极客社区**
-
-工程师们自己的Linux底层技术社区，分享体系架构、内核、网络、安全和驱动。
-
-316篇原创内容
-
-公众号
-
-5T技术资源大放送！包括但不限于：C/C++，Arm, Linux，Android，人工智能，单片机，树莓派，等等。在上面的【人人都是极客】公众号内回复「peter」，即可免费获取！！
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E) **记得点击****分享****、****赞****和****在看****，给我充点儿电吧**
-
-Linux93
-
-驱动22
-
-Linux · 目录
-
-上一篇如何实时监测进程调度累计的runtime下一篇Linux kernel中栈的介绍
-
-阅读 3618
-
-​
-
-写留言
+---
 
 **留言 11**
 

@@ -1,14 +1,13 @@
-Linux阅码场
-_2021年09月29日 09:04_
-The following article is from Linux内核远航者 Author Linux内核远航者
 
-\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247502772&idx=1&sn=6421e35ae01844d2d405eff6fc402bae&source=41&key=daf9bdc5abc4e8d0a0a2ad6eed4ed1a13b043ec3718f49704bf3ac6d5bd258857daff0d603683be12d708a9283f3a1c04638682e317b0906c23551ae91c4a06be02ac3dd6e1625559f08d64d1dc0fc5f5440c2c611b3c6bda506b60ec939e6158a4b17821d20b47e5f5860fd88bf75b79cdb783953decc568447ed0f17c7f18b&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_89d7b88c9033&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQqaqw0STgliQ1JLlTg1etYhKUAgIE97dBBAEAAAAAAPIzBhVi2Q0AAAAOpnltbLcz9gKNyK89dVj0AkE%2BiUpnFLSuLsA5Je5TSWx%2F3jxXKhLV2itU0qKNmUsfwAwFSE3mcest2QYDYg9MtbzSGVpNWdcJ236Q6oZ7OQvnHxPO7lZpEKbRmYiR4sLoa3ZQlloyKcQw1LEzjRzREnawS5rSxnz00V9qmTzC5lHdamCwPkIGM6CwyjH6eexXV7tRQZn%2BwLAXQ6cAUe0yjPMBwKNC0A%2B%2Fq%2FdtPZW31Ut8DqfTCtyRBkgYpjOS9neSr9TdbFYIfCbwAm5Vcjz%2F4Xo5eHE9R%2FIp91a7RICMzgATxOOsD9P%2BIJxUmIA7tacyv8KvZ%2BPfNrPpk%2Feokw%3D%3D&acctmode=0&pass_ticket=TrnVfrQqmBxi2hB%2BlDOlWzc%2FGcbrhv02sZSqWBz%2Bm1zTRBRCbnJtAMWQd0rwd5Bz&wx_header=0#)
+Linux阅码场 _2021年09月29日 09:04_
+
+The following article is from Linux内核远航者 Author Linux内核远航者
 
 首先祝大家中秋节快乐，阖家欢乐，节日之余记得学习哟！
 
 Linux中有后备文件支持的页称为文件页，如属于进程的代码段、数据段的页，内存回收的时候这些页面只需要做脏页的同步即可（干净的页面可以直接丢弃掉）。反之为匿名页，如进程的堆栈使用的页，内存回收的时候这些页面不能简单的丢弃掉，需要交换到交换分区或交换文件。本文中，主要分析匿名页的访问将发生哪些可能颠覆我们认知的"化学反应"。
 
-# 1.实例代码
+# 1. 实例代码
 
 首先以一个简单的示例代码来说明：
 

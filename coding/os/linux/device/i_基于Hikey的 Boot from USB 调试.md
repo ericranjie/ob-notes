@@ -1,10 +1,11 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2016-12-20 22:36 分类：[X Project](http://www.wowotech.net/sort/x_project)
 
-## 1. 前言
+# 1. 前言
 
 话说在半年前，乐美客送给蜗窝几块Hikey(乐美客版)开发板\[1\]，不过由于太忙，就一直把它们放在角落里思考人生，因此甚是愧疚。这几天，闲来无事，翻了下Hikey的资料，觉得挺有意思，就想花点时间让“[X Project](http://www.wowotech.net/sort/x_project)”在这个板子上跑起来。当然，按照“规矩”，先从“[【任务1】启动过程-Boot from USB](http://www.wowotech.net/forum/viewtopic.php?id=15)”做起，记录如下。
 
-## 2. Hikey介绍
+# 2. Hikey介绍
 
 说实话，作为一块开发板，Hikey有着国产平台的通病----资料匮乏，但它的source code却非常完整：
 
@@ -12,7 +13,7 @@
 
 另外，之所以觉得这块板子很有意思，是因为海思的这颗SOC----[Hi6220V100](https://github.com/96boards/documentation/blob/master/ConsumerEdition/HiKey/HardwareDocs/Hi6220V100_Multi-Mode_Application_Processor_Function_Description.pdf)\[2\]，它有如下的处理器架构：
 
-[![Hi6220V100_SOC_ARCH](http://www.wowotech.net/content/uploadfile/201612/62b2298744793b5d87787b6c16eb688520161220143652.gif "Hi6220V100_SOC_ARCH")](http://www.wowotech.net/content/uploadfile/201612/ecc7dd6296f3c16d7ee954e6d0c9600c20161220143651.gif)
+![[Pasted image 20241021184109.png]]
 
 图片1 Hi6220V100 SOC Architecture
 
@@ -24,7 +25,7 @@
 
 基于上述的架构，Hikey USB boot的流程如下：
 
-[![Hi6220V100_USB_BOOT](http://www.wowotech.net/content/uploadfile/201612/fe7a8c34e063b4136c6fb3ca1eb3975420161220143653.gif "Hi6220V100_USB_BOOT")](http://www.wowotech.net/content/uploadfile/201612/5b04128ebcb2b889fc8008e5ac44c81720161220143652.gif)
+![[Pasted image 20241021184130.png]]
 
 图片2 Hi6220V100 USB BOOT
 
@@ -38,17 +39,17 @@
 
 注2：Hikey的官方Image并没有使用常规的bootloader（u-boot等），而是用ARM Trusted Firmware代替了bootloader的功能，因此它的boot过程为：l-loader---->ARM Trusted Firmware(BL1, BL2, BL3等)---->Linux kernel。另外，ARM Trusted Firmware也集成了Android的fast boot功能，用起来还是很方便的。感兴趣的同学可以研究一下相关的source code。
 
-## 3. 移植u-boot SPL到Hikey中
+# 3. 移植u-boot SPL到Hikey中
 
 本章将根据第2章罗列的信息，基于“[X Project](http://www.wowotech.net/sort/x_project)”有关的文档，尝试将u-boot的SPL跑在Hikey开发板上，并点亮一盏灯，步骤如下。
 
-#### 3.1 修改“[X Project](http://www.wowotech.net/sort/x_project)”的编译脚本，加入对Hikey的支持
+## 3.1 修改“[X Project](http://www.wowotech.net/sort/x_project)”的编译脚本，加入对Hikey的支持
 
 不再详细描述修改步骤，具体可参考下面的patch：
 
 > [\[xprj, hikey\] support hikey.](https://github.com/wowotechX/build/commit/030be3ea25a4d103ca515d898e95d33b849b89db)
 
-#### 3.2 修改“[X Project](http://www.wowotech.net/sort/x_project)”的u-boot，增加对Hikey SPL的支持
+## 3.2 修改“[X Project](http://www.wowotech.net/sort/x_project)”的u-boot，增加对Hikey SPL的支持
 
 mainline的u-boot已经支持了Hikey，但没有使能SPL功能，这刚好给我们大显身手的机会，步骤如下：
 
@@ -104,7 +105,7 @@ CONFIG_SPL_BSS_MAX_SIZE + \
 
 修改完毕后，编译生成u-boot-spl.bin，留作后用。
 
-#### 3.3 单独编译出l-loader
+## 3.3 单独编译出l-loader
 
 从[https://github.com/96boards/l-loader.gi](https://github.com/96boards/l-loader.git "https://github.com/96boards/l-loader.git")[t](https://github.com/96boards/l-loader.git "https://github.com/96boards/l-loader.git")中将l-loader单独编译出，并保存在“[X Project](http://www.wowotech.net/sort/x_project)”的tools/hisilicon目录中，留作后用，如下：
 
@@ -112,7 +113,7 @@ CONFIG_SPL_BSS_MAX_SIZE + \
 
 注3：l-loader的编译方法，这里不再详细介绍（无非就是下载一个gcc-arm-linux-gnueabihf交叉编译器，稍微修改一下[l-loader.git](https://github.com/96boards/l-loader.git "https://github.com/96boards/l-loader.git")的Makefile文件）。
 
-#### 3.4 将[gen_loader.py](https://github.com/96boards/l-loader/blob/master/gen_loader.py)和[hisi-idt.py](http://builds.96boards.org/releases/reference-platform/aosp/hikey/15.10/bootloader/hisi-idt.py)保存到“[X Project](http://www.wowotech.net/sort/x_project)”的tools/hisilicon目录中
+## 3.4 将[gen_loader.py](https://github.com/96boards/l-loader/blob/master/gen_loader.py)和[hisi-idt.py](http://builds.96boards.org/releases/reference-platform/aosp/hikey/15.10/bootloader/hisi-idt.py)保存到“[X Project](http://www.wowotech.net/sort/x_project)”的tools/hisilicon目录中
 
 如下：
 
@@ -120,7 +121,7 @@ CONFIG_SPL_BSS_MAX_SIZE + \
 >
 > [https://github.com/wowotechX/tools/blob/hikey/hisilicon/hisi-idt.py](https://github.com/wowotechX/tools/blob/hikey/hisilicon/hisi-idt.py "https://github.com/wowotechX/tools/blob/hikey/hisilicon/hisi-idt.py")
 
-#### 3.5 修改“[X Project](http://www.wowotech.net/sort/x_project)”的编译脚本，增加Hikey u-boot-spl的运行命令
+## 3.5 修改“[X Project](http://www.wowotech.net/sort/x_project)”的编译脚本，增加Hikey u-boot-spl的运行命令
 
 如下：
 
@@ -133,7 +134,7 @@ hisi-idt=(TOOLS_DIR)/(BOARD_VENDOR)/hisi-idt.py
 
 spl-run:
 
-# generate SPL image
+#generate SPL image
 
 sudo python (gen-loader) -o spl.img --img_loader=(img-loader) --img_bl1=$(uboot-spl-bin)\
 sudo python $(hisi-idt) --img1=spl.img -d /dev/ttyUSB0\
@@ -145,7 +146,7 @@ rm -f spl.img
 
 2）使用[hisi-idt.py](http://builds.96boards.org/releases/reference-platform/aosp/hikey/15.10/bootloader/hisi-idt.py)将spl.img下载到板子中运行。
 
-#### 3.6 运行并测试
+## 3.6 运行并测试
 
 按照\[1\]中的步骤，为Hikey供电，并让它进入USB boot模式，然后在“[X Project](http://www.wowotech.net/sort/x_project)”的build目录中执行make spl-run即可。观察Hikey的LED灯，应该有一个亮了，说明移植成功。
 
@@ -169,7 +170,7 @@ rm -f spl.img
 
 标签: [USB](http://www.wowotech.net/tag/USB) [boot](http://www.wowotech.net/tag/boot) [u-boot](http://www.wowotech.net/tag/u-boot) [spl](http://www.wowotech.net/tag/spl) [hikey](http://www.wowotech.net/tag/hikey) [Hi6220V100](http://www.wowotech.net/tag/Hi6220V100)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [MMC/SD/SDIO介绍](http://www.wowotech.net/basic_tech/mmc_sd_sdio_intro.html) | [Linux serial framework(1)\_概述](http://www.wowotech.net/comm/serial_overview.html)»
 

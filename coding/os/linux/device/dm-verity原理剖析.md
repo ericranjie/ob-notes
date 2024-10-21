@@ -1,10 +1,7 @@
-# 
 
-Original Mcgrady_wu OPPO内核工匠
+Original Mcgrady_wu OPPO内核工匠 _2021年09月10日 17:00_
 
-_2021年09月10日 17:00_
-
-**一、技术模块简介**
+# **一、技术模块简介**
 
 Dm-verity 是 device-mapper 架构下的一个目标设备类型， 通过它来保障设备或者设备分区的完整性。
 
@@ -12,11 +9,11 @@ Dm-verity类型的目标设备有两个底层设备，一个是数据设备(data
 
 简单的架构图如下：
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjOGz8hI5WJKqy9FNqicb0cgmOrQ7kzTnzrYhg5CTJHadozRMhk2nDSD1NWrFPDjDuEzRnkSdV5UFPw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241021184258.png]]
 
 图中映射设备(Mapper Device)和目标设备(Target Device)是一对一关系，对映射设备的读操作被映射成对目标设备的读操作，在目标设备中，dm-verity又将读操作映射为数据设备（Data Device）的读操作。但是在读操作的结束处，dm-verity加了一个额外的校验操作，对读到的数据计算一个hash值，用这个哈希值和存储在哈希设备(Hash Device)
 
-**二、设计原理**
+# **二、设计原理**
 
 对于本文要介绍的dm-verity功能模块，笔者选择在当前移动终端应用的角度来展开讲解，也就是Android平台在dm-verity的应用。
 

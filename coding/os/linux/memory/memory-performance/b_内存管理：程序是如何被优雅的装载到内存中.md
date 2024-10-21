@@ -1,45 +1,30 @@
-# 
 
-一口Linux
-
-_2021年11月18日 11:50_
+一口Linux _2021年11月18日 11:50_
 
 The following article is from 假装懂编程 Author 康师傅
 
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6lvv53yFKEBBKrgXD5ZO4eiaBqq3gUl6HUWWdktWI2mjg/0)
-
-**假装懂编程**.
-
-大厂程序员，热爱分享，喜欢钻研，一起来切磋呀～
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzUxMjEyNDgyNw==&mid=2247499719&idx=2&sn=6d3405bec456cbcb9e4ffe813ac24020&chksm=f96b8d33ce1c0425e0cf586aa08739266ef9ecf3f9f0063683ae48bffaed4d468ff3fac6a5e7&mpshare=1&scene=24&srcid=1118QqTO7DC37O8UNlWidZhr&sharer_sharetime=1637232729360&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0578aa43b0a8c3ab24f12624a2208b9c597919613dd735b391f3a2114ad51dcbfcafd6331b42174b17ae1f5168d749d99faad6a89a1cde6e7d8f3ed7c2f8586e1a73bb818b36bda8850fb4c3f868b36c2a7a2e3ef0f88704475f6c52cd058e84389e5fd160f090d7315177a968b366a23c872f9da2fb4c51f&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_fc2c47bdbd29&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQBnxN7nrVLKyqfG4Y%2FRNAVxKUAgIE97dBBAEAAAAAABi%2BMuWKK64AAAAOpnltbLcz9gKNyK89dVj0ozon%2B3K6d4ZdO%2F%2BMAR2uh%2FoCEeQjEXDYmrxXZyJmSFcb3%2BILNIpp9jClZQwupeKNTvMo9GQ%2BneBno5ud4moe0gwb%2Fk0zYSVS2SME1cBXIdV1JoXSUY4nhgOyDivbLs8oiFk7sE2K4O5uSl%2FKJzNUKrqO0%2BJ2c%2B%2B50bwraSmv%2BMp5dQTb2kOFD6qxmq6Df3NXxaetALH5eO0Jb33LshW01P2sKJssJhvFAFWNPpqjzWzlqGNSiY04O85Tk8H71DZLM6pMwzLUJ3yX6B5%2Brx2FaDSk4uFD10jiK1h4zUB0mGuxABOblDdlSeNky%2B%2BDfw%3D%3D&acctmode=0&pass_ticket=NTqf0xhV5SihCv%2FBtZWuyJwfrnkB3ykQAUQJmszyl2uhvWU4zMo4qGlL4AoLm5qW&wx_header=0#)
-
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/WUHAvRwQMxqYwM80nxcbksRibSkUiareWupzG2IrQ8QnQiacNKvJwFmENZIqRLdOGqtIXhuicf1kCSvFZLrUNLtwKA/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
-
 内存作为计算机中一项比较重要的资源，它的主要作用就是解决CPU和磁盘之间速度的鸿沟，但是由于内存条是需要插入到主板上的，因此对于一台计算机来说，由于物理限制，它的内存不可能无限大的。我们知道我们写的代码最终是要从磁盘被加载到内存中的，然后再被CPU执行，不知道你有没有想过，为什么一些大型游戏大到10几G，却可以在只有8G内存的电脑上运行？甚至在玩游戏期间，我们还可以聊微信、听音乐...，这么多进程看着同时在运行，它们在内存中是如何被管理的？带着这些疑问我们来看看计算系统内存管理那些事。
 
-## 内存的交换技术
+# 内存的交换技术
 
 如果我们的内存可以无限大，那么我们担忧的问题就不会存在，但是实际情况是往往我们的机器上会同时运行多个进程，这些进程小到需要几十兆内存，大到可能需要上百兆内存，当许许多多这些进程想要同时加载到内存的时候是不可能的，但是从我们用户的角度来看，似乎这些进程确实都在运行呀，这是怎么回事？
 
 这就引入要说的交换技术了，从字面的意思来看，我想你应该猜到了，它会把某个内存中的进程交换出去。当我们的进程空闲的时候，其他的进程又需要被运行，然而很不幸，此时没有足够的内存空间了，这时候怎么办呢？似乎刚刚那个空闲的进程有种占着茅坑不拉屎的感觉，于是可以把这个空闲的进程从内存中交换到磁盘上去，这时候就会空出多余的空间来让这个新的进程运行，当这个换出去的空闲进程又需要被运行的时候，那么它就会被再次交换进内存中。通过这种技术，可以让有限的内存空间运行更多的进程，进程之间不停来回交换，看着好像都可以运行。
-!\[\[Pasted image 20240928103709.png\]\]
+![[Pasted image 20240928103709.png]]
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)如图所示，一开始进程A被换入内存中，所幸还剩余的内存空间比较多，然后进程B也被换入内存中，但是剩余的空间比较少了，这时候进程C想要被换入到内存中，但是发现空间不够了，这时候会把已经运行一段时间的进程A换到磁盘中去，然后调入进程C。
-!\[\[Pasted image 20240928103717.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+如图所示，一开始进程A被换入内存中，所幸还剩余的内存空间比较多，然后进程B也被换入内存中，但是剩余的空间比较少了，这时候进程C想要被换入到内存中，但是发现空间不够了，这时候会把已经运行一段时间的进程A换到磁盘中去，然后调入进程C。
 
-### 内存碎片
+![[Pasted image 20240928103717.png]]
+
+## 内存碎片
 
 通过这种交换技术，交替的换入和换出进程可以达到小内存可以运行更多的进程，但是这似乎也产生了一些问题，不知道你发现了没有，在进程C换入进来之后，在进程B和进程C之间有段较小的内存空间，并且进程B之上也有段较小的内存空间，说实话，这些小空间可能永远没法装载对应大小的程序，那么它们就浪费了，在某些情况下，可能会产生更多这种内存碎片。
-!\[\[Pasted image 20240928103724.png\]\]
+![[Pasted image 20240928103724.png]]
 !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)如果想要节约内存，那么就得用到内存紧凑的技术了，即把所有的进程都向下移动，这样所有的碎片就会连接在一起变成一段更大的连续内存空间了。
 !\[\[Pasted image 20240928103734.png\]\]
 !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)但是这个移动的开销基本和当前内存中的活跃进程成正比，据统计，一台16G内存的计算机可以每8ns复制8个字节，它紧凑全部的内存大概需要16s，所以通常不会进行紧凑这个操作，因为它耗费的CPU时间还是比较大的。
 
-### 动态增长
+## 动态增长
 
 其实上面说的进程装载算是比较理想的了，正常来说，一个进程被创建或者被换入的时候，它占用多大的空间就分配多大的内存，但是如果我们的进程需要的空间是动态增长的，那就麻烦了，比如我们的程序在运行期间的for循环可能会利用到某个临时变量来存放目标数据（例如以下变量a，随着程序的运行是会越来越大的）：
 

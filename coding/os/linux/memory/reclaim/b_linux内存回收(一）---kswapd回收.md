@@ -1,5 +1,5 @@
-奇小葩 Linux阅码场
-_2021年12月22日 10:14_
+
+奇小葩 Linux阅码场 _2021年12月22日 10:14_
 _**原文作者：奇小葩**_
 _**原文链接：https://blog.csdn.net/u012489236/article/details/120587124**_
 
@@ -63,14 +63,14 @@ _**原文链接：https://blog.csdn.net/u012489236/article/details/120587124**_
 - 针对第②种，Linux系统会触发直接内存回收(direct reclaim)，在内核调用页分配函数分配物理页面时，由于系统内存短缺，不能满足分配请求，内核就会直接触发页面回收机制，尝试回收内存来解决问题
 
 这两种回收的触发方式不同，其区别如下图所示
-!\[\[Pasted image 20240915195643.png\]\]
+![[Pasted image 20240915195643.png]]
 
 # **3 kswapd初始化**
 
 kswpad本身是内核线程，它和调用者的关系是异步的，如test进程尝试调用alloc_pages()来分配内存，当发现在低水位情况下无法分配出内存时，它唤醒kswapd内核线程。这时，kswapd内核线程就开始执行页面回收工作了。同时test进程会尝试其他的方法来分配内存，如调用直接内存回收。
 
 Linux内核中有一个非常重要的内核线程kswapda，它负责在内存不足的情况下回收页面。kswapd内核线程初始化时会为系统每个NUMA内存结点创建一个名为kswap%d的内核线程。
-!\[\[Pasted image 20240915195649.png\]\]
+![[Pasted image 20240915195649.png]]
 
 - swap_setup函数根据物理内存大小设定全局变量page_cluster，当megs小于16时候，page_cluster为2，否则为3
 
@@ -78,7 +78,7 @@ Linux内核中有一个非常重要的内核线程kswapda，它负责在内存�
 
 - 然后通过for_each_node_state遍历所有 节点，kswapd_run中kthread_run为每个节点创建一 个kswapd%d线程
 
-!\[\[Pasted image 20240915195655.png\]\]
+![[Pasted image 20240915195655.png]]
 
 在NUMA系统中，每个内存结点都通过一个pg_data_t数据结构来描述物理内存的布局，pg_data_t数据结构定义在include/linux/mmzone.h中，kswapd传递的参数就是pg_data_t数据结构
 
@@ -101,8 +101,7 @@ enum zone_type kswapd_classzone_idx;
 
 和kswapd相关的参数有kswapd_order，kswapd_wait和kswapd_classzone_idx等。kswapd_wait是一个等待队列，每个pg_data_t数据结构都有一个等待队列，它是在free_area_init_core函数中初始化的。
 
-!\[\[Pasted image 20240915195703.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195703.png]]
 
 - Kswapd的主循环是一个死循环，首先设置kswapd内核线程的进程描述符的标志位，只有当kthread \_should_stop的时候才会break跳出循环体，会kswapd_try_to_sleep中睡眠，并让出CPU控制权。当系统内存紧张时，这时内存分配函数会调
 - wakeup_kswapd()来唤醒kswapd内核线程，此时kswapd内核线程在kswapd_try_to_sleep函数中被唤醒，然后调用balance_pgdat()函数来回收页面。
@@ -112,16 +111,14 @@ enum zone_type kswapd_classzone_idx;
 
 下面重点是看看kswapd_try_to_sleep，kswapd_try_to_sleep用于判断kswapd线程是否sleep，该函数是内核线程kswapd睡眠时让出cpu控制权的地方，同时也是睡眠kswapd被唤醒时进入的地方
 
-!\[\[Pasted image 20240915195709.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195709.png]]
 
 - 通过prepare_kswapd_sleep判断kswap是否可以睡眠
 - 可以睡眠则先尝试睡眠0.1s
 - 如果中途没有被唤醒，说明kswap可以睡眠，让出CPU，schedule出去
 - 如果中途被唤醒则返回上层函数，执行内存回收
 
-!\[\[Pasted image 20240915195713.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195713.png]]
 
 - 唤醒所有等待内存回收的进程
 - 如果此前kswapd回收失败达到16次了，没必要再唤醒kswapd
@@ -132,13 +129,11 @@ enum zone_type kswapd_classzone_idx;
 
 前面介绍了，kswapd内核线程初始化会在kswapd_try_to_sleep函数中睡眠，当内核线程被唤醒后，会调用最关键的balance_pgdat()来回收页面。首先，在kswapd回收内存过程中有一个扫描控制结构体，用于控制这个回收过程。既然是回收内存，就需要明确要回收多少内存，在哪里回收，以及回收时的操作权限等，我们看下这个控制结构struct scan_control主要的一些变量，
 
-!\[\[Pasted image 20240915195718.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195718.png]]
 
 scan_control数据结构用于控制页面回收的参数，在balance_pgdat中会使用到这些参数，那么重点关注这个函数
 
-!\[\[Pasted image 20240915195723.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195723.png]]
 
 主要流程：
 
@@ -151,18 +146,17 @@ scan_control数据结构用于控制页面回收的参数，在balance_pgdat中�
 - 回收完毕判断是否需要唤醒等待内存的进程
 - 此次kswap没有回收到页面，失败次数加1，达到16次就放弃
 
-**4 kswapd_shrink_node**
+# **4 kswapd_shrink_node**
 
 pgdat_balanced()检查这个内存节点中是否有合格的zone，遍历这个内存节点中可用的zone的顺序为从最低zone到classzone_idx指向的zone，classzone_idx通常是页分配器传递过来的参数，然后调用zone_watermark_ok_safe函数来检查这个zone的水位释放高于WMARK_HIGH水位并且是否可以分配出2的order次幂个连续的物理页面。如果不够，就调用kswapd_shrink_node函数用于扫描内存节点中所有可回收的页面。
 
-!\[\[Pasted image 20240915195729.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195729.png]]
 
 - 计算high_wmark水位值，回收页面数量要大于该值
 - 对node进行内存回收，包括LRU链表和slab缓存
 - 如果已经回收到两倍order大小的内存，设置检测内存阈值检测odrer为0阶，避免过度回收
 
-**5 shrink_node**
+# **5 shrink_node**
 
 shrink_node函数用于扫面内存节点中所有可用于回收的页面，其主要的操作如下：
 
@@ -170,10 +164,9 @@ shrink_node函数用于扫面内存节点中所有可用于回收的页面，其
 - 首先遍历mem_cgroup，调用shrink_node_memcg回收页面
 - shrink_slab函数调用内存管理系统的shrinker接口，很多子系统会注册shrinker接口来回收slab对象
 - vmpressure函数通过计算nr_scanned/nr_reclaimed比例来判断内存压力
-  !\[\[Pasted image 20240915195734.png\]\]
-  !\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+  ![[Pasted image 20240915195734.png]]
 
-**6 shrink_node_memcg**
+# **6 shrink_node_memcg**
 
 shrink_node_memcg函数使基于内存节点的页面回收函数，它被kswapd内核线程和直接页面回收机制调用，其有4个参数
 
@@ -182,14 +175,12 @@ shrink_node_memcg函数使基于内存节点的页面回收函数，它被kswapd
 - sc是页面回收的控制参数
 - lru_pages表示已经扫面的页面数量
 
-!\[\[Pasted image 20240915195742.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195742.png]]
 
 shrink_node_memcg函数中，调用了get_scan_count函数之后，获取到了扫描页面的信息后，就开始进入主题对LRU链表进行扫描处理了。它会对匿名页和文件页做平衡处理，选择更合适的页面来进行回收。当回收的页面超过了目标页面数后，将停止对文件页和匿名页两者间LRU页面数少的那一方的扫描，并调整对页面数多的另一方的扫描速度。最后，如果不活跃页面少于活跃页面，则需要将活跃页面迁移到不活跃页面链表中。
-!\[\[Pasted image 20240915195747.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195747.png]]
 
-**7 get_scan_count**
+# **7 get_scan_count**
 
 内存回收最后会调到shrink_node, 从代码可以看出回收的对象就两种
 
@@ -212,19 +203,15 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 这个函数用于获取针对文件页和匿名页的扫描页面数。这个函数决定内存回收每次扫描多少页，匿名页和文件页分别是多少，比例如何分配等。
 
 在函数的执行过程中，根据四种扫描平衡的方法标签来最终选择计算方式，四种扫描平衡标签如下：
-!\[\[Pasted image 20240915195754.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195754.png]]
 
-!\[\[Pasted image 20240915195802.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195802.png]]
 
 对于下面重点关注zone_reclaim_stat，其中匿名页面存放在数组\[0\]中，文件缓存页存放在数组\[1\]中。举个例子，如果recent_rotated\[1\]/recent_scanned\[1\]越小，说明LRU中的文件页面价值较小，那么更应该多扫描一些文件页面，尽量把没有价值的文件页面释放掉。根据公式，文件页面的recent_rotated越小，fp值越大，那么最后扫描的scan_file需要扫描的文件页面数量也就越大。也可以理解为：在扫描总量一定的情况下，扫描文件页面的比重更大。
 
-!\[\[Pasted image 20240915195807.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195807.png]]
 
-!\[\[Pasted image 20240915195811.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195811.png]]
 
 在get_scan_count()函数中会计算每个lru链表需要扫描的页框数量，然后将它们保存到nr数组中，在此，有两个因素会影响这4个lru链表需要扫描的数量，一个是sc->priority(扫描优先级)，一个是swapiness。
 
@@ -232,17 +219,15 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 
 - \*\*swapiness：\*\*影响的是在基准值的基础上，是否做调整，让系统更多地去扫描文件页lru链表，或者更多地去扫描匿名页lru链表。当swapiness为100时，扫描文件页lru链表与扫描匿名页lru链表是平衡的，并不倾向与谁，也就是它们需要扫描的页框就是就是sc->priority决定的基准值，当swapiness为0,时，就不会去扫描匿名页lru链表，只扫描文件页lru链表。
 
-**8 shrink_list**
+# **8 shrink_list**
 
 计算好每个lru链表需要扫描的页框数量后，就以活动匿名页lru链表、非活动匿名页lru链表、活动文件页lru链表、非活动文件页lru链表的顺序对每个链表进行一次最多32个页框的扫描，然后将对应的nr数组的数值进行减少，当对这4个lru链表都进行过一次扫描后，判断是否回收到了足够页框，如果没有回收到足够页框，则继续扫描，而如果已经回收到了足够页框的话，并且nr数组中的数还有剩余的情况下，那么就进入到最重要的回收函数中，根据LRU链表的类型来调用不同的处理函数
-!\[\[Pasted image 20240915195818.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195818.png]]
 
-**9 inactive_list_is_low**
+# **9 inactive_list_is_low**
 
 该函数的目的是判断传入的lru链表类型对应的不活跃lru链表上的页框数量是否过低，返回true表明过低。
-!\[\[Pasted image 20240915195840.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195840.png]]
 
 系统总是希望不活跃的匿名页面数量应该保持比较少，因为这样保证系统没有太多的工作可做，可以让页面回收的工作变得少。同时也希望而不活跃的文件映射页面也应该相对少一些，这样可以在活跃的LRU链表中预留更多的内存，更多的page cache，更高效的文件读取工作。
 
@@ -260,16 +245,14 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 
 对于匿名页面，不活跃的比例为
 
-!\[\[Pasted image 20240915195847.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195847.png]]
 
-**10 shrink_active_list**
+# **10 shrink_active_list**
 
 shrink_active_list用于扫描活跃LRU链表，包括匿名页面或文件映射页面，把最近一直没有人访问的页面添加到不活跃的LRU链表中。
-!\[\[Pasted image 20240915195853.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195853.png]]
 
-**11 shrink_inactive_list**
+# **11 shrink_inactive_list**
 
 对于shrink_inactive_list函数扫描不活跃LRU链表以尝试回收页面，并且返回已经回收的页面数量。其大致的过程如下：
 
@@ -284,27 +267,22 @@ shrink_active_list用于扫描活跃LRU链表，包括匿名页面或文件映�
 - 调用shrink_page_list来扫描页面并回收页面，nr_reclaimed表示成功回收的页面数量
 
 我们关注最重要的函数shrink_page_list，它决定在zone->inactive_list中的页面最后是否能被回收释放掉。这个函数的处理流程总结如下
-!\[\[Pasted image 20240915195859.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195859.png]]
 
 对于页面回收过程中，我们会遇到很多意想不到的情况，如大量脏页、大量正在回写的页面堵塞了块设备的I/O通道等问题，这些问题都会严重的影响页面回收的机制，甚至用户的体验。为了捕获这些信息，页面回收机制使用以下方式
-!\[\[Pasted image 20240915195905.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195905.png]]
 
 对于上面的页面，内核有几个标志位在内核节点pglist_datea的flags成员中，如下所示
 
-!\[\[Pasted image 20240915195910.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195910.png]]
 
 - PGDAT_WRITEBACK，表示正在回收时发现大量正在回写页面，kswapd内核线程就应该跳过该页面，但是对于直接内存回收来说，需要等待这个页面回收完成
 
-!\[\[Pasted image 20240915195915.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195915.png]]
 
 - PGDAT_CONGESTED表示系统中有大量页面堵塞在块设备的I/O操作上，应对措施是让系统等待一段时间。在扫面内存节点的页面时，每次扫面完一轮，需要判断当前是否设置了PGDAT_CONGESTED标志位。若直接页面回收者发现系统有大量回写页面堵塞，那么调用wait_iff_congested函数让页面等待一会儿
 
-!\[\[Pasted image 20240915195922.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240915195922.png]]
 
 - PGDAT_DIRTY表示发现LRU链表中有大量的葬爷，对于匿名页面的葬爷，都会调用pageout函数回写脏页，对于文件映射的脏页，就需要分为两种情况
 
@@ -312,13 +290,13 @@ shrink_active_list用于扫描活跃LRU链表，包括匿名页面或文件映�
 
 - _对于直接内存回收者，只有发现大量葬爷，即设置了PGDAT_DIRTY标志位，才会调用pageout函数回写脏页，否则就直接跳过该页面_
 
-**12 总结**
+# **12 总结**
 
 页面回收，并不是回收得越多越好，而是力求达到一种balanced。因为页面回收总是以cache丢弃、内存swap等为代价的，对系统 性能会有一定程度的影响。而balanced，就是既要保证性能，又要应付好新来的页面分配请求。而kswapd也是以此为原则进行内存的回收，本章大致梳理了下kswapd的初始化和内存回收的流程，至于具体的LRU链表的类型来调用不同的处理放到后面章节中进行学习，本章主要理解kswapd流程，参考网上一张图，其处理流程如下图所示
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021185102.png]]
 
-**13 参考文档**
+# **13 参考文档**
 
 _\[内核内存\] \[arm64\] 内存回收4—shrink_node函数详解_
 

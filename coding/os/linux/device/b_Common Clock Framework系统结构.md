@@ -1,23 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-4-21 19:23 分类：[电源管理子系统](http://www.wowotech.net/sort/pm_subsystem)
 
-一、前言
+# 一、前言
 
 之前，wowo同学已经发表了关于CCF（[Common Clock Framework](http://www.wowotech.net/linux_kenrel/clk_overview.html)）的三份文档，相信大家对CCF有一定的了解了，本文就是在阅读那三份文档的基础上，针对Linux 4.4.6内核的内核代码实现，记录自己对CCF的理解，并对CCF进行系统结构层面的归纳和整理。
 
@@ -25,17 +9,17 @@
 
 另外，在阅读CCF代码的过程中，我准备用两份文档来分享我对CCF的理解。这一份是系统结构，另外一份是逻辑解析。
 
-二、软件框架
+# 二、软件框架
 
 1、CCF 相关的block diagram
 
 CCF的框架如下图所示：
 
-[![clk-arch](http://www.wowotech.net/content/uploadfile/201604/7af03a46e4a61486c507dd2bc68758dc20160421112336.gif "clk-arch")](http://www.wowotech.net/content/uploadfile/201604/ab50b4f724efcfbc9a68a285376d952920160421112334.gif)
+![[Pasted image 20241021191619.png]]
 
 上图中，位于图片中心的那个青色的Block就是CCF模块，和硬件无关，实现了通用的clock设备的逻辑。其他的软件模块都不属于CCF的范畴，但是会和CCF有接口进行通信。随后的两个章节会对各个block以及接口进行描述。
 
-三、软件框架图中各个block的功能描述
+# 三、软件框架图中各个block的功能描述
 
 1、HW clock device tree
 
@@ -162,13 +146,13 @@ CCF layer有2条全局的链表：clk_root_list和clk_orphan_list。所有设置
 
 （3）配合系统电源管理（TODO）。
 
-5、设备树
+## 5、设备树
 
 具体请参考本站的相关文档。
 
-四、接口描述
+# 四、接口描述
 
-1、consumer dts interface
+## 1、consumer dts interface
 
 clock consumer的属性列表如下：
 
@@ -179,7 +163,7 @@ clock consumer的属性列表如下：
 |clock-names|可选|同样的，该属性也似描述设备使用的clock source信息的，也是一个数组，是一个字符串数组，每一个字符串描述一个clock source，对应着clocks中phandle和clock specifier。  <br>之所以提供clock-names这个属性其实是为了编程方便，驱动程序可以通过比较直观的clock name来找到该设备的输入时钟源信息。|
 |clock-ranges|可选|该属性值为空，主要用来说明该设备的下级设备可以继承该设备的clock source。例如B设备是A设备的sub node，A设备如果有clock-ranges属性，那么B设备在寻找其clock source的时候，如果在本node定义的clock相关属性中没有能够找到，那么可以去A设备去继续寻找（也就是说，B设备会继承A设备的clock source相关的属性，也就是clocks或者clock-names这两个属性）。|
 
-2、provider dts interface
+## 2、provider dts interface
 
 clock provider的属性列表如下：
 

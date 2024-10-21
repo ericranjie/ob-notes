@@ -1,9 +1,9 @@
-spy_os Linux爱好者
-_2021年08月27日 11:52_
+
+spy_os Linux爱好者 _2021年08月27日 11:52_
 
 linux平台普遍采用的DRM软件架构中，不仅包含了内核空间驱动层的代码，而且提供应用层的支撑库libdrm。libdrm基于DRI协议通过ioctl与2D图显驱动进行交互，配置图显处理器以及HDMI、MIPI、LVDS等编解码单元。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/9aPYe0E1fb0XkZexF5cqTWxvVB8LSXTkrvlJnhX42SBI7DOFok1pUqU11yaIcdeibfeKV9DxEhMWvtBtJWesaew/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241021191736.png]]
 
 from rockchip
 
@@ -15,7 +15,7 @@ from rockchip
 
 通过库函数getopt()处理modetest的命令行参数
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/9aPYe0E1fb0XkZexF5cqTWxvVB8LSXTkfzTAD7G08d7tWo2zaVatWEat1K2eskVkcLRLzVj5VnbqfnRReQ5tZw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241021191751.png]]
 
 支持的命令行参数主要包括三类：
 

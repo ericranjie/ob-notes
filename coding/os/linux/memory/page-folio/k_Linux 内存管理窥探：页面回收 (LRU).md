@@ -1,5 +1,5 @@
-转载 Linux阅码场
-_2021年12月17日 07:02_
+
+转载 Linux阅码场 _2021年12月17日 07:02_
 _**原文作者：转载**_
 _**原文链接：https://blog.csdn.net/zhoutaopower/article/details/93429620**_
 
@@ -112,7 +112,7 @@ pagevec 这个结构就是用来管理 LRU 缓存中的这些页面的。该结�
 用来实现 LRU 缓存的两个关键函数是 lru_cache_add() 和 lru_cache_add_active()。前者用于延迟将页面添加到 inactive 链表上去，后者用于延迟将页面添加到 active 链表上去。这两个函数都会将要移动的页面先放到页向量 pagevec 中，当 pagevec 满了（已经装了 14 个页面的描述符指针），pagevec 结构中的所有页面才会被一次性地移动到相应的链表上去。
 
 下图概括总结了上文介绍的如何在两个链表之间移动页面，以及 LRU 缓存在其中起到的作用：
-!\[\[Pasted image 20240915164742.png\]\]
+![[Pasted image 20240915164742.png]]
 
 ## 5.4 回收过程 LRU 的扫描
 

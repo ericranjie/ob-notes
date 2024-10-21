@@ -1,5 +1,5 @@
-CSDN Linux内核之旅
-_2024年04月15日 14:20_ _陕西_
+
+CSDN Linux内核之旅 _2024年04月15日 14:20_ _陕西_
 
 本文对 Linux 内核目前热点项目 Large Folios 的社区与产品现状进行剖析，并预测未来趋势。文中讲述的技术内容，来自 Google、OPPO、ARM、Nivida、Samsung、华为、alibaba 等多家公司的社区与产品贡献。
 
@@ -15,7 +15,7 @@ _2024年04月15日 14:20_ _陕西_
 
 在 Linux 内核的整个内存管理中，large folios 将与 small folios（只有一个page）混合存在。比如在 LRU 链表上，挂在上面的 folio 既可能是 large，也可能是 small；一个进程的某个 VMA 里面的内存，可由 large folios 和 small folios 混合组成；文件的 pagecache 上，不同的 offset 上面对应的可能是 small folios 也可能是 large folios。
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHApozNs2phAzj4ib8ejpFE47d08OPu6jibvDWuyAMfW9GcPMuUnDOt7VA/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021185914.png]]
 
 # 1 **文件页 large folios**
 
@@ -28,57 +28,55 @@ Linux 社区在文件页方面，发展出多个文件系统支持 large folio�
 
 而 pagecache 这层，则会关注到这一情况，在 mapping_large_folio_support() 为真的情况下，允许申请 large folios 来填充 pagecache 的 xarray：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHaGx3vAATVtfwGljBZZWibbibMMicgBEJgR6Rqft6CUHy94spEic5uYllrQ/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021185933.png]]
 
 目前文件页 large folios 支持的文件系统非常有限，所以在许多行业还没法用起来，比如手机行业广泛使用的 erofs、f2fs 等。目前我们看到，社区里面华为公司 Zhang Yi 正在完成一个 patchset：ext4: use iomap for regular file's buffered IO path and enable large foilo\[1\]，寻求对 ext4 的 iomap 和 large folios 支持。Zhang Yi 提供的性能数据，在某种意义上可以证明文件系统支持 large folios 的好处：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHqppvMLztBibjDb1ic0iavbiaOq4lykaclcQwaBtZogeNFGzB1tu4X4v0Xg/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021185946.png]]
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/Pn4Sm0RsAujX5kS5KQ6BaBUsy1RqR06QDyP5HTUOXsPlJWd79yygiasaqXicpN7ibIfqiak5WFpaxE1mGxxpfmMjiaA/640?wx_fmt=png&wxfrom=5&wx_lazy=1&wx_co=1&tp=wxpic)
-
-**匿名页 large folios**
+# 2 **匿名页 large folios**
 
 社区里面 ARM 公司 Ryan Roberts 是这个项目的主要发起者以及相关 patchset 的主要贡献者之一。目前匿名页相关的 patchset 有多个议题，部分已经merge，部分在 Andrew Morton 的 mm tree 迭代，部分还在社区讨论或萌芽阶段。
 
-**1. Ryan Roberts（ARM）贡献的 Multi-size THP for anonymous memory**\[2\]
+## **1. Ryan Roberts（ARM）贡献的 Multi-size THP for anonymous memory**\[2\]
 
-这个 patchset，允许匿名页发生缺页中断的时候，申请多种不同 size 的 PTE-mapped 的 large folios。而内核原先的 THP 主要针对的是 PMD-mapped 的2MiB size，在支持多种 size 后，我们把 multi-size THP 简称为 mTHP。现在 /sys/kernel/mm/transparent_hugepage 目录下面，会有多个 hugepages- 子目录：
+这个 patchset，允许匿名页发生缺页中断的时候，申请多种不同 size 的 PTE-mapped 的 large folios。而内核原先的 THP 主要针对的是 PMD-mapped 的2MiB size，在支持多种 size 后，我们把 multi-size THP 简称为 mTHP。现在 /sys/kernel/mm/transparent_hugepage 目录下面，会有多个 hugepages- 子目录
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHwXwP38GjmOcos53ic1n1jGbaaYaZdqUga2MIBj6JJJZ8MsqGJ95Elaw/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190025.png]]
 
 比如你开启 64KiB 的 large folios：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHxCMHc19dy9l32lBvB0oBibRIxuEWFlDaqZHSwGUZHiakfQvLSy21Zbew/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190036.png]]
 
 这样在发生 PF 的时候，do_anonymous_page () 可以申请 64KiB 的 mTHP，并一次性透过 set_ptes 把 16 个 PTE 全部设置上：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHfBCeMPfh7FF7fXaQhBiaC1ydSBEmZ34V5vibNt9VZ77tZzYH16CpiclDw/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190048.png]]
 
 后面 15 个 PTE 就不会再发生 PF 了。Ryan 的 patchset，保持了 mTHP 与之前THP在ABI方面的兼容，比如之前的MADV_HUGEPAGE、MADV_NOHUGEPAGE 针对 mTHP 仍然适用。
 
-**2、 Ryan Roberts（ARM）贡献的 Transparent Contiguous PTEs for Us\*\*\*\*er Mappings**\[3\]
+## **2、 Ryan Roberts（ARM）贡献的 Transparent Contiguous PTEs for Us\*\*\*\*er Mappings**\[3\]
 
 这个 patchset 主要让 mTHP 可以自动用上 ARM64 的 CONT-PTE，即 16 个 PTE 对应的 PFN 如果物理连续且自然对界，则设 CONT bit 以便让它们只占用一个 TLB entry。Ryan 的这个 patchset 比较精彩的地方在于，mm 的 core 层其实不必意识到 CONT-PTE 的存在（因为不是啥硬件 ARCH 都有这个优化），保持了 PTE 相关 API 向 mm 的完全兼容，而在 ARM64 arch 的实现层面，自动加上或者去掉 CONT bit。
 
 比如原先 16 个 PTE 满足 CONT 的条件，如果有人 unmap 掉了其中 1 个 PTE 或者 mprotect 改变了 16 个 PTE 中一部分 PTE 的属性导致 CONT 不再能满足，set_ptes() 调用的 contpte_try_unfold() 则可将 CONT bit 自动 unfold 掉：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHmLp0XzibzxHASql6oh5GQcib0WHDWUD8Ej5Z2slkDfbeD0okJTnpYiavA/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190104.png]]
 
 CONT-PTE 的采用有效提升了一些 benchmark 的性能，比如内核编译：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHVmktpWcnr91cKkiay5Q0tYWWtL5wYbibiccsLSzBZc8neA6bwRtvCha1A/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190124.png]]
 
-**3、Ryan Roberts（ARM）贡献的 Swap-out mTHP witho\*\*\*\*ut splitting**\[4\]
+## **3、Ryan Roberts（ARM）贡献的 Swap-out mTHP witho\*\*\*\*ut splitting**\[4\]
 
 此 patchset 在 vmscan.c 对内存进行回收的时候，不将 mTHP split 为 small folios（除非 large folio 之前已经被加入了 \_deferred_list，证明其很可能已经被 partially unmap 了），而是整体申请多个 swap slots 和写入 swapfile。
 
 不过这里有一个问题，在 add_to_swap() 整体申请 nr_pages 个连续的 swap slots 的时候，swapfile 完全可能已经碎片化导致申请不到，这样它仍然需要回退到 split：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHDQpBcvxKJxMYAe4Ma4kSD4DAiauR8NA4gafZytib35ZfSkcEqaLwbv0A/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190146.png]]
 
 相信 swapfile 的反碎片问题，将是后续社区的一个重要话题，这方面 Chris Li（Google）有一些思考 Swap Abstraction "the pony"\[5\]，更多的讨论可能在 2024 年 5 月盐湖城的 LSF 上进行。
 
-**4、Chuanhua Han（OPPO）、Barry Song（OPPO 顾问）贡献的 mm: support large folios swap-in**\[6\]
+## **4、Chuanhua Han（OPPO）、Barry Song（OPPO 顾问）贡献的 mm: support large folios swap-in**\[6\]
 
 这个 patchset 瞄准让 do_swap_page() 在 swapin 的时候也能直接以 large folio 形式进行，从而减小 do_swap_page() 路径上的 PF。另外，更重要的一点是，如果 swapin 路径上不支持 mTHP 的话，前述 Ryan Roberts 的工作成果可能就因为 mTHP swapout 出去，swapin 回来就再也不是 mTHP了。
 
@@ -92,15 +90,15 @@ CONT-PTE 的采用有效提升了一些 benchmark 的性能，比如内核编译
 
 目前 patchset 瞄准 a、b 针对手机和嵌入式等采用 zRAM 的场景进行，相信该 patchset 后续会进一步发展到针对路径 c 的支持。近期可能较早能合入的是路径 a 的部分 large folios swap-in: handle refault cases first\[7\]。
 
-**5、Tangquan Zheng（OPPO）贡献的 mTHP-friendly compression in zsmalloc and zram based on multi-pages**\[8\]
+## **5、Tangquan Zheng（OPPO）贡献的 mTHP-friendly compression in zsmalloc and zram based on multi-pages**\[8\]
 
 此 patchset 的创意建立在以更大粒度对匿名页在 swapout/swapin 过程中进行压缩和解压的时候，可以极大减小 CPU 利用率和提高压缩率。该 patchset 的 cover letter 呈现了一组数据，对于原始数据，以 4KiB 和 64KiB 为单位进行压缩，时间可以大为减小，压缩后的数据也减小许多：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ehI6TqtQW71D1tIyqCdFLIHicMdzuqfAtZkGvpRkTRbDibynQN33pSd6v6PDKdmC8fuKGZkkRgs0WRQ/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190206.png]]
 
 前述 Ryan、Chuanhua、Barry 等的工作，在 swapout、swapin 的时候能够以 large folios 的粒度进行，这为 Tangquan 的工作提供了实践基础。在 Tangquan 的工作中，如果给 zRAM 的是 64KiB 的 mTHP，它可以直接以 64KiB 为单位压缩；如果给 zRAM 的是 128KiB 的 mTHP，则它可以分解为 2 个 64KiB 来进行压缩（没有 Tangquan 的工作的时候，128KiB 将作为 32 个 4KiB 的 page 进行压缩）。
 
-**6、Yu Zhao（Google）贡献的 TAO: THP Allocator Optimizatio\*\*\*\*ns**\[9\]
+## **6、Yu Zhao（Google）贡献的 TAO: THP Allocator Optimizatio\*\*\*\*ns**\[9\]
 
 这个 patchset（同时也是一个 LSF/MM/eBPF 议题）瞄准解决 large folio 的 metadata 的成本以及分配中经常遇到的碎片化难题。Buddy allocator 在系统运行较长时间的复杂应用后，通常会由于不可移动的内存页导致碎片化，进而无法继续有效的提供连续的物理内存。假如 large folio 的申请 90% 以上 fallback 到 4KB 页，前述的 mTHP 方案基本无法体现其作用。
 
@@ -110,13 +108,13 @@ TAO（同时也是中文“道”的英文翻译）的设计出发点是：4KB 
 
 TAO的结尾篇（见以上链接）还陈述了一个有趣的新概念：以金融学中的可互换性（Fungibility：指可用一物代替他物偿债）来思考THP。以2MB THP为例，如其使用者无法完全发挥此2MB THP的价值，内存管理应将此2MB THP与512个非连续的4KB页互换。此过程称为THP shattering，与现有的THP splitting看似相近，但其精髓是“偷梁换柱”，目的在于为有真正需求的用户保留原始的THP不被split。此概念还可用于未来的1GB THP。如果THP被split，现有的collapse将需分配一个新的THP，并进行数据复制。对与2MB THP来说，分配与复制也许并不是太大的问题。但对于未来的1GB THP，此两项都是无法接受的。所以唯一可行方案是THP recovery，也就是在被split的1GBTHP基础上，保留未被重新分配的页，并将已被重新分配的页的数据复制到额外的4KB页，然后将原有的1GB物理区域“物归原主”成THP。以2MB THP为例，以下2x2矩阵可概括上述的四种组合：
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/q7kM1wTg0ejy0lUvhtqC11vNm2c5hEVz3Tib8p7k183Gbn3nz4DxcWGrOjsOU0wHZ7RqPuYia2o89rs1SlMuibrgg/640?wx_fmt=other&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp)
+![[Pasted image 20241021190222.png]]
 
-**7、Barry Song（OPPO 顾问）贡献的 THP_SWAP support for ARM64 SoC w\*\*\*\*ith MTE**\[10\]
+## **7、Barry Song（OPPO 顾问）贡献的 THP_SWAP support for ARM64 SoC w\*\*\*\*ith MTE**\[10\]
 
 此 patchset 解决 large folios 整体 SWPOUT 和 SWPIN 情况下，ARM64 MTE tags 以 folio 为单位 save 和 restore 的问题，从而让支持 MTE 的 ARM64 硬件能享受到 mTHP 整体 swapout、swapin 带来的优势。
 
-\*\*8、\*\***Barry Song（OPPO顾问）贡献的mm: add per-order mTHP alloc and swpout** **counters**\[11\]
+## **8、Barry Song（OPPO顾问）贡献的mm: add per-order mTHP alloc and swpout** **counters**\[11\]
 
 mTHP发展到今天，计数和调试功能已经成为一个必需品，不然整个mTHP对用户表现为一个难以捉摸的黑盒子。Barry目前贡献的patchset暂时只实现了2组计数：
 
@@ -130,7 +128,7 @@ patchset在每个size的sysfs文件中，增加了一个stats目录，/sys/kerne
 anon_alloc
 ```
 
-**9、Zi Yan（Nvidia）贡献的 Split a folio to any lower** **order folios**\[12\]
+## **9、Zi Yan（Nvidia）贡献的 Split a folio to any lower** **order folios**\[12\]
 
 之前 large folio 永远只能 split 成 order-0 的 small folio，Zi Yan 的这个 patchset 让它可以转化为任意 order。这个 patchset 提供了一个 debugfs 接口，可以向 debugfs 接口写入一个 pid，以及虚拟地址范围，然后内核会 split 指定范围的 memory 为指定 order 的 mTHP。
 

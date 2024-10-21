@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-8-25 19:01 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 本文主要介绍了一些page reclaim机制中的基本概念。这份文档其实也可以看成阅读ULK第17章第一小节的一个读书笔记。虽然ULK已经读了很多遍，不过每一遍还是觉得有收获。Linux内核虽然不断在演进，但是页面回收的基本概念是不变的，所以ULK仍然值得内核发烧友仔细品味。
@@ -10,7 +11,7 @@
 
 能不能等到空闲内存用尽之后才启动page frame reclaiming呢？不行，因为在page frame reclaiming的过程中也会消耗内存（例如在页面回收过程中，我们可能会将page frame的数据交换到磁盘，因此需要分配buffer head数据结构，完成IO操作），因此我们必须在伙伴系统中保持一定的水位，以便让page frame reclaiming机制正常工作，以便回收更多的内存，让系统运转下去，否则系统会crash掉。
 
-三、哪些场景可以触发page frame reclaiming？
+# 三、哪些场景可以触发page frame reclaiming？
 
 当分配内存失败的时候触发页面回收是最直观的想法，然而内核的场景没有那么简单，例如在中断上下文中分配内存，这时候我们不能触发page frame reclaiming，因为这时候我们不能阻塞当前进程。此外，有些内存分配的场景是发生在持锁之后（以便对某些资源进行排他性的访问），这时候，我们也不能激活IO操作，进行内存回收。
 
@@ -24,7 +25,7 @@
 
 4、slab内存分配器会定时的queue work到system_wq上去，从而会周期性的调用cache_reap来回收slab上的空闲内存。
 
-四、页面回收的策略为何？
+# 四、页面回收的策略为何？
 
 首先我们需要对page frame进行分类，主要分成4类：
 
