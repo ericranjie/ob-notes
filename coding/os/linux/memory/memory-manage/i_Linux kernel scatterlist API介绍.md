@@ -1,6 +1,7 @@
+
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-10-13 22:20 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
-## 1. 前言
+# 1. 前言
 
 我们在那些需要和用户空间交互大量数据的子系统（例如MMC\[1\]、Video、Audio等）中，经常看到scatterlist的影子。对我们这些“非英语母语”的人来说，初见这个词汇，脑袋瞬间就蒙圈了。scatter可翻译成“散开、分散”，list是“列表”的意思，因而scatterlist可翻译为“散列表”。“散列表”又是什么？太抽象了！
 
@@ -8,7 +9,7 @@
 
 当然有用，具体可参考本文后续的介绍。
 
-## 2. scatterlist产生的背景
+# 2. scatterlist产生的背景
 
 我没有去考究scatterlist API是在哪个kernel版本中引入的（年代太久远了），凭猜测，我觉得应该和MMU有关。因为在引入MMU之后，linux系统中的软件将不得不面对一个困扰（下文将以图片1中所示的系统架构为例进行说明）：
 
@@ -24,17 +25,17 @@
 >
 > 最后，从本质上说：scatterlist（数组）是各种不同地址映射空间（PA、VA、DA、等等）的媒介（因为物理地址是真实的、实在的存在，因而可以作为通用语言），借助它，这些映射空间才能相互转换（例如从VA转到DA）。
 
-[![cpu_dma_device_memory](http://www.wowotech.net/content/uploadfile/201710/d568260d4a6a1127654074c114e84f1220171013142032.gif "cpu_dma_device_memory")](http://www.wowotech.net/content/uploadfile/201710/62ccc8c710eaa9b393e56c8d2746df4820171013142032.gif)
+![[Pasted image 20241021205233.png]]
 
 图片1 cpu_dma_device_memory
 
-[![cpu_view_memory](http://www.wowotech.net/content/uploadfile/201710/2392578dfe2c1f39048ea5ee8e7eb0c820171013142033.gif "cpu_view_memory")](http://www.wowotech.net/content/uploadfile/201710/a159a36c35bcec7617fd7684f92024fe20171013142033.gif)
+![[Pasted image 20241021205244.png]]
 
 图片2 cpu_view_memory
 
-## 3. scatterlist API介绍
+# 3. scatterlist API介绍
 
-#### 3.1 struct scatterlist
+## 3.1 struct scatterlist
 
 struct scatterlist用于描述一个在物理地址上连续的内存块（以page为单位），它的定义位于“include/linux/scatterlist.h”中，如下：
 
@@ -49,13 +50,19 @@ struct scatterlist用于描述一个在物理地址上连续的内存块（以pa
 > dma_address，该内存块实际的起始地址（PA，相比page更接近我们人类的语言）。\
 > dma_length，相应的长度信息。
 
-#### 3.2 struct sg_table
+## 3.2 struct sg_table
 
 在实际的应用场景中，单个的scatterlist是没有多少意义的，我们需要多个scatterlist组成一个数组，以表示在物理上不连续的虚拟地址空间。通常情况下，使用scatterlist功能的模块，会自行维护这个数组（指针和长度），例如\[2\]中所提到的struct mmc_data：
 
-|   |
-|---|
-|struct mmc_data {  <br>    …  <br><br>        unsigned int            sg_len;         /\* size of scatter list \*/       <br>        struct scatterlist      *sg;            /* I/O scatter list */           <br>        s32                     host_cookie;    /* host private data \*/          <br>};|
+```cpp
+struct mmc_data {  
+    …  
+    unsigned int sg_len;    /* size of scatter list */       
+    struct scatterlist *sg; /* I/O scatter list */           
+	s32 host_cookie;    /* host private data \*/          
+};
+```
+
 
 不过呢，为了使用者可以偷懒，kernel抽象出来了一个简单的数据结构：struct sg_table，帮忙保存scatterlist的数组指针和长度：
 
@@ -73,7 +80,7 @@ scatterlist数组中到底有多少有效内存块呢？这不是一个很直观
 >
 > 2）如果scatterlist数组中某个scatterlist的page_link的bit1为1，表示该scatterlist是scatterlist数组中最后一个有效内存块（后面的就忽略不计了）。
 
-#### 3.3 API介绍
+## 3.3 API介绍
 
 理解了scatterlist的含义之后，再去看“include/linux/scatterlist.h”中的API，就容易多了，例如（简单介绍一下，不再详细分析）：
 
@@ -110,7 +117,7 @@ scatterlist数组中到底有多少有效内存块呢？这不是一个很直观
 
 等等（不再罗列了，感兴趣的同学直接去看代码就行了）。
 
-## 4. 参考文档
+# 4. 参考文档
 
 \[1\] [Linux MMC framework(2)\_host controller driver](http://www.wowotech.net/comm/mmc_host_driver.html)
 

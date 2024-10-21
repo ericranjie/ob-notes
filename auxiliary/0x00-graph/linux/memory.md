@@ -9,7 +9,7 @@
 ### share-memory
 
 [[p_深入探索共享内存：实现高效的多线程通信]]
-[[a_n_五万字 深入理解Linux内存管理]]
+[[a_五万字 深入理解Linux内存管理]]
 [[i_mlock锁原理剖析]]
 
 ### virtual-memory

@@ -1,50 +1,49 @@
-程序喵大人
-_2022年02月24日 20:18_
+
+程序喵大人 _2022年02月24日 20:18_
+
 以下文章来源于后端研究所 ，作者大白斯基
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzkyODU5MTYxMA==&mid=2247493391&idx=1&sn=6d1a4f04aaebe7aa6962eef8914777bf&source=41&key=daf9bdc5abc4e8d0da1f047b35a002c5d97e58838bf9f2898ffb5115303747a198066468b6672e4bd41295cc4315e035d708fdbc5705c9bdfa20a9b5a44a8903d513b4fe65b37f3d349c3a1ce7d2e917dd0f3f1632ca45d514c1a7626d7783e5c9723ae41858112560d322056de44f6b8b4a15b9ea4183585bcc4dfc0663d006&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQz%2FMGKE%2BSTyf3E2bhaU8zNxLmAQIE97dBBAEAAAAAAG8cAqyOEIcAAAAOpnltbLcz9gKNyK89dVj07z4vg1IZBHb7Ee7Hm4%2BP0Mt9k1QMborDeAydMHWFeXI6dv%2FambdPjVpVAd%2BjZKb%2BeeIs3g52UyiO7sBwSgI75F1hO6WC%2Bq1roFe1wRikitWA%2F8IK%2Bo61DDsYhJSexNEELoCvizcoCS8dE%2F1MtXSDlvz%2Fu1ScZcSZvmORIn0w8F3fcSrMeAbSyVA3Ozg%2FZxioyASY9BtBrwHZi62uh8uTZdTrUcTmVQaEo7B3mNb3Lft92aaHoYlOa4JAAD3ZZ1DV&acctmode=0&pass_ticket=%2FDCdQgBmwlbNChkhR5EaNWphdQEnQWDqI1KKILhpnAlj4Pzg86hUczRvihcfF5Zo&wx_header=1#)
-
-## 前言
+# 前言
 
 大家好，我的朋友们！
 
 CPU、IO、磁盘、内存可以说是影响计算机性能关键因素，今天就聊探究下内存的那些事儿。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/wAkAIFs11qZEnicG2xuhhZm8QIGiaj9FVdciaKvmbd0KPaNdIrMiaZDJceg7q1N9kxggfInOibfONqr9IUYyS1BWTtw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241021204401.png]]
 
 内存为进程的运行提供物理空间，同时作为快速CPU和慢速磁盘之间的适配器，可以说是个非常重要的角色。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204410.png]]
 
 通过本文你将了解到以下内容：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204424.png]]
 
 本文均围绕Linux操作系统展开，话不多说，我们开始吧！
 
-## 虚拟内存机制
+# 虚拟内存机制
 
 当要学习一个新知识点时，比较好的过程是先理解出现这个技术点的背景原因，同期其他解决方案，新技术点解决了什么问题以及它存在哪些不足和改进之处，这样整个学习过程是闭环的。
 
-### 内存为什么需要管理
+## 内存为什么需要管理
 
 老子的著名观点是无为而治，简单说就是不过多干预而充分依靠自觉就可以有条不紊地运作，理想是美好的，现实是残酷的。
 
 Linux系统如果以一种原始简单的方式管理内存是存在一些问题:
 
-#### 进程空间隔离问题
+### 进程空间隔离问题
 
 假如现在有ABC三个进程运行在Linux的内存空间，设定OS给进程A分配的地址空间是0-20M，进程B地址空间30-80M，进程C地址空间90-120M。
 
 虽然分配给每个进程的空间是无交集的，但是仍然无法避免进程在某些情况下出现访问异常的情况，如图：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204458.png]]
 
 比如进程A访问了属于进程B的空间，进程B访问了属于进程C的空间，甚至修改了空间的值，这样就会造成混乱和错误，实际中是不允许发生的。
 
 所以我们需要的是每个进程有独立且隔离的安全空间。
 
-#### 内存效率低下问题
+### 内存效率低下问题
 
 机器的内存是有限资源，而进程数量是动态且无法确定的，这样就会出现几个必须要考虑的问题：
 
@@ -54,15 +53,17 @@ Linux系统如果以一种原始简单的方式管理内存是存在一些问题
 
 - 连续内存实在是很珍贵，大部分时候我们都无法给进程分配它想要的连续内存，离散化内存才是我们需要面对的现实。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204813.png]]
 
-#### 定位调试和编译运行问题
+### 定位调试和编译运行问题
 
 由于程序运行时的位置是不确定的，我们在定位问题、调试代码、编译执行时都会存在很多问题。
 
 我们希望每个进程有一致且完整的地址空间，同样的起始位置放置了堆、栈以及代码段等，从而简化编译和执行过程中的链接器、加载器的使用。
 
-换句话说，如果所有进程的空间地址分配都是一样的，那么Linux在设计编译和调试工具时就非常简单了，否则每个进程都可能是定制化的。!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+换句话说，如果所有进程的空间地址分配都是一样的，那么Linux在设计编译和调试工具时就非常简单了，否则每个进程都可能是定制化的。
+
+![[Pasted image 20241021204835.png]]
 
 综上，面对众多问题，我们需要一套内存管理机制。
 
@@ -74,7 +75,7 @@ Linux系统如果以一种原始简单的方式管理内存是存在一些问题
 
 计算机科学领域的任何问题都可以通过增加一个中间层来解决，解决内存问题也不例外。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204855.png]]
 
 Linux的虚拟内存机制简单来说就是在物理内存和进程之间请了个管家，内存管家上任之后做了以下几件事情：
 
@@ -90,21 +91,21 @@ Linux的虚拟内存机制简单来说就是在物理内存和进程之间请了
 
 - ......
 
-#### 虚拟内存下数据读写问题
+### 虚拟内存下数据读写问题
 
 引入虚拟机制后，进程在获取CPU资源读取数据时的流程也发生了一些变化。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204912.png]]
 
 CPU并不再直接和物理内存打交道，而是把地址转换的活外包给了MMU，MMU是一种硬件电路，其速度很快，主要工作是进行内存管理，地址转换只是它承接的业务之一。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204933.png]]
 
-#### 页表的存储和检索问题
+### 页表的存储和检索问题
 
 每个进程都会有自己的页表Page Table，页表存储了进程中虚拟地址到物理地址的映射关系，所以就相当于一张地图，MMU收到CPU的虚拟地址之后开始查询页表，确定是否存在映射以及读写权限是否正常，如图：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241021204947.png]]
 
 当机器的物理内存越来越大，页表这个地图也将非常大，于是问题出现了：
 

@@ -1,5 +1,5 @@
-Linux内核那些事
-_2021年12月03日 11:41_
+
+Linux内核那些事 _2021年12月03日 11:41_
 
 > 简介：作为一个系统管理程序（hypervisor），Linux 有几个创新，2.6.32 内核中一个有趣的变化是 KSM(Kernel Samepage Merging) 允许这个系统管理程序通过合并内存页面来增加并发虚拟机的数量。本文探索 KSM 背后的理念（比如存储去耦合）、KSM 的实现、以及如何管理 KSM。
 
@@ -7,27 +7,27 @@ _2021年12月03日 11:41_
 
 虚拟化技术从上世纪 60 年代开始出现，经由 IBM® System/360® 大型机得以流行。50 年过后，虚拟化技术取得了跨越式发展，使得多个操作系统和应用程序共享一个服务器成为可能。这一特殊用途（称为服务器虚拟化）正在演变为数据中心，因为单 个物理机能够用于托管 10 个（一般情况）或更多虚拟机（VM），如图 1 所示。这种虚拟化使基础设施更动态、更省电、（因而也）更经济。
 
-![](https://mmbiz.qpic.cn/mmbiz_png/ciab8jTiab9J4pcDQImVsL8aej3EM8GoD92icrvz0yQuia1uABTzzVMFDAyCwJ4VlqTSCnyyrx8d881u5OVxs45GiaQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241021205113.png]]
 
 图 1. 通过虚拟化进行的服务器合并
 
 页面都是相同的。假如操作系统和应用程序代码以及常量数据在 VMs 之间相同，那么这个特点就很有用。当页面惟一时，它们可以被合并，从而释放内存，供其他应用程序使用。图 2 演示了内存共享，并展示了在内容相同的 VMs 之间共享页面时更多可用闲置内存的好处。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/ciab8jTiab9J4pcDQImVsL8aej3EM8GoD9hkjUsyaVJ9ah8PB91xUxptuGXgCDdAJ04A0ekWADyGibmmPJDF0qZ5w/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241021205129.png]]
 
 图 2. 跨 VMs 的内存共享
 
-## 特性命名
+# 特性命名
 
 本文描述的特性非常新；因此，其名称经历了一些变化。您将发现这个 Linux 内核特性称为 Kernel Shared Memory 或 Kernel Samepage Merging。
 
 您很快就会发现，尽管 Linux 中的内存共享在虚拟环境中有优势（KSM 最初设计用于基于内核的虚拟机），但它在非虚拟环境中仍然有用。事实上，KSM 甚至在嵌入式 Linux 系统中也有用处，表明了这种方法的灵活性。下面，我们将探索这种 Linux 内存共享方法，以及如何使用该方法提高服务器的内存密度，从而增加其托管其他应用程序或 VMs 的能力。
 
-## 其他技术支持
+# 其他技术支持
 
 存储技术中的一个称为去耦合（de-duplication）的最 新进展是 Linux 和其他系统管理程序中的内存共享的先驱。去耦合这种技术通过删除冗余数据（基于数据块，或者基于更大的数据片段，比如文件）来减少已存储的数据。公共数据 片段被合并（以一种 copy-on-write \[CoW\] 方式），释放空间供其他用途。使用这种方法，存储成本更低，最终需要的存储器也更少。鉴于当前的数据增长速度，这个功能显得非常重要。
 
-## KSM 操作
+# KSM 操作
 
 KSM 作为内核中的守护进程（称为ksmd）存在，它定期执行页面扫描，识别副本页面并合并副本，释放这些页面以供它用。KSM 执行上述操作的过程对用户透明。例如，副本页面被合并（然后被标记为只读），但是，如果这个页面的其中一个用户由于某种原因更改该页面，该用户将（以 Copy on Write 方式）收到自己的副本。可以在内核源代码 ./mm/ksm.c 中找到 KSM 内核模块的完整实现。
 
@@ -44,19 +44,19 @@ int madvise( void *start, size_t length, int advice );
 
 一旦某个区域被定义为 “可合并”，KSM 将把该区域添加到它的工作内存列表。启用 KSM 时，它将搜索相同的页面，以写保护的 CoW 方式保留一个页面，释放另一个页面以供它用。
 
-### KSM
+## KSM
 
 使用的方法与内存去耦合中使用的方法不同。在传统的去耦合中，对象被散列化，然后使用散列值进行初始相似性检查。当散列值一致时，下一步是进行一个实际对 象比较（本例中是一个内存比较），以便正式确定这些对象是否一致。KSM 在它的第一个实现中采用这种方法，但后来开发了一种更直观的方法来简化它。
 
 在当前的 KSM 中，页面通过两个 `红黑树` 管理，其中一个红黑树是临时的。第一个树称为不稳定树，用于存储还不能理解为稳定的新页面。换句话说，作为合并候选对象的页面（在一段时间内没有变化）存储在这个不稳定树中。不稳定树中的页面不是写保护的。第二个树称为稳定树，存储那些已经发现是稳定的且通过 KSM 合并的页面。为确定一个页面是否是稳定页面，KSM 使用了一个简单的 32位校验和（checksum）。当一个页面被扫描时，它的校验和被计算且与该页面存储在一起。在一次后续扫描中，如果新计算的校验和不等于此前计算的校验和，则该页面正在更改，因此不是一个合格的合并候选对象。
 
-### 使用 KSM
+## 使用 KSM
 
 进程处理一个单一的页面时，第一步是检查是否能够在稳定树中发现该页面。搜索稳定树的过程很有趣，因为每个页面都被视为一个非常大的数字（页面的内容）。
 
 一个 `memcmp`（内存比较）操作将在该页面和相关节点的页面上执行。如果 memcmp 返回 0，则页面相同，发现一个匹配值。反之，如果 `memcmp` 返回 -1，则表示候选页面小于当前节点的页面；如果返回 1，则表示候选页面大于当前节点的页面。尽管比较 4KB 的页面似乎是相当重量级的比较，但是在多数情况下，一旦发现一个差异，memcmp 将提前结束。请参见图 3 查看这个过程的视觉呈现。
-!\[\[Pasted image 20240915164943.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240915164943.png]]
 
 图 3. 搜索树中的页面的搜索过程
 
@@ -68,7 +68,7 @@ int madvise( void *start, size_t length, int advice );
 
 如前所述，KSM 使用 红黑树 来管理页面，以支持快速查询。实际上，Linux 包含了一些 红黑树 作为一个可重用的数据结构，可以广泛使用它们。红黑树 还可以被 Completely Fair Scheduler (CFS) 使用，以便按时间顺序存储任务。您可以在 ./lib/rbtree.c 中找到 红黑树 的这个实现。
 
-## KSM 配置和监控
+# KSM 配置和监控
 
 KSM 的管理和监控通过 sysfs（位于根 /sys/kernel/mm/ksm）执行。在这个 sysfs 子目录中，您将发现一些文件，有些用于控制，其他的用于监控。
 
@@ -88,7 +88,7 @@ KSM 运行时，可以通过 3 个参数（sysfs中的文件）来控制它。sl
 
 KSM 作者定义：较高的 `pages_sharing/pages_shared` 比率表明高效的页面共享（反之则表明资源浪费）。
 
-## 结束语
+# 结束语
 
 Linux 并不是使用页面共享来改进内存效率的惟一系统管理程序，但是它的独特之处在于将其实现为一个操作系统特性。VMware 的 ESX 服务器系统管理程序将这个特性命名为 Transparent Page Sharing (TPS)，而 XEN 将其称为 Memory CoW。不管采用哪种名称和实现，这个特性都提供了更好的内存利用率，从而允许操作系统（KVM 的系统管理程序）过量使用内存，支持更多的应用程序或 VM。您可以在最新的 2.6.32 Linux 内核中发现 KSM — 以及其他很多有趣的特性。
 
@@ -102,15 +102,7 @@ Linux 并不是使用页面共享来改进内存效率的惟一系统管理程�
 
 阅读 1504
 
-​
-
-写留言
-
-[](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/ciab8jTiab9J6dgBc9aqzhEyz7LkUJ812dSOibgAHcHicR8zE8PyD3bvkyicjTSGfFsF1racDTDviayU3Mbcra30sacw/300?wx_fmt=png&wxfrom=18)
-
-Linux内核那些事
+---​
 
 113
 

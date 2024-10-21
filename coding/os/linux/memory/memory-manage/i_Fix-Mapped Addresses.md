@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-9-9 12:44 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 一、前言
@@ -38,11 +39,12 @@ Fix map中的fix指的是固定的意思，那么固定什么东西呢？其实�
 # 四、fixmap的具体位置在那里？
 
 fixmap的地址区域位于FIXADDR_START和FIXADDR_TOP之间，具体可以参考下图：
-!\[\[Pasted image 20241007233004.png\]\]
+
+![[Pasted image 20241007233004.png]]
 
 上图中，红色框的block就是fixmap address的具体位置。
 
-五、fixmap具体应用在哪些场景？
+# 五、fixmap具体应用在哪些场景？
 
 fixmap的地址区域有被进一步细分，如下：
 

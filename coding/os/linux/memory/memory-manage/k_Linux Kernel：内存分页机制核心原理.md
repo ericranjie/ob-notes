@@ -1,5 +1,5 @@
-原创 往事敬秋风 深度Linux
-_2024年04月29日 21:04_ _湖南_
+
+原创 往事敬秋风 深度Linux _2024年04月29日 21:04_ _湖南_
 
 内存分页机制是一种操作系统的内存管理技术，将进程的虚拟内存空间划分为固定大小的页面，并在需要时将其映射到物理内存中。操作系统会将辅助存储器（通常是磁盘）中的数据分区成固定大小的区块，称为“页”。当不需要时，将分页由主存（通常是内存）移到辅助存储器；当需要时，再将数据取回，加载主存中。相对于分段，分页允许存储器存储于不连续的区块以维持文件系统的整齐。分页是磁盘和内存间传输数据块的最小单位。
 
@@ -41,7 +41,7 @@ _2024年04月29日 21:04_ _湖南_
 
 为了减少地址转换所要求的总线周期数量，最近访问的页目录和页表会被存放在处理器的一个叫做转换查找缓冲区（TLB）的缓冲器件中。TLB 可以满足大多数读页目录和页表的请求而无需使用总线周期。只有当 TLB 中不包含所要求的页表项是才会出现使用额外的总线周期从内存读取页表项。通常在一个页表项很长时间没有访问过时才会出现这种情况。
 
-### 1.1四级分页机制
+### 1.1 四级分页机制
 
 前面我们提到Linux内核仅使用了较少的分段机制，但是却对分页机制的依赖性很强，其使用一种适合32位和64位结构的通用分页模型，该模型使用四级分页机制，即
 
@@ -80,7 +80,7 @@ _2024年04月29日 21:04_ _湖南_
 
 把线性地址映射到物理地址虽然有点复杂，但现在已经成了一种机械式的任务。
 
-## 二、linux中页表处理数据结构
+# 二、linux中页表处理数据结构
 
 分页转换功能由驻留在内存中的表来描述，该表称为页表，存放在物理地址空间中。页表可以看作是简单的 2^20 物理地址数组。线性到物理地址的映射功能可以简单地看作进行数组查找。线性地址的高 20 位构成这个数组的索引值，用于选择对应页面的物理（基）地址。线性地址的低 12 位给出了页面中的偏移量，加上页面的基地址最终形成对应的物理地址。由于页面基地址对齐在 4K 边界上，因此页面基地址的低 12 为肯定是 0 ，这意味着 高 20 位的页面基地址 和 12 位偏移地址连接组合在一起就能得到对应的物理地址。
 
@@ -131,7 +131,7 @@ typedef struct { pgdval_t pgd; } pgd_t;static inline pgd_t native_make_pgd(pgdva
 
 这里需要区别指向页表项的指针和页表项所代表的数据。以pgd_t类型为例子，如果已知一个pgd_t类型的指针pgd，那么通过pgd_val(\*pgd)即可获得该页表项(也就是一个无符号长整型数据)，这里利用了面向对象的思想。
 
-### 2.2页表描述宏
+## 2.2 页表描述宏
 
 参照arch/x86/include/asm/pgtable_64
 
@@ -209,7 +209,7 @@ linux中使用下列宏简化了页表处理，对于每一级页表都使用有
 
 PTRS_PER_PTE, PTRS_PER_PMD, PTRS_PER_PUD以及PTRS_PER_PGD用于计算页表、页中间目录、页上级目录和页全局目录表中表项的个数。当PAE被禁止时，它们产生的值分别为1024，1，1和1024。当PAE被激活时，产生的值分别为512，512，1和4。
 
-### 2.3页表处理函数
+## 2.3 页表处理函数
 
 内核还提供了许多宏和函数用于读或修改页表表项：
 
@@ -333,16 +333,16 @@ pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项�
 下面我们罗列最后一组函数来简化页表项的创建和撤消。当使用两级页表时，创建或删除一个页中间目录项是不重要的。如本节前部分所述，页中间目录仅含有一个指向下属页表的目录项。所以，页中间目录项只是页全局目录中的一项而已。然而当处理页表时，创建一个页表项可能很复杂，因为包含页表项的那个页表可能就不存在。在这样的情况下，有必要分配一个新页框，把它填写为 0 ，并把这个表项加入。
 
 如果 PAE 被激活，内核使用三级页表。当内核创建一个新的页全局目录时，同时也分配四个相应的页中间目录；只有当父页全局目录被释放时，这四个页中间目录才得以释放。当使用两级或三级分页时，页上级目录项总是被映射为页全局目录中的一个单独项。与以往一样，下表中列出的函数描述是针对 80x86 构架的。
-!\[\[Pasted image 20240915201541.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-## 三、线性地址转换
+![[Pasted image 20240915201541.png]]
 
-### 3.1分页模式下的的线性地址转换
+# 三、线性地址转换
+
+## 3.1 分页模式下的的线性地址转换
 
 线性地址、页表和页表项线性地址不管系统采用多少级分页模型，线性地址本质上都是索引+偏移量的形式，甚至你可以将整个线性地址看作N+1个索引的组合，N是系统采用的分页级数。在四级分页模型下，线性地址被分为5部分，如下图：
-!\[\[Pasted image 20240915201548.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240915201548.png]]
 
 在线性地址中，每个页表索引即代表线性地址在对应级别的页表中中关联的页表项。正是这种索引与页表项的对应关系形成了整个页表映射机制。
 
@@ -353,8 +353,8 @@ pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项�
 (2)页表项
 
 页表项从四种页表项的数据结构可以看出，每个页表项其实就是一个无符号长整型数据。每个页表项分两大类信息：页框基地址和页的属性信息。在x86-32体系结构中，每个页表项的结构图如下：
-!\[\[Pasted image 20240915201554.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240915201554.png]]
 
 这个图是一个通用模型，其中页表项的前20位是物理页的基地址。由于32位的系统采用4kb大小的 页，因此每个页表项的后12位均为0。内核将后12位充分利用，每个位都表示对应虚拟页的相关属性。
 
@@ -383,12 +383,12 @@ pud_bad宏和pgd_bad宏总是产生0。没有定义pte_bad宏，因为页表项�
 从线性地址的第五部分中取出物理页内偏移量，与物理页基址相加得到最终的物理地址。
 
 第五次读取内存得到最终要访问的数据。
-!\[\[Pasted image 20240915201600.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240915201600.png]]
 
 整个过程是比较机械的，每次转换先获取物理页基地址，再从线性地址中获取索引，合成物理地址后再访问内存。不管是页表还是要访问的数据都是以页为单 位存放在主存中的，因此每次访问内存时都要先获得基址，再通过索引(或偏移)在页内访问数据，因此可以将线性地址看作是若干个索引的集合。
 
-### 3.2 Linux中通过4级页表访问物理内存
+## 3.2 Linux中通过4级页表访问物理内存
 
 linux中每个进程有它自己的PGD( Page Global Directory)，它是一个物理页，并包含一个pgd_t数组。
 

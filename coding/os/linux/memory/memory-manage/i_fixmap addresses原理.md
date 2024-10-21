@@ -1,12 +1,13 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-4-29 20:35 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
-## 引言
+# 引言
 
 fixmap是一段固定地址映射。kernel预留一段虚拟地址空间。因此虚拟地址是在编译的时候确定。fixmap可以用来做什么？kernel启动初期，由于此时的kernel已经运行在虚拟地址上。因此我们访问具体的物理地址是不行的，必须建立虚拟地址和物理地址的映射，然后通过虚拟地址访问才可以。例如：dtb中包含bootloader传递过来的内存信息，我们需要解析dtb，但是我们得到的是dtb的物理地址。因此访问之前必须创建映射，创建映射又需要内存。但是由于所有的内存管理子系统还没有ready。因此我们不能使用ioremap接口创建映射。为此kernel提出fixmap的解决方案。
 
 > 注：文章代码分析基于linux-4.15，架构基于aarch64（ARM64）。
 
-## fixmap空间分配
+# fixmap空间分配
 
 fixmap虚拟地址空间又被平均分成两个部分permanent fixed addresses和temporary fixed addresses。permanent fixed addresses是永久映射，temporary fixed addresses是临时映射。永久映射是指在建立的映射关系在kernel阶段不会改变，仅供特定模块一直使用。临时映射就是模块使用前创建映射，使用后解除映射。
 
@@ -49,7 +50,7 @@ fixmap区域是地址空间范围从FIXADDR_START到FIXADDR_TOP结束。FIXADDR_
 
 FIX_FDT是给dtb创建映射的区域。例如需要得到FDT的虚拟地址，即可以利用\_\_fix_to_virt(FIX_FDT)得到虚拟地址。之所以FIX_FDT放在枚举的最前面，是因为我们针对dtb映射采用section mapping要求虚拟地址2M对齐。FIXADDR_TOP地址本身是2M对齐的，因此FIXADDR_TOP - (FIX_FDT \<\< PAGE_SHIFT)可以很容易2M对齐。
 
-## fixmap初始化
+# fixmap初始化
 
 fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PUD/PMD页表。early_fixmap_init实现如下（简化部分代码逻辑）。
 
@@ -90,7 +91,7 @@ fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PU
 
 经过early_fixmap_init函数的探究，我们也可以得到一个结论：为了以page为单位进行映射，必须保证FIX_FDT和\_\_end_of_fixed_addresses之间的虚拟地址空间必须小于2M。如果有超过2M的部分就要使用section mapping（因为只有一个PTE页表），以2M为单位映射。
 
-## early ioremap初始化
+# early ioremap初始化
 
 如果你希望kernel启动早期使用ioremap操作，其实是不行的。我们必须借助early ioremap接口。early ioremap是基于fixmap实现。初始化在early_ioremap_init完成。简化部分代码如下。
 
@@ -115,7 +116,7 @@ fixmap初始化操作在early_fixmap_init函数中完成。主要是建立PGD/PU
 
 > early ioremap利用slot管理映射，最多支持FIX_BTMAPS_SLOTS个映射，每个映射最大支持映射256KB。slot_virt数组存储每个slot的虚拟地址首地址。prev_map数组用来记录已经分配出去的虚拟地址，数组值为0代表没有分配。prev_size记录映射的size。
 
-## 创建FDT映射
+# 创建FDT映射
 
 创建FDT映射的函数是\_\_fixmap_remap_fdt，实现如下。
 
