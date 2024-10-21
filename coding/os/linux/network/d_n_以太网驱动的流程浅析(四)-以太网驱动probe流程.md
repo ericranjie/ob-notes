@@ -29,7 +29,7 @@ of_mdiobus_register(fep->mii_bus, node);
 rc = phy_device_register(phy);
 ```
 
-[![图像 6.jpg](http://www.wowotech.net/content/uploadfile/202001/a6731578378528.jpg "点击查看原图")](http://www.wowotech.net/content/uploadfile/202001/a6731578378528.jpg)
+![[Pasted image 20241020171440.png]]
 
 搞驱动的都知道，probe是drvier的入口函数：
 
@@ -496,7 +496,7 @@ struct net_device \*ndev;这里对net_device进行初始化，分配内存
 12. }
 ```
 
-4）  FEC mac registers set by bootloader===》即靠usb方式下载mac address ，如果没有跳到步骤5；
+4）  FEC mac registers set by bootloader ===> 即靠usb方式下载mac address ，如果没有跳到步骤5；
 
 ```cpp
 1. /*
@@ -533,11 +533,10 @@ struct net_device \*ndev;这里对net_device进行初始化，分配内存
 17. ndev->dev_addr[ETH_ALEN-1] = macaddr[ETH_ALEN-1] + fep->dev_id;
 ```
 
-
 所以最后一种方式就是kernel会自己算一个mac地址出来，我这里有个前提是这个是freescale（现在被nxp收购了）的控制器代码这样写的，我不确定其他厂商的控制器是否也是这样的流程，技术讲究严谨，所以这里不能一概而论。当然这个mac 地址也是可以用户自己在dts中进行自行配置的。
 
 ```cpp
-1. 1. /**
+1./**
 2.  * eth_hw_addr_random - Generate software assigned random Ethernet and
 3.  * set device flag
 4.  * @dev: pointer to net_device structure
@@ -551,7 +550,7 @@ struct net_device \*ndev;这里对net_device进行初始化，分配内存
 12. 	dev->addr_assign_type = NET_ADDR_RANDOM;
 13. 	eth_random_addr(dev->dev_addr);
 14. }
-15. 1. /**
+15./**
 16.  * eth_random_addr - Generate software assigned random Ethernet address
 17.  * @addr: Pointer to a six-byte array containing the Ethernet address
 18.  *
@@ -652,18 +651,15 @@ is_valid_ether_addr，用来检测以太网地址是否正确的
 
 CONFIG_ARCH_MXC因为我们使用的是这个宏，因此：
 
+```cpp
 1. #if defined(CONFIG_M523x) || defined(CONFIG_M527x) || defined(CONFIG_M528x) || \\
-1. ```
    defined(CONFIG_M520x) || defined(CONFIG_M532x) || \
-   ```
-1. ```
    defined(CONFIG_ARCH_MXC) || defined(CONFIG_SOC_IMX28)
-   ```
-1. /\*
+1. /*
 1. - Just figures, Motorola would have to change the offsets for
 1. - registers in the same peripheral device on different models
 1. - of the ColdFire!
-1. \*/
+1. */
 1. #define FEC_IEVENT		0x004 /\* Interrupt event reg \*/
 1. #define FEC_IMASK		0x008 /\* Interrupt mask reg \*/
 1. #define FEC_R_DES_ACTIVE_0	0x010 /\* Receive descriptor reg \*/
@@ -676,13 +672,17 @@ CONFIG_ARCH_MXC因为我们使用的是这个宏，因此：
 1. #define FEC_X_CNTRL		0x0c4 /\* Transmit Control reg \*/
 1. #define FEC_ADDR_LOW		0x0e4 /\* Low 32bits MAC address \*/
 1. #define FEC_ADDR_HIGH		0x0e8 /\* High 16bits MAC address \*/
+```
 
 否则：
 
+```cpp
 1. #define FEC_ADDR_LOW		0x3c0 /\* Low 32bits MAC address \*/
 1. #define FEC_ADDR_HIGH		0x3c4 /\* High 16bits MAC address \*/
+```
 
 设置buffer传输的基地址
+
 
 1. /\* Set receive and transmit descriptor base. \*/
 

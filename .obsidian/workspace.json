@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/device/i_致驱动工程师的一封信.md",
+                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/device/i_致驱动工程师的一封信.md",
+                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/device/i_致驱动工程师的一封信.md",
+                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/device/i_致驱动工程师的一封信.md"
+                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md"
               }
             }
           }
@@ -148,6 +148,12 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/device/k_蓝牙协议分析(8)_BLE安全机制之白名单.md",
+    "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
+    "README.md",
+    "zx99-image/Pasted image 20241020171440.png",
+    "code-griding-note.md",
+    "coding/os/linux/device/i_致驱动工程师的一封信.md",
     "coding/os/linux/device/DRAM/k_DRAM 原理 4 ：DRAM Timing.md",
     "zx99-image/Pasted image 20241020120501.png",
     "coding/os/linux/device/DRAM/i_DRAM 原理 1 ：DRAM Storage Cell.md",
@@ -160,8 +166,6 @@
     "coding/os/linux/device/device_tree/b_Device Tree（三）：代码分析.md",
     "coding/os/linux/device/device_tree/b_Device Tree（四）：文件结构解析.md",
     "coding/os/linux/device/device_model/b_n_Linux设备模型(8)_platform设备.md",
-    "code-griding-note.md",
-    "README.md",
     "coding/os/linux/device/device_model/Linux设备模型(7)_Class.md",
     "coding/os/linux/device/device_model/Linux设备模型(6)_Bus.md",
     "coding/os/linux/device/device_model/Linux设备模型(5)_device和device driver.md",
@@ -170,7 +174,6 @@
     "zx99-image/Pasted image 20241019223247.png",
     "coding/os/linux/device/device_model/i_Linux设备模型(4)_sysfs.md",
     "coding/os/linux/device/device_model/i_Linux设备模型(3)_Uevent.md",
-    "zx99-image/Pasted image 20241019223333.png",
     "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md",
@@ -181,9 +184,6 @@
     "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md",
     "coding/os/linux/device/bluetooth/i_蓝牙协议分析(11)_BLE安全机制之SM.md",
     "coding/os/linux/device/bluetooth/i_蓝牙协议分析(10)_BLE安全机制之LE Encryption.md",
-    "coding/os/linux/filesystem/k_n_Linux文件系统十问.md",
-    "coding/os/linux/filesystem/i_文件系统：ext4、ntfs、xfs、btrfs、zfs、f2fs和reiserFS性能测试对比.md",
-    "coding/os/linux/filesystem/i_t_文件缓存回写简述.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

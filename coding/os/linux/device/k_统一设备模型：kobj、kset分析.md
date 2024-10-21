@@ -1,19 +1,3 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[callme_friend](http://www.wowotech.net/author/148) 发布于：2018-1-9 18:37 分类：[统一设备模型](http://www.wowotech.net/sort/device_model)
 
@@ -21,9 +5,9 @@ kobj/kset作为统一设备模型的基础，到底提供了哪些功能，在�
 
 作为阅读wowo相关文章后的笔记，本文纰漏之处，欢迎各位大侠拍砖。
 
-**1 kobj\*\*\*\*实现**
+# **1 kobj实现**
 
-**1.1 kobject**
+## **1.1 kobject**
 
 > struct kobject {
 >
