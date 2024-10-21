@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
+                "file": "coding/os/linux/device/X-023-KERNEL-Linux pinctrl driver的移植.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
+                "file": "coding/os/linux/device/X-023-KERNEL-Linux pinctrl driver的移植.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
+                "file": "coding/os/linux/device/X-023-KERNEL-Linux pinctrl driver的移植.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md"
+                "file": "coding/os/linux/device/X-023-KERNEL-Linux pinctrl driver的移植.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/device/k_X-015-KERNEL-ARM generic timer driver的移植.md",
+    "coding/os/linux/device/b_学习下 eMMC.md",
+    "zx99-image/Pasted image 20241021182025.png",
+    "zx99-image/Pasted image 20241021182618.png",
+    "zx99-image/Pasted image 20241021182601.png",
+    "zx99-image/Pasted image 20241021182536.png",
+    "zx99-image/Pasted image 20241021182521.png",
+    "zx99-image/Pasted image 20241021182501.png",
+    "zx99-image/Pasted image 20241021182430.png",
+    "zx99-image/Pasted image 20241021182417.png",
+    "zx99-image/Pasted image 20241021182354.png",
+    "zx99-image/Pasted image 20241021182320.png",
+    "coding/os/linux/device/a_中断唤醒系统流程.md",
+    "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md",
+    "coding/os/linux/device/TTY/k_Linux TTY framework(1)_基本概念.md",
+    "coding/os/linux/device/dm-verity原理剖析.md",
+    "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
+    "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
+    "coding/os/linux/device/k_统一设备模型：kobj、kset分析.md",
     "coding/os/linux/device/k_蓝牙协议分析(8)_BLE安全机制之白名单.md",
     "coding/os/linux/network/d_n_以太网驱动的流程浅析(四)-以太网驱动probe流程.md",
     "README.md",
-    "zx99-image/Pasted image 20241020171440.png",
     "code-griding-note.md",
     "coding/os/linux/device/i_致驱动工程师的一封信.md",
     "coding/os/linux/device/DRAM/k_DRAM 原理 4 ：DRAM Timing.md",
-    "zx99-image/Pasted image 20241020120501.png",
     "coding/os/linux/device/DRAM/i_DRAM 原理 1 ：DRAM Storage Cell.md",
-    "zx99-image/Pasted image 20241020120658.png",
-    "zx99-image/Pasted image 20241020120643.png",
-    "zx99-image/Pasted image 20241020120629.png",
-    "zx99-image/Pasted image 20241020120604.png",
-    "zx99-image/Pasted image 20241020120547.png",
-    "zx99-image/Pasted image 20241020120525.png",
     "coding/os/linux/device/device_tree/b_Device Tree（三）：代码分析.md",
     "coding/os/linux/device/device_tree/b_Device Tree（四）：文件结构解析.md",
     "coding/os/linux/device/device_model/b_n_Linux设备模型(8)_platform设备.md",
     "coding/os/linux/device/device_model/Linux设备模型(7)_Class.md",
     "coding/os/linux/device/device_model/Linux设备模型(6)_Bus.md",
     "coding/os/linux/device/device_model/Linux设备模型(5)_device和device driver.md",
-    "Pasted image 20241019224132.png",
     "coding/os/linux/device/device_model/k_Linux设备模型(2)_Kobject.md",
-    "zx99-image/Pasted image 20241019223247.png",
     "coding/os/linux/device/device_model/i_Linux设备模型(4)_sysfs.md",
     "coding/os/linux/device/device_model/i_Linux设备模型(3)_Uevent.md",
     "coding/os/linux/device/device_model/i_Linux设备模型(1)_基本概念.md",
-    "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
-    "coding/os/linux/device/X-015-KERNEL-ARM generic timer driver的移植.md",
-    "coding/compiler/k_从编译器的角度来看循环优化.md",
-    "coding/compiler/b_编译乱序(Compiler Reordering).md",
-    "coding/os/linux/network/k_软硬件融合视角：一文看懂高性能网络.md",
-    "coding/os/linux/network/MQTT协议，终于有人讲清楚了.md",
-    "coding/os/linux/device/a_n_基于qemu手写vhost virtio，简化虚拟设备通信.md",
-    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(11)_BLE安全机制之SM.md",
-    "coding/os/linux/device/bluetooth/i_蓝牙协议分析(10)_BLE安全机制之LE Encryption.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

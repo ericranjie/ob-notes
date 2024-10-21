@@ -27,25 +27,25 @@ QEMU设备管理是非常重要的部分，后来引入了专门的设备树管�
 
 首先从QEMU的命令行入手，创建一个使用virtio设备的虚拟机，可使用如下命令行：
 
-```
+```c
 gdb --args ./x86_64-softmmu/qemu-system-x86_64 \    -machine accel=kvm -cpu host -smp sockets=2,cores=2,threads=1 -m 3072M \    -object memory-backend-file,id=mem,size=3072M,mem-path=/dev/hugepages,share=on \    -hda /home/kvm/disk/vm0.img -mem-prealloc -numa node,memdev=mem \    -vnc 0.0.0.0:00 -monitor stdio --enable-kvm \    -netdev type=tap,id=eth0,ifname=tap30,script=no,downscript=no     -device e1000,netdev=eth0,mac=12:03:04:05:06:08 \    -chardev socket,id=char1,path=/tmp/vhostsock0,server \    -netdev type=vhost-user,id=mynet3,chardev=char1,vhostforce,queues=$QNUM     -device virtio-net-pci,netdev=mynet3,id=net1,mac=00:00:00:00:00:03,disable-legacy=on
 ```
 
 其中，创建一个虚拟硬件设备，都是通过-device来实现的，上面的命令行中创建了一个virtio-net-pci设备
 
-```
+```c
 -device virtio-net-pci,netdev=mynet3,id=net1,mac=00:00:00:00:00:03,disable-legacy=on
 ```
 
 这个硬件设备的构造依赖于qemu框架里的netdev设备（并不会独立的对guest呈现）
 
-```
+```c
 -netdev type=vhost-user,id=mynet3,chardev=char1,vhostforce,queues=$QNUM
 ```
 
 上面的netdev设备又依赖于qemu框架里的字符设备（同样不会独立的对guest呈现）
 
-```
+```c
 -chardev socket,id=char1,path=/tmp/vhostsock0,server
 ```
 
@@ -89,8 +89,11 @@ static void virtio_net_pci_instance_init(Object *obj){    VirtIONetPCI *dev = VI
 
 VirtioNetPci结构体中包含其父类的实例VirtIOPCIProxy，其拥有的设备框架自定义的结构是VirtIONet的实例。对于netdev来说，它也利用了qemu的class和device框架，但netdev不像-device一样通过框架的qdev_device_add接口调用object_new完成。他的数据空间跟随在virtio_net_pci的自定义结构里，然后通过virtio_instance_init_com接口显式的调用object_initialize()函数实现“virtio-net-device”的instance初始化。
 
-```
-struct VirtIONetPCI {    VirtIOPCIProxy parent_obj;  //virtio-pci类<----继承pci-device<----继承device    VirtIONet vdev;    //virtio-net<----继承virtio-device<----继承device};
+```c
+struct VirtIONetPCI {
+VirtIOPCIProxy parent_obj;  //virtio-pci类<----继承pci-device<----继承device    
+VirtIONet vdev;    //virtio-net<----继承virtio-device<----继承device
+};
 ```
 
 (4) virtio-net-pci设备realize流程

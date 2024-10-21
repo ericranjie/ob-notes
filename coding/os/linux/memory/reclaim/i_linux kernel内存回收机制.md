@@ -1,14 +1,15 @@
+
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-11-12 20:37 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 无论计算机上有多少内存都是不够的，因而linux kernel需要回收一些很少使用的内存页面来保证系统持续有内存使用。页面回收的方式有页回写、页交换和页丢弃三种方式：如果一个很少使用的页的后备存储器是一个块设备（例如文件映射），则可以将内存直接同步到块设备，腾出的页面可以被重用；如果页面没有后备存储器，则可以交换到特定swap分区，再次被访问时再交换回内存；如果页面的后备存储器是一个文件，但文件内容在内存不能被修改（例如可执行文件），那么在当前不需要的情况下可直接丢弃。
 
 # **1** **回收的时机**
 
-![](http://www.wowotech.net/content/uploadfile/201511/4a471447331961.png)
+![[Pasted image 20241021180356.png]]
 
-**2** **哪些内存可以回收**
+# **2** **哪些内存可以回收**
 
-**2.1** **页框的回收**
+## **2.1** **页框的回收**
 
 LRU(Least Recently Used)，近期最少使用链表，是按照近期的使用情况排列的，最少使用的存在链表末尾，通过以下宏定义即可看出：
 
@@ -33,9 +34,9 @@ enum lru_list {
 
 为了评估页的活动程度，kernel引入了PG_referend和PG_active两个标志位。为什么需要两个位呢？假定只使用一个PG_active来标识页是否活动，在页被访问时，设置该位，但是何时清楚呢？为此需要维护大量的内核定时器，这种方法注定是要失败的。
 
-使用两个标志，可以实现一种更精巧的方法，其核心思想是：一个表示当前活动程度，一个表示最近是否被引用过，下图说明了基本算法。
+使用两个标志，可以实现一种更精巧的方法，其核心思想是：一个表示当前活动程度，一个表示最近是否被引用过，下图说明了基本算法
 
-![](http://www.wowotech.net/content/uploadfile/201511/fb5c1447331983.png)
+![[Pasted image 20241021180417.png]]
 
 基本上有以下步骤：
 
@@ -47,7 +48,7 @@ enum lru_list {
 
 如果对内存页的访问是稳定的，那么对page_referenced和mark_page_accessed的调用在本质上是均衡的，因而页面保持在当前LRU链表。这种方案同时确保了内存页不会再ACTIVE与INACTIVE链表间快速跳跃。
 
-**2.2 slab\*\*\*\*缓存回收**
+## **2.2 slab缓存回收
 
 slab缓存回收相对比较灵活，所有注册到shrinker_list中的方法都会被执行。
 
@@ -55,17 +56,18 @@ slab缓存回收相对比较灵活，所有注册到shrinker_list中的方法都
 
 android的lowmemorykiller机制注册了选择性杀死进程的方法，回收进程使用的内存。
 
-**3\*\*\*\*怎样回收页框**
+# **3 怎样回收页框**
 
-![](http://www.wowotech.net/content/uploadfile/201511/10fb1447331995.png)
+![[Pasted image 20241021180501.png]]
+
 
 其中shrink_page_list是真正回收页面的过程
 
-![](http://www.wowotech.net/content/uploadfile/201511/09dd1447331995.png)
+![[Pasted image 20241021180600.png]]
 
-**4\*\*\*\*周期性回收的频率**
+# **4 周期性回收的频率
 
-**4.1 kswapd**
+## **4.1 kswapd**
 
 kswapd是内核为每个内存node创建的内存回收线程，为什么有了紧缺回收机制还需要周期性回收呢？因为有些内存分配是不允许阻塞等待回收的，比如中断和异常处理程序中的内存分配；还有些内存分配不允许激活I/O访问的。只有少数情况的内存紧缺可以完整执行回收过程，所以利用系统空闲时间回收内存非常必要。
 
@@ -73,11 +75,11 @@ kswapd是内核为每个内存node创建的内存回收线程，为什么有了�
 
 balance_pgdat均衡操作直到该内存域的zone_wartermark_ok为止。
 
-**4.2 cache_reap**
+## **4.2 cache_reap**
 
 cache_reap用来回收slab中的空闲对象，如果空闲对象可以还原成一个页面，则释放回buddy system。每次调用cache_reap会把所有的slab_caches遍历一遍，之后休眠2\*HZ，对于arm(HZ=100)来说，周期就是20ms。
 
-**5** **参考文献**
+# **5** **参考文献**
 
 (1)《understanding the linux kernel》
 (2)《professional linux kernel architecture》

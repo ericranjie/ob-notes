@@ -1,29 +1,13 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2017-7-14 21:58 分类：[X Project](http://www.wowotech.net/sort/x_project)
 
-## 1. 前言
+# 1. 前言
 
 本文是“[linux内核中的GPIO系统之（4）：pinctrl驱动的理解和总结](http://www.wowotech.net/gpio_subsystem/pinctrl-driver-summary.html)”的一个实例，结合”[X Project](http://www.wowotech.net/sort/x_project)”的开发过程，介绍pinctrl driver的移植步骤，进而加深对pinctrl framework的理解。
 
 注1：本文后续的描述，kernel基于本站“[X Project](http://www.wowotech.net/sort/x_project)”所使用的kernel版本\[4\]，硬件基于 ”[X Project](http://www.wowotech.net/sort/x_project)”所使用的“Bubbugum-96”平台。
 
-## 2. pinctrl driver的移植步骤
+# 2. pinctrl driver的移植步骤
 
 #### 2.1 添加pinctrl driver在驱动模型中的框架
 

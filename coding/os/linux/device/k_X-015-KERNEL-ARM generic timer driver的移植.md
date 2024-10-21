@@ -1,13 +1,13 @@
 
 作者：[wowo](http://www.wowotech.net/author/2 "runangaozhong@163.com") 发布于：2016-11-2 22:31 分类：[X Project](http://www.wowotech.net/sort/x_project)
 
-## 1. 前言
+# 1. 前言
 
 本文将基于“[Linux时间子系统之（十七）：ARM generic timer驱动代码分析](http://www.wowotech.net/timer_subsystem/armgeneraltimer.html)\[1\]”，以bubblegum-96平台为例，介绍ARM generic timer的移植步骤。
 
 另外，我们在\[2\]中完成了ARM GIC驱动的移植，但还没有测试是否可用。刚好借助timer驱动，测试GIC是否可以正常工作，顺便理解Interrupt的使用方法。
 
-## 2. Generic timer硬件说明
+# 2. Generic timer硬件说明
 
 有关ARM generic timer的技术细节，可参考\[1\]。本文所使用的bubblegum-96平台，其SOC包含了4个Cortex A53的core，支持CP15 type的Generic timer。为了驱动它，我们需要如下两个信息：
 
@@ -21,9 +21,9 @@
 >
 > 2）4个Per-CPU timer的中断源分别是：Non-secure PL1 physical timer----PPI 13，Secure PL1 physical timer----PPI 14，Non-secure PL2 physical timer----PPI 11，virtual timer----PPI 10。 它们都是低电平触发的方式。
 
-## 3. Generic timer移植
+# 3. Generic timer移植
 
-#### 3.1 u-boot中的移植
+## 3.1 u-boot中的移植
 
 记得我们在“[X-013-UBOOT-使能autoboot功能](http://www.wowotech.net/x_project/uboot_autoboot.html)”中调试u-boot的autoboot功能的时候，由于没有timer驱动，无法正确使用CONFIG_BOOTDELAY（因为无法计时）。既然本文要在kernel中移植generic timer，就顺便提一下，在u-boot中支持ARM generic timer的方法。
 

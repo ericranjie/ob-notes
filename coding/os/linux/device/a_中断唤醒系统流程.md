@@ -1,3 +1,4 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-1-1 17:03 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 # 1. 前言
@@ -14,7 +15,7 @@
    好了，本片文章就为你解答所有的疑问。\
    注：文章代码分析基于linux-4.15.0-rc3。
 
-2) 中断唤醒流程
+# 2 中断唤醒流程
 
 现在还是假设你有一个上述的设备，现在你开始编写driver代码了。假设部分代码如下：
 
@@ -81,7 +82,7 @@
 
 在probe函数中通过request_thread_irq接口注册驱动的中断服务函数smcdef_event_handler，注意这里smcdef_event_handler的执行环境是中断上下文，thread_fn的方式下面也会介绍。
 
-2.1. enable_irq_wake
+## 2.1. enable_irq_wake
 
 当系统睡眠（echo "mem" > /sys/power/state）的时候，回想一下suspend的流程就会知道，最终会调用smcdef_suspend使能中断唤醒功能。enable_irq_wake主要工作是在irq_set_irq_wake中完成，代码如下：
 
@@ -122,11 +123,11 @@
 > 1. 首先在set_irq_wake_real函数中通过irq_chip的irq_set_wake回调函数设置SoC相关wakeup寄存器使能中断唤醒功能，如果不使能的话，即使设备在那疯狂的产生中断signal，SoC可不会理睬你哦！
 > 1. 设置irq的state为IRQD_WAKEUP_STATE，这步很重要，suspend流程会用到的。
 
-2.2. Suspend to RAM流程
+## 2.2. Suspend to RAM流程
 
 先画个图示意一下系统Suspend to RAM流程。我们可以看到图片画的很漂亮。从enter_state开始到suspend_ops->enter()结束。对于suspend_ops->enter()调用，我的理解是CPU停在这里了，待到醒来的时候，就从这里开始继续前行的脚步。
 
-[![STR流程.png](http://www.wowotech.net/content/uploadfile/201801/7dc41514798124.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201801/7dc41514798124.png)
+![[Pasted image 20241021181043.png]]
 
 > 1. enable_irq_wake()可以有两种途径，一是在driver的suspend函数中由驱动开发者主动调用；二是在driver的probe函数中调用dev_pm_set_wake_irq()和device_init_wakeup()。因为suspend的过程中会通过dev_pm_arm_wake_irq()打开所有wakeup source的irq wake功能。我更推荐途径1，因为系统已经帮我们做了，何必重复造轮子呢！
 > 1. 对于已经enable 并且使能wakeup的irq，置位IRQD_WAKEUP_ARMED，然后等待IRQ handler和threaded handler执行完成。后续详细分析这一块。
@@ -138,22 +139,22 @@
 
 假设我们使用的是gic-v3代码，边沿触发中断设备。现在设备需要唤醒系统了，产生一个边沿电平触发中断。此时会唤醒boot cpu（因为noboot cpu在suspend的时候已经被disable）。你以为此时就开始跳转中断服务函数了吗？no！还记得上一节说的吗？suspend之后已经diasble boot cpu的irq，因此中断不会立即执行。什么时候会执行呢？当然是等到local_irq_enable()之后。resume流程如下图。
 
-[![resume流程.png](http://www.wowotech.net/content/uploadfile/201801/a16a1514798123.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201801/a16a1514798123.png)
+![[Pasted image 20241021181124.png]]
 
 > 1. 首先执行syscore resume，马上为你讲解syscore的用意。
 > 1. arch_suspend_enable_irqs()结束后就会进入中断服务函数，因为中断打开了，interrupt controller的pending寄存器没有清除，因此触发中断。你以为此时会调用到你注册的中断handle吗？错了！此时中断服务函数还没执行你注册的handle就返回了。马上为你揭晓为什么。先等等。
 
 先说到这里，先看看什么是syscore。
 
-2.4. system core operations有什么用？
+## 2.4. system core operations有什么用？
 
 先想一想为什么要等到syscore_resume之后才arch_suspend_enable_irqs()呢？试想一下，系统刚被唤醒，最重要的事情是不是先打开相关的时钟以及最基本driver（例如：gpio、irq_chip等）呢？因此syscore_resume主要是clock以及gpio的驱动resume，因为这是其他设备依赖的最基本设备。回想一下上一节中Susoend to RAM流程中，syscore_suspend也同样是最后suspend的，毕竟人家是大部分设备的基础，当然最后才能suspend。可以通过register_syscore_ops()接口注册syscore operation。
 
-2.5. gic interrupt controller中断执行流程
+## 2.5. gic interrupt controller中断执行流程
 
 接下来arch_suspend_enable_irqs()之后就是中断流程了，其函数执行流程如下。
 
-[![中断执行流程.png](http://www.wowotech.net/content/uploadfile/201801/e8b41514798125.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201801/e8b41514798125.png)
+![[Pasted image 20241021181147.png]]
 
 图片中是一个中断从汇编开始到结束的流程。假设我们的设备是边沿触发中断，那么一定会执行到handle_edge_irq()，如果你不想追踪代码，或者对中断流程不熟悉，我教你个方法，在注册的中断handle中加上一句WARN_ON(1);语句，请查看log信息即可。handle_edge_irq()代码如下：
 
@@ -215,11 +216,11 @@
 > 1) irq_may_run()判断irq是否有IRQD_WAKEUP_ARMED标志位，当然这里是有的。随后调用irq_pm_check_wakeup()清除IRQD_WAKEUP_ARMED flag顺便置位IRQS_SUSPENDED和IRQS_PENDING flag，又irq_disable关闭了中断。\
 > 2) irq_may_run()返回false，因此这里直接返回了，所以你注册的中断handle并没有执行。你绝望，也没办法。当然这里也可以知道，唤醒系统的这次中断注册的handle的执行环境不是硬件中断上下文。
 
-2.6. dpm_resume_noirq()
+## 2.6. dpm_resume_noirq()
 
 我们来继续分析2.3节resume的后续流程，把图继续搬过来。
 
-[![resume流程.png](http://www.wowotech.net/content/uploadfile/201801/a16a1514798123.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201801/a16a1514798123.png)
+![[Pasted image 20241021181823.png]]
 
 > 1) 继续enable所有的noboot cpu之后，开始dpm_resume_noirq()。这里为什么起名noirq呢？中断已经可以响应了，我猜测是这样的：虽然可以响应中断，但是也是仅限于suspend之前的enable_irq_wake的irq，因为其他irq已经被disable。并且具有唤醒功能的irq也仅仅是进入中断后设置一些flag就立即退出了，没有执行irq handle，因此相当于noirq。\
 > 2) dpm_noirq_resume_devices()会调用"noirq" resume callbacks，这个就是struct dev_pm_ops结构体的resume_noirq成员。那么什么的设备驱动需要填充resume_noirq成员呢？我们考虑一个事情，到现在为止唤醒系统的irq的handle还没有执行，如果注册的中断handle是通过spi、i2c等方式通信，那么在即将执行之前，我们是不是应该首先resume spi、i2c等设备呢！所以说，很多设备依赖的设备，尽量填充resume_noirq成员，这样才比较合理。毕竟唤醒的设备是要使用的嘛！而gpio驱动就适合syscore resume，因为这里i2c设备肯定依赖gpio设备。大家可以看看自己平台的i2c、spi等设备驱动是不是都实现resume_noirq成员。当然了，前提是这个设备需要resume操作，如果不需要resume就可以使用，那么完全没有必要resume_noirq。所以，写driver也是要考虑很多问题的，driver应该实现哪些dev_pm_ops的回调函数？\
@@ -293,7 +294,7 @@ check_irq_resend代码如下:
 > 3)  在resend_irqs函数中，通过判断irqs_resend变量中的每一个bit位是否为1（即是否需要resend，也就是调用irq注册的中断handle）。\
 > 好了，现在可以解答清楚的解答第一个问题了：设备唤醒cpu之后是立即跳转中断向量表指定的位置吗？如果不是，那么是什么时候才会跳转呢？设备唤醒cpu之后并不是立即跳转中断向量执行中断，而是等到syscore_resume以及打开cpu中断之后才开始。第二个问题也有答案了，已经跳转到中断服务函数开始执行代码，后续就会调用你注册的中断handle 吗？如果不是，那中断服务函数做什么准备呢？而你注册的中断handle又会在什么时候才开始执行呢？第一次跳转执行中断仅仅是设置相关的flag并且disable_irq，在执行完成设备的resume noirq回调函数之后通过check_irq_resend中调度tasklet，最终执行注册的中断handle，至于为什么要这么做，前面分析也给了答案。
 
-2.7. IRQ handler会睡眠吗？
+## 2.7. IRQ handler会睡眠吗？
 
 你想过request_thread_irq函数注册的hardirq handler或者是threaded handler会执行一半时，系统会再一次的休眠下去吗？再看看2.2节的图，实际上对于所有已经打开的irq在suspend_device_irqs()会调用synchronize_irq()等待正在处理的hardirq handler或者threaded handler。synchronize_irq()代码如下：
 
@@ -409,7 +410,7 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 通过kthread_create()创建irq/irq-new->name的线程，该线程的入口函数值irq_thread。在irq_thread()中每执行完成一个thread_fn就会threads_active计数减1。\
 现在可以考虑第三个问题了，假如register_thread_irq方式注册的threaded irq中调用msleep(1000)，睡眠1秒，请问系统此时会继续睡下去而没调度回来吗？因此导致msleep后续的操作没有执行。答案就是不会，因为suspend时候会等待threaded handler执行完毕，所以系统不会睡眠，放心好了。
 
-2.8. 工作队列会睡眠吗？
+## 2.8. 工作队列会睡眠吗？
 
 现在来思考一个按键消抖问题。如果你还不知道什么是按键消抖的话，我……。按键消抖在内核中通常是这样处理，通过变压触发中断，在中断handler中通过queue delayed work一段时间，计时结束执行按键上报处理。从内核的gpio_keys抠出部分代码如下：
 
@@ -462,7 +463,7 @@ irqd_irq_inprogress()是判断irq是否设置了IRQD_IRQ_INPROGRESS 标志位。
 
 结论就是：内核的suspend只保证了IRQ handler（hardirq handler or threaded handler）的执行完成，并没有保证工作队列的执行完毕。因此我们使用工作队列的话，必须要考虑这种情况的发生，并解决。
 
-2.9. 如何解决工作队列睡眠问题？
+## 2.9. 如何解决工作队列睡眠问题？
 
 系统suspend的过程中，主要是通过pm_wakeup_pending()判断suspend是否需要abort。如果你对我说的这一块不清楚，可以看看wowo其他几篇关于电源管理的文章。pm_wakeup_pending()主要是判断combined_event_count变量在suspend的过程中是否改变，如果改变suspend就应该abort。既然知道了原理，那么就好办了。在中断handler开始处增加combined_event_count计数，工作队列函数结尾位置减小combined_event_count计数即可。当然是不用你自己写代码，系统提供了接口函数pm_stay_awake()和pm_relax()。2.8节修改后的代码如下：
 
@@ -510,8 +511,6 @@ _原创文章，转发请注明出处。蜗窝科技，www.wowotech.net。_
 ______________________________________________________________________
 
 标签: [电源管理](http://www.wowotech.net/tag/%E7%94%B5%E6%BA%90%E7%AE%A1%E7%90%86) [中断处理](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86) [中断子系统](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%AD%90%E7%B3%BB%E7%BB%9F) [中断唤醒](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%94%A4%E9%86%92)
-
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
 
 « [O(n)、O(1)和CFS调度器](http://www.wowotech.net/process_management/scheduler-history.html) | [USB-C(USB Type-C)规范的简单介绍和分析](http://www.wowotech.net/usb/usb_type_c_overview.html)»
 
