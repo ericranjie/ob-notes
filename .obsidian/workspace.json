@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/linux/memory/memory-manage/slub/a_图解slub.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/linux/memory/memory-manage/slub/a_图解slub.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
+                "file": "coding/os/linux/memory/memory-manage/slub/a_图解slub.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md"
+                "file": "coding/os/linux/memory/memory-manage/slub/a_图解slub.md"
               }
             }
           }
@@ -148,26 +148,34 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "zx99-image/-20241021/Pasted image 20241021191619.png",
+    "coding/os/linux/memory/memory-manage/a_Meltdown论文翻译.md",
+    "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
+    "zx99-image/Pasted image 20241021202149.png",
+    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
+    "coding/os/linux/memory/memory-model/i_ARMv8之memory model.md",
+    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
+    "coding/os/linux/memory/memory-performance/k_zRAM内存压缩技术原理与应用.md",
+    "zx99-image/Pasted image 20241021202611.png",
+    "zx99-image/Pasted image 20241021202551.png",
+    "zx99-image/Pasted image 20241021202427.png",
+    "zx99-image/Pasted image 20241021202409.png",
+    "zx99-image/Pasted image 20241021202342.png",
+    "zx99-image/Pasted image 20241021202328.png",
+    "zx99-image/Pasted image 20241021202248.png",
+    "coding/os/linux/memory/memory-performance/b_图解 Linux内存性能优化核心思想.md",
+    "code-griding-note.md",
+    "zx99-image/Pasted image 20241021201748.png",
+    "zx99-image/Pasted image 20241021202041.png",
     "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
     "coding/os/linux/memory/MMU/d_Arm MMU深度解读.md",
     "coding/os/linux/device/k_X-015-KERNEL-ARM generic timer driver的移植.md",
     "coding/os/linux/device/k_n_libdrm-modetest 原理及图显系统验证方法.md",
-    "zx99-image/-20241021/Pasted image 20241021191751.png",
-    "zx99-image/-20241021/Pasted image 20241021191736.png",
     "coding/os/linux/device/k_蓝牙协议分析(8)_BLE安全机制之白名单.md",
     "coding/os/linux/device/i_Linux reset framework.md",
     "coding/os/linux/device/b_Common Clock Framework系统结构.md",
     "coding/os/linux/device/a_中断唤醒系统流程.md",
-    "zx99-image/-20241021/Pasted image 20241018185935.png",
-    "zx99-image/-20241021/Pasted image 20241006171055.png",
-    "zx99-image/-20241021/Pasted image 20240928120704.png",
-    "zx99-image/-20241021/Pasted image 20240923185622.png",
-    "zx99-image/-20241021/Pasted image 20240923185643.png",
-    "zx99-image/-20241021/Pasted image 20241021191333.png",
     "zx99-image/-20241021",
     "coding/os/linux/memory/MMU/d_n_MMU内存管理单元.md",
-    "zx99-image/-20241021/Pasted image 20241021191420.png",
     "coding/os/linux/memory/page-folio/c_图文详解 Linux 分页机制！.md",
     "coding/os/linux/memory/page-folio/b_由Google、OPPO、ARM、华为等大厂程序员贡献的Linux Large Folios大页在社区和产品的现状和未来.md",
     "coding/os/linux/memory/page-folio/i_文件系统和裸块设备的page cache问题.md",
@@ -177,13 +185,6 @@
     "coding/os/linux/memory/page-folio/k_Linux下访问匿名页发生的神奇“化学反应”.md",
     "coding/os/linux/memory/page-folio/k_深入理解Linux内核页表映射分页机制原理.md",
     "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
-    "coding/os/linux/memory/reclaim/b_linux内存回收(一）---kswapd回收.md",
-    "coding/os/linux/device/dm-verity原理剖析.md",
-    "coding/os/linux/device/i_基于Hikey的 Boot from USB 调试.md",
-    "coding/os/linux/device/i_致驱动工程师的一封信.md",
-    "coding/os/linux/device/i_驱动加载的本质.md",
-    "coding/os/linux/device/X-023-KERNEL-Linux pinctrl driver的移植.md",
-    "coding/os/linux/device/eMMC/b_学习下 eMMC.md",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
     "interview/leetcode/bytedance",

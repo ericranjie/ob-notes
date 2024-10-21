@@ -1,6 +1,7 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-2-22 21:02 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
-# **1.前言**
+# **1. 前言**
 
 在Linux中，伙伴系统（buddy system）是以页为单位管理和分配内存。但是现实的需求却以字节为单位，假如我们需要申请20Bytes，总不能分配一页吧！那岂不是严重浪费内存。那么该如何分配呢？slab分配器就应运而生了，专为小内存分配而生。slab分配器分配内存以Byte为单位。但是slab分配器并没有脱离伙伴系统，而是基于伙伴系统分配的大内存进一步细分成小内存分配。
 

@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2020-3-8 8:38 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 1. **技术背景**
@@ -14,7 +15,7 @@
 
 zSwap是在memory与flash之间的一层“cache”,当内存需要swap出去磁盘的时候，先通过压缩放到zSwap中去，zSwap空间按需增长。达到一定程度后则会按照LRU的顺序(前提是使用的内存分配方法需要支持LRU)将就最旧的page解压写入磁盘swap device，之后将当前的page压缩写入zSwap。
 
-[![图片1](http://www.wowotech.net/content/uploadfile/202003/5e0cc315e337296bbcd4ad5be492dcc120200308003812.png "图片1")](http://www.wowotech.net/content/uploadfile/202003/59bb3d3f67de515e770ecbe43f1f73c820200308003811.png)
+![[Pasted image 20241021202149.png]]
 
 zswap本身存在一些缺陷或问题:
 
@@ -43,27 +44,27 @@ zcache本身存在一些缺陷或问题:
 1. zCache目前无法使用zsmalloc, 如果使用zbud,压缩率较低
 1. 使用的zbud/z3fold分配的内存是不可移动的, 需要关注内存碎片问题
 
-#### 3. **内****存压缩****主流\*\*\*\*的内存分配器**
+# 3. **内存压缩主流的内存分配器
 
-###### **3.2.1** **Zsmalloc**
+### **3.2.1** **Zsmalloc**
 
 zsmalloc是为ZRAM设计的一种内存分配器。内核已经有slub了， 为什么还需要zsmalloc内存分配器？这是由内存压缩的场景和特点决定的。zsmalloc内存分配器期望在低内存的场景也能很好地工作，事实上，当需要压缩内存进行zsmalloc内存分配时，内存一般都比较紧张且内存碎片都比较严重了。如果使用slub分配， 很可能由于高阶内存分配不到而失败。另外，slub也可能导致内存碎片浪费比较严重，最坏情况下，当对象大小略大于PAGE_SIZE/2时，每个内存页接近一般的内存将被浪费。
 
 Android手机实测发现，anon pages的平均压缩比大约在1:3左右，所以compressed anon page size很多在1.2K左右。如果是Slub，为了分配大量1.2K的内存，可能内存浪费严重。zsmalloc分配器尝试将多个相同大小的对象存放在组合页（称为zspage）中，这个组合页不要求物理连续，从而提高内存的使用率。
 
-[![wps2CC0.tmp](http://www.wowotech.net/content/uploadfile/202003/bffb0713fc01271ddea4e109a018f0e920200308003812.png "wps2CC0.tmp")](http://www.wowotech.net/content/uploadfile/202003/675bdba738ec115e83025b03299e609320200308003812.png)
+![[Pasted image 20241021202248.png]]
 
 需要注意的是, 当前zsmalloc不支持LRU功能, 旧版本内核分配的不可移动的页, 对内存碎片影响严重, 但最新版本内核已经是支持分配可移动类型内存了。
 
-###### **3.2.2 Zbud**
+### **3.2.2 Zbud**
 
 zbud是一个专门为存储压缩page而设计的内存分配器。用于将2个objects存到1个单独的page中。zbud是可以支持LRU的, 但分配的内存是不可移动的。
 
-###### **3.2.3 Z3fold**
+### **3.2.3 Z3fold**
 
 z3fold是一个较新的内存分配器, 与zbud不同的是, 将3个objects存到1个单独的page中,也就是zbud内存利用率极限是1:2, z3fold极限是1:3。同样z3fold是可以支持LRU的, 但分配的内存是不可移动的。
 
-#### 4. **内****存压缩技术与内存分配器组合****对比\*\*\*\*分析**
+# 4. **内存压缩技术与内存分配器组合对比分析**
 
 结合上面zSwap / zRam /zCache的介绍, 与zsmalloc/zbud/z3fold分别怎样组合最合适呢?
 
@@ -77,19 +78,19 @@ z3fold是一个较新的内存分配器, 与zbud不同的是, 将3个objects存�
 |zRam|√(最佳)|√(可用)|√(可用)|
 |zCache|×(不可用)|√(可用)|√(最佳)|
 
-#### 5. **zRAM技术原理**
+# 5. **zRAM技术原理**
 
 本文重点介绍zRam内存压缩技术，它是目前移动终端广泛使用的内存压缩技术。
 
-##### 5.1 **软件框架**
+## 5.1 **软件框架**
 
 下图展示了内存管理大体的框架， 内存压缩技术处于内存回收memory reclaim部分中。
 
-[![tp2](http://www.wowotech.net/content/uploadfile/202003/ebba4eccd9eb6d90a49573d80724f26b20200308003813.png "tp2")](http://www.wowotech.net/content/uploadfile/202003/c1c8f8316011be1a390b62878ceaee2c20200308003813.png)
+![[Pasted image 20241021202328.png]]
 
 再具体到zRam, 它的软件架构可以分为3部分， 分别是数据流操作，内存压缩算法 ，zram驱动。
 
-[![image](http://www.wowotech.net/content/uploadfile/202003/fc14b80aa29aafc174432f4167535e9e20200308003814.png "image")](http://www.wowotech.net/content/uploadfile/202003/b085b16f660d3bf0e9b640e276d01ac720200308003814.png)
+![[Pasted image 20241021202342.png]]
 
 数据流操作:提供串行或者并行的压缩和解压操作。
 
@@ -97,7 +98,7 @@ z3fold是一个较新的内存分配器, 与zbud不同的是, 将3个objects存�
 
 Zram驱动：创建一个基于ram的块设备， 并提供IO请求处理接口。
 
-##### 5.2 **实现原理**
+## 5.2 **实现原理**
 
 Zram内存压缩技术本质上就是以时间换空间。通过CPU压缩、解压缩的开销换取更大的可用内存空间。
 
@@ -113,29 +114,29 @@ Zram内存压缩技术本质上就是以时间换空间。通过CPU压缩、解�
 
 2） Direct reclaim场景：内存分配过程进入slowpath, 进行直接行内存回收。
 
-[![image](http://www.wowotech.net/content/uploadfile/202003/564cfb76a4daa43f2f496992ef5adb2b20200308003815.png "image")](http://www.wowotech.net/content/uploadfile/202003/7eed1590491a37be1aefa84eab32fe8c20200308003815.png)
+![[Pasted image 20241021202409.png]]
 
 下面是基于4.4内核理出的内存压缩、解压缩流程。
 
 内存回收过程路径进行内存压缩。会将非活跃链表的页进行shrink, 如果是匿名页会进行pageout, 由此进行内存压缩存放到ZRAM中， 调用路径如下：
 
-[![image](http://www.wowotech.net/content/uploadfile/202003/3f273cc2792c82a95546d360bd36db3b20200308003816.png "image")](http://www.wowotech.net/content/uploadfile/202003/1b24c97b8e440bea2cac473fdd65811420200308003816.png)
+![[Pasted image 20241021202427.png]]
 
 在匿名页换出到swap设备后， 访问页时， 产生页访问错误, 当发现“页表项不为空， 但页不在内存中”， 该页就是已换到swap区中，由此会开始将该页从swap区中重新读取， 如果是ZRAM， 则是解压缩的过程。调用路径如下：
 
-[![image](http://www.wowotech.net/content/uploadfile/202003/d76b0e76538a7ee96e449fdf4012b9ab20200308003817.png "image")](http://www.wowotech.net/content/uploadfile/202003/caf4329fe540f0db7d7dd548f5af559420200308003817.png)
+![[Pasted image 20241021202551.png]]
 
-##### 5.3 **内存压缩算法**
+## 5.3 **内存压缩算法**
 
 目前比较主流的内存算法主要为LZ0, LZ4, ZSTD等。下面截取了几种算法在x86机器上的表现。各算法有各自特点， 有以压缩率高的， 有压缩/解压快的等， 具体要结合需求场景选择使用。
 
-[![wps2D14.tmp](http://www.wowotech.net/content/uploadfile/202003/d6e53e3fe37da3c00a4a16cfcaa1922620200308003818.jpg "wps2D14.tmp")](http://www.wowotech.net/content/uploadfile/202003/e4f01fb391d18ec3f9a4bb751b66b10f20200308003818.jpg)
+![[Pasted image 20241021202611.png]]
 
-#### 6. **zRAM技术应用**
+# 6. **zRAM技术应用**
 
 本节描述一下在使用ZRAM常遇到的一些使用或配置，调试的方法。
 
-##### 6.1 **如何配置开启zRAM**
+## 6.1 **如何配置开启zRAM**
 
 1） **配置内存压缩算法**
 
@@ -155,13 +156,13 @@ mkswap /dev/zram0
 
 swapon /dev/zram0
 
-##### 6.2 **swappiness含义简述**
+## 6.2 **swappiness含义简述**
 
 swappiness参数是内核倾向于回收匿名页到swap（使用的ZRAM就是swap设备）的积极程度， 原生内核范围是0~100， 参数值越大， 表示回收匿名页到swap的比例就越大。如果配置为0， 表示仅回收文件页，不回收匿名页。默认值为60。可以通过节点“/proc/sys/vm/swappiness”配置。
 
-##### 6.3 **zRam\*\*\*\*相关的技术指标**
+## 6.3 **zRam相关的技术指标**
 
-1） **ZRAM大小及剩余空间**
+### 1） **ZRAM大小及剩余空间**
 
 Proc/meminfo中可以查看相关信息
 
@@ -171,7 +172,7 @@ SwapFree：swap剩余大小, 如果配置为ZRAM, 这里就是ZRAM剩余大小
 
 当然， 节点 /sys/block/zram0/disksize是最直接的。
 
-2） **ZRAM压缩率**
+### 2） **ZRAM压缩率**
 
 /sys/block/zram/mm_stat中有压缩前后的大小数据， 由此可以计算出实际的压缩率
 
@@ -179,13 +180,13 @@ orig_data_size：压缩前数据大小， 单位为bytes
 
 compr_data_size ：压缩后数据大小， 单位为bytes
 
-3） **换出/换入swap区的总量, proc/vmstat中中有相关信息**
+### 3） **换出/换入swap区的总量, proc/vmstat中中有相关信息**
 
 pswpin:换入总量， 单位为page
 
 pswout:换出总量， 单位为page
 
-##### 6.4 **zRam****相****关优化**
+## 6.4 **zRam相关优化**
 
 上面提到zRam的一些缺陷, 怎么去改善呢?
 
@@ -201,7 +202,7 @@ zRam本质就是以时间换空间, 在低内存的情况下, 肯定会比较频
 
 使用zRam是有可能导致系统内存碎片变得更严重的, 特别是zsmalloc分配不支持可移动内存类型的时候。新版的内核zsmalloc已经支持可移动类型分配的， 但由于增大了zRam,结合android手机的使用特点, 仍然会有可能导致系统内存碎片较严重的情况,因些内存碎片问题也是需要重点关注的。解决系统内存碎片的方法也比较多, 可以结合具体的原因及场景进行优化。
 
-#### 7. **参考资料**
+# 7. **参考资料**
 
 1) [https://github.com/lz4/lz4](https://github.com/lz4/lz4)
 
@@ -213,7 +214,7 @@ zRam本质就是以时间换空间, 在低内存的情况下, 肯定会比较频
 
 标签: [zRAM](http://www.wowotech.net/tag/zRAM)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [一例centos7.6内核hardlock的解析](http://www.wowotech.net/linux_kenrel/479.html) | [Binder从入门到放弃（下）](http://www.wowotech.net/binder2.html)»
 

@@ -5,13 +5,13 @@ C语言与CPP编程 _2022年07月01日 08:40_
 
 最近群里聊到了`Memory Order`相关知识，恰好自己对这块的理解是模糊的、不成体系的，所以借助本文，重新整理下相关知识。
 
-## 写在前面
+# 写在前面
 
 在真正了解Memory Order的作用之前，曾经简单地将Memory Order等同于mutex和atomic来进行线程间数据同步，或者用来限制线程间的执行顺序，其实这是一个错误的理解。直到后来仔细研究了Memory Order之后，才发现无论是功能还是原理，Memory Order与他们都不是同一件事。实际上，Memory Order是用来用来约束同一个线程内的内存访问排序方式的，虽然同一个线程内的代码顺序重排不会影响本线程的执行结果（如果结果都不一致，那么重排就没有意义了），但是在多线程环境下，重排造成的数据访问顺序变化会影响其它线程的访问结果。
 
 正是基于以上原因，引入了内存模型。C++的内存模型解决的问题是如何合理地限制单一线程中的代码执行顺序，使得在不使用锁的情况下，既能最大化利用CPU的计算能力，又能保证多线程环境下不会出现逻辑错误。
 
-## 指令乱序
+# 指令乱序
 
 现在的CPU都采用的是多核、多线程技术用以提升计算能力；采用乱序执行、流水线、分支预测以及多级缓存等方法来提升程序性能。多核技术在提升程序性能的同时，也带来了执行序列乱序和内存序列访问的乱序问题。与此同时，编译器也会基于自己的规则对代码进行优化，这些优化动作也会导致一些代码的顺序被重排。
 
@@ -60,7 +60,7 @@ void fun() {    A = B + 1;    asm volatile("" ::: "memory"); �
 lfence (asm), void _mm_lfence(void)sfence (asm), void _mm_sfence(void)mfence (asm), void _mm_mfence(void)
 ```
 
-## 为什么需要内存模型
+# 为什么需要内存模型
 
 多线程技术是为了最大限度地压榨cpu，提升计算能力。在单核时代，多线程的概念是在`宏观上并行，微观上串行`，多线程可以访问相同的CPU缓存和同一组寄存器。但是在多核时代，多个线程可能执行在不同的核上，每个CPU都有自己的缓存和寄存器，在一个CPU上执行的线程无法访问另一个CPU的缓存和寄存器。CPU会根据一定的规则对机器指令的内存交互进行重新排序，特别是允许每个处理器延迟存储并且从不同位置装载数据。与此同时，编译器也会基于自己的规则对代码进行优化，这些优化动作也会导致一些代码的顺序被重排。这种指令的重排，虽然不影响单线程的执行结果，但是会加剧多线程访问共享数据时的数据竞争（Data Race）问题。
 
@@ -84,11 +84,11 @@ lfence (asm), void _mm_lfence(void)sfence (asm), void _mm_sfence(void)mfen
 
 - • CPU Cache不一致：在CPU Cache的影响下，在某个CPU下执行了指令，不会立即被其它CPU所看到
 
-## 关系术语
+# 关系术语
 
 为了便于更好地理解后面的内容，我们需要理解几种关系术语。
 
-### sequenced-before
+## sequenced-before
 
 sequenced-before是一种单线程上的关系，这是一个非对称，可传递的成对关系。
 
@@ -120,7 +120,7 @@ sequenced-before就是对在`同一个线程内`，求值顺序关系的描述�
 
 - • 如果A not sequenced-before B，而B not sequenced-before A，则A和B都有可能先执行，甚至可以同时执行
 
-### happens-before
+## happens-before
 
 happens-before是sequenced-before的扩展，因为它还包含了不同线程之间的关系。当A操作**happens-before** B操作的时候，操作A先于操作B执行，且A操作的结果对B来说可见。
 
@@ -158,7 +158,7 @@ C++中定义了5种能够建立跨线程的happens-before的场景，如下：
 
 - • A inter-thread happens-before some evaluation X, and X inter-thread happens-before B
 
-### synchronizes-with
+## synchronizes-with
 
 synchronized-with描述的是不同线程间的同步关系，当线程A synchronized-with线程B的时，代表线程A对某个变量或者内存的操作，对于线程B是可见的。换句话说，`synchronized-with就是跨线程版本的happens-before`。
 
@@ -202,9 +202,9 @@ ps: 因为memory_order_relaxed没有定义同步和排序约束，所以它不�
 
 在后面的内容中，将结合这6种约束符来进一步分析内存模型。
 
-## 内存模型
+# 内存模型
 
-### Sequential consistency模型
+## Sequential consistency模型
 
 Sequential consistency模型又称为顺序一致性模型，是控制粒度最严格的内存模型。最早追溯到Leslie Lamport在**1979**年**9**月发表的论文《**How to Make a Multiprocessor Computer That Correctly Executes Multiprocess Programs**》，在该文里面首次提出了`Sequential consistency`概念：
 
@@ -246,7 +246,7 @@ x = y = 0;thread1:x = 1;r1 = y;thread2:y = 1;r2 = x;
 
 顺序一致性的所有操作都按照代码指定的顺序进行，符合开发人员的思维逻辑，但这种严格的排序也限制了现代CPU利用硬件进行并行处理的能力，会严重拖累系统的性能。
 
-### Relax模型
+## Relax模型
 
 Relax模型对应的是memory_order中的`memory_order_relaxed`。从其字面意思就能看出，其对于内存序的限制最小，也就是说这种方式只能**保证当前的数据访问是原子操作（不会被其他线程的操作打断）**，但是对内存访问顺序没有任何约束，也就是说对不同的数据的读写可能会被重新排序。
 
@@ -275,7 +275,7 @@ std::atomic<int> cnt = {0};void fun1() {  for (int n = 0; n < 100;
 
 通常，与其它内存序相比，宽松内存序具有最少的同步开销。但是，正因为同步开销小，这就导致了不确定性，所以我们在开发过程中，根据自己的使用场景来选择合适的内存序选项。
 
-## Acquire-Release模型
+# Acquire-Release模型
 
 Acquire-Release模型的控制力度介于Relax模型和Sequential consistency模型之间。其定义如下：
 
@@ -287,13 +287,13 @@ Acquire-Release模型的控制力度介于Relax模型和Sequential consistency�
 
 Acquire-Release模型对应六种约束关系中的memory_order_consume、memory_order_acquire、memory_order_release和memory_order_acq_rel。这些约束关系，有的只能用于读操作(memory_order_consume、memory_order_acquire)，有的适用于写操作(memory_order_release)，有的技能用于读操作也能用于写操作(memory_order_acq_rel)。这些约束符互相配合，可以实现相对严格一点的内存访问顺序控制。
 
-### memory_order_release
+## memory_order_release
 
 假设有一个原子变量A，对其进行写操作X的时候施加了memory_order_release约束符，则在当前线程T1中，该操作X之前的任何读写操作指令都不能放在操作X之后。当另外一个线程T2对原子变量A进行读操作的时候，施加了memory_order_acquire约束符，则当前线程T1中写操作之前的任何读写操作都对线程T2可见；当另外一个线程T2对原子变量A进行读操作的时候，如果施加了memory_order_consume约束符，则当前线程T1中所有原子变量A所`依赖`的读写操作都对T2线程可见(没有依赖关系的内存操作就不能保证顺序)。
 
 需要注意的是，对于施加了memory_order_release约束符的写操作，其写之前所有读写指令操作都不会被重排序写操作之后的前提是：`其他线程对这个原子变量执行了读操作，且施加了`**memory_order_acquire或者 memory_order_consume**约束符。
 
-### memory_order_acquire
+## memory_order_acquire
 
 一个对原子变量的**load操作**时，使用memory_order_acquire约束符：在**当前线程**中，该load之后读和写操作都不能被重排到当前指令前。如果**其他线程**使用`memory_order_release`约束符，则对此原子变量进行`store`操作，在当前线程中是可见的。
 
@@ -302,19 +302,28 @@ Acquire-Release模型对应六种约束关系中的memory_order_consume、memory
 为了便于理解，使用`cppreference`中的例子，如下：
 
 ```c
-#include <thread>#include <atomic>#include <cassert>#include <string> std::atomic<std::string*> ptr;int data; void producer() {  std::string* p  = new std::string("Hello");  // L10  data = 42; // L11  ptr.store(p, std::memory_order_release); // L12} void consumer() {  std::string* p2;  while (!(p2 = ptr.load(std::memory_order_acquire))); // L17  assert(*p2 == "Hello"); // L18  assert(data == 42); // L19} int main() {  std::thread t1(producer);  std::thread t2(consumer);  t1.join();   t2.join();    return 0;}
+#include <thread>
+#include <atomic>
+#include <cassert>
+#include <string> 
+std::atomic<std::string*> ptr;int data; void producer() {  std::string* p  = new std::string("Hello");  // L10  
+														 data = 42; // L11  ptr.store(p, std::memory_order_release); // L12} void consumer() {  std::string* p2;  while (!(p2 = ptr.load(std::memory_order_acquire))); // L17  assert(*p2 == "Hello"); // L18  assert(data == 42); // L19} int main() {  std::thread t1(producer);  std::thread t2(consumer);  t1.join();   t2.join();    return 0;}
 ```
 
 在上述例子中，原子变量ptr的写操作(L12)施加了memory_order_release标记，根据前面所讲，这意味着在线程producer中，L10和L11不会重排到L12之后；在consumer线程中，对原子变量ptr的读操作L17施加了memory_order_acquire标记，也就是说L8和L19不会重排到L17之前，这也就意味着当L17读到的ptr不为null的时候，producer线程中的L10和L11操作对consumer线程是可见的，因此consumer线程中的assert是成立的。
 
-### memory_order_consume
+## memory_order_consume
 
 一个**load操作**使用了memory_order_consume约束符：在**当前线程**中，load操作之后的依赖于此原子变量的读和写操作都不能被重排到当前指令前。如果有**其他线程**使用`memory_order_release`内存模型对此原子变量进行`store`操作，在当前线程中是可见的。
 
 在理解memory_order_consume约束符的意义之前，我们先了解下依赖关系，举例如下：
 
-```c
-std::atomic<std::string*> ptr;int data;std::string* p  =newstd::string("Hello");data =42;                                   ptr.store(p,std::memory_order_release);
+```cpp
+std::atomic<std::string*> ptr;
+int data;
+std::string *p = new std::string("Hello");
+data = 42;                                   
+ptr.store(p,std::memory_order_release);
 ```
 
 在该示例中，原子变量ptr依赖于p，但是不依赖data，而p和data互不依赖
@@ -323,8 +332,12 @@ std::atomic<std::string*> ptr;int data;std::string* p  =newstd::string("Hel
 
 同样，使用cppreference中的例子，如下：
 
-```c
-#include <thread>#include <atomic>#include <cassert>#include <string> std::atomic<std::string*> ptr;int data; void producer() {  std::string* p  = new std::string("Hello"); // L10  data = 42; // L11  ptr.store(p, std::memory_order_release); // L12} void consumer() {  std::string* p2;  while (!(p2 = ptr.load(std::memory_order_consume))); // L17  assert(*p2 == "Hello"); // L18  assert(data == 42); // L19} int main() {  std::thread t1(producer);  std::thread t2(consumer);  t1.join();   t2.join();    return 0;}
+```cpp
+#include <thread>
+#include <atomic>
+#include <cassert>
+#include <string> 
+std::atomic<std::string*> ptr;int data; void producer() {  std::string* p  = new std::string("Hello"); // L10  data = 42; // L11  ptr.store(p, std::memory_order_release); // L12} void consumer() {  std::string* p2;  while (!(p2 = ptr.load(std::memory_order_consume))); // L17  assert(*p2 == "Hello"); // L18  assert(data == 42); // L19} int main() {  std::thread t1(producer);  std::thread t2(consumer);  t1.join();   t2.join();    return 0;}
 ```
 
 与memory_order_acquire一节中示例相比较，producer()没有变化，consumer()函数中将load操作的标记符从memory_order_acquire变成了memory_order_consume。而这个变动会引起如下变化：producer()中，ptr与p有依赖 关系，则p不会重排到store()操作L12之后，而data因为与ptr没有依赖关系，则可能重排到L12之后，所以可能导致L19的assert()失败。
@@ -335,7 +348,7 @@ std::atomic<std::string*> ptr;int data;std::string* p  =newstd::string("Hel
 
 > memory_order_consume约束符是对acquire&release语义的一种优化，这种优化仅限定于与原子变量存在依赖关系的变量操作，因此在重新排序的限制上，其比memory_order_acquire更为宽容。需要注意的是，因为memory_order_consume实现的复杂性，自2016年6月起，所有的编译器的实现中，memory_order_consume和memory_order_acquire的功能完全一致，详见《P0371R1: Temporarily discourage memory_order_consume》
 
-### memory_order_acq_rel
+## memory_order_acq_rel
 
 Acquire-Release模型中的其它三个约束符，要么用来约束读，要么用来约束写。那么如何对一个原子操作中的两个动作执行约束呢？这就要用到 memory_order_acq_rel，它既可以约束读，也可以约束写。
 
@@ -394,7 +407,7 @@ y.store(1, memory_order_release); // D
 
 上述两个示例，效果完全一样，都可以保证A先于B执行，C先于D执行。
 
-## 总结
+# 总结
 
 C++11提供的6种内存访问约束符中：
 
@@ -419,10 +432,10 @@ C++的内存模型则是依赖上面六种内存约束符来实现的：
 - • Sequential consistency模型：对应的memory_order_seq_cst约束符；程序的执行顺序与代码顺序严格一致，也就是说，在顺序一致性模型中，不存在指令乱序。
 
 下面这幅图大致梳理了内存模型的核心概念，可以帮我们快速回顾。
-!\[\[Pasted image 20240915164551.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
 
-## 后记
+![[Pasted image 20240915164551.png]]
+
+# 后记
 
 这篇文章断断续续写了一个多月，中间很多次都想放弃。不过，幸好还是咬牙坚持了下来。查了很多资料，奈何因为知识储备不足，很多地方都没有理解透彻，所以文章中可能存在理解偏差，希望友好交流，共同进步。
 
@@ -430,21 +443,11 @@ C++的内存模型则是依赖上面六种内存约束符来实现的：
 
 好了，今天的文章就到这，我们下期见！
 
-![](https://res.wx.qq.com/op_res/NN_GToMiIjsXzgPzF9-74ZzwR3cA9-fv3o9eWo8f5gQWqx71CmGlY8kFxuIxZaG0TB1bFeMCmh1DGN_pWMRg0A)
-
-**帐号已迁移**
-
-公众号
-
-阅读 1998
-
+---
 ​
-
 写留言
 
 [](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/ibLeYZx8Co5JKf72TOeLcba56VknmOtKrMWnS3gyv2Z3RPZ6S28sAtAKSyozOHMDzI8LEkz8ic8eH2v4ZysDq6sQ/300?wx_fmt=png&wxfrom=18)
 
 C语言与CPP编程
 
