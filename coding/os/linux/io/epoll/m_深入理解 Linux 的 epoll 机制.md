@@ -1,3 +1,4 @@
+
 Linux 的 Epoll 是高并发不可或缺的组件：[深入理解 Linux 的 epoll 机制](http://mp.weixin.qq.com/s?__biz=Mzg3NTU3OTgxOA==&mid=2247492165&idx=1&sn=b7556601db1d4118ea9188945cb891aa&chksm=cf3df280f84a7b96a6247a59218bc30ac2487d14905924a2e64568bfe21762157595316b909c&token=1501681079&lang=zh_CN&scene=21#wechat_redirect)
 
 Epoll 的搭档是各种 fd 类型：\

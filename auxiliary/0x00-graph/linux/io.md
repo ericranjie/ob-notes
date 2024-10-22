@@ -4,8 +4,8 @@
 
 
 
-[[epoll背后的原理]]
-[[a_ 深入揭秘 epoll 是如何实现 IO 多路复用的]]
+[[k_epoll背后的原理]]
+[[a_深入揭秘 epoll 是如何实现 IO 多路复用的]]
 [[p_盘点Linux Epoll那些致命弱点]]
 [[redis 源码 epoll 用法]]
 [[m_深入理解 Linux 的 epoll 机制]]

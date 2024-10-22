@@ -1,12 +1,12 @@
-Linux爱好者
-_2021年12月30日 11:53_
+
+Linux爱好者 _2021年12月30日 11:53_
 
 > 来源：云原生实验室\
 > https://arthurchiao.art/blog/intro-to-io-uring-zh/
 
 今天分享一篇Linux异步IO编程框架文章，对比IO复用的epoll框架，到底性能提高多少？让我们看一看。
 
-## 译者序
+# 译者序
 
 本文组合翻译了以下两篇文章的干货部分，作为 `io_uring` 相关的入门参考：
 
@@ -52,9 +52,9 @@ ______________________________________________________________________
 
 本文介绍 io_uring（我们在 ScyllaDB 中有 io_uring 的深入使用经验），并略微提及一下 eBPF。
 
-## 1 Linux I/O 系统调用演进
+# 1 Linux I/O 系统调用演进
 
-### 1.1 基于 fd 的阻塞式 I/O：`read()/write()`
+## 1.1 基于 fd 的阻塞式 I/O：`read()/write()`
 
 作为大家最熟悉的读写方式，Linux 内核提供了 **==基于文件描述符的系统调用==**， 这些描述符指向的可能是 **==存储文件==**（storage file），也可能是  **==network sockets==**：
 
@@ -70,11 +70,11 @@ ______________________________________________________________________
 
 但很容易想到，随着存储 **==设备越来越快，程序越来越复杂==**， 阻塞式（blocking）已经这种最简单的方式已经不适用了。
 
-### 1.2 非阻塞式 I/O：`select()/poll()/epoll()`
+## 1.2 非阻塞式 I/O：`select()/poll()/epoll()`
 
 阻塞式之后，出现了一些新的、非阻塞的系统调用，例如 `select()`、`poll()` 以及更新的 `epoll()`。应用程序在调用这些函数读写时不会阻塞，而是 **==立即返回==**，返回的是一个\*\*==已经 ready 的文件描述符列表==\*\*。
-!\[\[Pasted image 20240923185643.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240923185643.png]]
 
 但这种方式存在一个致命缺点：**==只支持 network sockets 和 pipes==** ——`epoll()` 甚至连 storage files 都不支持。
 

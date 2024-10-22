@@ -1,20 +1,9 @@
-# 
 
 原创 往事敬秋风 深度Linux
 
 _2024年08月25日 09:10_
 
 我还以为是硬件里边电平的边沿触发和水平触发，水平触发是指在信号达到或超过某个阈值时触发，只要信号保持在该阈值之上（或之下），触发状态就会一直持续。换句话说，水平触发检测的是信号的绝对水平而不关心其变化速率。常见的例子是开关门磁感应器，当门磁感应器所接收到的磁场强度超过预设阈值时，可以认为门被打开了。
-
-![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
-
-**深度Linux**
-
-拥有15年项目开发经验及丰富教学经验，曾就职国内知名企业项目经理，部门负责人等职务。研究领域：Windows&Linux平台C/C++后端开发、Linux系统内核等技术。
-
-184篇原创内容
-
-公众号
 
 边缘触发是指在信号上升沿或下降沿出现时触发。当信号从低电平跃迁到高电平（上升沿）或从高电平跃迁到低电平（下降沿）时才会触发。边缘触发更加关注信号变化的瞬间，并且只有在出现特定变化时才会进行响应。例如，在数字系统中，计数器可能会在输入信号上升沿或下降沿处进行计数操作，后来才发现理解错了，原来软件编程里也有类似的概念。
 
@@ -48,7 +37,7 @@ _2024年08月25日 09:10_
 
 - 优缺点：考虑不同应用场景下，用户态和内核态的切换次数的细节
 
-## 一、epoll的数据结构
+# 一、epoll的数据结构
 
 epoll工作环境？
 
@@ -56,16 +45,14 @@ epoll工作环境？
 
 - epoll是在内核协议栈和vfs都有的情况下才有的。
 
-!\[\[Pasted image 20240911163105.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240911163105.png]]
 
 epoll 的核心数据结构是：1个红黑树和1个双向链表。还有3个核心API。
-!\[\[Pasted image 20240911163111.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240911163111.png]]
 
 可以看到，链表和红黑树使用的是同一个结点。实际上是红黑树管理所有的IO，当内部IO就绪的时候就会调用epoll的回调函数，将相应的IO添加到就绪链表上。数据结构有epitm和eventpoll，分别代表红黑树和单个结点，在单个结点上分别使用rbn和rblink使得结点同时指向两个数据结构。
 
-### 1.1红黑树
+## 1.1 红黑树
 
 - 因为链表在查询，删除的时候毫无疑问时间复杂度是O(n)；
 
@@ -79,7 +66,7 @@ epoll 的核心数据结构是：1个红黑树和1个双向链表。还有3个�
 
 当然不选择用AVL树是因为红黑树是不符合AVL树的平衡条件的，红黑树用非严格的平衡来换取增删节点时候旋转次数的降低，任何不平衡都会在三次旋转之内解决；而AVL树是严格平衡树，在增加或者删除节点的时候，根据不同情况，旋转的次数比红黑树要多。所以红黑树的插入效率更高。
 
-### 1.2就绪socket列表-双向链表
+## 1.2 就绪socket列表-双向链表
 
 就绪列表存储的是就绪的socket，所以它应能够快速的插入数据。
 
@@ -94,7 +81,7 @@ struct epitem {RB_ ENTRY(epitem) rbn;LIST_ ENTRY(epitem) rdlink;int rdy; //exist
 			   int sockfd;struct epoll_ event event ;};struct eventpoll {ep_ _rb_ tree rbr;int rbcnt ;LIST_ HEAD( ,epitem) rdlist;int rdnum;int waiting;pthread_ mutex_ t mtx; //rbtree updatepthread_ spinlock_ t 1ock; //rdList updatepthread_ cond_ _t cond; //bLock for eventpthread_ mutex_ t cdmtx; //mutex for cond};|
 ```
 
-### 1.3三个API
+## 1.3 三个API
 
 ```
 int epoll_create(int size)
@@ -136,7 +123,7 @@ epoll和poll/select区别？
 
 解释：poll/select每次都要把fds总集拷贝到内核协议栈内，内核采取轮询/遍历，返回就绪的fds集合。（大白话：poll/select的fds是存放在用户态协议栈，调用时拷贝到内核协议栈中并轮询，轮询完成后再拷贝到用户态协议栈）。而epoll是通过epoll_ctl每次有新的io就加入到红黑树里，有触发的时候用epoll_wait带出即可，不需要拷贝总集。
 
-## 二、epoll的实现原理
+# 二、epoll的实现原理
 
 为什么需要epoll？
 
@@ -164,7 +151,7 @@ select与poll的缺陷？
 
 - 为了解决这些问题，现代操作系统中引入了新的系统调用 epoll 来替代 select 和 poll。epoll 没有文件描述符的限制，它可以监视大量的文件描述符，并且可以实现即开即用，无需传递所有文件描述符集合。此外，epoll 可以直接告诉你哪些文件描述符已经准备好，这大大提高了处理效率。
 
-### 2.1epoll操作
+## 2.1 epoll操作
 
 epoll 在 linux 内核中申请了一个简易的文件系统，把原先的一个 select 或者 poll 调用分为了三个部分：调用 epoll_create 建立一个 epoll 对象（在 epoll 文件系统中给这个句柄分配资源）、调用 epoll_ctl 向 epoll 对象中添加连接的套接字、调用 epoll_wait 收集发生事件的连接。这样只需要在进程启动的时候建立一个 epoll 对象，并在需要的时候向它添加或者删除连接就可以了，因此，在实际收集的时候，epoll_wait 的效率会非常高，因为调用的时候只是传递了发生 IO 事件的连接。
 
@@ -192,7 +179,7 @@ epoll 有两种工作模式，LT（水平触发）模式与 ET（边缘触发）
 
 当然，在 LT 模式下开发基于 epoll 的应用要简单一些，不太容易出错，而在 ET 模式下事件发生时，如果没有彻底地将缓冲区的数据处理完，则会导致缓冲区的用户请求得不到响应。注意，默认情况下 Nginx 采用 ET 模式使用 epoll 的。
 
-### 2.2 I/O 多路复用
+## 2.2 I/O 多路复用
 
 (1)阻塞OR非阻塞
 
@@ -215,16 +202,16 @@ epoll 有两种工作模式，LT（水平触发）模式与 ET（边缘触发）
 阻塞是进程调度的关键一环，指的是进程在等待某事件（如接收到网络数据）发生之前的等待状态，recv、select和epoll都是阻塞方法，以简单网络编程为例
 
 下图中的计算机中运行着A、B、C三个进程，其中进程A执行着上述基础网络程序，一开始，这3个进程都被操作系统的工作队列所引用，处于运行状态，会分时执行
-!\[\[Pasted image 20240911163150.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911163150.png]]
 
 当进程A执行到创建socket的语句时，操作系统会创建一个由文件系统管理的socket对象（如下图）。这个socket对象包含了发送缓冲区、接收缓冲区、等待队列等成员。等待队列是个非常重要的结构，它指向所有需要等待该socket事件的进程。
-!\[\[Pasted image 20240911163154.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911163154.png]]
 
 当程序执行到recv时，操作系统会将进程A从工作队列移动到该socket的等待队列中（如下图）。由于工作队列只剩下了进程B和C，依据进程调度，cpu会轮流执行这两个进程的程序，不会执行进程A的程序。所以进程A被阻塞，不会往下执行代码，也不会占用cpu资源。
-!\[\[Pasted image 20240911163159.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911163159.png]]
 
 ps：操作系统添加等待队列只是添加了对这个“等待中”进程的引用，以便在接收到数据时获取进程对象、将其唤醒，而非直接将进程管理纳入自己之下。上图为了方便说明，直接将进程挂到等待队列之下。
 
@@ -246,17 +233,17 @@ ps：操作系统添加等待队列只是添加了对这个“等待中”进程
 
 为了避免CPU空转，可以引进了一个代理。这个代理比较厉害，可以同时观察许多流的I/O事件，在空闲的时候，会把当前线程阻塞掉，当有一个或多个流有I/O事件时，就从阻塞态中醒来，于是我们的程序就会轮询一遍所有的流，这就是 select 与 poll 所做的事情，可见，采用 I/O 复用极大的提高了系统的效率。
 
-### 2.3内核接收网络数据全过程
+## 2.3 内核接收网络数据全过程
 
 如下图所示，进程在recv阻塞期间，计算机收到了对端传送的数据（步骤①）。数据经由网卡传送到内存（步骤②），然后网卡通过中断信号通知CPU有数据到达，CPU执行中断程序（步骤③）。此处的中断程序主要有两项功能，先将网络数据写入到对应socket的接收缓冲区里面（步骤④），再唤醒进程A（步骤⑤），重新将进程A放入工作队列中。
-!\[\[Pasted image 20240911163207.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911163207.png]]
 
 唤醒线程的过程如下图所示：
-!\[\[Pasted image 20240911163443.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-## 三、协议栈如何与epoll通信？
+![[Pasted image 20240911163443.png]]
+
+# 三、协议栈如何与epoll通信？
 
 协议栈和epoll模块之间的通信是异步的，没有耦合，不需要等待。
 
@@ -266,13 +253,13 @@ ps：操作系统添加等待队列只是添加了对这个“等待中”进程
 
 - （2）客户端发了1个数据到协议栈，协议栈此时要返回ack给客户端的这里的时机，会通知epoll有事件可读 epollin。
 
-## 四、epoll线程安全如何加锁？
+# 四、epoll线程安全如何加锁？
 
 1、对红黑树枷锁：一种是锁整棵树，另一种是锁子树。一般使用互斥锁。
 
 2、对就绪队列枷锁：用自旋锁，队列操作比较简单，等到一些时间比让出线程更高效点。
 
-### 4.1等待队列实现原理
+## 4.1 等待队列实现原理
 
 (1)功能介绍
 
@@ -325,19 +312,19 @@ struct list_head{    struct list_head *next, *prev;};
 
 epoll 关键结构体：
 
-```
+```cpp
 struct ep_pqueue{    poll_table pt;    struct epitem *epi;};
 ```
 
 这个结构体类似于select/poll中的struct poll_wqueues。由于epoll需要在内核态保存大量信息，所以光光一个回调函数指针已经不能满足要求，所以在这里引入了一个新的结构体struct epitem。
 
-```
+```cpp
 struct epitem{     struct rb_node rbn;    红黑树，用来保存eventpoll     struct list_head rdllink;    双向链表，用来保存已经完成的eventpoll     struct epoll_filefd ffd;    这个结构体对应的被监听的文件描述符信息     int nwait;    poll操作中事件的个数     struct list_head pwqlist;    双向链表，保存着被监视文件的等待队列，功能类似于select/poll中的poll_table     struct eventpoll *ep;    指向eventpoll，多个epitem对应一个eventpoll     struct epoll_event event;    记录发生的事件和对应的fd     atomic_t usecnt;    引用计数     struct list_head fllink;    双向链表，用来链接被监视的文件描述符对应的struct file。因为file里有f_ep_link，    用来保存所有监视这个文件的epoll节点     struct list_head txlink;    双向链表，用来保存传输队列     unsigned int revents;    文件描述符的状态，在收集和传输时用来锁住空的事件集合};
 ```
 
 该结构体用来保存与epoll节点关联的多个文件描述符，保存的方式是使用红黑树实现的hash表。至于为什么要保存，下文有详细解释。它与被监听的文件描述符一一对应。
 
-```
+```cpp
 struct eventpoll{     spinlock_t lock;    读写锁     struct mutex mtx;    读写信号量     wait_queue_head_t wq;     wait_queue_head_t poll_wait;     struct list_head rdllist;    已经完成的操作事件的队列。     struct rb_root rbr;    保存epoll监视的文件描述符    struct epitem *ovflist;    struct user_struct *user;};
 ```
 
@@ -397,11 +384,11 @@ epitem被添加到readylist中的各种情况(当一个epitem被添加到readyli
 SYSCALL_DEFINE4(epoll_wait, int, epfd, struct epoll_event __user *, events,int, maxevents, int, timeout) SYSCALL_DEFINE4(epoll_ctl, int, epfd, int, op, int, fd,struct epoll_event __user *, event)epoll_ctl的机制大致如下：mutex_lock(&ep->mtx);epi = ep_find(ep, tfile, fd); //这里就是去ep->rbr 红黑树查找error = -EINVAL;switch (op) {case EPOLL_CTL_ADD:if (!epi) {             epds.events |= POLLERR | POLLHUP;            error = ep_insert(ep, &epds, tfile, fd);        } else            error = -EEXIST;        break;    case EPOLL_CTL_DEL:        if (epi)             error = ep_remove(ep, epi);        else            error = -ENOENT;        break;     case EPOLL_CTL_MOD:        if (epi) {             epds.events |= POLLERR | POLLHUP;            error = ep_modify(ep, epi, &epds);         } else             error = -ENOENT;         break;    }   mutex_unlock(&ep->mtx);
 ```
 
-### 4.2源码分析
+## 4.2 源码分析
 
 (1)sys_epoll_wait()函数：
 
-```
+```cpp
 /*  * Implement the event wait interface for the eventpoll file. It is the kernel  * part of the user space epoll_wait(2).  */  SYSCALL_DEFINE4(epoll_wait, int, epfd, struct epoll_event __user *, events,          int, maxevents, int, timeout)  {      int error;      struct file *file;      struct eventpoll *ep;        /* The maximum number of event must be greater than zero */      /*      * 检查maxevents参数。      */      if (maxevents <= 0 || maxevents > EP_MAX_EVENTS)          return -EINVAL;        /* Verify that the area passed by the user is writeable */      /*      * 检查用户空间传入的events指向的内存是否可写。参见__range_not_ok()。      */      if (!access_ok(VERIFY_WRITE, events, maxevents * sizeof(struct epoll_event))) {          error = -EFAULT;          goto error_return;      }        /* Get the "struct file *" for the eventpoll file */      /*      * 获取epfd对应的eventpoll文件的file实例，file结构是在epoll_create中创建      */      error = -EBADF;      file = fget(epfd);      if (!file)          goto error_return;        /*      * We have to check that the file structure underneath the fd      * the user passed to us _is_ an eventpoll file.      */      /*      * 通过检查epfd对应的文件操作是不是eventpoll_fops      * 来判断epfd是否是一个eventpoll文件。如果不是      * 则返回EINVAL错误。      */      error = -EINVAL;      if (!is_file_epoll(file))          goto error_fput;        /*      * At this point it is safe to assume that the "private_data" contains      * our own data structure.      */      ep = file->private_data;        /* Time to fish for events ... */      error = ep_poll(ep, events, maxevents, timeout);    error_fput:      fput(file);  error_return:        return error;  }
 ```
 
@@ -411,7 +398,7 @@ sys_epoll_wait（）是epoll_wait()对应的系统调用，主要用来获取文
 
 除非你故意指定一个不存在的文件描述符，否则几乎百分百肯定，你的程序有BUG了！从源码中可以看到调用fget（）函数返回NULL时，会返回此错误。fget（）源码如下：
 
-```
+```cpp
 struct file *fget(unsigned int fd)  {      struct file *file;      struct files_struct *files = current->files;        rcu_read_lock();      file = fcheck_files(files, fd);      if (file) {          if (!atomic_long_inc_not_zero(&file->f_count)) {              /* File object ref couldn't be taken */              rcu_read_unlock();              return NULL;          }      }      rcu_read_unlock();        return file;  }
 ```
 
@@ -421,7 +408,7 @@ struct file *fget(unsigned int fd)  {      struct file *file;      struct files_
 
 epoll_wait（）中有一个设置超时时间的参数，所以我在循环中没有使用睡眠队列的操作，想依赖epoll的睡眠操作，所以在返回值小于等于0时，直接进行下一次循环，没有充分考虑epoll_wait（）的返回值小于0时的不同情况，所以代码写成了下面的样子：
 
-```
+```cpp
 for(;;) {      ......      events = epoll_wait(fcluster_epfd, fcluster_wait_events,               fcluster_wait_size, 3000);          if (unlikely(events <= 0)) {              continue;          }      .......  }
 ```
 
@@ -429,7 +416,7 @@ for(;;) {      ......      events = epoll_wait(fcluster_epfd, fcluster_wait_even
 
 (2)ep_poll（）函数
 
-```
+```cpp
 static int ep_poll(struct eventpoll *ep, struct epoll_event __user *events,             int maxevents, long timeout)  {      int res, eavail;      unsigned long flags;      long jtimeout;      wait_queue_t wait;        /*      * Calculate the timeout by checking for the "infinite" value (-1)      * and the overflow condition. The passed timeout is in milliseconds,      * that why (t * HZ) / 1000.      */      /*      * timeout是以毫秒为单位，这里是要转换为jiffies时间。      * 这里加上999(即1000-1)，是为了向上取整。      */      jtimeout = (timeout < 0 || timeout >= EP_MAX_MSTIMEO) ?          MAX_SCHEDULE_TIMEOUT : (timeout * HZ + 999) / 1000;    retry:      spin_lock_irqsave(&ep->lock, flags);        res = 0;      if (list_empty(&ep->rdllist)) {          /*          * We don't have any available event to return to the caller.          * We need to sleep here, and we will be wake up by          * ep_poll_callback() when events will become available.          */          init_waitqueue_entry(&wait, current);          wait.flags |= WQ_FLAG_EXCLUSIVE;          /*          * 将当前进程加入到eventpoll的等待队列中，          * 等待文件状态就绪或直到超时，或被          * 信号中断。          */          __add_wait_queue(&ep->wq, &wait);            for (;;) {              /*              * We don't want to sleep if the ep_poll_callback() sends us              * a wakeup in between. That's why we set the task state              * to TASK_INTERRUPTIBLE before doing the checks.              */              set_current_state(TASK_INTERRUPTIBLE);              /*              * 如果就绪队列不为空，也就是说已经有文件的状态              * 就绪或者超时，则退出循环。              */              if (!list_empty(&ep->rdllist) || !jtimeout)                  break;              /*              * 如果当前进程接收到信号，则退出              * 循环，返回EINTR错误              */              if (signal_pending(current)) {                  res = -EINTR;                  break;              }                spin_unlock_irqrestore(&ep->lock, flags);              /*              * 主动让出处理器，等待ep_poll_callback()将当前进程              * 唤醒或者超时,返回值是剩余的时间。从这里开始              * 当前进程会进入睡眠状态，直到某些文件的状态              * 就绪或者超时。当文件状态就绪时，eventpoll的回调              * 函数ep_poll_callback()会唤醒在ep->wq指向的等待队列中的进程。              */              jtimeout = schedule_timeout(jtimeout);              spin_lock_irqsave(&ep->lock, flags);          }          __remove_wait_queue(&ep->wq, &wait);            set_current_state(TASK_RUNNING);      }      /* Is it worth to try to dig for events ? */      /*      * ep->ovflist链表存储的向用户传递事件时暂存就绪的文件。      * 所以不管是就绪队列ep->rdllist不为空，或者ep->ovflist不等于      * EP_UNACTIVE_PTR，都有可能现在已经有文件的状态就绪。      * ep->ovflist不等于EP_UNACTIVE_PTR有两种情况，一种是NULL，此时      * 可能正在向用户传递事件，不一定就有文件状态就绪，      * 一种情况时不为NULL，此时可以肯定有文件状态就绪，      * 参见ep_send_events()。      */      eavail = !list_empty(&ep->rdllist) || ep->ovflist != EP_UNACTIVE_PTR;        spin_unlock_irqrestore(&ep->lock, flags);        /*      * Try to transfer events to user space. In case we get 0 events and      * there's still timeout left over, we go trying again in search of      * more luck.      */      /*      * 如果没有被信号中断，并且有事件就绪，      * 但是没有获取到事件(有可能被其他进程获取到了)，      * 并且没有超时，则跳转到retry标签处，重新等待      * 文件状态就绪。      */      if (!res && eavail &&          !(res = ep_send_events(ep, events, maxevents)) && jtimeout)          goto retry;        /*      * 返回获取到的事件的个数或者错误码      */      return res;  }
 ```
 
@@ -437,7 +424,7 @@ ep_poll（）的主要过程是：首先将超时时间（以毫秒为单位）�
 
 (3)ep_scan_ready_list（）函数
 
-```
+```cpp
 /**  * ep_scan_ready_list - Scans the ready list in a way that makes possible for  *                      the scan code, to call f_op->poll(). Also allows for  *                      O(NumReady) performance.  *  * @ep: Pointer to the epoll private data structure.  * @sproc: Pointer to the scan callback.  * @priv: Private opaque data passed to the @sproc callback.  *  * Returns: The same integer error code returned by the @sproc callback.  */  static int ep_scan_ready_list(struct eventpoll *ep,                    int (*sproc)(struct eventpoll *,                         struct list_head *, void *),                    void *priv)  {      int error, pwake = 0;      unsigned long flags;      struct epitem *epi, *nepi;      LIST_HEAD(txlist);        /*      * We need to lock this because we could be hit by      * eventpoll_release_file() and epoll_ctl().      */      /*      * 获取互斥锁，该互斥锁在移除eventpoll文件(eventpoll_release_file() )、      * 操作文件描述符(epoll_ctl())和向用户传递事件(epoll_wait())之间进行互斥      */      mutex_lock(&ep->mtx);        /*      * Steal the ready list, and re-init the original one to the      * empty list. Also, set ep->ovflist to NULL so that events      * happening while looping w/out locks, are not lost. We cannot      * have the poll callback to queue directly on ep->rdllist,      * because we want the "sproc" callback to be able to do it      * in a lockless way.      */      spin_lock_irqsave(&ep->lock, flags);      /*      * 将就绪队列中就绪的文件链表暂存在临时      * 表头txlist中，并且初始化就绪队列。      */      list_splice_init(&ep->rdllist, &txlist);      /*      * 将ovflist置为NULL，表示此时正在向用户空间传递      * 事件。如果此时有文件状态就绪，不会放在      * 就绪队列中，而是放在ovflist链表中。      */      ep->ovflist = NULL;      spin_unlock_irqrestore(&ep->lock, flags);        /*      * Now call the callback function.      */      /*      * 调用ep_send_events_proc()将就绪队列中的事件      * 存入用户传入的内存中。      */      error = (*sproc)(ep, &txlist, priv);        spin_lock_irqsave(&ep->lock, flags);      /*      * During the time we spent inside the "sproc" callback, some      * other events might have been queued by the poll callback.      * We re-insert them inside the main ready-list here.      */      /*      * 在调用sproc指向的函数将就绪队列中的事件      * 传递到用户传入的内存的过程中，可能有文件      * 状态就绪，这些事件会暂存在ovflist链表中，      * 所以这里要将ovflist中的事件移到就绪队列中。      */      for (nepi = ep->ovflist; (epi = nepi) != NULL;           nepi = epi->next, epi->next = EP_UNACTIVE_PTR) {          /*          * We need to check if the item is already in the list.          * During the "sproc" callback execution time, items are          * queued into ->ovflist but the "txlist" might already          * contain them, and the list_splice() below takes care of them.          */          if (!ep_is_linked(&epi->rdllink))              list_add_tail(&epi->rdllink, &ep->rdllist);      }      /*      * We need to set back ep->ovflist to EP_UNACTIVE_PTR, so that after      * releasing the lock, events will be queued in the normal way inside      * ep->rdllist.      */      /*      * 重新初始化ovflist，表示传递事件已经完成，      * 之后再有文件状态就绪，这些事件会直接      * 放在就绪队列中。      */      ep->ovflist = EP_UNACTIVE_PTR;        /*      * Quickly re-inject items left on "txlist".      */      /*      * 如果sproc指向的函数ep_send_events_proc()中处理出错或者某些文件的      * 触发方式设置为水平触发(Level Trigger)，txlist中可能还有事件，需要      * 将这些就绪的事件重新添加回eventpoll文件的就绪队列中。      */      list_splice(&txlist, &ep->rdllist);        if (!list_empty(&ep->rdllist)) {          /*          * Wake up (if active) both the eventpoll wait list and          * the ->poll() wait list (delayed after we release the lock).          */          if (waitqueue_active(&ep->wq))              wake_up_locked(&ep->wq);          if (waitqueue_active(&ep->poll_wait))              pwake++;      }      spin_unlock_irqrestore(&ep->lock, flags);        mutex_unlock(&ep->mtx);        /* We have to call this outside the lock */      if (pwake)          ep_poll_safewake(&ep->poll_wait);        return error;  }
 ```
 
@@ -459,7 +446,7 @@ static int ep_send_events_proc(struct eventpoll *ep, struct list_head *head,
 							                                                                  revents = epi->ffd.file->f_op->poll(epi->ffd.file, NULL) &              epi->event.events;            /*          * If the event mask intersect the caller-requested one,          * deliver the event to userspace. Again, ep_scan_ready_list()          * is holding "mtx", so no operations coming from userspace          * can change the item.          */          if (revents) {              /*              * 向用户内存传值失败时，将当前epitem实例重新放回              * 到链表中，从这里也可以看出，在处理失败后，head指向的              * 链表(对应ep_scan_ready_list()中的临时变量txlist)中              * 有可能会没有完全处理完，因此在ep_scan_ready_list()中              * 需要下面的语句              *    list_splice(&txlist, &ep->rdllist);              * 来将未处理的事件重新放回到eventpoll文件的就绪队列中。              */              if (__put_user(revents, &uevent->events) ||                  __put_user(epi->event.data, &uevent->data)) {                  list_add(&epi->rdllink, head);                  /*                  * 如果此时已经获取了部分事件，则返回已经获取的事件个数，                  * 否则返回EFAULT错误。                  */                  return eventcnt ? eventcnt : -EFAULT;              }              eventcnt++;              uevent++;              if (epi->event.events & EPOLLONESHOT)                  epi->event.events &= EP_PRIVATE_BITS;              /*              * 如果是触发方式不是边缘触发(Edge Trigger)，而是水平              * 触发(Level Trigger)，需要将当前的epitem实例添加回              * 链表中，下次读取事件时会再次上报。              */              else if (!(epi->event.events & EPOLLET)) {                  /*                  * If this file has been added with Level                  * Trigger mode, we need to insert back inside                  * the ready list, so that the next call to                  * epoll_wait() will check again the events                  * availability. At this point, noone can insert                  * into ep->rdllist besides us. The epoll_ctl()                  * callers are locked out by                  * ep_scan_ready_list() holding "mtx" and the                  * poll callback will queue them in ep->ovflist.                  */                  list_add_tail(&epi->rdllink, &ep->rdllist);              }          }      }        return eventcnt;  }
 ```
 
-### 4.3如何加锁
+## 4.3 如何加锁
 
 3个api做什么事情
 
@@ -487,7 +474,7 @@ epoll_ctl() 对红黑树加锁epoll_wait()对就绪队列加锁回调函数()   
 
 对于红黑树这种节点比较多的时候，采用互斥锁来加锁。就绪队列就跟生产者消费者一样，结点是从协议栈回调函数来生产的，消费是epoll_wait()来消费。那么对于队列而言，用自旋锁（对于队列而言，插入删除比较简单，cpu自旋等待比让出的成本更低，所以用自旋锁）。
 
-## 五、ET与LT的实现
+# 五、ET与LT的实现
 
 - ET边沿触发，只触发一次
 
@@ -497,11 +484,11 @@ epoll_ctl() 对红黑树加锁epoll_wait()对就绪队列加锁回调函数()   
 
 那么具体如何实现呢？协议栈流程里面触发回调，是天然的符合ET只触发一次的。那么如果是LT，在recv之后，如果缓冲区还有数据那么加入到就绪队列。那么如果是LT，在send之后，如果缓冲区还有空间那么加入到就绪队列。那么这样就能实现LT了。
 
-## 六、epoll内核源码详解
+# 六、epoll内核源码详解
 
 网上很多博客说epoll使用了共享内存,这个是完全错误的 ,可以阅读源码,会发现完全没有使用共享内存的任何api，而是 使用了copy_from_user跟\_\_put_user进行内核跟用户虚拟空间数据交互。
 
-```c
+```cpp
 /* *  fs/eventpoll.c (Efficient event retrieval implementation) *  Copyright (C) 2001,...,2009	 Davide Libenzi * *  This program is free software; you can redistribute it and/or modify *  it under the terms of the GNU General Public License as published by *  the Free Software Foundation; either version 2 of the License, or *  (at your option) any later version. * *  Davide Libenzi <davidel@xmailserver.org> * */
 /* * 在深入了解epoll的实现之前, 先来了解内核的3个方面. * 1. 等待队列 waitqueue * 我们简单解释一下等待队列: * 队列头(wait_queue_head_t)往往是资源生产者, * 队列成员(wait_queue_t)往往是资源消费者, * 当头的资源ready后, 会逐个执行每个成员指定的回调函数, * 来通知它们资源已经ready了, 等待队列大致就这个意思. * 2. 内核的poll机制 * 被Poll的fd, 必须在实现上支持内核的Poll技术, * 比如fd是某个字符设备,或者是个socket, 它必须实现 * file_operations中的poll操作, 给自己分配有一个等待队列头. * 主动poll fd的某个进程必须分配一个等待队列成员, 添加到 * fd的对待队列里面去, 并指定资源ready时的回调函数. * 用socket做例子, 它必须有实现一个poll操作, 这个Poll是 * 发起轮询的代码必须主动调用的, 该函数中必须调用poll_wait(), * poll_wait会将发起者作为等待队列成员加入到socket的等待队列中去. * 这样socket发生状态变化时可以通过队列头逐个通知所有关心它的进程. * 这一点必须很清楚的理解, 否则会想不明白epoll是如何 * 得知fd的状态发生变化的. * 3. epollfd本身也是个fd, 所以它本身也可以被epoll, * 可以猜测一下它是不是可以无限嵌套epoll下去...  * * epoll基本上就是使用了上面的1,2点来完成. * 可见epoll本身并没有给内核引入什么特别复杂或者高深的技术, * 只不过是已有功能的重新组合, 达到了超过select的效果. *//*  * 相关的其它内核知识: * 1. fd我们知道是文件描述符, 在内核态, 与之对应的是struct file结构, * 可以看作是内核态的文件描述符. * 2. spinlock, 自旋锁, 必须要非常小心使用的锁, * 尤其是调用spin_lock_irqsave()的时候, 中断关闭, 不会发生进程调度, * 被保护的资源其它CPU也无法访问. 这个锁是很强力的, 所以只能锁一些 * 非常轻量级的操作. * 3. 引用计数在内核中是非常重要的概念, * 内核代码里面经常有些release, free释放资源的函数几乎不加任何锁, * 这是因为这些函数往往是在对象的引用计数变成0时被调用, * 既然没有进程在使用在这些对象, 自然也不需要加锁. * struct file 是持有引用计数的. *//* --- epoll相关的数据结构 --- *//* * This structure is stored inside the "private_data" member of the file * structure and rapresent the main data sructure for the eventpoll * interface. *//* 每创建一个epollfd, 内核就会分配一个eventpoll与之对应, 可以说是 * 内核态的epollfd. */
 struct eventpoll {	/* Protect the this structure access */	
@@ -529,6 +516,8 @@ epoll_ctl操作
 epoll_wait操作
 
 计算睡眠时间(如果有),判断eventpoll对象的链表是否为空,不为空那就干活不睡明.并且初始化一个等待队列,把自己挂上去,设置自己的进程状态，为可睡眠状态.判断是否有信号到来(有的话直接被中断醒来,),如果啥事都没有那就调用schedule_timeout进行睡眠，如果超时或者被唤醒,首先从自己初始化的等待队列删除,然后开始拷贝资源给用户空间了，拷贝资源则是先把就绪事件链表转移到中间链表,然后挨个遍历拷贝到用户空间, 并且挨个判断其是否为水平触发,是的话再次插入到就绪链表。
+
+---
 
 2023年往期回顾
 

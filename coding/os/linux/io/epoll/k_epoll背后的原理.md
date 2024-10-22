@@ -1,26 +1,15 @@
-极客重生
-
-_2021年12月20日 12:30_
 
 以下文章来源于Qunar技术沙龙 ，作者冯志明
 
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4zfH9WsPjiaCjqflC0o4ZzKiac2TSlUGZKk0vz0COz2Jsg/0)
-
-**Qunar技术沙龙**.
-
 Qunar技术沙龙是去哪儿网工程师小伙伴以及业界小伙伴们的学习交流平台。我们会分享Qunar和业界最前沿的热门技术趋势和话题,为中高端技术同学提供一个自由的技术交流和学习分享平台。
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247563937&idx=2&sn=ae50d7fe2997b4609cb749d3fa1c3d6f&chksm=c1850df0f6f284e64767e787734bc53ef3234c68749566f2fcb04478a3778ecfd890cca752ef&mpshare=1&scene=24&srcid=1220UNb3LtoN6Sb5hQ0rAUZ5&sharer_sharetime=1639979706270&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0f4af897b334a1f99373e485b6d34f73547a54cc6c07471ca8b7ab3f218c12e3aa3948366ebd9bc918aa015953e8af9de18cf0ef07f28b5cf3e7fce5117eb50ef24b7bbbadb15ec60534f548e855a0b148910c5dfcfbea2fad3bce6504263d7efc36a31bb5125053313fe35eb530f166f91efd3cf74b32cd0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQTTrNVsKeTe%2B3UAgfvpkPAxLmAQIE97dBBAEAAAAAAAyuL%2FrzeJ0AAAAOpnltbLcz9gKNyK89dVj0I50h4Fx9iyhOYLnhyVyb6rJ9szn0dkMI%2B4YqCQqJkVTWCcI9JKSxx07WRtYERNWf49JOB3mDvjrylwErfxgQtV%2FMnpIiMaAGZlWTuIxGa2a0R42XJVR9%2FQHqewSQl8hwfpjWV%2FqboXF0ErnaFCwaKUuDEUDPOw1s5iHjPgqANvTZnV4TRRT9hvBWpB%2Fl2aHf%2BQBaVwiPEB6AmBfA8tHEQ17saIYkUHxB%2Fto83z7AVGkvsYmcCNYiMZbnIuzyBuyV&acctmode=0&pass_ticket=VjZoPP4h4kGl%2Bm8sw33zja1%2FH9yY2YT5zr0bCqCsB5WLmUViXGnPp4m7lLv8HptZ&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
-
-## **1 简介**
+# **1 简介**
 
 Epoll 是个很老的知识点，是后端工程师的经典必修课。这种知识具备的特点就是研究的人多，所以研究的趋势就会越来越深。当然分享的人也多，由于分享者水平参差不齐，也产生的大量错误理解。
 
 今天我再次分享 epoll，肯定不会列个表格，对比一下差异，那就太无聊了。我将从线程阻塞的原理，中断优化，网卡处理数据过程出发，深入的介绍 epoll 背后的原理，最后还会 diss 一些流行的观点。相信无论你是否已经熟悉 epoll，本文都会对你有价值。
 
-### **2 引言**
+# **2 引言**
 
 正文开始前，先问大家几个问题。
 
@@ -48,7 +37,7 @@ PS：
 
 Linux 下进程和线程的区别其实并不大，尤其是在讨论原理和性能问题时，因此本文中“进程”和“线程”两个词是混用的。
 
-### **3 初识 epoll**
+# **3 初识 epoll**
 
 epoll 是 Linux 内核的可扩展 I/O 事件通知机制，其最大的特点就是性能优异。下图是 **libevent**(一个知名的异步事件处理软件库)对 select，poll，epoll ，kqueue 这几个 I/O 多路复用技术做的性能测试。
 
