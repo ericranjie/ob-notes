@@ -1,20 +1,6 @@
-# 
-
-CPP开发者
-
-_2021年12月07日 11:55_
 
 以下文章来源于Linux内核那些事 ，作者songsong001
 
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6dwH9qJmWO5T0Rnsiaib5jEUibibJgLmkkG02PrbyOWab4UA/0)
-
-**Linux内核那些事**.
-
-以简单的方式介绍 Linux 内核的原理，以通俗的语言分析 Linux 内核的实现。如果你没有接触过 Linux 内核，那么就关注我们的公众号吧，我们将以图解的方式让内核更亲民...
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651167900&idx=1&sn=4af1c2b142a724149b3647f2035056a8&chksm=80644dc3b713c4d58dad916ddad4e00f9961c370590909f6098a851ea6e4dd78c9393deddddc&mpshare=1&scene=24&srcid=1207FXnsiX8ksmCAAVIqIPYt&sharer_sharetime=1638850571122&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0292fc00c107633dbfb5fcb8b194ce9ce52d8e7d24b5ce48d8eeb669b56c2d4eddb82f66f265050f439117be438cddde3f4ccbd0119d9330925e4c652d3d2a482990847cfc1872033223caab615fac02016239ffed8dd429b59b16f43d4a0e38127a352ca5da04c3ef2979601820ff200477fc67ecc5e9eaa&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQtxATPGTIwHOyYVc%2FVzlWyxLmAQIE97dBBAEAAAAAADgcMs6vGOgAAAAOpnltbLcz9gKNyK89dVj0fV%2FSomHzLg%2FpVfsE6xK00CJKWq%2Fms50%2B6iJ8xCxGYHxeVt1Dnka7B1MylTBRswSgXoiAeZuofhXQJiYMAph6BFuOIB8WPuXWF2e%2FgW21KHGFCPbg3wKJlqUhAJTJxi0mDWdaZrFdVR2QoT%2B8juWLKp3hwCyZiZrD2D8%2B4D4NvrjzHGpzTOmveW%2BMPatXSNpoIN90CS6gE78A2ruORTuRDmkCSc%2B9zwrFhuibO%2FiTF8El8WOeCeVFgmcZKBVngJoq&acctmode=0&pass_ticket=q6LqxUljNwwDoX5IhWuTJ4Qgf1RucBw4BF%2F%2Bmorq3LlE7Iu%2FWSbI0QS%2BglZ%2BaewF&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 处于安全的考虑，不同进程之间的内存空间是相互隔离的，也就是说 `进程A` 是不能访问 `进程B` 的内存空间，反之亦然。如果不同进程间能够相互访问和修改对方的内存，那么当前进程的内存就有可能被其他进程非法修改，从而导致安全隐患。
 
@@ -43,8 +29,8 @@ _2021年12月07日 11:55_
 - 由于子进程会继承父进程打开的文件句柄，所以父子进程可以通过新创建的管道进行通信。
 
 其原理如下图所示：
-!\[\[Pasted image 20240922225820.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922225820.png]]
 
 由于管道分为读端和写端，所以需要两个文件描述符来管理管道：`fd[0]` 为读端，`fd[1]` 为写端。
 
@@ -66,17 +52,17 @@ _2021年12月07日 11:55_
 [root@localhost pipe]# ./pipeparent read 11 bytes data: hello world
 ```
 
-## 二、管道的实现
+# 二、管道的实现
 
 每个进程的用户空间都是独立的，但内核空间却是共用的。所以，进程间通信必须由内核提供服务。前面介绍了 `管道(pipe)` 的使用，接下来将会介绍管道在内核中的实现方式。
 
 > 本文使用 Linux-2.6.23 内核作为分析对象。
 
-### 1. 环形缓冲区（Ring Buffer）
+## 1.  环形缓冲区（Ring Buffer）
 
 在内核中，`管道` 使用了环形缓冲区来存储数据。环形缓冲区的原理是：把一个缓冲区当成是首尾相连的环，其中通过读指针和写指针来记录读操作和写操作位置。如下图所示：
-!\[\[Pasted image 20240922225931.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922225931.png]]
 
 在 Linux 内核中，使用了 16 个内存页作为环形缓冲区，所以这个环形缓冲区的大小为 64KB（16 * 4KB）。
 
@@ -84,7 +70,7 @@ _2021年12月07日 11:55_
 
 > 注意：可以将管道文件描述符设置为非阻塞，这样对管道进行读写操作时，就不会阻塞当前进程。
 
-### 2. 管道对象
+## 2. 管道对象
 
 在 Linux 内核中，管道使用 `pipe_inode_info` 对象来进行管理。我们先来看看 `pipe_inode_info` 对象的定义，如下所示：
 
@@ -125,8 +111,8 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
 - `len`：表示当前内存页拥有未读数据的长度。
 
 下图展示了 `pipe_inode_info` 对象与 `pipe_buffer` 对象的关系：
-!\[\[Pasted image 20240922225944.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922225944.png]]
 
 管道的环形缓冲区实现方式与经典的环形缓冲区实现方式有点区别，经典的环形缓冲区一般先申请一块地址连续的内存块，然后通过读指针与写指针来对读操作与写操作进行定位。
 
@@ -134,11 +120,11 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
 
 那么当进程从管道读取数据时，内核怎么处理呢？下面我们来看看管道读操作的实现方式。
 
-### 3. 读操作
+## 3. 读操作
 
 从 `经典的环形缓冲区` 中读取数据时，首先通过读指针来定位到读取数据的起始地址，然后判断环形缓冲区中是否有数据可读，如果有就从环形缓冲区中读取数据到用户空间的缓冲区中。如下图所示：
-!\[\[Pasted image 20240922225952.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922225952.png]]
 
 而 `管道的环形缓冲区` 与 `经典的环形缓冲区` 实现稍有不同，`管道的环形缓冲区` 其读指针是由 `pipe_inode_info` 对象的 `curbuf` 字段与 `pipe_buffer` 对象的 `offset` 字段组合而成：
 
@@ -147,8 +133,8 @@ struct pipe_buffer {    struct page *page;    unsigned int offset;
 - `pipe_buffer` 对象的 `offset` 字段表示读操作要从内存页的哪个位置开始读取数据。
 
 读取数据的过程如下图所示：
-!\[\[Pasted image 20240922230000.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922230000.png]]
 
 从缓冲区中读取到 n 个字节的数据后，会相应移动读指针 n 个字节的位置（也就是增加 `pipe_buffer` 对象的 `offset` 字段），并且减少 n 个字节的可读数据长度（也就是减少 `pipe_buffer` 对象的 `len` 字段）。
 
@@ -174,13 +160,13 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 
 - 如果读取到用户期望的数据长度，退出循环。
 
-### 4. 写操作
+## 4. 写操作
 
 分析完管道读操作的实现后，接下来，我们分析一下管道写操作的实现。
 
 `经典的环形缓冲区` 写入数据时，首先通过写指针进行定位要写入的内存地址，然后判断环形缓冲区的空间是否足够，足够就把数据写入到环形缓冲区中。如下图所示：
-!\[\[Pasted image 20240922230012.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922230012.png]]
 
 但 `管道的环形缓冲区` 并没有保存 `写指针`，而是通过 `读指针` 计算出来。那么怎么通过读指针计算出写指针呢？
 
@@ -191,8 +177,8 @@ static ssize_tpipe_read(struct kiocb *iocb, const struct iovec *_iov, un
 下面我们来看看，向管道写入 200 字节数据的过程示意图，如下所示：
 
 如上图所示，向管道写入数据时：
-!\[\[Pasted image 20240922230021.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922230021.png]]
 
 - 首先通过 `pipe_inode_info` 的 `curbuf` 字段和 `nrbufs` 字段来定位到，应该向哪个 `pipe_buffer` 写入数据。
 
@@ -212,15 +198,15 @@ static ssize_tpipe_write(struct kiocb *iocb, const struct iovec *_iov, u
 
 - 如果写入的数据已经全部写入成功，那么就退出写操作。
 
-## 三、思考一下
+# 三、思考一下
 
 管道读写操作的实现已经分析完毕，现在我们来思考一下以下问题。
 
-### 1. 为什么父子进程可以通过管道来通信？
+## 1. 为什么父子进程可以通过管道来通信？
 
 这是因为父子进程通过 `pipe` 系统调用打开的管道，在内核空间中指向同一个管道对象（`pipe_inode_info`）。所以父子进程共享着同一个管道对象，那么就可以通过这个共享的管道对象进行通信。
 
-### 2. 为什么内核要使用 16 个内存页进行数据存储？
+## 2. 为什么内核要使用 16 个内存页进行数据存储？
 
 这是为了减少内存使用。
 
@@ -240,7 +226,7 @@ static ssize_tpipe_write(struct kiocb *iocb, const struct iovec *_iov, u
 
 看精选C++技术文章 . 加C++开发者专属圈子
 
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
+---
 
 **CPP开发者**
 

@@ -1,10 +1,13 @@
+
 原创 Harris OPPO内核工匠
 
 _2021年12月10日 17:03_
 
 作为存储业务的一个重要组成部分，block IO是非易失存储的唯一路径，它的生命历程每个阶段都直接关乎我们手机的性能、功耗、甚至寿命。本文试图通过block IO的产生、调度、下发、返回的4个阶段，阐述一个block IO的生命历程。
 
-\*\*一、\*\***什么是块设备和块设备层**
+# **一、什么是块设备和块设备层
+
+![[Pasted image 20241022201640.png]]
 
 ![](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjPO6lYICbtlC2HKDtr29tb5qKkU081rVdJNic6DJwD3baIFo7R2sPpNDdY0m2yvUtH3oqAbNuCLsQg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
@@ -12,66 +15,59 @@ _2021年12月10日 17:03_
 
 块设备层在整个存储栈中的位置如下图所示，上承文件系统，下接具体的块设备驱动（UFS，EMMC驱动）:
 
-![](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjPO6lYICbtlC2HKDtr29tb5Gud5jvOcvIXLicIibUwA0F8kAghq9wE4XxEGyApvXYKuEOTIia163gYBQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241022201707.png]]
 
 通过blktrace这个开源工具可以用来分析IO轨迹和性能，从AQGP开始创建线程的plug，再到后面的AQM完成了线程内部plug的merge合并，最后IUDC完成了线程内部plug的下发和返回。
-!\[\[Pasted image 20240910190825.png\]\]
+![[Pasted image 20240910190825.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-## **二、  block IO\*\*\*\*的产生**
+# **二、  block IO\*\*\*\*的产生**
 
 大到手机里面每一个应用程序的打开，小到很多人学生时代写过的一个C语言程序，都会伴随block IO的产生。究其本质，只要调用了libc库中的open, read, close,write, fsync, sync这些库函数，都可能产生blockIO。
 
-**1. 用户态常用文件操作**
-!\[\[Pasted image 20240910190834.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-!\[\[Pasted image 20240910190841.png\]\]
+## **1. 用户态常用文件操作**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240910190834.png]]
 
-**2.文件系统\*\*\*\*IO~预读**
-!\[\[Pasted image 20240910190901.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240910190841.png]]
 
-**3.文件系统\*\*\*\*IO~脏页回写**
-!\[\[Pasted image 20240910190934.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+## **2.文件系统IO~预读**
 
-**4.文件系统\*\*\*\*IO~fsync & sync**
-!\[\[Pasted image 20240910190943.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240910190901.png]]
 
-**5.文件系统\*\*\*\*IO~dm设备写**
+## **3.文件系统\*\*\*\*IO~脏页回写**
+
+![[Pasted image 20240910190934.png]]
+
+## **4.文件系统\*\*\*\*IO~fsync & sync**
+
+![[Pasted image 20240910190943.png]]
+
+## **5.文件系统\*\*\*\*IO~dm设备写**
 
 通过下面的命令获取dm设备(253:26)的轨迹：
 
 ./blktrace -d /dev/block/dm-26 -o - |./blkparse -i -
-!\[\[Pasted image 20240910190953.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240910190953.png]]
 
 由于dm设备到真实的物理设备，有一层映射，对于同一个逻辑地址8898352通过下面的命令获取针对这个逻辑地址的block IO在其映射的物理设备(259:41)的轨迹，在物理设备中，块地址经过remap从8898352变成了33294128。
 
 ./blktrace -d /dev/block/sdc57 -o - | ./blkparse -i -
-!\[\[Pasted image 20240910191001.png\]\]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240910191001.png]]
 
 这里以verity类型的dm设备为例，其block io的产生路径：
-!\[\[Pasted image 20240910191008.png\]\]
+![[Pasted image 20240910191008.png]]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-**6.direct-IO\*\*\*\*的产生路径**
+## **6.direct-IO\*\*\*\*的产生路径**
 
 上面的预读，脏页回写，sync操作，都是经过了page cache，有些跑分软件如androbench不会经过page cache，更关注直接的底层存储性能，会采用direct-IO的方式。下图是direct-IO的block IO产生路径。
-!\[\[Pasted image 20240910191014.png\]\]
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240910191014.png]]
 
-## **三、block IO\*\*\*\*的调度**
+# **三、block IO\*\*\*\*的调度**
 
-**1.IO\*\*\*\*调度整体框架**
+## **1.IO\*\*\*\*调度整体框架**
 
 调度在我们日常生活中会经常遇到，如电梯，或者打车司机派单拼车，错峰吃饭，错峰上下班等，都是为了更好的整体性能和能耗。
 
@@ -81,8 +77,7 @@ _2021年12月10日 17:03_
 
 前面列举了一些block IO的产生场景，当这些IO产生后，为了更好的整体性能和能耗，它们也需要合适的调度机制。从IO产生后，经过软队列，调度器，硬队列，最终完成派发。
 
-!\[\[Pasted image 20240910191025.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240910191025.png]]
 
 **2.关键数据结构\*\*\*\*bio,request,page,sector的关系**
 

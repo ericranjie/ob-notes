@@ -1,20 +1,5 @@
-# 
-
-云巅论剑
-
-_2021年12月02日 20:00_
 
 以下文章来源于OpenAnolis龙蜥 ，作者李光水、毛文安
-
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4bZCboj0qz7G2rqBCKMh4iblVGkMN9XKUxiaECBVF6nj1g/0)
-
-**OpenAnolis龙蜥**.
-
-龙蜥社区（OpenAnolis）是立足中国面向国际的 Linux 服务器操作系统开源根社区及创新平台。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzUxNjE3MTcwMg==&mid=2247486692&idx=1&sn=c82230b7611e9e9b33a1d012bd2f2e1c&chksm=f9aa3e3dceddb72b4d15345c6d4f6139fed7735f522e5bd4d71d7f37d1f1dba03789a80addbc&mpshare=1&scene=24&srcid=1202q8pDUW6wZWzoio9d6Rdv&sharer_sharetime=1638446727189&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04789e970ff79682ec977325c54793dfacbe24ae3b4fb8959bb1b315e0fa33f40d63a4ce737cc5b2ab3871f5adddec18333e67f078d563be124afcd9e204dce7dcc53f220ced61acdea106ab005ba7e963ce4bd2575567e5073c980c43ffe25cc94d698232824e647c62304c0a62272daaf147cd7a76cdc75&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ4rEFUnxkzAJuUlWE0Grn7hLbAQIE97dBBAEAAAAAAAyFMlvbMI8AAAAOpnltbLcz9gKNyK89dVj0bCF5ouRek50Xxj2HtuU9Nf0a4%2FytFsCNgoVDk%2BkfuKoX4io8zlyqXAm%2F5%2FioyxnISFd%2FqYkrAHLr%2FxFP3v%2FFfXzAfFCsOKfyGUp6i1L5jjDgcS9Y4nllN58uV87Hl9DRoJUNzkZnRC6gBz9nAdFZ%2FqIAF73zveDCzalVuFZVeTwtLnmI0cENDkb80pfNg77gQvkA7B8Lmv%2BQQ3moMfe9SbDMY%2F8qSXfln2qcIeGdUxF73fwYpw%3D%3D&acctmode=0&pass_ticket=uhDtJfYrSkyY%2FeQQwkqcGt3fQmILzsYnwmLyvq5xM2mXVOu5oeT4biFv38In5BNO&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
 
 \*\*编者按：**sysAK（system analyse kit），**是\*\*\*\*龙蜥社区（OpenAnolis）系统运维 SIG 下面的一个开源项目**，聚集阿里百万服务器的多年运维经验，针对不同的运维需求提供了一系列工具，形成统一的产品进行服务。作者总结了实际工作中处理的 IO 夯问题的经验，将它梳理成一套理论分析方法并形成 iosdiag 工具，集成到了sysAK 工具集里。本文将由作者带大家一道领略一下 iosdiag 在 IO 夯领域叱咤风云的魅力。本文整理自**[龙蜥大讲堂第三期技术解读](http://mp.weixin.qq.com/s?__biz=Mzg4MTMyMTUwMQ==&mid=2247488486&idx=1&sn=47c066b12244b610fb6136323419af6d&chksm=cf66e094f811698276bf6cc5220559efcdcce9e034b79a90d6e1bab5251b60296ba839065c9d&scene=21#wechat_redirect)，\*\*直播回顾可在龙蜥社区官网查看。
 
@@ -36,19 +21,19 @@ _2021年12月02日 20:00_
 
 先来看看这个栈，500 多个进程是因为在内核下等待某个磁盘的块设备互斥锁而进入 D 状态，如图 1-1 所示：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/xHicTWic3y1DsXI7duicccO0DzCmwIueQFVKSUt2UNxNUnX0ict4vUpYoJiaU2Sv38LupTEVQ3FbE2Kktiaiccn2Dsz0A/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241022202013.png]]
 
 图 1-1
 
 互斥锁正被执行读 IO 请求的内核进程 kworker 持有，如图 1-2 所示，只有读 IO 流程完成之后才能释放锁。但是因为 IO 夯住了，读 IO 流程无法顺利完成，所以就没法正常释放锁了。所以接下来就需要找到是访问哪块磁盘出现了 IO 夯？IO 究竟夯在哪里？
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/xHicTWic3y1DsXI7duicccO0DzCmwIueQFVwK0Tjplaib1GUFYdeiczJcRfCZ1Tfib2KyggUnPzRiaic7QKibAfcWaI9hfA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241022202025.png]]
 
 图1-2
 
 之后作者使用 sysak iosdiag 工具找到了出现 IO 夯问题的磁盘，同时也定位出来这个 IO 是夯在了磁盘侧，如图 1-3 所示：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/xHicTWic3y1DsXI7duicccO0DzCmwIueQFVYaCsQ25gxo3OpW9Tp1Z7YfDZ5PRt2UxGic6MyWDtV4SDTfjuh3eeIpQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241022202037.png]]
 
 图1-3
 
@@ -56,7 +41,7 @@ _2021年12月02日 20:00_
 
 经过此问题，作者也简单做了下总结，聊一下 IO 夯的那些事。
 
-**二、史诗级的IO架构**
+# **二、史诗级的IO架构**
 
 在聊 IO 夯之前，了解一个 IO 会经过哪些路径还是很有必要的。网上有各式各样的 IO 架构图，足以让人看到眼花撩乱；作者从一个 IO 的生命周期的角度画了一幅图，然后描述一个 IO 在不同阶段的那些事儿（下图中去掉了部分软件层次，如 dm、lvm 等），流程有点长，请耐心看完～
 
