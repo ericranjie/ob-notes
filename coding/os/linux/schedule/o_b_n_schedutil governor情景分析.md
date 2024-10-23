@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-4-26 6:29 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 # 前言
@@ -11,7 +12,8 @@
 ## 1、sugov相关软件模块
 
 Sugov在整个调频软件的位置如下所示：
-!\[\[Pasted image 20241008184145.png\]\]
+
+![[Pasted image 20241008184145.png]]
 
 Sugov作为一种内核调频策略模块，它主要是根据当前CPU的利用率进行调频。因此，sugov会注册一个callback函数（sugov_update_shared/sugov_update_single）到调度器负载跟踪模块，当CPU util发生变化的时候就会调用该callback函数，检查一下当前CPU频率是否和当前的CPU util匹配，如果不匹配，那么就进行提频或者降频。
 
@@ -23,7 +25,7 @@ Sugov选定target frequency之后，需要通过cpufreq core（cpufreq framework
 
 Sugov的基本算法如下：
 
-![](http://www.wowotech.net/content/uploadfile/202204/0ff01650926152.png)
+![[Pasted image 20241023222559.png]]
 
 和基于采样的governor不同的是sugov是基于调度器调度事件的。每当发生调度事件的时候，负载跟踪模块会及时更新各个level的调度实体和cfs_rq的平均调度负载（sched_avg），直到顶层cfs rq（即CPU的平均调度负载） 。每当CPU利用率发生变化的时候，调度器都会调用cpufreq_update_util通知sugov，由sugov判断是否需要进行调频操作。基于采样的governor是governor定期去采样负载信息，而sugov是调度事件（进程切换、入队、出队、tick等）驱动调频的，因此调频会更及时。具体驱动调频的时机包括：
 
@@ -57,7 +59,7 @@ next_freq = C * max_freq * util / max
 |struct gov_attr_set attr_set|Sugov所属的attribute set。这个数据结构中最重要的就是policy_list成员，它是所有使用该tunalbe参数的sugov policy对象链表。如果每个policy都有自己的tunable参数，那么该链表只有一个节点。如果多个policy共享一个tunable参数，那么共享该tunable参数的sugov policy会被挂入该链表。|
 |unsigned int rate_limit_us|目前sugov只有一个可调参数rate_limit_us，该参数用来限制连续调频的间隔（单位是us）。当用户空间修改这个参数之后，tunalbe参数链表的所有sugov policy对象的freq_update_delay_ns成员也随之改变。|
 
-2、struct sugov_cpu
+## 2、struct sugov_cpu
 
 Sugov为每一个cpu构建了该数据结构，记录per-cpu的调频数据信息：
 
@@ -74,7 +76,7 @@ Sugov为每一个cpu构建了该数据结构，记录per-cpu的调频数据信�
 |unsigned long max|该cpu的最大算力（归一化到1024），和当前运行频率无关，对齐到该cpu的最大频率上的算力。|
 |unsigned long saved_idle_calls|这个成员仅在single cpu cluster的调频中有效。在这样的场景中，由于任务迁移会导致该CPU的utility下降，从而引发降频，然而实际上CPU可能有其他任务还在持续执行，这时候降频还为时过早。因此，saved_idle_calls保存了上次轮询的idle call的计数。如果这个计数没有变化，说明当前CPU还是繁忙，暂时不适合降频。在multi cpu cluster中不存在这样的问题，因为在调频的时候选择的是所有CPU中utility最大的那个。|
 
-3、struct sugov_policy
+## 3、struct sugov_policy
 
 Sugov为每一个cluster构建了该数据结构，记录per-cluster的调频数据信息：
 
@@ -94,9 +96,9 @@ Sugov为每一个cluster构建了该数据结构，记录per-cluster的调频数
 |bool limits_changed|Cpufreq core的max或者min发生了修改，需要立刻开启频率调整，不需要估计调频间隔限制。有些其他的模块也利用这个标记来忽略调频间隔，例如dl模块|
 |bool need_freq_update|当need_freq_update等于true的时候，sugov不会忽略任何一次调频请求，都会忠实的下发给驱动进行频率调整。一般而言，sugov不需要每次下发频率调整请求（例如变化的cpu util不足以引起CPU频点的变化），但是在某些特殊场景下，我们需要sugov忠实下发。具体场景下面会具体分析。|
 
-三、Sugov和cpufreq core之间的接口和流程分析
+# 三、Sugov和cpufreq core之间的接口和流程分析
 
-1、Sugov的注册
+## 1、Sugov的注册
 
 如果想要自己实现一个cpufreq governor，那么就需要定义一个struct cpufreq_governor的数据对象并向cpufreq framwork（或者叫cpufreq core）系统注册它。对于sugov而言，这个数据对象定义如下：
 

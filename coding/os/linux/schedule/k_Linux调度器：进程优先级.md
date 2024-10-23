@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-3-14 18:46 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 # 一、前言
@@ -8,7 +9,7 @@
 
 ## 1、蓝图
 
-!\[\[Pasted image 20241008161241.png\]\]
+![[Pasted image 20241008161241.png]]
 
 ## 2、用户空间的视角
 

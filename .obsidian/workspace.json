@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
+                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
+                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
+                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md"
+                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md"
               }
             }
           }
@@ -146,11 +146,14 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
+    "zx99-image/Pasted image 20241023222559.png",
+    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
     "zx99-image/Pasted image 20241023221945.png",
     "zx99-image/Pasted image 20241023221255.png",
-    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
     "zx99-image/Pasted image 20241023221557.png",
     "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（任务放置）.md",
     "zx99-image/Pasted image 20241023221512.png",
@@ -164,8 +167,6 @@
     "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
     "zx99-image/Pasted image 20241023221228.png",
     "README.md",
-    "Pasted image 20241023221155.png",
-    "zx99-image/Pasted image 20241023221137.png",
     "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
     "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
     "coding/os/linux/memory/a_s_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
@@ -183,7 +184,6 @@
     "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
     "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
     "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
-    "coding/os/linux/memory/reclaim/b_linux内存回收(一）---kswapd回收.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
