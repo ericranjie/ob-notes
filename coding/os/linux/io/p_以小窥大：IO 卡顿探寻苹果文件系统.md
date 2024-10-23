@@ -1,8 +1,5 @@
-原创 腾讯程序员 腾讯技术工程
 
-_2022年08月04日 18:00_ _重庆_
-
-![图片](https://mmbiz.qpic.cn/mmbiz_gif/j3gficicyOvasIjZpiaTNIPReJVWEJf7UGpmokI3LL4NbQDb8fO48fYROmYPXUhXFN8IdDqPcI1gA6OfSLsQHxB4w/640?wx_fmt=gif&wxfrom=13&tp=wxpic)
+腾讯程序员 腾讯技术工程 _2022年08月04日 18:00_ _重庆_
 
 作者：rhythmzhang，腾讯 WXG 客户端开发工程师
 
@@ -10,9 +7,9 @@ _2022年08月04日 18:00_ _重庆_
 
 近期有用户反馈频繁遇到了一个奇怪的严重卡顿问题，微信刷朋友圈和查看聊天都非常卡，主线程卡在最普通的 access, rename 等常见 I/O 系统调用，并且经常卡上百 ms，而这种场景的底层接口一般都没干什么大量的 I/O 操作。比如 access 接口也就是获取文件是否存在的轻量操作，正常耗时都只有几十 us 而已，远达不到此时的上百 ms 耗时。
 
-### 一、分析问题
+# 一、分析问题
 
-#### 寻找关键堆栈
+## 寻找关键堆栈
 
 堆栈上看，只是很常规的视频号卡片列表滑动时，触发了下载图片和查图片本地缓存的逻辑，通过 access 接口同步查本地图片是否存在，有则直接展示，否则从网络下载图片，下载完成时再尝试删除可能已有的旧文件。这完全是一个非常简单的图片缓存和加载逻辑。
 
@@ -24,17 +21,17 @@ _2022年08月04日 18:00_ _重庆_
 
 最终在多次试验和猜测后，构造出了一个高概率复现的场景，在对应目录下写入10万个小图片伪造图片数据，并触发并发 I/O，此时问题终于复现了。这个时候如果触发视频号卡片滑动，朋友圈卡片滑动，就大概率必现严重的滑动掉帧和卡顿了。
 
-#### 构造必现代码
+## 构造必现代码
 
 大概知道了必现路径后，我们构造出了一个必现代码，打开 Instruments 的 System Trace 分析，结果如下：
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBianYnT2ldkOUKUyHqia9Fcs3YFD0mVB5ggu2qAKZXtLBicK9sjX9hW51dQ/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20241023112530.png]]
 
 发现 access 等常规 I/O 接口的平均耗时依旧很低只有几十 us，但等待耗时波动很大，可以达到140 ms，也就导致了主线程每次查询图片存在状态时，单次调用耗时超过了140 ms，而滑动过程中大概存在十几次这样的行为，那最终就是每次滑动都要因为这些 I/O wait time 导致滑动耗时数秒之久，甚至个别情况下还会因此滑动卡死触发 watchdog。
 
 继续分析 Instruments 报告，发现等待的主因如下：will wait for event/lock xxx.
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiavwEBa6uibicabDp4IicV0nCOAiaF0RX5ia3iabM5ceqL03Z89iaEOy9VaTg5A/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20241023112557.png]]
 
 经过前面的研究，我们已经能够构造一个必现 demo 了。大概如下：
 
@@ -60,7 +57,7 @@ _2022年08月04日 18:00_ _重庆_
 
 这时在 x86 的 ssd 设备上都能稳定复现出 access 调用平均耗时 1ms 以上，个别情况下可以达到几十ms，确实令人费解。
 
-#### dtrace 分析
+## dtrace 分析
 
 既然 Instruments 告诉我们耗时的主因是 wait for lock，那接下来我们尝试分析下到底在 wait 什么 lock 最多。这就需要借助于 dtrace 来进一步分析了。
 
@@ -84,7 +81,7 @@ R/W writer blocked by readers: 239 events in 10.048 seconds (24 event
 
 通过 dtrace 的 lockstat 数据，大概率怀疑是 kernel 层的 APFS 相关的  lock 出了问题，那为什么 APFS lock 会导致如此严重的问题呢？
 
-#### Hopper 分析
+## Hopper 分析
 
 rename 和 access 都是系统调用，他们都是 XNU 里 VFS 注册的系统服务。APFS 的系统支持是通过系统的 apfs.kext 内核扩展载入的，我们通过 Hopper 打开 apfs.kext，分析下 APFS 对应的 rename 或 access 里到底干了什么
 
@@ -99,21 +96,22 @@ apf.kext 的代码里 vfs_fsprivate 返回了一个结构，这个结构存了�
 
 通过进一步 System Trace 验证，当并发 I/O 遍历的文件目录是同一个时，Instruments 报告里的 will wait for lock xxx 会显示为同一个，大概率证明了 APFS 内部存在某种目录锁的结构，当对同一个目录的文件进行遍历 I/O 操作时，都会先请求加解锁。而在超大目录遍历时这个加锁导致的等待问题会急剧扩大，导致锁等待超时，最终可能导致了并发 I/O 速度骤降的问题。
 
-#### 对比 HFS+
+## 对比 HFS+
 
 我们在同一台电脑上构造了两个不同的磁盘分区：APFS 和 HFS+，分别在各自分区下的同一路径下写入了相同数据的10万个文件，接着开始跑同样的测试程序，又发现了更出人意料的结论：
 
 HFS+ 测试如下：
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiaQ0kuw3PUuxz1GoDsgHrEXqkUB3XzibLVmut90OvUWwkBp0iarN3icoIFw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20241023112629.png]]
+
 
 APFS 测试如下：
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiaU6JC0QOynViaA0ibnYeicb1LvBhKpJPvn6vHQRyhdytL3KfERDTdicF0TA/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20241023112640.png]]
 
 通过多次对比测试，发现在这种超大目录文件遍历的并发 I/O 情况下，HFS+ 的平均读写速度要比 APFS 快 8~20 倍，想不到 APFS 竟然反而比 HFS+ 要慢那么多。这个问题在 macOS 12.3 和 iOS 15.4 上都可以稳定构造出必现测试用例。
 
-### 二、解决问题
+# 二、解决问题
 
 回到开始的卡顿问题，通过构造 demo 我们稳定复现了该问题，同时继续分析用户的相关数据，确认了用户遇到问题时的情况的确和我们最终 demo 构造的基本一致，至此又一个奇怪的卡顿问题终于找到原因了：**超大目录导致了并发 I/O 时性能急剧下降。**
 
@@ -123,41 +121,41 @@ APFS 测试如下：
 
 经过测试，将该目录拆分为二级目录并缓解单目录文件过多的情况后，再也没有遇到类似的并发 I/O 卡顿的情况了。另外，该问题已经反馈给苹果，苹果内部也开了 radar ，希望可以进一步提升 APFS 性能。
 
-#### 一些坑
+## 一些坑
 
 结合已有数据分析，发现苹果的文件操作里还存在一些坑，如下：
 
-##### tmp
+### tmp
 
 苹果在 [File System Programming Guide](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html#//apple_ref/doc/uid/TP40010672-CH2-SW2) 里建议 app 用 tmp/ 目录来存储临时文件，并且说系统会在 app 不运行时自动删除 tmp/ 目录的数据，但是实测，大概率不会，因为文档写的是 may purge。极端情况下该目录可能会存在 >90G 的占用。
 
-##### WebKit
+### WebKit
 
 WebKit 的网络缓存默认在 /Library/Caches/WebKit/NetworkCache/ ，按照 WebKit 源码 NetworkCacheStorage 里的实现，WebKit 会采取一定随机+权重的方式删除网络缓存，但是极端情况下，个别用户会因此而占用 10G 或更多的存储空间。也就是这个随机删除存在很大的随机性。
 
-##### NSURLCache
+### NSURLCache
 
 NSURLCache 自定义磁盘缓存路径时，如果 diskCapacity 设置过大，会导致占用超大存储空间，同时也会导致网络请求因为 I/O 读写慢而变慢。
 
-##### 删除文件
+### 删除文件
 
 实测部分情况下删文件的 I/O 量基本等于写文件的 I/O 量，而且密集删文件时会容易导致 I/O 性能下降过快。因此业务应尽量避免短时间大量密集 I/O。
 
-### 三、结论
+# 三、结论
 
 System Trace 数据表明：当并发 I/O 遍历的文件目录是同一个时，Instruments 报告里的 will wait for lock xxx 会显示为同一个，也就进一步证明了 **APFS 内部存在某种目录锁的结构，当对同一个目录的文件进行遍历 I/O 操作时，都会先请求加解锁。而在超大目录遍历时这个加锁导致的等待问题会急剧扩大，导致锁等待超时，最终可能导致了并发 I/O 速度骤降的问题**。
 
 为了避免这种极端情况导致的 I/O 性能骤降问题， 移动端 app 也需要合理的设计存储结构。例如**需要分层分级管理文件**，尽量**不要将单个文件夹或单个文件搞的过大**，同时也**需要定时清理临时缓存目录**，来进一步优化存储空间占用和优化 I/O 效率。
 
-### 四、附录
+# 四、附录
 
 苹果从 iOS10.3 开始引入了 APFS，而在此之前 HFS+ 一直是作为 iOS 和 macOS 的文件系统。
 
 应用程序是如何从 ssd 等存储介质上读写文件的呢？如下图：
-!\[\[Pasted image 20240923192751.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-#### VFS
+![[Pasted image 20240923192751.png]]
+
+## VFS
 
 VFS 统一并抽象了不同文件系统的接口，使得用户可以通过统一的系统调用接口去访问不同文件系统不同存储介质上的文件。VFS 主要可以被抽象为3层，vfstbllist 用于管理不同的文件系统，mount 管理文件系统的挂载，vnode 则抽象代表了文件和文件夹等对象。
 
@@ -174,8 +172,8 @@ XNU 中主要使用 vfstbllist 来注册管理多个文件系统，典型的 vfs
 - mount
 
 文件系统只有被 mount 挂载后才可以被访问。对于内核支持的文件系统，macOS 会自动 从 /System/Library/FileSystems 里找到对应的内核扩展并挂载，而对于内核不支持的文件系统，则需要触发一次 kext 加载操作以支持对应的文件系统。macOS 上常见的 mount 操作如下图：
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/j3gficicyOvasbibnicqK54k5Nia6MYIWFjBiaENc8cvZLf5xibMy2QbhbOFG82Y2l9gktHJARwvu9c3tHrw1MM8AROlw/640?wx_fmt=jpeg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20241023112723.png]]
 
 - vnode
 
@@ -193,7 +191,7 @@ APFS(Apple File System) 是苹果推出的最新文件系统，它是 HFS+ 的�
 
 以 rename 调用为例，开发者通过触发 rename 系统调用向 VFS 请求文件操作，VFS 触发 vn_rename 调用，如果当前目录使用的分区是 APFS，则最终会触发 apfs_vnop_renamex，而如果是 HFS+ 分区，则会触发 hfs_vnop_rename 调用，最终完成 rename 操作。
 
-### 五、参考
+# 五、参考
 
 [Mac OS X and iOS Internals: To the Apple's Core](https://www.amazon.com/Mac-OS-iOS-Internals-Apples/dp/1118057651)
 
@@ -223,9 +221,7 @@ APFS(Apple File System) 是苹果推出的最新文件系统，它是 HFS+ 的�
 
 写留言
 
-[](javacript:;)
 
-![](http://mmbiz.qpic.cn/sz_mmbiz_png/j3gficicyOvauPPfL7J2AVERiaoMJy9NBIwbJE2ZRJX7FZ2Dx7IibtTwdlqYSqTZTCsXkDS2jvNF8wWJKcibxXtOHng/300?wx_fmt=png&wxfrom=18)
 
 腾讯技术工程
 

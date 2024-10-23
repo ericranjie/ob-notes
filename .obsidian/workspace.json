@@ -11,11 +11,9 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "image",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
-                "mode": "source",
-                "source": false
+                "file": "zx99-image/Pasted image 20241023111954.png"
               }
             }
           }
@@ -85,7 +83,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+                "file": "zx99-image/Pasted image 20241023111954.png",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +100,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+                "file": "zx99-image/Pasted image 20241023111954.png",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +123,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md"
+                "file": "zx99-image/Pasted image 20241023111954.png"
               }
             }
           }
@@ -146,25 +144,28 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "zx99-image/Pasted image 20241023111325.png",
+    "zx99-image/Pasted image 20241023112530.png",
+    "coding/os/linux/io/p_架构必知：深入理解Linux IO系统.md",
+    "coding/os/linux/io/p_以小窥大：IO 卡顿探寻苹果文件系统.md",
+    "zx99-image/Pasted image 20241023112723.png",
+    "zx99-image/Pasted image 20241023112640.png",
+    "zx99-image/Pasted image 20241023112629.png",
+    "zx99-image/Pasted image 20241023112557.png",
+    "coding/os/linux/io/k_超专业解析！10分钟带你搞懂Linux中直接I O原理.md",
+    "zx99-image/Pasted image 20241023111954.png",
     "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+    "zx99-image/Pasted image 20241023111325.png",
     "zx99-image/Pasted image 20241023111423.png",
     "zx99-image/Pasted image 20241023111411.png",
     "zx99-image/Pasted image 20241023111354.png",
-    "zx99-image/Pasted image 20241023111334.png",
     "coding/os/linux/io/i_看一遍就理解：IO模型详解.md",
     "coding/os/linux/io/b_block io生命历程.md",
     "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
     "coding/os/linux/io/epoll/p_盘点Linux Epoll那些致命弱点.md",
     "coding/os/linux/io/epoll/m_深入理解 Linux 的 epoll 机制.md",
     "coding/os/linux/io/epoll/k_epoll背后的原理.md",
-    "zx99-image/Pasted image 20241023110825.png",
-    "zx99-image/Pasted image 20241023111208.png",
-    "zx99-image/Pasted image 20241023111059.png",
-    "zx99-image/Pasted image 20241023111051.png",
-    "zx99-image/Pasted image 20241023111034.png",
     "code-griding-note.md",
     "README.md",
     "coding/os/linux/io/k_Linux IO 那些事儿.md",
@@ -180,9 +181,6 @@
     "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
     "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
     "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
-    "coding/os/linux/memory/memory-manage/i_KSM机制剖析 — Linux 内核中的内存去耦合.md",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
-    "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
