@@ -1,40 +1,26 @@
-# 
 
-Linux内核之旅
-
-_2024年09月05日 12:01_ _陕西_
+Linux内核之旅 _2024年09月05日 12:01_ _陕西_
 
 The following article is from 程栩的性能优化笔记 Author 程栩
-
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM4zuU31ibxk2hXrLSO8s7BlzpZARHVyjr5o3AjCfNU7iabA/0)
-
-**程栩的性能优化笔记**.
-
-一个专注于性能的大厂程序员，分享包括但不限于计算机体系结构、性能优化、云原生的知识。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664617923&idx=1&sn=8347bae1d2e6f9b3e9dd1bc38eaac0cd&chksm=f1b8d35bbc976781abc34cc5413242c76b1ca2f4d38c6422633364bec774734393a6ef3398ec&mpshare=1&scene=24&srcid=0905YN8kJOP9vbf3UCq5rYhr&sharer_shareinfo=0662d57d64f628efd8d2ea46e0b65cb7&sharer_shareinfo_first=0662d57d64f628efd8d2ea46e0b65cb7&key=daf9bdc5abc4e8d08f506593bdfe16f29044ad7bce4cd7b156546e863d1bef2d22d69f4a07c277d0733c28bb7f94a80f4a84567aab179aa246d37d64f48b8e2329276ba2c5d47377f2034250149c31a9455698b891f22202fbfbfd9c4860646ebf97df734937a152a6cff300a23f59fbb226f78d4d2889c5acc0fa104a88c22d&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_3e85a6de261f&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQf%2BeR4Rx8ocws3WzbvdCbmRKUAgIE97dBBAEAAAAAAG6gAvVApYsAAAAOpnltbLcz9gKNyK89dVj0stHs0CxOBjURHNZMGqgpLwKO8Ddp6%2BtfBFRWC7VAKU7OazXxwVwqSJHwx5mmwthkz32kj7sa6aJIFnyd3ZvPRhmnSqvbH6%2FMjA%2FU%2BLaVpSjS1ExhinPGEeyKTC2RIeOPbXi3cm6%2FTaE%2FTGJOi2A35UDf1dOsi7qp1ADOyIEq8cQxICYtE4%2FS4RpNYdurxhU8lmVFsWsmukXJfka3i2ii48g62lG8CcfFU8EPseB3W4rYZzxyb5Cw4Qo8HkT554Fpxx7mYVkqhRBrEnhfzgD4Z%2FxsxsFbzprdjjlHX%2FOARbBwgVFU%2FBDD3X1VmnM3Pg%3D%3D&acctmode=0&pass_ticket=Kj2gBxQtkyURGRqNICP0lnNgX1%2FSpg2FTnrrzQHZOL5mu6OhroSTyDUV%2Frznjw2Q&wx_header=0#)
-
-### cache
+# cache
 
 在我们的程序访问内存的时候，如果每一次都去从主存里面获取数据的话，程序就会经常需要去等待访存，这会导致程序的运行比较缓慢：
 
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIztXZtCibOsicaUwW6Hnes0lCGuIoZ3fIiaYggNTjaibcwVeZmwMCshlF3A/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023162405.png]]
 
 内存访问
 
 为了加快程序的执行，出于一种简单的考虑：如果访问了A地址，那么下次极有可能去访问A或者A附近的地址，也就是所谓的局部性原理，我们设计了缓存(`cache`)。**缓存简单来说就是主存的一个子集，映射到主存上，每次基于规则去判断是否命中，如果命中的话就直接从缓存中取数据来加速程序的执行，一般我们将一个cache line作为一个最小区域**：
 
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIsDmL9iat462noibiatsGibkP72zq3Mr73X6vqnkXEo8YpjagAu7H3nC1xQ/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023162415.png]]
 
 cache示意图
 
 走缓存能够极大的加速内存的访问，我们用几张图来展示单`CPU`缓存（不考虑多级缓存）命中与不命中的流程：
 
-#### 命中缓存
+# 命中缓存
 
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/0A9N2rUnQ9P8FsqzAr4dO5OibATgAzicqIVP9YsmcMh19BibKibRxs5AwS7KdN24p65SlhncicEkhibNrpmNOL9v0vzQ/640?wx_fmt=png&from=appmsg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023162429.png]]
 
 hit
 

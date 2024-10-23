@@ -26,9 +26,9 @@
 
 上面三个数据结构的描述，可参考第3章的介绍。然后，我们会在第4章介绍相关的API、controller driver的开发思路和步骤以及dmaengine中和controller driver有关的重要流程。
 
-## 3. 主要数据结构描述
+# 3. 主要数据结构描述
 
-#### 3.1 struct dma_device
+## 3.1 struct dma_device
 
 用于抽象dma controller的struct dma_device是一个庞杂的数据结构（具体可参考include/linux/dmaengine.h中的代码），不过真正需要dma controller driver关心的内容却不是很多，主要包括：
 
@@ -66,7 +66,7 @@
 
 总结：dmaengine对dma controller的抽象和封装，只是薄薄的一层：仅封装出来一些回调函数，由dma controller driver实现，被client driver调用，dmaengine本身没有太多的操作逻辑。
 
-#### 3.2 struct dma_chan
+## 3.2 struct dma_chan
 
 struct dma_chan用于抽象dma channel，其内容为：
 
@@ -105,7 +105,7 @@ struct dma_chan {
 >
 > router、route_data，TODO。
 
-#### 3.3 struct virt_dma_cha
+## 3.3 struct virt_dma_cha
 
 struct virt_dma_chan用于抽象一个虚拟的dma channel，多个虚拟channel可以共用一个物理channel，并由软件调度多个传输请求，将多个虚拟channel的传输串行地在物理channel上完成。该数据结构的定义如下：
 
@@ -119,15 +119,16 @@ struct virt_dma_chan用于抽象一个虚拟的dma channel，多个虚拟channel
 >
 > desc_allocated、desc_submitted、desc_issued、desc_completed，四个链表头，用于保存不同状态的虚拟channel描述符（struct virt_dma_desc，仅仅对struct dma_async_tx_descriptor\[2\]做了一个简单的封装）。
 
-## 4. dmaengine向dma controller driver提供的API汇整
+# 4. dmaengine向dma controller driver提供的API汇整
 
 damengine直接向dma controller driver提供的API并不多（大部分的逻辑交互都位于struct dma_device结构的回调函数中），主要包括：
 
 1）struct dma_device变量的注册和注销接口
 
-|   |
-|---|
-|/\* include/linux/dmaengine.h \*/  <br>int dma_async_device_register(struct dma_device \*device);  <br>void dma_async_device_unregister(struct dma_device \*device);|
+|                                                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| /\* include/linux/dmaengine.h \*/  <br>int dma_async_device_register(struct dma_device \*device);  <br>void dma_async_device_unregister(struct dma_device \*device); |
+|                                                                                                                                                                      |
 
 > dma controller driver准备好struct dma_device变量后，可以调用dma_async_device_register将它（controller）注册到kernel中。该接口会对device指针进行一系列的检查，然后对其做进一步的初始化，最后会放在一个名称为dma_device_list的全局链表上，以便后面使用。
 >
@@ -169,7 +170,7 @@ damengine直接向dma controller driver提供的API并不多（大部分的逻�
 
 后面会有专门的文章介绍虚拟dma，这里不再介绍。
 
-## 5. 编写一个dma controller driver的方法和步骤
+# 5. 编写一个dma controller driver的方法和步骤
 
 上面啰嗦了这么多，相信大家还是似懂非懂（很正常，我也是，dmaengine framework特点就是框架简单，细节复杂）。到底怎么在dmaengine的框架下编写dma controller驱动呢？现在看来，只靠这篇文章，可能达不到目的了，这里先罗列一下基本步骤，后续我们会结合实际的开发过程，进一步的理解和掌握。
 
@@ -195,7 +196,7 @@ damengine直接向dma controller driver提供的API并不多（大部分的逻�
 
 10）等等。
 
-## 6. 参考文档
+# 6. 参考文档
 
 \[1\] [Linux DMA Engine framework(1)\_概述](http://www.wowotech.net/linux_kenrel/dma_engine_overview.html)
 
@@ -205,7 +206,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [driver](http://www.wowotech.net/tag/driver) [controller](http://www.wowotech.net/tag/controller) [framework](http://www.wowotech.net/tag/framework) [dma](http://www.wowotech.net/tag/dma) [engine](http://www.wowotech.net/tag/engine)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [为什么会有文件系统(二)](http://www.wowotech.net/filesystem/396.html) | [Linux的时钟](http://www.wowotech.net/timer_subsystem/clock-id-in-linux.html)»
 

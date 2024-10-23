@@ -1,39 +1,41 @@
+
 Linux内核之旅 _2021年12月16日 11:23_
 
 以下文章来源于人人都是极客 ，作者布道师Peter
 
-## DMA 概念介绍
+# DMA 概念介绍
 
 DMA 传输是由 CPU 发起的：CPU 会告诉 DMA 控制器，帮忙将 source 地方的数据搬到 dest 地方。CPU 发完指令之后，就不管了。具体怎么搬，何时搬，完全由 DMA 控制器决定。DMA 控制器搬运数据的方向有如下几种：
+
 ![[Pasted image 20241008162332.png]]
 
-### 何时传输（DMA request lines）
+## 何时传输（DMA request lines）
 
 因为 CPU 发起 DMA 传输的时候，并不知道当前是否具备传输条件，例如 source 设备是否有数据、dest 设备的 FIFO 是否空闲等等。那谁知道是否可以传输呢？设备！因此，需要设备和 DMA 控制器之间，有几条物理的连接线（称作DMA request，DRQ），用于通知 DMA 控制器可以开始传输了。
 
-### 传输通道（DMA channels）
+## 传输通道（DMA channels）
 
 DMA 控制器可以同时进行的传输个数是有限的，每一个传输都需要使用到 DMA 物理通道。DMA 物理通道的数量决定了 DMA 控制器能够同时传输的任务量。
 
 在软件上，DMA 控制器会为外设分配一个 DMA 虚拟通道，这个虚拟通道是根据 DMA request 信号来区分的。
 
-### 传输参数
+## 传输参数
 
 - transfer size
 - transfer width
 - burst size
 
-### scatter gather
+## scatter gather
 
 我们知道，一般情况下 DMA 传输只能处理在物理上连续的 buffer。但在有些场景下，我们需要将一些非连续的 buffer 拷贝到一个连续 buffer 中，这样的操作称作 scatter gather。
 
 对于这种非连续的传输，大多时候都是通过软件，将传输分成多个连续的小块。但为了提高传输效率，有些 DMA controller 从硬件上支持了这种操作。
 
-## DMA 客户端设备驱动
+# DMA 客户端设备驱动
 
 我们先看下一个 DMA 客户端设备驱动涉及到的数据结构有哪些，然后再看下使用 dmaengine 内核框架的步骤。
 
-### 数据结构
+## 数据结构
 
 - **dma_slave_config**
 
