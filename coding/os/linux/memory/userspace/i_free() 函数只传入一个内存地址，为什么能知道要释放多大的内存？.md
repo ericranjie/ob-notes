@@ -1,20 +1,7 @@
-# 
 
-Linux爱好者
-
-_2024年08月23日 14:31_
+Linux爱好者 _2024年08月23日 14:31_
 
 The following article is from CppPlayer Author CppPlayer
-
-\[
-
-![](http://wx.qlogo.cn/mmhead/lV0d907m3OW8RDttoJRIK57icaxXwSD2xpzhIH88ibbpbwziaX2xme1zzDibNRgEoZia9nF0gNRC0QNU/0)
-
-**CppPlayer**.
-
-CPP玩家攻略 分享编程技术以及各种实用免费软件。期待您的关注！
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAxODI5ODMwOA==&mid=2666570557&idx=2&sn=0e648cf9bb2bdfa179d2edfa12a65bc3&chksm=814a396660e2161aee8cae9687f3154b97f2e0e6a326dbd74e16f4c930d7df1f43c2634aedab&mpshare=1&scene=24&srcid=0824fSBZa1X085yFDOJ7ZJzu&sharer_shareinfo=1186f1799d89589249754c54509ca76c&sharer_shareinfo_first=1186f1799d89589249754c54509ca76c&key=daf9bdc5abc4e8d0e4a27eb5afd5c928587dcb0729f38183cd1de42d0d798688117ce35709e9b67d2bfd529d163689a143db9baf28f5185b8194c6aa0b1e1d6098c5a57ff110a2df661e4237305b0a798032472c1f3df8627e3c0fdd08a418e953f1be57c5877aaf881865077ec3ed448fee955bfad34183e55c4ba22279aff0&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_9f1efcd6f4ab&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQS%2FiJHW53zvMBd2%2F4JqcC2hKUAgIE97dBBAEAAAAAABmFE5DGOx8AAAAOpnltbLcz9gKNyK89dVj0ijagPzSk3X9S7BSnFLC%2BZ5L%2B4CMiXOm5QJU%2Fy5YHuLM8vwHVpjBWBuizY%2Fr4B2wy%2BtsxZsPaVoo1qGJwPyFttquUGgeH368gBH9EX%2FprpQtS6FRHwUMe0GpCtAr16YcRU2TYL2y7aYOmgeLFA9wIc1sKos3ofBoTYoRTZ0dlBL50zNN7Q0tmKISFVjlKLbuz1UG8PzGVZuHLGBTkaUgSdTawYmMq%2BSY9mPs43xn6Ybml8vW8rIssOCViqRz%2FlJxoC%2Bbyj8HVqxgSTiGgB7i9KNSy1NTiuxjpb4P0MmgnPu5nVmRFWV54EMtWwsvUqg%3D%3D&acctmode=0&pass_ticket=39eR6Jovs18SbwKRNZf7ENnGyzp%2BGpCxOeimGgZEqNtXWM2BKSb62qmk1V%2FaH74s&wx_header=0#)
 
 **free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？**
 

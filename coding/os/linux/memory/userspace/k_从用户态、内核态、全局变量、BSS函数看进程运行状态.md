@@ -1,8 +1,7 @@
-土豆居士 一口Linux
 
-_2022年01月07日 11:52_
+土豆居士 一口Linux _2022年01月07日 11:52_
 
-# 收集项目组需求的时候，我们知道一个进程要运行起来需要以下的内存结构。
+收集项目组需求的时候，我们知道一个进程要运行起来需要以下的内存结构。
 
 用户态：
 
@@ -28,13 +27,11 @@ _2022年01月07日 11:52_
 
 我画了一个图，总结一下进程运行状态在 32 位下对应关系。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_jpg/icRxcMBeJfcibRhN7z0jEticTbTBY3br7n9Qlczo7zMVwLZ3vJKlzTHyLrjZXSI6QGvfxJRqJicwn8v7gIlaDa3yOw/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)
+![[Pasted image 20241023190333.png]]
 
 对于 64 位的对应关系，只是稍有区别，我这里也画了一个图，方便你对比理解。
-!\[\[Pasted image 20240914164616.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-______________________________________________________________________
+![[Pasted image 20240914164616.png]]
 
 # 用户态和内核态的划分
 
@@ -67,8 +64,8 @@ current->mm->task_size = TASK_SIZE;
 对于 32 位系统，最大能够寻址 2^32=4G，其中用户态虚拟地址空间是 3G，内核态是 1G。
 
 对于 64 位置系统，虚拟地址只使用了 48 位。就像代码里面写的一样，1 左移了 47 位，就相当于 48 位地址空间一半的位置，0x0000800000000000，然后减去一个页，就是 0x00007FFFFFFFF000，共 128T。同样，内核空间也是 128T。内核空间和用户空间之间隔着很大的空隙，以此来进行隔离。
-!\[\[Pasted image 20240914164638.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914164638.png]]
 
 用户态布局
 
@@ -95,8 +92,8 @@ arg_start 和 arg_end 是参数列表的位置， env_start 和 env_end 是环�
 mmap_base 表示虚拟地址空间中用于内存映射的起始地址。一般情况下，这个空间是从高地址到低地址增长的。前面咱们讲 malloc 申请一大块内存的时候，就是通过 mmap 在这里映射一块区域到物理内存。咱们加载动态链接库 so 文件，也是在这个区域里面，映射一块区域到 so 文件。
 
 这下所有用户状态的区域的位置基本上都描述清楚了。整个布局就像下面这张图这样。虽然 32 位和 64 位置的空间相差很大，但是区域的类别和布局是相似的。
-!\[\[Pasted image 20240914164651.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914164651.png]]
 
 除了位置信息之外，struct mm_struct 里面还专门有一个结构 vm_area_struct，来描述这些区域的属性。
 
@@ -177,8 +174,8 @@ static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	
 在内核态，32 位和 64 位的布局差别比较大，主要是因为 32 位内核态空间太小了。
 
 我们来看 32 位的内核态的布局。
-!\[\[Pasted image 20240914164710.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914164710.png]]
 
 32 位的内核态虚拟地址空间一共就 1G，占绝大部分的前 896M，我们称为直接映射区。
 
@@ -190,7 +187,7 @@ static int do_brk(unsigned long addr, unsigned long len, struct list_head *uf){	
 
 - \_\_va(paddr) 则计算出对应于物理地址 paddr 的虚拟地址。
 
-```c
+```cpp
 #define __va(x)			((void *)((unsigned long)(x)+PAGE_OFFSET))    #define __pa(x)		__phys_addr((unsigned long)(x))    #define __phys_addr(x)		__phys_addr_nodebug(x)    #define __phys_addr_nodebug(x)	((x) - PAGE_OFFSET)
 ```
 
@@ -227,8 +224,8 @@ FIXADDR_START 到 FIXADDR_TOP(0xFFFF F000) 的空间，称为固定映射区域�
 其实 64 位的内核布局反而简单，因为虚拟空间实在是太大了，根本不需要所谓的高端内存，因为内核是 128T，根本不可能有物理内存超过这个值。
 
 64 位的内存布局如图所示。
-!\[\[Pasted image 20240914164720.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914164720.png]]
 
 64 位的内核主要包含以下几个部分。
 
@@ -246,11 +243,8 @@ FIXADDR_START 到 FIXADDR_TOP(0xFFFF F000) 的空间，称为固定映射区域�
 
 end
 
-**一口Linux**
 
-**关注，回复【****1024****】海量Linux资料赠送**
-
-![](http://mmbiz.qpic.cn/mmbiz_png/icRxcMBeJfc8535w2vKlsLPf5hwdMjpYrzuVCHx0rcQmvv8rYqTFtIyic5qErtciaibqaIOWgeKkDsOMeae4HciaUaw/300?wx_fmt=png&wxfrom=19)
+---
 
 **一口Linux**
 

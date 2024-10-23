@@ -1,8 +1,7 @@
-嵌入式Linux
-_2022年06月20日 07:20_ _广东_
-以下文章来源于Linux内核远航者 ，作者Linux内核远航者
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzA5NTM3MjIxMw==&mid=2247503761&idx=1&sn=8a7456d3aeea4d566d2f2dae55d44294&chksm=9042d94ba735505d525a96b93a7f58490887fb309dc76aa4592cf6a0e0f8880945d5837a770a&mpshare=1&scene=24&srcid=0621I3laNjgjkGAw7TgZ5q6W&sharer_sharetime=1655774485712&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d031485ea19d9a753accd968198341675be4b65c0dd5ec4b6a5d16b39fed0c5e9ce3cc1c50493889f074aa4fd35c09d379c4bb42c56a9082f959b12a7f26d0a894515eb4b2138778bd01c5b5fcf704886e00a501185a97d6e90934ea689bcbed3397c1d18b2756c5652325d9f3f09b800f8e1e1e6369a1decb&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQOOyBj6xULmcIk16VtupE%2FxLmAQIE97dBBAEAAAAAAAoWJwh9vuMAAAAOpnltbLcz9gKNyK89dVj0J3ZguapZ86p67X6vI9cSO0wN7E47uVxg3xFVzS%2BxFEjfnmjGKrGIl%2FiVcOLGibUqrMXcnBfBQEYiIUCFHaZu%2FpyJSISGpQEAkbRJ5GfFcUYNmpNvUJPN%2F5dzR8yG2EH%2FHi2mPi01Uxgu8eBqJMCql%2BL4WBa7aaW0gmb%2B%2FolkAUBULXGKbdniaVIxlQC9fJft4y%2ByMSQu21Zyw0ZPb71qsnNktFu%2BXehdkUctT7WBecZj49cwrPTvux69Id8RQr%2Bc&acctmode=0&pass_ticket=OSy6gRekQQdaR%2BPLjhExAqlMlJlTsMW0lijPOjSUMYpmmGsxVYCRBgwRGVO39fjk&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+嵌入式Linux _2022年06月20日 07:20_ _广东_
+
+以下文章来源于Linux内核远航者 ，作者Linux内核远航者
 
 # 1.开场白
 
@@ -17,7 +16,7 @@ _2022年06月20日 07:20_ _广东_
 
 下面是正常情况下用户空间和内核空间数据访问图示：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/ljlJkD7iaUC1nyA3xTD2Y1vF5IqhsJPf2j0AyKv2EdPKR924LydlPiclMmF1Ku8vt4Et9hL7gkHbN0Nxcjfd7JtQ/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241023190512.png]]
 
 # 2. 体验一下
 
@@ -70,7 +69,7 @@ export CROSS_COMPILE=aarch64-linux-gnu-      KERNEL_DIR ?= ~/kernel/linux-5.1
 
 **4.mmap映射这种方法由于物理页面通过页面共享更加节省内存，而用户态和内核态内存拷贝需要两份物理页面。**
 
-# 3.实现原理
+# 3. 实现原理
 
 我们发现通过mmap映射之后，我们在应用程序中可以直接读写这段内存，不需要任何用户空间和内核空间的拷贝动作，大大提高了内存访问效率，那么就是是如何实现的呢？下面我们来揭开它神秘的面纱：
 
@@ -97,9 +96,10 @@ remap_pfn_range       ...       pgd = pgd_offset(mm, addr);     
 **2.同样，物理页面到用户空间虚拟页面的映射也在调用mmap的时候，驱动调用mmap接口的remap_pfn_range映射好了，也不需要在访问的时候发生缺页异常来建立映射。所以，只要用户进程通过mmap映射之后就可以正常访问，访问过程中不会发生缺页异常，映射虚拟页对应的物理页面已经在驱动中申请好映射好。**
 
 下面给出mmap映射原理的图示：
-!\[\[Pasted image 20240914165043.png\]\]
 
-# 4.应用场景
+![[Pasted image 20240914165043.png]]
+
+# 4. 应用场景
 
 最后，我们来看下使用**framebuffer的lcd对0拷贝的使用情况**：
 
@@ -113,6 +113,6 @@ lcd驱动代码中会设置好最终注册framebuffer：
 
 可以看到当系统支持framebuffer设备时，在fbmem_init中会创建framebuffer设备类关联字符设备操作集fb_fops，lcd的驱动代码中会调用register_framebuffer创建framebuffer设备（就会创建出了/dev/fdx 设备节点），应用程序就可以通过mmap来映射framebuffer设备到用户空间，然后进行屏幕绘制操作，不需要任何数据拷贝。
 
-# 5.总结
+# 5. 总结
 
 可以看的出，通过mmap实现0拷贝非常简单，只需要在驱动的mmap接口中调用remap_pfn_range来将内核空间映射的那块物理页再次映射到用户空间即可，这就实现了用户空间和内核空间的数据共享，这和用户进程之间的共享内存机制非常相似，都需要操作进程的页表将这段物理内存映射到进程虚拟地址空间。

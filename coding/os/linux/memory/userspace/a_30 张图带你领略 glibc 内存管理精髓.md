@@ -1,27 +1,27 @@
-CPP开发者
-_2022年05月12日 11:50_ _浙江_
-The following article is from 高性能架构探索 Author 雨乐
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651170981&idx=1&sn=61be27deb019126bb32fd6d8da71d44a&chksm=806479fab713f0ec2c47394610dc0e91e7fd51d01b473566f10d9adfa3dda9a8a48bfa5d15ae&mpshare=1&scene=24&srcid=0512SAyJ9OJxGdXLQ7YCVAjs&sharer_sharetime=1652338318591&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d0587970c94857179744e0205b2a8b610acadc576e8a17dd598be9fe9bdf2324916f995c39d585c306ab622680f4f0df9f3d46433d2db46cd37539ed4c65502e372c9bd6c8aec76ce508dff7e3f9933aaaeffa3741106b262cd0246c9323c2379fda1143ceed5438f481258103507a6c05b6c0d1f72092c79a&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_e829fd9228a9&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQ02wLcyO%2B3%2Fj%2FRmT%2B6lGfRxKUAgIE97dBBAEAAAAAAARMFt%2FXnXcAAAAOpnltbLcz9gKNyK89dVj0pIZOhCMoj51%2Fbd2zR%2B2Kka0Vvs8Q3HWgtAdfntSTklobIVWavD5FvwsFLIyXLX5RiiAXfLqamW7P1MqDIr0gV9immhm%2Bf5VIsLyGDmUqvuyhA9jGid0Fg%2B0BvxCtdIxhsmNDr1AFeY7sBI2hmy3QjVaCGaJISbwynacz75cdE8hyS9zAoF3Y%2F4pPoUpYOtM7kZN0s9BmUuw%2B1m8yI%2Bn0SdJxnJXvIHLNzdz2wZ%2FPd73sqyVyKmVdMUGpufqQqqgx8jsiivv5cwfp44aaLDveX%2Fw%2BeU507rV6pkoYRWCg%2BjbIm3YoGVrFJZIuZRNd%2Fg%3D%3D&acctmode=0&pass_ticket=q6POhk3Bct7s1ht4Sq%2BwmceZMpwDuNxcMqFo88t1VUhRzhjl%2F%2BnXe83K0Ts2j52V&wx_header=0#)
+CPP开发者 _2022年05月12日 11:50_ _浙江_
+
+The following article is from 高性能架构探索 Author 雨乐
 
 在逛知乎的时候，看到篇帖子，如下：
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/p3sYCQXkuHhRXIkKJ7KWooq2f0YibyXX9AAGq6Vqp50R6onibERQV75sBiaIyuI8LEOUVNWQicQLJs99FOuVcVHTdw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023184325.png]]
 
 看了下面所有的回答，要么是没有回答到点上，要么是回答不够深入，所以，借助本文，深入讲解C/C++内存管理。
 
-## 1 写在前面
+# 1 写在前面
 
 源码分析本身就很枯燥乏味，尤其是要将其写成通俗易懂的文章，更是难上加难。
 
 本文尽可能的从读者角度去进行分析，重点写大家关心的点，必要的时候，会贴出部分源码，以加深大家的理解，尽可能的通过本文，让大家理解内存分配释放的本质原理。
 
 接下来的内容，干货满满，对于你我都是一次收获的过程。主要从内存布局、glibc内存管理、malloc实现以及free实现几个点来带你领略glibc内存管理精髓。最后，针对项目中的问题，指出了解决方案。大纲内容如下：
-!\[\[Pasted image 20240914160557.png\]\]
+
+![[Pasted image 20240914160557.png]]
 
 主要内容
 
-## 2 背景
+# 2 背景
 
 几年前，在上家公司做了一个项目，暂且称之为SeedService吧。SeedService从kafka获取feed流的转、评、赞信息，加载到内存。因为每天数据不一样，所以kafka的topic也是按天来切分，整个server内部，类似于双指针实现，当天0点释放头一天的数据。
 
@@ -42,13 +42,13 @@ The following article is from 高性能架构探索 Author 雨乐
 
 带着上面这些问题，大概用了将近一个月的时间分析了glibc运行时库的内存管理代码，今天将当时的笔记整理了出来，希望能够对大家有用。
 
-## 3 基础
+# 3 基础
 
 Linux 系统在装载 elf 格式的程序文件时，会调用 loader 把可执行文件中的各个段依次载入到从某一地址开始的空间中。
 
 用户程序可以直接使用系统调用来管理 heap 和mmap 映射区域，但更多的时候程序都是使用 C 语言提供的 malloc()和 free()函数来动态的分配和释放内存。stack区域是唯一不需要映射，用户却可以访问的内存区域，这也是利用堆栈溢出进行攻击的基础。
 
-### 3.1 进程内存布局
+## 3.1 进程内存布局
 
 计算机系统分为32位和64位，而32位和64位的进程布局是不一样的，即使是同为32位系统，其布局依赖于内核版本，也是不同的。
 
@@ -64,13 +64,13 @@ Linux 系统在装载 elf 格式的程序文件时，会调用 loader 把可执�
 
 - 代码区（Text）— 存储只读的程序执行代码，即机器指令
 
-#### 3.1.1 32位进程内存布局
+### 3.1.1 32位进程内存布局
 
-###### 经典布局
+#### 经典布局
 
 在Linux内核2.6.7以前，进程内存布局如下图所示。
-!\[\[Pasted image 20240914160612.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160612.png]]
 
 32位经典布局
 
@@ -79,22 +79,22 @@ Linux 系统在装载 elf 格式的程序文件时，会调用 loader 把可执�
 ###### 默认布局
 
 如上所示，由于经典内存布局具有空间局限性，因此在内核2.6.7以后，就引入了下图这种默认进程布局方式。
-!\[\[Pasted image 20240914160623.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160623.png]]
 
 32位默认布局
 
 从上图可以看到，栈至顶向下扩展，并且栈是有界的。堆至底向上扩展，mmap 映射区域至顶向下扩展，mmap 映射区域和堆相对扩展，直至耗尽虚拟地址空间中的剩余区域，这种结构便于C运行时库使用 mmap 映射区域和堆进行内存分配。
 
-#### 3.1.2 64位进程内存布局
+### 3.1.2 64位进程内存布局
 
 如之前所述，64位进程内存布局方式由于其地址空间足够，且实现方便，所以采用的与32位经典内存布局的方式一致，如下图所示:
-!\[\[Pasted image 20240914160644.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160644.png]]
 
 64位进程布局
 
-### 3.2 操作系统内存分配函数
+## 3.2 操作系统内存分配函数
 
 在之前介绍内存布局的时候，有提到过，heap 和mmap 映射区域是可以提供给用户程序使用的虚拟内存空间。那么我们该如何获得该区域的内存呢？
 
@@ -111,8 +111,7 @@ sbrk()，brk() 或者 mmap() 都可以用来向我们的进程添加额外的虚
 > 这里要提到一个很重要的概念，内存的延迟分配，只有在真正访问一个地址的时候才建立这个地址的物理映射，这是 Linux 内存管理的基本思想之一。Linux 内核在用户申请内存的时候，只是给它分配了一个线性区（也就是虚拟内存），并没有分配实际物理内存；只有当用户使用这块内存的时候，内核才会分配具体的物理页面给用户，这时候才占用宝贵的物理内存。内核释放物理页面是通过释放线性区，找到其所对应的物理页面，将其全部释放的过程。
 >
 > ❞
-> !\[\[Pasted image 20240914160658.png\]\]
-> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+> ![[Pasted image 20240914160658.png]]
 
 内存分配
 
@@ -135,12 +134,12 @@ struct mm_struct { ... unsigned long (*get_unmapped_area) (struct file 
 - mmap_base表示memory mapping段的起始地址。
 
 C语言的动态内存分配基本函数是 malloc()，在 Linux 上的实现是通过内核的 brk 系统调用。brk()是一个非常简单的系统调用， 只是简单地改变mm_struct结构的成员变量 brk 的值。
-!\[\[Pasted image 20240914160709.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160709.png]]
 
 mm_struct
 
-#### 3.2.1 Heap操作
+### 3.2.1 Heap操作
 
 在前面有提过，有两个函数可以直接从堆(Heap)申请内存，brk()函数为系统调用，sbrk()为c库函数。
 
@@ -159,11 +158,11 @@ int brk(void *addr);void *sbrk(intptr_t increment);
 >
 > ❞
 
-#### 3.2.2 MMap操作
+### 3.2.2 MMap操作
 
 在LINUX中我们可以使用mmap用来在进程虚拟内存地址空间中分配地址空间，创建和物理内存的映射关系。
-!\[\[Pasted image 20240914160730.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160730.png]]
 
 共享内存
 
@@ -220,7 +219,7 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, of
 >
 > ❞
 
-## 4 概述
+# 4 概述
 
 在前面，我们有提到在堆上分配内存有两个函数，分别为brk()系统调用和sbrk()c运行时库函数，在内存映射区分配内存有mmap函数。
 
@@ -229,10 +228,10 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, of
 这就引入了一个概念，「内存管理」。
 
 本节大纲如下：
-!\[\[Pasted image 20240914160821.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-### 4.1 内存管理
+![[Pasted image 20240914160821.png]]
+
+## 4.1 内存管理
 
 内存管理是指软件运行时对计算机内存资源的分配和使用的技术。其最主要的目的是如何高效，快速的分配，并且在适当的时候释放和回收内存资源。
 
@@ -244,7 +243,7 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, of
 
 4、调试功能作为一个 C/C++程序员，内存错误可以说是我们的噩梦，上一次的内存错误一定还让你记忆犹新。内存管理器提供的调试功能，强大易用，特别对于嵌入式环境来说，内存错误检测工具缺乏，内存管理器提供的调试功能就更是不可或缺了。
 
-### 4.2 管理方式
+## 4.2 管理方式
 
 内存管理的管理方式，分为 手动管理 和 自动管理 两种。
 
@@ -252,19 +251,19 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, of
 
 自动管理内存由编程语言的内存管理系统自动管理，在大多数情况下不需要使用者的参与，能够自动释放不再使用的内存。
 
-#### 4.2.1 手动管理
+### 4.2.1 手动管理
 
 手动管理内存是一种比较传统的内存管理方式，C/C++ 这类系统级的编程语言不包含狭义上的自动内存管理机制，使用者需要主动申请或者释放内存。经验丰富的工程师能够精准的确定内存的分配和释放时机，人肉的内存管理策略只要做到足够精准，使用手动管理内存的方式可以提高程序的运行性能，也不会造成内存安全问题。
 
 但是，毕竟这种经验丰富且能精准确定内存和分配释放实际的使用者还是比较少的，只要是人工处理，总会带来一些错误，内存泄漏和悬挂指针基本是 C/C++ 这类语言中最常出现的错误，手动的内存管理也会占用工程师的大量精力，很多时候都需要思考对象应该分配到栈上还是堆上以及堆上的内存应该何时释放，维护成本相对来说还是比较高的，这也是必然要做的权衡。
 
-#### 4.2.2 自动管理
+### 4.2.2 自动管理
 
 自动管理内存基本是现代编程语言的标配，因为内存管理模块的功能非常确定，所以我们可以在编程语言的编译期或者运行时中引入自动的内存管理方式，最常见的自动内存管理机制就是垃圾回收，不过除了垃圾回收之外，一些编程语言也会使用自动引用计数辅助内存的管理。
 
 自动的内存管理机制可以帮助工程师节省大量的与内存打交道的时间，让使用者将全部的精力都放在核心的业务逻辑上，提高开发的效率；在一般情况下，这种自动的内存管理机制都可以很好地解决内存泄漏和悬挂指针的问题，但是这也会带来额外开销并影响语言的运行时性能。
 
-### 4.1 常见的内存管理器
+## 4.1 常见的内存管理器
 
 1 ptmalloc：ptmalloc是隶属于glibc(GNU Libc)的一款内存分配器，现在在Linux环境上，我们使用的运行库的内存分配(malloc/new)和释放(free/delete)就是由其提供。
 
@@ -274,13 +273,14 @@ void *mmap(void *addr, size_t length, int prot, int flags, int fd, of
 
 4 TCMalloc：Google 开发的内存分配器，在不少项目中都有使用，例如在 Golang 中就使用了类似的算法进行内存分配。它具有现代化内存分配器的基本特征：对抗内存碎片、在多核处理器能够 scale。据称，它的内存分配速度是 glibc2.3 中实现的 malloc的数倍。
 
-## 5 glibc之内存管理(ptmalloc)
+# 5 glibc之内存管理(ptmalloc)
 
 因为本次事故就是用的运行库函数new/delete进行的内存分配和释放，所以本文将着重分析glibc下的内存分配库ptmalloc。
 
 本节大纲如下：
-!\[\[Pasted image 20240914160834.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160834.png]]
+
 
 在c/c++中，我们分配内存是在堆上进行分配，那么这个堆，在glibc中是怎么表示的呢？
 
@@ -294,7 +294,7 @@ typedef struct _heap_info{  mstate ar_ptr;            /* Arena
 
 在开始这部分之前，我们先了解下一些概念。
 
-### 5.1 分配区(arena)
+## 5.1 分配区(arena)
 
 > ❝
 >
@@ -322,26 +322,25 @@ typedef struct _heap_info{  mstate ar_ptr;            /* Arena
 struct malloc_state { mutex_t mutex;                 /* Serialize access. */ int flags;                       /* Flags (formerly in max_fast). */ #if THREAD_STATS /* Statistics for locking. Only used if THREAD_STATS is defined. */ long stat_lock_direct, stat_lock_loop, stat_lock_wait; #endif mfastbinptr fastbins[NFASTBINS];    /* Fastbins */ mchunkptr top; mchunkptr last_remainder; mchunkptr bins[NBINS * 2]; unsigned int binmap[BINMAPSIZE];   /* Bitmap of bins */ struct malloc_state *next;           /* Linked list */ INTERNAL_SIZE_T system_mem; INTERNAL_SIZE_T max_system_mem; };
 ```
 
-!\[\[Pasted image 20240914160902.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240914160902.png]]
 
 malloc_state
 
 每一个进程只有一个主分配区和若干个非主分配区。主分配区由main线程或者第一个线程来创建持有。主分配区和非主分配区用环形链表连接起来。分配区内有一个变量mutex以支持多线程访问。
-!\[\[Pasted image 20240914160924.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914160924.png]]
 
 环形链表链接的分配区
 
 在前面有提到，在每个分配区中都有一个变量mutex来支持多线程访问。每个线程一定对应一个分配区，但是一个分配区可以给多个线程使用，同时一个分配区可以由一个或者多个的堆组成，同一个分配区下的堆以链表方式进行连接，它们之间的关系如下图：
-!\[\[Pasted image 20240914161039.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161039.png]]
 
 线程-分配区-堆
 
 一个进程的动态内存，由分配区管理，一个进程内有多个分配区，一个分配区有多个堆，这就组成了复杂的进程内存管理结构。
-!\[\[Pasted image 20240914161047.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161047.png]]
 
 需要注意几个点：
 
@@ -359,7 +358,7 @@ malloc_state
 
 - 每次malloc时，先去线程局部存储空间中找area，用thread cache中的area分配存在thread area中的chunk。当不够时才去找堆区的area。
 
-### 5.2 chunk
+## 5.2 chunk
 
 ptmalloc通过malloc_chunk来管理内存，给User data前存储了一些信息，使用边界标记区分各个chunk。
 
@@ -380,8 +379,10 @@ struct malloc_chunk {    INTERNAL_SIZE_T      prev_size;    /* 
 - fd_nextsize 和 bk_nextsize: 当前的 chunk 存在于 large bins 中时， large bins 中的空闲 chunk 是按照大小排序的，但同一个大小的 chunk 可能有多个，增加了这两个字段可以加快遍历空闲 chunk ，并查找满足需要的空闲 chunk ， fd_nextsize 指向下一个比当前 chunk 大小大的第一个空闲 chunk ， bk_nextszie 指向前一个比当前 chunk 大小小的第一个空闲 chunk 。（同一大小的chunk可能有多块，在总体大小有序的情况下，要想找到下一个比自己大或小的chunk，需要遍历所有相同的chunk，所以才有fd_nextsize和bk_nextsize这种设计） 如果该 chunk 块被分配给应用程序使用，那么这两个指针也就没有用（该chunk 块已经从 size 链中拆出）了，所以也当作应用程序的使用空间，而不至于浪费。
 
 正如上面所描述，在ptmalloc中，为了尽可能的节省内存，使用中的chunk和未使用的chunk在结构上是不一样的。
-!\[\[Pasted image 20240914161108.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)在上图中：
+
+![[Pasted image 20240914161108.png]]
+
+在上图中：
 
 - chunk指针指向chunk开始的地址
 
@@ -396,12 +397,12 @@ struct malloc_chunk {    INTERNAL_SIZE_T      prev_size;    /* 
 - A=0 为主分配区分配；A=1 为非主分配区分配。
 
 与非空闲chunk相比，空闲chunk在用户区域多了四个指针，分别为fd,bk,fd_nextsize,bk_nextsize，这几个指针的含义在上面已经有解释，在此不再赘述。
-!\[\[Pasted image 20240914161122.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161122.png]]
 
 空闲chunk
 
-### 5.3 空闲链表(bins)
+## 5.3 空闲链表(bins)
 
 用户调用free函数释放内存的时候，ptmalloc并不会立即将其归还操作系统，而是将其放入空闲链表(bins)中，这样下次再调用malloc函数申请内存的时候，就会从bins中取出一块返回，这样就避免了频繁调用系统调用函数，从而降低内存分配的开销。
 
@@ -420,12 +421,12 @@ struct malloc_chunk {    INTERNAL_SIZE_T      prev_size;    /* 
 从前面malloc_state结构定义，对bin进行分类，可以分为fast bin和bins，其中unsorted bin、small bin 以及 large bin属于bins。
 
 在glibc中，上述4中bin的个数都不等，如下图所示：
-!\[\[Pasted image 20240914161131.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161131.png]]
 
 bin
 
-#### 5.3.1 fast bin
+### 5.3.1 fast bin
 
 程序在运行时会经常需要申请和释放一些较小的内存空间。当分配器合并了相邻的几个小的 chunk 之后,也许马上就会有另一个小块内存的请求,这样分配器又需要从大的空闲内存中切分出一块,这样无疑是比较低效的,故而,malloc 中在分配过程中引入了 fast bins。
 
@@ -448,12 +449,12 @@ mfastbinptr fastbins[NFASTBINS]; // NFASTBINS  = 10
 1. free操作：先通过chunksize函数根据传入的地址指针获取该指针对应的chunk的大小；然后根据这个chunk大小获取该chunk所属的fast bin，然后再将此chunk添加到该fast bin的链尾即可。
 
 下面是fastbin结构图：
-!\[\[Pasted image 20240914161148.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161148.png]]
 
 fastbin
 
-#### 5.3.2 unsorted bin
+### 5.3.2 unsorted bin
 
 unsorted bin 的队列使用 bins 数组的第一个，是bins的一个缓冲区，加快分配的速度。当用户释放的内存大于max_fast或者fast bins合并后的chunk都会首先进入unsorted bin上。
 
@@ -464,12 +465,12 @@ unsorted bin 的队列使用 bins 数组的第一个，是bins的一个缓冲区
 与fast bin所不同的是，unsortedbin采用的遍历顺序是FIFO。
 
 unsorted bin结构图如下：
-!\[\[Pasted image 20240914161205.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161205.png]]
 
 unsorted bin
 
-#### 5.3.3 small bin
+### 5.3.3 small bin
 
 大小小于512字节的chunk被称为small chunk，而保存small chunks的bin被称为small bin。数组从2开始编号，前62个bin为small bins，small bin每个bin之间相差8个字节，同一个small bin中的chunk具有相同大小。
 
@@ -480,12 +481,12 @@ unsorted bin
 在free一个chunk的时候，检查其前或其后的chunk是否空闲，若是则合并，也即把它们从所属的链表中摘除并合并成一个新的chunk，新chunk会添加在unsorted bin链表的前端。
 
 small bin也采用的是FIFO算法，即内存释放操作就将新释放的chunk添加到链表的front end(前端)，分配操作就从链表的rear end(尾端)中获取chunk。
-!\[\[Pasted image 20240914161239.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161239.png]]
 
 small bin
 
-#### 5.3.4 large bin
+### 5.3.4 large bin
 
 大小大于等于512字节的chunk被称为large chunk，而保存large chunks的bin被称为large bin，位于small bins后面。large bins中的每一个bin分别包含了一个给定范围内的chunk，其中的chunk按大小递减排序，大小相同则按照最近使用时间排列。
 
@@ -504,28 +505,30 @@ small bins 的策略非常适合小分配，但我们不能为每个可能的块
 Binmap记录了各个bin中是否为空，通过bitmap可以避免检索一些空的bin。如果通过binmap找到了下一个非空的large bin的话，就按照上一段中的方法分配chunk，否则就使用top chunk（在后面有讲）来分配合适的内存。
 
 large bin的free 操作与small bin一致，此处不再赘述。
-!\[\[Pasted image 20240914161250.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161250.png]]
 
 large bin
 
-上述几种bin，组成了进程中最核心的分配部分：bins，如下图所示：!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)!\[\[Pasted image 20240914161302.png\]\]
+上述几种bin，组成了进程中最核心的分配部分：bins，如下图所示：
 
-### 5.4 特殊chunk
+![[Pasted image 20240914161302.png]]
+
+## 5.4 特殊chunk
 
 上节内容讲述了几种bin以及各种bin内存的分配和释放特点，但是，仅仅上面几种bin还不能够满足，比如假如上述bins不能满足分配条件的时候，glibc提出了另外几种特殊的chunk供分配和释放，分别为top chunk，mmaped chunk 和last remainder chunk。
 
-#### 5.4.1 top trunk
+### 5.4.1 top trunk
 
 top chunk是堆最上面的一段空间，它不属于任何bin，当所有的bin都无法满足分配要求时，就要从这块区域里来分配，分配的空间返给用户，剩余部分形成新的top chunk，如果top chunk的空间也不满足用户的请求，就要使用brk或者mmap来向系统申请更多的堆空间（主分配区使用brk、sbrk，非主分配区使用mmap）。
 
 在free chunk的时候，如果chunk size不属于fastbin的范围，就要考虑是不是和top chunk挨着，如果挨着，就要merge到top chunk中。
 
-#### 5.4.2 mmaped chunk
+### 5.4.2 mmaped chunk
 
 当分配的内存非常大（大于分配阀值，默认128K）的时候，需要被mmap映射，则会放到mmaped chunk上，当释放mmaped chunk上的内存的时候会直接交还给操作系统。（chunk中的M标志位置1）
 
-#### 5.4.3 last remainder chunk
+### 5.4.3 last remainder chunk
 
 Last remainder chunk是另外一种特殊的chunk，这个特殊chunk是被维护在unsorted bin中的。
 
@@ -535,21 +538,21 @@ Last remainder chunk是另外一种特殊的chunk，这个特殊chunk是被维�
 
 last remainder chunk主要通过提高内存分配的局部性来提高连续malloc（产生大量 small chunk）的效率。
 
-### 5.5 chunk 切分
+## 5.5 chunk 切分
 
 chunk释放时，其长度不属于fastbins的范围，则合并前后相邻的chunk。首次分配的长度在large bin的范围，并且fast bins中有空闲chunk，则将fastbins中的chunk与相邻空闲的chunk进行合并，然后将合并后的chunk放到unsorted bin中，如果fastbin中的chunk相邻的chunk并非空闲无法合并，仍旧将该chunk放到unsorted bin中，即能合并的话就进行合并，但最终都会放到unsorted bin中。
 
 fastbins，small bin中都没有合适的chunk，top chunk的长度也不能满足需要，则对fast bin中的chunk进行合并。
 
-### 5.6 chunk 合并
+## 5.6 chunk 合并
 
 前面讲了相邻的chunk可以合并成一个大的chunk，反过来，一个大的chunk也可以分裂成两个小的chunk。chunk的分裂与从top chunk中分配新的chunk是一样的。需要注意的一点是：分裂后的两个chunk其长度必须均大于chunk的最小长度（对于64位系统是32字节），即保证分裂后的两个chunk仍旧是可以被分配使用的，否则则不进行分裂，而是将整个chunk返回给用户。
 
-## 6 内存分配(malloc)
+# 6 内存分配(malloc)
 
 glibc运行时库分配动态内存，底层用的是malloc来实现(new 最终也是调用malloc)，下面是malloc函数调用流程图：
-!\[\[Pasted image 20240914161318.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161318.png]]
 
 malloc
 
@@ -594,16 +597,16 @@ malloc
 > ❞
 
 当然了，glibc中malloc的分配远比上面的要复杂的多，要考虑到各种情况，比如指针异常ΩΩ越界等，将这些判断条件也加入到流程图中，如下图所示：
-!\[\[Pasted image 20240914161335.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161335.png]]
 
 malloc
 
 ## 7 内存释放(free)
 
 malloc进行内存分配，那么与malloc相对的就是free，进行内存释放，下面是free函数的基本流程图：
-!\[\[Pasted image 20240914161343.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161343.png]]
 
 free
 
@@ -626,12 +629,12 @@ free
 1. 判断top chunk的大小是否大于mmap收缩阈值（默认为128KB），如果是的话，对于主分配区，则会试图归还top chunk中的一部分给操作系统。free结束。
 
 如果将free函数内部各种条件加入进去，那么free调用的详细流程图如下：
-!\[\[Pasted image 20240914161353.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914161353.png]]
 
 free
 
-## 8 问题分析以及解决
+# 8 问题分析以及解决
 
 通过前面对glibc运行时库的分析，基本就能定位出原因，是因为我们调用了free进行释放，但仅仅是将内存返还给了glibc库，而glibc库却没有将内存归还操作系统，最终导致系统内存耗尽，程序因为 OOM 被系统杀掉。
 
@@ -645,13 +648,13 @@ free
 
 最终采用tcmalloc来解决了问题。
 
-## 9 结语
+# 9 结语
 
 业界语句说法，是否了解内存管理机制，是辨别C/C++程序员和其他的高级语言程序员的重要区别。作为C/C++中的最重要的特性，指针及动态内存管理在给编程带来极大的灵活性的同时，也给开发人员带来了许多困扰。
 
 了解底层内存实现，有时候会有意想不到的效果哦。
 
-## 10 参考
+# 10 参考
 
 1、https://sourceware.org/glibc/wiki/MallocInternals
 
@@ -665,6 +668,8 @@ free
 
 - EOF -
 
+---
+
 推荐阅读  点击标题可跳转
 
 1、[内核虚拟机原理：网络可编程](http://mp.weixin.qq.com/s?__biz=MzAxNDI5NzEzNg==&mid=2651170783&idx=1&sn=0b6db991015ff8b3315aa86bf8c42c38&chksm=80647680b713ff96d94c570741cbe118b37038a352d8a002bfa12d9468fdef2ee69af577724e&scene=21#wechat_redirect)
@@ -676,8 +681,6 @@ free
 **关注『CPP开发者』**
 
 看精选C/C++技术文章
-
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
 
 **CPP开发者**
 
@@ -716,8 +719,6 @@ Comment
 已无更多数据
 
 [](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=18)
 
 CPP开发者
 

@@ -1,31 +1,15 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2024-2-28 20:13 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
-## 背景
+# 背景
 
 linux kernel 5.10.100
 
-## 故障现象
+# 故障现象
 
 扫描pci设备时，出现设备扫描失败。
 
-## 故障分析
+# 故障分析
 
 该程序使用mmap /dev/mem指定的物理地址，在用户态操作寄存器。类似于：
 
@@ -33,7 +17,7 @@ linux kernel 5.10.100
 
 A核负责扫描，B核负责利用该寄存器答复A核。AB两个核是inner shareable。A核对某个RC扫描，x16 lane拆分为两个x8，一个做rc x8，一个做ep x8，使用pci链接线连接两个x8.
 
-![](https://pic3.zhimg.com/v2-0aae8346e66154ec872d4c9464585586_b.jpg)
+![[Pasted image 20241023185703.png]]
 
 硬件链接和扫描示意图
 
@@ -56,7 +40,7 @@ A核负责扫描，B核负责利用该寄存器答复A核。AB两个核是inner 
 
 pz1抓波形，我们看到了很诡异的那一面，B核在发出写寄存器附近的指令，必然伴随着一个tlbi+dsb指令，而且根据tlbi指令的波形，分析出对应的地址，刚好就是我们写的寄存器的va地址，（一开始波形分析这个VA地址分析有错，误导了一些方向，消耗了一些时间）。
 
-![](https://pic2.zhimg.com/v2-c8c86e53b03463bb86d64f2f20f8fd6d_b.jpg)
+![[Pasted image 20241023185744.png]]
 
 tlbi的va地址，刚好落在对应B核tlp线程的地址空间的写寄存器范围
 
@@ -70,7 +54,7 @@ tlbi的va地址，刚好落在对应B核tlp线程的地址空间的写寄存器�
 
 问题太过绕口，这两个问题继续排查，都已经得到原因，后来通过配置 kernel相关配置，也就是开启 CONFIG_ARM64_HW_AFDBM 解决了该问题。
 
-![](https://pic3.zhimg.com/v2-b14860f271fe7c2b598d162d730e0d36_b.jpg)
+![[Pasted image 20241023185758.png]]
 
 1991是tlp线程
 
@@ -82,7 +66,7 @@ tlbi的va地址，刚好落在对应B核tlp线程的地址空间的写寄存器�
 
 问题2就是因为 arm64中DSB的语义，实现为 DVM sync属性，则必然等待其他核完成前面指令才会返回，如果两者属于同一个dvm域，则必现。
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 [Linux读写锁逻辑解析](http://www.wowotech.net/kernel_synchronization/rwsem.html)»
 

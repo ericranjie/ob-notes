@@ -1,18 +1,5 @@
-David Lafreniere 控制工程研习
 
-_2024年03月31日 08:26_ _北京_
-
-![](http://mmbiz.qpic.cn/mmbiz_png/hpoqGPEUNGbsumNmseibc6N4waFGsCCoS2A5F72qfmSfCrORcDVrkUqPnaw7YiaBiaE6pTWavHwYweNoCnSGyB2Qw/300?wx_fmt=png&wxfrom=19)
-
-**控制工程研习**
-
-好好学习，天天向上
-
-313篇原创内容
-
-公众号
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/hpoqGPEUNGYQD4llsKB9z2DKpvSzXF4g4XA0jhibPRUYUKqDdGB4PpiaV94a7q8KXQ92xrIoFTNe6vEkuoIA8Fjw/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+David Lafreniere 控制工程研习 _2024年03月31日 08:26_ _北京_
 
 原文链接：
 
@@ -20,7 +7,7 @@ https://www.codeproject.com/Articles/1084801/Replace-malloc-free-with-a-Fast-Fix
 
 在本文中，C 库 malloc/free 被替换为替代的固定内存块版本 xmalloc() 和 xfree()。首先，本文会简要解释底层 Allocator 存储回收方法，然后再解释 xallocator 的工作原理。
 
-**介绍**
+# **介绍**
 
 自定义固定块分配器（Custom fixed block allocators）是专门的内存管理器，用于解决全局堆的性能问题。在《高效 C++ 固定块内存分配器》一文中，我实现了一个分配器类来提高速度并消除碎片堆内存故障的可能性。在这篇最新文章中，Allocator 类被用作 xallocator 实现的基础来替换 malloc() 和 free()。
 
@@ -28,7 +15,7 @@ https://www.codeproject.com/Articles/1084801/Replace-malloc-free-with-a-Fast-Fix
 
 在本文中，我将 C 库 malloc/free 替换为替代的固定内存块版本 xmalloc() 和 xfree()。首先，我将简要解释底层 Allocator 存储回收方法，然后介绍 xallocator 的工作原理。
 
-**储存回收(Storage Recycling)**
+# **储存回收(Storage Recycling)**
 
 内存管理方案的基本原理是回收在对象分配期间获得的内存。\*\*一旦创建了对象的存储空间，它就永远不会返回到堆中。相反，内存被回收，允许相同类型的另一个对象重用该空间。\*\*我已经实现了一个名为 Allocator 的类来表达该技术。
 
@@ -40,7 +27,7 @@ https://www.codeproject.com/Articles/1084801/Replace-malloc-free-with-a-Fast-Fix
 
 1. 静态池（Static pool）
 
-**堆vs池**
+# **堆vs池**
 
 当空闲列表无法提供现有块时，Allocator 类能够从堆或内存池创建新块。如果使用池，则必须预先指定对象的数量。使用对象总数，创建一个足够大的池来处理最大数量的实例。**另一方面，从堆获取块内存则没有这样的数量限制——在存储允许的情况下构造尽可能多的新对象。**
 
@@ -60,7 +47,7 @@ class Allocator { public:     Allocator(size_t size, UINT objects=0, CHAR* memor
 
 有关Allocator的更多信息，请参阅“高效的 C++ 固定块内存分配器”。
 
-**xallocator**
+# **xallocator**
 
 xallocator 模块有六个主要 API：
 
@@ -118,7 +105,7 @@ static MyClassStatic myClassStatic;
 
 解决方案的关键来自于C++标准中的一个保证：
 
-**引用：**
+# **引用：**
 
 _“在同一翻译单元的命名空间范围内定义并动态初始化的静态存储持续时间的对象应按照其定义在翻译单元中出现的顺序进行初始化。”_
 
@@ -158,7 +145,7 @@ XallocInitDestroy 是一个空类，因此大小为 1 字节。对于包含 xall
 
 在 PC 或类似配备的高 RAM 系统上，这 1 个字节是微不足道的，但反过来又确保了程序退出期间静态类实例中 xallocator 操作的安全。它还使您不必调用 xalloc_init() 和 xalloc_destroy()，因为这是自动处理的。
 
-**重载new和delete**
+# **重载new和delete**
 
 为了使 xallocator 真正易于使用，我创建了一个宏来重载类中的 new/delete 并将内存请求路由到 xmalloc()/xfree()。只需在类定义中的任意位置添加宏 XALLOCATOR 即可。
 

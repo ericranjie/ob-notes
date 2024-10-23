@@ -11,9 +11,11 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241023180355.png"
+                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241023180355.png",
+                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241023180355.png",
+                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241023180355.png"
+                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md"
               }
             }
           }
@@ -144,44 +146,43 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "coding/os/linux/memory/MMU/k_n_【万字长文】带你搞定MMU&TLB&TWU.md",
-    "zx99-image/Pasted image 20241023180442.png",
-    "zx99-image/Pasted image 20241023180429.png",
-    "coding/os/linux/memory/MMU/p_甄建勇：五分钟搞定MMU.md",
-    "coding/os/linux/memory/MMU/d_n_MMU内存管理单元.md",
+    "zx99-image/Pasted image 20241023190259.png",
+    "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+    "coding/os/linux/memory/userspace/p_Jemalloc内存分配与优化实践.md",
+    "coding/os/linux/memory/userspace/k_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
+    "zx99-image/Pasted image 20241023190512.png",
+    "coding/os/linux/memory/userspace/k_从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
+    "zx99-image/Pasted image 20241023190333.png",
+    "coding/os/linux/memory/userspace/k_一文读懂零拷贝技术｜splice原理与实现.md",
+    "coding/os/linux/memory/userspace/k_Linux Mmap映射：优化文件访问和共享内存.md",
+    "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
+    "zx99-image/Pasted image 20241023184325.png",
+    "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
+    "coding/os/linux/memory/userspace/i_mmap在arm64背后的那个深坑.md",
+    "zx99-image/Pasted image 20241023185758.png",
+    "zx99-image/Pasted image 20241023185744.png",
+    "zx99-image/Pasted image 20241023185703.png",
+    "coding/os/linux/memory/userspace/i_free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
+    "coding/os/linux/memory/userspace/d_copy_{to,from}_user()的思考.md",
+    "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
+    "zx99-image/-20240922/Pasted image 20240914161353.png",
+    "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
+    "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
+    "README.md",
+    "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
+    "coding/os/linux/memory/reclaim/b_linux内存回收(一）---kswapd回收.md",
+    "coding/os/linux/memory/page-folio/i_深入理解Linux内核之脏页跟踪.md",
+    "coding/os/linux/memory/page-folio/i_页面回收的基本概念.md",
+    "coding/os/linux/memory/page-folio/k_Linux 内存管理窥探：页面回收 (LRU).md",
+    "coding/os/linux/memory/page-folio/k_Linux下访问匿名页发生的神奇“化学反应”.md",
+    "coding/os/linux/memory/page-folio/k_深入理解Linux内核页表映射分页机制原理.md",
+    "coding/os/linux/memory/page-folio/i_文件系统和裸块设备的page cache问题.md",
+    "coding/os/linux/memory/page-folio/c_图文详解 Linux 分页机制！.md",
+    "coding/os/linux/memory/page-folio/b_由Google、OPPO、ARM、华为等大厂程序员贡献的Linux Large Folios大页在社区和产品的现状和未来.md",
     "zx99-image/Pasted image 20241023180355.png",
-    "coding/os/linux/memory/MMU/d_Arm MMU深度解读.md",
-    "coding/os/linux/memory/memory-performance/k_zRAM内存压缩技术原理与应用.md",
-    "coding/os/linux/memory/memory-performance/b_图解 Linux内存性能优化核心思想.md",
-    "coding/os/linux/memory/memory-performance/b_内存管理：程序是如何被优雅的装载到内存中.md",
-    "coding/os/linux/memory/memory-model/k_内存一致性模型.md",
-    "coding/os/linux/memory/memory-model/k_Linux内存模型.md",
-    "zx99-image/Pasted image 20241023164015.png",
-    "coding/os/linux/memory/memory-model/i_ARMv8之memory model.md",
-    "coding/os/linux/memory/memory-model/a_聊聊内存模型与内存序.md",
-    "zx99-image/Pasted image 20241023163351.png",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel内存管理的基本概念.md",
-    "coding/os/linux/memory/memory-manage/k_Linux Kernel：内存分页机制核心原理.md",
-    "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
-    "coding/os/linux/memory/memory-manage/i_KSM机制剖析 — Linux 内核中的内存去耦合.md",
-    "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
-    "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
-    "coding/os/linux/memory/memory-manage/a_五万字 深入理解Linux内存管理.md",
-    "coding/os/linux/memory/memory-manage/a_s_n_Meltdown论文翻译.md",
-    "zx99-image/Pasted image 20241023163756.png",
-    "coding/os/linux/memory/memory-manage/slub/i_slub分配器.md",
-    "zx99-image/Pasted image 20241023163717.png",
-    "zx99-image/Pasted image 20241023163703.png",
-    "zx99-image/Pasted image 20241023163651.png",
-    "coding/os/linux/memory/memory-manage/slub/b_n_SLUB DEBUG原理.md",
-    "zx99-image/Pasted image 20241023163600.png",
-    "coding/os/linux/memory/memory-manage/slub/a_图解slub.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（二）：内存布局.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化代码分析（一）：identity mapping和kernel image mapping.md",
-    "coding/os/linux/memory/memory-init/k_内存初始化（上）.md",
+    "zx99-image/Pasted image 20241023180442.png",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",

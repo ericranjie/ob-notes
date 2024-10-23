@@ -1,32 +1,20 @@
-Linux阅码场
 
-_2023年05月30日 08:01_ _北京_
+Linux阅码场 _2023年05月30日 08:01_ _北京_
 
 Editor's Note
 
 C/C++通过libc做内存分配。glibc中默认的分配机制是ptmalloc。除此之外，还有众多的不同侧重的优化，例如tcmalloc，jemalloc。本文是字节跳动STE团队对jemalloc分配机制的介绍及其优化实践。
 
 The following article is from 字节跳动SYS Tech Author 字节跳动STE团队
+技术创新与实践、行业技术热点分析。
 
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6uUM5Ku4VPaMibzyXia8bJZJsrcIVT7KGMQFvYZQQucicYg/0)
-
-**字节跳动SYS Tech**.
-
-聚焦系统技术领域，分享前沿技术动态、技术创新与实践、行业技术热点分析。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=Mzg2OTc0ODAzMw==&mid=2247511505&idx=1&sn=016336f026007641268ffc75c1426563&chksm=ce9ab1fff9ed38e9c435a4c82cedb7c88006a183f41dff026fbb099ec2a95e10a7af2b5e83f2&mpshare=1&scene=24&srcid=0530JqW2CHbHMyITzFP2HnCm&sharer_sharetime=1685455511001&sharer_shareid=8397e53ca255d0bca170c6327d62b9af&key=daf9bdc5abc4e8d088131e499ebfee4316efbf1b92a4b31edbe4fc6b88d93b735c698aa968d3cee50b58c33d70e7a41d0d1ed43f6046cd4c83bcc3367c29ccda754f827eba2b3af0b26cedf5d707d02efe45e9235dc8c4db01772c2c39694198b7a41562019ed51f476c4d89904b21d059a89a3485d2bf17eeaf70e1ace52081&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_28254f84d698&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQspI9qOqDxEdsiPACwkJGPhKUAgIE97dBBAEAAAAAANbhJ7qPWKgAAAAOpnltbLcz9gKNyK89dVj0%2Bx1uXX3pL22YGKTcY4jnilLdTdTudrfgu1XQRtUDEpv975Epk0hXREHFz9slw%2BIYUIj3KQRCBDtp5tF8CcAGFKMwmQOTdU%2Bzs1y4OaNjOdmeMXKYYFlsWiwO6T5bxP6Et3tBy726WbVJSj0Wgf74rXgP9QzId5oMWL1k0NSBByAO8R%2BCsmzMxxEBvBbBOMyY7C1Y6%2BbasfOV%2FvtJR7%2F997ZTp3%2Bv4jXB4O9pyuqbmfsoqDzWRHIYqKt3fK0xPv0U2IbhM6dgpiwb4DzIQtVbHzr97cg5XiSwaTcmU3UfKVmBM1OlTxW8EkTL%2BzFGLA%3D%3D&acctmode=0&pass_ticket=WyKMDXry1OO%2BfRFbfYbtiRCcksB65WA83bSih%2BnU969bdPkh%2BTFn1JbfDLNPnRSb&wx_header=0#)
-
-**前言**
+# **前言**
 
 C++ 语言中提供了大量的类库和编程接口，虽然可以帮助开发者提升研发效率，但在特定场景下，其性能表现仍存在优化空间。开发者往往追求极致的代码性能逻辑，一点点的优化改变就可以帮助业务获得良好的性能收益。在字节降本提效的过程中，STE 团队在[算力监控系统](http://mp.weixin.qq.com/s?__biz=Mzg3Mjg2NjU4NA==&mid=2247484264&idx=1&sn=c27c08c225fcceb65a5ffc071dba3f95&chksm=cee9f51ff99e7c09a0c103bc4b362fcdcba7d8e6de74ab251afe1beb5b7af0412e619dd53f13&scene=21#wechat_redirect)中发现 Jemalloc 是业务的前五大 CPU 热点基础库，具有很高的潜在性能优化空间。因此，从 2019 年开始对 Jemalloc 进行深度优化，并在字节内部进行了大范围的优化落地，帮助业务团队取得了较好的收益。本文将主要介绍 Jemalloc 的基本原理以及一些简单易用的优化方法，帮助开发者在 Jemalloc 的实际应用中，获得更好的性能表现。
 
-**内存相关概念简介**
+# **内存相关概念简介**
 
-![Image](https://mmbiz.qpic.cn/mmbiz_svg/hqDXUD6csU8f9Z5wkbLZ7HLtPDibHdMSawfOb24xUx3ic0mG59ZjNKZC9whK2BN3YyETvOfCic0bwCWHPtfD1bqWPseL6yJkb6T/640?wx_fmt=svg&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
-
-**Linux内存分配与分配器**
+## **Linux内存分配与分配器**
 
 当代 Linux 系统中可以同时运行多种多样的进程，并且进程之间可以做到内存互相隔离，这得益于 Linux 的进程地址空间管理。
 
@@ -56,8 +44,7 @@ C++ 语言中提供了大量的类库和编程接口，虽然可以帮助开发�
 
 **Buddy allocation**
 
-!\[\[Pasted image 20240914155126.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240914155126.png]]
 
 Buddy 算法简单来说如上图，一般 2 的 n 次幂大小来管理内存，当申请的内存 size 较小，且当前空闲内存块均大于 size 的两倍，那么会将较大的块分裂，直到分裂出大于size，并小于 size * 2的块为止；当内存 size 较大时则相反，会将空闲块不断合并。
 
@@ -128,12 +115,12 @@ extent 本身设置 bitmap，来记录内存占用情况，以及自身的各种
 **Tcache and arena**
 
 为了减少多线程下锁的竞争，Jemalloc 参考 lkmalloc 和 tcmalloc，实现了一套由多个 arena 独立管理内存加 thread cache 的机制，形成 tcache 有空余空间时不需要加锁分配，没有空余空间时将锁控制在线程所属 arena 管理的几个线程之间的模式。
-!\[\[Pasted image 20240914155317.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914155317.png]]
 
 tcache 中每一个 size 对应一个 bin，当 tcache 需要填充时，在 arena 中发生的如下图：\
-!\[\[Pasted image 20240914155323.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914155323.png]]
 
 **allocation/dallocation in tcache**
 
@@ -148,8 +135,8 @@ tcache 以 thread local storage对象的形式存储，主要服务于 small siz
 1. bin 有空闲地址则直接返回，没有空闲地址则会向 arena 请求填充
 
 每个 bin 的结构如下图，avail 指向 bin 的起始地址，ncached 初始为 bin 的最大值 ncached_max (与 slab size 相关，最小为 20 最大为 200)，每次申请内存会返回 ncached 指向的地址并自减1，直到小于限制值。
-!\[\[Pasted image 20240914155331.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914155331.png]]
 
 释放的时候相反，当 tcache 不为空，即 ncached 不等于 bin 的 ncached_max 时，ncached 自加1，并且将 free 的地址填入 bin 中。
 
@@ -180,9 +167,7 @@ tcache 以 thread local storage对象的形式存储，主要服务于 small siz
 Slab size 的大小如上所述，为 usize 大小和 pagesize 的最小公倍数，这一机制可以保证减少内存碎片，但是tcache 的 fill 与 flush 都与 slab size 相关，一个和业务内存模型匹配的 slab class 才可以得到最好的性能效果。
 
 下面是一张 jemalloc 和 ptmalloc 的对比图，可以看到在 1024 以下的性能 jemalloc 都优于 ptmalloc，但是jemalloc 自身的性能明显存在波动，几个波动出现在 128B、256B、512B 以及 1024B 周围，因为这些 size 本身就是 pagesize 的因子或者公因子较多，所以 slab size 占用的 page 数也相对较少，fill 和 flush 所需要的slab数也越多。
-!\[\[Pasted image 20240914155508.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
+![[Pasted image 20240914155508.png]]
 !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
 **dirty decay & muzzy decay**
@@ -221,8 +206,8 @@ export MALLOC_CONF=stats_print:true
 **stats 分析**
 
 用 Json 格式 dump stats 后，可以得到如下图所示结构的 json 文件：
-!\[\[Pasted image 20240914155431.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914155431.png]]
 
 各字段含义可参考：\
 https://jemalloc.net/jemalloc.3.html

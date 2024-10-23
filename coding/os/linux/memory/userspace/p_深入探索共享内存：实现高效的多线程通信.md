@@ -1,34 +1,23 @@
-原创 往事敬秋风 深度Linux
 
-_2024年03月15日 21:50_ _湖南_
+原创 往事敬秋风 深度Linux _2024年03月15日 21:50_ _湖南_
 
 共享内存是一种在多个进程或线程之间共享数据的机制。它允许不同的进程或线程可以直接读取和写入同一块内存区域，从而实现高效的数据共享和通信，通过使用共享内存，可以避免复制大量数据，减少了通信开销，并提高了程序的性能。常见的应用场景包括并行计算、多线程编程、分布式系统等。
 
-![](http://mmbiz.qpic.cn/mmbiz_png/dkX7hzLPUR0Ao40RncDiakbKx1Dy4uJicoqwn5GZ5r7zSMmpwHdJt32o95wdQmPZrBW038j8oRSSQllpnOUDlmUg/300?wx_fmt=png&wxfrom=19)
-
-**深度Linux**
-
-拥有15年项目开发经验及丰富教学经验，曾就职国内知名企业项目经理，部门负责人等职务。研究领域：Windows&Linux平台C/C++后端开发、Linux系统内核等技术。
-
-181篇原创内容
-
-公众号
-
 在使用共享内存时，需要注意对于并发访问的控制，如使用锁或其他同步机制来保证数据的一致性和安全性。此外，还需要谨慎处理资源管理问题，确保正确地释放共享内存以避免内存泄漏。
 
-## 一、共享内存原理
+# 一、共享内存原理
 
 共享内存是System V版本的最后一个进程间通信方式。共享内存，顾名思义就是允许两个不相关的进程访问同一个逻辑内存，共享内存是两个正在运行的进程之间共享和传递数据的一种非常有效的方式。不同进程之间共享的内存通常为同一段物理内存。进程可以将同一段物理内存连接到他们自己的地址空间中，所有的进程都可以访问共享内存中的地址。如果某个进程向共享内存写入数据，所做的改动将立即影响到可以访问同一段共享内存的任何其他进程。
 
 特别提醒：共享内存并未提供同步机制，也就是说，在第一个进程结束对共享内存的写操作之前，并无自动机制可以阻止第二个进程开始对它进行读取，所以我们通常需要用其他的机制来同步对共享内存的访问，例如信号量。
 
-### 1.1通信原理
+## 1.1 通信原理
 
 在Linux中，每个进程都有属于自己的进程控制块（PCB）和地址空间（Addr Space），并且都有一个与之对应的页表，负责将进程的虚拟地址与物理地址进行映射，通过内存管理单元（MMU）进行管理。两个不同的虚拟地址通过页表映射到物理空间的同一区域，它们所指向的这块区域即共享内存。
 
 共享内存的通信原理示意图：
-!\[\[Pasted image 20240914191904.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914191904.png]]
 
 对于上图我的理解是：当两个进程通过页表将虚拟地址映射到物理地址时，在物理地址中有一块共同的内存区，即共享内存，这块内存可以被两个进程同时看到。这样当一个进程进行写操作，另一个进程读操作就可以实现进程间通信。但是，我们要确保一个进程在写的时候不能被读，因此我们使用信号量来实现同步与互斥。
 
@@ -44,7 +33,7 @@ _2024年03月15日 21:50_ _湖南_
 
 因为直接在内存上操作，所以共享内存的速度也就提高了。
 
-### 1.2接口函数以及指令
+## 1.2 接口函数以及指令
 
 1.查看系统中的共享存储段
 
@@ -112,7 +101,7 @@ int shmctl(int shmid, int cmd, struct shmid_ds *buf);
 
 \[返回值\]：成功返回0，失败返回-1。
 
-### 1.3模拟共享内存
+## 1.3 模拟共享内存
 
 我们用server来创建共享存储段，用client获取共享存储段的标识符，二者关联起来之后server将数据写入共享存储段，client从共享区读取数据。通信结束之后server与client断开与共享区的关联，并由server释放共享存储段。
 
@@ -163,14 +152,13 @@ all:server client client:client.c comm.c	gcc -o $@ $^server:server.c comm.c	gcc 
 ```
 
 运行结果：
-!\[\[Pasted image 20240914192036.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240914192036.png]]
 
 （1）优点：我们可以看到使用共享内存进行进程之间的通信是非常方便的，而且函数的接口也比较简单，数据的共享还使进程间的数据不用传送，而是直接访问内存，加快了程序的效率。
 
 （2）缺点：共享内存没有提供同步机制，这使得我们在使用共享内存进行进程之间的通信时，往往需要借助其他手段来保证进程之间的同步工作。
 
-## 二、内存映射
+# 二、内存映射
 
 mmap I/O的描述符间接说明内存映射是对文件操作。另外，mmap另外可以在无亲缘的进程之间提供共享内存区。这样，类似的两个进程之间就是可以进行了通信。
 

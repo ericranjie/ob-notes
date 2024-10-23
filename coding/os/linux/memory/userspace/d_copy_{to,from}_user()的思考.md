@@ -1,23 +1,7 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2019-1-27 19:03 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
-## 引言
+# 引言
 
 我们对copy\_{to,from}\_user()接口的使用应该是再熟悉不过吧。基本Linux书籍都会介绍它的作用。毕竟它是kernel space和user space沟通的桥梁。所有的数据交互都应该使用类似这种接口。所以，我们没有理由不知道接口的作用。但是，我也曾经有过以下疑问。
 
@@ -29,7 +13,7 @@
 
 > 温馨提示：文章代码分析基于Linux-4.18.0，部分架构相关代码以ARM64为代表。
 
-## 百家争鸣
+# 百家争鸣
 
 针对以上问题当然是先百度。百度对于该问题的博客也是很多，足以看出这个问题肯定困惑着一大批Linux的爱好者。对于我的查阅结果来说，观点主要分成以下两种：
 
@@ -38,7 +22,7 @@
 
 从各家博客上，观点主要集中在第一点。看起来第一点受到大家的广泛认可。但是，注重实践的人又得出了第二种观点，毕竟是实践出真知。真理究竟是是掌握在少数人手里呢？还是群众的眼睛是雪亮的呢？当然，我不否定以上任何一种观点。也不能向你保证哪种观点正确。因为，我相信即使是曾经无懈可击的理论，随着时间的推移或者特定情况的改变理论也可能不再正确。比如，牛顿的经典力学理论（好像扯得有点远）。如果要我说人话，就是：随着时间的推移，Linux的代码在不断的变化。或许以上的观点在曾经正确。当然，也可能现在还正确。下面的分析就是我的观点了。同样，大家也是需要保持怀疑的态度。下面我就抛砖引玉。
 
-## 抛砖引玉
+# 抛砖引玉
 
 首先我们看下memcpy()和copy\_{to,from}\_user()的函数定义。参数几乎没有差别，都包含目的地址，源地址和需要复制的字节size。
 
@@ -107,7 +91,7 @@
 
 在打开CONFIG_ARM64_SW_TTBR0_PAN的选项后，测试以上代码就会导致kernel oops。原因就是内核态直接访问了用户空间地址。因此，在这种情况我们就不可以使用memcpy()。我们别无选择，只能使用copy\_{to,from}\_user()。当然了，我们也不是没有办法使用memcpy()，但是需要额外的操作。如何操作呢？下一节为你揭晓。
 
-## 刨根问底
+# 刨根问底
 
 既然提到了CONFIG_ARM64_SW_TTBR0_PAN的配置选项。当然我也希望了解其背后设计的原理。由于ARM64的硬件特殊设计，我们使用两个页表基地址寄存器ttbr0_el1和ttbr1_el1。处理器根据64 bit地址的高16 bit判断访问的地址属于用户空间还是内核空间。如果是用户空间地址则使用ttbr0_el1，反之使用ttbr1_el1。因此，ARM64进程切换的时候，只需要改变ttbr0_el1的值即可。ttbr1_el1可以选择不需要改变，因为所有的进程共享相同的内核空间地址。
 
@@ -134,7 +118,7 @@
 
 现在我们可以解答上一节中遗留的问题。怎样才能继续使用memcpy()？现在就很简单了，在memcpy()调用之前通过[uaccess_enable_not_uao()](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/include/asm/uaccess.h#L232)允许内核态访问用户空间地址，调用memcpy()，最后通过[uaccess_disable_not_uao()](https://elixir.bootlin.com/linux/v4.18/source/arch/arm64/include/asm/uaccess.h#L227)关闭内核态访问用户空间的能力。
 
-## 未雨绸缪
+# 未雨绸缪
 
 以上的测试用例都是建立在用户空间传递合法地址的基础上测试的，何为合法的用户空间地址？用户空间通过系统调用申请的虚拟地址空间包含的地址范围，即是合法的地址（不论是否分配物理页面建立映射关系）。既然要写一个接口程序，当然也要考虑程序的健壮性，我们不能假设所有的用户传递的参数都是合法的。我们应该预判非法传参情况的发生，并提前做好准备，这就是未雨绸缪。
 
@@ -247,7 +231,7 @@ struct exception_table_entry {	int insn, fixup;};
 
 1. 修改函数返回值x0 = -EFAULT (-14) 并返回（ARM64通过x0传递函数返回值）
 
-## 总结
+# 总结
 
 到了回顾总结的时候，copy\_{to,from}\_user()的思考也到此结束。我们来个总结结束此文。
 
@@ -259,7 +243,7 @@ struct exception_table_entry {	int insn, fixup;};
 
 标签: [copy_to_user](http://www.wowotech.net/tag/copy_to_user)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [内存一致性模型](http://www.wowotech.net/memory_management/456.html) | [编译乱序(Compiler Reordering)](http://www.wowotech.net/kernel_synchronization/453.html)»
 

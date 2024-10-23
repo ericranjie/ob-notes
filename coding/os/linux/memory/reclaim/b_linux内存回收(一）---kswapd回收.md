@@ -1,6 +1,8 @@
 
 奇小葩 Linux阅码场 _2021年12月22日 10:14_
+
 _**原文作者：奇小葩**_
+
 _**原文链接：https://blog.csdn.net/u012489236/article/details/120587124**_
 
 在linux操作系统中，当内存充足的时候，内核会尽量使用内存作为文件缓存(page cache)，从而提高系统的性能。例如page cache缓冲硬盘中的内容，dcache、icache缓存文件系统的数据，这些内容是为了提升性能而设计的，还可以再次从硬盘中重新读取来构建对象，这部分内容可以在内存紧张的时候可以直接释放。
@@ -63,6 +65,7 @@ _**原文链接：https://blog.csdn.net/u012489236/article/details/120587124**_
 - 针对第②种，Linux系统会触发直接内存回收(direct reclaim)，在内核调用页分配函数分配物理页面时，由于系统内存短缺，不能满足分配请求，内核就会直接触发页面回收机制，尝试回收内存来解决问题
 
 这两种回收的触发方式不同，其区别如下图所示
+
 ![[Pasted image 20240915195643.png]]
 
 # **3 kswapd初始化**
@@ -70,6 +73,7 @@ _**原文链接：https://blog.csdn.net/u012489236/article/details/120587124**_
 kswpad本身是内核线程，它和调用者的关系是异步的，如test进程尝试调用alloc_pages()来分配内存，当发现在低水位情况下无法分配出内存时，它唤醒kswapd内核线程。这时，kswapd内核线程就开始执行页面回收工作了。同时test进程会尝试其他的方法来分配内存，如调用直接内存回收。
 
 Linux内核中有一个非常重要的内核线程kswapda，它负责在内存不足的情况下回收页面。kswapd内核线程初始化时会为系统每个NUMA内存结点创建一个名为kswap%d的内核线程。
+
 ![[Pasted image 20240915195649.png]]
 
 - swap_setup函数根据物理内存大小设定全局变量page_cluster，当megs小于16时候，page_cluster为2，否则为3
@@ -178,6 +182,7 @@ shrink_node_memcg函数使基于内存节点的页面回收函数，它被kswapd
 ![[Pasted image 20240915195742.png]]
 
 shrink_node_memcg函数中，调用了get_scan_count函数之后，获取到了扫描页面的信息后，就开始进入主题对LRU链表进行扫描处理了。它会对匿名页和文件页做平衡处理，选择更合适的页面来进行回收。当回收的页面超过了目标页面数后，将停止对文件页和匿名页两者间LRU页面数少的那一方的扫描，并调整对页面数多的另一方的扫描速度。最后，如果不活跃页面少于活跃页面，则需要将活跃页面迁移到不活跃页面链表中。
+
 ![[Pasted image 20240915195747.png]]
 
 # **7 get_scan_count**
@@ -203,6 +208,7 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 这个函数用于获取针对文件页和匿名页的扫描页面数。这个函数决定内存回收每次扫描多少页，匿名页和文件页分别是多少，比例如何分配等。
 
 在函数的执行过程中，根据四种扫描平衡的方法标签来最终选择计算方式，四种扫描平衡标签如下：
+
 ![[Pasted image 20240915195754.png]]
 
 ![[Pasted image 20240915195802.png]]
@@ -227,6 +233,7 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 # **9 inactive_list_is_low**
 
 该函数的目的是判断传入的lru链表类型对应的不活跃lru链表上的页框数量是否过低，返回true表明过低。
+
 ![[Pasted image 20240915195840.png]]
 
 系统总是希望不活跃的匿名页面数量应该保持比较少，因为这样保证系统没有太多的工作可做，可以让页面回收的工作变得少。同时也希望而不活跃的文件映射页面也应该相对少一些，这样可以在活跃的LRU链表中预留更多的内存，更多的page cache，更高效的文件读取工作。
@@ -250,6 +257,7 @@ static void get_scan_count(struct lruvec *lruvec, struct mem_cgroup *memcg,
 # **10 shrink_active_list**
 
 shrink_active_list用于扫描活跃LRU链表，包括匿名页面或文件映射页面，把最近一直没有人访问的页面添加到不活跃的LRU链表中。
+
 ![[Pasted image 20240915195853.png]]
 
 # **11 shrink_inactive_list**
@@ -267,6 +275,7 @@ shrink_active_list用于扫描活跃LRU链表，包括匿名页面或文件映�
 - 调用shrink_page_list来扫描页面并回收页面，nr_reclaimed表示成功回收的页面数量
 
 我们关注最重要的函数shrink_page_list，它决定在zone->inactive_list中的页面最后是否能被回收释放掉。这个函数的处理流程总结如下
+
 ![[Pasted image 20240915195859.png]]
 
 对于页面回收过程中，我们会遇到很多意想不到的情况，如大量脏页、大量正在回写的页面堵塞了块设备的I/O通道等问题，这些问题都会严重的影响页面回收的机制，甚至用户的体验。为了捕获这些信息，页面回收机制使用以下方式

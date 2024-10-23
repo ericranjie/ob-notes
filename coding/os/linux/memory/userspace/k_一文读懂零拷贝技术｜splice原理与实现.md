@@ -1,13 +1,13 @@
-Original songsong001 Linux内核那些事
-_2022年09月27日 13:05_ _广东_
 
-## splice 原理重温
+Original songsong001 Linux内核那些事 _2022年09月27日 13:05_ _广东_
+
+# splice 原理重温
 
 在《[splice使用](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466923&idx=1&sn=acf2fb71a960f3831f9b98657b39d4ce&scene=21#wechat_redirect)》一文中介绍了 `splice` 的原理和使用，现在我们来分析一下 `splice` 的代码实现。
 
 我们先来回顾一下 `splice` 的原理：
 
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/ciab8jTiab9J7urRMyNiaOWPSWzxSibUHQrjuP65XsSGlokb1QZwL2R6MK6YF1hmO1AibRkO9kdHYC60uKLBhnvrdEA/640?wx_fmt=jpeg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023190259.png]]
 
 如上图所示，使用 `splice` 拷贝数据时，需要通过管道作为中转。`splice` 首先将 `页缓存` 绑定到 `管道` 的写端，然后通过 `管道` 的读端读取到 `页缓存` 的数据，并且拷贝到 `socket` 缓冲区中。
 
@@ -17,7 +17,7 @@ _2022年09月27日 13:05_ _广东_
 !\[\[Pasted image 20240914164257.png\]\]
 通过将文件页缓存绑定到管道的环形缓冲区后，就可以通过管道的读端读取文件页缓存的数据。
 
-## splice 代码实现
+# splice 代码实现
 
 在《[splice使用](https://mp.weixin.qq.com/s?__biz=MzA3NzYzODg1OA==&mid=2648466923&idx=1&sn=acf2fb71a960f3831f9b98657b39d4ce&scene=21#wechat_redirect)》一文中介绍过 `splice` 的使用过程，要将文件内容发送到客户端连接的步骤如下：
 
@@ -43,7 +43,7 @@ static longdo_splice(struct file *in, loff_t *off_in,           
 
 下面我们分别来说明这两种情况的处理过程。
 
-### 1. 输入端是一个管道
+## 1. 输入端是一个管道
 
 如果输入端是一个管道（也就是说从管道拷贝数据到输出端句柄），那么将会调用 `do_splice_from()` 函数进行处理，`do_splice_from()` 函数的实现如下：
 
@@ -76,7 +76,7 @@ ssize_t__splice_from_pipe(struct pipe_inode_info *pipe, struct splice_desc 
 sys_splice()└→ do_splice()   └→ do_splice_from()      └→ generic_file_splice_write()         └→ __splice_from_pipe()            └→ pipe_to_file()
 ```
 
-### 2. 输出端是一个管道
+## 2. 输出端是一个管道
 
 如果输出端是一个管道（也就是说将输入端与管道绑定），那么将会调用 `do_splice_to()` 函数进行处理，`do_splice_to()` 函数的实现如下：
 
@@ -117,7 +117,7 @@ ssize_tsplice_to_pipe(struct pipe_inode_info *pipe, struct splice_pipe_desc�
 sys_splice()└→ do_splice()   └→ do_splice_to()      └→ generic_file_splice_read()         └→ __generic_file_splice_read()            └→ splice_to_pipe()
 ```
 
-## 总结
+# 总结
 
 本文主要介绍了 `splice` 的原理与实现，`splice` 是 `零拷贝技术` 的一种实现。希望通过本文，能够让读者对 `零拷贝技术` 有更深入的理解。
 
