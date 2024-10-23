@@ -41,7 +41,7 @@ Linux 下进程和线程的区别其实并不大，尤其是在讨论原理和�
 
 epoll 是 Linux 内核的可扩展 I/O 事件通知机制，其最大的特点就是性能优异。下图是 **libevent**(一个知名的异步事件处理软件库)对 select，poll，epoll ，kqueue 这几个 I/O 多路复用技术做的性能测试。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023110825.png]]
 
 很多文章在描述 epoll 性能时都引用了这个基准测试，但少有文章能够清晰的解释这个测试结果。
 
@@ -55,15 +55,15 @@ epoll 是 Linux 内核的可扩展 I/O 事件通知机制，其最大的特点�
 
 问题好像越来越多了，看来我们需要更深入的研究了。
 
-### **4 epoll背后的原理**
+# **4 epoll背后的原理**
 
-#### **4.1 阻塞**
+## **4.1 阻塞**
 
-**4.1.1 为什么阻塞**
+### **4.1.1 为什么阻塞**
 
 我们以网卡接收数据举例，回顾一下之前我分享过的网卡接收数据的过程。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023110851.png]]
 
 为了方便理解，我尽量简化技术细节，可以把接收数据的过程分为4步：
 
@@ -81,7 +81,7 @@ epoll 是 Linux 内核的可扩展 I/O 事件通知机制，其最大的特点�
 
 阻塞是进程调度的关键一环，指的是进程在等待某事件发生之前的等待状态。请看下表，在 Linux 中，进程状态大致有7种（在 include/linux/sched.h 中有更多状态）：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023110909.png]]
 
 从说明中其实就可以发现，“可运行状态”会占用 CPU 资源，另外创建和销毁进程也需要占用 CPU 资源（内核）。重点是，当进程被"阻塞/挂起"时，是不会占用 CPU 资源的。
 
@@ -89,21 +89,21 @@ epoll 是 Linux 内核的可扩展 I/O 事件通知机制，其最大的特点�
 
 另外讲个知识点，为了方便时间片的调度，所有“可运行状态”状态的进程，会组成一个队列，就叫\*\*“工作队列”\*\*。
 
-**4.1.3 阻塞的恢复**
+### **4.1.3 阻塞的恢复**
 
 内核当然可以很容易的修改一个进程的状态，问题是网络 IO 中，内核该修改那个进程的状态。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023110925.png]]
 
 socket 结构体，包含了两个重要数据：进程 ID 和端口号。进程 ID 存放的就是执行 connect，send，read 函数，被挂起的进程。在 socket 创建之初，端口号就被确定了下来，操作系统会维护一个端口号到 socket 的数据结构。
 
 当网卡接收到数据时，数据中一定会带着端口号，内核就可以找到对应的 socket，并从中取得“挂起”进程的 ID。将进程的状态修改为“可运行状态”（加入到工作队列）。此时内核代码执行完毕，将控制权交还给用户态。通过正常的“CPU 时间片的调度”，用户进程得以处理数据。
 
-**4.1.4 进程模型**
+### **4.1.4 进程模型**
 
 上面介绍的整个过程，基本就是 BIO（阻塞 IO）的基本原理了。用户进程都是独立的处理自己的业务，这其实是一种符合进程模型的处理方式。
 
-#### **4.2 上下文切换的优化**
+## **4.2 上下文切换的优化**
 
 上面介绍的过程中，有两个地方会造成频繁的上下文切换，效率可能会很低。
 
@@ -121,7 +121,7 @@ socket 结构体，包含了两个重要数据：进程 ID 和端口号。进程
 
 所以使用了 NAPI 的驱动，接收数据过程可以简化描述为：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023111017.png]]
 
 1. NIC 接收到数据，通过 DMA 方式写入内存(Ring Buffer 和 sk_buff)。
 
@@ -135,19 +135,19 @@ socket 结构体，包含了两个重要数据：进程 ID 和端口号。进程
 
 一句话概括就是：等着收到一批数据，再一次批量的处理数据。
 
-**4.2.2 单线程的 IO 多路复用**
+### **4.2.2 单线程的 IO 多路复用**
 
 内核优化“进程间上下文切换”的技术叫的“IO 多路复用”，思路和 NAPI 是很接近的。
 
 每个 socket 不再阻塞读写它的进程，而是用一个专门的线程，批量的处理用户态数据，这样就减少了线程间的上下文切换。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023111034.png]]
 
 作为 IO 多路复用的一个实现，select 的原理也很简单。所有的 socket 统一保存执行 select 函数的（监视进程）进程 ID。任何一个 socket 接收了数据，都会唤醒“监视进程”。内核只要告诉“监视进程”，那些 socket 已经就绪，监视进程就可以批量处理了。
 
-#### **4.3 IO 多路复用的进化**
+## **4.3 IO 多路复用的进化**
 
-**4.3.1 对比 epoll 与 select**
+### **4.3.1 对比 epoll 与 select**
 
 select，poll 和 epoll 都是“IO 多路复用”，那为什么还会有性能差距呢？篇幅限制，这里我们只简单对比 select 和 epoll 的基本原理差异。
 
@@ -179,11 +179,11 @@ select，poll 和 epoll 都是“IO 多路复用”，那为什么还会有性�
 
 **Select 示例代码**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023111051.png]]
 
 **Epoll 示例代码**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023111059.png]]
 
 另外，epoll_create 底层实现，到底是不是红黑树，其实也不太重要（完全可以换成 hashtable）。重要的是 efd 是个指针，其数据结构完全可以对外透明的修改成任意其他数据结构。
 
@@ -205,7 +205,7 @@ select，poll 和 epoll 都是“IO 多路复用”，那为什么还会有性�
 
 2、select、poll 和 epoll，这三个“IO 多路复用 API”是相继发布的。这说明了，它们是 IO 多路复用的3个进化版本。因为 API 设计缺陷，无法在不改变 API 的前提下优化内部逻辑。所以用 poll 替代 select，再用 epoll 替代 poll。
 
-#### **4.4 总结**
+## **4.4 总结**
 
 我们花了三个章节，阐述 Epoll 背后的原理，现在用三句话总结一下。
 
@@ -215,7 +215,7 @@ select，poll 和 epoll 都是“IO 多路复用”，那为什么还会有性�
 
 1. 为了优化“内核与监视进程的交互”，设计了三个版本的 API(select,poll,epoll)。
 
-### **5 Diss 环节**
+# **5 Diss 环节**
 
 讲完“Epoll 背后的原理”，已经可以回答最初的几个问题。这已经是一个完整的文章，很多人劝我删掉下面的 diss 环节。
 
@@ -225,9 +225,9 @@ select，poll 和 epoll 都是“IO 多路复用”，那为什么还会有性�
 
 关于阻塞，非阻塞，同步，异步的分类，这么分自然有其道理。但是在操作系统的角度来看\*\*“这样分类，容易产生误解，并不好”\*\*。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023111208.png]]
 
-**5.1.1 阻塞和非阻塞**
+### **5.1.1 阻塞和非阻塞**
 
 Linux 下所有的 IO 模型都是阻塞的，这是收发数据的基本原理导致的。阻塞用户线程是一种高效的方式。
 
@@ -235,7 +235,7 @@ Linux 下所有的 IO 模型都是阻塞的，这是收发数据的基本原理�
 
 换句话说，阻塞不是问题，运行才是问题，运行才会消耗 CPU。IO 多路复用不是减少了阻塞，是减少了运行。上下文切换才是问题，IO 多路复用，通过减少运行的进程，有效的减少了上下文切换。
 
-**5.1.2 同步和异步**
+### **5.1.2 同步和异步**
 
 Linux 下所有的 IO 模型都是同步的。BIO 是同步的，select 同步的，poll 同步的，epoll 还是同步的。
 
@@ -268,41 +268,3 @@ epoll 到底用没用到 mmap？
 - END -
 
 ______________________________________________________________________
-
-**看完一键三连****在看****，**转发****，点赞\*\*\*\*
-
-**是对文章最大的赞赏，极客重生感谢你**\*\*!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)\*\*
-
-推荐阅读
-
-\[
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-深入理解Linux异步I/O框架 io_uring
-
-\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247562787&idx=1&sn=471a0956249ca789afad774978522717&chksm=c1850172f6f28864474f9832bfc61f723b5f54e174417d570a6b1e3f9f04bda7b539662c0bed&scene=21#wechat_redirect)
-
-\[
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-五个半小时
-
-\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247563566&idx=1&sn=26156d79dffb3f0f10b6a26931f993cc&chksm=c1850e7ff6f28769b6ff3358366e917d3d54fc0f0563131422da4bed201768c958262b5d5a99&scene=21#wechat_redirect)
-
-\[
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-服务器性能优化之网络性能优化
-
-\](http://mp.weixin.qq.com/s?\_\_biz=MzkyMTIzMTkzNA==&mid=2247561718&idx=1&sn=f93ad69bff3ab80665e4b9d67265e6bd&chksm=c18506a7f6f28fb12341c3e439f998d09c4b1d93f8bf59af6b1c6f4427cea0c48b51244a3e53&scene=21#wechat_redirect)
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-求点赞，在看，分享三连!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-阅读 1896
-
-​

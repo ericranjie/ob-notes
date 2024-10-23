@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "code-griding-note.md",
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "code-griding-note.md"
+                "file": "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md"
               }
             }
           }
@@ -148,41 +148,41 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
-    "README.md",
-    "zx99-image/Pasted image 20241022201640.png",
-    "coding/os/linux/io/k_Linux IO 那些事儿.md",
-    "zx99-image/Pasted image 20241022202859.png",
+    "zx99-image/Pasted image 20241023111325.png",
+    "coding/os/linux/io/k_深入理解SR-IOV和IO虚拟化.md",
+    "zx99-image/Pasted image 20241023111423.png",
+    "zx99-image/Pasted image 20241023111411.png",
+    "zx99-image/Pasted image 20241023111354.png",
+    "zx99-image/Pasted image 20241023111334.png",
     "coding/os/linux/io/i_看一遍就理解：IO模型详解.md",
-    "zx99-image/Pasted image 20241022202658.png",
-    "zx99-image/Pasted image 20241022202645.png",
-    "zx99-image/Pasted image 20241022202629.png",
-    "zx99-image/Pasted image 20241022202615.png",
-    "coding/os/linux/io/i_浅析Linux sockfs文件系统.md",
-    "coding/os/linux/io/i_图解 Linux  管道通信的原理？.md",
-    "coding/os/linux/io/b_直播回顾：如何对付臭名昭著的 IO 夯？诊断利器来了 龙蜥技术.md",
-    "zx99-image/Pasted image 20241022202037.png",
-    "zx99-image/Pasted image 20241022202025.png",
-    "zx99-image/Pasted image 20241022202013.png",
     "coding/os/linux/io/b_block io生命历程.md",
-    "zx99-image/Pasted image 20241022201707.png",
     "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
     "coding/os/linux/io/epoll/p_盘点Linux Epoll那些致命弱点.md",
     "coding/os/linux/io/epoll/m_深入理解 Linux 的 epoll 机制.md",
     "coding/os/linux/io/epoll/k_epoll背后的原理.md",
+    "zx99-image/Pasted image 20241023110825.png",
+    "zx99-image/Pasted image 20241023111208.png",
+    "zx99-image/Pasted image 20241023111059.png",
+    "zx99-image/Pasted image 20241023111051.png",
+    "zx99-image/Pasted image 20241023111034.png",
+    "code-griding-note.md",
+    "README.md",
+    "coding/os/linux/io/k_Linux IO 那些事儿.md",
+    "coding/os/linux/io/i_浅析Linux sockfs文件系统.md",
+    "coding/os/linux/io/i_图解 Linux  管道通信的原理？.md",
+    "coding/os/linux/io/b_直播回顾：如何对付臭名昭著的 IO 夯？诊断利器来了 龙蜥技术.md",
     "coding/os/linux/io/epoll/a_深入揭秘 epoll 是如何实现 IO 多路复用的.md",
     "coding/os/linux/io/epoll/a_大疆一面：请说出水平触发和边缘触发的区别？.md",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
     "coding/compiler/b_编译乱序(Compiler Reordering).md",
     "0x01-leetcode/algorithm/dynamic-programming/subarray-subsequence/longest-increasing-subsequence/m_300. Longest Increasing Subsequence.md",
-    "code-griding-note.md",
     "coding/os/linux/memory/memory-manage/b_论好名字的重要性： Linux内核page到folio的变迁.md",
     "coding/os/linux/memory/memory-manage/i_Fix-Mapped Addresses.md",
     "coding/os/linux/memory/memory-manage/i_fixmap addresses原理.md",
     "coding/os/linux/memory/memory-manage/i_KSM机制剖析 — Linux 内核中的内存去耦合.md",
     "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
     "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
-    "coding/os/linux/memory/memory-manage/i_Linux kernel内存管理的基本概念.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
