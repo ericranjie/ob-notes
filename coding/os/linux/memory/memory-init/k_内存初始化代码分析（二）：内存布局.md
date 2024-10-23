@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-11-18 18:25 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 一、前言

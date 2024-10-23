@@ -1,3 +1,4 @@
+
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-12-21 18:51 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 Linux的物理内存管理采用了以页为单位的buddy system（伙伴系统），但是很多情况下，内核仅仅需要一个较小的对象空间，而且这些小块的空间对于不同对象又是变化的、不可预测的，所以需要一种类似用户空间堆内存的管理机制(malloc/free)。然而内核对对象的管理又有一定的特殊性，有些对象的访问非常频繁，需要采用缓冲机制；对象的组织需要考虑硬件cache的影响；需要考虑多处理器以及NUMA架构的影响。90年代初期，在Solaris 2.4操作系统中，采用了一种称为“slab”（原意是大块的混凝土）的缓冲区分配和管理方法，在相当程度上满足了内核的特殊需求。
@@ -17,11 +18,11 @@ Linux的物理内存管理采用了以页为单位的buddy system（伙伴系统
 整体数据结构关系如下图所示：
 !\[\[Pasted image 20241008093809.png\]\]
 
-# **1 SLUB\*\*\*\*分配器的初始化**
+# **1 SLUB分配器的初始化**
 
 SLUB初始化有两个重要的工作：第一，创建用于申请struct kmem_cache和struct kmem_cache_node的kmem_cache；第二，创建用于常规kmalloc的kmem_cache。
 
-## **1.1** **申请kmem_cache\*\*\*\*的kmem_cache**
+## **1.1** **申请kmem_cache的kmem_cache**
 
 第一个工作涉及到一个“先有鸡还是先有蛋”的问题，因为创建kmem_cache需要从kmem_cache的缓冲区申请，而这时候还没有创建kmem_cache的缓冲区。kernel的解决办法是先用两个静态变量boot_kmem_cache和boot_kmem_cache_node来保存struct kmem_cach和struct kmem_cache_node缓冲区管理数据，以两个静态变量为基础申请大小为struct kmem_cache和struct kmem_cache_node对象大小的slub缓冲区，随后再从这些缓冲区中分别申请两个kmem_cache，然后把boot_kmem_cache和boot_kmem_cache_node中的内容拷贝到新申请的对象中，从而完成了struct kmem_cache和struct kmem_cache_node管理结构的bootstrap（自引导）。
 
@@ -93,13 +94,14 @@ SLUB初始化有两个重要的工作：第一，创建用于申请struct kmem_c
 创建缓存通过接口kmem_cache_create进行，在创建新的缓存以前，尝试找到可以合并的缓存，合并条件包括对对象大小以及缓存属性的判断，如果可以合并则直接返回已存在的kmem_cache，并创建一个kobj链接指向同一个节点。
 
 创建新的缓存主要是申请管理结构暂用的空间，并初始化，这些管理结构包括kmem_cache、kmem_cache_nodes、kmem_cache_cpu。同时在sysfs创建kobject节点。最后把kmem_cache加入到全局cahce链表slab_caches中。
-!\[\[Pasted image 20241008093858.png\]\]
+
+![[Pasted image 20241008093858.png]]
 
 ## **2.2** **缓存的销毁**
 
 销毁过程比创建过程简单的多，主要工作是释放partial队列所有page，释放kmem_cache_cpu，释放每个node的kmem_cache_node，最后释放kmem_cache本身。
 
-![](http://www.wowotech.net/content/uploadfile/201512/10fb1450695162.png)
+![[Pasted image 20241023163651.png]]
 
 # **3** **申请对象**
 
@@ -111,11 +113,11 @@ SLUB初始化有两个重要的工作：第一，创建用于申请struct kmem_c
 
 cpu_slab的freelist则保存着当前第一个空闲对象的地址。
 
-![](http://www.wowotech.net/content/uploadfile/201512/09dd1450695162.png)
+![[Pasted image 20241023163703.png]]
 
 如果本地CPU缓存没有空闲对象，则申请新的slab；如果有空闲对象，但是内存node不相符，则deactive当前cpu_slab，再申请新的slab。
 
-![](http://www.wowotech.net/content/uploadfile/201512/82661450695162.png)
+![[Pasted image 20241023163717.png]]
 
 deactivate_slab主要进行两步工作：
 

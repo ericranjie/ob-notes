@@ -61,7 +61,7 @@ Memory model也是一个演进过程，刚开始的时候，使用flat memory去
 
 从page到PFN稍微有一点麻烦，实际上PFN分成两个部分：一部分是section index，另外一个部分是page在该section的偏移。我们需要首先从page得到section index，也就得到对应的memory_section，知道了memory_section也就知道该page在section_mem_map，也就知道了page在该section的偏移，最后可以合成PFN。对于page到section index的转换，sparse memory有2种方案，我们先看看经典的方案，也就是保存在page->flags中（配置了SECTION_IN_PAGE_FLAGS）。这种方法的最大的问题是page->flags中的bit数目不一定够用，因为这个flag中承载了太多的信息，各种page flag，node id，zone id现在又增加一个section id，在不同的architecture中无法实现一致性的算法，有没有一种通用的算法呢？这就是CONFIG_SPARSEMEM_VMEMMAP。具体的算法可以参考下图：
 
-![](http://www.wowotech.net/content/uploadfile/201608/a6e21472616210.gif)
+![[Pasted image 20241023164015.png]]
 
 （上面的图片有一点问题，vmemmap只有在PHYS_OFFSET等于0的情况下才指向第一个struct page数组，一般而言，应该有一个offset的，不过，懒得改了，哈哈）
 

@@ -9,7 +9,7 @@
 
 在详细描述linux kernel对内存的初始化过程之前，我们必须首先了解kernel在执行第一条语句之前所面临的处境。这时候的内存状况可以参考下图：
 
-![](http://www.wowotech.net/content/uploadfile/201610/46d41476331680.gif)
+![[Pasted image 20241023162657.png]]
 
 bootloader有自己的方法来了解系统中memory的布局，然后，它会将绿色的kernel image和蓝色dtb image copy到了指定的内存位置上。kernel image最好是位于main memory起始地址偏移TEXT_OFFSET的位置，当然，TEXT_OFFSET需要和kernel协商好。kernel image是否一定位于起始的main memory（memory address最低）呢？也不一定，但是对于kernel而言，低于kernel image的内存，kernel是不会纳入到自己的内存管理系统中的。对于dtb image的位置，linux并没有特别的要求。由于这时候MMU是turn off的，因此CPU只能看到物理地址空间。对于cache的要求也比较简单，只有一条：kernel image对应的cache必须clean to PoC，即系统中所有的observer在访问kernel image对应内存地址的时候是一致性的。
 
@@ -19,7 +19,7 @@ bootloader有自己的方法来了解系统中memory的布局，然后，它会�
 
 在体系结构相关的汇编初始化阶段，我们会准备二段地址的页表：一段是identity mapping，其实就是把地址等于物理地址的那些虚拟地址mapping到物理地址上去，打开MMU相关的代码需要这样的mapping（别的CPU不知道，但是ARM ARCH强烈推荐这么做的）。第二段是kernel image mapping，内核代码欢快的执行当然需要将kernel running需要的地址（kernel txt、rodata、data、bss等等）进行映射了。具体的映射情况可以参考下图：
 
-![](http://www.wowotech.net/content/uploadfile/201610/95491476331682.gif)
+![[Pasted image 20241023162731.png]]
 
 turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.text，实际上对应上图中物理地址空间的IDMAP_TEXT这个block。这个区域的代码被mapping了两次，做为kernel image的一部分，它被映射到了\_\_idmap_text_start开始的虚拟地址上去，此外，假设IDMAP_TEXT block的物理地址是A地址，那么它还被映射到了A地址开始的虚拟地址上去。虽然上图中表示的A地址似乎要大于PAGE_OFFSET，不过实际上不一定需要这样的关系，这和具体处理器的实现有关。
 
@@ -35,7 +35,7 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 
 下面这张图片给出了解决方案：
 
-![](http://www.wowotech.net/content/uploadfile/201610/d2921476331683.gif)
+![[Pasted image 20241023162751.png]]
 
 整个虚拟地址空间那么大，可以被平均分成两半，上半部分的虚拟地址空间主要各种特定的功能，而下半部分主要用于物理内存的直接映射。对于DTB而言，我们借用了fixed-mapped address这个概念。fixed map是被linux kernel用来解决一类问题的机制，这类问题的共同特点是：（1）在很早期的阶段需要进行地址映射，而此时，由于内存管理模块还没有完成初始化，不能动态分配内存，也就是无法动态分配创建映射需要的页表内存空间。（2）物理地址是固定的，或者是在运行时就可以确定的。对于这类问题，内核定义了一段固定映射的虚拟地址，让使用fix map机制的各个模块可以在系统启动的早期就可以创建地址映射，当然，这种机制不是那么灵活，因为虚拟地址都是编译时固定分配的。
 
@@ -47,7 +47,7 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 
 除了DTB，在启动阶段，还有其他的模块也想要创建地址映射，当然，对于这些需求，内核统一采用了fixmap的机制来应对，fixmap的具体信息如下图所示：
 
-![](http://www.wowotech.net/content/uploadfile/201610/5c8f1476331684.gif)
+![[Pasted image 20241023162810.png]]
 
 从上面这个图片可以看出fix-mapped虚拟地址分成两段，一段是permanent fix map，一段是temporary fixmap。所谓permanent表示映射关系永远都是存在的，例如FDT区域，一旦完成地址映射，内核可以访问DTB之后，这个映射关系一直都是存在的。而temporary fixmap则不然，一般而言，某个模块使用了这部分的虚拟地址之后，需要尽快释放这段虚拟地址，以便给其他模块使用。
 
@@ -81,7 +81,7 @@ turn on MMU相关的代码被放入到一个特别的section，名字是.idmap.t
 
 怎么办呢？内核采用了一个巧妙的办法：那就是控制创建地址映射，memblock_alloc分配页表内存的顺序。也就是说刚开始的时候创建的地址映射不需要页表内存的分配，当内核需要调用memblock_alloc进行页表物理地址分配的时候，很多已经创建映射的内存已经ready了，这样，在调用create_mapping的时候不需要分配页表内存。更具体的解释参考下面的图片：
 
-![](http://www.wowotech.net/content/uploadfile/201610/634b1476331687.gif)
+![[Pasted image 20241023162828.png]]
 
 我们知道，在内核编译的时候，在BSS段之后分配了几个page用于swapper进程地址空间（内核空间）的映射，当然，由于kernel image不需要mapping那么多的地址，因此swapper进程translation table的最后一个level中的entry不会全部的填充完毕。换句话说：swapper进程页表可以支持远远大于kernel image mapping那一段的地址区域，实际上，它可以支持的地址段的size是SWAPPER_INIT_MAP_SIZE。为（PAGE_OFFSET，PAGE_OFFSET＋SWAPPER_INIT_MAP_SIZE）这段虚拟内存创建地址映射，mapping到（PHYS_OFFSET，PHYS_OFFSET＋SWAPPER_INIT_MAP_SIZE）这段物理内存的时候，调用create_mapping不会发生内存分配，因为所有的页表都已经存在了，不需要动态分配。
 

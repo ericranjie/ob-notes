@@ -1,3 +1,4 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-2-22 21:49 分类：[内存管理](http://www.wowotech.net/sort/memory_management)
 
 # 1. 前言
@@ -31,8 +32,10 @@ aarch64-linux-gnu-gcc -o slabinfo slabinfo.c\
 
 # 3. object layout
 
-配置kernel选项CONFIG_SLUB_DEBUG_ON后，在创建kmem_cache的时候会传递很多flags（SLAB_CONSISTENCY_CHECKS、SLAB_RED_ZONE、SLAB_POISON、SLAB_STORE_USER）。针对这些flags，SLUB allocator管理的object对象的format将会发生变化。如下图所示。\
-[![12.png](http://www.wowotech.net/content/uploadfile/201802/9eb61519307945.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/9eb61519307945.png)\
+配置kernel选项CONFIG_SLUB_DEBUG_ON后，在创建kmem_cache的时候会传递很多flags（SLAB_CONSISTENCY_CHECKS、SLAB_RED_ZONE、SLAB_POISON、SLAB_STORE_USER）。针对这些flags，SLUB allocator管理的object对象的format将会发生变化。如下图所示。
+
+![[Pasted image 20241023163351.png]]
+
 SLUBU DEBUG关闭的情况下，free pointer是内嵌在object之中的，但是SLUB DEBUG打开之后，free pointer是在object之外，并且多了很多其他的内存，例如red zone、trace和red_left_pad等。这里之所以将FP后移就是因为为了检测use-after-free问题,当free object时会在将object填充magic num(0x6b)。如果不后移的话，岂不是破坏了object之间的单链表关系。
 
 ## 3.1. Red zone有什么用
@@ -46,8 +49,10 @@ padding是sizeof(void ) bytes的填充区域，在分配slab缓存池时，会�
 
 ## 3.3. red_left_pad有什么用
 
-red_left_pad和Red zone的作用一致。都是为了检测oob。区别就是Red zone检测right oob，而red_left_pad是检测left oob。如果仅仅看到上面图片中object layout。你可能会好奇，如果发生left oob，那么应该是前一个object的red_left_pad区域被改写，而不是当前object的red_left_pad。如果你注意到这个问题，还是很机智的，这都被你发现了。为了避免这种情况的发生，SLUB allocator在初始化slab缓存池的时候会做一个转换。\
-[![13.png](http://www.wowotech.net/content/uploadfile/201802/c00b1519307827.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/c00b1519307827.png)\
+red_left_pad和Red zone的作用一致。都是为了检测oob。区别就是Red zone检测right oob，而red_left_pad是检测left oob。如果仅仅看到上面图片中object layout。你可能会好奇，如果发生left oob，那么应该是前一个object的red_left_pad区域被改写，而不是当前object的red_left_pad。如果你注意到这个问题，还是很机智的，这都被你发现了。为了避免这种情况的发生，SLUB allocator在初始化slab缓存池的时候会做一个转换。
+
+![[Pasted image 20241023163416.png]]
+
 如果你去追踪kmem_cache_create()，在calculate_sizes()中布局object。区域划分的layout就如同你看到上图的上半部分。当我第一次看到这段代码的时候，我也这么认为。实际上却不是这样的。在struct page结构中有一个freelist指针，freelist会指向第一个available object。在构建object之间的单链表的时候，object首地址实际上都会加上一个red_left_pad的偏移，这样实际的layout就如同图片中转换之后的layout。为什么会这样呢？因为在有SLUB DEBUG功能的时候，并没有检测left oob功能。这种转换是后续一个补丁的修改。补丁就是为了增加left oob检测功能。\
 做了转换之后的red_left_pad就可以检测left oob。检测的方法和Red zone区域一样，填充的magic num也一样，差别只是检测的区域不一样而已。
 
@@ -70,19 +75,28 @@ SLUB 中有哪些magic num呢?所有使用的magic num都宏定义在include/lin
 
 SLUB_RED_INACTIVE和SLUB_RED_ACTIVE用来填充Red zone和red_left_pad，目的是检测oob。POISON_INUSE用来填充padding区域，同样可以用来检测oob，只不过是poison overwrite。POISON_FREE作用是检测use-after-free问题。POISON_END是object可用区域的最后一个字节填充。\
 4.2. slab缓存池填充\
-当SLUB allocator申请一块内存作为slab 缓存池的时候，会将整块内存填充POISON_INUSE。如下图所示。\
-[![14.png](http://www.wowotech.net/content/uploadfile/201802/7b6f1519307828.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/7b6f1519307828.png)\
-然后通过init_object()函数将相关的区域填充成free object的情况，并且建立单链表。注意freelist指针指向的位置，SLUB_DEBUG on和off的情况下是不一样的。主要就是3.3节提到的转换关系。为什么这里填充成free object的情况呢？其实就是为了假装我这里都是free的object，也是符合情理的。object初始化流程如下。\
-[![15.png](http://www.wowotech.net/content/uploadfile/201802/d6421519307830.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/d6421519307830.png)\
-4.3. free object layout\
-刚分配slab缓存池和free object之后，系统都会通过调用init_object()函数初始化object各个区域，主要是填充magic num。free object layout如下图所示。\
-[![16.png](http://www.wowotech.net/content/uploadfile/201802/1e411519307832.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/1e411519307832.png)\
+当SLUB allocator申请一块内存作为slab 缓存池的时候，会将整块内存填充POISON_INUSE。如下图所示。
+
+![[Pasted image 20241023163441.png]]
+
+然后通过init_object()函数将相关的区域填充成free object的情况，并且建立单链表。注意freelist指针指向的位置，SLUB_DEBUG on和off的情况下是不一样的。主要就是3.3节提到的转换关系。为什么这里填充成free object的情况呢？其实就是为了假装我这里都是free的object，也是符合情理的。object初始化流程如下。
+
+![[Pasted image 20241023163458.png]]
+
+## 4.3. free object layout
+
+刚分配slab缓存池和free object之后，系统都会通过调用init_object()函数初始化object各个区域，主要是填充magic num。free object layout如下图所示。
+
+![[Pasted image 20241023163525.png]]
+
 1) red_left_pad和Red zone填充了SLUB_RED_INACTIVE（0xbb）；\
 2) object填充了POISON_FREE（0x6b），但是最后一个byte填充POISON_END（0xa5）；\
 3) padding在allocate_slab的时候就已经被填充POISON_INUSE（0x5a），如果程序意外改变，当检测到padding被改变的时候，会output error syslog并继续填充0x5a。\
 4.4. alloc object layout\
-当从SLUB allocator申请一个object时，系统同样会调用init_object()初始化成想要的模样。alloc object layout如下图所示。\
-[![17.png](http://www.wowotech.net/content/uploadfile/201802/c9ba1519307834.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/c9ba1519307834.png)\
+当从SLUB allocator申请一个object时，系统同样会调用init_object()初始化成想要的模样。alloc object layout如下图所示。
+
+![[Pasted image 20241023163544.png]]
+
 1) red_left_pad和Red zone填充了SLUB_RED_ACTIVE（0xcc）；\
 2) object填充了POISON_FREE（0x6b），但是最后一个byte填充POISON_END（0xa5）；\
 3) padding在allocate_slab的时候就已经被填充POISON_INUSE（0x5a），如果程序意外改变，当检测到padding被改变的时候，会output error syslog并继续填充0x5a。\
@@ -101,8 +115,10 @@ alloc object layout和free object layout相比较而言，也仅仅是red_left_p
 8. }
 ```
 
-运行后的object layout如下图所示。\
-[![18.png](http://www.wowotech.net/content/uploadfile/201802/88391519307837.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/88391519307837.png)\
+运行后的object layout如下图所示。
+
+![[Pasted image 20241023163600.png]]
+
 我们可以看到，Red zone区域本来应该0xcc的地方被修改成了0x88。很明显这是一个Redzone overwritten问题。那么系统什么时候会检测到这个严重的bug呢？就在你kfree()之后。kfree()中会去检测释放的object中各个区域的值是否valid。Red zone区域的值全是0xcc就是valid，因此这里会检测0x88不是0xcc，进而输出error syslog。kfree()最终会调用free_consistency_checks()检测object。free_consistency_checks()函数如下。
 
 1. static inline int free_consistency_checks(struct kmem_cache \*s,

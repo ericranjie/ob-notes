@@ -169,7 +169,8 @@ slab分配器提供的接口该如何使用呢？其实很简单，总结分成�
 
 说了这么多终于要抛出辛辛苦苦画的美图了。
 
-[![1.png](http://www.wowotech.net/content/uploadfile/201803/4a471520078976.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201803/4a471520078976.png)
+![[Pasted image 20241023162936.png]]
+
 好了，后面说的大部分内容请看这张图。足以表明数据结构之间的关系了。看懂了这张图，就可以理清数据结构之间的关系了。
 
 ## 3.1. slub管理object方法
@@ -192,49 +193,52 @@ per node partia链表类似per cpu partial，区别是node中的slab是所有cpu
 
 当调用kmem_cache_alloc()分配内存的时候，我们可以从正在使用slab分配，也可以从per cpu partial分配，同样还可以从per node partial分配，那么分配的顺序是什么呢？我们可以用下图表示。
 
-[![2.png](http://www.wowotech.net/content/uploadfile/201802/fb5c1519305301.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/fb5c1519305301.png)
+![[Pasted image 20241023162953.png]]
 
 首先从cpu 本地缓存池分配，如果freelist不存在，就会转向per cpu partial分配，如果per cpu partial也没有可用对象，继续查看per node partial，如果很不幸也不没有可用对象的话，就只能从伙伴系统分配一个slab了，并挂入per cpu freelist。我们详细看一下这几种情况。
 
 1)     kmem_cache刚刚建立，还没有任何对象可供分配，此时只能从伙伴系统分配一个slab，如下图所示。
 
-[![3.png](http://www.wowotech.net/content/uploadfile/201802/10fb1519305301.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/10fb1519305301.png)
+![[Pasted image 20241023163021.png]]
+
 2)     如果正在使用的slab有free obj，那么就直接分配即可，这种是最简单快捷的。如下图所示。
 
-[![4.png](http://www.wowotech.net/content/uploadfile/201802/09dd1519305302.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/09dd1519305302.png)
+![[Pasted image 20241023163037.png]]
+
 3)     随着正在使用的slab中obj的一个个分配出去，最终会无obj可分配，此时per cpu partial链表中有可用slab用于分配，那么就会从per cpu partial链表中取下一个slab用于分配obj。如下图所示。
 
-[![5.png](http://www.wowotech.net/content/uploadfile/201802/82661519305303.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/82661519305303.png)
+![[Pasted image 20241023163124.png]]
 
-4)     随着正在使用的slab中obj的一个个分配出去，最终会无obj可分配，此时per cpu partial链表也为空，此时发现per node partial链表中有可用slab用于分配，那么就会从per node partial链表中取下一个slab用于分配obj。如下图所示。
+4)     随着正在使用的slab中obj的一个个分配出去，最终会无obj可分配，此时per cpu partial链表也为空，此时发现per node partial链表中有可用slab用于分配，那么就会从
+per node partial链表中取下一个slab用于分配obj。如下图所示。
 
-[![6.png](http://www.wowotech.net/content/uploadfile/201802/f19c1519305304.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/f19c1519305304.png)
+![[Pasted image 20241023163139.png]]
 
 # **5. slub释放内存原理**
 
 我们可以通过kmem_cache_free()接口释放申请的obj对象。释放对象的流程如下图所示。
 
-[![7.png](http://www.wowotech.net/content/uploadfile/201802/9eb91519305304.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/9eb91519305304.png)
+![[Pasted image 20241023163153.png]]
 
 如果释放的obj就是属于正在使用cpu上的slab，那么直接释放即可，非常简单；如果不是的话，首先判断所属slub是不是full状态，因为full slab是没妈的孩子，释放之后就变成partial empty，急需要找个链表领养啊！这个妈就是per cpu partial链表。如果per cpu partial链表管理的所有slab的free object数量超过kmem_cache的cpu_partial成员的话，就需要将per cpu partial链表管理的所有slab移动到per node partial链表管理；如果不是full slab的话，继续判断释放当前obj后的slab是否是empty slab，如果是empty slab，那么在满足kmem_cache_node的nr_partial大于kmem_cache的min_partial的情况下，则会释放该slab的内存。其他情况就直接释放即可。
 
 1)     假设下图左边的情况下释放obj，如果满足kmem_cache_node的nr_partial大于kmem_cache的min_partial的话，释放情况如下图所示。
 
-[![8.png](http://www.wowotech.net/content/uploadfile/201802/602e1519305305.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/602e1519305305.png)
+![[Pasted image 20241023163211.png]]
 
 2)     假设下图左边的情况下释放obj，如果不满足kmem_cache_node的nr_partial大于kmem_cache的min_partial的话，释放情况如下图所示。
 
-[![9.png](http://www.wowotech.net/content/uploadfile/201802/7afb1519305306.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/7afb1519305306.png)
+![[Pasted image 20241023163222.png]]
 
 3)     假设下图从full slab释放obj的话，如果满足per cpu partial管理的所有slab的free object数量大于kmem_cache的cpu_partial成员的话的话，将per cpu partial链表管理的所有slab移动到per node partial链表管理，释放情况如下图所示。
 
-[![10.png](http://www.wowotech.net/content/uploadfile/201802/586e1519305307.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/586e1519305307.png)
+![[Pasted image 20241023163236.png]]
 
 4)     假设下图从full slab释放obj的话，如果不满足per cpu partial管理的所有slab的free object数量大于kmem_cache的cpu_partial成员的话的话，释放情况如下图所示。
 
-[![11.png](http://www.wowotech.net/content/uploadfile/201802/59b21519305308.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201802/59b21519305308.png)
+![[Pasted image 20241023163259.png]]
 
-**6. kmalloc**
+# **6. kmalloc**
 
 好了，说了这么多，估计你会感觉slab好像跟我们没什么关系。如果作为一个驱动开发者，是不是感觉自己写的driver从来没有使用过这些接口呢？其实我们经常使用，只不过隐藏在kmalloc的面具之下。
 

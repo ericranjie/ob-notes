@@ -1,3 +1,4 @@
+
 # 思考
 
 1、为什么要用虚拟地址？为什么要用MMU？
@@ -41,6 +42,7 @@ Enable the MMU
 高位是1的虚拟地址空间，使用TTBR1_ELx基地址寄存器进行页表翻译；高位是0的虚拟地址空间，使用TTBR0_ELx基地址寄存器页表翻译。 所以不应该说，因为你使用了哪个寄存器(TTBR0/TTBR1)，然后决定了你使用的哪套虚拟地址空间；应该说，你操作系统(或userspace软件)使用了哪套虚拟地址空间，决定了使用哪个哪个基地址寄存器(TTBR0/TTBR1)进行翻译。
 
 如下便是两套虚拟地址空间和TTBRn_ELx的对应关系，其中高位的位数不是固定的16(即T1SZ和T0SZ不一定等于16)
+
 ![[Pasted image 20240909130008.png]]
 
 以下摘自ARM文档的官方描述：
@@ -58,6 +60,7 @@ Which TTBR_ELx is used depends only on the VA presented for translation. The mos
 ## 2.2 物理地址空间有效位(范围)
 
 具体每一个core的物理地址是多少位，其实都是定死的，虚拟地址是多少位，是编译或开发的时候根据自己的需要自己配置的。如下表格摘出了部分arm core的物理地址有效位，所以你具体使用多少有效位的物理地址，可以查询core TRM手册。
+
 ![[Pasted image 20240909130025.png]]
 
 页表翻译相关寄存器的配置
@@ -79,11 +82,13 @@ The table walk unit : 它从内存中读取页表，并完成地址转换
 Translation Lookaside Buffers (TLBs) ： 缓存，相当于cache
 
 软件看到的所有内存地址都是虚拟的。 这些内存地址被传递到 MMU，它检查最近使用的缓存转换的 TLB。 如果 TLB没有找到最近缓存的翻译，那么翻译单元将从内存中读取适当的一个或多个表项目进行地址翻译，如下所示：
-!\[\[Pasted image 20240909130056.png\]\]
+
+![[Pasted image 20240909130056.png]]
 
 Translation tables 的工作原理是将虚拟地址空间划分为大小相等的块，并在表中为每个块提供一个entry。
 Translation tables 中的entry 0 提供block 0 的映射，entry 1 提供block 1 的映射，依此类推。 每个entry都包含相应物理内存块的地址以及访问物理地址时要使用的属性。
-!\[\[Pasted image 20240909130102.png\]\]
+
+![[Pasted image 20240909130102.png]]
 
 在当前的ARMV8/ARMV9体系中(暂不考虑armv9的RME扩展), 至少存在以下9类Translation regime：
 
@@ -97,7 +102,8 @@ Secure EL2 translation regime
 Non-secure EL2 translation regime
 Secure EL3 translation regime
 这9类Translation regime的地址翻译的场景如下图所示：
-!\[\[Pasted image 20240909130109.png\]\]
+
+![[Pasted image 20240909130109.png]]
 
 Secure and Non-secure地址空间
 在REE(linux)和TEE(optee)双系统的环境下，可同时开启两个系统的MMU.

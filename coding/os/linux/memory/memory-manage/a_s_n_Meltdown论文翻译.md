@@ -100,7 +100,7 @@ R4 \<- R2 + R3
 
 第一条指令是计算R1+R3并把结果保存到R2，第二条指令依赖于R2的值进行计算。在没有保留站的时候，第一条指令的操作结果提交到R2寄存器之后，第二条指令才可以执行，因为需要从R2寄存器中加载操作数。如果有了保留站，那么我们可以在保留站中重命名寄存器R2，我们称这个寄存器是R2.rename。这时候，第一条指令执行之后就把结果保存在R2.rename寄存器中，而不需要把最终结果提交到R2寄存器中，这样第二条指令就可以直接从R2.rename寄存器中获取操作数并执行，从而解决了RAW带来的hazard。WAR和WAW类似，不再赘述。（注：上面这一句的翻译我自己做了一些扩展，方便理解保留站）。此外，保留站和所有的执行单元通过一个统一的CDB（common data bus）相连。如果操作数尚未准备好，那么执行单元可以监听CDB，一旦获取到操作数，该执行单元会立刻开始指令的执行。
 
-[![clip_image002](http://www.wowotech.net/content/uploadfile/201801/25df405b3b80e4439f5b677cf23274f220180119121816.jpg "clip_image002")](http://www.wowotech.net/content/uploadfile/201801/a8ebc8be807bfae4e1dbfb2cb389c8d020180119121811.jpg)
+![[Pasted image 20241023163756.png]]
 
 On the Intel architecture, the pipeline consists of the front-end, the execution engine (back-end) and the memory subsystem \[14\]. x86 instructions are fetched by the front-end from the memory and decoded to microoperations (μOPs) which are continuously sent to the execution engine. Out-of-order execution is implemented within the execution engine as illustrated in Figure 1. The Reorder Buffer is responsible for register allocation, register renaming and retiring. Additionally, other optimizations like move elimination or the recognition of zeroing idioms are directly handled by the reorder buffer. The μOPs are forwarded to the Unified Reservation Station that queues the operations on exit ports that are connected to Execution Units. Each execution unit can perform different tasks like ALU operations, AES operations, address generation units (AGU) or memory loads and stores. AGUs as well as load and store execution units are directly connected to the memory subsystem to process its requests.
 
@@ -114,7 +114,7 @@ Various approaches to predict the branch exist: With static branch prediction \[
 
 分支预测有各种各样的方法：使用静态分支预测\[ 12 \] 的时候，程序跳转的结果完全基于指令本身。动态分支预测\[ 2 \] 则是在运行时收集统计数据来预测结果。一级分支预测使用1位或2位计数器来记录跳转结果\[ 21 \]。现代处理器通常使用两级自适应预测器\[36\]，这种方法会记住最后n个历史跳转结果，并通过这些历史跳转记过来寻找有规律的跳转模式。最近，使用神经分支预测\[ 34, 18, 32 \]的想法被重新拾起并集成到CPU体系结构中\[ 3 \]。
 
-2、地址空间（address space）
+## 2、地址空间（address space）
 
 To isolate processes from each other, CPUs support virtual address spaces where virtual addresses are translated to physical addresses. A virtual address space is divided into a set of pages that can be individually mapped to physical memory through a multi-level page translation table. The translation tables define the actual virtual to physical mapping and also protection properties that are used to enforce privilege checks, such as readable, writable, executable and user-accessible. The currently used translation table that is held in a special CPU register. On each context switch, the operating system updates this register with the next process’ translation table address in order to implement per process virtual address spaces. Because of that, each process can only reference data that belongs to its own virtual address space. Each virtual address space itself is split into a user and a kernel part. While the user address space can be accessed by the running application, the kernel address space can only be accessed if the CPU is running in privileged mode. This is enforced by the operating system disabling the user accessible property of the corresponding translation tables. The kernel address space does not only have memory mapped for the kernel’s own usage, but it also needs to perform operations on user pages, e.g., filling them with data. Consequently, the entire physical memory is typically mapped in the kernel. On Linux and OS X, this is done via a direct-physical map, i.e., the entire physical memory is directly mapped to a pre-defined virtual address (cf. Figure 2).
 
@@ -130,7 +130,7 @@ The exploitation of memory corruption bugs often requires the knowledge of addre
 
 利用memory corruption（指修改内存的内容而造成crash）bug进行攻击往往需要知道特定数据的地址（因为我们需要修改该地址中的数据）。为了阻止这种攻击，内核提供了地址空间布局随机化（ASLR）、非执行堆栈和堆栈溢出检查三种手段。为了保护内核，KASLR会在驱动每次开机加载的时候将其放置在一个随机偏移的位置，这种方法使得攻击变得更加困难，因为攻击者需要猜测内核数据结构的地址信息。然而，攻击者可以利用侧信道攻击手段获取内核数据结构的确定位置\[ 9, 13, 17 \]或者在JavaScript中对ASLR 解随机化\[ 6 \]。结合本节描述的两种机制，我们可以发起攻击，实现特权代码的执行。
 
-3、缓存攻击（Cache Attacks）
+## 3、缓存攻击（Cache Attacks）
 
 In order to speed-up memory accesses and address translation, the CPU contains small memory buffers, called caches, that store frequently used data. CPU caches hide slow memory access latencies by buffering frequently used data in smaller and faster internal memory. Modern CPUs have multiple levels of caches that are either private to its cores or shared among them. Address space translation tables are also stored in memory and are also cached in the regular caches.
 
@@ -144,7 +144,7 @@ A special use case are covert channels. Here the attacker controls both, the par
 
 缓存侧信道攻击一个特殊的使用场景是构建隐蔽通道（covert channel）。在这个场景中，攻击者控制隐蔽通道的发送端和接收端，也就是说攻击者会通过程序触发产生cache side effect，同时他也会去量测这个cache side effect。通过这样的手段，信息可以绕过体系结构级别的边界检查，从一个安全域泄漏到外面的世界，。Prime+Probe 和 Flush+Reload这两种方法都已被用于构建高性能隐蔽通道\[ 24, 26, 10 \]。
 
-三、简单示例（A toy example）
+# 三、简单示例（A toy example）
 
 In this section, we start with a toy example, a simple code snippet, to illustrate that out-of-order execution can change the microarchitectural state in a way that leaks information. However, despite its simplicity, it is used as a basis for Section 4 and Section 5, where we show how this change in state can be exploited for an attack.
 
