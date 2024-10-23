@@ -1,30 +1,7 @@
+
 作者：[schspa](http://www.wowotech.net/author/542) 发布于：2021-11-15 18:41 分类：[电源管理子系统](http://www.wowotech.net/sort/pm_subsystem)
 
-- [术语](http://www.wowotech.net/admin/#org5c40aed)
-- [硬件架构](http://www.wowotech.net/admin/#orgd7b01ed)
-  - [gic对唤醒功能的支持](http://www.wowotech.net/admin/#org7c77031)
-  - [GIC power down ？](http://www.wowotech.net/admin/#orgc654f8d)
-  - [CPU Power Down](http://www.wowotech.net/admin/#orgdf72b0e)
-  - [CPU Power Up](http://www.wowotech.net/admin/#orgd3f14d0)
-    - [RESET的执行地址](http://www.wowotech.net/admin/#org76e8360)
-- [Suspend In Linux](http://www.wowotech.net/admin/#org786b4f8)
-- [Linux irq wakeup](http://www.wowotech.net/admin/#orgc55abf5)
-  - [irq flags](http://www.wowotech.net/admin/#orgc3391b3)
-    - [IRQCHIP_MASK_ON_SUSPEND](http://www.wowotech.net/admin/#orgbabe822)
-    - [IRQCHIP_SKIP_SET_WAKE](http://www.wowotech.net/admin/#org7c947f0)
-  - [arm-gic](http://www.wowotech.net/admin/#org6d4deb1)
-  - [linux内核接口](http://www.wowotech.net/admin/#orgc146640)
-  - [implement stacked irqchip](http://www.wowotech.net/admin/#org2113d60)
-    - [used function & macors](http://www.wowotech.net/admin/#orge144b9c)
-    - [irq domain](http://www.wowotech.net/admin/#org34598ff)
-    - [irq initialization](http://www.wowotech.net/admin/#orge030d08)
-    - [irq domain ops](http://www.wowotech.net/admin/#orgb944abf)
-- [ATF软件](http://www.wowotech.net/admin/#org036e12d)
-  - [参数：](http://www.wowotech.net/admin/#org1958417)
-  - [平台相关实现](http://www.wowotech.net/admin/#org9d23227)
-- [refs](http://www.wowotech.net/admin/#org0417c6b)
-
-## 术语
+# 术语
 
 |   |   |
 |---|---|
@@ -33,7 +10,7 @@
 |GIC|Generic Interrupt Controller|
 |smccc|SMC CALLING CONVENTION|
 
-## 硬件架构
+# 硬件架构
 
 在本篇文章中基于AARCH64平台，GIC作为中断控制器来进行讨论\
 下面是GIC-600的系统框架图：

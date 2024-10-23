@@ -1,10 +1,9 @@
-CPP开发者
-_2021年11月30日 11:55_
+
+CPP开发者 _2021年11月30日 11:55_
+
 以下文章来源于后端研究所 ，作者程序员大白啊
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651167793&idx=1&sn=f44c8c206391dfbe61f4e19a1f249ab9&chksm=80644d6eb713c478d23a4b166903c9dd33ed6dfadc0d73b783b1b24eb638c0c0346161d287c7&mpshare=1&scene=24&srcid=1130WVTkjj3Q7Io2HcrokrPg&sharer_sharetime=1638264435514&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d03d2c27bf9ee4cde7dd404e045fe6bb8c0488f18856387e4046d5e8e40a8cae76e4b8bc7e114763262a1deab08438b962a042dc04126903dd0a6a1576ae592a4f1fae0bd67ac74e1efda2d4e997aee81f0681ca67e5d05c2dfb29c5384470282e6c447513d8b3a37601b2638b4b5caf56dad839b9c29a7f10&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQnoe8gNQH1VphtPNrFcTxZRLmAQIE97dBBAEAAAAAABHhFtctiS4AAAAOpnltbLcz9gKNyK89dVj02R%2FJTCiCjngjb3g6DI2TGNNj9dFQ9slXNQSPOP4aVlHvJKFG6tA%2BWEZp4FitD7mr5VmHphCQvVLly5xOqhUn87YgncHYcxDawxg1%2BsgWGVhg8mr%2B%2BHLqZhk8ZiZeWP6lK7JHrHz%2FMupgAowtNN4ync274X0RHBwY2VaEQigEDQC5Wr8Q4Kp3cCJDgu7fIrh8mHiyPayMVO0ktm5lIXZHiKsPR4qSPyLzeGDZ5PUxEK8BGyL19S6CNK2VGRn%2BMcSt&acctmode=0&pass_ticket=ZY3IJbcGJD4QRKmq848HB%2FXmhuJpTiAGjRyP0e75kASdb%2FDV4Gs5D5w3qaZHUsGo&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
-
-## 1. 开场白
+# 1. 开场白
 
 在开始今天的文章之前，先抛一个面试题出来：
 
@@ -16,8 +15,6 @@ _2021年11月30日 11:55_
 
 思考几分钟，如果你**没有头绪或者对答案不确定**，那么你先不用着急关闭页面去玩耍，你应该继续往下看，因为这个问题很不错。
 
-![](https://mmbiz.qpic.cn/mmbiz_png/wAkAIFs11qZibu6QZauU9zUcre7RvLf7icChfuS7diaTcxlfhqoDtywqvSBECicHuwjENAxfCMpsicykWGYMQ0keXKg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
-
 对于后端开发人员来说，并发数往往和技术难度是呈正相关的，实际上也确实如此：**体量决定架构**。
 
 服务端根据不同业务场景会有不同的侧重点，单纯追求高并发其实并不是根本目的，**高可用&稳定性更重要**。
@@ -26,9 +23,9 @@ _2021年11月30日 11:55_
 
 高可用&高并发是我们直观感受到的，本质上这是个**复杂的系统工程**，每个环节都会影响结果，每一块都值得研究和深入。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/wAkAIFs11qZibu6QZauU9zUcre7RvLf7ic9xdUEcyPezq66oDWiaHc0Dewu9A48duaFMn2rt84n7PmWKg92ibcx7icA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023223743.png]]
 
-## 2. C10K问题和C10M问题
+# 2. C10K问题和C10M问题
 
 在2000年初的时候，全球互联网的规模并不大，但是当时就已经提出了C10K问题，所谓**C10K就是单机1w并发问题**，虽然现在不觉得是个难题了，但是这在当初是很有远见和挑战的问题。
 

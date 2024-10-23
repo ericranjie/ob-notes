@@ -1,25 +1,25 @@
-Linux开发架构之路
-_2024年03月27日 20:06_ _湖南_
+
+Linux开发架构之路 _2024年03月27日 20:06_ _湖南_
 
 # 一、提出问题
 
 在日常的软件开发中，多线程是不可避免的，使用多线程中的一大问题就是线程对锁的不合理使用造成的死锁，死锁一旦发生，将导致多线程程序响应时间长，吞吐量下降甚至宕机崩溃，那么如何检测出一个多线程程序中是否存在死锁呢？在提出解决方案之前，先对死锁产生的原因以及产生的现象做一个分析。最后在用有向环来检测多线程中是否存在死锁的问题。
 
-## 二、死锁存在的条件
+# 二、死锁存在的条件
 
 所谓死锁，是指多个进程在运行过程中因争夺资源而造成的一种僵局，当进程处于这种僵持状态时，若无外力作用，它们都将无法再向前推进。
 
 我们举个例子来描述，如果此时有一个线程A，按照先锁a再获得锁b的的顺序获得锁，而在此同时又有另外一个线程B，按照先锁b再锁a的顺序获得锁。
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0xZslZTn668Q7iaMZSibJMLMIjBF3SuRhzzBicqwXSMSqug5WVcl4yjSG1nVq3GsFAickJneNiaMN13jWA/640?wx_fmt=png&from=appmsg&wxfrom=13)
+![[Pasted image 20241023223805.png]]
 
 在来看看4个线程线程的情况，线程A想获取线程B的锁，线程B想获取线程C的锁，线程C想获取线程D的锁，线程D想获取线程A 的锁，在线程之间构建了一个资源获取环。
 
-![图片](https://mmbiz.qpic.cn/sz_mmbiz_png/8pECVbqIO0xZslZTn668Q7iaMZSibJMLMIiceLNQor88A8qMqregtZhBicgT0bqiaGtUSdTnQWU6UxfMIm1rP6Gw64w/640?wx_fmt=png&from=appmsg&wxfrom=13)
+![[Pasted image 20241023223814.png]]
 
 注意：后面的例子都是以4个线程的例子来说明的。
 
-## 三、死锁的产生原因
+# 三、死锁的产生原因
 
 （1）竞争资源
 
@@ -162,13 +162,9 @@ struct task_graph {
 
 在深度遍历（DFS）遍历的过程中，如果发现某个结点的访问标志已经为1，那么就存在环了。
 
-## 
+# 九 实现
 
-九 实现
-
-### 
-
-C语言源代码
+## C语言源代码
 
 #define \_GNU_SOURCE\
 #include \<dlfcn.h>

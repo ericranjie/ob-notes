@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-8-26 17:03 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 # 一、前言
@@ -10,14 +11,15 @@
 
 一个关于通用中断处理的示意图如下：
 
-[![zhongduan](http://www.wowotech.net/content/uploadfile/201408/c1bc605fe5555c059b2e2e3196d2862a20140826100303.gif "zhongduan")](http://www.wowotech.net/content/uploadfile/201408/3e79044a4981e30f35e9b19fe44a441720140826100300.gif)
+![[Pasted image 20241023225009.png]]
+
 
 在linux kernel中，对于每一个外设的IRQ都用struct irq_desc来描述，我们称之中断描述符（struct irq_desc）。linux kernel中会有一个数据结构保存了关于所有IRQ的中断描述符信息，我们称之中断描述符DB（上图中红色框图内）。当发生中断后，首先获取触发中断的HW interupt ID，然后通过irq domain翻译成IRQ nuber，然后通过IRQ number就可以获取对应的中断描述符。调用中断描述符中的highlevel irq-events handler来进行中断处理就OK了。而highlevel irq-events handler主要进行下面两个操作：
 
 （1）调用中断描述符的底层irq chip driver进行mask，ack等callback函数，进行interrupt flow control。
 （2）调用该中断描述符上的action list中的specific handler（我们用这个术语来区分具体中断handler和high level的handler）。这个步骤不一定会执行，这是和中断描述符的当前状态相关，实际上，interrupt flow control是软件（设定一些标志位，软件根据标志位进行处理）和硬件（mask或者unmask interrupt controller等）一起控制完成的。
 
-2、中断的打开和关闭
+## 2、中断的打开和关闭
 
 我们再来看看整个通用中断处理过程中的开关中断情况，开关中断有两种：
 
@@ -47,7 +49,7 @@
 
 因此，在新的内核中，比如3.14，IRQF_DISABLED被废弃了。我们可以思考一下，为何要有slow handler？每一个handler不都是应该迅速执行完毕，返回中断现场吗？此外，任意中断可以打断slow handler执行，从而导致中断嵌套加深，对内核栈也是考验。因此，新的内核中在interrupt specific handler中是全程关闭CPU中断的。
 
-3、IRQ number
+## 3、IRQ number
 
 从CPU的角度看，无论外部的Interrupt controller的结构是多么复杂，I do not care，我只关心发生了一个指定外设的中断，需要调用相应的外设中断的handler就OK了。更准确的说是通用中断处理模块不关心外部interrupt controller的组织细节（电源管理模块当然要关注具体的设备（interrupt controller也是设备）的拓扑结构）。一言以蔽之，通用中断处理模块可以用一个线性的table来管理一个个的外部中断，这个表的每个元素就是一个irq描述符，在kernel中定义如下：
 
@@ -65,9 +67,9 @@
 
 此外，需要注意的是，在旧内核中，IRQ number和硬件的连接有一定的关系，但是，在引入irq domain后，IRQ number已经变成一个单纯的number，和硬件没有任何关系。
 
-三、中断描述符数据结构
+# 三、中断描述符数据结构
 
-1、底层irq chip相关的数据结构
+## 1、底层irq chip相关的数据结构
 
 中断描述符中应该会包括底层irq chip相关的数据结构，linux kernel中把这些数据组织在一起，形成struct irq_data，具体代码如下：
 
@@ -89,7 +91,7 @@
 
 node成员用来保存中断描述符的内存位于哪一个memory node上。 对于支持NUMA（Non Uniform Memory Access Architecture）的系统，其内存空间并不是均一的，而是被划分成不同的node，对于不同的memory node，CPU其访问速度是不一样的。如果一个IRQ大部分（或者固定）由某一个CPU处理，那么在动态分配中断描述符的时候，应该考虑将内存分配在该CPU访问速度比较快的memory node上。
 
-2、irq chip数据结构
+## 2、irq chip数据结构
 
 Interrupt controller描述符（struct irq_chip）包括了若干和具体Interrupt controller相关的callback函数，我们总结如下：
 
@@ -116,7 +118,7 @@ Interrupt controller描述符（struct irq_chip）包括了若干和具体Interr
 |irq_calc_mask|TODO|
 |irq_print_chip|/proc/interrupts中的信息显示|
 
-3、中断描述符
+## 3、中断描述符
 
 在linux kernel中，使用struct irq_desc来描述一个外设的中断，我们称之中断描述符，具体代码如下：
 

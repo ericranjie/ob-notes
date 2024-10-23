@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-10-10 17:56 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、源由
@@ -67,7 +68,7 @@ int counter;
 |atomic_add_negative(i,v)|给一个原子变量v增加i，并判断变量v的最新值是否是负数|
 |static inline int atomic_add_unless(atomic_t \*v, int a, int u)|只要原子变量v不等于u，那么就执行原子变量v加a的操作。  <br>如果v不等于u，返回非0值，否则返回0值|
 
-三、ARM中的实现
+# 三、ARM中的实现
 
 我们以atomic_add为例，描述linux kernel中原子操作的具体代码实现细节：
 

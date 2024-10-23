@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-10-16 11:17 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、源由：为何引入Per-CPU变量？
@@ -22,7 +23,7 @@ lock memory bus对多核系统的性能造成严重的影响（系统中其他�
 
 在[The Memory Hierarchy](http://www.wowotech.net/basic_subject/memory-hierarchy.html)文档中，我们已经了解了关于memory一些基础的知识，一些基础的内容，这里就不再重复了。我们假设一个多核系统中的cache如下：
 
-[![cache](http://www.wowotech.net/content/uploadfile/201410/8369372a65abd7f6f524ecde2892b17f20141016031721.gif "cache")](http://www.wowotech.net/content/uploadfile/201410/4fc150ca70feab42839fa1a5624e42ee20141016031720.gif)
+![[Pasted image 20241023223553.png]]
 
 每个CPU都有自己的L1 cache（包括data cache和instruction cache），所有的CPU共用一个L2 cache。L1、L2以及main memory的访问速度之间的差异都是非常大，最高的性能的情况下当然是L1 cache hit，这样就不需要访问下一阶memory来加载cache line。
 
@@ -64,7 +65,7 @@ lock memory bus对多核系统的性能造成严重的影响（系统中其他�
 
 上面这两个接口函数已经内嵌了锁的机制（preempt disable），用户可以直接调用该接口进行本CPU上该变量副本的访问。如果用户确认当前的执行环境已经是preempt disable（例如持有spinlock），那么可以使用lock-free版本的Per-CPU变量的API:\_\_get_cpu_var。
 
-3、动态分配Per-CPU变量的API如下表所示：
+## 3、动态分配Per-CPU变量的API如下表所示：
 
 |   |   |
 |---|---|
@@ -72,7 +73,7 @@ lock memory bus对多核系统的性能造成严重的影响（系统中其他�
 |alloc_percpu(type)|分配类型是type的per cpu变量，返回per cpu变量的地址（注意：不是各个CPU上的副本）|
 |void free_percpu(void \_\_percpu \*ptr)|释放ptr指向的per cpu变量空间|
 
-4、访问动态分配Per-CPU变量的API如下表所示：
+## 4、访问动态分配Per-CPU变量的API如下表所示：
 
 |   |   |
 |---|---|
@@ -230,7 +231,7 @@ raw_smp_processor_id可以获取本CPU的ID，如果没有arch specific没有定
 
 对于ARMV6K和ARMv7版本，offset保存在TPIDRPRW寄存器中，这样是为了提升系统性能。
 
-3、动态分配per cpu变量
+## 3、动态分配per cpu变量
 
 这部分内容留给内存管理子系统吧。
 
@@ -240,7 +241,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [内核同步](http://www.wowotech.net/tag/%E5%86%85%E6%A0%B8%E5%90%8C%E6%AD%A5) [Per-CPU变量](http://www.wowotech.net/tag/Per-CPU%E5%8F%98%E9%87%8F)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux common clock framework(1)\_概述](http://www.wowotech.net/pm_subsystem/clk_overview.html) | [Linux内核同步机制之（一）：原子操作](http://www.wowotech.net/kernel_synchronization/atomic.html)»
 

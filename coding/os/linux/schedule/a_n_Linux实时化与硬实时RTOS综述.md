@@ -1,46 +1,5 @@
-原创 伟林 Linux阅码场
-_2022年02月17日 08:00_
-伟林，中年码农，从事过电信、手机、安全、芯片等行业，目前依旧从事Linux方向开发工作，个人爱好Linux相关知识分享，个人微博CSDN pwl999，欢迎大家关注！
 
-# 文章目录
-
-**1. 背景介绍**
-**1.1 OS 实时难题**
-**1.2 Linux 实时补丁**
-**1.3 Xenomai + Linux 双内核**
-**1.4 HW-RTOS**
-**1.5 More**
-**2. 优化点1：API**
-**2.1 原理介绍**
-2.1.1 Software API Execution time
-2.1.2 Software Influence of Queue Handling
-2.1.3 HW-RTOS API Execution time
-2.1.4 HW-RTOS Influence of Queue Handling
-**2.2 具体实现**
-**2.3 性能测试**
-**3. 优化点2：Tick offloading**
-**3.1 原理介绍**
-3.1.1 Software Tick
-3.1.2 HW-RTOS Tick
-**4. 优化点3：Hardware ISR (HW ISR)**
-**4.1 原理介绍**
-4.1.1 Software ISR
-4.1.2 Software ISR handed over to Task
-4.1.3 HW-RTOS ISR handed over to Task
-4.1.4 Non-OS managed Interrupt & Direct Interrupt Service
-**4.2 具体实现**
-**4.3 性能测试**
-**4.4 相关应用**
-4.4.1 Multiple interrupts using HW ISR
-4.4.2 Cyclic activation task
-4.4.3 Using cyclic activation task for network synchronization
-**5. 优化点4：Task Management**
-**5.1 原理介绍**
-5.1.1 HW-RTOS Scheduler
-5.1.1 HW-RTOS Context Switch
-**6. 典型案例**
-**6.1 Network and RTOS**
-**7. 下一代 HW-RTOS**
+原创 伟林 Linux阅码场 _2022年02月17日 08:00_
 
 # 1.背景介绍
 
@@ -65,7 +24,7 @@ void MyTask (void)
 
 对一个任务来说它好像独占CPU，但实际上是多个任务共享一个 CPU 的，由 OS Kernel 根据任务的状态和优先级来动态调度运行的：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224422.png]]
 
 可以看到OS对CPU调度提供了封装，站在OS之上可以很方便的开发、移植应用，应用只需要关注自己的 Task 循环，其他复杂操作对OS都是透明。但是另一方面，OS 的这些封装不可避免带来了开销，通常来说一个 CPU 上了 OS 以后会比裸机系统更慢，在频率较低的 MCU 系统上这些开销的占比会更为明显。
 
@@ -79,7 +38,7 @@ void MyTask (void)
 
 对实时(Real Time)系统来说，不仅仅要求OS能提供多任务环境，更要求任务能在极短的时间之内响应外部的中断事件。这个要求也充满了挑战，即要享受 OS 带来的好处，又要把 OS 带来的开销将到最小。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224436.png]]
 
 OS 实时模型的时序如上图所示，实时优化就是围绕这张图来展开的。其中的时间点和可能的优化方式如下：
 
@@ -93,7 +52,7 @@ OS 实时模型的时序如上图所示，实时优化就是围绕这张图来�
 |ISR (schedule)|schedule api 动作可能随负载增多而增加|增加抢占(preemption)<br><br>调度算法防止优先级翻转|
 |ContextSwitch|-|目前没有太好的优化方法|
 
-**1.2 Linux 实时补丁**
+## **1.2 Linux 实时补丁**
 
 大名鼎鼎的 Linux RT-Preempt Patch 试图从以下方面改善 Linux 的实时性：
 
@@ -108,17 +67,17 @@ OS 实时模型的时序如上图所示，实时优化就是围绕这张图来�
 
 实时补丁大大改善了 Linux 的实时性能，但还是软实时的水平。
 
-**1.3** **Xenomai + Linux** **双内核**
+## **1.3** **Xenomai + Linux** **双内核**
 
 优先处理实时任务，linux也被视为其中一个线程，本身也有调度器，但须等到没有实时任务时（空闲状态），才会执行linux thread。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224455.png]]
 
 Xenomai + Linux 双内核可以达到 RTOS 的实时水平，也有把这种称为硬实时。
 
 但是 RTOS 的实时还是存在不确定性，因为OS API等临界区的关中断时间还是存在不确定性，和系统的负载相关联。这也是 HW-RTOS 的优化点。
 
-**1.4 HW-RTOS**
+## **1.4 HW-RTOS**
 
 HW-RTOS (hardware real-time operating system，硬件实时操作系统)是一种基于硬件实现的实时操作系统，是瑞萨电子的专有技术。HW-RTOS支持大约30个api，都是通过硬件实现的。与传统的软件RTOS相比，硬件实现提供了极高水平的实时性能。
 
@@ -151,19 +110,19 @@ Fast API execution with little fluctuation
 
 从支持的 OS 来说，目前 uITRON 和 μC/OS‑III 推出了支持 HW-RTOS 的版本，但是目前找不到具体的实例代码。μC/OS‑III HW-RTOS 号称做到和原版 μC/OS‑III 的接口和体验一致：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224510.png]]
 
 接下来的章节，我们来详细的分析 HW-RTOS 实现的相关优化点。
 
-**1.5 More**
+## **1.5 More**
 
 需要特别注意的是，就算实现了 HW-RTOS 但是还是有影响实时的硬件因素存在：Cache Miss、TLB Miss、分支预测失败、长跳转与短跳转、DVFS 等等。
 
 航空航天等行业会使用专业的WCET(Worst-caseExecutionTime最坏执行时间)工具，对系统的实时性做一个全面分析。
 
-## 2.优化点1：API
+# 2. 优化点1：API
 
-**2.1 原理介绍**
+## **2.1 原理介绍**
 
 传统软件 OS API 会给系统来带开销，影响系统的性能和实时性，主要体现在两方面：
 
@@ -171,33 +130,33 @@ Fast API execution with little fluctuation
 
 (2)、OS API 在执行期间为了保证一致性大部分情况下是关中断的，如果最坏情况下它的执行时间是难以预估的，那么它带来的最坏关中断时间也是不可预估的。
 
-**2.1.1 Software API Execution time**
+### **2.1.1 Software API Execution time**
 
 图3-1显示了日本最常用的RTOS——ITRON的API执行时间。包含“/D”的API是通过分派执行的API进程。图3-1的测量是在静态条件下进行的。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224536.png]]
 
 但是由于RTOS的执行时间取决于当前的内部状态，因此它们是动态波动的：
 
 (1)、以Set Flag API执行时间为例。如图3-2所示。图中显示了所有Set Flag API的执行时间。但是，等待同一事件的任务越多，执行时间就越长。换句话说，执行时间会根据RTOS的内部状态而波动：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224546.png]]
 
 (2)、Wait队列的基本原理。如图3-3所示，RTOS的Wait队列运行在基于优先级的FCFS (First Come, First Served)算法上。具体来说，每个对象为每个任务优先级级别都有一个队列(在本例中，优先级0被指定为最高优先级，优先级n被指定为最低优先级)。例如，要实现信号量，每个信号量标识符必须有n个队列。每个希望获取信号量的任务必须在队列中等待。当一个任务释放它的信号量时，优先级最高的队列头的任务被选中，该信号量被该任务获取：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224554.png]]
 
 (3)、Set Flag API 的关键流程如下。对于标志控制，系统必须在设置后比较等待标志模式和事件表中的标志模式，以确定释放等待的条件是否满足。换句话说，RTOS必须从图3-3中队列的头部开始依次检查每个任务，并比较标志模式。结果，Set Flag系统调用的处理时间与等待相同标志的任务数量成比例显著增加，如图3-2所示。
 
 因此，API执行时发生的RTOS开销会动态变化，以响应RTOS执行时的内部状态。通常，大多数设计人员希望系统调用执行在几百个时钟周期内得到结果。然而，现在很多人都没有意识到，某些条件的重叠可能会花费更多的时间。因此，当上面讨论的这些条件堆积起来时，开销会突然增加，这意味着某些过程不能在指定的时间限制内完成，从而导致实时系统的整体故障。
 
-**2.1.2 Software Influence of Queue Handling**
+### **2.1.2 Software Influence of Queue Handling**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224608.png]]
 
 如图3-3中Wait队列的逻辑结构所示，RTOS的每个对象都需要优先级队列。通常，软件中实现的队列使用列表结构。在RTOS中，TCB通过一个列表体系结构相互连接，以实现一个等待队列(TCB: Task Control Block)，图3-3中的队列实现如图3-4所示。当一个任务从Wait队列中取出时，优先级最高的队列头的任务将首先取出。因此，软件必须检查任务是否被添加到从最高优先级开始的队列中，以找到任务正在等待的最高优先级队列。作为结果，所需的处理时间会因队列条件的不同而有很大差异。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224616.png]]
 
 另一个问题出现了。在RTOS中存在大量的队列。例如，如果有64个信号量标识符、64个事件标识符和16个优先级级别，那么总数量将是64×2×16 = 2048个队列。因此，即使对象的数量相对较低，也需要大量的资源。图3-5显示了一个可能的改进。每个队列的尾部连接到下一个优先级下降的队列(即下一个较低的队列)头部的TCB。这个结构允许很容易地从Wait队列中删除任务，只需选择指针所指示的任务。它还大大减少了指针的数量。然而，如果仔细考虑，这种改进思想会导致在将任务添加到队列时进行大量处理。例如，当将优先级为7的任务添加到队列中时，搜索从队列头部开始，然后当搜索到达优先级为7的任务时，它将新任务添加到最后一个7级任务的末尾。
 
@@ -205,45 +164,52 @@ Fast API execution with little fluctuation
 
 下面我们将探讨队列处理需要多少时间，并评估这对实时性能有多大影响。测试模型如图3-6 所示：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224628.png]]
 
 测试结果如下图所示：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224636.png]]
 
 伴随队列处理的API执行时间会根据RTOS中队列的状态急剧波动。此外，由此导致的中断禁用周期几乎与api执行时间一样长，因此中断禁用周期也可以根据RTOS队列内部状态动态波动。
 
 因此，当大量任务被添加到队列中时，队列处理可能会产生意想不到的开销和意想不到的长中断禁用周期，从而可能导致实时系统中出现意想不到的错误。很有可能，应用程序和软件设计人员通常不会考虑RTOS中连接到队列的任务数量，但提前了解这些任务可能导致的问题真的很重要。
 
-**2.1.3 HW-RTOS API Execution time**
+### **2.1.3 HW-RTOS API Execution time**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224651.png]]
 
 HW-RTOS中调用api的方法如图4-1所示。如图所示，应用程序调用的API通过库软件作为硬件信号传递给HW-RTOS，返回值也通过库软件接收。库软件还根据HW-RTOS的指令执行调度过程。在图4-2中，我们可以看到HW-RTOS和传统软件RTOS(现在称为SW RTOS)执行时间测量的比较。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224659.png]]
 
 HW-RTOS中的API执行时间非常快，大多数系统调用可以在10个周期内执行。然而，库软件的开销确实会增加执行时间，如图4-2所示。在HW-RTOS中，相同的API的执行时间不会因为内部状态而改变，就像在SW RTOS中显示的设置标志一样。另一个巨大的优点是系统调用的最坏情况值可以在数据表中指定。
 
-**2.1.4 HW-RTOS Influence of Queue Handling**
+### **2.1.4 HW-RTOS Influence of Queue Handling**
 
 HW-RTOS使用瑞萨特有的“虚拟队列”技术实现硬件队列。Virtual Queue可以将任务添加到队列中，从队列中删除任务，也可以从队列中间删除任务，每个操作周期为2个周期。因此，无论队列的状态是什么，处理都可以在指定的时间内完成。
 
 和软件方式在同样测试模型下的对比：
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224712.png]]
 
-**2.2 具体实现**
+## **2.2 具体实现**
 
 HW-RTOS 通过硬件大概实现了 30 个 API 函数，具体包括以下几个方面：
 
-```
-Semaphore
+```c
+ Semaphore 
+ Event flag 
+ Mail box 
+ Lock CPU and disable dispatch 
+ Sleep / wakeup 
+ Release waiting 
+ Rotate ready queue 
+ Change priority
 ```
 
 如下图所示，HW-RTOS作为系统总线上的一个外围模块来实现。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224800.png]]
 
 HW-RTOS为API调用实现了3个专门的寄存器:
 
@@ -253,13 +219,14 @@ API register,
 
 瑞萨已经为处理这些寄存器准备了一个操作系统库。用户可以使用操作系统库轻松调用API调用，就像传统的软件RTOS一样。当调用set_flg API调用时，OS库将参数写入参数寄存器，并将API的类型写入API寄存器。当HW-RTOS接收到这些信息时，它执行API并将返回值写入结果寄存器。OS库将返回值报告给调用方应用程序。执行API时可能需要进行任务切换。在这种情况下，HW-RTOS表示需要进行任务切换，并将下一个应该执行的任务的ID写入结果寄存器，以将该信息传递到OS库。OS库根据此信息执行上下文切换。
 
-**2.3 性能测试**
+## **2.3 性能测试**
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20241023224813.png]]
+
 
 上图显示了API执行时间。传统软件RTOS的执行时间用深紫色表示，HW-RTOS用浅紫色表示。HW-RTOS不仅比软件RTOS的执行时间短，而且波动也不大。
 
-## 3.优化点2：Tick offloading
+# 3. 优化点2：Tick offloading
 
 **3.1 原理介绍**
 

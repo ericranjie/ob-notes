@@ -1,5 +1,5 @@
-原创 TrickBoy CodeTrap
-_2024年03月30日 00:00_ _江苏_
+
+原创 TrickBoy CodeTrap _2024年03月30日 00:00_ _江苏_
 
 在Linux内核中，IPI(Inter-Processor Interrupt, 核间中断)是在多处理器系统下，一种常用的CPU间的通信机制。
 
@@ -7,7 +7,7 @@ _2024年03月30日 00:00_ _江苏_
 
 本文将从**为什么要使用IPI**，**如何使用IPI**以及**IPI的实现原理**来分析Linux中的IPI机制。
 
-**为什么要使用IPI**
+# **为什么要使用IPI**
 
 昨天，有个朋友问了我这样一个问题：
 
@@ -22,8 +22,8 @@ typedef struct {     char comm[TASK_COMM_LEN];     int pid;     int cpu;     int
 ```
 
 输出结果如下：\
-!\[\[Pasted image 20240906122829.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240906122829.png]]
 
 1. 为什么只有3个CPU上的curr信息？
 
@@ -58,8 +58,8 @@ static atomic_t cpu_get_num;  static int my_kprobe_handler(struct kprobe *p, str
 ```
 
 输出结果如下：\
-!\[\[Pasted image 20240906122913.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240906122913.png]]
 
 但这种实现的问题是：
 
@@ -82,8 +82,8 @@ static void do_get_cpu_current(void *args) {   int cpu = smp_processor_id();   s
 ```
 
 输出结果如下：\
-!\[\[Pasted image 20240906122939.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240906122939.png]]
 
 这里忽略掉当前内核模块所在的CPU，输出了其余CPU上的curr信息。向其它CPU发送IPI中断使用了smp_call_function这个函数。
 
@@ -113,7 +113,7 @@ smp_call_function_any——给任意给定的CPU上运行一个函数。
 
 smp_call_function_single_async——在指定某个CPU上运行一个异步函数。
 
-**IPI的实现原理**
+# **IPI的实现原理**
 
 知道了IPI有哪些接口，现在分析一下IPI的实现原理。
 
@@ -191,7 +191,7 @@ generic_smp_call_function_interrupt()->   generic_smp_call_function_single_inter
 
 \_\_flush_smp_call_function_queue函数也没有特别，就是在之前添加任务的call_single_queue队列中取出函数指针去执行，很标准的任务列表的代码。
 
-**最后1个问题**
+# **最后1个问题**
 
 为什么有些接口只可以在进程上下文使用？而那个异步接口却可以在中断上下文使用？
 
@@ -207,28 +207,4 @@ int smp_call_function_single_async(int cpu, struct __call_single_data *csd) {   
 
 我对IPI的理解也并不算深入。
 
-但对开发者来说，这种手段在特定场景下的效果可能也蛮不错的!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)。
-
-![](https://mmbiz.qlogo.cn/mmbiz_jpg/TibnEdoonBKJXf2P0sGG5JBWKUIMIjlib4YekFs5IhJyEluzwzPibd7nl2IZjn7nbhEcEov3x4IrWYAoWv6HNziaGQ/0?wx_fmt=jpeg)
-
-TrickBoy
-
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=Mzg3MDYzOTQyNg==&mid=2247483697&idx=1&sn=60a1f9aca4382ab2c25bf24b2d9e0cbb&chksm=ce8bf31cf9fc7a0a84599e80eed1c7e850a5fcbf499d29c9462594b56654d64e4eae5369e896&mpshare=1&scene=24&srcid=0330o9kaFJmqUWH4ovHYRBl2&sharer_shareinfo=1e9468b27cfc62d78ac5873f4c0ac31b&sharer_shareinfo_first=1e9468b27cfc62d78ac5873f4c0ac31b&key=daf9bdc5abc4e8d0ecfc8525ad5670367b54640c22c5212335774d14ec26e8b41d7d371002e5c352160c37f0cbb074a524496f8051a59640605d38d5f8ee0e83e1567653bbb67bbc20a914020a5670cfb3f20853f574fb21e97c320185bcddbdcb7cf2a00973f1dc619cbd127f6e77983672d3a506bae74404b2eb517f997abb&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQM84yUEIQLWhsciz%2BFQgTyRLmAQIE97dBBAEAAAAAADQYNQXp7MMAAAAOpnltbLcz9gKNyK89dVj0F1jTdSOOQs6V7jebQpwauQXQkq6WUxCjp5eVophDew8Im%2Bi%2Bh1Abn007YWU3kYP8H0Y8VAEOIq9mCGozvmsVk0JpsRQDBuxxDj9HtPkGDCeRX%2FjXLroNZY7d0PiFVF4YRItRyKtxL5NlRTW%2BUg2azO9aZgB4035tsprfY5FG5J07DeFoYXmOHHbeNIKjmq7bQSn9B1ZJXWH%2B6nvKTfutlInscQMq6usXOTNFTYW5kKTiQITa0OqGyzYgKwtalCI2&acctmode=0&pass_ticket=%2BheWQ8duYrNY1ThuaO7lLUMoYbdW1Elm9lVQlYdUhsSiPER8TfEzdYBx3OVeaBWK&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
-
-阅读 86
-
-修改于2024年03月30日
-
-​
-
-发消息
-
-[](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/Dz7JZlP0rjyQkC3MaOvFTPggGQhbvqy1ibY6AtwjYXC4w9kBXBXCouwL0q7W9TlzsZ9giarG2VId58QzffAeF3JQ/300?wx_fmt=png&wxfrom=18)
-
-CodeTrap
-
-117在看
-
-发消息
+但对开发者来说，这种手段在特定场景下的效果可能也蛮不错的!

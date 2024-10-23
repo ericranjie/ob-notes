@@ -1,6 +1,7 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-7-2 18:10 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
-一、前言
+# 一、前言
 
 对于中断处理而言，linux将其分成了两个部分，一个叫做中断handler（top half），属于不那么紧急需要处理的事情被推迟执行，我们称之deferable task，或者叫做bottom half，。具体如何推迟执行分成下面几种情况：
 
@@ -14,9 +15,9 @@
 
 注：本文中的linux kernel的版本是4.0
 
-二、为什么需要tasklet？
+# 二、为什么需要tasklet？
 
-1、基本的思考
+## 1、基本的思考
 
 我们的驱动程序或者内核模块真的需要tasklet吗？每个人都有自己的看法。我们先抛开linux kernel中的机制，首先进行一番逻辑思考。
 
@@ -28,7 +29,7 @@
 
 本质上讲，越快越好型的bottom half不应该太多，而且tasklet的callback函数不能执行时间过长，否则会产生进程调度延迟过大的现象，甚至是非常长而且不确定的延迟，对real time的系统会产生很坏的影响。
 
-2、对linux中的bottom half机制的思考
+## 2、对linux中的bottom half机制的思考
 
 在linux kernel中，“越快越好型”有两种，softirq和tasklet，“随遇而安型”也有两种，workqueue和threaded irq handler。“越快越好型”能否只留下一个softirq呢？对于崇尚简单就是美的程序员当然希望如此。为了回答这个问题，我们先看看tasklet对于softirq而言有哪些好处：
 
@@ -38,9 +39,9 @@
 
 对于第一种好处，其实也就是为乱用tasklet打开了方便之门，很多撰写驱动的软件工程师不会仔细考量其driver是否有性能需求就直接使用了tasklet机制。对于第二种好处，本身考虑并发就是软件工程师的职责。因此，看起来tasklet并没有引入特别的好处，而且和softirq一样，都不能sleep，限制了handler撰写的方便性，看起来其实并没有存在的必要。在4.0 kernel的代码中，grep一下tasklet的使用，实际上是一个很长的列表，只要对这些使用进行简单的归类就可以删除对tasklet的使用。对于那些有性能需求的，可以考虑并入softirq，其他的可以考虑使用workqueue来取代。Steven Rostedt试图进行这方面的尝试（[http://lwn.net/Articles/239484/](http://lwn.net/Articles/239484/ "http://lwn.net/Articles/239484/")），不过这个patch始终未能进入main line。
 
-三、tasklet的基本原理
+# 三、tasklet的基本原理
 
-1、如何抽象一个tasklet
+## 1、如何抽象一个tasklet
 
 内核中用下面的数据结构来表示tasklet：
 

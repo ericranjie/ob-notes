@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-9-22 18:33 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 一、前言

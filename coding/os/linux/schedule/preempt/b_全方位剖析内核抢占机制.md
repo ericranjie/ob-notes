@@ -1,5 +1,5 @@
-原创 summer OPPO内核工匠
-_2024年05月24日 17:30_ _广东_
+
+原创 summer OPPO内核工匠 _2024年05月24日 17:30_ _广东_
 
 在当今数字时代，手机已成为人们日常生活中不可或缺，多任务处理和实时响应对于用户体验越来越重要，抢占(preemption)机制在提升系统性能和用户体验方面发挥了至关重要的作用。内核抢占机制使得系统能够有效地管理多任务处理，确保系统对用户操作的快速响应，并在资源紧张的情况下仍能保持稳定和流畅的运行。
 
@@ -13,7 +13,7 @@ _2024年05月24日 17:30_ _广东_
 
 4.实例分析：通过实际案例中一个高优先级的线程长时间抢占不到资源，来看如何定位类似问题
 
-# **1. latency in linux**
+# **1.  latency in linux**
 
 内核抢占允许高优先级任务中断正在执行的低优先级任务，从而减少调度延迟，提高系统响应性，那么我们就需要知道对于Linux内核中有哪些因素会导致响应不及时。首先，我们来看看典型应用场景如下：![图片](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjNhtmSSUMJo4hat99prxyEEV6gIqAqGyGWXABHayY3Ehjib9pVLPAmo9icq1xhiaAtLagYACIibTiacceg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 

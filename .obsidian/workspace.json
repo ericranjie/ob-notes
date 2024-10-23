@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md"
+                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md"
               }
             }
           }
@@ -148,42 +148,42 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
+    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
+    "coding/os/linux/schedule/interrupt/k_Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
+    "coding/os/linux/schedule/interrupt/i_linux kernel的中断子系统之（九）：tasklet.md",
+    "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
+    "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
+    "coding/os/linux/schedule/interrupt/d_Linux kernel中断子系统之（五）：驱动申请中断API.md",
+    "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
+    "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
+    "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
+    "zx99-image/Pasted image 20241023225009.png",
+    "coding/os/linux/schedule/interrupt/a_d_n_linux kernel的中断子系统之（七）：GIC代码分析.md",
+    "coding/os/linux/schedule/a_n_Linux实时化与硬实时RTOS综述.md",
+    "zx99-image/Pasted image 20241023224422.png",
+    "zx99-image/Pasted image 20241023224813.png",
+    "zx99-image/Pasted image 20241023224800.png",
+    "zx99-image/Pasted image 20241023224712.png",
+    "zx99-image/Pasted image 20241023224659.png",
+    "zx99-image/Pasted image 20241023224651.png",
+    "zx99-image/Pasted image 20241023224636.png",
+    "zx99-image/Pasted image 20241023224628.png",
+    "zx99-image/Pasted image 20241023224616.png",
+    "coding/os/linux/schedule/d_n_多线程死锁检测的分析与实现(linux c)-有向图的应用.md",
+    "coding/os/linux/schedule/i_Linux 最大并发数是多少？.md",
+    "coding/os/linux/schedule/i_Linux内核同步机制之（一）：原子操作.md",
+    "coding/os/linux/schedule/i_Linux内核同步机制之（二）：Per-CPU变量.md",
+    "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
     "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
     "coding/os/linux/schedule/i_甄建勇：五分钟搞定计算机体系结构（上）.md",
     "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
     "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
     "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
-    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
     "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
     "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
-    "zx99-image/Pasted image 20241023222559.png",
     "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
-    "zx99-image/Pasted image 20241023221945.png",
-    "zx99-image/Pasted image 20241023221255.png",
-    "zx99-image/Pasted image 20241023221557.png",
     "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（任务放置）.md",
-    "zx99-image/Pasted image 20241023221512.png",
-    "zx99-image/Pasted image 20241023221435.png",
-    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
-    "zx99-image/Pasted image 20241023221354.png",
-    "zx99-image/Pasted image 20241023221341.png",
-    "zx99-image/Pasted image 20241023221323.png",
-    "coding/os/linux/schedule/barrier/Why Memory Barriers中文翻译（下）.md",
-    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
-    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
-    "zx99-image/Pasted image 20241023221228.png",
-    "README.md",
-    "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
-    "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
-    "coding/os/linux/memory/a_s_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
-    "coding/os/linux/memory/userspace/p_Jemalloc内存分配与优化实践.md",
-    "coding/os/linux/memory/userspace/k_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "coding/os/linux/memory/userspace/k_从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
-    "coding/os/linux/memory/userspace/k_一文读懂零拷贝技术｜splice原理与实现.md",
-    "coding/os/linux/memory/userspace/k_Linux Mmap映射：优化文件访问和共享内存.md",
-    "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
-    "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
-    "coding/os/linux/memory/userspace/i_mmap在arm64背后的那个深坑.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",

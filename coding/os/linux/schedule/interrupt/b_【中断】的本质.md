@@ -1,40 +1,13 @@
-Linux云计算网络
-_2021年10月25日 08:13_
+
+Linux云计算网络 _2021年10月25日 08:13_
+
 以下文章来源于IOT物联网小镇 ，作者道哥
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzI1OTY2MzMxOQ==&mid=2247496751&idx=1&sn=dbdb208d4a9489981364fa36e916efc9&chksm=ea77c097dd004981e7358d25342f5c16e48936a2275202866334d872090692763110870136ad&mpshare=1&scene=24&srcid=1025peMJiUpm4aKVPsLvw1Zn&sharer_sharetime=1635124512104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d04bb4eb637ddf607b3f3973caff47f9e57980acde5c001b070729666898ffb01d5f76551b6a95ec17053ab6340bab531c5eeb9b906f26aa6d90c4d762c252e3a0b90e887c437bf278688d4d81ce27756f9b217aad492ab0073a93a5cc8fc73a152234fd3fdef5736e615b2607de46cc63275cbca893629594&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQhc%2BeS6SshNikRXyWPYNVNBLmAQIE97dBBAEAAAAAAEbHL71HiEUAAAAOpnltbLcz9gKNyK89dVj00M2etG%2Bpo5B0ubHnyhcWPD7ZS8ONZ1eK2%2B0AD0NAhI0c%2BRMZUOysodHehBQylawPN5DfXFo7cbWNYRhmF4vvkkoDd5ggzAMtVhIV32lQrV4KSqfCcAp5yA%2Fzv54VqpWZuYCglwE9mSfwic2P0jTjsCgBQG5nPfbsHFS%2B%2F2fVGkjigd2TDU%2F3v84g0z4Ol7BtMs6Mv0J9YmIZ9sLpeRtG5Y4vIfUyeyPDLZVdXdPgC49%2B3FQpPd4IMlyqyyl%2Bv52d&acctmode=0&pass_ticket=nI3fD44N03%2F076Ut5RH0dB6vWUwI3QJ7W38UCvR2PbFN4F%2BqtJgd0bIfpnIN4qRu&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
-
-> 作  者：道哥，10+年的嵌入式开发老兵。
->
-> 专注于：C/C++、Linux操作系统、应用程序设计、物联网、单片机和嵌入式开发等领域。
-
-- 中断向量与中断描述符
-
-- 中断的分类
-
-- 内部中断
-
-- 外部中断
-
-- 中断号
-
-- 中断向量和中断处理程序
-
-- 中断向量的本质
-
-- 中断处理程序的安装
-
-- 中断现场的保护和恢复
-
-- 总结：中断的本质
 
 在软件开发中，中断是一个绕不开的重要话题，但是，不知道您是否遇到过这样的困惑：
 
 很多书籍、文章在介绍中断相关的知识点时，说的都挺有道理。
 
 这篇文章对中断的讲解很正确，那篇文章在描述中断的时候也挺对的，但是，这两篇文章中，怎么有些内容是矛盾的啊？！
-
-![图片](https://mmbiz.qpic.cn/mmbiz_png/WC13ibsIvG3adXgDp6bxSJDmv4oS0NYxma2SfGjPAMAHShKMeV1vXHB8AjazVYn8gQrtRRZyFofxpHqjYx6yLjg/640?wx_fmt=png&wxfrom=13&tp=wxpic)
 
 单独看任何一篇文章感觉都有道理，看的越多，反而越迷糊？
 
@@ -58,7 +31,7 @@ _2021年10月25日 08:13_
 
 有了这个储备，理清了基本的脉络之后，以后再去学习 `Linux` 系统中的中断相关内容时，才会有原来如此的感觉！
 
-## 中断向量与中断描述符
+# 中断向量与中断描述符
 
 中断向量这个词很时髦，也很神秘！
 
