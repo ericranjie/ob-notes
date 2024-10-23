@@ -1,5 +1,5 @@
-原创 Hcoco TrustZone
-_2024年03月19日 07:31_ _四川_
+
+原创 Hcoco TrustZone _2024年03月19日 07:31_ _四川_
 
 # 前言
 
@@ -7,7 +7,7 @@ Hi，早啊！
 
 最近一直在学习内存管理，也知道MMU是管理内存的映射的逻辑IP，还知道里面有个TLB。
 
-![](https://mmbiz.qpic.cn/mmbiz_png/0l8e8dYXFXYaucpw1h2fC6VibicvHqfWmBLpibW6PR3pTdmsSKrePZFwJPaRay7b3tF1MdO1TXIWWcWss6kZJOw6A/640?wx_fmt=png&wxfrom=13&tp=wxpic "null")
+![[Pasted image 20241023180429.png]]
 
 在这里插入图片描述
 
@@ -21,7 +21,7 @@ Hi，早啊！
 
 放在整个大系统多核架构里面，每个处理器内置了MMU模块，MMU模块包含了TLB和TWU两个子模块。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/0l8e8dYXFXYaucpw1h2fC6VibicvHqfWmBMqDIQPV9pPFiaaZHUteRW4CRX4RibXnicL75yIONqpYLwlIJIlrhibDBWA/640?wx_fmt=png&wxfrom=13&tp=wxpic "null")
+![[Pasted image 20241023180442.png]]
 
 在这里插入图片描述
 
@@ -40,7 +40,8 @@ Hi，早啊！
 虚拟地址又被简称为虚地址，物理地址又被称为实地址。虚拟地址和物理地址之间的转换，又称为虚实地址转化。
 
 而这个转换的过程是硬件执行的：虚拟地址不是被直接送到内存地址总线上，而是送到内存管理单元MMU。他由一个或一组芯片组成，一般存在与协处理器中，其功能是把虚拟地址映射为物理地址。
-!\[\[Pasted image 20240914200542.png\]\]
+
+![[Pasted image 20240914200542.png]]
 
 ## 2-微观理解
 
@@ -49,7 +50,8 @@ Hi，早啊！
 它们不需要了解系统的物理内存图，即硬件实际使用的地址，也不需要了解可能在同一时间执行的其他程序。
 
 **所以在这种时候其实也要注意，你到底是使用的物理内存还是虚拟内存，使用的同一片内存，会不会出现踩踏内存的现象。**
-!\[\[Pasted image 20240914200547.png\]\]
+
+![[Pasted image 20240914200547.png]]
 
 **你可以为每个程序使用相同的虚拟内存地址空间**。
 
@@ -62,7 +64,8 @@ Hi，早啊！
 如下图所示的内存虚拟和物理视图的系统实例，**一个系统中的不同处理器和设备可能有不同的虚拟和物理地址图**。
 
 **操作系统对MMU进行编程，在这两个内存视图之间进行转换。**
-!\[\[Pasted image 20240914200554.png\]\]
+
+![[Pasted image 20240914200554.png]]
 
 要做到这一点，**虚拟内存系统中的硬件必须提供地址转换，即把处理器发出的虚拟地址转换为主内存中的物理地址**。
 
@@ -79,7 +82,8 @@ MMU将**代码和数据的虚拟地址映射成实际系统中的物理地址**�
 除了地址转换外，MMU还**控制内存访问权限**、**内存排序**和**每个区域内存的缓存策略**。
 
 （安全地址与非安全地址的访问控制权限，检查页标签）
-!\[\[Pasted image 20240914200603.png\]\]
+
+![[Pasted image 20240914200603.png]]
 
 MMU使**任务或应用程序的编写方式要求它们对系统的物理内存图或可能同时运行的其他程序一无所知**。**这使你可以为每个程序使用相同的虚拟内存地址空间。**
 
@@ -92,7 +96,8 @@ MMU使**任务或应用程序的编写方式要求它们对系统的物理内存
 CPU发出的虚拟地址由两部分组成：VPN和offset，VPN（virtual page number）是页表中的条目number，而offset是指页内偏移。
 
 最终转换后的物理地址也有两部分：PFN和offset，PFN（ Physical frame number）是物理页框number，offset和上面虚拟地址的offset相同，是页内偏移。
-!\[\[Pasted image 20240914200610.png\]\]
+
+![[Pasted image 20240914200610.png]]
 
 ### 2-MMU包含两个模块
 
@@ -105,7 +110,8 @@ TWU是一个页表遍历模块，页表是由操作系统维护在物理内存�
 MMU由两部分组成：TLB(Translation Lookaside Buffer)和table walk unit。TLB 是一种地址转换cache，这里我们略过TLB的工作细节。
 
 table walk unit在不同的CPU架构上有不同的叫法，但其作用是相同的，就是把内存页表走一走进行查表，完成虚拟地址到物理地址的转换。
-!\[\[Pasted image 20240914200616.png\]\]
+
+![[Pasted image 20240914200616.png]]
 
 ### 3-访问权限控制
 
@@ -128,21 +134,23 @@ TrustZone技术之所以能提高系统的安全性，是因为对外部资源�
 Cache也同样进行了扩展，Cache中的每一项都会按照安全状态和非安全状态打上对应的标签，在不同的状态下，处理器只能使用对应状态下的Cache。
 
 在REE(linux)和TEE(optee)双系统的环境下，可同时开启两个系统的MMU。在secure和non-secure中使用不同的页表.secure的页表可以映射non-secure的内存，**而non-secure的页表不能去映射secure的内存，否则在转换时会发生错误：**
-!\[\[Pasted image 20240914200623.png\]\]
+
+![[Pasted image 20240914200623.png]]
 
 在EL2系统中，MMU地址转换时，会自动使用TTBR2_EL1指向的页表。
 
 在EL3系统中，MMU地址转换时，会自动使用TTBR3_EL1指向的页表。
-!\[\[Pasted image 20240914200629.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200629.png]]
 
 在这里插入图片描述
 
 ### 4-启用hypervisor
 
 如果启用了hypervisor那么虚拟地址转换的过程将有VA—>PA变成了VA—>IPA—>PA, 也就是要经过两次转换.在guestos(如linux kernel)中转换的物理地址，其实不是真实的物理地址(假物理地址)，然后在EL2通过VTTBR0_EL2基地址的页表转换后的物理地址，才是真实的硬件地址。
-!\[\[Pasted image 20240914200636.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200636.png]]
+
 
 在这里插入图片描述
 
@@ -155,16 +163,15 @@ IPA : intermediate physical address
 在ARM嵌入式应用系统中， 很多系统控制由ARM CP15协处理器来完成的。CP15协处理器包含编号0-15的16个32位的寄存器。例如，ARM处理器使用C15协处理器的寄存器来控制cache、TCM（Tightly-Coupled Memory）和存储器管理。
 
 在这些C15寄存器中和MMU关系较大的有C2、C7、C17寄存器。
-!\[\[Pasted image 20240914200649.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200649.png]]
 
 在这里插入图片描述
-!\[\[Pasted image 20240914200656.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200656.png]]
 
 在这里插入图片描述
-!\[\[Pasted image 20240914200704.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+![[Pasted image 20240914200704.png]]
 
 在这里插入图片描述
 
@@ -188,14 +195,13 @@ TTCR控制TTBR0和TTBR1的使用。
 
 #### 1-为什么要有TLB
 
-!\[\[Pasted image 20240914200711.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+![[Pasted image 20240914200711.png]]
 
 在这里插入图片描述
 
 TLB 是 translation lookaside buffer 的简称。首先，我们知道 MMU 的作用是把虚拟地址转换成物理地址。
-!\[\[Pasted image 20240914200717.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200717.png]]
 
 在这里插入图片描述
 
@@ -208,8 +214,8 @@ TLB 是 translation lookaside buffer 的简称。首先，我们知道 MMU 的�
 分别是 PGD、PUD、PMD、PTE 四级页表。
 
 **在硬件上会有一个叫做页表基地址寄存器，它存储 PGD 页表的首地址。**
-!\[\[Pasted image 20240914200723.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200723.png]]
 
 在这里插入图片描述
 
@@ -220,8 +226,8 @@ MMU 就是根据页表基地址寄存器从 PGD 页表一路查到 PTE，最终�
 这个过程你也看到了，非常繁琐。如果第一次查到你家的具体位置，我如果记下来你的姓名和你家的地址。下次查找时，是不是只需要跟我说你的姓名是什么，我就直接能够告诉你地址，而不需要一级一级查找。
 
 四级页表查找过程需要四次内存访问。\*\*延时可想而知，非常影响性能。页表查找过程的示例如下图所示。\*\*以后有机会详细展开，这里了解下即可。
-!\[\[Pasted image 20240914200731.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200731.png]]
 
 在这里插入图片描述
 
@@ -238,8 +244,8 @@ TLB 其实就是一块高速缓存。
 ### 7-TWU
 
 table walk unit：包含从内存中读取translation tables的逻辑
-!\[\[Pasted image 20240914200738.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200738.png]]
 
 在这里插入图片描述
 
@@ -254,8 +260,8 @@ page table是每个进程独有的，是软件实现的，是存储在main memor
 **Address Translation**
 
 因为访问内存中的页表相对耗时，尤其是在现在普遍使用多级页表的情况下，需要多次的内存访问，为了加快访问速度，系统设计人员为page table设计了一个硬件缓存 - TLB，CPU会首先在TLB中查找，因为在TLB中找起来很快。TLB之所以快，一是因为它含有的entries的数目较少，二是TLB是集成进CPU的，它几乎可以按照CPU的速度运行。
-!\[\[Pasted image 20240914200744.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200744.png]]
 
 在这里插入图片描述
 
@@ -327,8 +333,7 @@ page table是每个进程独有的，是软件实现的，是存储在main memor
 
 ### （1）页命中
 
-!\[\[Pasted image 20240914200753.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+![[Pasted image 20240914200753.png]]
 
 在这里插入图片描述
 
@@ -344,8 +349,7 @@ page table是每个进程独有的，是软件实现的，是存储在main memor
 
 ### （2）缺页
 
-!\[\[Pasted image 20240914200757.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+![[Pasted image 20240914200757.png]]
 
 在这里插入图片描述
 
@@ -366,8 +370,8 @@ page table是每个进程独有的，是软件实现的，是存储在main memor
 ## 3-多级页表映射过程
 
 物理页面大小一级地址总线宽度不同，页表的级数也不同。以AArch64运行状态，4KB大小物理页面，48位地址宽度为例，页表映射的查询过程如图：
-!\[\[Pasted image 20240914200803.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "null")
+
+![[Pasted image 20240914200803.png]]
 
 在这里插入图片描述
 
@@ -475,34 +479,3 @@ RTOS可以运行在没有MMU的系统上，因为RTOS通常不需要进行内存
 
 - • 《计算机架构与体系》
 
-![](https://mmbiz.qlogo.cn/mmbiz_jpg/SaKicxhw1fk0PHoWR27WHcLd5on8NmYrObw2a1oUveVIlaGXvOlSA7CJP1a2urOvSa0Ck3xz5Bq392Bic0r1RPdQ/0?wx_fmt=jpeg)
-
-Hcoco
-
-![赞赏二维码](https://mp.weixin.qq.com/s?__biz=MzUyOTY5NzkwNg==&mid=2247490543&idx=2&sn=cc20bd90ec5e732c2c18e9d0df967906&chksm=fa5c46f2cd2bcfe414b75c3a6764eda2d330154817c3b689bff5bad9cda8e00ec05838277c54&mpshare=1&scene=24&srcid=03308a8ZfLYP1vPAPu8eyTKO&sharer_shareinfo=d4e29fd7735d6111c56bb7cb1b072298&sharer_shareinfo_first=d4e29fd7735d6111c56bb7cb1b072298&key=daf9bdc5abc4e8d06fc28bc49fbd4ba09ec571803cf32380d043951c220d6e28674a6990204bc8a4832abbd9ba03cdb3eba48ec58fb6e448a0702b4509b41f546698e07a44a695ba647e2b774688d52ed0c98a23d2cfac66f484eb3ff29747f6745b073b61c49eeeb988433b19f4fd3c3c349337469e89f456b6f15cf1e8472d&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQTwvF00AINcP5iMQMUJoHRhLmAQIE97dBBAEAAAAAABqBKRwOLmkAAAAOpnltbLcz9gKNyK89dVj0uW2VII%2BPZptF2S9Lcepp9ZL3aUuDRrK8e2J6nr7mJdzevc7LAYrGVt4780cpzoBlDX94puF6rfnMpqY%2FN5Vn1j114eGH3pDCdFr3K2dm6WbJprRKaLzaaRW%2B7MAzjOCMsRd69DF7JiX05Zjs04sndZHutXWu5JyKT%2BcEsWK9YRokRKgZQSZj9QSJlOLcgkgM5PxvukvkYswS5%2FUPcsVh3L7XlvB2iqalpou9wj4Amaswywicc4FaVV%2Fy2kSN7N7F&acctmode=0&pass_ticket=ZirsIrD8tP3a1Wa%2FaN9a396HRYwez%2FQ17OunmnRX6aSU%2FhHEap9maV80HJwcXKCI&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1)喜欢作者
-
-1人喜欢
-
-![](http://wx.qlogo.cn/mmopen/LvmGXjXssfTRpWP3vnk4Tp5cibVFYdbSIJkapCZ9YjdRicCdAfxlicgW7PvVUl3zic6bJ7Sxk3smHJpIpSxibJR6BP4gQvZAQZetC/64)
-
-内存18
-
-内存 · 目录
-
-上一篇深入理解Linux内核页表映射分页机制原理
-
-阅读 1332
-
-​
-
-发消息
-
-[](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/0l8e8dYXFXaFeZekILpgPwqrlcnjeuvsXica1ZDPqT1Qb1yzv4OVDF8PbOajBRGZ683pPeA7exWWYHpOLLbG4pw/300?wx_fmt=png&wxfrom=18)
-
-TrustZone
-
-62043
-
-发消息

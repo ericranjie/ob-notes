@@ -108,21 +108,25 @@ Secure EL3 translation regime
 Secure and Non-secure地址空间
 在REE(linux)和TEE(optee)双系统的环境下，可同时开启两个系统的MMU.
 在secure和non-secure中使用不同的页表.secure的页表可以映射non-secure的内存，而non-secure的页表不能去映射secure的内存，否则在转换时会发生错误
-!\[\[Pasted image 20240909130115.png\]\]
+
+![[Pasted image 20240909130115.png]]
 
 Two Stage Translations
 EL1&0 Translation regime处于VM(Virtual Machine)或SP(Secure Partition)时，EL2 enabled的情况下，是需要stage2转换的。对于EL2 Translation regime 和 EL3 Translation regime是没用stage2 转换的。
-!\[\[Pasted image 20240909130123.png\]\]
+
+![[Pasted image 20240909130123.png]]
 
 # 四、地址翻译/几级页表？
 
 4.1、思考：页表到底有几级？
 从以下图来看，有的页表从L2开始，有得从L1开始，有的从L0开始，还有从L-1开始的，都是到L3终止。
 那么我们的页表到底有几级呢？
-!\[\[Pasted image 20240909130130.png\]\]
+
+![[Pasted image 20240909130130.png]]
 
 4.2、以4KB granule为例，页表的组成方式
-!\[\[Pasted image 20240909130140.png\]\]
+
+![[Pasted image 20240909130140.png]]
 
 除了第一级index(这里是leve 0 table中的index)，每一个查找table/page的index都是9个bit，也就是说除了第一级页表，后面的每一级table都是有512个offset
 
@@ -137,25 +141,32 @@ EL1&0 Translation regime处于VM(Virtual Machine)或SP(Secure Partition)时，EL
 另外我们还需注意一点，在Level 0 table中，他只能指向D_Table，不能指向D_Block
 
 以下针对虚拟地址是48有效位的情形做了一个总结：
-!\[\[Pasted image 20240909130148.png\]\]
+
+![[Pasted image 20240909130148.png]]
 
 4.3、optee实际使用的示例
 32位有效虚拟地址、，3级页表查询(L1、L2、L3)，颗粒的位4KB
-!\[\[Pasted image 20240909130158.png\]\]
+
+![[Pasted image 20240909130158.png]]
 
 如下展示是optee os的页表结构，TTBR0_EL1指向L1 Table，L1 Table中有4个表项，但只用了3个 , 也就对应着3张L2 Table.
-!\[\[Pasted image 20240909130225.png\]\]
+
+![[Pasted image 20240909130225.png]]
 
 配置相关的代码如下：
-!\[\[Pasted image 20240909130232.png\]\]
+
+![[Pasted image 20240909130232.png]]
 
 # 五、页表格式（Descriptor format）
 
-5.1、ARMV8支持的3种页表格式
+## 5.1、ARMV8支持的3种页表格式
+
 AArch64 Long Descriptor : 我们只学习这个
 Armv7-A Long Descriptor ： for Large Physical Address Extension (LPAE)
 Armv7-A Short Descriptor
-5.2、AArch64 Long Descriptor支持的四种entry
+
+## 5.2、AArch64 Long Descriptor支持的四种entry
+
 对于AArch64 Long Descriptor，又分为下面四种entry：
 
 An invalid or fault entry.
@@ -163,11 +174,14 @@ A table entry, that points to the next-level translation table.
 A block entry, that defines the memory properties for the access.
 A reserved format
 注意：entry\[1:0\] 表示该entry属于哪类entry， Block Descriptor和Page Descriptor是一个意思。在当前架构中，reserved也是invalid。
-!\[\[Pasted image 20240909130238.png\]\]
 
-5.3、页表的属性位介绍（ Block Descriptor/Page Descriptor ）
-5.3.1、stage1的页表属性
-!\[\[Pasted image 20240909130245.png\]\]
+![[Pasted image 20240909130238.png]]
+
+## 5.3、页表的属性位介绍（ Block Descriptor/Page Descriptor ）
+
+### 5.3.1、stage1的页表属性
+
+![[Pasted image 20240909130245.png]]
 
 （Attribute fields in stage 1 VMSAv8-64 Block and Page descriptors）
 
@@ -184,10 +198,12 @@ SH, bits\[9:8\] ：shareable属性
 AP\[2:1\], bits\[7:6\] ：Data Access Permissions bits,
 NS, bit\[5\] ：Non-secure bit
 AttrIndx\[2:0\], bits\[4:2\] ：
-5.3.2、stage2的页表属性
+
+### 5.3.2、stage2的页表属性
 
 （Attribute fields in stage 2 VMSAv8-64 Block and Page descriptors）
-!\[\[Pasted image 20240909130254.png\]\]
+
+![[Pasted image 20240909130254.png]]
 
 PBHA\[3:1\], bits\[62:60\] ：for FEAT_HPDS2
 
@@ -211,7 +227,7 @@ S2AP, bits\[7:6\] ：Stage 2 data Access Permissions
 
 MemAttr, bits\[5:2\] ：
 
-5.3.3、其它标志位的详细介绍
+### 5.3.3、其它标志位的详细介绍
 
 （1）、MemAttr
 指向MAIR_ELx寄存器中的attrn属性域，表示内存的缓存属性，如cachable、shareable等
@@ -221,11 +237,13 @@ Non-secure比特 表示转换后的物理地址是secure的还是non-secure的�
 
 （3）、AP
 Data access permissions 数据访问权限
-!\[\[Pasted image 20240909130300.png\]\]
+
+![[Pasted image 20240909130300.png]]
 
 （4）、SH
 shareable属性
-!\[\[Pasted image 20240909130305.png\]\]
+
+![[Pasted image 20240909130305.png]]
 
 （5）、AF
 Access flag, AF=0后，第一次访问该页面时，会将该标志置为1. 即暗示第一次访问
@@ -233,25 +251,31 @@ Access flag, AF=0后，第一次访问该页面时，会将该标志置为1. 即
 对于 EL0/EL1 虚拟地址空间，Page Descriptor属性字段中的 nG 位将转换标记为Gloabl(G) 或non-Gloabl(nG)。例如，内核映射是Gloabl(G)翻译，应用程序映射是non-Gloabl翻译。Gloabl翻译适用于当前正在运的任何应用程序。非全局翻译仅适用于特定应用程序
 
 non-Gloabl映射在 TLB 中使用 ASID进行标记。在 TLB 查找时，将 TLB 条目中的 ASID 与当前选择的 ASID 进行比较。如果它们不匹配，则不使用TLB 条目。下图显示了内核空间中没有 ASID 标记的全局映射和用户空间中具有 ASID 标记的非全局映射
-!\[\[Pasted image 20240909130314.png\]\]
+
+![[Pasted image 20240909130314.png]]
 
 （7）、XN or UXN
 特权和非特权不可从该memory-region中执行指令的标志位：
 Execute-never
 Unprivileged execute-never
 
-六、地址翻译指令介绍
+# 六、地址翻译指令介绍
+
 address translation的指令大约14个：
-!\[\[Pasted image 20240909130320.png\]\]
+
+![[Pasted image 20240909130320.png]]
 
 总结一下：
-!\[\[Pasted image 20240909130328.png\]\]
 
-七、地址翻译相关的系统寄存器总结
+![[Pasted image 20240909130328.png]]
+
+# 七、地址翻译相关的系统寄存器总结
+
 地址转换由系统寄存器的组合控制：
 
-7.1 SCTLR_ELx
-!\[\[Pasted image 20240909130339.png\]\]
+## 7.1 SCTLR_ELx
+
+![[Pasted image 20240909130339.png]]
 
 系统控制寄存器，控制着MMU、I-cache、D-cache的打开与关闭，也控制着translation table walks访问内存的大小端。
 
@@ -261,17 +285,20 @@ C - Enable for data and unified caches.
 
 EE - Endianness of translation table walks.
 
-7.2 TTBRn_ELx
-!\[\[Pasted image 20240909130344.png\]\]
+## 7.2 TTBRn_ELx
+
+![[Pasted image 20240909130344.png]]
 
 BADDR : 基地址
 ASID ：TLB entry区分user程序所用的ASID
 
-7.3 TCR_ELx
-在ARM Core中(aarch64)，有三个Translation Control Register 寄存器:
-!\[\[Pasted image 20240909130349.png\]\]
+## 7.3 TCR_ELx
 
-!\[\[Pasted image 20240909130354.png\]\]
+在ARM Core中(aarch64)，有三个Translation Control Register 寄存器:
+
+![[Pasted image 20240909130349.png]]
+
+![[Pasted image 20240909130354.png]]
 
 比特位 功能 说明
 ORGN1、IRGN1、ORGN0、IRGN0 cacheable属性 outer/inner cableability的属性(如直写模式、回写模式)
@@ -283,10 +310,12 @@ TBI1、TBI0 - top addr是ignore，还是用于MTE的计算
 A1 - ASID的选择，是使用TTBR_EL1中的，还是使用TTBR_EL0中的
 AS - ASID是使用8bit，还是使用16bit
 
-7.3 MAIR_ELx
+## 7.3 MAIR_ELx
+
 内存属性寄存器，分为8个Attrn，所以一个core，最多只支持8中内存属性。
 页表中的每一个entry，都会指向一个Attr域。
-!\[\[Pasted image 20240909130400.png\]\]
+
+![[Pasted image 20240909130400.png]]
 
 推荐
 ARMv8/ARMv9架构从入门到精通 --博客专栏
@@ -294,8 +323,6 @@ ARMv8/ARMv9架构从入门到精通 --博客专栏
 8天入门ARM架构 --入门课程
 ————————————————
 
-```
-                        版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
-```
+版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
 
 原文链接：https://blog.csdn.net/a1657054242/article/details/136613964

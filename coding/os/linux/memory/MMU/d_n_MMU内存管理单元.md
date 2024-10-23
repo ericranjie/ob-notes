@@ -1,3 +1,4 @@
+
 # 什么是MMU
 
 MMU(Memory Management Unit)主要用来管理虚拟存储器、物理存储器的控制线路，同时也负责**虚拟地址映射为物理地址**，以及提供硬件机制的内存访问授权、多任务多进程操作系统。（来自百度百科，**对其几个点不熟悉，因此可以只考虑加粗部分**）
@@ -111,7 +112,7 @@ C3寄存器.png
 
 其中每两位控制一个域的访问控制特性，其编码及对应的含义如下所示：
 
-![](https://upload-images.jianshu.io/upload_images/2310756-a20552080cd50a24.png)
+![[Pasted image 20241023180355.png]]
 
 Paste_Image.png
 
