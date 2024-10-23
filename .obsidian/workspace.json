@@ -11,9 +11,11 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241022201640.png"
+                "file": "code-griding-note.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241022201640.png",
+                "file": "code-griding-note.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241022201640.png",
+                "file": "code-griding-note.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241022201640.png"
+                "file": "code-griding-note.md"
               }
             }
           }
@@ -144,8 +146,10 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "README.md",
+    "zx99-image/Pasted image 20241022201640.png",
     "coding/os/linux/io/k_Linux IO 那些事儿.md",
     "zx99-image/Pasted image 20241022202859.png",
     "coding/os/linux/io/i_看一遍就理解：IO模型详解.md",
@@ -161,7 +165,6 @@
     "zx99-image/Pasted image 20241022202013.png",
     "coding/os/linux/io/b_block io生命历程.md",
     "zx99-image/Pasted image 20241022201707.png",
-    "zx99-image/Pasted image 20241022201640.png",
     "coding/os/linux/io/a_深入理解 Linux 异步 IO 框架 io_uring.md",
     "coding/os/linux/io/epoll/p_盘点Linux Epoll那些致命弱点.md",
     "coding/os/linux/io/epoll/m_深入理解 Linux 的 epoll 机制.md",
@@ -170,7 +173,6 @@
     "coding/os/linux/io/epoll/a_大疆一面：请说出水平触发和边缘触发的区别？.md",
     "coding/os/linux/syscall/i_Linux 多线程全面解析.md",
     "coding/os/linux/LWN：针对每个调用点设置slab cache来防护heap-spray！.md",
-    "README.md",
     "coding/compiler/b_编译乱序(Compiler Reordering).md",
     "0x01-leetcode/algorithm/dynamic-programming/subarray-subsequence/longest-increasing-subsequence/m_300. Longest Increasing Subsequence.md",
     "code-griding-note.md",
@@ -181,7 +183,6 @@
     "coding/os/linux/memory/memory-manage/i_Linux kernel scatterlist API介绍.md",
     "coding/os/linux/memory/memory-manage/i_linux kernel内存碎片防治技术.md",
     "coding/os/linux/memory/memory-manage/i_Linux kernel内存管理的基本概念.md",
-    "coding/os/linux/memory/memory-manage/k_Linux Kernel：内存分页机制核心原理.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
