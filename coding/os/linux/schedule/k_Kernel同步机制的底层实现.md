@@ -1,7 +1,7 @@
-原创 baron 人人极客社区
-_2022年03月01日 08:28_
 
-## 原子操作
+原创 baron 人人极客社区 _2022年03月01日 08:28_
+
+# 原子操作
 
 通常我们代码中的a = a + 1这样的一行语句，翻译成汇编后蕴含着3条指令:
 
@@ -50,13 +50,13 @@ atomic_cmpxchg(v,old,new)
 (linux/arch/arm/include/asm/atomic.h)      static inline void atomic_##op(int i, atomic_t *v)   \   {         \    unsigned long tmp;          int result;       \            \    prefetchw(&v->counter);      \    __asm__ __volatile__("@ atomic_" #op "\n"   \   "1: ldrex %0, [%3]\n"      \   " " #asm_op " %0, %0, %4\n"     \   " strex %1, %0, [%3]\n"      \   " teq %1, #0\n"      \   " bne 1b"       \    : "=&r" (result), "=&r" (tmp), "+Qo" (v->counter)  \    : "r" (&v->counter), "Ir" (i)     \    : "cc");       \   }   
 ```
 
-### 总结：
+## 总结：
 
 在很早期，使用arm的exclusive机制来实现的原子操作，exclusive相关的指令也就是ldrex、strex了，但在armv8后，exclusive机制的指令发生了变化变成了ldxr、stxr。但是又由于在一个大系统中，处理器是非常多的，竞争也激烈，使用独占的存储和加载指令可能要多次尝试才能成功，性能也就变得很差，在armv8.1为了解决该问题，增加了ldadd等相关的原子操作指令。
 
-## spinlock 自旋锁
+# spinlock 自旋锁
 
-### 早期spinlock的设计
+## 早期spinlock的设计
 
 早期的spinlock的设计是锁的拥有者加锁时将锁的值设置为1，释放锁时将锁的值设置为0，这样做的缺点是会出现 先来抢占锁的进程一直抢占不到锁，而后来的进程可能一来 就能获取到锁。导致这个原因的是先抢占的进程和后抢占的进程在抢占锁时并没有一个先后关系，最终就是离锁所在的内存最近的cpu节点就有更多的机会抢占锁，离锁所在内存远的节点可能一直抢占不到。
 
@@ -75,7 +75,8 @@ atomic_cmpxchg(v,old,new)
 1. 只有在第二个进程释放了spinlock，就会将spinlock的owner字段加1，第三个进程才有机会获取spinlock。
 
 我在举个例子，如下：
-!\[\[Pasted image 20240923215552.png\]\]
+
+![[Pasted image 20240923215552.png]]
 
 > T1 : 进程1调用spin_lock，此时next=0, owner=0获得该锁，在arch_spin_lock()底层实现中，会next++
 >
@@ -85,9 +86,9 @@ atomic_cmpxchg(v,old,new)
 >
 > T4&T5 : 进程1调用spin_unlock，此时owner++，即owner=1，接着调用sev指令，让进程2和进程3退出standby状态，走while(1)流程，重新检查owner==next条件。此时进程2条件成立，进程3继续等待。进程2获得该锁，进程3继续等待。
 
-### Linux Kernel中的SpinLock的实现
+## Linux Kernel中的SpinLock的实现
 
-!\[\[Pasted image 20240923215558.png\]\]
+![[Pasted image 20240923215558.png]]
 
 ```c
 (linux/include/linux/spinlock.h)      static __always_inline void spin_unlock(spinlock_t *lock)   {    raw_spin_unlock(&lock->rlock);   }         static __always_inline void spin_lock(spinlock_t *lock)   {    raw_spin_lock(&lock->rlock);   }   

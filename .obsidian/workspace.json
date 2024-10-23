@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
+                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
+                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
+                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/k_Linux调度器：进程优先级.md"
+                "file": "coding/os/linux/schedule/i_Linux调度器：用户空间接口.md"
               }
             }
           }
@@ -148,6 +148,12 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/i_正确认识实时Linux内核.md",
+    "coding/os/linux/schedule/i_甄建勇：五分钟搞定计算机体系结构（上）.md",
+    "coding/os/linux/schedule/i_进程切换分析（3）：同步处理.md",
+    "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
+    "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
+    "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
     "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
     "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
     "zx99-image/Pasted image 20241023222559.png",
@@ -178,12 +184,6 @@
     "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
     "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
     "coding/os/linux/memory/userspace/i_mmap在arm64背后的那个深坑.md",
-    "coding/os/linux/memory/userspace/i_free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
-    "coding/os/linux/memory/userspace/d_copy_{to,from}_user()的思考.md",
-    "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
-    "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
-    "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
-    "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",

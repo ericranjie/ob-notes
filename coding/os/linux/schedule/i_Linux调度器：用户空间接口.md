@@ -1,23 +1,8 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
 
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2017-3-10 18:50 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-一、前言\
+# 一、前言
+
 Linux调度器神秘而充满诱惑，每个Linux工程师都想深入其内部一探究竟。不过中国有一句古话叫做“相由心生”，一个模块精巧的内部逻辑（也就是所谓的“心”）其外延就是简洁而优雅的接口（我称之为“相”）。通过外部接口的定义，其实我们也可以收获百分之六七十的该模块的内部信息。因此，本文主要描述Linux调度器开放给用户空间的接口，希望可以通过用户空间的调度器接口来理解Linux调度器的行为。
 
 二、nice函数
