@@ -169,8 +169,8 @@ Linux提供了内存映射函数mmap, 它把文件内容映射到一段内存上
 mmap系统调用并不完全是为了共享内存来设计的，它本身提供了不同于一般对普通文件的访问的方式，进程可以像读写内存一样对普通文件进行操作，IPC的共享内存是纯粹为了共享。
 
 内存映射指的是将 ：进程中的1个虚拟内存区域 & 1个磁盘上的对象，使得二者存在映射关系。当然，也可以多个进程同时映射到一个对象上面。
-!\[\[Pasted image 20240914192045.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192045.png]]
 
 实现过程
 
@@ -194,7 +194,7 @@ mmap系统调用并不完全是为了共享内存来设计的，它本身提供�
 
 （这样的优点是 避免了频繁的进入内核空间，进行系统调用，提高了效率）
 
-### 2.1mmap系统调用
+## 2.1 mmap系统调用
 
 ```c
  void *mmap(void *addr, size_t length, int prot, int flags,                  int fd, off_t offset);
@@ -225,7 +225,7 @@ MAP_HUGETLB	按照大内存页面来分配内存空间
 
 fd参数是用来被映射文件对应的文件描述符，通过open系统调用得到，offset设定从何处进行映射。
 
-### 2.2mmap用于共享内存的方式
+## 2.2 mmap用于共享内存的方式
 
 1、我们可以使用普通文件进行提供内存映射，例如，open系统调用打开一个文件，然后进行mmap操作，得到共享内存，这种方式适用于任何进程之间。
 
@@ -233,23 +233,23 @@ fd参数是用来被映射文件对应的文件描述符，通过open系统调�
 
 3、另外POSIX版本的共享内存底层也是使用了mmap。所以，共享内存在在posix上一定程度上就是指的内存映射了。
 
-## 三、mmap和System V共享内存的比较
+# 三、mmap和System V共享内存的比较
 
 共享内存：
-!\[\[Pasted image 20240914192139.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192139.png]]
 
 这是System V版本的共享内存（以下我们统称为shm），下面看下mmap的：
-!\[\[Pasted image 20240914192146.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192146.png]]
 
 mmap是在磁盘上建立一个文件，每个进程地址空间中开辟出一块空间进行映射。而shm共享内存，每个进程最终会映射到同一块物理内存。shm保存在物理内存，这样读写的速度肯定要比磁盘要快，但是存储量不是特别大，相对于shm来说，mmap更加简单，调用更加方便，所以这也是大家都喜欢用的原因。
 
 另外mmap有一个好处是当机器重启，因为mmap把文件保存在磁盘上，这个文件还保存了操作系统同步的映像，所以mmap不会丢失，但是shmget在内存里面就会丢失，总之，共享内存是在内存中创建空间，每个进程映射到此处。内存映射是创建一个文件，并且映射到每个进程开辟的空间中，但在posix中的共享内存就是指这种使用文件的方式“内存映射”。
 
-## 四、POSIX共享内存
+# 四、POSIX共享内存
 
-### 4.1 IPC机制
+## 4.1 IPC机制
 
 共享内存是最快的可用IPC形式。它允许多个不相关(无亲缘关系)的进程去访问同一部分逻辑内存。
 
@@ -261,7 +261,7 @@ mmap是在磁盘上建立一个文件，每个进程地址空间中开辟出一�
 
 实际上，进程之间在共享内存时，并不总是读写少量数据后就解除映射，有新的通信时，再重新建立共享内存区域。而是保持共享区域，直到通信完毕为止。
 
-### 4.2 POSIX共享内存API
+## 4.2 POSIX共享内存API
 
 使用POSIX共享内存需要用到下面这些API：
 
@@ -292,7 +292,7 @@ int shm_open(const char *name, int oflag, mode_t mode);int shm_unlink(const char
 
 - fchmod：改变一个共享内存对象的权限。
 
-## 五、共享内存操作
+# 五、共享内存操作
 
 (1)shmget函数创建或者打开一个共享内存，返回一个共享内存的标识符：
 
@@ -301,8 +301,8 @@ int shm_open(const char *name, int oflag, mode_t mode);int shm_unlink(const char
 ```
 
 运行结果：
-!\[\[Pasted image 20240914192211.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192211.png]]
 
 (2)共享内存映射(attach)
 
@@ -350,8 +350,8 @@ int main(int argc, char const *argv[]){ //使用ftok函数获取键值key_t myke
 ```
 
 运行如下：
-!\[\[Pasted image 20240914192223.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192223.png]]
 
 用结构体指针来实现：
 
@@ -360,8 +360,8 @@ int main(int argc, char const *argv[]){ //使用ftok函数获取键值key_t myke
 ```
 
 运行如下：
-!\[\[Pasted image 20240914192234.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192234.png]]
 
 shmctl函数
 
@@ -376,8 +376,8 @@ shmctl函数
 ```
 
 运行结果：
-!\[\[Pasted image 20240914192241.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240914192241.png]]
 
 2023年往期回顾
 

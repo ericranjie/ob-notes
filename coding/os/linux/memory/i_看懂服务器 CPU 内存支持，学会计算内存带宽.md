@@ -21,11 +21,11 @@ DRAM
 
 所以今天我们就详细展开对 CPU 内存控制器相关参数展开介绍。
 
-## 内存通道数与带宽
+# 内存通道数与带宽
 
 下图是 Skylake 的 CPU 的总体结构图。
 
-![图00.webp](https://kfngxl.cn/usr/uploads/2024/04/3147808058.webp "图00.webp")
+![[Pasted image 20241023220320.png]]
 
 该 CPU 有两个内存控制器（IMC，Integrate Memory Controller）。每个内存控制器上都有一个 DDR PHY。DDR PHY 是连接 DDR 内存条和 内存控制器的桥梁。它负责把内存控制器发过来的数据转化成符合 DDR 协议的信号，并传给内存颗粒。也负责把内存返回给 CPU 的数据转化成内存控制器认识的信号，最终交给 CPU 核来处理。
 
@@ -38,7 +38,7 @@ DRAM
 - 单通道内存带宽 = 2666M _64 比特 = 2666M_ 8 字节 = 21.33 GB/s
 - 6个通道的总带宽 = 21.33 GB/s * 6 = 128 GB/s
 
-## 内存条模块规格
+# 内存条模块规格
 
 我们再来看 Skylake 内存控制器中支持的 RDIMM and LRDIMM。 那么 RDIMM 和 LRDIMM 类型的内存是什么呢？ 我们先来看 DIMM。
 
@@ -54,7 +54,7 @@ DIMM 是双列直插内存模块，是现代最常用的内存条模块的规格
 
 下图是一个台式机的 UDIMM 16GB 内存条。该内存条背面是空的，总共有八个黑色的内存颗粒。
 
-![图3.png](https://kfngxl.cn/usr/uploads/2024/04/3333515706.png "图3.png")
+![[Pasted image 20241023220353.png]]
 
 另外上面这个内存条还标识了 16 GB 2R\*8 PC4-3200AA-U82-11。
 

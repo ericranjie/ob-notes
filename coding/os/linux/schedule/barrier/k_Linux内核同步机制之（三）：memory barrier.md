@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-11-14 19:20 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、前言
@@ -19,19 +20,21 @@ CPU的核心思想就是取指执行，对于in-order的单核CPU，并且没有
 
 我们先看下面的一个例子：
 
-> preempt_disable（）
->
-> 临界区
->
-> preempt_enable
+```cpp
+preempt_disable()
+临界区
+preempt_enable()
+```
 
 有些共享资源可以通过禁止任务抢占来进行保护，因此临界区代码被preempt_disable和preempt_enable给保护起来。其实，我们知道所谓的preempt enable和disable其实就是对当前进程的struct thread_info中的preempt_count进行加一和减一的操作。具体的代码如下：
 
-> #define preempt_disable() \\
-> do { \\
-> preempt_count_inc(); \\
-> barrier(); \\
-> } while (0)
+```cpp
+define preempt_disable() \
+do { \
+preempt_count_inc(); \
+barrier(); \
+} while (0)
+```
 
 linux kernel中的定义和我们的想像一样，除了barrier这个优化屏障。barrier就象是c代码中的一个栅栏，将代码逻辑分成两段，barrier之前的代码和barrier之后的代码在经过编译器编译后顺序不能乱掉。也就是说，barrier之后的c代码对应的汇编，不能跑到barrier之前去，反之亦然。之所以这么做是因为在我们这个场景中，如果编译为了榨取CPU的performace而对汇编指令进行重排，那么临界区的代码就有可能位于preempt_count_inc之外，从而起不到保护作用。
 
@@ -53,19 +56,23 @@ linux kernel中的定义和我们的想像一样，除了barrier这个优化屏�
 
 上面描述的是优化屏障在内存中的变量的应用，下面我们看看硬件寄存器的场景。一般而言，串口的驱动都会包括控制台部分的代码，例如：
 
-> static struct console xx_serial_console = {\
-> ……\
-> .write        = xx_serial_console_write,\
-> ……\
-> };
+```cpp
+static struct console xx_serial_console = {
+……
+.write        = xx_serial_console_write,
+……
+};
+```
 
 如果系统enable了串口控制台，那么当你的驱动调用printk的时候，实际上最终是通过console的write函数输出到了串口控制台。而这个console write的函数可能会包含下面的代码：
 
-> do {\
-> 获取TX FIFO状态寄存器\
-> barrier();\
-> } while (TX FIFO没有ready);\
-> 写TX FIFO寄存器;
+```cpp
+do {
+获取TX FIFO状态寄存器
+barrier();
+} while (TX FIFO没有ready);
+写TX FIFO寄存器;
+```
 
 对于某些CPU archtecture而言（至少ARM是这样的），外设硬件的IO地址也被映射到了一段内存地址空间，对编译器而言，它并不知道这些地址空间是属于外设的。因此，对于上面的代码，如果没有barrier的话，获取TX FIFO状态寄存器的指令可能和写TX FIFO寄存器指令进行重新排序，在这种情况下，程序逻辑就不对了，因为我们必须要保证TX FIFO ready的情况下才能写TX FIFO寄存器。
 
@@ -78,7 +85,8 @@ linux kernel中的定义和我们的想像一样，除了barrier这个优化屏�
 （1）基本概念
 
 在[The Memory Hierarchy](http://www.wowotech.net/basic_subject/memory-hierarchy.html)文档中，我们已经了解了关于cache一些基础的知识，一些基础的内容，这里就不再重复了。我们假设一个多核系统中的cache如下：
-[![cache arch](http://www.wowotech.net/content/uploadfile/201411/6ae345c874b4a99f06046f32377c7af320141114112003.gif "cache arch")](http://www.wowotech.net/content/uploadfile/201411/e35f2f4793d734a566d1d230d1b83b4620141114112002.gif)
+
+![[Pasted image 20241023221137.png]]
 
 我们先了解一下各个cpu cache line状态的迁移过程：
 
@@ -96,7 +104,7 @@ linux kernel中的定义和我们的想像一样，除了barrier这个优化屏�
 
 我们考虑另外一个场景：在上一节中step e中的操作变成CPU 0对共享变量进行写的操作。这时候，写的性能变得非常的差，因为CPU 0必须要等到CPU n上的cacheline 数据传递到其cacheline之后，才能进行写的操作（CPU n上的cacheline 变成invalid状态，CPU 0则切换成exclusive状态，为后续的写动作做准备）。而从一个CPU的cacheline传递数据到另外一个CPU的cacheline是非常消耗时间的，而这时候，CPU 0的写的动作只是hold住，直到cacheline的数据完成传递。而实际上，这样的等待是没有意义的，因此，这时候cacheline的数据仍然会被覆盖掉。为了解决这个问题，多核系统中的cache修改如下：
 
-[![cache arch1](http://www.wowotech.net/content/uploadfile/201411/4f1fe5220dacaa8ac8f18f4efd43b5b020141114112007.gif "cache arch1")](http://www.wowotech.net/content/uploadfile/201411/a872a1863fec02585bb786a5c382d3eb20141114112005.gif)
+![[Pasted image 20241023221228.png]]
 
 这样，问题解决了，写操作不必等到cacheline被加载，而是直接写到store buffer中然后欢快的去干其他的活。在CPU n的cacheline把数据传递到其cache 0的cacheline之后，硬件将store buffer中的内容写入cacheline。
 

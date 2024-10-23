@@ -1,19 +1,19 @@
-Original Ham OPPO内核工匠
-_2023年01月06日 17:00_ _广东_
+
+Original Ham OPPO内核工匠 _2023年01月06日 17:00_ _广东_
 
 注：本文缩写说明
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjP7W0s65zd4aJAdJYNYnlGDnUHpbzoVicq4WFVVhAXYXEpRLkyXq17wTmPd9icqwR14icicricH6ooIXTA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023221255.png]]
 
 # **一、CFS组调度简介**
 
-**1.1. 存在的原因**
+## **1.1. 存在的原因**
 
 总结来说是希望不同分组的任务在高负载下能分配可控比例的CPU资源。为什么会有这个需求呢，比如多用户计算机系统每个用户的所有任务划分到一个分组中，A用户90个相同任务，而B用户只有10个相同任务，在CPU完全跑满的情况下，那么A用户将占90%的CPU时间，而B用户只占到了10%的CPU时间，这对B用户显然是不公平的。再或者同一个用户，既想-j64快速编译，又不想被编译任务影响使用体验，也可将编译任务设置到对应分组中，限制其CPU资源。
 
-**1.2. 手机设备上的分组状态**
+## **1.2. 手机设备上的分组状态**
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjP7W0s65zd4aJAdJYNYnlGDoFNmoSeqiaWS8ZtWSdWiaeeelC5PlJfZDpocW2sV4V14v9UaWEEiaqb6g/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023221323.png]]
 
 /dev/cpuctl 目录使用struct task_group root_task_group 表示。其下的每一层级的子目录都抽象为一个task_group结构。有几个需要注意的点：
 
@@ -27,29 +27,29 @@ _2023年01月06日 17:00_ _广东_
 
 注意：task和task group都是通过权重来分配时间片的，但是task的权重来自其优先级，而task group的权重则来自与其cgroup目录下cpu.shares文件设置的值。使能组调度后，看任务分得的时间片，就不能单看其prio对应的权重了，还要看其task group分得的权重和本group中其它任务的运行情况。
 
-**二、任务的task group分组**
+# **二、任务的task group分组**
 
 CFS组调度功能主要是通过对任务进行分组体现出来的，一个分组由一个struct task_group来表示。
 
-**2.1. 如何设置分组**
+## **2.1. 如何设置分组**
 
 task group分组配置接口由cpu cgroup子系统通过cgroup目录层次结构导出到用户空间。
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjP7W0s65zd4aJAdJYNYnlGD9DHRTxjuMBxOVvOCKfyKIQicib5xmp2J8AAIaeFdTFsBG3HsMqv5fWZQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023221341.png]]
 
 如何从task group中移除一个任务呢，没有办法直接移除的，在cgroup语义下，一个任务某一时刻必须属于一个task group，只有通过将其echo到其它分组中才能将其从当前分组中移除。
 
-**2.2. Android中如何设置分组**
+## **2.2. Android中如何设置分组**
 
 Process.java中向其它模块提供 setProcessGroup(int pid, int group) 将pid进程设置进group参数指定的分组中，供其它模块进行调用设置。比如OomAdjuster.java 中将任务切前/后台分别调用传参group=THREAD_GROUP_TOP_APP/THREAD_GROUP_BACKGROUND。
 
 libprocessgroup 中提供了一个名为 task_profiles.json 的配置文件，它里面 AggregateProfiles 聚合属性字段配置了上层设置下来后的对应的行为。比如 THREAD_GROUP_TOP_APP 对应的聚合属性为 SCHED_SP_TOP_APP，其中的MaxPerformance属性对应的行为就是加入到cpu top-app分组。
 
-![Image](https://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjP7W0s65zd4aJAdJYNYnlGDHWI6nxWD5M9D0EulszDFX5EPicdxcnwkt64b48j5MRdWzWc0GzRg8Kg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241023221354.png]]
 
 ”MaxPerformance”属性的配置可读性非常强，可以看出是加入到cpu子系统的top-app分组中。
 
-**2.3. Android中设置为TOP-APP分组，对cgroup设置了什么**
+## **2.3. Android中设置为TOP-APP分组，对cgroup设置了什么**
 
 因为有多个cgroup子系统，除了我们正在讲的CFS组调度依附的cpu cgroup子系统外，还有cpuset cgroup子系统(限制任务可运行的CPU和可使用的内存节点)，blkio cgroup子系统(限制进程的块设备io)，freezer cgroup子系统(提供进程冻结功能)等。上层配置分组下来可能不只切一个cgroup，具体切了哪些子系统体现在集合属性 AggregateProfiles 的数组成员上，比如上例中另外两个属性对应的行为分别是加入blkio子系统的根组和将任务的timer_slack_ns(一个平衡hrtimer定时唤醒及时性与功耗的参数)设置为50000ns。
 

@@ -1,14 +1,15 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2021-11-12 6:55 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-**一、前言**
+# **一、前言**
 
 负载均衡的系列文章共分为三篇，第一篇为框架篇，描述负载均衡的相关原理、场景和框架。本篇作为该系列文章第二篇，主要通过对任务放置场景（task placement）的均衡分布进行分析，加深对内核调度器实现任务均衡分布的理解。
 
 本文基于linux-5.4.24分析，由于涉及较多代码的讲解，建议结合源码阅读。另外，浏览本文前，建议先阅读负载均衡系列文章第一篇：CFS任务的负载均衡（概述）。当然，部分已经提及的基本概念，在本文中也会进行简单回顾。
 
-\*\*二、\*\***任务放置场景**
+# **二、任务放置场景**
 
-**2.1** **什么是任务放置（task placement）**
+## **2.1** **什么是任务放置（task placement）**
 
 linux内核为每个CPU都配置一个cpu runqueue，用以维护当前CPU需要运行的所有线程，调度器会按一定的规则从runqueue中获取某个线程来执行。如果一个线程正挂在某个CPU的runqueue上，此时它处于就绪状态，尚未得到cpu资源，调度器会适时地通过负载均衡（load balance）来调整任务的分布；当它从runqueue中取出并开始执行时，便处于运行状态，若该状态下的任务负载不是当前CPU所能承受的，那么调度器会将其标记为misfit task，周期性地触发主动迁移（active upmigration），将misfit task布置到更高算力的CPU。
 
@@ -22,7 +23,7 @@ linux内核为每个CPU都配置一个cpu runqueue，用以维护当前CPU需要
 
 （3）阻塞的进程被唤醒。
 
-**2.2 调度域（sched domain）及其标志位（sd flag）**
+## **2.2 调度域（sched domain）及其标志位（sd flag）**
 
 如果你正在使用智能手机阅读本文，那你或许知道，目前的手机设备往往具备架构不同的8个CPU core。我们仍然以4小核+4大核的处理器结构为例进行说明。4个小核（cpu0-3）组成一个little cluster，另外4个大核（cpu4-7）组成big cluster，每个cluster的CPU架构相同，它们之间使用同一个调频策略，并且频率调节保持一致。大核相对小核而言，具备更高的算力，但也会带来更多的能量损耗。
 
@@ -43,15 +44,15 @@ linux内核为每个CPU都配置一个cpu runqueue，用以维护当前CPU需要
 
 在构建CPU拓扑结构时，会为各个sched domain配置初始的标识位，如果是异构系统，会设置SD_BALANCE_WAKE：
 
-![](http://www.wowotech.net/content/uploadfile/202111/b31e1636671699.png)
+![[Pasted image 20241023221435.png]]
 
-**2.3** **task placement均衡代码框架**
+## **2.3** **task placement均衡代码框架**
 
-linux内核的调度框架是高度抽象、模块化的，所有的线程都拥有各自所属的调度类（sched class），比如大家所熟知的实时线程属于rt_sched_class，CFS线程属于fair_sched_class，不同的调度类采用不同的调度策略。上面提到的task placement的三种场景，最终的函数入口都是core.c中定义的\*\*select_task_rq()**方法，之后会跳转至调度类自己的具体实现。本文以CFS调度类为分析对象，因为该调度类的线程在整个系统中占据较大的比重。有兴趣的朋友可以了解下其它调度类的**select_task_rq()\*\*实现。
+linux内核的调度框架是高度抽象、模块化的，所有的线程都拥有各自所属的调度类（sched class），比如大家所熟知的实时线程属于rt_sched_class，CFS线程属于fair_sched_class，不同的调度类采用不同的调度策略。上面提到的task placement的三种场景，最终的函数入口都是core.c中定义的\*\*select_task_rq()**方法，之后会跳转至调度类自己的具体实现。本文以CFS调度类为分析对象，因为该调度类的线程在整个系统中占据较大的比重。有兴趣的朋友可以了解下其它调度类的**select_task_rq()实现。
 
-![](http://www.wowotech.net/content/uploadfile/202111/acb11636671763.png)
+![[Pasted image 20241023221512.png]]
 
-**2.4** **select_task_rq_fair**\*\*()方法\*\*
+## **2.4** **select_task_rq_fair**\*\*()方法\*\*
 
 CFS调度类的线程进行task placement时，会通过core.c的**select_task_rq\*\*\*\*()**方法跳转至**select_task_rq\*\*\*\*\_fair()**，该方法声明如下：
 

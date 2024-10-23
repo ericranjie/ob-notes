@@ -9,7 +9,7 @@
 
 ![[Pasted image 20241018184357.png]]
 
-## 1. 预处理大页映射
+# 1. 预处理大页映射
 
 ```c
 SYSCALL_DEFINE6(mmap, unsigned long, addr, unsigned long, len,
@@ -109,7 +109,7 @@ bool is_file_shm_hugepages(struct file *file)
 }
 ```
 
-## 2. 是否立即为映射分配物理内存
+# 2. 是否立即为映射分配物理内存
 
 在一般情况下，我们调用 mmap 进行内存映射的时候，内核只是会在进程的虚拟内存空间中为这次映射分配一段虚拟内存，然后建立好这段虚拟内存与相关文件之间的映射关系就结束了，内核并不会为映射分配物理内存。
 
@@ -233,7 +233,7 @@ static long __get_user_pages(struct task_struct *tsk, struct mm_struct *mm,
 }
 ```
 
-## 3. 虚拟内存映射整体流程
+# 3. 虚拟内存映射整体流程
 
 ![[Pasted image 20241018184527.png]]
 
@@ -462,7 +462,7 @@ static inline int mlock_future_check(struct mm_struct *mm,
 }
 ```
 
-## 4. 虚拟内存的分配流程
+# 4. 虚拟内存的分配流程
 
 ![[Pasted image 20241018184933.png]]
 
@@ -470,7 +470,7 @@ mmap 系统调用分配虚拟内存的本质其实就是在进程的虚拟内存
 
 由此可以看出 mmap 主要的工作区域是在文件映射与匿名映射区，而在映射区查找空闲 vma 的过程又是和映射区的布局息息相关的，所以在为大家介绍虚拟内存分配流程之前，还是有必要介绍一下文件映射与匿名映射区的布局情况，这样方便大家后续理解虚拟内存分配的逻辑。
 
-### 4.1 文件映射与匿名映射区的布局
+## 4.1 文件映射与匿名映射区的布局
 
 文件映射与匿名映射区的布局在 linux 内核中分为两种：一种是经典布局，另一种是新式布局，不同的体系结构可以通过内核参数 `/proc/sys/vm/legacy_va_layout` 来指定具体采用哪种布局。 1 表示采用经典布局， 0 表示采用新式布局。
 
@@ -498,7 +498,7 @@ mmap 系统调用分配虚拟内存的本质其实就是在进程的虚拟内存
 
 这样一来堆在进程地址空间中较低的地址处开始向上增长，而映射区位于进程空间较高的地址处向下增长，因此堆区和映射区在新式布局下都可以较好的扩展，直到耗尽剩余的虚拟内存区域。
 
-### 4.2 内核具体如何对文件映射与匿名映射区进行布局
+## 4.2 内核具体如何对文件映射与匿名映射区进行布局
 
 进程虚拟内存空间的创建以及初始化是由 load_elf_binary 函数负责的，当进程通过 fork() 系统调用创建出子进程之后，子进程可以通过前面介绍的 execve 系统调用加载并执行一个指定的二进制执行文件。
 
@@ -736,7 +736,7 @@ static unsigned long mmap_base(unsigned long rnd, unsigned long task_size,
 
 现在 mmap 的主要工作区域：文件映射与匿名映射区在进程虚拟内存空间中的布局情况，我们已经清楚了。那么接下来，笔者会以 AMD64 体系结构的经典布局为基础，为大家介绍 mmap 是如何分配虚拟内存的。
 
-### 4.3 虚拟内存的分配
+## 4.3 虚拟内存的分配
 
 get_unmapped_area 主要的目的就是在具体的映射区布局下，根据布局特点，真正负责划分虚拟内存区域的函数。经过上一小节的介绍我们知道，在经典布局下，mm->get_unmapped_area 指向的函数为 arch_get_unmapped_area。
 
@@ -917,7 +917,7 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 }
 ```
 
-### 4.4 find_vma_prev 查找是否有重叠的映射区域
+## 4.4 find_vma_prev 查找是否有重叠的映射区域
 
 find_vma_prev 的作用就是根据我们指定的映射起始地址 addr，在进程地址空间中查找出符合 `addr < vma->vm_end` 条件的第一个 vma 出来（下图中的蓝色部分）。
 
@@ -1023,7 +1023,7 @@ struct vm_area_struct *find_vma(struct mm_struct *mm, unsigned long addr)
 
 ![[Pasted image 20241018185459.png]]
 
-### 4.5 vm_unmapped_area 寻找未映射的虚拟内存区域
+## 4.5 vm_unmapped_area 寻找未映射的虚拟内存区域
 
 ```c
 /*
@@ -1255,7 +1255,7 @@ found:
 }
 ```
 
-## 5. 内存映射的本质
+# 5. 内存映射的本质
 
 流程走到这里，我们就来到了 mmap 系统调用最为核心的部分了，在之前的内容中，内核已经通过 get_unmapped_area 函数为我们在进程地址空间中挑选出一段地址范围为 \[addr , addr + len\] 的虚拟内存区域供 mmap 进行映射。
 
@@ -1328,20 +1328,15 @@ vma->vm_file = get_file(file);
 
 ```c
 struct vm_area_struct {
-
     struct file * vm_file;      /* File we map to (can be NULL). */
-
     /* Function pointers to deal with this struct. */
     const struct vm_operations_struct *vm_ops;
 }
 
 struct vm_operations_struct {
-
     vm_fault_t (*fault)(struct vm_fault *vmf);
-
     void (*map_pages)(struct vm_fault *vmf,
             pgoff_t start_pgoff, pgoff_t end_pgoff);
-
     vm_fault_t (*page_mkwrite)(struct vm_fault *vmf);
 }
 ```
@@ -1625,7 +1620,7 @@ out:
 }
 ```
 
-### 5.1 may_expand_vm 检查映射的虚拟内存是否超过了内核限制
+## 5.1 may_expand_vm 检查映射的虚拟内存是否超过了内核限制
 
 进程地址空间中对虚拟内存的用量是有限制的，限制分为两个方面：
 
@@ -1708,7 +1703,7 @@ bool may_expand_vm(struct mm_struct *mm, vm_flags_t flags, unsigned long npages)
 }
 ```
 
-### 5.2 内核的 overcommit 策略
+## 5.2 内核的 overcommit 策略
 
 正如前边笔者所介绍到的，内核的 overcommit 策略会影响到进程申请虚拟内存的用量，进程对虚拟内存的申请就好比是我们向银行贷款，我们在向银行贷款的时候，银行是需要对我们的还款能力进行审计的，我们抵押的资产越优质，银行贷款给我们的也会越多。
 
@@ -1818,7 +1813,7 @@ OVERCOMMIT_NEVER 策略下，内核会严格控制进程申请虚拟内存的用
 
 vm_commit_limit 函数返回值体现在 `/proc/meminfo` 中的 CommitLimit 字段中。
 
-![image](https://img2023.cnblogs.com/blog/2907560/202310/2907560-20231010111027166-1136393873.png)
+![[Pasted image 20241023220219.png]]
 
 > 注意：只有在 OVERCOMMIT_NEVER 策略下，CommitLimit 的限制才会生效
 
@@ -1929,7 +1924,7 @@ unsigned long vm_commit_limit(void)
 }
 ```
 
-### 5.3 vma_merge 函数解析
+## 5.3 vma_merge 函数解析
 
 经过前面的介绍我们知道，当 mmap 在进程虚拟内存空间中映射出一段 \[addr , end\] 的虚拟内存区域 area 时，内核需要为这段虚拟内存区域 area 创建一个 vma 结构来描述。
 

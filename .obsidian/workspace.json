@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md"
+                "file": "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md"
               }
             }
           }
@@ -146,43 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "zx99-image/Pasted image 20241023190259.png",
+    "zx99-image/Pasted image 20241023221945.png",
+    "zx99-image/Pasted image 20241023221255.png",
+    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
+    "zx99-image/Pasted image 20241023221557.png",
+    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（任务放置）.md",
+    "zx99-image/Pasted image 20241023221512.png",
+    "zx99-image/Pasted image 20241023221435.png",
+    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
+    "zx99-image/Pasted image 20241023221354.png",
+    "zx99-image/Pasted image 20241023221341.png",
+    "zx99-image/Pasted image 20241023221323.png",
+    "coding/os/linux/schedule/barrier/Why Memory Barriers中文翻译（下）.md",
+    "coding/os/linux/schedule/barrier/perfbook memory barrier（14.2章节）中文翻译（下）.md",
+    "coding/os/linux/schedule/barrier/k_Linux内核同步机制之（三）：memory barrier.md",
+    "zx99-image/Pasted image 20241023221228.png",
+    "README.md",
+    "Pasted image 20241023221155.png",
+    "zx99-image/Pasted image 20241023221137.png",
     "coding/os/linux/memory/userspace/p_深入探索共享内存：实现高效的多线程通信.md",
+    "coding/os/linux/memory/i_看懂服务器 CPU 内存支持，学会计算内存带宽.md",
+    "coding/os/linux/memory/a_s_n_从内核世界透视 mmap 内存映射的本质（源码实现篇）.md",
     "coding/os/linux/memory/userspace/p_Jemalloc内存分配与优化实践.md",
     "coding/os/linux/memory/userspace/k_所谓的0拷贝不就是为了让CPU休息吗？深入理解mmap.md",
-    "zx99-image/Pasted image 20241023190512.png",
     "coding/os/linux/memory/userspace/k_从用户态、内核态、全局变量、BSS函数看进程运行状态.md",
-    "zx99-image/Pasted image 20241023190333.png",
     "coding/os/linux/memory/userspace/k_一文读懂零拷贝技术｜splice原理与实现.md",
     "coding/os/linux/memory/userspace/k_Linux Mmap映射：优化文件访问和共享内存.md",
     "coding/os/linux/memory/userspace/k_7 张图，轻松掌握零拷贝原理.md",
-    "zx99-image/Pasted image 20241023184325.png",
     "coding/os/linux/memory/userspace/i_用快速固定块内存分配器替换 malloc free.md",
     "coding/os/linux/memory/userspace/i_mmap在arm64背后的那个深坑.md",
-    "zx99-image/Pasted image 20241023185758.png",
-    "zx99-image/Pasted image 20241023185744.png",
-    "zx99-image/Pasted image 20241023185703.png",
     "coding/os/linux/memory/userspace/i_free() 函数只传入一个内存地址，为什么能知道要释放多大的内存？.md",
     "coding/os/linux/memory/userspace/d_copy_{to,from}_user()的思考.md",
     "coding/os/linux/memory/userspace/a_30 张图带你领略 glibc 内存管理精髓.md",
-    "zx99-image/-20240922/Pasted image 20240914161353.png",
     "coding/os/linux/memory/rmap/a_郭健： Linux内存逆向映射（reverse mapping）技术的前世今生.md",
     "coding/os/linux/memory/rmap/d_逆向映射的演进.md",
-    "README.md",
     "coding/os/linux/memory/reclaim/i_linux kernel内存回收机制.md",
     "coding/os/linux/memory/reclaim/b_linux内存回收(一）---kswapd回收.md",
-    "coding/os/linux/memory/page-folio/i_深入理解Linux内核之脏页跟踪.md",
-    "coding/os/linux/memory/page-folio/i_页面回收的基本概念.md",
-    "coding/os/linux/memory/page-folio/k_Linux 内存管理窥探：页面回收 (LRU).md",
-    "coding/os/linux/memory/page-folio/k_Linux下访问匿名页发生的神奇“化学反应”.md",
-    "coding/os/linux/memory/page-folio/k_深入理解Linux内核页表映射分页机制原理.md",
-    "coding/os/linux/memory/page-folio/i_文件系统和裸块设备的page cache问题.md",
-    "coding/os/linux/memory/page-folio/c_图文详解 Linux 分页机制！.md",
-    "coding/os/linux/memory/page-folio/b_由Google、OPPO、ARM、华为等大厂程序员贡献的Linux Large Folios大页在社区和产品的现状和未来.md",
-    "zx99-image/Pasted image 20241023180355.png",
-    "zx99-image/Pasted image 20241023180442.png",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",
