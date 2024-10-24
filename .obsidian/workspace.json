@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+                "file": "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+                "file": "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md",
+                "file": "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/BPF/XDP/BPF案例分析(2)—XDP程序原理与案例讲解.md"
+                "file": "coding/os/linux/build/a_n_Linux C基础——” Makefile “ 文件管理大师你拜访过嘛？.md"
               }
             }
           }
@@ -146,8 +146,12 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "55dec6effde51c58",
+  "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
+    "zx99-image/Pasted image 20241025002227.png",
+    "coding/os/linux/BPF/XDP/万字长文 深入理解XDP全景指南.md",
+    "zx99-image/Pasted image 20241025002146.png",
+    "coding/os/linux/BPF/XDP/k_BPF案例分析(2)—XDP程序原理与案例讲解.md",
     "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
     "coding/os/linux/BPF/Tetragon进程阻断原理.md",
     "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
@@ -173,9 +177,6 @@
     "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
     "coding/os/linux/network/a_n_深入理解 Linux socket.md",
     "coding/os/linux/network/a_25 张图，一万字，拆解 Linux 网络包发送过程.md",
-    "coding/os/linux/network/QUIC/10 分钟讲完 QUIC 协议.md",
-    "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
-    "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
     "zx99-image/Pasted image 20241024232458.png",
     "zx99-image/Pasted image 20241024225051.png",
     "zx99-image/Pasted image 20241024225651.png",
@@ -183,7 +184,6 @@
     "zx99-image/Pasted image 20241024225537.png",
     "zx99-image/Pasted image 20241024225523.png",
     "zx99-image/Pasted image 20241024225513.png",
-    "zx99-image/Pasted image 20241024225458.png",
     "coding/os/linux/schedule/real-time",
     "coding/os/linux/schedule/atomic",
     "zx99-image/-20241021",

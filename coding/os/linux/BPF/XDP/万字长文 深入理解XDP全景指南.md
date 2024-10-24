@@ -1,20 +1,9 @@
-Linux阅码场
 
-_2022年02月07日 08:02_
+Linux阅码场 _2022年02月07日 08:02_
 
 以下文章来源于极客重生
 
-![](http://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6m7W7KicZrc94icQe4d8ItHFyONKlBkGVqEAiavUicEzmEszR5aPvicKDeCMy8aAw6lPFe8AGhHQic1UKaA/300?wx_fmt=png&wxfrom=19)
-
-**极客重生**
-
-技术学习分享，一起进步
-
-180篇原创内容
-
-公众号
-
-### ![图片](https://mmbiz.qpic.cn/mmbiz_png/cYSwmJQric6mmd7YqHPSbeNAco3rsyBVaYQVMy3ia1n8NdGLNgjSZcr8R9EpWuIicGeqayY0Fyrt2D8uqG568wXxw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241025002146.png]]
 
 ### 译者序
 
@@ -31,138 +20,6 @@ The eXpress Data Path: Fast Programmable Packet Processing in the Operating Syst
 由于译者水平有限，本文不免存在遗漏或错误之处。如有疑问，请查阅原文。
 
 **以下是译文。**
-
-- 译者序
-
-- 摘要
-
-- 1 引言
-
-- 1.1 现有方案（kernel bypass）存在的问题
-
-- 1.2 新方案：给内核网络栈添加可编程能力
-
-- 1.3 新方案（XDP）的优点
-
-- 1.4 本文组织结构
-
-- 2 相关工作
-
-- 2.1 用户态轮询 vs. XDP
-
-- 2.2 内核模块 vs. XDP
-
-- 2.3 可编程硬件 vs. XDP
-
-- 2.4 小结
-
-- 3 XDP 设计
-
-- 唯一加载入口：`bpf()` 系统调用
-
-- 校验器工作原理：two-pass DAG
-
-- 内存越界和空指针检查：职责上移到程序自身/开发者
-
-- 跟踪数据访问操作和值范围
-
-- 不同类型数据的校验信息来源（source of truth）
-
-- 校验器的目的
-
-- 在设备驱动中执行，无需上下文切换
-
-- 在软件最早能处理包的位置执行，性能最优
-
-- XDP 程序典型执行流
-
-- 3.0 XDP 系统架构
-
-- 3.1 XDP driver hook
-
-- 3.2 eBPF 虚拟机
-
-- 3.3 BPF maps
-
-- 3.4 eBPF verifier
-
-- 3.5 XDP 程序示例
-
-- 3.6 小结
-
-- 4 性能评估
-
-- XDP 未做底层代码优化
-
-- 通用目的操作系统，首要目标：更好的扩展和配置，而非极致性能
-
-- 转发吞吐（pps）
-
-- 转发延迟
-
-- 4.1 直接弃包（packet drop）性能
-
-- 4.2 CPU Usage
-
-- 4.3 包转发性能
-
-- 4.4 讨论：XDP 性能与 DPDK 还有差距的原因
-
-- 5 真实场景使用案例
-
-- Facebook Katran
-
-- 性能
-
-- 模拟 Cloudflare 防御架构
-
-- 程序逻辑
-
-- 性能
-
-- 内核数据平面 & 控制平面（BIRD/FRR）
-
-- XDP：直接查询内核路由表并转发
-
-- 测试：XDP routing + 全球 BGP 路由表
-
-- 性能：2.5x
-
-- 5.1 案例一：软件路由（software routing）
-
-- 5.2 案例二：Inline DoS Mitigation
-
-- 5.3 案例三：负载均衡（load balancing）
-
-- 6 XDP 的未来方向
-
-- 校验逻辑偏保守
-
-- 缺少标准库
-
-- 一个网卡接口只能 attach 一个 XDP 程序
-
-- 6.1 eBPF 程序的限制
-
-- 6.2 用户体验和调试
-
-- 6.3 驱动支持
-
-- 6.4 性能提升
-
-- 6.5 QoS 和 Rate Transitions
-
-- 6.6 加速传输层协议
-
-- 6.7 内核-用户空间零拷贝（zero-copy to userspace）
-
-- 6.8 XDP 作为基础构建模块（XDP as a building block）
-
-- 7 总结
-
-- 致谢
-
-- 参考文献
 
 # 摘要
 

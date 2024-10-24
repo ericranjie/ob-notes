@@ -1,5 +1,6 @@
-Linux内核之旅
-_2022年05月24日 08:42_ _陕西_
+
+Linux内核之旅 _2022年05月24日 08:42_ _陕西_
+
 The following article is from 一口Linux Author 土豆居士
 
 # Make简介：
@@ -22,7 +23,7 @@ The following article is from 一口Linux Author 土豆居士
 
 **==注意:==** 命令行前面必须是一个”**==TAB==** 键”,否则编译错误为:\*\*\* missing separator. Stop.
 
-例如：![Image](https://mmbiz.qpic.cn/mmbiz_png/icRxcMBeJfc8Jn2zPPCsOyXwtxcrKpia3YCwADf0u8oc7lst8ZY5Io1LIpytn5Bk7tmQTakaMRsicKXzxaF7nKrJA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+例如：![[Pasted image 20241025002227.png]]
 
 **Makefile格式：**
 
@@ -90,11 +91,13 @@ make工作时的执行步骤入下：（想来其它的make也是类似）
 
 1-5步为第一个阶段，6-7为第二个阶段。第一个阶段中，如果定义的变量被使用了，那么，make会把其展开在使用的位置。但make并不会完全马上展开，make使用的是拖延战术，如果变量出现在依赖关系的规则中，那么仅当这条依赖被决定要使用了，变量才会在其内部展开。
 
-## 2.makefile文件中的依赖关系理解
+## 2. makefile文件中的依赖关系理解
 
 假设当前工程目录为object/，该目录下有6个文件，分别是：main.c、abc.c、xyz.c、abc.h、xyz.h和Makefile。其中main.c包含头文件abc.h和xyz.h，abc.c包含头文件abc.h，xyz.c包含头文件xyz.h，而abc.h又包含了xyz.h。它们的依赖关系如图。
-!\[\[Pasted image 20240929153126.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)Makefile应该写成这个样子（假设生成目标main）：
+
+![[Pasted image 20240929153126.png]]
+
+Makefile应该写成这个样子（假设生成目标main）：
 
 `main:main.o abc.o xyz.o        gcc main.o abc.o xyz.o -o main   main.o:main.c abc.h xyz.h        gcc -c main.c –o main.o -g   abc.o:abc.c abc.h xyz.h        gcc -c abc.c –o abc.o -g    xyz.o:xyz.c xyz.h        gcc -c xyz.c -o xyz.o -g   .PHONY:clean    clean:      rm main main.o abc.o xyz.o -f   `
 
@@ -119,8 +122,9 @@ make工作时的执行步骤入下：（想来其它的make也是类似）
 **接下来我们做个实例来学习下怎么写 Makefile**
 
 写两个c程序
-!\[\[Pasted image 20240929153138.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240929153138.png]]
+
+
 !\[\[Pasted image 20240929153151.png\]\]
 !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)写一个head.h 头文件，用来声明上面的函数
 !\[\[Pasted image 20240929153205.png\]\]
