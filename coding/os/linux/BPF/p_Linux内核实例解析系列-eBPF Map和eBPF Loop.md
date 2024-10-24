@@ -1,8 +1,5 @@
-Original clouds clouds
 
-_2024年08月24日 13:32_
-
-![Image](https://mmbiz.qpic.cn/mmbiz_jpg/Bh66jm0ozvYuBmCrWlIeq84BlZZSVSPaYhP0OQqsAaKO3jJkgRCAdRdJJUfN1rq11djyZfcDUcUz5fOZUsqIfw/640?wx_fmt=jpeg&from=appmsg&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+Original clouds clouds _2024年08月24日 13:32_
 
 本文通过Linux内核自带的例子，来讲解eBPF Map和eBPF Loop的使用方法和原理。
 

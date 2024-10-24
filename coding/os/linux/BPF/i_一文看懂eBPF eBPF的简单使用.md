@@ -1,5 +1,5 @@
-原创 songsong001 Linux内核那些事
-_2022年03月14日 09:00_
+
+原创 songsong001 Linux内核那些事 _2022年03月14日 09:00_
 
 `eBPF（extended Berkeley Packet Filter）` 可谓 Linux 社区的新宠，很多大公司都开始投身于 `eBPF` 技术，如 Goole、Facebook、Twitter 等。
 
@@ -19,7 +19,7 @@ eBPF 究竟有什么魅力让大家都关注它呢？
 
 看完这3篇文章，估计对 eBPF 也有较深的理解了。
 
-## 什么是 eBPF
+# 什么是 eBPF
 
 eBPF 全称 extended Berkeley Packet Filter，中文意思是 `扩展的伯克利包过滤器`。一般来说，要向内核添加新功能，需要修改内核源代码或者编写 `内核模块` 来实现。而 eBPF 允许程序在不修改内核源代码，或添加额外的内核模块情况下运行。
 
@@ -27,11 +27,11 @@ eBPF 全称 extended Berkeley Packet Filter，中文意思是 `扩展的伯克�
 
 但随着 eBPF 不断完善和加强，现在的 eBPF 已经不再限于过滤网络数据包了。
 
-## eBPF 架构
+# eBPF 架构
 
 我们先来看看 eBPF 的架构，如下图所示：
 
-!\[\[Pasted image 20241007185836.png\]\]
+![[Pasted image 20241007185836.png]]
 
 下面用文字来描述一下：
 
@@ -65,7 +65,7 @@ eBPF 程序就像 AOP 中的拦截器，而内核的某个运行路径就像 AOP
 1. **容器**
 1. **安全**
 
-## eBPF 使用
+# eBPF 使用
 
 在介绍 eBPF 的实现前，我们先来介绍一下如何使用 eBPF 来跟踪 `fork()` 系统调用的运行情况。
 
@@ -81,7 +81,7 @@ eBPF 程序就像 AOP 中的拦截器，而内核的某个运行路径就像 AOP
 >
 > 本文使用 `Ubuntu 20.20`（内核版本为5.8.1）作为解说。
 
-### 1. BCC 工具安装
+## 1. BCC 工具安装
 
 在 Ubuntu 系统中安装 BCC 工具是比较简单的，可以使用以下命令：
 
@@ -95,7 +95,7 @@ BCC 工具可以让你使用 Python 和 C 语言组合来编写 eBPF 程序。
 
 > https://github.com/iovisor/bcc/blob/master/INSTALL.md
 
-### 2. 编写 eBPF 版的 hello world
+## 2. 编写 eBPF 版的 hello world
 
 一般编程课的第一步都是编写著名的 `hello world` 程序，所以我们也以编写 `hello world` 程序作为第一步吧。
 

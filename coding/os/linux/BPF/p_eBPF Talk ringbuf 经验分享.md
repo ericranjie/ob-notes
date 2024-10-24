@@ -1,20 +1,9 @@
-Original Leon Hwang eBPF Talk
 
-_2024年08月26日 08:10_
-
-![](http://mmbiz.qpic.cn/mmbiz_png/6QxwXGlhS9FPHblxYiaxMiaYWhCKBUs37o2XqGcg9ickZoh10hor44VRx8KT08XIaCYKCzUNBdxb2JWPCy6TFTzjw/300?wx_fmt=png&wxfrom=19)
-
-**eBPF Talk**
-
-专注于 eBPF 技术，以及 Linux 网络上的 eBPF 技术应用
-
-140篇原创内容
-
-公众号
+Original Leon Hwang eBPF Talk _2024年08月26日 08:10_
 
 最近在使用 ringbuf 的 `bpf_ringbuf_reserve()` 时踩了一个坑，记录一下。
 
-## ringbuf 简介
+# ringbuf 简介
 
 ringbuf 是 BPF 中能够取代 **PERF_EVENT_ARRAY** 的特殊 map 类型，提供了类似的 helpers:
 

@@ -1,8 +1,7 @@
-原创 扫地僧666 IEEEE
 
-_2021年11月27日 23:07_
+原创 扫地僧666 IEEEE _2021年11月27日 23:07_
 
-**![图片](https://mmbiz.qpic.cn/mmbiz_jpg/W9DqKgFsc6ibRRBRwpAc6LV4p31Ik5mX2rAqcRyUdzic9mymwSPDIWzS7DJMKDzD76zYPiaP8nGkGzgy2Gf9iaZ3tA/640?wx_fmt=jpeg&wxfrom=13&tp=wxpic)**
+![[Pasted image 20241024233358.png]]
 
 在 BPF 出现之前，如果你想去做包过滤，你必须拷贝所有的包到用户空间，然后才能去过滤它们
 

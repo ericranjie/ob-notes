@@ -1,34 +1,11 @@
-酷玩BPF
 
-_2024年08月12日 18:30_
+酷玩BPF _2024年08月12日 18:30_
 
 The following article is from 深入浅出BPF Author davaddi
 
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM6qJiaaicEDXMrKNnhx5D6WCIYOhyctx1l1TLk6mT7zwsBQ/0)
-
-**深入浅出BPF**.
-
-专注 BPF 及相关基础技术
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzkyMjM4MTcwOQ==&mid=2247485004&idx=1&sn=932df5461e671dfd72115e5207b85fab&chksm=c1f47aaef683f3b8003a74661127bf7b10cbe2c475626e1c4ffbb2ebb18b88f0ed435b6ea963&mpshare=1&scene=24&srcid=0813DdjjqOeZ817SHCVqgHGM&sharer_shareinfo=c48280cd8d1bf190fb3d07c2def37953&sharer_shareinfo_first=c48280cd8d1bf190fb3d07c2def37953&key=daf9bdc5abc4e8d07a97c44e199d197300d372127c10bc1e4c7611586e33fce85f673834750b65fab90f4ebd61b72ec7dc1d35f8ad44719e7bc9ca8cd10abd6cfec1ae125da886f8608b8e0637f7815626e55e588b63ee5e5b9e713d8cc137e872575c1d47b20260e729c97a002884d5d8c205e4fbbcfc79e40b9d794a428c59&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_90ffe86f56a3&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQmZ37pqVZuGD7CDzBe0wWshKUAgIE97dBBAEAAAAAADI0CQsUo9IAAAAOpnltbLcz9gKNyK89dVj0oaxe74RsF5byTQR8b0fCmxIcROItlE%2FC1MYlcFrVlKfnVZfK5qUgjdGczD0CZtqRspIQ1FXnf9tu7SOKlIGEbptZlVSN4Lg7lXdOUFx1nChc1zd3rwIrK%2FhSV%2Brv7%2BnEiJPaFPU%2Fpt14VeccJg452Ec%2BSivjHCglGE2sLSDzdeiJ4gaED8GygFivKJhc8vVkSmO%2F7QmOcZhFRIWk6MZf3gqwDgPOWJq85WjG6dzhhDJbnevx5eUo5m2ZAjr3DpY6U1W%2B7o7XcU0DzJA8M1VnwjASZBskyzATMIJb98UiOA9Hsd4WC%2B5B2Uk7atv2gQ%3D%3D&acctmode=0&pass_ticket=KQaF6PnjsZFgQ1BXA5CrVhkWnJPQyqydAA7jKJeS83xN0qMfQeE4XSRfJA3HeWN6&wx_header=0#)
-
-# 
-
-![](http://mmbiz.qpic.cn/mmbiz_png/CrEZgiblEdJWdTnicQwNnku8Bf0M2ibrxIiannSqT6OOppxiaaQxsqiaTeLq8YAc8SRsL3AH6icXW29ypuQzsXUNfwaRg/300?wx_fmt=png&wxfrom=19)
-
-**深入浅出BPF**
-
-专注 BPF 及相关基础技术
-
-38篇原创内容
-
-公众号
-
 在文章 [Linus 强势拍板合入: BPF 赋能调度器终成正果](http://mp.weixin.qq.com/s?__biz=MzA3NzUzNTM4NA==&mid=2649615282&idx=1&sn=599120eab147d7975665b553aed70d7b&chksm=8749ca45b03e4353d1aa31448500323518a179c583c85d6ab6969c5724b6fd546343a649425f&scene=21#wechat_redirect)\[1\] 已经在为合并到 6.11 做好了准备，后续代码仓库也变更为了 kernel git 地址\[2\]，不出意外合并只是时间问题 。本篇博文会重点介绍 sched_ext 的实现原理，sched_ext 是一个由 Meta 和 Google 共同联合推出的可扩展调度器类，称之为 ext_sched_class 或 sched_ext，这种机制允许用户通过定义的 BPF 程序来实现调度类实现针对特定工作负载或场景的调度器策略优化。
 
-## Linux 进程调度器
+# Linux 进程调度器
 
 进程调度器是操作系统中都是必不可少的部分。
 
@@ -44,7 +21,7 @@ The following article is from 深入浅出BPF Author davaddi
 
 此外，调度器可能希望充分利用多个 CPU 核心，因此其可以将任务分配给任何空闲的 CPU 核心。这种调度模式可能会增加整体 CPU 利用率，但更高的 CPU 利用率并不总是意味着更高的性能。当任务频繁地从一个 CPU 迁移到另一个 CPU 时，新分配的 CPU 的缓存需要重新预热，因此在任务下次调度时几乎没有机会重用缓存，导致性能下降。当系统具有多个缓存域（如 NUMA 和 AMD CCX 架构）时，缓存重新预热的成本会更高。
 
-### CFS 调度器
+## CFS 调度器
 
 Linux 系统调度器从 2.6.23 版本（2007 年）开始就采用 **CFS**（Completely Fair Scheduler） 调度器，并且一直是主线内核的默认调度器。CFS 通过使用红黑树数据结构来管理进程，旨在提供完全公平的调度。更细节的资料可参考 Linux 进程管理\[3\] 和 Linux CFS 调度器：原理、设计与内核实现（2023）\[4\]。
 
@@ -55,10 +32,10 @@ CFS 调度器的目标是让每个任务尽量公平获得 CPU 资源：
 - **时间片**：CFS 并不使用固定的时间片，根据任务的优先级和已使用的 CPU 时间进行综合动态调整。这样可以确保高优先级的任务获得更多的 CPU 时间，而低优先级的任务也不会被完全饿死。
 
 CFS 采用红黑树实现进行优先级选择，红黑树是一种平衡二叉树，能够高效地插入、删除和查找任务：
-!\[\[Pasted image 20240911193216.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-### EEVDF 调度器
+![[Pasted image 20240911193216.png]]
+
+## EEVDF 调度器
 
 CFS 调度器不强制执行调度截止时间，并且在许多情况下，**延迟关键任务未能按时调度**—这种延迟关键任务的调度延迟会导致高尾延迟。CFS 调度器在服务了 15 年后，于近期被淘汰。EEVDF\[5\]（_Earliest eligible virtual deadline first_ ）调度器在 Linux 内核 6.6 版本（2023 年 11 月）中被引入作为新的默认调度器。EEVDF 由调度器的维护者 Peter Zijlstra 2023 年提交\[6\]。EEVDF 调度器的设计基于一个来自 90 年代末的研究论文，旨在通过考虑进程**的虚拟截止时间**和**公平性**来优化调度决策
 
@@ -68,7 +45,7 @@ CFS 调度器不强制执行调度截止时间，并且在许多情况下，**�
 
 EEVDF 调度器的实现细节包括如何计算虚拟截止时间，如何维护一个按照虚拟截止时间排序的红黑树，如何处理进程的迁移和唤醒，以及如何与其他调度器类协作。结果显示，EEVDF 在一些场景下比 CFS 有更好的表现，特别是在延迟敏感的进程较多的情况下，EEVDF 可以显著降低调度延迟，提高响应速度，而不会牺牲吞吐量和能耗。
 
-### 通用调度器的窘境
+## 通用调度器的窘境
 
 经过内核中的调度器从 CFS 演进到了 EEVDF，能够提升某些场景下延迟敏感调度任务，但**内核调度器的目的是为了保障大多数工作负载**（例如数据库、游戏、微服务）和**大多数硬件平台**（例如 x86、ARM、NUMA、非 NUMA、CCX 等）上**通用并工作良好**。调度器优化在某些工作负载和硬件组合中表现良好，而在其他工作负载和硬件组合中表现出不符合预期的退化并不罕见。为了避免这种性能回归错误，因此内核社区对更改调度器代码设定了很高的门槛。
 
@@ -78,23 +55,23 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 
 最后，但同样重要的是，你可以在不重新安装内核和重启服务器的情况下更新 BPF 调度器。在拥有数十万台服务器的大型数据中心中，这是一种魅力。
 
-## BPF 调度扩展器 sched_ext 实现机制
+# BPF 调度扩展器 sched_ext 实现机制
 
-### 新增 1：SCHED_EXT 调度类
+## 新增 1：SCHED_EXT 调度类
 
 调度器在内核中的实现通过**调度类**实现具体场景的功能，调度类可以理解为一个通用抽象结构，这在面向对象语言中通常称之为理解为基类。不同场景的调度实现通过不同的调度类来实现，具体的调度类实现调度类定义的函数，不同调度类有优先级概念。任务的对应的具体调度类由进程创建时默认设定或者通过函数 `sched_setscheduler` 调整。
 
 `SCHED_EXT` 是一个非特权类，这意味着任何进程都可设置为 `SCHED_EXT` 。`SCHED_EXT` 放置在优先级位于的 `SCHED_IDLE` 和 `SCHED_NORMAL` 之间。因此， `SCHED_EXT` 调度程序无法以阻止（例如）以 `SCHED_NORMAL` 运行的普通 shell 会话运行的方式接管系统。调度类的接口、调度器类和新增的 ext_sched_cls 的整体关系如下图所示：
-!\[\[Pasted image 20240911193226.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911193226.png]]
 
 > 新版本废弃 scx_bpf_switch_all() 函数：早期版本有个神奇的增强函数 scx_bpf_switch_all()，用于将新创建出来的任务都会被添加到 scs_tasks 全局列表中，当用户定义的 BPF 调度器注册的时候，可以一键将非 dl_sched_cls/rt_shec_cls 等进程切换为 ext_sched_cls 的功能。详细参见移除 scx_bpf_switch_all\[7\]。
 
-### 新增 2：eBPF 自定义调度器函数
+## 新增 2：eBPF 自定义调度器函数
 
 在 `SCHED_EXT` 调度类实现中，增加了针对用户自定义扩展接口定义。`SCHED_EXT` 类的函数实现中，定义了一组基于 eBPF 的扩展函数，以 `enqueue_task_scx` 为例，在运行过中会判断是否注册了对应的 `sched_ext_ops` 结构中的 `runnable` 接口（一般简称为 `ops.runnable`），如加载的 BPF 程序定义了该操作函数则调用执行，如果没有定义则继续原来的流程。
-!\[\[Pasted image 20240911193233.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911193233.png]]
 
 以 `ext_sched_cls.enqueue_task_scx` 函数实现为例：
 
@@ -106,9 +83,9 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 
 通过扩展 BPF 程序结构的方式实现了用户自定义调度逻辑。
 
-## SCHED_EXT 调度类工作流程
+# SCHED_EXT 调度类工作流程
 
-### 调度队列 DSQ（Dispatch Queues）
+## 调度队列 DSQ（Dispatch Queues）
 
 为了适配调度器核心和 BPF 调度器，`sched_ext` 使用调度队列 DSQ（Dispatch Queues），调度队列既可以作为 FIFO 也可以作为优先级队列。
 
@@ -127,8 +104,8 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 当 CPU 就绪时会优先从本地选择任务，如果本地 DSQ 不为空，则选择第一个任务。否则，CPU 会尝试使用内置的全局 DSQ。如最后仍然没有产生可运行的任务，则调用 `ops.dispatch()` 进行调度或消费任务。
 
 `sched_ext` 中的 BPF 调度器工作流程可从任务唤醒和 CPU 就绪两个维度进行分析，这仅给出核心流程示意图\[8\]。
-!\[\[Pasted image 20240911193245.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240911193245.png]]
 
 1. 当任务唤醒时， `ops.select_cpu()` 是调用的第一个操作函数。
 
@@ -180,7 +157,7 @@ sched_ext 是为了解决上述问题而提出的。它允许用户使用 BPF �
 
 `scx_bpf_dispatch()` 在目标 DSQ 的 FIFO 上对任务进行排队。使用 `scx_bpf_dispatch_vtime()` 作为优先级队列。`SCX_DSQ_LOCAL` 和 `SCX_DSQ_GLOBAL` 等内部 DSQ 不支持优先级队列调度，必须使用 `scx_bpf_dispatch()` 调度。有关详细信息，请参阅 `tools/sched_ext/scx_simple.bpf.c` 中的函数文档和用法。
 
-## 切换到 sched_ext
+# 切换到 sched_ext
 
 `CONFIG_SCHED_CLASS_EXT` 是启用 sched_ext 的配置选项， `tools/sched_ext` 包含示例调度程序。在编译内核的时候，应启用以下配置选项才能使用 sched_ext：
 
@@ -206,7 +183,7 @@ BPF 调度器的当前状态可以确定如下：
 
 `# grep ext /proc/self/sched   ext.enabled                                  :                    1   `
 
-## 总结
+# 总结
 
 本文尝试从内核调度器 CFS/EEVDF、`schd_ext` 实现机制和工作流程给出了简单介绍，结合内核中的 `scx_simple` BPF 调度器给与了具体说明，如果你对 `sched_ext` 的实现和应用感兴趣，你可以通过编译内核的方式来对 `tools/sched_ext/` 目录下实现的调度器进行学习和实验，相信你可以得到更多的发现和调度的启示。相信，在 `sched_ext` 合入到内核代码后，这将为我们的测试和实现带来更多的便利。
 

@@ -1,11 +1,11 @@
-Linux内核之旅
-_2024年03月10日 15:48_ _陕西_
-**深入浅出BPF**
-专注 BPF 及相关基础技术
+
+Linux内核之旅 _2024年03月10日 15:48_ _陕西_
+
+**深入浅出BPF** 专注 BPF 及相关基础技术
 
 本文就 Linux Trace 跟踪过程中的主要 Hook 点给出了简单介绍，然后重点介绍了 rawtracepoint 类型出现的背景，性能测试说明，并通过 libbpf 和 bpftrace 分别基于  task_rename 给出了完整实现，介绍过程结合 tracepoint 跟踪点给出对比说明。
 
-## 1. Trace 跟踪常见的 Hook 类型
+# 1. Trace 跟踪常见的 Hook 类型
 
 通过`eBPF`可以对多种类型的事件进行跟踪，在  trace 领域分类如下：
 
@@ -21,11 +21,11 @@ _2024年03月10日 15:48_ _陕西_
 
 本文我们重点讨论一下内核静态跟踪中的 `rawtracepoint`，最后我们基于 libbpf 开发库和 bpftrace 给出实际代码样例。
 
-## 2. BPF 原始跟踪点 rawtracepoint
+# 2. BPF 原始跟踪点 rawtracepoint
 
 eBPF 的作者 Alexei Starovoitov 在 Linux 内核 4.17 版本中添加了一个原始跟踪点（rawtracepoint）。`rawtracepoint` 与 `tracepoint` 相比直接暴露原始参数，一定程度上避免创建稳定跟踪点参数的带来的性能开销，但由于直接对用户暴露了原始参数，因此这是属于动态跟踪的模式，属于不稳定的跟踪模式。`rawtracepoint` 相比较 `kprobe` 来讲相对稳定，因为跟踪点无论是名字还是参数变化相对低频，而相对于 `tracepoint` 的跟踪方式可提供更优的性能。`rawtracepoint` 提交实现可参见：bpf: introduce BPF_RAW_TRACEPOINT\[1\]。从作者提交的性能压测报告相比较 kprobe 和 tracepoint 跟踪都具有性能提升\[2\]，比较适用于长期监控频繁次调用的函数，比如系统调用。Tracee 安全产品监控系统调用的实现就采用 rawtracepoint 的方式\[3\]。
 
-### 2.1 跟踪性能优化提升 20%
+## 2.1 跟踪性能优化提升 20%
 
 表格为作者提交时候的原始性能数据：
 
@@ -41,10 +41,10 @@ perf comparision of linux trace
 性能压测运行方式如下：
 
 ```cpp
-$ cd tools/testing/selftests/bpf   $ ./benchs/run_bench_trigger.sh   
+$ cd tools/testing/selftests/bpf   $ ./benchs/run_bench_trigger.sh  
 ```
 
-### 2.2 rawtracepoint 跟踪事件查看及数量统计
+## 2.2 rawtracepoint 跟踪事件查看及数量统计
 
 bpftrace 在 0.19 版本支持 rawtracepoint\[4\]。可以使用 bpftrace -l 查看，程序类型缩写为 rt\[5\]，参数类型为 arg0, arg1..。我们可使用 bpftrace -l 查看到全部的列表：
 
@@ -73,7 +73,7 @@ $ sudo bpftrace -l "rawtracepoint:*"|wc -l   1480      $ sudo bpftrace -
 
 `$ bpftrace -e 'rawtracepoint:kfree_skb  { printf("%s\n", comm)} '   Attaching 1 probe...   `
 
-### 2.3 传递参数变化
+## 2.3 传递参数变化
 
 从 BPF 程序角度来看，`rawtracepoint`  方式的参数定义和访问如下所示，后续我们将给出完整的使用样例程序。
 
@@ -104,9 +104,9 @@ void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec
 static void test_task_rename(int cpu)   {    char buf[] = "test\n";    int i, fd;       fd = open("/proc/self/comm", O_WRONLY|O_TRUNC);    if (fd < 0) {     printf("couldn't open /proc\n");     exit(1);    }    for (i = 0; i < MAX_CNT; i++) {     if (write(fd, buf, sizeof(buf)) < 0) {      printf("task rename failed: %s\n", strerror(errno));      close(fd);      return;     }    }    close(fd);   }      int main()   {    test_task_rename(0);    return 0;   }   
 ```
 
-## 3. 使用 rawtracepoint 样例
+# 3. 使用 rawtracepoint 样例
 
-### 3.1 libbpf 库 （基于 CO-RE）
+## 3.1 libbpf 库 （基于 CO-RE）
 
 系统中对应的 `task_rename` 跟踪点为  `tracepoint:task:task_rename` ，跟踪点格式定义如下：
 
@@ -131,7 +131,7 @@ SEC("tracepoint/task/task_rename")   int prog(struct trace_event_raw_task_rena
 
 `SEC("raw_tracepoint/task_rename")   int rt_prog(struct bpf_raw_tracepoint_args *ctx)   {       // void __set_task_comm(struct task_struct *tsk, const char *buf, bool exec);       struct task_struct *tsk = (struct task_struct *) ctx->args[0];       u32 pid;       u16 oom_score_adj;       char old_name[TASK_COMM_LEN] = {};       char new_name[TASK_COMM_LEN] = {};             pid = BPF_CORE_READ(tsk, pid);       // BPF_CORE_READ_INTO(&old_name, tsk, comm);       bpf_core_read(&old_name, sizeof(old_name), &tsk->comm);       bpf_core_read(&new_name, sizeof(new_name), (void *)ctx->args[1]);       oom_score_adj = BPF_CORE_READ(tsk, signal, oom_score_adj);          bpf_printk("task_rename:rt -> pid %d, oldcomm %s, newcomm %s, oom %d",                   pid,                   old_name,                   new_name,                   oom_score_adj);       return 0;   }   `
 
-### 3.2 bpftrace
+## 3.2 bpftrace
 
 bpftrace 在 0.19 版本开始支持 rawtracepoint\[6\]。可以使用 bpftrace -l 查看，程序类型缩写为 rt\[7\]，参数类型为 arg0, arg1..
 

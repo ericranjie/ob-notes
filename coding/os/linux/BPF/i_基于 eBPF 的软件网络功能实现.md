@@ -1,5 +1,5 @@
-Original 沈典、杨彬 酷玩BPF
-_2024年08月26日 08:30_ _广西_
+
+Original 沈典、杨彬 酷玩BPF _2024年08月26日 08:30_ _广西_
 
 # 1、基于eBPF实现网络功能的优势
 
@@ -18,7 +18,8 @@ _2024年08月26日 08:30_ _广西_
 因为eBPF对非连续内存的使用施加了严格限制，阻碍了部分网络功能核心组件的实现。例如基于跳表的key-value store 和基于红黑树的优先级队列等。使用非连续内存意味着eBPF需要支持将可变数量的动态内存持久化。尽管最近的Linux内核（版本6.1及以上）支持分配动态内存并将其持久化到BPF MAP中，但验证器强制规定了BPF MAP只能持久化固定数量的动态内存。因此，由于缺乏对可变动态内存的支持，现有的eBPF无法使用非连续内存。
 
 例如，以下代码展示了eBPF目前支持动态内存，但无法支持可变数量的动态内存。
-!\[\[Pasted image 20240920141231.png\]\]
+
+![[Pasted image 20240920141231.png]]
 
 ## 2.2 用eBPF实现网络功能性能次优
 
@@ -60,7 +61,8 @@ _2024年08月26日 08:30_ _广西_
 eNetSTL将上述的通用的模式抽象并实现为一系列高性能低开销的API。在解决问题的同时，避免代码过度膨胀。eNetSTL基于eBPF的 kernel function (kfunc) 和 kernel pointer (kptr) 技术实现，并将API实现在内核模块中，从而避免了内核的修改。
 
 目前eNetSTL的设计除了使用kfunc和kptr接口外，其他部分是self-contain的。因此能保持较好的内核版本的兼容性。eNetSTL包含的内容如下图所示：
-!\[\[Pasted image 20240920141240.png\]\]
+
+![[Pasted image 20240920141240.png]]
 
 具体来说，eNetSTL包含以下内容：
 
@@ -74,41 +76,48 @@ eNetSTL将上述的通用的模式抽象并实现为一系列高性能低开销�
 1. 由eNetSTL管理所有的底层指针，通过kfunc实现节点到节点的指针路由，通过给kfunc增加KF_ACQUIRE tag 来安全获取下一个节点的指针，并在eBPF中直接访问该指针，例如 a->b。
 
 下面是Memory wrapper的部分API：
-!\[\[Pasted image 20240920141250.png\]\]
 
-## 4、eNetSTL使用技术实践
+![[Pasted image 20240920141250.png]]
 
-### 4.1 基于eNetSTL实现跳表
+# 4、eNetSTL使用技术实践
+
+## 4.1 基于eNetSTL实现跳表
 
 通过Memory wrapper API，直接在eBPF里使用非连续内存。我们用简化版本的单链表来展示使用非连续内存 （跳表的实现类似）：
-!\[\[Pasted image 20240920141303.png\]\]
+
+![[Pasted image 20240920141303.png]]
 
 性能测试结果 （40G网卡 单核性能） 如下图所示 （红色折线代表用内核模块实现，黄色折线代表用eNetSTL实现)：
-!\[\[Pasted image 20240920141310.png\]\]
+
+![[Pasted image 20240920141310.png]]
 
 我们验证了跳表的查找性能和插入性能，可以看到使用eNetSTL在使能了原本无法直接实现的跳表的同时，其性能损耗在10%以下。
 
-### 4.2 基于eNetSTL实现sketch
+## 4.2 基于eNetSTL实现sketch
 
 sketch是一种在网络测量领域常用的网络功能，其核心设计是使用多个hash函数将同一条流的数据包映射到多个counter上。我们使用eNetSTL的API来加速多个函数的计算，典型的Count-min sketch用eNetSTL实现代码如下：
-!\[\[Pasted image 20240920141317.png\]\]
+
+![[Pasted image 20240920141317.png]]
 
 性能测试结果 （40G网卡 单核性能） 如下图所示 （红色代表用内核模块实现，黄色代表用eNetSTL实现，蓝色表示用纯eBPF实现）：
-!\[\[Pasted image 20240920141329.png\]\]
+
+![[Pasted image 20240920141329.png]]
 
 实验结果显示，与eBPF相比，基于eNetSTL的实现平均性能提升了47.9%。特别是，随着哈希函数数量的增加，这种提升变得更加显著，使用8个哈希函数时达到了70.9%的峰值。这是由于随着哈希函数数量的增加，SIMD指令能带来更多的优化效果。并且调用eNetSTL几乎不会带来性能损失。
 
-### 4.3 基于eNetSTL优化Cuckoo Switch中的hash性能
+## 4.3 基于eNetSTL优化Cuckoo Switch中的hash性能
 
 Cuckoo Switch中使用了Blocked Cuckoo hash这一核心数据结构。相比于原始的Cuckoo hash， Blocked Cuckoo hash为了降低hash的冲突率，在一个bucket中同时保存16个hash指纹。我们参考DPDK的实现，使用eNetSTL提供的 `hw_hash_crc`（用硬件指令生成crc来代替hash计算）和 基于SIMD的并行比较算`bpf__find_mask_u16`分别优化hash的计算、hash指纹的比较、和full-key的比较。
 
 下面是一个简化后的例子：
-!\[\[Pasted image 20240920141336.png\]\]
 
-!\[\[Pasted image 20240920141342.png\]\]
+![[Pasted image 20240920141336.png]]
+
+![[Pasted image 20240920141342.png]]
 
 性能测试结果 （40G网卡 单核性能） 如下图所示 （红色的折线代表用内核模块实现，黄色的折线代表用eNetSTL实现，蓝色的折线表示用纯eBPF实现）：
-!\[\[Pasted image 20240920141349.png\]\]
+
+![[Pasted image 20240920141349.png]]
 
 使用了eNetSTL的方案与纯eBPF 相比，平均性能提升 27.4%，并且随着负载的增加，性能提升更加明显，在满负载时达到 33.08%。这是因为，随着负载增加，单个条目中的平均比较次数也增加。基于 SIMD 的并行比较优化效果变得更好。在低负载场景下，优化主要体现在使用 hw_hash_crc 替代基于软件的哈希计算和 SIMD 优化的full key比较。与内核相比，采用eNetSTL的方案平均性能损失约为4.30%。
 

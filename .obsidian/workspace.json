@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md"
+                "file": "coding/os/linux/BPF/从DPDK和eBPF感受一下Smart NIC.md"
               }
             }
           }
@@ -146,44 +146,44 @@
       "command-palette:Open command palette": false
     }
   },
-  "active": "97c141a77dfb8bbf",
+  "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/BPF/Tetragon进程阻断原理.md",
+    "coding/os/linux/BPF/p_Linux内核实例解析系列-eBPF Map和eBPF Loop.md",
+    "coding/os/linux/BPF/p_eBPF Talk ringbuf 经验分享.md",
+    "coding/os/linux/BPF/p_BPF 赋能调度器：万字详解 sched_ext 实现机制与工作流程【建议收藏】.md",
+    "coding/os/linux/BPF/Linux中基于eBPF的恶意利用与检测机制.md",
+    "coding/os/linux/BPF/i_抽丝剥茧：从 Linux 源码探索 eBPF 的实现.md",
+    "coding/os/linux/BPF/i_基于 eBPF 的软件网络功能实现.md",
+    "zx99-image/Pasted image 20241024233358.png",
+    "coding/os/linux/BPF/i_内核虚拟机原理 网络可编程.md",
+    "zx99-image/Pasted image 20241024233657.png",
+    "coding/os/linux/BPF/i_一文看懂eBPF eBPF的简单使用.md",
+    "coding/os/linux/BPF/i_bpf在android逆向中的辅助效果.md",
+    "coding/os/linux/BPF/i_BPF 高性能稳定跟踪机制 rawtracepoint 介绍和样例.md",
+    "coding/os/linux/BPF/eBPF综述 已付费.md",
+    "coding/os/linux/BPF/b_eBPF动手实践系列三：基于原生libbpf库的eBPF编程改进方案.md",
+    "coding/os/linux/BPF/k_eBPF 概述：第 3 部分：软件开发生态.md",
+    "coding/os/linux/BPF/c_Linux eBPF学习路径.md",
+    "coding/os/linux/BPF/b_eBPF 简史.md",
+    "coding/os/linux/network/b_性能神器的碰撞：io_uring与高性能网络IO框架Netpoll的邂逅.md",
+    "coding/os/linux/network/b_多核心Linux内核路径优化的不二法门之-多核心平台TCP优化.md",
+    "coding/os/linux/network/b_iptables 长文详解，值得收藏细读.md",
+    "coding/os/linux/network/a_p_Linux转发性能评估与优化(转发瓶颈分析与解决方案).md",
+    "coding/os/linux/network/a_n_深入理解 Linux socket.md",
+    "coding/os/linux/network/a_25 张图，一万字，拆解 Linux 网络包发送过程.md",
+    "coding/os/linux/network/QUIC/10 分钟讲完 QUIC 协议.md",
+    "coding/os/linux/network/debug/p_记一个诡异的 TCP 挥手乱序问题.md",
+    "coding/os/linux/network/debug/p_一例智能网卡mellanox的网卡故障分析.md",
+    "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
     "zx99-image/Pasted image 20241024232458.png",
-    "coding/os/linux/network/debug/p_Wireshark的抓包和分析，看这篇就够了！.md",
     "zx99-image/Pasted image 20241024225051.png",
     "zx99-image/Pasted image 20241024225651.png",
-    "coding/os/linux/network/debug/p_virtio-net 的前后端延迟高分析.md",
     "zx99-image/Pasted image 20241024225549.png",
     "zx99-image/Pasted image 20241024225537.png",
     "zx99-image/Pasted image 20241024225523.png",
     "zx99-image/Pasted image 20241024225513.png",
     "zx99-image/Pasted image 20241024225458.png",
-    "zx99-image/Pasted image 20241024225441.png",
-    "zx99-image/Pasted image 20241024225428.png",
-    "zx99-image/Pasted image 20241024225417.png",
-    "coding/os/linux/network/debug/p_Linux内核常见的网络丢包场景分析.md",
-    "coding/os/linux/network/debug/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
-    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
-    "coding/os/linux/performance/c_n_Linux 性能基准测试工具及测试方法.md",
-    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
-    "coding/os/linux/performance/d_闻茂泉：系统性能监控与分析的工程化实践之路.md",
-    "coding/os/linux/performance/i_性能提升 8450%，Linux 内核函数获大幅改进.md",
-    "coding/os/linux/performance/i_系统性能监控工具ssar实例精选 龙蜥SIG.md",
-    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
-    "coding/os/linux/performance/k_一文说清linux system load.md",
-    "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
-    "coding/os/linux/performance/t_性能优化的路有多远？.md",
-    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
-    "coding/os/linux/performance/b_微信工程师：常见性能优化方案与实用工具.md",
-    "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
-    "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
-    "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
-    "coding/os/linux/performance/a_n_系统性能分析从入门到进阶.md",
-    "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
-    "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
-    "coding/os/linux/process/k_进程管理和终端驱动：基本概念.md",
-    "coding/os/linux/process/k_一文看懂 fork 系统调用.md",
     "coding/os/linux/schedule/real-time",
     "coding/os/linux/schedule/atomic",
     "zx99-image/-20241021",

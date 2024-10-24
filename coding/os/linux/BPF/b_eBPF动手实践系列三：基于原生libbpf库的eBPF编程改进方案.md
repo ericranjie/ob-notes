@@ -1,8 +1,7 @@
-闻茂泉 深入浅出BPF
 
-_2024年03月18日 12:09_ _上海_
+闻茂泉 深入浅出BPF _2024年03月18日 12:09_ _上海_
 
-**01** **欲穷千里目，更上一层楼**
+# **01** **欲穷千里目，更上一层楼**
 
 在上一篇文章《[eBPF动手实践系列二：构建基于纯C语言的eBPF项目](https://mp.weixin.qq.com/s?__biz=MzUwOTkwNzQxMg==&mid=2247485351&idx=1&sn=5025af06acf375c6aeb0f03700f7ce6c&scene=21#wechat_redirect)》中，我们初步实现了脱离内核源码进行纯C语言eBPF项目的构建。libbpf库在早期和内核源码结合的比较紧密，如今的libbpf库更加成熟，已经完全脱离内核源码独立发展。
 
@@ -20,7 +19,7 @@ $ cat ./source/tools/lib/bpf/libbpf.map | grep -oE '^LIBBPF_([0-9.]+)' | sort -r
 $ cat ./source/tools/lib/bpf/Makefile
 ```
 
-**02** **eBPF编程方案简介**
+# **02** **eBPF编程方案简介**
 
 为了简化 eBPF程序的开发流程，降低开发者在使用 libbpf 库时的入门难度，libbpf-bootstrap 框架应运而生。基于libbpf-bootstrap框架的编程方案是目前网络上看到的最主流编程方案。此外，网络上也偶见比较古老的仅依赖一个bpf_load.c文件的C语言编程方案，这个方案并不需要依赖libbpf库的支持。
 

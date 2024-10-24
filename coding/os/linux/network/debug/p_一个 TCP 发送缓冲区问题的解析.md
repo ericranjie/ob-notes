@@ -63,7 +63,7 @@ sk->sk_sndbuf = mat_x(u32, val * 2, SOCK_MIN_SNDBUF)\
 
 但是，问题现象还不能解释，因为即使是 8192 字节的发送缓冲区内存全部用来存放用户数据(额外开销为 0，当然这是不可能的)，也达不到 Send-Q 最后达到的 14480 。
 
-### sk_wmem_queued
+# sk_wmem_queued
 
 既然设置了 sk->sk_sndbuf, 那么内核就会在发包时检查当前的发送缓冲区已使用内存值是否超过了这个限制，前者使用 sk->wmem_queued 保存。
 
@@ -82,7 +82,7 @@ bool sk_stream_memory_free(const struct sock* sk)
 
 sk->wmem_queued 是不断变化的，对 TCP socket 来说，当内核将 skb 塞入发送队列后，这个值增加 skb->truesize (truesize 正如其名，是指包含了额外开销后的报文总大小)；而当该报文被 ACK 后，这个值减小 skb->truesize。
 
-### tcp_sendmsg
+# tcp_sendmsg
 
 以上都是铺垫，让我们来看看 tcp_sendmsg 是怎么做的。总的来说内核会根据发送队列(write queue)是否有待发送的报文，决定是 创建新的 sk_buff，或是将用户数据追加(append)到 write queue 的最后一个 sk_buff
 
@@ -119,7 +119,7 @@ new_segment：
 }
 ```
 
-#### \*\*Case 1.\*\*创建新的 sk_buff
+## **Case 1. 创建新的 sk_buff
 
 在我们这个问题中，Client 在 Phase 1 是不会累积 sk_buff 的。也就是说，这时每个用户发送的报文都会通过 `sk_stream_alloc_skb` 创建新的 sk_buff。
 
@@ -134,7 +134,7 @@ static inline bool sk_stream_memory_free(const struct sock* sk)
 }
 ```
 
-#### \*\*Case 2.\*\*将用户数据追加到最后一个 sk_buff
+## **Case 2. 将用户数据追加到最后一个 sk_buff
 
 而在进入 Phase 2 后，Client 的发送缓冲区已经有了累积的 sk_buff，这时，内核就会尝试将用户数据(msg中的内容)追加到 write queue 的最后一个 sk_buff。
 
@@ -248,9 +248,3 @@ new_segment:
 ```
 
 ______________________________________________________________________
-
-**Linux云计算网络**
-
-专注于 「Linux」 「云计算」「网络」技术栈，分享的干货涉及到 Linux、网络、虚拟化、Docker、Kubernetes、SDN、Python、Go、编程等，后台回复「1024」，送你一套 10T 资源学习大礼包，期待与你相遇。
-
-93篇原创内容

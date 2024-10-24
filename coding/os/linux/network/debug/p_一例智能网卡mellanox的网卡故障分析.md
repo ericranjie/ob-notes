@@ -1,3 +1,4 @@
+
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2021-7-6 10:38 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 背景：这个是在centos 7.6.1810的环境上复现的，智能网卡是目前很多云服务器上的网卡标配，在oppo主要用于vpc等场景，智能网卡的代码随着功能的增强导致复杂度一直在上升，驱动的bug一直是内核bug中的大头，在遇到类似问题时，内核开发者由于对驱动代码不熟悉，排查会比较费劲,本身涉及的背景知识有：dma_pool,dma_page,net_device,mlx5_core_dev设备，设备卸载，uaf问题等,另外，这个bug目测在最新的linux基线也没有解决,本文单独拿出来列举是因为uaf问题相对比较独特。

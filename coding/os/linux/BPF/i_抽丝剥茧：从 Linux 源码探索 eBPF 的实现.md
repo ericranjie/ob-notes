@@ -1,18 +1,7 @@
-深入浅出BPF
 
-_2024年04月09日 19:22_ _上海_
+深入浅出BPF _2024年04月09日 19:22_ _上海_
 
 以下文章来源于云原生指北 ，作者张晓辉Addo
-
-\[
-
-![](http://wx.qlogo.cn/mmhead/Q3auHgzwzM7vGH6kaGEfhpFNJxj7o6cVfOU2bTL5bicqf2YcQsbMf9w/0)
-
-**云原生指北**.
-
-专注于基础架构、云原生，分享 Kubernetes、容器、DevOps 等前沿技术、工具。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzA3NzUzNTM4NA==&mid=2649615264&idx=1&sn=63a7824cda2c8ee01af67e6ddc080731&chksm=8749ca57b03e434134726fc8aa0691d90b4406a92d458b3ae635a61fa3e6f8d5ca325f27b84d&mpshare=1&scene=24&srcid=0410OrsVR6Fdot1PMftFWo2M&sharer_shareinfo=f6750c340d09e183c946f363aa0086fb&sharer_shareinfo_first=f6750c340d09e183c946f363aa0086fb&key=daf9bdc5abc4e8d0feb5567fa15d6bda59327155326b72781dcdf29f58336adcdb3909dd86192817ac77356ac3da12d6cb832f4afad96297439360ae43af68c25560a891c15f9e88cbe08d8ae0fbe110895d4d3b517795ba05247c1eced8b418e1e712af768bcccf764ad087b8ac276397ba35c61f995808c80af1c280530081&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQzBULIzipHyT5wHl4zegxWBLmAQIE97dBBAEAAAAAADsMOrNXdkAAAAAOpnltbLcz9gKNyK89dVj0KjQHO418XU6rclNiEnIqvpah9jAxnq1SodT8XbCTRhxQZUX1fOQrCpaU98Ept5T%2BQxsqCOzu%2BNU3bAg4%2FxL7xakFLYdkPkEwtiMI3ikm1ewZByuVE9IRWbH1zLYFxa6RfSWrr9tDlPVugWuLAICMNdWDVQ7LvTXhquGSKp9G4IMXwZWCkQ%2FnEwBvSeE9IbvfbTYqYM%2BCK9G73diiE%2BEeDERUoxgrZvDjOVNQKT3CamvTvb%2B%2Bk6BAB2tdLKlBMGwZ&acctmode=0&pass_ticket=3HA5R8yAs%2FM5MvqQB7M7oRb%2BnMgZb06jQ%2FkFTX6%2FqscI5TPgV8qycuelKorN%2B0P9&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 去年学习 eBPF，分享过 几篇 eBPF 方面的学习笔记\[1\]，都是面向 eBPF 的应用。为了准备下一篇文章，这次决定从 Linux 源码入手，深入了解 eBPF 的工作原理。因此这篇又是一篇学习笔记，假如你对 eBPF 的工作原理也感兴趣，不如跟随我的脚步一起。文章中若有任何问题，请不吝赐教。
 

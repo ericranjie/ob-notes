@@ -1,14 +1,11 @@
-dog250 Linux阅码场
 
-_2021年12月07日 07:02_
+dog250 Linux阅码场 _2021年12月07日 07:02_
 
 _**原文作者：dog250**_
 
 _**原文链接：https://blog.csdn.net/dog250/article/details/103301816**_
 
 周三晚上，我演示了Linux下一代防火墙bpfilter的一个自制简易POC：
-
-![图片](https://mmbiz.qpic.cn/mmbiz_gif/Ljib4So7yuWiaC0oer2QpXIolHVU3Xibtm9BNWiav660mHaB5qEd1dibMibUicNYmAzBBiadQP2s7HArdUxoWL5cDkTEbQ/640?wx_fmt=gif&tp=wxpic&wxfrom=5&wx_lazy=1)
 
 前天晚上在家加班处理问题，一顿操作后没响应了，以为系统panic了，就等待重启，远程登录的设备，就不知道是不是真panic了还是说仅仅网络断了，等待期间撸了下文里的代码，还测通了，当再想起正事儿的时候，快一个小时过去了，系统依旧没有恢复…让同事帮忙带外check，发现是在我配置vf时网卡reset了，丢了路由…这就是远程登录的坏处，搞搞业务代码还行，搞网络搞内核的还是机器在眼前，键盘在手边让人安心啊。
 

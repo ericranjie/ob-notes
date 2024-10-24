@@ -1,14 +1,7 @@
-Linux内核之旅
 
-_2024年05月01日 13:12_ _陕西_
+Linux内核之旅 _2024年05月01日 13:12_ _陕西_
 
 以下文章来源于云巅论剑 ，作者卢烈
-
-**云巅论剑**.
-
-发掘Linux相关内核技术，探索操作系统未来发展方向。
-
-\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664617582&idx=1&sn=2842836429faab0c0fdea9bac2959363&chksm=f04dfb8bc73a729d40155c5863cb116ab9f6dac72dd61e4e522cc81f94f2d05674c7a4e0d0c5&mpshare=1&scene=24&srcid=0502qZCYBeKNtBWuONZVIdnG&sharer_shareinfo=fe468619fb57e1c1b337d1d2108d3bd3&sharer_shareinfo_first=fe468619fb57e1c1b337d1d2108d3bd3&key=daf9bdc5abc4e8d0787aefccf840cbd8ef2cf6e893e92008f36d3936c048ca1d40e61cefed19017ab238e3c37ee4e2601f99bec0879d59f5c0dde178b301506ada33aae36cc7f91d652f17bb45a9bdbf3b00dcc7c2e0b3ac3da4ae1cff922f7bc23d1427f0927d18fd9a544b72dd5564e39a5ad2212ab69fe674119f736afcd0&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090621&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQ8gAjaN5UEHabuDXAL5ReSBLmAQIE97dBBAEAAAAAAAkeLyq%2BBZ8AAAAOpnltbLcz9gKNyK89dVj0XBuGXFr%2FKp1U4p6tNEMlut%2BYoa2Hx6L2ECtJBGPIGW4MTrt8WQwUL87V2e4frtX3Ic9R6c9H2ntbwcsSOx%2BPOiXh%2FH%2BswcsGlyfym6OVB5RrXVOtZzuchODFS3jdaqGClqvrtePpt8wDFVmjd62WXbHCCewja1Dg000O%2FHWrHTSzXJC9pmLRDmpqA21c1ydwnKnj4pcdeTSYb2TexjPWaWQ6yTS6utHGU8EGcG8QeSskfcuEAbEykWlSJmyNJje3&acctmode=0&pass_ticket=yibkohbe0bO3Mc2IZ2laS0BHAG4rUIlnlZs9jToI3W5If2ONMJBlj2Th9YWv7ZBv&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
 
 > tcp 四次挥手是超经典的网络知识，但是网络中的异常状况千奇百怪，说不定会“偷袭”到标准流程的盲区。最近笔者遇到了一个罕见的挥手乱序问题，经过对内核代码的分析和试验，最后终于找到了原因，角度可谓刁钻。
 >
@@ -16,9 +9,7 @@ _2024年05月01日 13:12_ _陕西_
 
 ⚠️本文内容包括但不限于：tcp 四次挥手（同时关闭），tcp 包的 seq/ack 号规则，tcp 状态机，内核 tcp 代码，tcp 发送窗口等知识。
 
-_**01**_
-
-**问题是什么？**
+# _**01**_ **问题是什么？**
 
 > 内核版本 5.10.112。
 
