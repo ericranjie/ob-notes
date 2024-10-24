@@ -1,16 +1,17 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2019-1-1 12:37 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 经过前面一系列的文章描述，我们已经对CFS调度器有了一定的认识。那么本篇文章就作为一篇总结和思考。我们就回忆一下CFS调度器的那些事。我们就以问题的形式重新回顾一遍CFS调度器设计的原理。现在开始，我们问题来了。
 
-#### CFS调度器为什么要引入虚拟时间片vruntime？
+# CFS调度器为什么要引入虚拟时间片vruntime？
 
 > 我觉得如果所有的进程不存在优先级区分的话，我们完全可以不引入vruntime的概念。所有的进程需要运行的实际时间都是一样的，大家都保持绝对的公平。如果由我们设计调度器，当然完全可以记录每个进程运行的实际时间。每次调度选择下一个进程的时候，我们完全可以挑选出已经运行时间最短的进程。当然，进程是存在轻重关系的。用户认为重要的进程，就是应该运行更长的时间。此时不同的进程由于优先级的原因导致运行时间不等。如果我们依然想采用像没有优先级的时候的方法去选择下一个运行的进程的话，自然有点困难。因为现在不同的进程运行的时间就是应该不一样，我们还怎么评判哪个进程运行时间最少呢。所以我们引入虚拟时间的概念。现在我们希望不同的进程根据优先级分配的物理时间通过一个公式计算得到一个相同的值，我们称这个值为虚拟时间。我们记录每个进程运行的虚拟时间，当需要选择下一个运行进程的时候，找出虚拟时间最小的进程即可。
 
-#### 新建进程的vruntime的初值是不是0？
+# 新建进程的vruntime的初值是不是0？
 
 > 我们先考虑另一个问题，通过fork()创建的新进程的vruntime如果是0会怎么样？就绪队列上所有的进程的vruntime都已经是很大的一个值。如果新建进程的vruntime的值是0的话，根据CFS调度器pick_next_task_fair()逻辑，我们会倾向选择新建进程，一直让其更多的运行，追赶上就绪队列中其他进程的vruntime。既然不能是0，初值应该是什么比较合理呢？当然是和就绪队列上所有进程的vruntime的值差不多。具体怎么操作，下个问题揭晓。
 
-#### 就绪队列记录的min_vruntime的作用是什么？
+# 就绪队列记录的min_vruntime的作用是什么？
 
 > 首先我们需要明白的是min_vruntime记录的究竟是什么。min_vruntime记录的是就绪队列管理的所有进程的最小虚拟时间。理论上来说，所有的进程的虚拟时间都大于min_vruntime。记录这个时间有什么用呢？我认为主要有3点作用。
 >
@@ -18,19 +19,19 @@
 > - 当进程sleep一段时间被wakeup的时候，此时也仅是物是人非。同样面临着类似新建进程的境况。同样我们需要根据min_vruntime的值适当调整后赋值给该进程。
 > - 针对migration进程，我们面临一个新的问题。每个CPU上就绪队列的min_vruntime的值各不相同。有可能相差很多。如果进程从CPU0迁移到CPU1的话，进程的vruntime是否应该改变呢？当时是需要的，否则就会面临迁移后受到惩罚或者奖励。我们的方法是进程进程的vruntime减去CPU0的min_vruntime，然后加上CPU1的min_vruntime。
 
-#### 唤醒的进程的vruntime该如何处理？
+# 唤醒的进程的vruntime该如何处理？
 
 > 经过上一个问题，我们应该有点答案了。如果睡眠时间很长，自然是根据min_vruntime的值处理。问题是我们该如何处理？我们会根据min_vruntime的值减去一个数值作为唤醒进程的vruntime。为何减去一个值呢？我认为该进程已经sleep很长时间，本身就没有太占用CPU时间。给点补偿也是正常的。大多数的交互式应用，基本都是属于这种情况。这样处理，又提高了交互式应用的相应速度。如果sleep时间很短呢？当然是不需要干涉该进程的vruntime。
 
-#### 就绪队列上所有的进程的vruntime都一定大于min_vruntime吗？
+# 就绪队列上所有的进程的vruntime都一定大于min_vruntime吗？
 
 > 答案当然不是的。我们虽然引入min_vruntime的意义是最终就绪队列上所有进程的最小虚拟时间，但是并不能代表所有的进程vruntime都大于min_vruntime。这个问题在部分的情况下是成立的。例如，上面提到给唤醒进程vruntime一定的补偿，就会出现唤醒的进程的vruntime的值小于min_vruntime。
 
-#### 唤醒的进程会抢占当前正在运行的进程吗？
+# 唤醒的进程会抢占当前正在运行的进程吗？
 
 > 分成两种情况，这个取决于唤醒抢占特性是否打开。即sched_feat的WAKEUP_PREEMPTION。如果没有打开唤醒抢占特性，那么就没有后话了。现在考虑该特性打开的情况。由于唤醒的进程会根据min_vruntime的值进行一定的奖励，因此存在很大的可能vruntime小于当前正在运行进程的vruntime。当时是否意味着只要唤醒进程的vruntime比当前运行进程的vruntime小就抢占呢？并不是。我们既要满足小的条件，又要在此基础上附加条件。两者差值必须大于唤醒粒度时间。该时间存在变量`sysctl_sched_wakeup_granularity`中，默认值1ms。
 
-#### min_vruntime初始值为何如此奇怪？
+# min_vruntime初始值为何如此奇怪？
 
 > 就绪队列`struct cfs_rq`初始化是通过init_cfs_rq()函数进行。该函数如下：
 >
@@ -41,7 +42,7 @@
 >
 > 初始值是U64_MAX - (1LL \<\< 20)，U64_MAX代表64 bits无符号整型最大值。这里，我也有同样的疑问，min_vruntime为何初值不是0，搞个这么大的数是什么意思，和0相比有什么好处吗。当然，我也没有找到答案。下面都是我的猜测，和大家分享。min_vruntime单位是ns。也就是说系统运行大概(1\<\<20)ns，大约1ms的时间min_vruntime就会溢出。因此，原因可能就是为了更早的发现由于min_vruntime数值溢出导致的问题。如果初值是0的话，我们如果要提前发现min_vruntime溢出导致的问题大概需要545年时间（以NICE为0的进程计算，如果以NICE值为20计算的话，只需要8年左右时间）。
 
-#### 最小粒度时间sysctl_sched_min_granularity是否一定会满足？
+# 最小粒度时间sysctl_sched_min_granularity是否一定会满足？
 
 > CFS调度周期的时间设定取决于进程的数量，根据\_\_sched_period()函数可知，当进程的数量大于`sched_nr_latency`时，调度周期的时间等于进程数量乘以`sysctl_sched_min_granularity`。
 >
@@ -64,7 +65,7 @@
 
 标签: [CFS](http://www.wowotech.net/tag/CFS)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [编译乱序(Compiler Reordering)](http://www.wowotech.net/kernel_synchronization/453.html) | [CFS调度器（5）-带宽控制](http://www.wowotech.net/process_management/451.html)»
 

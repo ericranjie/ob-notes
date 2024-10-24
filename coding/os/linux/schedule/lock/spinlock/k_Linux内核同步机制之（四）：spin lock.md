@@ -1,31 +1,15 @@
-# [蜗窝科技](http://www.wowotech.net/)
-
-### 慢下来，享受技术。
-
-[![](http://www.wowotech.net/content/uploadfile/201401/top-1389777175.jpg)](http://www.wowotech.net/)
-
-- [博客](http://www.wowotech.net/)
-- [项目](http://www.wowotech.net/sort/project)
-- [关于蜗窝](http://www.wowotech.net/about.html)
-- [联系我们](http://www.wowotech.net/contact_us.html)
-- [支持与合作](http://www.wowotech.net/support_us.html)
-- [登录](http://www.wowotech.net/admin)
-
-﻿
-
-## 
-
+ 
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-4-22 12:22 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
-一、前言
+# 一、前言
 
 在linux kernel的实现中，经常会遇到这样的场景：共享数据被中断上下文和进程上下文访问，该如何保护呢？如果只有进程上下文的访问，那么可以考虑使用semaphore或者mutex的锁机制，但是现在中断上下文也参和进来，那些可以导致睡眠的lock就不能使用了，这时候，可以考虑使用spin lock。本文主要介绍了linux kernel中的spin lock的原理以及代码实现。由于spin lock是architecture dependent代码，因此，我们在第四章讨论了ARM32和ARM64上的实现细节。
 
 注：本文需要进程和中断处理的基本知识作为支撑。
 
-二、工作原理
+# 二、工作原理
 
-1、spin lock的特点
+## 1、spin lock的特点
 
 我们可以总结spin lock的特点如下：
 
@@ -37,7 +21,7 @@
 
 （4）可以在中断上下文执行。由于不睡眠，因此spin lock可以在中断上下文中适用。
 
-2、 场景分析
+## 2、 场景分析
 
 对于spin lock，其保护的资源可能来自多个CPU CORE上的进程上下文和中断上下文的中的访问，其中，进程上下文包括：用户进程通过系统调用访问，内核线程直接访问，来自workqueue中work function的访问（本质上也是内核线程）。中断上下文包括：HW interrupt context（中断handler）、软中断上下文（soft irq，当然由于各种原因，该softirq被推迟到softirqd的内核线程中执行的时候就不属于这个场景了，属于进程上下文那个分类了）、timer的callback函数（本质上也是softirq）、tasklet（本质上也是softirq）。
 
@@ -67,9 +51,9 @@ linux kernel中提供了丰富的bottom half的机制，虽然同属中断上下
 
 最后，我们讨论一下中断上下文之间的竞争。同一种中断handler之间在uni core和multi core上都不会并行执行，这是linux kernel的特性。如果不同中断handler需要使用spin lock保护共享资源，对于新的内核（不区分fast handler和slow handler），所有handler都是关闭中断的，因此使用spin lock不需要关闭中断的配合。bottom half又分成softirq和tasklet，同一种softirq会在不同的CPU上并发执行，因此如果某个驱动中的sofirq的handler中会访问某个全局变量，对该全局变量是需要使用spin lock保护的，不用配合disable CPU中断或者bottom half。tasklet更简单，因为同一种tasklet不会多个CPU上并发，具体我就不分析了，大家自行思考吧。
 
-三、通用代码实现
+# 三、通用代码实现
 
-1、文件整理
+## 1、文件整理
 
 和体系结构无关的代码如下：
 
@@ -94,7 +78,7 @@ linux kernel中提供了丰富的bottom half的机制，虽然同属中断上下
 |UP需要的头文件|SMP需要的头文件|
 |linux/spinlock_type_up.h:  <br>linux/spinlock_types.h:  <br>linux/spinlock_up.h:  <br>linux/spinlock_api_up.h:  <br>linux/spinlock.h|asm/spinlock_types.h  <br>linux/spinlock_types.h:  <br>asm/spinlock.h  <br>linux/spinlock_api_smp.h:  <br>linux/spinlock.h|
 
-2、数据结构
+## 2、数据结构
 
 根据第二章的分析，我们可以基本可以推断出spin lock的实现。首先定义一个spinlock_t的数据类型，其本质上是一个整数值（对该数值的操作需要保证原子性），该数值表示spin lock是否可用。初始化的时候被设定为1。当thread想要持有锁的时候调用spin_lock函数，该函数将spin lock那个整数值减去1，然后进行判断，如果等于0，表示可以获取spin lock，如果是负数，则说明其他thread的持有该锁，本thread需要spin。
 
@@ -126,7 +110,7 @@ linux kernel中提供了丰富的bottom half的机制，虽然同属中断上下
 
 对于SMP平台，这和arch相关，我们在下一节描述。
 
-3、spin lock接口API
+## 3、spin lock接口API
 
 我们整理spin lock相关的接口API如下：
 
@@ -191,11 +175,11 @@ UP中很简单，本质上就是一个preempt_disable而已，和我们在第二
 
 \_\_acquire和静态代码检查相关，忽略之，最终实际的获取spin lock还是要靠arch相关的代码实现。
 
-四、ARM平台的细节
+# 四、ARM平台的细节
 
 代码位于arch/arm/include/asm/spinlock.h和spinlock_type.h，和通用代码类似，spinlock_type.h定义ARM相关的spin lock定义以及初始化相关的宏；spinlock.h中包括了各种具体的实现。
 
-1、回忆过去
+## 1、回忆过去
 
 在分析新的spin lock代码之前，让我们先回到2.6.23版本的内核中，看看ARM平台如何实现spin lock的。和arm平台相关spin lock数据结构的定义如下（那时候还是使用raw_spinlock_t而不是arch_spinlock_t）：
 
@@ -215,7 +199,7 @@ UP中很简单，本质上就是一个preempt_disable而已，和我们在第二
 
 lock本质上是保存在main memory中的，由于cache的存在，当然不需要每次都有访问main memory。在多核架构下，每个CPU都有自己的L1 cache，保存了lock的数据。假设CPU0获取了spin lock，那么执行完临界区，在释放锁的时候会调用smp_mb invalide其他忙等待的CPU的L1 cache，这样后果就是释放spin lock的那个cpu可以更快的访问L1cache，操作lock数据，从而大大增加的下一次获取该spin lock的机会。
 
-2、回到现在：arch_spinlock_t
+## 2、回到现在：arch_spinlock_t
 
 ARM平台中的arch_spinlock_t定义如下（little endian）：
 
@@ -233,7 +217,7 @@ ARM平台中的arch_spinlock_t定义如下（little endian）：
 
 回到arch_spinlock_t，这里的owner就是当前已经入席的那个号码，next记录的是下一个要分发的号码。下面的描述使用普通的计算机语言和在九毛九就餐（假设九毛九只有一张餐桌）的例子来进行描述，估计可以让吃货更有兴趣阅读下去。最开始的时候，slock被赋值为0，也就是说owner和next都是0，owner和next相等，表示unlocked。当第一个个thread调用spin_lock来申请lock（第一个人就餐）的时候，owner和next相等，表示unlocked，这时候该thread持有该spin lock（可以拥有九毛九的唯一的那个餐桌），并且执行next++，也就是将next设定为1（再来人就分配1这个号码让他等待就餐）。也许该thread执行很快（吃饭吃的快），没有其他thread来竞争就调用spin_unlock了（无人等待就餐，生意惨淡啊），这时候执行owner++，也就是将owner设定为1（表示当前持有1这个号码牌的人可以就餐）。姗姗来迟的1号获得了直接就餐的机会，next++之后等于2。1号这个家伙吃饭巨慢，这是不文明现象（thread不能持有spin lock太久），但是存在。又来一个人就餐，分配当前next值的号码2，当然也会执行next++，以便下一个人或者3的号码牌。持续来人就会分配3、4、5、6这些号码牌，next值不断的增加，但是owner岿然不动，直到欠扁的1号吃饭完毕（调用spin_unlock），释放饭桌这个唯一资源，owner++之后等于2，表示持有2那个号码牌的人可以进入就餐了。
 
-3、接口实现
+## 3、接口实现
 
 同样的，这里也只是选择一个典型的API来分析，其他的大家可以自行学习。我们选择的是arch_spin_lock，其ARM32的代码如下：
 
@@ -338,7 +322,7 @@ _1、2015/11/5，加入ARM64的代码实现部分的分析_
 
 标签: [spin](http://www.wowotech.net/tag/spin) [lock](http://www.wowotech.net/tag/lock) [自旋锁](http://www.wowotech.net/tag/%E8%87%AA%E6%97%8B%E9%94%81)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [蜗窝流量地域统计](http://www.wowotech.net/168.html) | [spin_lock最简单用法。](http://www.wowotech.net/164.html)»
 

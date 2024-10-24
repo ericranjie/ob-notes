@@ -1,6 +1,7 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-10-24 11:53 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
-一、前言
+# 一、前言
 
 对于中断处理而言，linux将其分成了两个部分，一个叫做中断handler（top half），是全程关闭中断的，另外一部分是deferable task（bottom half），属于不那么紧急需要处理的事情。在执行bottom half的时候，是开中断的。有多种bottom half的机制，例如：softirq、tasklet、workqueue或是直接创建一个kernel thread来执行bottom half（这在旧的kernel驱动中常见，现在，一个理智的driver厂商是不会这么做的）。本文主要讨论softirq机制。由于tasklet是基于softirq的，因此本文也会提及tasklet，但主要是从需求层面考虑，不会涉及其具体的代码实现。
 
@@ -8,9 +9,9 @@
 
 注：本文中的linux kernel的版本是3.14
 
-二、为何有softirq和tasklet
+# 二、为何有softirq和tasklet
 
-1、为何有top half和bottom half
+## 1、为何有top half和bottom half
 
 中断处理模块是任何OS中最重要的一个模块，对系统的性能会有直接的影响。想像一下：如果在通过U盘进行大量数据拷贝的时候，你按下一个key，需要半秒的时间才显示出来，这个场景是否让你崩溃？因此，对于那些复杂的、需要大量数据处理的硬件中断，我们不能让handler中处理完一切再恢复现场（handler是全程关闭中断的），而是仅仅在handler中处理一部分，具体包括：
 
@@ -24,7 +25,7 @@
 
 我们可以基于下面的系统进一步的进行讨论：
 
-[![rrr](http://www.wowotech.net/content/uploadfile/201410/3493c1557a15f648877c755ee850171c20141024045350.gif "rrr")](http://www.wowotech.net/content/uploadfile/201410/79f8acfac6f25a2aae1a173df44a86e920141024045348.gif)
+![[Pasted image 20241024193257.png]]
 
 当网卡控制器的FIFO收到的来自以太网的数据的时候（例如半满的时候，可以软件设定），可以将该事件通过irq signal送达Interrupt Controller。Interrupt Controller可以把中断分发给系统中的Processor A or B。
 
@@ -36,7 +37,7 @@ NIC的中断处理过程大概包括：mask and ack interrupt controller--------
 
 要解决上面的问题，最重要的是尽快的执行完中断handler，打开中断，unmask IRQ（或者发送EOI），方法就是把耗时的handle Data in the ram这个步骤踢出handler，让其在bottom half中执行。
 
-2、为何有softirq和tasklet
+## 2、为何有softirq和tasklet
 
 OK，linux kernel已经把中断处理分成了top half和bottom half，看起来已经不错了，那为何还要提供softirq、tasklet和workqueue这些bottom half机制，linux kernel本来就够复杂了，bottom half还来添乱。实际上，在早期的linux kernel还真是只有一个bottom half机制，简称BH，简单好用，但是性能不佳。后来，linux kernel的开发者开发了task queue机制，试图来替代BH，当然，最后task queue也消失在内核代码中了。现在的linux kernel提供了三种bottom half的机制，来应对不同的需求。
 
@@ -62,7 +63,7 @@ workqueue和softirq、tasklet有本质的区别：workqueue运行在process cont
 
 同样的，我们先假设Processor A处理了这个网卡中断事件，很快的完成了基本的HW操作后，schedule tasklet（同时也就raise TASKLET_SOFTIRQ softirq）。在返回中断现场前，会检查softirq的触发情况，因此，在TASKLET_SOFTIRQ softirq的handler中，获取tasklet相关信息并在processor A上执行该tasklet的handler。在执行过程中，NIC硬件再次触发中断，Interrupt controller将该中断分发给processor B，执行动作和Processor A是类似的，虽然TASKLET_SOFTIRQ softirq在processor B上可以执行，但是，在检查tasklet的状态的时候，如果发现该tasklet在其他processor上已经正在运行，那么该tasklet不会被处理，一直等到在processor A上的tasklet处理完，在processor B上的这个tasklet才能被执行。这样的串行化操作虽然对驱动工程师是一个福利，但是对性能而言是极大的损伤。
 
-三、理解softirq需要的基础知识（各种context）
+# 三、理解softirq需要的基础知识（各种context）
 
 1、preempt_count
 
@@ -76,7 +77,7 @@ workqueue和softirq、tasklet有本质的区别：workqueue运行在process cont
 
 preempt_count这个成员被用来判断当前进程是否可以被抢占。如果preempt_count不等于0（可能是代码调用preempt_disable显式的禁止了抢占，也可能是处于中断上下文等），说明当前不能进行抢占，如果preempt_count等于0，说明已经具备了抢占的条件（当然具体是否要抢占当前进程还是要看看thread info中的flag成员是否设定了_TIF_NEED_RESCHED这个标记，可能是当前的进程的时间片用完了，也可能是由于中断唤醒了优先级更高的进程）。 具体preempt_count的数据格式可以参考下图：
 
-[![preempt-count](http://www.wowotech.net/content/uploadfile/201410/0b84fe0c3c69d47f3c834224e27ad3ab20141024045352.gif "preempt-count")](http://www.wowotech.net/content/uploadfile/201410/24f930c7abd97222c253d42fcc7719af20141024045351.gif)
+![[Pasted image 20241024193323.png]]
 
 preemption count用来记录当前被显式的禁止抢占的次数，也就是说，每调用一次preempt_disable，preemption count就会加一，调用preempt_enable，该区域的数值会减去一。preempt_disable和preempt_enable必须成对出现，可以嵌套，最大嵌套的深度是255。
 
@@ -101,7 +102,7 @@ hardirq count描述当前中断handler嵌套的深度。对于ARM平台的linux 
 
 （2）由于内核同步的需求，进程上下文需要禁止softirq。这时候，kernel提供了local_bh_enable和local_bh_disable这样的接口函数。这部分的概念是和preempt disable/enable类似的，占用了bit9～15，最大可以支持127次嵌套。
 
-2、一个task的各种上下文
+## 2、一个task的各种上下文
 
 看完了preempt_count之后，我们来介绍各种context：
 
@@ -117,11 +118,11 @@ softirq context并没有那么的直接，一般人会认为当sofirq handler正
 
 所谓中断上下文，就是IRQ context ＋ softirq context＋NMI context。
 
-四、softirq机制
+# 四、softirq机制
 
 softirq和hardirq（就是硬件中断啦）是对应的，因此softirq的机制可以参考hardirq对应理解，当然softirq是纯软件的，不需要硬件参与。
 
-1、softirq number
+## 1、softirq number
 
 和IRQ number一样，对于软中断，linux kernel也是用一个softirq number唯一标识一个softirq，具体定义如下：
 
@@ -143,7 +144,7 @@ softirq和hardirq（就是硬件中断啦）是对应的，因此softirq的机�
 
 HI_SOFTIRQ用于高优先级的tasklet，TASKLET_SOFTIRQ用于普通的tasklet。TIMER_SOFTIRQ是for software timer的（所谓software timer就是说该timer是基于系统tick的）。NET_TX_SOFTIRQ和NET_RX_SOFTIRQ是用于网卡数据收发的。BLOCK_SOFTIRQ和BLOCK_IOPOLL_SOFTIRQ是用于block device的。SCHED_SOFTIRQ用于多CPU之间的负载均衡的。HRTIMER_SOFTIRQ用于高精度timer的。RCU_SOFTIRQ是处理RCU的。这些具体使用情景分析会在各自的子系统中分析，本文只是描述softirq的工作原理。
 
-2、softirq描述符
+## 2、softirq描述符
 
 我们前面已经说了，softirq是静态定义的，也就是说系统中有一个定义softirq描述符的数组，而softirq number就是这个数组的index。这个概念和早期的静态分配的中断描述符概念是类似的。具体定义如下：
 
@@ -167,7 +168,7 @@ HI_SOFTIRQ用于高优先级的tasklet，TASKLET_SOFTIRQ用于普通的tasklet�
 
 ipi_irqs这个成员用于处理器之间的中断，我们留到下一个专题来描述。\_\_softirq_pending就是这个“软件寄存器”。softirq采用谁触发，谁负责处理的。例如：当一个驱动的硬件中断被分发给了指定的CPU，并且在该中断handler中触发了一个softirq，那么该CPU负责调用该softirq number对应的action callback来处理该软中断。因此，这个“软件寄存器”应该是每个CPU拥有一个（专业术语叫做banked register）。为了性能，irq_stat中的每一个entry被定义对齐到cache line。
 
-3、如何注册一个softirq
+## 3、如何注册一个softirq
 
 通过调用open_softirq接口函数可以注册softirq的action callback函数，具体如下：
 
@@ -178,7 +179,7 @@ ipi_irqs这个成员用于处理器之间的中断，我们留到下一个专题
 
 softirq_vec是一个多CPU之间共享的数据，不过，由于所有的注册都是在系统初始化的时候完成的，那时候，系统是串行执行的。此外，softirq是静态定义的，每个entry（或者说每个softirq number）都是固定分配的，因此，不需要保护。
 
-4、如何触发softirq？
+## 4、如何触发softirq？
 
 在linux kernel中，可以调用raise_softirq这个接口函数来触发本地CPU上的softirq，具体如下：
 
@@ -209,7 +210,7 @@ softirq_vec是一个多CPU之间共享的数据，不过，由于所有的注册
 
 （2）如果在中断上下文，我们只要set \_\_softirq_pending的某个bit就OK了，在中断返回的时候自然会进行软中断的处理。但是，如果在context上下文调用这个函数的时候，我们必须要调用wakeup_softirqd函数用来唤醒本CPU上的softirqd这个内核线程。具体softirqd的内容请参考下一个章节。
 
-5、disable/enable softirq
+## 5、disable/enable softirq
 
 在linux kernel中，可以使用local_irq_disable和local_irq_enable来disable和enable本CPU中断。和硬件中断一样，软中断也可以disable，接口函数是local_bh_disable和local_bh_enable。虽然和想像的local_softirq_enable/disable有些出入，不过bh这个名字更准确反应了该接口函数的意涵，因为local_bh_disable/enable函数就是用来disable/enable bottom half的，这里就包括softirq和tasklet。
 
@@ -292,7 +293,7 @@ in_irq()这个函数如果不等于0的话，说明local_bh_enable被irq_enter�
 
 （5）在softirq handler中很可能wakeup了高优先级的任务，这里最好要检查一下，看看是否需要进行调度，确保高优先级的任务得以调度执行。
 
-5、如何处理一个被触发的soft irq
+## 5、如何处理一个被触发的soft irq
 
 我们说softirq是一种defering task的机制，也就是说top half没有做的事情，需要延迟到bottom half中来执行。那么具体延迟到什么时候呢？这是本节需要讲述的内容，也就是说soft irq是如何调度执行的。
 
@@ -394,7 +395,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [软中断](http://www.wowotech.net/tag/%E8%BD%AF%E4%B8%AD%E6%96%AD) [softirq](http://www.wowotech.net/tag/softirq)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [新技能get: 订阅Linux内核邮件列表](http://www.wowotech.net/linux_application/lkml.html) | [防冲突机制介绍](http://www.wowotech.net/basic_tech/103.html)»
 

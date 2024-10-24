@@ -1,14 +1,15 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2021-11-5 6:39 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-前言
+# 前言
 
 我们描述负载均衡的系列文章一共三篇，第一篇是框架部分，即本文，主要描述了负载均衡相关的原理、场景和框架。后面的两篇是对均衡代码的情景分析，通过对tick balance、new idle balance和task placement等几个典型的负载均衡来呈现其实现细节，稍后发布，敬请期待。
 
 本文出现的内核代码来自Linux5.10.61，如果有兴趣，读者可以配合代码阅读本文。
 
-一、什么是负载均衡
+# 一、什么是负载均衡
 
-1、什么是CPU负载（load）
+## 1、什么是CPU负载（load）
 
 CPU load是一个很容易和CPU usage混淆的概念。CPU usage是CPU忙闲的比例，例如在一个周期为1000ms的窗口中观察CPU的情况，如果500ms的时间在执行任务，500ms的时间处于idle状态，那么在这个窗口中CPU的usage是50%。CPU usage是一个直观的概念，所见即所得，然而它不能用来对比。例如一个任务在小核300MHz频率下执行1000ms，看到CPU usage是100%，同样的任务，在大核3GHz下的执行50ms，CPU usage是5%。这种场景下，同样的任务，load是一样的，但是CPU usage差别很大。CPU 利用率（utility）是另外一个容易混淆的概念。Utility和usage的共同点都是考虑了running time，区别是Utility进行了归一化，即把running time归一化到了系统中最大算力（超大核最高频率）上的执行时间。为了能和CPU capacity进行运算，utility还归一化到了1024。
 
@@ -18,7 +19,7 @@ CPU load和utility一样，都进行了归一化，但是概念还是不同的�
 
 3.8版本的linux内核引入了PELT算法来跟踪每一个sched entity的负载，把负载跟踪的算法从per-CPU进化到per-entity。PELT算法不但能知道CPU的负载，而且知道负载来自哪一个调度实体，从而可以更精准的进行负载均衡。
 
-2、什么是均衡
+## 2、什么是均衡
 
 对于负载均衡而言，并不是把整个系统的负载平均的分配到系统中的各个CPU上。实际上，我们还是必须要考虑系统中各个CPU的算力，让CPU获得和其算力匹配的负载。例如在一个6个小核+2个大核的系统中，整个系统如果有800的负载，那么每个CPU上分配100的负载其实是不均衡的，因为大核CPU可以提供更强的算力。
 
@@ -34,7 +35,7 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 有了各个任务负载，将runqueue中的任务负载累加起来就可以得到CPU负载，配合系统中各个CPU的算力，看起来我们就可以完成负载均衡的工作，然而事情没有那么简单，当负载不均衡的时候，任务需要在CPU之间迁移，不同形态的迁移会有不同的开销。例如一个任务在小核cluster上的CPU之间的迁移所带来的性能开销一定是小于任务从小核cluster的CPU迁移到大核cluster的开销。因此，为了更好的执行负载均衡，我们需要构建和CPU拓扑相关的数据结构，也就是调度域和调度组的概念。
 
-3、调度域（sched domain）和调度组（sched group）
+## 3、调度域（sched domain）和调度组（sched group）
 
 负载均衡的复杂性主要和复杂的系统拓扑有关。由于当前CPU很忙，我们把之前运行在该CPU上的一个任务迁移到新的CPU上的时候，如果迁移到新的CPU是和原来的CPU在不同的cluster中，性能会受影响（因为会cache会变冷）。但是对于超线程架构，cpu共享cache，这时候超线程之间的任务迁移将不会有特别明显的性能影响。NUMA上任务迁移的影响又不同，我们应该尽量避免不同NUMA node之间的任务迁移，除非NUMA node之间的均衡达到非常严重的程度。总之，一个好的负载均衡算法必须适配各种cpu拓扑结构。为了解决这些问题，linux内核引入了sched_domain的概念。
 
@@ -87,11 +88,11 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 上面的描述过于枯燥，我们后面会使用一个具体的例子来描述负载如何在各个level的sched domain上进行均衡的，不过在此之前，我们先看看负载均衡的整体软件架构。
 
-二、负载均衡的软件架构
+# 二、负载均衡的软件架构
 
 负载均衡的整体软件结构图如下：
 
-![](http://www.wowotech.net/content/uploadfile/202111/b31e1636066593.png)
+![[Pasted image 20241024200326.png]]
 
 负载均衡模块主要分两个软件层次：核心负载均衡模块和class-specific均衡模块。内核对不同的类型的任务有不同的均衡策略，普通的CFS（complete fair schedule）任务和RT、Deadline任务处理方式是不同的，由于篇幅原因，本文主要讨论CFS任务的负载均衡。
 
@@ -105,13 +106,13 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 有了上面描述的基础设施，那么什么时候进行负载均衡呢？这主要和调度事件相关，当发生任务唤醒、任务创建、tick到来等调度事件的时候，我们可以检查当前系统的不均衡情况，并酌情进行任务迁移，以便让系统负载处于平衡状态。
 
-三、如何做负载均衡
+# 三、如何做负载均衡
 
-1、一个CPU拓扑示例
+## 1、一个CPU拓扑示例
 
 我们以一个4小核+4大核的处理器来描述CPU的domain和group：
 
-![](http://www.wowotech.net/content/uploadfile/202111/acb11636066663.png)
+![[Pasted image 20241024200342.png]]
 
 在上面的结构中，sched domain是分成两个level，base domain称为MC domain（multi core domain），顶层的domain称为DIE domain。顶层的DIE domain覆盖了系统中所有的CPU，小核cluster的MC domain包括所有小核cluster中的cpu，同理，大核cluster的MC domain包括所有大核cluster中的cpu。
 
@@ -121,7 +122,7 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 为了减少锁的竞争，每一个cpu都有自己的MC domain和DIE domain，并且形成了sched domain之间的层级结构。在MC domain，其所属cpu形成sched group的环形链表结构，各个cpu对应的MC domain的groups成员指向环形链表中的自己的cpu group。在DIE domain，cluster形成sched group的环形链表结构，各个cpu对应的DIE domain的groups成员指向环形链表中的自己的cluster group。
 
-2、负载均衡的基本过程
+## 2、负载均衡的基本过程
 
 负载均衡不是一个全局CPU之间的均衡，实际上那样做也不现实，当系统的CPU数量较大的时候，很难一次性的完成所有CPU之间的均衡，这也是提出sched domain的原因之一。我们以周期性均衡为例来描述负载均衡的基本过程。当一个CPU上进行周期性负载均衡的时候，我们总是从base domain开始（对于上面的例子，base domain就是MC domain），检查其所属sched group之间（即各个cpu之间）的负载均衡情况，如果有不均衡情况，那么会在该cpu所属cluster之间进行迁移，以便维护cluster内各个cpu core的任务负载均衡。有了各个CPU上的负载统计以及CPU的算力信息，我们很容易知道MC domain上的不均衡情况。为了让算法更加简单，Linux内核的负载均衡算法只允许CPU拉任务，这样，MC domain的均衡大致需要下面几个步骤：
 
@@ -137,7 +138,7 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 （2）该sched group的算力，即sched group中所有CPU算力之和
 
-3、其他需要考虑的事项
+## 3、其他需要考虑的事项
 
 之所以要进行负载均衡主要是为了系统整体的throughput，避免出现一核有难，七核围观的状况。然而，进行负载均衡本身需要额外的算力开销，为了降低开销，我们为不同level的sched domain定义了时间间隔，不能太密集的进行负载均衡。之外，我们还定义了不均衡的门限值，也就是说domain的group之间如果有较小的不均衡，我们也是可以允许的，超过了门限值才发起负载均衡的操作。很显然，越高level的sched domain其不均衡的threashhold越高，越高level的均衡会带来更大的性能开销。
 
@@ -151,9 +152,9 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 负载均衡算法会让任务均布，从而带来功耗的收益。虽然方案一中有三个CPU是处于idle状态的，但是那个繁忙CPU运行在更高的频率上。而方案二中，由于任务均布，CPU处于较低的频率运行，功耗会比方案一更低。
 
-四、负载均衡场景分析
+# 四、负载均衡场景分析
 
-1、整体的场景描述
+## 1、整体的场景描述
 
 在linux内核中，为了让任务均衡的分布在系统的所有CPU上，我们主要考虑下面三个场景：
 
@@ -163,7 +164,7 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 （3）主动均衡（active upmigration）。当一个低算力CPU的runqueue中出现misfit task的时候，如果该任务持续执行，那么负载均衡无能为力，因为它只负责迁移runnable状态的任务。这种场景下，active upmigration可以把当前正在运行的misfit task向上迁移到算力更高的CPU上去。
 
-2、Task placement
+## 2、Task placement
 
 任务放置主要发生在：
 
@@ -175,29 +176,29 @@ Cpufreq系统会根据当前的CPU util来调节CPU当前的运行频率，也�
 
 在上面的三个场景中都会调用select_task_rq来为task选择一个适合的CPU core。
 
-3、Load balance
+## 3、Load balance
 
 Load balance主要有三种：
 
 （1）在tick中触发load balance。我们称之tick load balance或者periodic load balance。具体的代码执行路径是：
 
-![](http://www.wowotech.net/content/uploadfile/202111/10c11636066724.png)
+![[Pasted image 20241024200411.png]]
 
 （2）调度器在pick next的时候，当前cfs runque中没有runnable，只能执行idle线程，让CPU进入idle状态。我们称之new idle load balance。具体的代码执行路径是：
 
-![](http://www.wowotech.net/content/uploadfile/202111/33591636066774.png)
+![[Pasted image 20241024200439.png]]
 
 （3）其他的cpu已经进入idle，本CPU任务太重，需要通过ipi将其idle的cpu唤醒来进行负载均衡。我们称之nohz idle load banlance，具体的代码执行路径是：
 
-![](http://www.wowotech.net/content/uploadfile/202111/2d2e1636066830.png)
+![[Pasted image 20241024200452.png]]
 
 如果没有dynamic tick特性，那么其实不需要进行nohz idle load balance，因为tick会唤醒处于idle的cpu，从而周期性tick就可以覆盖这个场景。
 
-4、Active upmigration
+## 4、Active upmigration
 
 主动迁移是Load balance的一种特殊场景。在负载均衡中，只要运用适当的同步机制（持有一个或者多个rq lock），runnable的任务可以在各个CPU runqueue之间移动，然而running的任务是例外，它不挂在CPU runqueue中，load balance无法覆盖。为了能够迁移running状态的任务，内核提供了Active upmigration的方法（利用stop machine调度类）。这个feature原生内核没有提供，故不再详述。
 
-参考文献：
+# 参考文献：
 
 1、内核源代码
 
@@ -209,7 +210,7 @@ Load balance主要有三种：
 
 标签: [进程管理](http://www.wowotech.net/tag/%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [CFS任务的负载均衡（任务放置）](http://www.wowotech.net/process_management/task_placement.html) | [mellanox的网卡故障分析](http://www.wowotech.net/linux_kenrel/485.html)»
 

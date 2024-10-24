@@ -1,8 +1,7 @@
-Linux内核之旅
-_2024年03月06日 21:16_ _陕西_
-以下文章来源于嵌入式ARM和Linux ，作者tupeloshen
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzI3NzA5MzUxNA==&mid=2664616933&idx=1&sn=58a93ef3c3f4a9e9bed672aa23db9d6a&chksm=f04dfe00c73a77162159d967b799523e1aba0616ffdad62fd2cbb8df2fda2ede1c00f9f3264e&mpshare=1&scene=24&srcid=0306nVHnxgFrHWAsxOzGWTmH&sharer_shareinfo=a19214a4ec6776ba98e9ed0f9c94e34e&sharer_shareinfo_first=a19214a4ec6776ba98e9ed0f9c94e34e&key=daf9bdc5abc4e8d0da554e703da0700cb379cdc101464c07876e71407485bd58dad5698a6db3d5ca16ad9b801a3c2f6fb821621b985f48d222cd3c34fd7cf51cf1f9b9ef428f3f3b45a1f1fc4706676c1553b84f93f546d8d6c4905ca68470cd0aa5c02c7a958aa7e39bdaaba1e0074e065a621a13192aa7167547e7d22e3fef&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQl4kzuQbYJjI4879aJL7x8RLmAQIE97dBBAEAAAAAAEraNpI9rkcAAAAOpnltbLcz9gKNyK89dVj0KBGboHjEbwOT5AIRUAL56oiogmbFLahPd%2FpHvsO%2BxhnKAPPWkFX78FgWb1bxUIBr4MHkePE%2BmLQBCIc9MEezYB7%2Fdc0foQjSdKIoZ7oTCCCokviGZU2B9f30Rzxvi6hYRz%2BLg%2Fu9coGzkn9quoc21DDhzlbOywU7BFr6R%2FPo9lZtVQthbzs4GctJ9F7byhWjVUVUQW9PKMMtbpmE7dM2DJV23ZGM4C8urWpOfqjjDxj%2FHXF2JDEfc3RtyDN2AVAg&acctmode=0&pass_ticket=vLWo0ZwNrZKlXT3BYW5AhZd%2FAT4S7VjNtt0fHItUGsihAiAag8O0Mwpc1DL2VeNr&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7350504-zh_CN-zip&fasttmpl_flag=1#)
+Linux内核之旅 _2024年03月06日 21:16_ _陕西_
+
+以下文章来源于嵌入式ARM和Linux ，作者tupeloshen
 
 - 1 执行信号的默认动作
 - 2 捕获信号
@@ -46,7 +45,7 @@ _2024年03月06日 21:16_ _陕西_
 
 接下来的两节，我们将描述如何执行默认动作和信号处理程序。
 
-## 1 执行信号的默认动作
+# 1 执行信号的默认动作
 
 如果`ka->sa.sa_handler`等于`SIG_DFL`，`do_signal()`执行信号的默认动作。唯一的例外是，当接收进程是`init`时，这种情况下，信号会被抛弃：
 
@@ -66,7 +65,7 @@ _2024年03月06日 21:16_ _陕西_
 
 默认动作为`dump`的信号会在进程的工作目录中创建核心转储文件：该文件列出了进程地址空间和寄存器的完整内容。`do_signal()`创建核心转储文件之后，会杀死线程组。其余`18`个信号的默认动作是`terminate`，就是杀死进程。为此，调用`do_group_exit()`，执行一个优雅的`group exit`处理程序（可以参考第3章的`进程终止`一节）
 
-## 2 捕获信号
+# 2 捕获信号
 
 如果信号指定了处理程序，则`do_signal()`执行该程序。通过调用`invoking handle_signal()`
 
@@ -79,12 +78,14 @@ _2024年03月06日 21:16_ _陕西_
 `信号处理程序`是由用户进程定义的函数，包含在用户代码段中。`handle_signal()`函数在内核态运行，而信号处理程序在用户态运行；这意味着当前进程必须首先在用户态执行信号处理程序，然后才能被允许恢复其“正常”执行。此外，当内核试图恢复进程的正常执行时，内核堆栈不再包含被中断程序的硬件上下文，因为内核堆栈在每次从用户态转换到内核态时都会被清空。
 
 下图`11-2`说明了捕获信号的函数执行流程。假设非阻塞信号被发送给进程。中断或异常发生时，进程切换到内核态。在即将返回到用户态之前，内核调用`do_signal()`函数，依次处理信号（`handle_signal()`）并配置用户态栈（`setup_frame()`或`setup_rt_frame()`）。进程切换到用户态后，开始执行信号处理程序，因为该处理程序的地址被强制加载到了`PC`程序计数器中。当信号程序终止后，调用`setup_frame()`或`setup_rt_frame()`将返回代码加载到用户态栈中。这段返回代码会调用`sigreturn()`和`rt_sigreturn()`系统调用；相应的服务例程会将正常程序的硬件上下文内容拷贝到内核态栈并将用户态栈恢复到其原始状态（`restore_sigcontext()`）。当系统调用终止时，正常程序继续其执行。
-!\[\[Pasted image 20240924152400.png\]\]
+
+![[Pasted image 20240924152400.png]]
+
 图`11-2` 捕获一个信号
 
 现在，让我们看一下其执行细节：
 
-#### 2.1 Setting up the frame
+## 2.1 Setting up the frame
 
 为了正确设置进程的用户态栈，`handle_signal()`函数既可以调用`setup_frame()`（对于那些不需要`siginfo_t`的信号），也可以调用`setup_rt_frame()`（对于那些确定需要`siginfo_t`的信号）。具体调用哪个函数，依赖于信号的`sigaction`表中`sa_flags`字段的`SA_SIGINFO`标志。
 
@@ -131,8 +132,7 @@ _2024年03月06日 21:16_ _陕西_
 
   发起`sigreturn()`系统调用的8字节代码。在`Linux`早期版本中，这段代码用来从信号处理程序返回；但`Linux 2.6`版本以后，仅用作符号签名，以便调试器可以识别信号的栈帧。
 
-!\[\[Pasted image 20240924152411.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240924152411.png]]
 
 图`11-3` 用户态栈上的`frame`
 
@@ -152,7 +152,7 @@ _2024年03月06日 21:16_ _陕西_
 
 `setup_rt_frame()`函数与`setup_frame()`类似，但是它把一个扩展帧（数据结构为`rt_sigframe`）存放到了用户态栈中，该扩展帧还包括与信号有关的`siginfo_t`表的内容。此外，该函数还将`pretcode`字段指向`vsyscall`内存页中的`__kernel_rt_sigreturn`代码段。
 
-#### 2.2 计算信号标志
+## 2.2 计算信号标志
 
 配置完用户态栈后，`handle_signal()`函数检查与该信号相关的标志。如果该信号没有设置`SA_NODEFER`标志，则在信号处理程序执行期间，`sigaction`表中的`sa_mask`字段中的所有信号必须被阻塞，以便该信号快速处理完成：
 
@@ -162,11 +162,11 @@ _2024年03月06日 21:16_ _陕西_
 
 完成之后，返回`do_signal()`，随即也返回。
 
-#### 2.3 启动信号处理程序
+## 2.3 启动信号处理程序
 
 当从`do_signal()`返回后，当前进程切换到用户态执行。因为`setup_frame()`的准备工作，`eip`寄存器指向了信号处理程序的第一条指令，而`esp`指向了压入用户态栈顶的`frame`的第一个内存位置。于是，开始执行信号处理程序。
 
-#### 2.4 终止信号处理程序
+## 2.4 终止信号处理程序
 
 当信号处理程序执行完成时，其栈顶的返回地址指向`vsyscall`内存页（`frame`中的`pretcode`字段）
 
@@ -186,7 +186,7 @@ _2024年03月06日 21:16_ _陕西_
 
 如果信号是由系统调用发送的（比如，`rt_sigqueueinfo()`），要求信号相关的`siginfo_t`表数据，其机制与上面类似。扩展帧中的`pretcode`字段指向`__kernel_rt_sigreturn`标签处的汇编代码（位于`vsyscall`内存页），这段代码会调用`rt_sigreturn()`系统调用。相应的系统服务例程`sys_rt_sigreturn()`将扩展帧中的进程硬件上下文拷贝到内核态栈，并且将扩展帧从用户态栈中移除，以便恢复原始的用户态栈。
 
-## 3 系统调用的重新执行
+# 3 系统调用的重新执行
 
 对于系统调用请求，内核有时不能立即满足。这时候，发起系统调用的进程会被置成`TASK_INTERRUPTIBLE`或`TASK_UNINTERRUPTIBLE`状态。
 
@@ -234,7 +234,7 @@ _2024年03月06日 21:16_ _陕西_
 
 因此，`orig_eax`中的非负值意味着信号唤醒了一个在系统调用中休眠的可中断进程（`TASK_INTERRUPTIBLE`）。服务例程意识到了系统调用被中断，因此返回一个前面提到的错误码。
 
-#### 3.1 重新启动`non-caught`信号中断的系统调用
+## 3.1 重新启动`non-caught`信号中断的系统调用
 
 对于被忽略或执行默认动作的信号，`do_signal()`分析系统调用的错误码，判断系统调用是否自动重新执行，如表`11-1`所示。如果系统调用必须重启，则修改`regs`上下文内容：`eip-2`表示将`eip`指向`int $0x80`或`sysenter`，`eax`包含系统调用号：
 
@@ -246,7 +246,7 @@ _2024年03月06日 21:16_ _陕西_
 
 相反，如果`nanosleep()`系统调用服务例程被中断，则使用特殊服务例程的地址填充`current`进程的`thread_info`结构体的`restart_block`字段，并返回`ERESTART_RESTARTBLOCK`错误码。`sys_restart_syscall()`服务例程只执行前面特殊的服务里程，计算首次调用和重新启动之间经过的时间，从而调整延时。
 
-#### 3.2 重新启动`caught`信号中断的系统调用
+## 3.2 重新启动`caught`信号中断的系统调用
 
 如果信号需要捕获处理，`handle_signal()`分析错误码，根据`sigaction`中的`SA_RESTART`标志，判断是否需要重启：
 
@@ -254,7 +254,7 @@ _2024年03月06日 21:16_ _陕西_
 
 如果必须重新启动系统调用，`handle_signal()`的处理方式与`do_signal()`完全相同；否则，它会向用户进程返回一个`-EINTR`错误码。
 
-## 4 x86_64架构-do_signal()
+# 4 x86_64架构-do_signal()
 
 Linux内核版本是`v2.6.11`，文件位置：`arch/x86_64/kernel/signal.c`：
 
@@ -270,10 +270,5 @@ Linux内核版本是`v2.6.11`，文件位置：`arch/x86_64/kernel/signal.c`：
 
 `static void setup_rt_frame(int sig, struct k_sigaction *ka, siginfo_t *info,                  sigset_t *set, struct pt_regs * regs)   {       struct rt_sigframe __user *frame;       struct _fpstate __user *fp = NULL;        int err = 0;       struct task_struct *me = current;          if (used_math()) {           fp = get_stack(ka, regs, sizeof(struct _fpstate));            frame = (void __user *)round_down((unsigned long)fp - sizeof(struct rt_sigframe), 16) - 8;              if (!access_ok(VERIFY_WRITE, fp, sizeof(struct _fpstate))) {            goto give_sigsegv;           }              if (save_i387(fp) < 0)                err |= -1;        } else {           frame = get_stack(ka, regs, sizeof(struct rt_sigframe)) - 8;       }          if (!access_ok(VERIFY_WRITE, frame, sizeof(*frame))) {           goto give_sigsegv;       }          if (ka->sa.sa_flags & SA_SIGINFO) {            err |= copy_siginfo_to_user(&frame->info, info);           if (err) {                goto give_sigsegv;       }       }                  /* Create the ucontext.  */       err |= __put_user(0, &frame->uc.uc_flags);       err |= __put_user(0, &frame->uc.uc_link);       err |= __put_user(me->sas_ss_sp, &frame->uc.uc_stack.ss_sp);       err |= __put_user(sas_ss_flags(regs->rsp),                 &frame->uc.uc_stack.ss_flags);       err |= __put_user(me->sas_ss_size, &frame->uc.uc_stack.ss_size);       err |= setup_sigcontext(&frame->uc.uc_mcontext, regs, set->sig[0], me);       err |= __put_user(fp, &frame->uc.uc_mcontext.fpstate);       if (sizeof(*set) == 16) {            __put_user(set->sig[0], &frame->uc.uc_sigmask.sig[0]);           __put_user(set->sig[1], &frame->uc.uc_sigmask.sig[1]);        } else {               err |= __copy_to_user(&frame->uc.uc_sigmask, set, sizeof(*set));       }          /* Set up to return from userspace.  If provided, use a stub          already in userspace.  */       /* x86-64 should always use SA_RESTORER. */       if (ka->sa.sa_flags & SA_RESTORER) {           err |= __put_user(ka->sa.sa_restorer, &frame->pretcode);       } else {           /* could use a vstub here */           goto give_sigsegv;        }          if (err) {            goto give_sigsegv;       }       #ifdef DEBUG_SIG       printk("%d old rip %lx old rsp %lx old rax %lx\n", current->pid,regs->rip,regs->rsp,regs->rax);   #endif          /* Set up registers for signal handler */       {            struct exec_domain *ed = current_thread_info()->exec_domain;           if (unlikely(ed && ed->signal_invmap && sig < 32))               sig = ed->signal_invmap[sig];       }        regs->rdi = sig;       /* In case the signal handler was declared without prototypes */        regs->rax = 0;            /* This also works for non SA_SIGINFO handlers because they expect the          next argument after the signal number on the stack. */       regs->rsi = (unsigned long)&frame->info;        regs->rdx = (unsigned long)&frame->uc;        regs->rip = (unsigned long) ka->sa.sa_handler;          regs->rsp = (unsigned long)frame;          set_fs(USER_DS);       if (regs->eflags & TF_MASK) {           if ((current->ptrace & (PT_PTRACED | PT_DTRACE)) == (PT_PTRACED | PT_DTRACE)) {               ptrace_notify(SIGTRAP);           } else {               regs->eflags &= ~TF_MASK;           }       }      #ifdef DEBUG_SIG       printk("SIG deliver (%s:%d): sp=%p pc=%p ra=%p\n",           current->comm, current->pid, frame, regs->rip, frame->pretcode);   #endif          return;      give_sigsegv:       force_sigsegv(sig, current);   }   `
 
-欢迎交流，可以扫描下面二维码，关注本公众号。
-
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-阅读 2440
 
 ​

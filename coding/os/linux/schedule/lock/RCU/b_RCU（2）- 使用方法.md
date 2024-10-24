@@ -1,3 +1,4 @@
+
 作者：[沙漠之狐](http://www.wowotech.net/author/535) 发布于：2019-5-24 19:36 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 作者简介：余华兵，在网络通信行业工作十多年，负责IPv4协议栈、IPv6协议栈和Linux内核。在工作中看着2.6版本的专业书籍维护3.x和4.x版本的Linux内核，感觉不方便，于是自己分析4.x版本的Linux内核整理出一本书，书名叫《Linux内核深度解析》，2019年5月出版，希望对同行有帮助。

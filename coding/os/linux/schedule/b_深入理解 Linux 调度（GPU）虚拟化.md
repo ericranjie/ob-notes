@@ -1,10 +1,9 @@
-CPP开发者
-_2021年10月01日 12:08_
+
+CPP开发者 _2021年10月01日 12:08_
+
 The following article is from 腾讯技术工程 Author jikesong
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzAxNDI5NzEzNg==&mid=2651164873&idx=1&sn=a5da190031ea8ebe35359e8bacbfee9d&chksm=80644196b713c880266185caed05902b108f872ffc756f35b5b0133444623f97d94ebb087bb5&mpshare=1&scene=24&srcid=1001uLTXW1wtB4cvn4LqgJSh&sharer_sharetime=1633064163225&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d07ec8774a70d5063c7b2dc671230885689157d915ae34c1a23faf88c80b9fa911d4a0d6d9d86357b72efbf9e1acaaf2a85f1ff697f4ba2c11b5b8503784944c55b26e62aea668086cc6ece1f448e5793df2b36d4d51e7657ecdbb513456d4dd39db7d1d6715393b66eacc754433d9528eae6ca05d847e7c40&ascene=14&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=iMac+MacBookAir10%2C1+OSX+OSX+14.6.1+build(23G93)&version=13080710&nettype=WIFI&lang=en&session_us=gh_e829fd9228a9&countrycode=CN&fontScale=100&exportkey=n_ChQIAhIQdRtKCNamtVRKikbvAfo97xKUAgIE97dBBAEAAAAAAKs8LhGiAz0AAAAOpnltbLcz9gKNyK89dVj0xiUoeOdv1Dlx%2F6C90IJNAQD%2F84fXFqISgUfOxrvQD%2Bv%2Fggnsrev%2BORdgLBzY5VY66do4BL4Tl9aUoiOJnLu0jqEc%2BNuTO636LxNVHkcPFk57kJSUVEGkFLV8nrimmLcM8t9BnEtcjHaBxYK7OdA6y74YekrC8UCeCIomQf1gdPJwqXX9xqpRUlN%2BuFxDn1UbvfJ8j9qB5Sk4F0tKOgu%2FiL5giXBNUzyh1r%2FDBLJpanWD%2F2%2BvcCg7d7lwB2T47%2BkuunWKyqGNRmxgy%2FvO9SN7Yx8mrJZSO6haVYugChP4loqNZT1mEdZRF3ZqzAUKIA%3D%3D&acctmode=0&pass_ticket=Lti1HA6TBo9eKoRD1KfJ9G16pIgRm%2FU8YQfKhYdNo2EXQznZ5CpPuRP7xivrZTwr&wx_header=0#)
-
-### 〇、本文写作背景
+# 〇、本文写作背景
 
 大约 2 年前，在腾讯内网，笔者和很多同事讨论了 GPU 虚拟化的现状和问题。从那以后，出现了一些新的研究方向，并且，有些业界变化，可能会彻底颠覆掉原来的一些论断。
 
@@ -14,7 +13,7 @@ The following article is from 腾讯技术工程 Author jikesong
 
 本文涉及对一些厂商的推测性技术介绍，不保证准确性。
 
-### 一、术语介绍
+# 一、术语介绍
 
 **GPU —————** Graphics Processing Unit，显卡
 **CUDA ————** Compute Unified Device Architecture，英伟达 2006 年推出的计算 API
@@ -40,12 +39,13 @@ The following article is from 腾讯技术工程 Author jikesong
 **PRM ————** Programming Reference Manual，硬件的编程手册
 **MIG ————** Multi-Instance GPU，Ampere 架构高端 GPU 如 A100 支持的一种 hardware partition 方案
 
-### 二、GPU 虚拟化的历史和谱系
+# 二、GPU 虚拟化的历史和谱系
 
-#### 2.1 GPU 能做什么
+## 2.1 GPU 能做什么
 
 GPU 天然适合向量计算。常用场景及 API：
-!\[\[Pasted image 20240924114438.png\]\]
+
+![[Pasted image 20240924114438.png]]
 
 此外还有加解密、哈希等场景，例如近些年来的挖矿。渲染是 GPU 诞生之初的应用: GPU 的 G 就是 Graphics —— 图形。
 
@@ -61,7 +61,7 @@ GPU 天然适合向量计算。常用场景及 API：
 
 从 2012 年开始，人工智能领域的深度学习方法开始崛起，此时 CUDA 受到青睐，并很快统治了这个领域。
 
-#### 2.2 系统虚拟化和 OS 虚拟化
+## 2.2 系统虚拟化和 OS 虚拟化
 
 系统虚拟化演化之路，起初是和 GPU 的演化完全正交的：
 
@@ -82,9 +82,9 @@ GPU 天然适合向量计算。常用场景及 API：
 
 这种 OS 虚拟化最初于 2005 年，由 Sun 公司在 Solaris 10 上实现，名为「Solaris Zone」。Linux 在 2007 ～ 2008 开始跟进，接下来有了 LXC 容器等；到了 2013 年，Docker 横空出世，彻底改变了软件分发的生态，成为事实上的标准。
 
-#### 2.3 GPU 虚拟化的谱系
+## 2.3 GPU 虚拟化的谱系
 
-##### 2.3.1 作为 PCIe 设备的 GPU
+### 2.3.1 作为 PCIe 设备的 GPU
 
 不考虑嵌入式平台的话，那么，GPU 首先是一个 PCIe 设备。GPU 的虚拟化，还是要首先从 PCIe 设备虚拟化角度来考虑。
 
@@ -110,7 +110,7 @@ GPU 天然适合向量计算。常用场景及 API：
 1. CPU 找到中断处理程序 —— KMD 此前向 OS Kernel 注册过的 —— 调用它
 1. 中断处理程序找到是哪个 workload 被执行完毕了，...最终驱动唤醒相关的应用
 
-##### 2.3.2 PCIe 直通
+### 2.3.2 PCIe 直通
 
 我们首先来到 GPU 虚拟化的最保守的实现: PCIe 设备直通。
 
@@ -122,7 +122,7 @@ PCIe 协议，在事务层(Transaction Layer)，有多种 TLP，DMA 即是其中
 
 很显然，PCIe 直通只能支持 1:1 的场景，无法满足 1:N 的需求。
 
-##### 2.3.3 SR-IOV
+### 2.3.3 SR-IOV
 
 那么，业界对 1:N 的 PCIe 虚拟化是如何实现的呢？我们首先就会想到 SR-IOV。SR-IOV 是 PCI-SIG 在 2007 年推出的规范，目的就是 PCIe 设备的虚拟化。SR-IOV 的本质是什么？考虑我们说过的 2 种资源和 2 种能力，来看看一个 VF 有什么:
 
@@ -147,7 +147,7 @@ PCIe 协议，在事务层(Transaction Layer)，有多种 TLP，DMA 即是其中
 
 表面上它支持 SR-IOV，但事实上硬件只是做了 VF 在 PCIe 层的抽象。Host 上还需要一个 Virtualization-Aware 的 pGPU 驱动，负责 VF 的模拟和调度。
 
-##### 2.3.4 API 转发
+### 2.3.4 API 转发
 
 因此，在业界长期缺乏 SRIOV-capable GPU、又有强烈的 1:N 需求的情形下，就有更 high-level 的方案出现了。我们首先回到 GPU 应用的场景:
 
@@ -176,7 +176,7 @@ API 层的 GPU 虚拟化是目前业界应用最广泛的 GPU 虚拟化方案。
 **注释**
 【1】 Vulkan 的编解码支持，spec 刚刚添加，有望被所有 GPU 厂商支持。见下「未来展望」部分。
 
-##### 2.3.5 MPT/MDEV/vGPU
+### 2.3.5 MPT/MDEV/vGPU
 
 鉴于这些困难，业界就出现了 SR-IOV、API 转发之外的第三种方案。我们称之为 MPT（Mediated Pass-Through，受控的直通）。MPT 本质上是一种通用的 PCIe 设备虚拟化方案，甚至也可以用于 PCIe 之外的设备。它的基本思路是：
 
@@ -202,36 +202,35 @@ API 层的 GPU 虚拟化是目前业界应用最广泛的 GPU 虚拟化方案。
 
 \*\*该方案最大的缺陷，是必须有一个 pGPU 驱动，负责 vGPU 的模拟和调度工作。\*\*逻辑上它相当于一个实现在内核态的 device-model。而且，由于 GPU 硬件通常并不公开其 PRM，所以事实上就只有 GPU 厂商才有能力提供这样的 Virtualization-Aware pGPU 驱动。使用了厂商提供的 MPT 方案，事实上就形成了对厂商的依赖。
 
-##### 2.3.6 SR-IOV: revisited
+### 2.3.6 SR-IOV: revisited
 
 重新回到 GPU 的 SR-IOV。AMD 从 S7150 开始、英伟达从 Turing 架构开始，数据中心 GPU 都支持了 SR-IOV。但是 again，它不是 NIC 那样的 SR-IOV，它需要 Host 上存在一个 vGPU 的 device-model，来模拟从 VM 来的 VF 访问。
 
 所以事实上，到目前为止，GPU 的 SR-IOV 仅仅是封装了 PCIe TLP 层的 VF 路由标识、从而规避了 runtime 时的软件 DMA 翻译，除此之外，和基于 MDEV 的 MPT 方案并无本质的不同。
 
-##### 2.3.7 谱系表
+### 2.3.7 谱系表
 
-!\[\[Pasted image 20240924114515.png\]\]
+![[Pasted image 20240924114515.png]]
 
 在介绍完了上述的这些方案后，我们重新看下 CUDA 计算、OpenGL 渲染两种场景的软件栈，看看能发现什么:
 
 CUDA 计算 stack：
-!\[\[Pasted image 20240924114542.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114542.png]]
 
 OpenGL 渲染 Stack：
-!\[\[Pasted image 20240924114554.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114554.png]]
 
 可以看出，**从 API 库开始，直到 GPU 硬件，Stack 中的每一个阶段，都有被截获、转发的可能性**。甚至，一概称之为「API 转发」是不合适的 —— 以 GRID vGPU、GVT-g 为例的 DEV 转发，事实上就是 MPT，和任何 API 都没有关系。
 
-### 三、容器 GPU 虚拟化
+# 三、容器 GPU 虚拟化
 
 首先，我们这里谈到的，都是 nVidia 生产的 GPU、都只考虑 CUDA 计算场景。其次，这里的虚拟化指的是 OS 虚拟化的容器技术，不适用于 KATA 这样的、基于系统虚拟化的安全容器。
 
-#### 3.1 CUDA 的生态
+## 3.1 CUDA 的生态
 
-!\[\[Pasted image 20240924114602.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240924114602.png]]
 
 CUDA 开发者使用的，通常是 CUDA Runtime API，它是 high-level 的；而 CUDA Driver API 则是 low-level 的，它对程序和 GPU 硬件有更精细的控制。Runtime API 是对 Driver API 的封装。
 
@@ -246,36 +245,36 @@ CUDA Driver 即是 UMD，它直接和 KMD 打交道。两者都属于 NVIDIA Dri
 - 其它的反调试、反逆向手段
 
 以 nvidia.ko 为例，为了兼容不同版本的 Linux 内核 API，它提供了相当丰富的兼容层，于是也就开源了部分代码:
-!\[\[Pasted image 20240924114639.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114639.png]]
 
 其中这个 26M 大小的、被剥离了符号表的 nv-kernel.o_binary，就是 GPU 驱动的核心代码，所有的 GPU 硬件细节都藏在其中。
 
-#### 3.2 vCUDA 和友商 cGPU
+## 3.2 vCUDA 和友商 cGPU
 
 为了让多个容器可以共享同一个 GPU，为了限定每个容器能使用的 GPU 份额，业界出现了不同的方案，典型的如 vCUDA 和 cGPU：
 
 vCUDA 架构：
-!\[\[Pasted image 20240924114648.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114648.png]]
 
 cGPU 架构：
-!\[\[Pasted image 20240924114655.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114655.png]]
 
 两者的实现策略不同，cGPU 比 vCUDA 更底层，从而实现了不侵入用户环境。
 
-#### 3.3 GPU 池化简介
+## 3.3 GPU 池化简介
 
 从截获的位置，看 GPU 池化的谱系：
-!\[\[Pasted image 20240924114726.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114726.png]]
 
 以 CUDA API 转发的池化方案、业界某产品为例，它到了 GPU 所在的后端机器上，由于一个 GPU 卡可能运行多个 GPU 任务，这些任务之间，依然需要有算力隔离。它为了实现这一点，在后端默认启用了 nVidia MPS —— 也就是故障隔离最差的方案。这会导致什么？**一个 VM 里的 CUDA 程序越界访问了显存，一堆风马牛不相及的 VM 里的 CUDA 应用就会被杀死**。
 
 所以，很显然，GPU 池化也必须以同时满足故障隔离和算力隔离的方案作为基础。
 
-#### 3.4 算力隔离的本质
+## 3.4 算力隔离的本质
 
 从上述介绍中，我们可以看出：算力隔离、故障隔离都是 GPU 虚拟化、GPU 池化的关键，缺一不可。如果没有算力隔离，不管虚拟化损耗有多低，都会导致其方案价值变低；而如果缺少实例间的故障隔离，则基本无法在生产环境使用了。
 
@@ -295,17 +294,17 @@ nVidia GPU 支持基于 Engine 的 Context Switch。不管是哪一代的 GPU，
 
 鉴于 MIG 的高成本和不灵活、MPS 故障隔离方面的致命缺陷，事实上就只剩下一种可能：Time Sharing。唯一的问题是，如何在原厂不支持的情况下，利用 Time Sharing 支持好算力隔离、以保证 QoS。这也是学术界、工业界面临的最大难题。
 
-##### 3.4.1 GPU microarchitecture 和 chip
+### 3.4.1 GPU microarchitecture 和 chip
 
 真正决定 GPU 硬件以何种方式工作的，是 chip 型号。不管是 GRID Driver 还是 Tesla Driver，要指挥 GPU 硬件工作，就要首先判断 GPU 属于哪种 chip，从而决定用什么样的软硬件接口来驱动它。
-!\[\[Pasted image 20240924114743.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-##### 3.4.2 PFIFO: GPU Scheduling Internals
+![[Pasted image 20240924114743.png]]
+
+### 3.4.2 PFIFO: GPU Scheduling Internals
 
 PFIFO 架构：
-!\[\[Pasted image 20240924114803.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240924114803.png]]
 
 概念解释：
 
@@ -357,7 +356,7 @@ GPU 上和 SYSMEM 打交道的部分(通过 PCIe 系统)。PBDMA 是 Host 的一
 
 每个 Channel 对应一个 Instance Block，它包含各个 Engine 的状态，用于 Context Switch 时的 Save/Restore；包含 GMMU pagetable；包含 RAMFC —— 其中包括 UMD 控制的 USERD。
 
-##### 3.4.3 runlist/TSG/channel 的关系
+### 3.4.3 runlist/TSG/channel 的关系
 
 1. Tesla 驱动为每个 GPU，维护一或多个 runlist，runlist 或位于 GPU 显存，或位于系统内存
 
@@ -375,7 +374,7 @@ GPU 上和 SYSMEM 打交道的部分(通过 PCIe 系统)。PBDMA 是 Host 的一
 
 - 发生了 preemption
 
-##### 3.4.4 pending channel notification
+### 3.4.4 pending channel notification
 
 pending channel notification 是 USERD 提供的机制。UMD 可以利用它通知 GPU：某个 channel 有了新的任务了【1】。这样，GPU 硬件在当前 channel 被切换后(执行完毕、或 timeslice 到了)，就会执行相应的 channel。
 
@@ -405,20 +404,19 @@ GRID vGPU 支持 3 种 scheduler：
 
 **原理：** Ditto.
 
-#### 3.5 腾讯云 qGPU 简介
+## 3.5 腾讯云 qGPU 简介
 
 qGPU == QoS GPU。它是目前业界唯一真正实现了故障隔离、显存隔离、算力隔离、且不入侵生态的容器 GPU 共享的技术。
 
-##### 3.5.1 qGPU 基本架构
+### 3.5.1 qGPU 基本架构
 
 qGPU 基本架构：
-!\[\[Pasted image 20240924114820.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-##### 3.5.2 qGPU QoS 效果
+![[Pasted image 20240924114820.png]]
 
-!\[\[Pasted image 20240924114828.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+### 3.5.2 qGPU QoS 效果
+
+![[Pasted image 20240924114828.png]]
 
 **注释**
 
@@ -426,7 +424,7 @@ qGPU 基本架构：
 
 【2】两个 PoD 的算力配比为 2：1。横坐标为 batch 值，纵坐标为运行时两个 PoD 的实际算力比例。可以看到，batch 较小时，负载较小，无法反映算力配比；随着 batch 增大，qGPU 和 MPS 都趋近理论值 2，vCUDA 也偏离不远，但缺乏算力隔离的业界某产品则逐渐趋近 1。
 
-### 四、GPU 虚拟化: 未来展望
+# 四、GPU 虚拟化: 未来展望
 
 2021 以来，GPU 工业界发生了一些变化，e.g.：
 
@@ -450,7 +448,7 @@ qGPU 基本架构：
 
 很可能，编解码 API 不统一的乱象即将终结，这对 API 转发方案有很大的意义。不远的将来，或许某种 API 方案的 vGPU 会成为主流。Google 在社区的一些活动标明，很可能它就有这样的计划。
 
-### 五、参考资料和项目简介
+# 五、参考资料和项目简介
 
 **1. nVidia MPS**
 
@@ -488,7 +486,7 @@ nouveau 的配套项目。除了提供各种 profiling GPU 硬件细节的工具
 
 官方。细节也是全在 nv-kernel.o_binary 文件中。与 Tesla Driver 不同的是，它为 vGPU 的 Fixed Share 和 Equal Share 两种调度策略，实现了 per-vGPU runlist。因此有很高的参考价值。
 
-### 六、思考 & 致谢
+# 六、思考 & 致谢
 
 > "Lasciate ogne speranza, voi ch'intrate." -- Dante Alighieri
 >
@@ -526,7 +524,7 @@ nouveau 的配套项目。除了提供各种 profiling GPU 硬件细节的工具
 
 看精选C++技术文章 . 加C++开发者专属圈子
 
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
+---
 
 **CPP开发者**
 

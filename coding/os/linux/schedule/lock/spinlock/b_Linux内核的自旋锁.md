@@ -1,4 +1,6 @@
+
 作者：[沙漠之狐](http://www.wowotech.net/author/535) 发布于：2019-5-17 19:11 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
+
 作者简介：余华兵，在网络通信行业工作十多年，负责IPv4协议栈、IPv6协议栈和Linux内核。在工作中看着2.6版本的专业书籍维护3.x和4.x版本的Linux内核，感觉不方便，于是自己分析4.x版本的Linux内核整理出一本书，书名叫《Linux内核深度解析》，2019年5月出版，希望对同行有帮助。
 
 自旋锁用于处理器之间的互斥，适合保护很短的临界区，并且不允许在临界区睡眠。申请自旋锁的时候，如果自旋锁被其他处理器占有，本处理器自旋等待（也称为忙等待）。
@@ -219,44 +221,31 @@ spin_lock() -> raw_spin_lock() -> \_raw_spin_lock() -> \_\_raw_spin_lock()
 第24行代码，wfe（wait for event）指令的功能是使处理器进入低功耗状态，等待事件。
 
 函数spin_unlock()负责释放自旋锁，ARM64架构的代码如下所示：
-
+```cpp
 spin_unlock() -> raw_spin_unlock() -> \_raw_spin_unlock() -> \_\_raw_spin_unlock()  -> do_raw_spin_unlock() -> arch_spin_unlock()
+```
 
 **arch/arm64/include/asm/spinlock.h**
 
+```cpp
 1   static inline void arch_spin_unlock(arch_spinlock_t \*lock)
-
 2   {
-
 3    unsigned long tmp;
-
 4
-
 5    asm volatile(ARM64_LSE_ATOMIC_INSN(
-
 6    /\* LL/SC \*/
-
 7    "    ldrh   %w1, %0\\n"
-
 8    "    add   %w1, %w1, #1\\n"
-
 9    "    stlrh   %w1, %0",
-
 10   /\* 大多统扩展的原子指令 \*/
-
 11   "    mov   %w1, #1\\n"
-
 12   "    staddlh   %w1, %0\\n"
-
 13   \_\_nops(1))
-
 14   : "=Q" (lock->owner), "=&r" (tmp)
-
 15   :
-
 16   : "memory");
-
 17  }
+```
 
 把自旋锁的服务号加1，有两种实现方法：
 
@@ -302,21 +291,17 @@ MCS（MCS是“Mellor-Crummey”和“Scott”这两个发明人的名字的首�
 
 结构体的定义如下所示：
 
-typedef struct \_\_mcs_lock_node {
-
-struct \_\_mcs_lock_node \*next;
-
+```cpp
+typedef struct __mcs_lock_node {
+struct __mcs_lock_node *next;
 int locked;
-
-} \_\_\_\_cacheline_aligned_in_smp mcs_lock_node;
+} ____cacheline_aligned_in_smp mcs_lock_node;
 
 typedef struct {
-
-mcs_lock_node \*tail;
-
-mcs_lock_node nodes\[NR_CPUS\];/\* NR_CPUS是处理器的数量 \*/
-
+mcs_lock_node *tail;
+mcs_lock_node nodes[NR_CPUS];/* NR_CPUS是处理器的数量 */
 } spinlock_t;
+```
 
 其中“\_\_\_\_cacheline_aligned_in_smp”的作用是：在多处理器系统中，结构体的起始地址和长度都是一级缓存行长度的整数倍。
 
@@ -360,17 +345,14 @@ atomic_t  val;
 
 **kernel/locking/qspinlock.c**
 
+```cpp
 #ifdef CONFIG_PARAVIRT_SPINLOCKS
-
 #define MAX_NODES  8
-
 #else
-
 #define MAX_NODES  4
-
 #endif
-
 static DEFINE_PER_CPU_ALIGNED(struct mcs_spinlock, mcs_nodes\[MAX_NODES\]);
+```
 
 配置宏CONFIG_PARAVIRT_SPINLOCKS用来启用半虚拟化的自旋锁，给虚拟机使用，本文不考虑这种使用场景。每个处理器需要4个队列节点，原因如下：
 
@@ -390,15 +372,13 @@ static DEFINE_PER_CPU_ALIGNED(struct mcs_spinlock, mcs_nodes\[MAX_NODES\]);
 
 **kernel/locking/mcs_spinlock.h**
 
+```cpp
 struct mcs_spinlock {
-
-struct mcs_spinlock \*next;
-
+struct mcs_spinlock *next;
 int locked;
-
 int count;
-
 };
+```
 
 其中成员next指向队列的下一个节点；成员locked指示锁是否被前一个等待者占有，如果值为1，表示锁被前一个等待者占有；成员count是嵌套层数，也就是数组mcs_nodes已分配的数组项的数量。
 
@@ -430,27 +410,19 @@ spin_lock() -> raw_spin_lock() -> \_raw_spin_lock() -> \_\_raw_spin_lock()
 
 **include/asm-generic/qspinlock.h**
 
+```cpp
 1     #define arch_spin_lock(l)         queued_spin_lock(l)
-
 2
-
-3     static \_\_always_inline void queued_spin_lock(struct qspinlock \*lock)
-
+3     static __always_inline void queued_spin_lock(struct qspinlock *lock)
 4     {
-
 5     u32 val;
-
 6
-
-7     val = atomic_cmpxchg_acquire(&lock->val, 0, \_Q_LOCKED_VAL);
-
+7     val = atomic_cmpxchg_acquire(&lock->val, 0, _Q_LOCKED_VAL);
 8     if (likely(val == 0))
-
 9          return;
-
 10   queued_spin_lock_slowpath(lock, val);
-
 11   }
+```
 
 第7行代码，执行带有获取语义的原子比较交换操作，如果锁的值是0，那么把锁的locked字段设置为1。获取语义保证后面的加载/存储指令必须在函数atomic_cmpxchg_acquire()完成之后开始执行。函数atomic_cmpxchg_acquire()返回锁的旧值。
 
@@ -462,191 +434,101 @@ spin_lock() -> raw_spin_lock() -> \_raw_spin_lock() -> \_\_raw_spin_lock()
 
 **kernel/locking/qspinlock.c**
 
-1     void queued_spin_lock_slowpath(struct qspinlock \*lock, u32 val)
-
+```cpp
+1     void queued_spin_lock_slowpath(struct qspinlock *lock, u32 val)
 2     {
-
-3     struct mcs_spinlock \*prev, \*next, \*node;
-
+3     struct mcs_spinlock *prev, *next, *node;
 4     u32 new, old, tail;
-
 5     int idx;
-
 6
-
 7     ...
-
-8     if (val == \_Q_PENDING_VAL) {
-
-9          while ((val = atomic_read(&lock->val)) == \_Q_PENDING_VAL)
-
+8     if (val == _Q_PENDING_VAL) {
+9          while ((val = atomic_read(&lock->val)) == _Q_PENDING_VAL)
 10             cpu_relax();
-
 11   }
-
 12
-
 13   for (;;) {
-
-14        if (val & ~\_Q_LOCKED_MASK)
-
+14        if (val & ~_Q_LOCKED_MASK)
 15             goto queue;
-
 16
-
-17        new = \_Q_LOCKED_VAL;
-
+17        new = _Q_LOCKED_VAL;
 18        if (val == new)
-
-19             new |= \_Q_PENDING_VAL;
-
+19             new |= _Q_PENDING_VAL;
 20
-
 21        old = atomic_cmpxchg_acquire(&lock->val, val, new);
-
 22        if (old == val)
-
 23             break;
-
 24
-
 25        val = old;
-
 26   }
-
 27
-
-28   if (new == \_Q_LOCKED_VAL)
-
+28   if (new == _Q_LOCKED_VAL)
 29        return;
-
 30
-
-31   smp_cond_load_acquire(&lock->val.counter, !(VAL & \_Q_LOCKED_MASK));
-
+31   smp_cond_load_acquire(&lock->val.counter, !(VAL & _Q_LOCKED_MASK));
 32
-
 33   clear_pending_set_locked(lock);
-
 34   return;
-
 35
-
 36   queue:
-
-37   node = this_cpu_ptr(&mcs_nodes\[0\]);
-
+37   node = this_cpu_ptr(&mcs_nodes[0]);
 38   idx = node->count++;
-
 39   tail = encode_tail(smp_processor_id(), idx);
-
 40
-
 41   node += idx;
-
 42   node->locked = 0;
-
 43   node->next = NULL;
-
 44   ...
-
 45
-
 46   if (queued_spin_trylock(lock))
-
 47        goto release;
-
 48
-
 49   old = xchg_tail(lock, tail);
-
 50   next = NULL;
-
 51
-
-52   if (old & \_Q_TAIL_MASK) {
-
+52   if (old & _Q_TAIL_MASK) {
 53        prev = decode_tail(old);
-
 54        smp_read_barrier_depends();
-
 55
-
 56        WRITE_ONCE(prev->next, node);
-
 57
-
 58        ...
-
 59        arch_mcs_spin_lock_contended(&node->locked);
-
 60
-
 61        next = READ_ONCE(node->next);
-
 62        if (next)
-
 63             prefetchw(next);
-
 64   }
-
 65
-
 66   ...
-
-67   val = smp_cond_load_acquire(&lock->val.counter, !(VAL & \_Q_LOCKED_PENDING_MASK));
-
+67   val = smp_cond_load_acquire(&lock->val.counter, !(VAL & _Q_LOCKED_PENDING_MASK));
 68
-
 69   locked:
-
 70   for (;;) {
-
-71        if ((val & \_Q_TAIL_MASK) != tail) {
-
+71        if ((val & _Q_TAIL_MASK) != tail) {
 72             set_locked(lock);
-
 73             break;
-
 74        }
-
 75
-
-76        old = atomic_cmpxchg_relaxed(&lock->val, val, \_Q_LOCKED_VAL);
-
+76        old = atomic_cmpxchg_relaxed(&lock->val, val, _Q_LOCKED_VAL);
 77        if (old == val)
-
 78             goto release;
-
 79
-
 80        val = old;
-
 81   }
-
 82
-
 83   if (!next) {
-
 84        while (!(next = READ_ONCE(node->next)))
-
 85             cpu_relax();
-
 86   }
-
 87
-
 88   arch_mcs_spin_unlock_contended(&next->locked);
-
 89   ...
-
 90
-
 91   release:
-
-92   \_\_this_cpu_dec(mcs_nodes\[0\].count);
-
+92   __this_cpu_dec(mcs_nodes[0].count);
 93   }
+```
 
 第8~11行代码，如果锁的状态是pending，即{tail=0，pending=1，locked=0}，那么等待锁的状态变成locked，即{tail=0，pending=0，locked=1}。
 
@@ -696,17 +578,14 @@ spin_unlock() -> raw_spin_unlock() -> \_raw_spin_unlock() -> \_\_raw_spin_
 
 **include/asm-generic/qspinlock.h**
 
+```cpp
 1     #define arch_spin_unlock(l)       queued_spin_unlock(l)
-
 2
-
-3     static \_\_always_inline void queued_spin_unlock(struct qspinlock \*lock)
-
+3     static __always_inline void queued_spin_unlock(struct qspinlock *lock)
 4     {
-
-5     (void)atomic_sub_return_release(\_Q_LOCKED_VAL, &lock->val);
-
+5     (void)atomic_sub_return_release(_Q_LOCKED_VAL, &lock->val);
 6     }
+```
 
 第5行代码，执行带释放语义的原子减法操作，把锁的locked字段设置为0，释放语义保证前面的加载/存储指令在函数atomic_sub_return_release()开始执行之前执行完。
 
@@ -738,7 +617,7 @@ depends on SMP
 
 标签: [Linux](http://www.wowotech.net/tag/Linux) [自旋锁](http://www.wowotech.net/tag/%E8%87%AA%E6%97%8B%E9%94%81) [锁](http://www.wowotech.net/tag/%E9%94%81)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [RCU（1）- 概述](http://www.wowotech.net/kernel_synchronization/461.html) | [浅谈Cache Memory](http://www.wowotech.net/memory_management/458.html)»
 

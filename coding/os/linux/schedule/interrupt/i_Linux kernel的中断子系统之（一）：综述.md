@@ -19,15 +19,15 @@
 
 本章节不是描述具体的硬件，而是使用了HW block这样的概念。例如CPU HW block是只ARM core或者X86这样的实际硬件block的一个逻辑描述，实际中，可能是任何可能的CPU block。
 
-1、HW中断系统的逻辑block图
+## 1、HW中断系统的逻辑block图
 
 我对HW中断系统之逻辑block diagram的理解如下图所示：
 
-\[![irq_thumb1](http://www.wowotech.net/content/uploadfile/201408/3c022613b452b88b4d1e2dc76ccd7a3a20140816061633.gif "irq_thumb1")\](file:///C:/Documents%20and%20Settings/unigz/Local%20Settings/Temp/WindowsLiveWriter-429641856/supfiles134F60E/irq3.gif)
+![[Pasted image 20241024194015.png]]
 
 系统中有若干个CPU block用来接收中断事件并进行处理，若干个Interrupt controller形成树状的结构，汇集系统中所有外设的irq request line，并将中断事件分发给某一个CPU block进行处理。从接口层面看，主要有两类接口，一种是中断接口。有的实现中，具体中断接口的形态就是一个硬件的信号线，通过电平信号传递中断事件（ARM以及GIC组成的中断系统就是这么设计的）。有些系统采用了其他的方法来传递中断事件，比如x86＋APIC（Advanced Programmable Interrupt Controller）组成的系统，每个x86的核有一个Local APIC，这些Local APIC们通过ICC（Interrupt Controller Communication）bus连接到IO APIC上。IO APIC收集各个外设的中断，并翻译成总线上的message，传递给某个CPU上的Local APIC。因此，上面的红色线条也是逻辑层面的中断信号，可能是实际的PCB上的铜线（或者SOC内部的铜线），也可能是一个message而已。除了中断接口，CPU和Interrupt Controller之间还需要有控制信息的交流。Interrupt Controller会开放一些寄存器让CPU访问、控制。
 
-2、多个Interrupt controller和多个cpu之间的拓扑结构
+## 2、多个Interrupt controller和多个cpu之间的拓扑结构
 
 Interrupt controller有的是支持多个CPU core的（例如GIC、APIC等），有的不支持（例如S3C2410的中断控制器，X86平台的PIC等）。如果硬件平台中只有一个GIC的话，那么通过控制该GIC的寄存器可以将所有的外设中断，分发给连接在该interrupt controller上的CPU。如果有多个GIC呢（或者级联的interrupt controller都支持multi cpu core）？假设我们要设计一个非常复杂的系统，系统中有8个CPU，有2000个外设中断要处理，这时候你如何设计系统中的interrupt controller？如果使用GIC的话，我们需要两个GIC（一个GIC最多支持1024个中断源），一个是root GIC，另外一个是secondary GIC。这时候，你有两种方案：
 
@@ -69,7 +69,7 @@ Interrupt controller有的是支持多个CPU core的（例如GIC、APIC等），
 
 linux kernel的中断子系统相关的软件框架图如下所示：
 
-[![isbs](http://www.wowotech.net/content/uploadfile/201408/3ec48c362ba8d614358dfdb779fd6c3020140814111248.gif "isbs")](http://www.wowotech.net/content/uploadfile/201408/4a6be3bcb547cdcd1c2d787a15db689720140814111245.gif)
+![[Pasted image 20241024194141.png]]
 
 由上面的block图，我们可知linux kernel的中断子系统分成4个部分：
 
@@ -107,7 +107,7 @@ _原创文章，转发请注明出处。蜗窝科技。[http://www.wowotech.net/
 
 标签: [软件框架](http://www.wowotech.net/tag/%E8%BD%AF%E4%BB%B6%E6%A1%86%E6%9E%B6) [中断子系统](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%AD%90%E7%B3%BB%E7%BB%9F)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [DMB DSB ISB以及SMP CPU 乱序](http://www.wowotech.net/77.html) | [开源的RF硬件平台](http://www.wowotech.net/75.html)»
 

@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-4-7 7:09 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 # 前言
@@ -60,9 +61,9 @@ Linux是一个通用操作系统的内核，她的目标是星辰大海，上到
 
 在手机环境中，大核最高频上的算力定义为最高算力，即1024。瞬时运行负载的定义类似utility，如下：
 
-|   |
-|---|
-|RLi = Max CPU capacity  x （runnable time/1024）|
+|                                                |
+| ---------------------------------------------- |
+| RLi = Max CPU capacity  x （runnable time/1024） |
 
 任务的瞬时负载和瞬时利用率都是一个快速变化的计算量，但是它们并不适合直接调整调度算法，因为调度器期望的是一段时间内保持平稳而不是疲于奔命。例如，在迁移算法中，在上一个1024us窗口中，是满窗运行，瞬时利用率是1024，立刻将任务迁移到大核，下一个窗口，任务有3/4时间在阻塞状态，利用率急速下降，调度器会将其迁移到小核上执行。从这个例子可以看出，用瞬时量来推动调度器的算法不适合，任务会不断在大核小核之间跳来跳去，迁移的开销会急剧加大。为此，我们需要对瞬时负载进行滑动平均的计算，得到平均负载。一个调度实体的平均负载可以表示为：
 
@@ -103,11 +104,11 @@ Li表示在周期pi中的瞬时负载，对于过去的负载我们在计算的�
 
 实际的任务执行时间delta，通过cpu scale和freq scale，归一化到了系统最大算力的CPU上去。
 
-三、内核调度器基本知识
+# 三、内核调度器基本知识
 
 为了能够讲清楚PELT算法，我们本章需要科普一点基本的CFS的基础知识。
 
-1、调度实体
+## 1、调度实体
 
 内核用struct sched_entity抽象一个调度实体结构（蓝色成员是组调度相关）：
 
@@ -128,7 +129,7 @@ Li表示在周期pi中的瞬时负载，对于过去的负载我们在计算的�
 
 上面蓝色字体的成员都是CFS组调度相关的成员，所有的成员都很直观，不再赘述。
 
-2、Cfs任务的运行队列
+## 2、cfs任务的运行队列
 
 内核用struct cfs_rq抽象一个管理调度实体的cfs任务运行队列：
 
@@ -175,7 +176,7 @@ Cfs rq有一个成员load保存了挂入该runqueue的调度实体load weight之
 
 通过上面的公式，我们把任务对其cfs rq的负载贡献转换成了对CPU runqueue的负载贡献。
 
-3、任务组（task group）
+## 3、任务组（task group）
 
 内核用struct task_group来抽象属于同一个control group的一组任务（cpuctrl类型的cgroup组，需要内核支持组调度，具体细节可参考其他文章）：
 
@@ -194,7 +195,7 @@ Cfs rq有一个成员load保存了挂入该runqueue的调度实体load weight之
 
 和调度器相关的基本组件如下：
 
-![](http://www.wowotech.net/content/uploadfile/202204/64be1649288010.png)
+![[Pasted image 20241024183618.png]]
 
 这是当系统不支持组调度时候的形态，每个任务都内嵌一个sched_entity，我们称之task se，每个CPU runqueue上都内嵌调度类自己的runqueue，对于cfs调度类而言就是cfs rq。Cfs rq有一个红黑树，每个处于runnable状态的任务（se）都是按照vruntime的值挂入其所属的cfs rq（实线）。当进入阻塞状态的时候，任务会被挂入wait queue，但是从PELT的角度来看，该任务仍然挂在cfs rq上（虚线），该task se的负载（blocked load）仍然会累计到cfs rq的负载（如上图虚线所示），不过既然该task se进入阻塞状态，那么就会按照PELT算法的规则衰减，计入其上次挂入的cfs rq。
 
@@ -202,7 +203,7 @@ Cfs rq有一个成员load保存了挂入该runqueue的调度实体load weight之
 
 当系统支持组调度的时候，cfs rq---se这个基本组件会形成层级结构，如下图所示：
 
-![](http://www.wowotech.net/content/uploadfile/202204/0ff01649288051.png)
+![[Pasted image 20241024183634.png]]
 
 一组任务（task group）作为一个整体进行调度的时候，那么它也就是一个sched entity了，也就是说task group对应一个se。这句话对UP是成立的，然而，在SMP的情况下，系统有多个CPU，任务组中的任务可能遍布到各个CPU上去，因此实际上，task group对应的是一组se，我们称之group se。由于task group中可能包含另外一个task group，因此task group也是形成层级关系，顶层是一个虚拟的root task group，该task group没有对应的group se（都顶层了，不需要挂入其他cfs rq），因而其对应的cfs rq内嵌在cpu runqueue中。
 
@@ -218,9 +219,9 @@ Group se需要管理若干个sched se（可能是task se，也可能是其下的
 |---|
 |static inline struct cfs_rq \*group_cfs_rq(struct sched_entity \*grp)<br><br>{<br><br>return grp->my_q;<br><br>}|
 
-四、关于负载权重（load weight）
+# 四、关于负载权重（load weight）
 
-1、load weight
+## 1、load weight
 
 PELT算法中定义了一个struct load_weight的数据结构来表示调度实体的负载权重：
 

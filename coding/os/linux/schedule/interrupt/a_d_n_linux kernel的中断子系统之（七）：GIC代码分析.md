@@ -20,7 +20,8 @@ GIC（Generic Interrupt Controller）是ARM公司提供的一个通用的中断�
 ### （1）GIC-V2的输入和输出信号示意图
 
 要想理解一个building block（无论软件还是硬件），我们都可以先把它当成黑盒子，只是研究其input，output。GIC-V2的输入和输出信号的示意图如下（注：我们以GIC-400为例，同时省略了clock，config等信号）：
-!\[\[Pasted image 20241009100741.png\]\]
+
+![[Pasted image 20241009100741.png]]
 
 （2）输入信号
 
@@ -77,7 +78,7 @@ GIC-V2支持的中断类型有下面几种：
 
 GIC的block diagram如下图所示：
 
-[![gic](http://www.wowotech.net/content/uploadfile/201409/049e88993db95cd9b35b6d9e8c1fa99920140904115854.gif "gic")](http://www.wowotech.net/content/uploadfile/201409/e1fbd5278ddff2a62b06d22df15848e920140904115852.gif)
+![[Pasted image 20241024194812.png]]
 
 GIC可以清晰的划分成两个block，一个block是Distributor（上图的左边的block），一个是CPU interface。CPU interface有两种，一种就是和普通processor接口，另外一种是和虚拟机接口的。Virtual CPU interface在本文中不会详细描述。
 

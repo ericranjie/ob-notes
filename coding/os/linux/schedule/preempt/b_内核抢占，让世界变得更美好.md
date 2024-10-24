@@ -76,7 +76,7 @@ Linux 2.6 之前是不支持内核抢占的。这意味着当处于用户空间�
 > If a task in the kernel explicitly calls schedule()
 > If a task in the kernel blocks (which results in a call to schedule() )
 
-## 为什么要引入内核抢占？
+# 为什么要引入内核抢占？
 
 **根本原因**：
 
@@ -93,18 +93,22 @@ Linux 2.6 之前是不支持内核抢占的。这意味着当处于用户空间�
 ![[Pasted image 20240906162216.png]]
 
 CONFIG_PREEMPT_NONE=y：不允许内核抢占，吞吐量最大的 Model，一般用于 Server 系统。
-!\[\[Pasted image 20240906162255.png\]\]
+
+![[Pasted image 20240906162255.png]]
 
 CONFIG_PREEMPT_VOLUNTARY=y：在一些耗时较长的内核代码中主动调用cond_resched()让出CPU，对吞吐量有轻微影响，但是系统响应会稍微快一些。
-!\[\[Pasted image 20240906162314.png\]\]
+
+![[Pasted image 20240906162314.png]]
 
 CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他时候都允许内核抢占，响应速度进一步提升，吞吐量进一步下降，一般用于 Desktop / Embedded 系统。
-!\[\[Pasted image 20240906162322.png\]\]
+
+![[Pasted image 20240906162322.png]]
 
 另外，还有一个没有合并进主线内核的 Model: CONFIG_PREEMPT_RT，这个模式几乎将所有的 spinlock 都换成了 preemptable mutex，只剩下一些极其核心的地方仍然用禁止抢占的 spinlock，所以基本可以认为是随时可被抢占。
-!\[\[Pasted image 20240906162327.png\]\]
 
-## 抢占前的检查
+![[Pasted image 20240906162327.png]]
+
+# 抢占前的检查
 
 这里的检查是同时针对所有的 preemption 的。如果你理解了前面的 4 种 preempiton model 的话，应该能感觉到其实是不用太严格区分 user / kernel preemption，所有抢占的作用和性质都一样：降低 lantency，完全可以将它们一视同仁。
 
@@ -137,7 +141,7 @@ CONFIG_PREEMPT=y：除了处于持有 spinlock 时的 critical section，其他�
 - preempt_disable()，关闭内核抢占，可嵌套调用。
 - preempt_count()，返回 preempt_count。
 
-## 什么场景会设置需要抢占 (TIF_NEED_RESCHED = 1)
+# 什么场景会设置需要抢占 (TIF_NEED_RESCHED = 1)
 
 通过 grep resched_curr 可以找出大多数标记抢占的场景。
 
@@ -195,7 +199,7 @@ void set_user_nice(struct task_struct *p, long nice){    [...]    /
 
 还有很多场景，这里就不一一列举了。
 
-## 什么场景下要禁止内核抢占 (preempt_count > 0)
+# 什么场景下要禁止内核抢占 (preempt_count > 0)
 
 有几种场景是明确需要关闭内核抢占的。
 
@@ -228,7 +232,7 @@ static inline void __raw_spin_lock(raw_spinlock_t *lock){     preempt_d
 
 还有很多场景，这里就不一一列举了。
 
-## 真正执行抢占的地方
+# 真正执行抢占的地方
 
 这部分是 platform 相关的，下面以 ARM64 Linux-5.4 为例，快速看下执行抢占的具体代码。
 

@@ -1,6 +1,7 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-8-28 20:00 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
-一、前言
+# 一、前言
 
 当外设触发一次中断后，一个大概的处理过程是：
 
@@ -16,9 +17,9 @@
 
 注：这份文档充满了猜测和空想，很多地方描述可能是有问题的，不过我还是把它发出来，抛砖引玉，希望可以引发大家讨论。
 
-一、如何进入high level irq event handler
+# 一、如何进入high level irq event handler
 
-1、从具体CPU architecture的中断处理到machine相关的处理模块
+## 1、从具体CPU architecture的中断处理到machine相关的处理模块
 
 说到具体的CPU，我们还是用ARM为例好了。对于ARM，我们在[ARM中断处理](http://www.wowotech.net/linux_kenrel/irq_handler.html)文档中已经有了较为细致的描述。这里我们看看如何从从具体CPU的中断处理到machine相关的处理模块 ，其具体代码如下：
 
@@ -54,7 +55,7 @@ gic_nr是GIC的编号，linux kernel初始化过程中，每发现一个GIC，�
 
 关于MULTI_IRQ_HANDLER这个配置项，我们可以再多说几句。当然，其实这个配置项的名字已经出卖它了。multi irq handler就是说系统中有多个irq handler，可以在run time的时候指定。为何要run time的时候，从多个handler中选择一个呢？HW interrupt block难道不是固定的吗？我的理解（猜想）是：一个kernel的image支持多个HW platform，对于不同的HW platform，在运行时检查HW platform的类型，设定不同的irq handler。
 
-2、interrupt controller相关的代码
+## 2、interrupt controller相关的代码
 
 我们还是以2个级联的GIC为例来描述interrupt controller相关的代码。代码如下：
 
@@ -95,7 +96,7 @@ gic_nr是GIC的编号，linux kernel初始化过程中，每发现一个GIC，�
 > ……\
 > }
 
-3、调用high level handler
+## 3、调用high level handler
 
 调用high level handler的代码逻辑非常简单，如下：
 
@@ -114,9 +115,9 @@ gic_nr是GIC的编号，linux kernel初始化过程中，每发现一个GIC，�
 > desc->handle_irq(irq, desc);\
 > }
 
-二、理解high level irq event handler需要的知识准备
+# 二、理解high level irq event handler需要的知识准备
 
-1、自动探测IRQ
+## 1、自动探测IRQ
 
 一个硬件驱动可以通过下面的方法进行自动探测它使用的IRQ：
 
@@ -210,7 +211,7 @@ b、该中断描述符允许自动探测（不能设定IRQ_NOPROBE）
 
 因为在调用probe_irq_off已经触发了自动探测IRQ的那个硬件中断，因此在该中断的high level handler的执行过程中，该硬件对应的中断描述符的IRQS_WAITING标致应该已经被清除，因此probe_irq_off函数scan中断描述符DB，找到处于auto probe中，而且IRQS_WAITING标致被清除的那个IRQ。如果找到一个，那么探测OK，返回该IRQ number，如果找到多个，说明探测失败，返回负的IRQ个数信息，没有找到的话，返回0。
 
-2、resend一个中断
+## 2、resend一个中断
 
 一个ARM SOC总是有很多的GPIO，有些GPIO可以提供中断功能，这些GPIO的中断可以配置成level trigger或者edge trigger。一般而言，大家都更喜欢用level trigger的中断。有的SOC只能是有限个数的GPIO可以配置成电平中断，因此，在项目初期进行pin define的时候，大家都在争抢电平触发的GPIO。
 
@@ -256,7 +257,7 @@ b、该中断描述符允许自动探测（不能设定IRQ_NOPROBE）
 
 这里会清除IRQS_REPLAY状态，表示该中断已经被retrigger，一次resend interrupt的过程结束。
 
-3、unhandled interrupt和spurious interrupt
+## 3、unhandled interrupt和spurious interrupt
 
 在中断处理的最后，总会有一段代码如下：
 
@@ -370,9 +371,9 @@ irq_count和irqs_unhandled都是比较直观的，为何要记录unhandled inter
 > jiffies + POLL_SPURIOUS_IRQ_INTERVAL);\
 > }
 
-三、和high level irq event handler相关的硬件描述
+# 三、和high level irq event handler相关的硬件描述
 
-1、CPU layer和Interrupt controller之间的接口
+## 1、CPU layer和Interrupt controller之间的接口
 
 从逻辑层面上看，CPU和interrupt controller之间的接口包括：
 
@@ -388,15 +389,15 @@ irq_count和irqs_unhandled都是比较直观的，为何要记录unhandled inter
 
 所有的系统中，Interrupt controller和Peripheral device之间的接口都是一个Interrupt Request信号线。外设通过这个信号线上的电平或者边缘向CPU（实际上是通过interrupt controller）申请中断服务。
 
-四、几种典型的high level irq event handler
+# 四、几种典型的high level irq event handler
 
 本章主要介绍几种典型的high level irq event handler，在进行high level irq event handler的设定的时候需要注意，不是外设使用电平触发就选用handle_level_irq，选用什么样的high level irq event handler是和Interrupt controller的行为以及外设电平触发方式决定的。介绍每个典型的handler之前，我会简单的描述该handler要求的硬件行为，如果该外设的中断系统符合这个硬件行为，那么可以选择该handler为该中断的high level irq event handler。
 
-1、边缘触发的handler。
+## 1、边缘触发的handler。
 
 使用handle_edge_irq这个handler的硬件中断系统行为如下：
 
-[![xyz](http://www.wowotech.net/content/uploadfile/201408/1618e77f0e5a8cbc94806355a0ff3c4720140828120041.gif "xyz")](http://www.wowotech.net/content/uploadfile/201408/b844e701747cb80623342178d80fbe0120140828120039.gif)
+![[Pasted image 20241024193916.png]]
 
 我们以上升沿为例描述边缘中断的处理过程（下降沿的触发是类似的）。当interrupt controller检测到了上升沿信号，会将该上升沿状态（pending）锁存在寄存器中，并通过中断的signal向CPU触发中断。需要注意：这时候，外设和interrupt controller之间的interrupt request信号线会保持高电平，这也就意味着interrupt controller不可能检测到新的中断信号（本身是高电平，无法形成上升沿）。这个高电平信号会一直保持到软件ack该中断（调用irq chip的irq_ack callback函数）。ack之后，中断控制器才有可能继续探测上升沿，触发下一次中断。
 
@@ -509,7 +510,7 @@ IRQS_POLL_INPROGRESS标识了该IRQ正在被polling（上一章有描述），�
 
 使用handle_level_irq这个handler的硬件中断系统行为如下：
 
-[![level](http://www.wowotech.net/content/uploadfile/201408/335dea2bd22abd76c4df50e9953b759920140828120046.gif "level")](http://www.wowotech.net/content/uploadfile/201408/5a88d2c9e746aa35e79f6de6c1f6afd020140828120043.gif)
+![[Pasted image 20241024193935.png]]
 
 我们以高电平触发为例。当interrupt controller检测到了高电平信号，并通过中断的signal向CPU触发中断。这时候，对中断控制器进行ack并不能改变interrupt request signal上的电平状态，一直要等到执行具体的中断服务程序（specific handler），对外设进行ack的时候，电平信号才会恢复成低电平。在对外设ack之前，中断状态一直是pending的，如果没有mask中断，那么中断控制器就会assert CPU。
 
@@ -554,7 +555,7 @@ b、该中断被其他的CPU disable了。如果该中断被其他的CPU disable
 
 （4）为何是有条件的unmask该IRQ？正常的话当然是umask就OK了，不过有些threaded interrupt（这个概念在下一份文档中描述）要求是one shot的（首次中断，specific handler中开了一枪，wakeup了irq handler thread，如果允许中断嵌套，那么在specific handler会多次开枪，这也就不是one shot了，有些IRQ的handler thread要求是one shot，也就是不能嵌套specific handler）。
 
-3、支持EOI的handler
+## 3、支持EOI的handler
 
 TODO
 
@@ -562,7 +563,7 @@ _原创文章，转发请注明出处。蜗窝科技。_[http://www.wowotech.net
 
 标签: [中断处理](http://www.wowotech.net/tag/%E4%B8%AD%E6%96%AD%E5%A4%84%E7%90%86)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [linux kernel的中断子系统之（七）：GIC代码分析](http://www.wowotech.net/irq_subsystem/gic_driver.html) | [linux kernel的中断子系统之（三）：IRQ number和中断描述符](http://www.wowotech.net/irq_subsystem/interrupt_descriptor.html)»
 

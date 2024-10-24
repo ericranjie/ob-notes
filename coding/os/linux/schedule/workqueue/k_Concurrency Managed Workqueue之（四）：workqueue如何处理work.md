@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-8-17 19:41 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 # 一、前言
@@ -100,7 +101,7 @@ last_pool记录了上一次该work是被哪一个worker pool处理的，如果la
 
 具体的挂入队列的动作是在insert_work函数中完成的。
 
-6、唤醒idle的worker来处理该work
+## 6、唤醒idle的worker来处理该work
 
 在insert_work函数中有下面的代码：
 
@@ -109,9 +110,9 @@ last_pool记录了上一次该work是被哪一个worker pool处理的，如果la
 
 当线程池中正在运行状态的worker线程数目等于0的时候，说明需要wakeup线程池中处于idle状态的的worker线程来处理work。
 
-三、线程池如何创建worker线程？
+# 三、线程池如何创建worker线程？
 
-1、per cpu worker pool什么时候创建worker线程？
+## 1、per cpu worker pool什么时候创建worker线程？
 
 对于per-CPU workqueue，每个cpu有两个线程池，一个是normal，一个是high priority的。在初始化函数init_workqueues中有对这两个线程池的初始化：
 
@@ -128,11 +129,11 @@ last_pool记录了上一次该work是被哪一个worker pool处理的，如果la
 
 一旦initial worker启动，该线程会执行worker_thread函数来处理work，在处理过程中，如果有需要， worker会创建新的线程。
 
-2、unbound thread pool什么时候创建worker线程？
+## 2、unbound thread pool什么时候创建worker线程？
 
 我们先看看unbound thread pool的建立，和per-CPU不同的是unbound thread pool是全局共享的，因此，每当创建不同属性的unbound workqueue的时候，都需要创建pool_workqueue及其对应的worker pool，这时候就会调用get_unbound_pool函数在当前系统中现存的线程池中找是否有匹配的worker pool，如果没有就需要创建新的线程池。在创建新的线程池之后，会立刻调用create_worker创建一个initial worker。和per cpu worker pool一样，一旦initial worker启动，随着work不断的挂入以及worker处理work的具体情况，线程池会动态创建worker。
 
-3、如何创建worker。代码如下：
+## 3、如何创建worker。代码如下：
 
 > static struct worker \*create_worker(struct worker_pool \*pool)\
 > {\
@@ -169,11 +170,11 @@ last_pool记录了上一次该work是被哪一个worker pool处理的，如果la
 
 代码不复杂，通过线程池（struct worker_pool）绑定的cpu信息（struct worker_pool的cpu成员）可以知道该pool是per-CPU还是unbound，对于per-CPU线程池，pool->cpu是大于等于0的。对于对于per-CPU线程池，其worker线程的名字是kworker/_cpu_：_worker id_，如果是high priority的，后面还跟着一个H字符。对于unbound线程池，其worker线程的名字是kworker/u _pool id_：_worker id。_
 
-四、work的处理
+# 四、work的处理
 
 本章主要描述worker_thread函数的执行流程，部分代码有删节，保留主干部分。
 
-1、PF_WQ_WORKER标记
+## 1、PF_WQ_WORKER标记
 
 worker线程函数一开始就会通过PF_WQ_WORKER来标注自己：
 
@@ -181,7 +182,7 @@ worker线程函数一开始就会通过PF_WQ_WORKER来标注自己：
 
 有了这样一个flag，调度器在调度当前进程sleep的时候可以检查这个准备sleep的进程是否是一个worker线程，如果是的话，那么调度器不能鲁莽的调度到其他的进程，这时候，还需要找到该worker对应的线程池，唤醒一个idle的worker线程。通过workqueue模块和调度器模块的交互，当work A被阻塞后（处理该work的worker线程进入sleep），调度器会唤醒其他的worker线程来处理其他的work B，work C……
 
-2、管理线程池中的线程
+## 2、管理线程池中的线程
 
 > recheck:\
 > if (!need_more_worker(pool))\
@@ -196,7 +197,7 @@ worker线程函数一开始就会通过PF_WQ_WORKER来标注自己：
 
 （2）比较忙：worker pool的nr_running成员表示线程池中当前正在干活（running状态）的worker线程有多少个，当nr_running等于0表示所有的worker线程在处理work的时候阻塞了，这时候，必须要启动新的worker线程来处理worker pool上处于active状态的work链表上的work们。
 
-3、worker线程开始处理work
+## 3、worker线程开始处理work
 
 > worker_clr_flags(worker, WORKER_PREP | WORKER_REBOUND);
 >
@@ -223,7 +224,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [workqueue](http://www.wowotech.net/tag/workqueue) [Concurrency](http://www.wowotech.net/tag/Concurrency) [Managed](http://www.wowotech.net/tag/Managed)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [linux cpufreq framework(4)\_cpufreq governor](http://www.wowotech.net/pm_subsystem/cpufreq_governor.html) | [Concurrency Managed Workqueue之（三）：创建workqueue代码分析](http://www.wowotech.net/irq_subsystem/alloc_workqueue.html)»
 

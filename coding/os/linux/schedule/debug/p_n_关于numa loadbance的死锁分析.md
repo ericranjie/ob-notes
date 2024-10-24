@@ -1,3 +1,4 @@
+
 作者：[安庆](http://www.wowotech.net/author/539 "oppo混合云内核&虚拟化负责人，架构并孵化了oppo的云游戏，云手机等产品。") 发布于：2021-5-8 9:03 分类：[Linux内核分析](http://www.wowotech.net/sort/linux_kenrel)
 
 # 关于migrate_swap() 和 active_balance()之间的hardlock
@@ -5,105 +6,58 @@
 背景：这个是在3.10.0-957.el7.x86_64 遇到的一例crash
 下面列一下我们是怎么排查并解这个问题的。
 
-#### 一、故障现象
+## 一、故障现象
 
 Oppo云智能监控发现机器down机：
 
-```
-
+```c
  KERNEL: /usr/lib/debug/lib/modules/3.10.0-957.el7.x86_64/vmlinux 
-
- ....
-
+ ...
        PANIC: "Kernel panic - not syncing: Hard LOCKUP"
-
          PID: 14
-
      COMMAND: "migration/1"
-
         TASK: ffff8f1bf6bb9040  [THREAD_INFO: ffff8f1bf6bc4000]
-
          CPU: 1
-
        STATE: TASK_INTERRUPTIBLE (PANIC)
-
-  
-
 crash> bt
-
 PID: 14     TASK: ffff8f1bf6bb9040  CPU: 1   COMMAND: "migration/1"
-
  #0 [ffff8f4afbe089f0] machine_kexec at ffffffff83863674
-
  #1 [ffff8f4afbe08a50] __crash_kexec at ffffffff8391ce12
-
  #2 [ffff8f4afbe08b20] panic at ffffffff83f5b4db
-
  #3 [ffff8f4afbe08ba0] nmi_panic at ffffffff8389739f
-
  #4 [ffff8f4afbe08bb0] watchdog_overflow_callback at ffffffff83949241
-
  #5 [ffff8f4afbe08bc8] __perf_event_overflow at ffffffff839a1027
-
  #6 [ffff8f4afbe08c00] perf_event_overflow at ffffffff839aa694
-
  #7 [ffff8f4afbe08c10] intel_pmu_handle_irq at ffffffff8380a6b0
-
  #8 [ffff8f4afbe08e38] perf_event_nmi_handler at ffffffff83f6b031
-
  #9 [ffff8f4afbe08e58] nmi_handle at ffffffff83f6c8fc
-
 #10 [ffff8f4afbe08eb0] do_nmi at ffffffff83f6cbd8
-
 #11 [ffff8f4afbe08ef0] end_repeat_nmi at ffffffff83f6bd69
-
     [exception RIP: native_queued_spin_lock_slowpath+462]
-
     RIP: ffffffff839121ae  RSP: ffff8f1bf6bc7c50  RFLAGS: 00000002
-
     RAX: 0000000000000001  RBX: 0000000000000082  RCX: 0000000000000001
-
     RDX: 0000000000000101  RSI: 0000000000000001  RDI: ffff8f1afdf55fe8---锁
-
     RBP: ffff8f1bf6bc7c50   R8: 0000000000000101   R9: 0000000000000400
-
     R10: 000000000000499e  R11: 000000000000499f  R12: ffff8f1afdf55fe8
-
     R13: ffff8f1bf5150000  R14: ffff8f1afdf5b488  R15: ffff8f1bf5187818
-
     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-
 --- <NMI exception stack> ---
-
 #12 [ffff8f1bf6bc7c50] native_queued_spin_lock_slowpath at ffffffff839121ae
-
 #13 [ffff8f1bf6bc7c58] queued_spin_lock_slowpath at ffffffff83f5bf4b
-
 #14 [ffff8f1bf6bc7c68] _raw_spin_lock_irqsave at ffffffff83f6a487
-
 #15 [ffff8f1bf6bc7c80] cpu_stop_queue_work at ffffffff8392fc70
-
 #16 [ffff8f1bf6bc7cb0] stop_one_cpu_nowait at ffffffff83930450
-
 #17 [ffff8f1bf6bc7cc0] load_balance at ffffffff838e4c6e
-
 #18 [ffff8f1bf6bc7da8] idle_balance at ffffffff838e5451
-
 #19 [ffff8f1bf6bc7e00] __schedule at ffffffff83f67b14
-
 #20 [ffff8f1bf6bc7e88] schedule at ffffffff83f67bc9
-
 #21 [ffff8f1bf6bc7e98] smpboot_thread_fn at ffffffff838ca562
-
 #22 [ffff8f1bf6bc7ec8] kthread at ffffffff838c1c31
-
 #23 [ffff8f1bf6bc7f50] ret_from_fork_nospec_begin at ffffffff83f74c1d
-
 crash> 
-
 ```
 
-#### 二、故障现象分析
+## 二、故障现象分析
 
 hardlock一般是由于关中断时间过长，从堆栈看，上面的"migration/1" 进程在抢spinlock，
 
@@ -111,24 +65,15 @@ hardlock一般是由于关中断时间过长，从堆栈看，上面的"migratio
 
 arch_local_irq_disable 是常见的关中断函数,下面分析这个进程想要拿的锁被谁拿着。
 
-```
-
 x86架构下，native_queued_spin_lock_slowpath的rdi就是存放锁地址的
 
-  
-
+```c
 crash> arch_spinlock_t ffff8f1afdf55fe8
-
 struct arch_spinlock_t {
-
   val = {
-
     counter = 257
-
   }
-
 }
-
 ```
 
 下面，我们需要了解，这个是一把什么锁。
@@ -137,240 +82,133 @@ struct arch_spinlock_t {
 
 反汇编 cpu_stop_queue_work 拿锁阻塞的代码：
 
-```
-
+```c
 crash> dis -l ffffffff8392fc70
-
 /usr/src/debug/kernel-3.10.0-957.el7/linux-3.10.0-957.el7.x86_64/kernel/stop_machine.c: 91
-
 0xffffffff8392fc70 <cpu_stop_queue_work+48>:    cmpb   $0x0,0xc(%rbx)
-
-  
-
      85 static void cpu_stop_queue_work(unsigned int cpu, struct cpu_stop_work *work)
-
      86 {
-
      87         struct cpu_stopper *stopper = &per_cpu(cpu_stopper, cpu);
-
      88         unsigned long flags;
-
      89 
-
      90         spin_lock_irqsave(&stopper->lock, flags);---所以是卡在拿这把锁
-
      91         if (stopper->enabled)
-
      92                 __cpu_stop_queue_work(stopper, work);
-
      93         else
-
      94                 cpu_stop_signal_done(work->done, false);
-
      95         spin_unlock_irqrestore(&stopper->lock, flags);
-
      96 }
-
 ```
 
 看起来 需要根据cpu号，来获取对应的percpu变量 cpu_stopper,这个入参在 load_balance 函数中找到的
 
 最忙的rq，然后获取其对应的cpu号:
 
-```
-
+```c
    6545 static int load_balance(int this_cpu, struct rq *this_rq,
-
    6546                         struct sched_domain *sd, enum cpu_idle_type idle,
-
    6547                         int *should_balance)
-
    6548 {
-
 ....
-
    6735                         if (active_balance) {
-
    6736                                 stop_one_cpu_nowait(cpu_of(busiest),
-
    6737                                         active_load_balance_cpu_stop, busiest,
-
    6738                                         &busiest->active_balance_work);
-
    6739                         }
-
 ....
-
   6781 }
-
-  
-
   crash> dis -l load_balance |grep stop_one_cpu_nowait -B 6
-
 0xffffffff838e4c4d <load_balance+2045>: callq  0xffffffff83f6a0e0 <_raw_spin_unlock_irqrestore>
-
 /usr/src/debug/kernel-3.10.0-957.el7/linux-3.10.0-957.el7.x86_64/kernel/sched/fair.c: 6736
-
 0xffffffff838e4c52 <load_balance+2050>: mov    0x930(%rbx),%edi------------根据rbx可以取cpu号，rbx就是最忙的rq
-
 0xffffffff838e4c58 <load_balance+2056>: lea    0x908(%rbx),%rcx
-
 0xffffffff838e4c5f <load_balance+2063>: mov    %rbx,%rdx
-
 0xffffffff838e4c62 <load_balance+2066>: mov    $0xffffffff838de690,%rsi
-
 0xffffffff838e4c69 <load_balance+2073>: callq  0xffffffff83930420 <stop_one_cpu_nowait>
-
 ```
 
 然后我们再栈中取的数据如下：
 
-```
-
 最忙的组是：
 
+```c
 crash> rq.cpu ffff8f1afdf5ab80
-
   cpu = 26
-
 ```
 
 也就是说，1号cpu在等 percpu变量cpu_stopper 的26号cpu的锁。
 
 然后我们搜索这把锁在其他哪个进程的栈中，找到了如下：
 
-```
-
+```c
 ffff8f4957fbfab0: ffff8f1afdf55fe8 --------这个在  355608 的栈中
-
 crash> kmem ffff8f4957fbfab0
-
     PID: 355608
-
 COMMAND: "custom_exporter"
-
    TASK: ffff8f4aea3a8000  [THREAD_INFO: ffff8f4957fbc000]
-
     CPU: 26--------刚好也是运行在26号cpu的进程
-
   STATE: TASK_RUNNING (ACTIVE)
-
 ```
 
 下面，就需要分析，为什么位于26号cpu的进程 custom_exporter 会长时间拿着 ffff8f1afdf55fe8
 
 我们来分析26号cpu的堆栈：
 
-```
-
+```c
 crash> bt -f 355608
-
 PID: 355608  TASK: ffff8f4aea3a8000  CPU: 26  COMMAND: "custom_exporter"
-
 .....
-
  #3 [ffff8f1afdf48ef0] end_repeat_nmi at ffffffff83f6bd69
-
     [exception RIP: try_to_wake_up+114]
-
     RIP: ffffffff838d63d2  RSP: ffff8f4957fbfa30  RFLAGS: 00000002
-
     RAX: 0000000000000001  RBX: ffff8f1bf6bb9844  RCX: 0000000000000000
-
     RDX: 0000000000000001  RSI: 0000000000000003  RDI: ffff8f1bf6bb9844
-
     RBP: ffff8f4957fbfa70   R8: ffff8f4afbe15ff0   R9: 0000000000000000
-
     R10: 0000000000000000  R11: 0000000000000000  R12: 0000000000000000
-
     R13: ffff8f1bf6bb9040  R14: 0000000000000000  R15: 0000000000000003
-
     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0000
-
 --- <NMI exception stack> ---
-
  #4 [ffff8f4957fbfa30] try_to_wake_up at ffffffff838d63d2
-
     ffff8f4957fbfa38: 000000000001ab80 0000000000000086 
-
     ffff8f4957fbfa48: ffff8f4afbe15fe0 ffff8f4957fbfb48 
-
     ffff8f4957fbfa58: 0000000000000001 ffff8f4afbe15fe0 
-
     ffff8f4957fbfa68: ffff8f1afdf55fe0 ffff8f4957fbfa80 
-
     ffff8f4957fbfa78: ffffffff838d6705 
-
  #5 [ffff8f4957fbfa78] wake_up_process at ffffffff838d6705
-
     ffff8f4957fbfa80: ffff8f4957fbfa98 ffffffff8392fc05 
-
  #6 [ffff8f4957fbfa88] __cpu_stop_queue_work at ffffffff8392fc05
-
     ffff8f4957fbfa90: 000000000000001a ffff8f4957fbfbb0 
-
     ffff8f4957fbfaa0: ffffffff8393037a 
-
  #7 [ffff8f4957fbfaa0] stop_two_cpus at ffffffff8393037a
-
 .....
-
     ffff8f4957fbfbb8: ffffffff838d3867 
-
  #8 [ffff8f4957fbfbb8] migrate_swap at ffffffff838d3867
-
     ffff8f4957fbfbc0: ffff8f4aea3a8000 ffff8f1ae77dc100 -------栈中的 migration_swap_arg
-
     ffff8f4957fbfbd0: 000000010000001a 0000000080490f7c 
-
     ffff8f4957fbfbe0: ffff8f4aea3a8000 ffff8f4957fbfc30 
-
     ffff8f4957fbfbf0: 0000000000000076 0000000000000076 
-
     ffff8f4957fbfc00: 0000000000000371 ffff8f4957fbfce8 
-
     ffff8f4957fbfc10: ffffffff838dd0ba 
-
  #9 [ffff8f4957fbfc10] task_numa_migrate at ffffffff838dd0ba
-
     ffff8f4957fbfc18: ffff8f1afc121f40 000000000000001a 
-
     ffff8f4957fbfc28: 0000000000000371 ffff8f4aea3a8000 ---这里ffff8f4957fbfc30 就是 task_numa_env 的存放在栈中的地址
-
     ffff8f4957fbfc38: 000000000000001a 000000010000003f 
-
     ffff8f4957fbfc48: 000000000000000b 000000000000022c 
-
     ffff8f4957fbfc58: 00000000000049a0 0000000000000012 
-
     ffff8f4957fbfc68: 0000000000000001 0000000000000003 
-
     ffff8f4957fbfc78: 000000000000006f 000000000000499f 
-
     ffff8f4957fbfc88: 0000000000000012 0000000000000001 
-
     ffff8f4957fbfc98: 0000000000000070 ffff8f1ae77dc100 
-
     ffff8f4957fbfca8: 00000000000002fb 0000000000000001 
-
     ffff8f4957fbfcb8: 0000000080490f7c ffff8f4aea3a8000 ---rbx压栈在此，所以这个就是current
-
     ffff8f4957fbfcc8: 0000000000017a48 0000000000001818 
-
     ffff8f4957fbfcd8: 0000000000000018 ffff8f4957fbfe20 
-
     ffff8f4957fbfce8: ffff8f4957fbfcf8 ffffffff838dd4d3 
-
 #10 [ffff8f4957fbfcf0] numa_migrate_preferred at ffffffff838dd4d3
-
     ffff8f4957fbfcf8: ffff8f4957fbfd88 ffffffff838df5b0 
-
 .....
-
 crash> 
-
 crash> 
-
 ```
 
 整体上看，26号上的cpu也正在进行numa的balance动作，简单展开介绍一下numa在balance下的动作

@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-8-18 10:27 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 # 一、为何需要per-entity load tracking？
@@ -17,7 +18,7 @@
 
 3.8版本之前的内核CFS调度器在计算CPU load的时候采用的是跟踪每个运行队列上的负载（per-rq load tracking）。需要注意的是：CFS中的“运行队列”实际上是有多个，至少每个CPU就有一个runqueue。而且，当使用“按组调度”（ group scheduling）功能时，每个控制组（control group）都有自己的per-CPU运行队列。对于per-rq的负载跟踪方法，调度器可以了解到每个运行队列对整个系统负载的贡献。这样的统计信息足以帮助组调度器（group scheduler）在控制组之间分配CPU时间，但从整个系统的角度看，我们并不知道当前负载来自何处。除此之外，per-rq的负载跟踪方法还有另外一个问题，即使在工作负载相对稳定的情况下，跟踪到的运行队列的负载值也会变化很大。
 
-**二、如何进行**per-entity load tracking？
+# **二、如何进行**per-entity load tracking？
 
 Per-entity load tracking系统解决了这些问题，这是通过把负载跟踪从per rq推进到per-entity的层次。所谓调度实体（scheduling entity）其实就是一个进程或者control group中的一组进程。为了做到Per-entity的负载跟踪，时间（物理时间，不是虚拟时间）被分成了1024us的序列，在每一个1024us的周期中，一个entity对系统负载的贡献可以根据该实体处于runnable状态（正在CPU上运行或者等待cpu调度运行）的时间进行计算。如果在该周期内，runnable的时间是x，那么对系统负载的贡献就是（x/1024）。当然，一个实体在一个计算周期内的负载可能会超过1024us，这是因为我们会累积在过去周期中的负载，当然，对于过去的负载我们在计算的时候需要乘一个衰减因子。如果我们让Li表示在周期pi中该调度实体的对系统负载贡献，那么一个调度实体对系统负荷的总贡献可以表示为：
 
@@ -39,7 +40,7 @@ _L = L0 + L1*y + L2*y2 + L3\*y3 + ..._
 
 另外一个比较繁琐的地方是对节流进程（throttled processes）负载的计算。所谓节流进程是指那些在“CFS带宽控制器”（ [CFS bandwidth controller](https://lwn.net/Articles/428230/)）下控制运行的进程。当这些进程用完了本周期内的CPU时间，即使它们仍然在运行状态，即使CPU空闲，调度器并不会把CPU资源分配给它们。因此节流进程不会对系统造成负荷。正因为如此，当进程处于被节流状态的时候，它们对系统负荷的贡献值不应该按照runnable进程计算。在等待下一个周期到来之前，throttled processes不能获取cpu资源，因此它们的负荷贡献值会衰减。
 
-# \*\*三、per-entity load tracking有什么好处？
+# **三、per-entity load tracking有什么好处？
 
 有了Per-entity负载跟踪机制，在没有增加调度器开销的情况下，调度器现在对每个进程和“调度进程组”对系统负载的贡献有了更清晰的认识。有了更精细的统计数据（指per entity负载值）通常是好的，但人们可能会怀疑这些信息是否真的对调度器有用。
 
@@ -55,7 +56,7 @@ _原创翻译文章，转发请注明出处。蜗窝科技_
 
 标签: [PELT](http://www.wowotech.net/tag/PELT) [per-entity](http://www.wowotech.net/tag/per-entity) [load](http://www.wowotech.net/tag/load) [tracking](http://www.wowotech.net/tag/tracking)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [CFS调度器（1）-基本原理](http://www.wowotech.net/process_management/447.html) | [Linux中常见同步机制设计原理](http://www.wowotech.net/kernel_synchronization/445.html)»
 

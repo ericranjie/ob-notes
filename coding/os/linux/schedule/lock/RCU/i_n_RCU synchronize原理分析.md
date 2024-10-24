@@ -1,3 +1,4 @@
+
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-10-27 19:10 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 RCU（Read-Copy Update）是Linux内核比较成熟的新型读写锁，具有较高的读写并发性能，常常用在需要互斥的性能关键路径。在kernel中，rcu有tiny rcu和tree rcu两种实现，tiny rcu更加简洁，通常用在小型嵌入式系统中，tree rcu则被广泛使用在了server, desktop以及android系统中。本文将以tree rcu为分析对象。
@@ -24,7 +25,7 @@ RCU的核心理念是读者访问的同时，写者可以更新访问对象的�
 
 这时是否度过宽限期的判断就比较简单：每个CPU都经过一次抢占。因为发生抢占，就说明不在rcu_read_lock和rcu_read_unlock之间，必然已经完成访问或者还未开始访问。
 
-## **1.2** **每个CPU\*\*\*\*度过quiescnet state**
+## **1.2** **每个CPU度过quiescnet state**
 
 接下来我们看每个CPU上报完成抢占的过程。kernel把这个完成抢占的状态称为quiescent state。每个CPU在时钟中断的处理函数中，都会判断当前CPU是否度过quiescent state。
 
@@ -85,7 +86,7 @@ rcu_process_callbacks
 
 其中rcu_report_qs_rnp是从叶子节点向根节点的遍历过程，同一个节点的子节点都通过quiescent state后，该节点也设置为通过。
 
-![](http://www.wowotech.net/content/uploadfile/201510/c31d1445945201.png)
+![[Pasted image 20241024184506.png]]
 
 这个树状的汇报过程，也就是“Tree RCU”这个名字得来的缘由。
 
@@ -157,13 +158,13 @@ rcu_process_callbacks
 
 1. # define NUM_RCU_LVL_4	      (NR_CPUS)
 
-**1.3** **宽限期的发起与完成**
+## **1.3** **宽限期的发起与完成**
 
 所有宽限期的发起和完成都是由同一个内核线程rcu_gp_kthread来完成。通过判断rsp->gp_flags & RCU_GP_FLAG_INIT来决定是否发起一个gp；通过判断! (rnp->qsmask) && !rcu_preempt_blocked_readers_cgp(rnp))来决定是否结束一个gp。
 
 发起一个GP时，rsp->gpnum++；结束一个GP时，rsp->completed = rsp->gpnum。
 
-**1.4 rcu callbacks\*\*\*\*处理**
+## **1.4 rcu callbacks处理**
 
 rcu的callback通常是在sychronize_rcu中添加的wakeme_after_rcu，也就是唤醒synchronize_rcu的进程，它正在等待GP的结束。
 
@@ -183,7 +184,7 @@ rcu_process_callbacks
 
 rcu_do_batch只处理nxtlist -- *nxttail\[RCU_DONE_TAIL\]之间的callbacks。每个GP结束都会重新调整callback所处的段位，每个新的callback将会添加在末尾，也就是*nxttail\[RCU_NEXT_TAIL\]。
 
-**2** **可抢占的RCU**
+# **2** **可抢占的RCU**
 
 如果config文件定义了CONFIG_TREE_PREEMPT_RCU=y，那么sychronize_rcu将默认使用rcu_preempt_state。这类rcu的特点就在于read_lock期间是允许其它进程抢占的，因此它判断宽限期度过的方法就不太一样。
 
@@ -257,7 +258,7 @@ rcu_do_batch只处理nxtlist -- *nxttail\[RCU_DONE_TAIL\]之间的callbacks。�
 
 标签: [RCU](http://www.wowotech.net/tag/RCU)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux 3.18U盘无法正确使用](http://www.wowotech.net/226.html) | [作業系統之前的程式 for rpi2 (1) - mmu (0) : 位址轉換](http://www.wowotech.net/linux_kenrel/address-translation.html)»
 

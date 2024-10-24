@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-8-6 18:22 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 # 一、前言
@@ -35,7 +36,7 @@
 
 如果wq_power_efficient设定为true，那么WQ_POWER_EFFICIENT的标记的workqueue就会强制按照unbound workqueue来处理，即使没有标记WQ_UNBOUND。
 
-三、分配workqueue的内存
+# 三、分配workqueue的内存
 
 > if (flags & WQ_UNBOUND)\
 > tbl_size = nr_node_ids * sizeof(wq->numa_pwq_tbl\[0\]); －－－only for unbound workqueue
@@ -48,7 +49,7 @@
 
 代码很简单，与其要解释代码，不如来解释一些基本概念。
 
-1、workqueue和pool workqueue的关系
+## 1、workqueue和pool workqueue的关系
 
 我们先给出一个简化版本的workqueue_struct定义，如下：
 
@@ -72,7 +73,7 @@ workqueue_struct中的list成员就是挂入这个链表的节点。
 
 workqueue有两种：unbound workqueue和per cpu workqueue。对于per cpu类型，cpu_pwqs指向了一组per cpu的pool_workqueue数据结构，用来维护workqueue和per cpu thread pool之间的关系。每个cpu都有两个thread pool，normal和高优先级的线程池，到底cpu_pwqs指向哪一个pool_workqueue（worker thread）是和workqueue的flag相关，如果标有WQ_HIGHPRI，那么cpu_pwqs指向高优先级的线程池。unbound workqueue对应的pool_workqueue和workqueue属性相关，我们在下一节描述。
 
-2、workqueue attribute
+## 2、workqueue attribute
 
 挂入workqueue的work终究是需要worker线程来处理，针对worker线程有下面几个考量点（我们称之attribute）：
 
@@ -94,7 +95,7 @@ unbound workqueue由于不绑定在具体的cpu上，可以运行在系统中的
 
 nice是一个和thread优先级相关的属性，nice越低则优先级越高。cpumask是该workqueue挂入的work允许在哪些cpu上运行。no_numa是一个和NUMA affinity相关的设定。
 
-3、unbound workqueue和NUMA之间的联系
+## 3、unbound workqueue和NUMA之间的联系
 
 UMA系统中，所有的processor看到的内存都是一样的，访问速度也是一样，无所谓local or remote，因此，内核线程如果要分配内存，那么也是无所谓，统一安排即可。在NUMA系统中，不同的一个或者一组cpu看到的memory是不一样的，我们假设node 0中有CPU A和B，node 1中有CPU C和D，如果运行在CPU A上内核线程现在要迁移到CPU C上的时候，悲剧发生了：该线程在A CPU创建并运行的时候，分配的内存是node 0中的memory，这些memory是local的访问速度很快，当迁移到CPU C上的时候，原来local memory变成remote，性能大大降低。因此，unbound workqueue需要引入NUMA的考量点。
 
@@ -109,7 +110,7 @@ NUMA是内存管理的范畴，本文不会深入描述，我们暂且放开NUMA
 > static bool wq_disable_numa;\
 > module_param_named(disable_numa, wq_disable_numa, bool, 0444);
 
-四、初始化workqueue的成员
+# 四、初始化workqueue的成员
 
 > va_start(args, lock_name);\
 > vsnprintf(wq->name, sizeof(wq->name), fmt, args);－－－－－set workqueue name\
@@ -131,7 +132,7 @@ NUMA是内存管理的范畴，本文不会深入描述，我们暂且放开NUMA
 
 除了max active，没有什么要说的，代码都简单而且直观。如果用户没有设定max active（或者说max active等于0），那么系统会给出一个缺省的设定。系统定义了两个最大值WQ_MAX_ACTIVE（512）和WQ_UNBOUND_MAX_ACTIVE（和cpu数目有关，最大值是cpu数目乘以4，当然也不能大于WQ_MAX_ACTIVE），分别限定per cpu workqueue和unbound workqueue的最大可以创建的worker thread的数目。wq_clamp_max_active可以将max active限制在一个确定的范围内。
 
-五、分配pool workqueue的内存并建立workqueue和pool workqueue的关系
+# 五、分配pool workqueue的内存并建立workqueue和pool workqueue的关系
 
 这部分的代码主要涉及alloc_and_link_pwqs函数，如下：
 
@@ -166,7 +167,7 @@ NUMA是内存管理的范畴，本文不会深入描述，我们暂且放开NUMA
 
 init_pwq函数初始化pool_workqueue，最重要的是设定其对应的workqueue和worker pool。link_pwq主要是将pool_workqueue挂入它所属的workqueue的链表中。对于unbound workqueue，apply_workqueue_attrs完成分配pool workqueue并建立workqueue和pool workqueue的关系。
 
-六、应用新的attribute到workqueue中
+# 六、应用新的attribute到workqueue中
 
 unbound workqueue有两种，一种是normal type，另外一种是ordered type，这种workqueue上的work是严格按照顺序执行的，不存在并发问题。ordered unbound workqueue的行为类似过去的single thread workqueue。但是，无论那种类型的unbound workqueue都使用apply_workqueue_attrs来建立workqueue、pool wq和thread pool之间的关系。
 

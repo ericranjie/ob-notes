@@ -1,6 +1,7 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-8-4 18:26 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
-一、前言
+# 一、前言
 
 本文主要以ARM体系结构下的中断处理为例，讲述整个中断处理过程中的硬件行为和软件动作。具体整个处理过程分成三个步骤来描述：
 
@@ -14,9 +15,9 @@
 
 本文涉及的代码来自3.14内核。另外，本文注意描述ARM指令集的内容，有些source code为了简短一些，删除了THUMB相关的代码，除此之外，有些debug相关的内容也会删除。
 
-二、中断处理的准备过程
+# 二、中断处理的准备过程
 
-1、中断模式的stack准备
+## 1、中断模式的stack准备
 
 ARM处理器有多种processor mode，例如user mode（用户空间的AP所处于的模式）、supervisor mode（即SVC mode，大部分的内核态代码都处于这种mode）、IRQ mode（发生中断后，处理器会切入到该mode）等。对于linux kernel，其中断处理处理过程中，ARM 处理器大部分都是处于SVC mode。但是，实际上产生中断的时候，ARM处理器实际上是进入IRQ mode，因此在进入真正的IRQ异常处理之前会有一小段IRQ mode的操作，之后会进入SVC mode进行真正的IRQ异常处理。由于IRQ mode只是一个过度，因此IRQ mode的栈很小，只有12个字节，具体如下：
 
@@ -73,7 +74,7 @@ ARM处理器有多种processor mode，例如user mode（用户空间的AP所处�
 
 除了初始化，系统电源管理也需要irq、abt和und stack的设定。如果我们设定的电源管理状态在进入sleep的时候，CPU会丢失irq、abt和und stack point寄存器的值，那么在CPU resume的过程中，要调用cpu_init来重新设定这些值。
 
-2、SVC模式的stack准备
+## 2、SVC模式的stack准备
 
 我们经常说进程的用户空间和内核空间，对于一个应用程序而言，可以运行在用户空间，也可以通过系统调用进入内核空间。在用户空间，使用的是用户栈，也就是我们软件工程师编写用户空间程序的时候，保存局部变量的stack。陷入内核后，当然不能用用户栈了，这时候就需要使用到内核栈。所谓内核栈其实就是处于SVC mode时候使用的栈。
 
@@ -102,7 +103,7 @@ ARM处理器有多种processor mode，例如user mode（用户空间的AP所处�
 
 底部是struct thread_info数据结构，顶部（高地址）就是该进程的内核栈。当进程切换的时候，整个硬件和软件的上下文都会进行切换，这里就包括了svc mode的sp寄存器的值被切换到调度算法选定的新的进程的内核栈上来。
 
-3、异常向量表的准备
+## 3、异常向量表的准备
 
 对于ARM处理器而言，当发生异常的时候，处理器会暂停当前指令的执行，保存现场，转而去执行对应的异常向量处的指令，当处理完该异常的时候，恢复现场，回到原来的那点去继续执行程序。系统所有的异常向量（共计8个）组成了异常向量表。向量表（vector table）的代码如下：
 
@@ -189,11 +190,11 @@ ARM处理器有多种processor mode，例如user mode（用户空间的AP所处�
 
 一旦涉及代码的拷贝，我们就需要关心其编译连接时地址（link-time address)和运行时地址（run-time address）。在kernel完成链接后，\_\_vectors_start有了其link-time address，如果link-time address和run-time address一致，那么这段代码运行时毫无压力。但是，目前对于vector table而言，其被copy到其他的地址上（对于High vector，这是地址就是0xffff00000），也就是说，link-time address和run-time address不一样了，如果仍然想要这些代码可以正确运行，那么需要这些代码是位置无关的代码。对于vector table而言，必须要位置无关。B这个branch instruction本身就是位置无关的，它可以跳转到一个当前位置的offset。不过并非所有的vector都是使用了branch instruction，对于软中断，其vector地址上指令是“W(ldr)    pc, \_\_vectors_start + 0x1000 ”，这条指令被编译器编译成ldr     pc, \[pc, #4080\]，这种情况下，该指令也是位置无关的，但是有个限制，offset必须在4K的范围内，这也是为何存在stub section的原因了。
 
-4、中断控制器的初始化
+## 4、中断控制器的初始化
 
 具体可以参考[GIC代码分析](http://www.wowotech.net/linux_kenrel/gic-irq-chip-driver.html)。
 
-三、ARM HW对中断事件的处理
+# 三、ARM HW对中断事件的处理
 
 当一切准备好之后，一旦打开处理器的全局中断就可以处理来自外设的各种中断事件了。
 

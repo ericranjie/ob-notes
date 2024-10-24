@@ -1,12 +1,13 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-7-15 18:47 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 # 一、前言
 
 workqueue是一个驱动工程师常用的工具，在旧的内核中（指2.6.36之前的内核版本）workqueue代码比较简单（大概800行），在2.6.36内核版本中引入了CMWQ（Concurrency Managed Workqueue），workqueue.c的代码膨胀到5000多行，为了深入的理解CMWQ，单单一份文档很难将其描述的清楚，因此CMWQ作为一个主题将会产生一系列的文档，本文是这一系列文档中的第一篇，主要是基于2.6.23内核的代码实现来讲述workqueue的一些基本概念（之所以选择较低版本的内核，主要是因为代码简单，适合理解基本概念）。
 
-二、为何需要workqueue
+# 二、为何需要workqueue
 
-1、什么是中断上下文和进程上下文？
+## 1、什么是中断上下文和进程上下文？
 
 在继续描述workqueue之前，我们先梳理一下中断上下文和进程上下文。对于中断上下文，主要包括两种情况：
 
@@ -26,7 +27,7 @@ top half当然是绝对的interrupt context，但对于上面的第二种情况�
 
 对于linux而言，中断上下文都是惊鸿一瞥，只有进程（线程、或者叫做task）是永恒的。整个kernel都是在各种进程中切来切去，一会儿运行在进程的用户空间，一会儿通过系统调用进入内核空间。当然，系统不是封闭的，还是需要通过外设和User或者其他的系统进行交互，这里就需要中断上下文了，在中断上下文中，完成硬件的交互，最终把数据交付进程或者进程将数据传递给外设。进程上下文有丰富的、属于自己的资源：例如有硬件上下文，有用户栈、有内核栈，有用户空间的正文段、数据段等等。而中断上下文什么也没有，只有一段执行代码及其附属的数据。那么问题来了：中断执行thread中的临时变量应该保存在栈上，那么中断上下文的栈在哪里？中断上下文没有属于自己的栈，肿么办？那么只能借了，当中断发生的时候，遇到哪一个进程就借用哪一个进程的资源（遇到就是缘分呐）。
 
-2、如何判定当前的context？
+## 2、如何判定当前的context？
 
 OK，上一节描述中断上下文和进程上下文的含义，那么代码如何知道自己的上下文呢？下面我们结合代码来进一步分析。in_irq()是用来判断是否在hard interrupt context的，我们一起来来看看in_irq()是如何定义的：
 
@@ -62,7 +63,7 @@ in_softirq定义了更大的一个区域，不仅仅包括了in_serving_softirq�
 
 还有一个in_atomic的宏定义，大家可以自行学习，这里不再描述了。
 
-3、为何中断上下文不能sleep？
+## 3、为何中断上下文不能sleep？
 
 linux驱动工程师应该都会听说过这句话：中断上下文不能sleep，但是为什么呢？这个问题可以仔细思考一下。所谓sleep就是调度器挂起当前的task，然后在run queue中选择另外一个合适的task运行。规则很简单，不过实际操作就没有那么容易了。有一次，我们调试wifi驱动的时候，有一个issue很有意思：正常工作的时候一切都是OK的，但是当进行压力测试的时候，系统就会down掉。最后发现是在timer的callback函数中辗转多次调用了kmalloc函数，我们都知道，在某些情况下，kmalloc会导致当前进程被block。
 
@@ -72,11 +73,11 @@ linux驱动工程师应该都会听说过这句话：中断上下文不能sleep�
 
 因此，在中断上下文中（包括hard interrupt context和software interrupt context）不能睡眠。
 
-4、为何需要workqueue
+## 4、为何需要workqueue
 
 workqueue和其他的bottom half最大的不同是它是运行在进程上下文中的，它可以睡眠，这和其他bottom half机制有本质的不同，大大方便了驱动工程师撰写中断处理代码。当然，驱动模块也可以自己创建一个kernel thread来解决defering work，但是，如果每个driver都创建自己的kernel thread，那么内核线程数量过多，这会影响整体的性能。因此，最好的方法就是把这些需求汇集起来，提供一个统一的机制，也就是传说中的work queue了。
 
-三、数据抽象
+# 三、数据抽象
 
 1、workqueue。定义如下：
 
@@ -128,7 +129,7 @@ work对应的callback函数需要传递该work的struct作为callback函数的�
 
 我们把上文中描述的各个数据结构集合在一起，具体请参考下图：
 
-[![workqueue](http://www.wowotech.net/content/uploadfile/201507/8ac4ad9d9021a359edb98d1713c3ff2c20150715104623.gif "workqueue")](http://www.wowotech.net/content/uploadfile/201507/3f0b279644ba4646b73f303367bbe47220150715104521.gif)
+![[Pasted image 20241024183053.png]]
 
 我们自上而下来描述各个数据结构。首先，系统中包括若干的workqueue，最著名的workqueue就是系统缺省的的workqueue了，定义如下：
 
@@ -138,7 +139,7 @@ work对应的callback函数需要传递该work的struct作为callback函数的�
 
 从底层驱动的角度来看，我们只关心如何处理deferable task（由work_struct抽象）。驱动程序定义了work_struct，其func成员就是deferred work，然后挂入work list就OK了（当然要唤醒worker thread了），系统的调度器调度到worker thread的时候，该work自然会被处理了。当然，挂入哪一个workqueue的那一个worker thread呢？如何选择workqueue是driver自己的事情，可以使用系统缺省的workqueue，简单，实用。当然也可以自己创建一个workqueue，并把work挂入其中。选择哪一个worker thread比较简单：work在哪一个cpu上被调度，那么就挂入哪一个worker thread。
 
-四、接口以及内部实现
+# 四、接口以及内部实现
 
 1、初始化一个work。我们可以静态定义一个work，接口如下：
 
@@ -287,7 +288,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [workqueue](http://www.wowotech.net/tag/workqueue)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux CPU core的电源管理(3)\_cpu ops](http://www.wowotech.net/pm_subsystem/cpu_ops.html) | [ARMv8-a架构简介](http://www.wowotech.net/armv8a_arch/armv8-a_overview.html)»
 

@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-12-3 12:57 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、前言
@@ -21,7 +22,8 @@
 线程调用spin_unlock离开临界区，执行owner++，表示下一个线程可以进入。
 
 RW spin lcok和seq lock都类似spin lock，它们都是基于一个memory中的共享变量（对该变量的访问是原子的）。我们假设系统架构如下：
-!\[\[Pasted image 20241008205719.png\]\]
+
+![[Pasted image 20241008205719.png]]
 
 当线程在多个cpu上争抢进入临界区的时候，都会操作那个在多个cpu之间共享的数据lock（玫瑰色的block）。cpu 0操作了lock，为了数据的一致性，cpu 0的操作会导致其他cpu的L1中的lock变成无效，在随后的来自其他cpu对lock的访问会导致L1 cache miss（更准确的说是communication cache miss），必须从下一个level的cache中获取，同样的，其他cpu的L1 cache中的lock也被设定为invalid，从而引起下一次其他cpu上的communication cache miss。
 
@@ -31,7 +33,7 @@ RCU的read side不需要访问这样的“共享数据”，从而极大的提�
 
 spin lock是互斥的，任何时候只有一个thread（reader or writer）进入临界区，rw spin lock要好一些，允许多个reader并发执行，提高了性能。不过，reader和updater不能并发执行，RCU解除了这些限制，允许一个updater（不能多个updater进入临界区，这可以通过spinlock来保证）和多个reader并发执行。我们可以比较一下rw spin lock和RCU，参考下图：
 
-[![rw-rcu](http://www.wowotech.net/content/uploadfile/201512/581bf648cf35429a18b43bab7070651a20151203045709.gif "rw-rcu")](http://www.wowotech.net/content/uploadfile/201512/8180fbe55bc857b2d0208565308c932420151203045708.gif)
+![[Pasted image 20241024184358.png]]
 
 rwlock允许多个reader并发，因此，在上图中，三个rwlock reader愉快的并行执行。当rwlock writer试图进入的时候（红色虚线），只能spin，直到所有的reader退出临界区。一旦有rwlock writer在临界区，任何的reader都不能进入，直到writer完成数据更新，立刻临界区。绿色的reader thread们又可以进行愉快玩耍了。rwlock的一个特点就是确定性，白色的reader一定是读取的是old data，而绿色的reader一定获取的是writer更新之后的new data。RCU和传统的锁机制不同，当RCU updater进入临界区的时候，即便是有reader在也无所谓，它可以长驱直入，不需要spin。同样的，即便有一个updater正在临界区里面工作，这并不能阻挡RCU reader的步伐。由此可见，RCU的并发性能要好于rwlock，特别如果考虑cpu的数目比较多的情况，那些处于spin状态的cpu在无谓的消耗，多么可惜，随着cpu的数目增加，rwlock性能不断的下降。RCU reader和updater由于可以并发执行，因此这时候的被保护的数据有两份，一份是旧的，一份是新的，对于白色的RCU reader，其读取的数据可能是旧的，也可能是新的，和数据访问的timing相关，当然，当RCU update完成更新之后，新启动的RCU reader（绿色block）读取的一定是新的数据。
 
@@ -50,7 +52,7 @@ rwlock允许多个reader并发，因此，在上图中，三个rwlock reader愉�
 
 RCU的基本思路可以通过下面的图片体现：
 
-[![rcu](http://www.wowotech.net/content/uploadfile/201512/76efb6df52d164f2e5f49e121a61e57420151203045710.gif "rcu")](http://www.wowotech.net/content/uploadfile/201512/015011aa8857e3c6b7a37825ec01a6cf20151203045710.gif)
+![[Pasted image 20241024184432.png]]
 
 RCU涉及的数据有两种，一个是指向要保护数据的指针，我们称之RCU protected pointer。另外一个是通过指针访问的共享数据，我们称之RCU protected data，当然，这个数据必须是动态分配的  。对共享数据的访问有两种，一种是writer，即对数据要进行更新，另外一种是reader。如果在有reader在临界区内进行数据访问，对于传统的，基于锁的同步机制而言，reader会阻止writer进入（例如spin lock和rw spin lock。seqlock不会这样，因此本质上seqlock也是lock-free的），因为在有reader访问共享数据的情况下，write直接修改data会破坏掉共享数据。怎么办呢？当然是移除了reader对共享数据的访问之后，再让writer进入了（writer稍显悲剧）。对于RCU而言，其原理是类似的，为了能够让writer进入，必须首先移除reader对共享数据的访问，怎么移除呢？创建一个新的copy是一个不错的选择。因此RCU writer的动作分成了两步：
 

@@ -1,12 +1,13 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-1-31 19:20 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-一、概述
+# 一、概述
 
 实时系统是这样的一种计算系统：当事件发生后，它必须在确定的时间范围内做出响应。在实时系统中，产生正确的结果不仅依赖于系统正确的逻辑动作，而且依赖于逻辑动作的时序。换句话说，当系统收到某个请求，会做出相应的动作以响应该请求，想要保证正确地响应该请求，一方面逻辑结果要正确，更重要的是需要在最后期限（deadline）内作出响应。如果系统未能在最后期限内进行响应，那么该系统就会产生错误或者缺陷。在多任务操作系统中（如Linux），实时调度器（realtime scheduler）负责协调实时任务对CPU的访问，以确保系统中的所有的实时任务在其deadline内完成。
 
 如果对实时任务进行抽象，那么它需要三个元素：周期（period），运行时间（runtime）和最后期限（deadline）。Deadline调度器正是利用了这一点（指对实时任务完美的抽象），允许用户来指定该任务的具体需求，从而使系统能够做出最好的调度决策，即使在负载很高的系统中也能保证实时任务的调度。
 
-二、Linux系统中的实时调度器
+# 二、Linux系统中的实时调度器
 
 实时任务和非实时任务（或者普通任务）的区别是什么？实时任务有deadline，超过deadline，将不能产生正确的逻辑结果，非实时任务则没有这个限制。为了满足实时任务的调度需求，Linux提供了两种实时调度器：POSIX realtime scheduler（后文简称RT调度器）和deadline scheduler（后文简称DL调度器）。
 
@@ -40,7 +41,7 @@ Deadline的参数看似复杂，其实简单，因为只要知道了task的行�
 
 为了进一步讨论DL调度器的好处，我们有必要后退一步，看看实时调度的蓝图。因此，下一节我们将描述一些实时调度的理论知识。
 
-三、实时调度概述
+# 三、实时调度概述
 
 在调度理论中，怎么来评估实时调度器的性能呢？具体的方法就是创建一组实时任务（后文称之实时任务集）让调度器来调度执行，看看是否能够完美的调度任务集中的所有任务，即所有实时任务的时间要求（deadline）都可以得到满足。为了能够在确定的时间内响应请求，实时任务必须在确定的时间点内完成某些动作。为此，我们需要对实时任务进行抽象，总结出其任务模型来描述这些动作确定性的时序。
 
@@ -63,11 +64,11 @@ Deadline的参数看似复杂，其实简单，因为只要知道了task的行�
 
 对于这样的一组实时任务，EDF调度器的调度行为如下图所示：
 
-[![p1](http://www.wowotech.net/content/uploadfile/201801/87dafe2e97eeff3f540b63c7e9017a1420180131112034.gif "p1")](http://www.wowotech.net/content/uploadfile/201801/6a671216105745e1d520d48c35d620a920180131112033.gif)
+![[Pasted image 20241024200053.png]]
 
 通过上图可知3个rt任务都很好的被调度，满足了各自的deadline需求。如果使用固定优先级的调度器（例如Linux内核中的FIFO）会怎样呢？其实不管如何调整各个rt task的优先级，都不能很好的满足每个任务的deadline要求，总会有一个任务的Job会在deadline之后完成，具体参考下面的图片：
 
-[![p2](http://www.wowotech.net/content/uploadfile/201801/b582b73755590096a4fa4e467952390a20180131112036.gif "p2")](http://www.wowotech.net/content/uploadfile/201801/2a25bb2d4d984275dbb27e06b28c296820180131112035.gif)
+![[Pasted image 20241024200115.png]]
 
 基于deadline的调度算法最大的好处是：一旦知道了一个实时任务集中每个任务的调度参数，其实根本不需要分析其他任务，你也能知道该实时任务集是否能在deadline之前完成。在单处理器系统，基于deadline进行调度所产生的上下文切换次数往往会比较少。此外，在保证每个任务都满足其deadline需求的条件下，基于deadline的调度算法可以调度的任务数目比固定优先级的调度算法要多。当然，基于deadline参数进行调度的调度器（后面简称deadline调度器）也有一些缺点。
 
@@ -75,7 +76,7 @@ deadline调度器虽然可以保证每个RT任务在deadline之前完成，但�
 
 如果系统出于某种原因发生过载，例如由于新任务添加或错误的估计了WCET，这时候，deadline调度有可能会有一个多米诺效应：当一个任务出现问题，影响的并非仅仅是该任务，这个问题会扩散到系统中的其他任务上去。我们考虑这样的场景，由于运行时间超过了其runtime参数指定的时间，调度器在deadline之后才完成job，并交付给其他任务，这个issue很影响系统中所有其他的任务，从而导致其他任务也可能会错过deadline，如红下面的区域所示：
 
-[![p3](http://www.wowotech.net/content/uploadfile/201801/9aeb0a56360bc446571b616c5745e6d820180131112039.gif "p3")](http://www.wowotech.net/content/uploadfile/201801/f95737f59d28cfffabd44008d165bc0920180131112038.gif)
+![[Pasted image 20241024200132.png]]
 
 而对于那些基于固定优先级的调度算法则相反，当一个任务出问题的时候，受影响的只是那个优先级最低的task。（顺便说一句：在linux中，DL调度器中实现了CBS，从而解决了多米诺效应，下一篇文档会详述。）
 
@@ -89,7 +90,7 @@ deadline调度器虽然可以保证每个RT任务在deadline之前完成，但�
 
 （4）任意类（Arbitrary ）：每一个任务都可以运行在任何一个CPU集合上。
 
-[![p4](http://www.wowotech.net/content/uploadfile/201801/e296c2a213a815aae26233f2245b643420180131112042.gif "p4")](http://www.wowotech.net/content/uploadfile/201801/32ff6d7e20772b51262a48a53eec7a1720180131112042.gif)
+![[Pasted image 20241024200143.png]]
 
 对于partitioned deadline调度器而言，多核系统中的调度其实就被严格分解成一个个的单核deadline调度过程。也就是说，partitioned deadline调度器的性能是最优的。不过，多核系统中的global、clustered和arbitrary deadline调度器并非最优。例如，在一个有M个处理器的系统中，如果有M个runtime等于period参数的实时任务需要调度，调度器很容易处理，每个CPU处理一个任务即可。我们可以进一步具体化，假设有四个“大活”，runtime和period都是1000ms，一个拥有四个处理器的系统可以分别执行这四个“大活”，在这样的场景下，CPU利用率是400％：
 
@@ -97,7 +98,7 @@ deadline调度器虽然可以保证每个RT任务在deadline之前完成，但�
 
 调度的结果如下图所示：
 
-[![P5](http://www.wowotech.net/content/uploadfile/201801/dc58f2e7207680e2adb7aeb0c8f711ec20180131112044.gif "P5")](http://www.wowotech.net/content/uploadfile/201801/48d3a889e44d809359c95a94b380ee3e20180131112043.gif)
+![[Pasted image 20241024200158.png]]
 
 在这么重的负载下，调度器都能工作起来，每个“大活”的deadline都得到满足。当系统的负载比较轻的情况下，我们直觉就认为调度器也应该能hold住场面。下面我们构造一个轻负载：调度器要面对的是4个“小活”和一个“大活”，“小活”的runtime是1ms，周期是999ms，“大活”同上。在这种场景下，系统的CPU利用率是100.4％：
 
@@ -105,7 +106,7 @@ deadline调度器虽然可以保证每个RT任务在deadline之前完成，但�
 
 1.004是远远小于4的，因此，我们直观上感觉调度器是可以很好的调度这个“4小一大”的调度场景的。然而实时并非如此，单核上表现最优的EDF调度器，在多核系统中会出现问题（指Global EDF调度器）。具体原因是这样的：如果所有任务同时释放，4个小活（deadline比较早）将会被调度在4个CPU上，这时候，“大活”只能在“小活”运行完毕之后才开始执行，因此“大活”的deadline不能得到满足。如下图所示。这就是众所周知的Dhall效应（Dhall's effect）。
 
-[![P6](http://www.wowotech.net/content/uploadfile/201801/3c0ebefcff14ddeabbe1b055bf1e6d2720180131112047.gif "P6")](http://www.wowotech.net/content/uploadfile/201801/bfe9d3ade59e7e63a9e71effa4ac858920180131112045.gif)
+![[Pasted image 20241024200210.png]]
 
 把若干个任务分配给若干个处理器执行其实是一个NP-hard问题（本质上是一个装箱问题），由于各种异常场景，很难说一个调度算法会优于任何其他的算法。有了这样的背景知识，我们就可以进一步解析Linux内核中的DL调度器的细节，看看它是如何避免潜在的问题，发挥其强大的调度能力的。欲知详情，且听下回分解。
 
@@ -113,7 +114,7 @@ _原创翻译整理文章，转发请注明出处。蜗窝科技_
 
 标签: [deadline调度器](http://www.wowotech.net/tag/deadline%E8%B0%83%E5%BA%A6%E5%99%A8)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [KASAN实现原理](http://www.wowotech.net/memory_management/424.html) | [Meltdown论文翻译](http://www.wowotech.net/basic_subject/meltdown.html)»
 

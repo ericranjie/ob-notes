@@ -1,12 +1,13 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-12-2 15:40 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-## 为什么需要PELT？
+# 为什么需要PELT？
 
 为了让调度器更加的聪明，我们总是希望系统满足最大吞吐量同时又最大限度的降低功耗。虽然可能有些矛盾，但是现实总是这样。PELT算法是Linux 3.8合入的，那么在此之前，我们存在什么问题才引入PELT算法呢？在Linux 3.8之前，CFS以每个运行队列（runqueue，简称rq）为基础跟踪负载。但是这种方法，我们无法确定当前负载的来源。同时，即使工作负载相对稳定的情况下，在rq级别跟踪负载，其值也会产生很大变化。为了解决以上的问题，PELT算法会跟踪每个调度实体（per-scheduling entity）的负载情况。
 
 > 注：代码分析基于Linux 4.18.0。
 
-## 如何进行PELT
+# 如何进行PELT
 
 具体原理的东西可以参考这篇文章[《per-entity load tracking》](http://www.wowotech.net/process_management/PELT.html)。我就无耻的从这篇文章中摘录一段话吧。为了做到Per-entity的负载跟踪，时间（物理时间，不是虚拟时间）被分成了1024us的序列，在每一个1024us的周期中，一个entity对系统负载的贡献可以根据该实体处于runnable状态（正在CPU上运行或者等待cpu调度运行）的时间进行计算。如果在该周期内，runnable的时间是x，那么对系统负载的贡献就是（x/1024）。当然，一个实体在一个计算周期内的负载可能会超过1024us，这是因为我们会累积在过去周期中的负载，当然，对于过去的负载我们在计算的时候需要乘一个衰减因子。如果我们让Li表示在周期pi中该调度实体的对系统负载贡献，那么一个调度实体对系统负荷的总贡献可以表示为：
 
@@ -43,7 +44,7 @@ static const u32 runnable_avg_yN_inv[] = {	0xffffffff, 0xfa83b2da, 0xf5257d14, 0
 > 1. LOAD_AVG_PERIOD的值为32，我们认为当时间经过2016个周期后，衰减后的值为0。即val\*yn=0, n > 2016。
 > 1. 当n大于等于32的时候，就需要根据y32=0.5条件计算yn的值。yn*232 = 1/2n/32 * yn%32*232=1/2n/32 * runnable_avg_yN_inv\[n%32\]。
 
-## 如何计算当前负载贡献
+# 如何计算当前负载贡献
 
 经过上面举例，我们可以知道计算当前负载贡献并不需要记录所有历史负载贡献。我们只需要知道上一刻负载贡献就可以计算当前负载贡献，这大大降低了代码实现复杂度。我们继续上面举例问题的思考，我们依然假设一个task开始从0时刻运行，那么1022us后的负载贡献自然就是1022。当task经过10us之后，此时（现在时刻是1032us）的负载贡献又是多少呢？很简单，10us中的2us和之前的1022us可以凑成一个周期1024us。这个1024us需要进行一次衰减，即现在的负载贡献是：(1024 - 1022 + 1022)y + 10 - (1024 - 1022) = 1022y + 2y + 8 = 1010。1022y可以理解成由于经历了一个周期，因此上一时刻的负载需要衰减一次，因此1022需要乘以衰减系数y，2y可以理解成，2us属于上一个负载计算时距离一个周期1024us的差值，由于2是上一个周期的时间，因此也需要衰减一次，8是当前周期时间，不需要衰减。又经过了2124us，此时（现在时刻是3156us）负载贡献又是多少呢？即：(1024 - 8 + 1010)y2 + 1024y + 2124 - 1024 - (1024 - 8) = 1010y2 + 1016y2 + 1024y + 84 = 3024。2124us可以分解成3部分：1016us补齐上一时刻不足1024us部分，凑成一个周期；1024us一个整周期；当前时刻不足一个周期的剩余84us部分。相当于我们经过了2个周期，因此针对上一次的负载贡献需要衰减2次，也就是1010y2部分，1016us是补齐上一次不足一个周期的部分，因此也需要衰减2次，所以公式中还有1016y2 部分。1024us部分相当于距离当前时刻是一个周期，所以需要衰减1次，最后84部分是当前剩余时间，不需要衰减。
 
@@ -56,7 +57,7 @@ static const u32 runnable_avg_yN_inv[] = {	0xffffffff, 0xfa83b2da, 0xf5257d14, 0
 
 上面的例子现在就可以套用上面的公式计算。例如，上一次的负载贡献u=1010，经过时间d=2124us，可以分解成3部分，d1=1016us，d2=1024，d3=84。经历的周期p=2。所以当前时刻负载贡献u'=1010y2 + 1016y2 + 1024y + 84，与上面计算结果一致。
 
-## 如何记录负载信息
+# 如何记录负载信息
 
 Linux中使用`struct sched_avg`结构体记录调度实体se或者就绪队列cfs rq负载信息。每个调度实体se以及cfs就绪队列结构体中都包含一个`struct sched_avg`结构体用于记录负载信息。`struct sched_avg`定义如下。
 
@@ -87,7 +88,7 @@ void init_entity_runnable_average(struct sched_entity *se){	struct sched_avg *sa
 
 针对group se，runnable_load_avg和load_avg的值初始化为0。这也意味着当前task group中没有任何task需要调度。runnable_weight虽然现在初始化为se的权重值，但是在后续的代码中会不断的更新runnable_weight的值。runnable_weight是实体权重的一部分，表示组runqueue的可运行部分。
 
-## 负载计算代码实现
+# 负载计算代码实现
 
 在了解了以上信息后，可以开始研究上一节中计算负载贡献的公式的源码实现。
 
@@ -370,7 +371,7 @@ static inline voiddequeue_runnable_load_avg(struct cfs_rq *cfs_rq, struct sched_
 
 标签: [PELT](http://www.wowotech.net/tag/PELT)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [CFS调度器（5）-带宽控制](http://www.wowotech.net/process_management/451.html) | [CFS调度器（3）-组调度](http://www.wowotech.net/process_management/449.html)»
 

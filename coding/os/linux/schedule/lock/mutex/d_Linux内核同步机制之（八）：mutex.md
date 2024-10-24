@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-5-10 5:55 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、Mutex锁简介
@@ -39,7 +40,7 @@
 
 大部分的成员都非常好理解，除了osq这个成员，其工作原理示意图如下：
 
-![](http://www.wowotech.net/content/uploadfile/202205/71421652133610.png)
+![[Pasted image 20241024184239.png]]
 
 字如其名，Optimistic spin queue就是乐观自旋队列的意思，也就是形成一组处于自旋状态的任务队列。和等待队列不一样，这个队列中的任务都是当前正在执行的任务。Osq并没有直接将这些任务的task struct形成队列结构，而是把per-CPU的mcs lock对象串联形成队列。Mcs lock中有cpu number，通过这些cpu number可以定位到指定cpu上的current thread，也就定位到了自旋的任务。
 
@@ -155,7 +156,7 @@ C、该任务被唤醒之后，如果是等待队列中的第一个任务，即t
 
 D、如果获取到mutex，那么就退出循环，否则继续进入阻塞状态等待。如果是队列中的第一个waiter，那么如果\_\_mutex_trylock失败，那么就进入乐观自旋过程，这样会有更大的机会成功获取mutex锁。
 
-六、乐观自旋
+# 六、乐观自旋
 
 Mutex乐观自旋的代码位于mutex_optimistic_spin函数中，进入乐观自旋函数的线程可能有下面几个结果：
 
@@ -191,7 +192,7 @@ B、如果\_\_mutex_trylock_or_owner返回了非空owner，说明当前线程获
 
 C、如果mutex锁的owner task发生变化（例如变成NULL）则mutex_spin_on_owner函数返回true，则说明可以跳转到for循环处再次尝试获取锁并进行乐观自旋。
 
-七、释放mutex锁
+# 七、释放mutex锁
 
 mutex_unlock的代码如下：
 
@@ -225,7 +226,7 @@ B、如果有任务（一般是top waiter，参考其唤醒后的代码逻辑）
 
 C、唤醒top waiter任务
 
-八、结论
+# 八、结论
 
 本文简单的介绍了linux内核中的mutex同步机制，在移动环境中，mutex锁的性能表现不尽如人意，无论是吞吐量还是延迟。在重载的场景下，我们经常会遇到Ux线程阻塞在mutex而引起的手机卡顿问题，如何在手机平台上优化mutex锁的性能是我们OPPO内核团队一直在做的事情，也欢迎热爱技术的你积极参与。
 
@@ -239,11 +240,11 @@ C、唤醒top waiter任务
 
 本文首发在“内核工匠”微信公众号，欢迎扫描以下二维码关注公众号获取最新Linux技术分享：
 
-![](http://www.wowotech.net/content/uploadfile/202111/b9c21636066902.png)
+---
 
 标签: [mutex](http://www.wowotech.net/tag/mutex)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux内核同步机制之（九）：Queued spinlock](http://www.wowotech.net/kernel_synchronization/queued_spinlock.html) | [schedutil governor情景分析](http://www.wowotech.net/process_management/schedutil_governor.html)»
 

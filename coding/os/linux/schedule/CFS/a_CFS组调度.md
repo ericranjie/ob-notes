@@ -173,13 +173,13 @@ on_list/leaf_cfs_rq_list: 尝试将叶cfs_rq串联起来，在CFS负载均衡和
 
 tg: 该cfs_rq隶属的task group。
 
-**五、task group权重**
+# **五、task group权重**
 
 task group的权重使用struct task_group 的 shares 成员来表示，默认值是scale_load(1024)。可以通过cgroup目录下的cpu.shares文件进行读写，echo weight > cpu.shares 就是将task group权重配置为weight，保存到shares 成员变量中的值是scale_load(weight)。root_task_group不支持设置权重。
 
 不同task group的权重大小表示系统CPU跑满后，哪个task group组可以跑多一些，哪个task group组要跑的少一些。
 
-**5.1. gse的权重**
+## **5.1. gse的权重**
 
 task group在每个CPU上都有一个group se，那么就需要将task group的权重 tg->shares 按照一定的规则分配到各个gse上。规则就是公式(1)：
 
@@ -192,13 +192,12 @@ task group在每个CPU上都有一个group se，那么就需要将task group的�
 其中 tg->weight 就是tg->shares, grq->load.weight 表示tg在各个CPU上的grq的权重。也就是每个gse根据其cfs_rq的权重比例来分配tg的权重。cfs_rq的权重等于其上挂载的任务的权重之和。假设tg的权重是1024，系统中只有2个CPU，因此有两个gse, 若其grq上任务状态如下如下图3，则gse\[0\]分得的权重为 1024 * (1024+2048+3072)/(1024+2048+3072+1024+1024) = 768；gse\[1\]分得的权重为 1024 * (1024+1024)/(1024+2048+3072+1024+1024) = 256。
 
 图3:
-!\[\[Pasted image 20240926174126.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174126.png]]
 
 gse的权重更新函数为 update_cfs_group()，下面看其具体实现:
 
-!\[\[Pasted image 20240926174131.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174131.png]]
 
 tg的权重向gse\[X\]的分配动作是在 calc_group_shares() 中完成的。
 
@@ -256,31 +255,29 @@ max(grq->load.weight, grq->avg.load_avg) 一般都是取grq->load.weight，因�
 
 calc_group_shares() 函数是通过公式(6)近似计算各个gse分得的权重：
 
-!\[\[Pasted image 20240926174142.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174142.png]]
 
 由于tg中的每个任务都对gse的权重有贡献，因此grq上任务个数变更时都要更新gse的权重，近似过程中使用到了se的负载，在entity_tick()中也进行了一次更新。调用路径：
-!\[\[Pasted image 20240926174148.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**5.2. gse上每个tse分到的权重**
+![[Pasted image 20240926174148.png]]
+
+## **5.2. gse上每个tse分到的权重**
 
 任务组中的任务也是按其权重比例分配gse的权重。如上图2中gse\[0\]的grq上挂的3个任务，tse1分得的权重就是768*1024/(1024+2048+3072)=128, tse2分得的权重就是768*2048/(1024+2048+3072)=256, tse3分得的权重就是768\*3072/(1024+2048+3072)=384。
 
 在tg中的任务分配tg分得的时间片的时候，会使用到这个按比例分得的权重。分组嵌套的越深，能按比例分得的权重就越小，由此可见，在高负载时task group中的任务是不利于分配时间片的。
 
-**六、task group时间片**
+# **六、task group时间片**
 
-**6.1. 时间片分配**
+## **6.1. 时间片分配**
 
 若使能CFS组调度会从上到下逐层通过权重比例来分配上层分得的时间片，分配函数是sched_slice()。但是从上到下不便于遍历，因此改为从下到上进行遍历，毕竟 A*B*C 和 C*B*A 是相等的。
 
-!\[\[Pasted image 20240926174158.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174158.png]]
 
 sched_slice的主要路径如下：
-!\[\[Pasted image 20240926174206.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174206.png]]
 
 在tick中断中，若发现se此次运行时间已经超过了其分得的时间片，就触发抢占，以便让其让出CPU。
 
@@ -293,8 +290,7 @@ tse2 获得 \[1024/(1024+1024+1024)\] * {\[1024/(1024+1024)\] * 15 }= 2.5ms
 tse4 获得 \[1024/(1024+1024)\] * {\[1024/(1024+1024+1024)\] * \[1024/(1024+1024)\] * 15} = 1.25ms
 
 图4:
-!\[\[Pasted image 20240926174214.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174214.png]]
 
 注：tg1和tg2的权重通过 cpu.shares 文件进行配置，然后各个cpu上的gse从 cpu.shares 配置的权重中按其上的grq的权重比例分配权重。gse的权重不再和nice值挂钩。
 
@@ -302,18 +298,17 @@ tse4 获得 \[1024/(1024+1024)\] * {\[1024/(1024+1024+1024)\] * \[1024/(1024+102
 
 pick_next_task_fair() 会优先pick虚拟时间最小的se。gse的虚拟时间是怎么更新的呢。虚拟时间是在 update_curr()中进行更新，然后通过 for_each_sched_entity 向上逐层遍历更新gse的虚拟时间。若tse运行5ms，则其父级各gse都运行5ms，然后各层级根据自己的权重更新虚拟时间。
 
-!\[\[Pasted image 20240926174223.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174223.png]]
 
 主要调用路径：
-!\[\[Pasted image 20240926174227.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174227.png]]
 
 在选择下一个任务出来运行时逐层级选择虚拟时间最小的se，若选到gse就从其grq上继续选，直到选到tse。
 
-**七、task group的PELT负载**
+# **七、task group的PELT负载**
 
-**7.1. 计算负载使用的timeline**
+## **7.1. 计算负载使用的timeline**
 
 计算负载使用的timeline和计算虚拟时间使用的timeline不同。计算虚拟时间时使用的timeline是 rq->clock_task, 这个是运行多长时间就是多长时间。而计算负载使用的timeline是rq->clock_pelt，它是根据CPU的算力和当前频点scale后的，在CPU进idle是会同步到rq->clock_task上。因此PELT计算出来的负载可以直接使用，而不用像WALT计算出来的负载那样还需要scale。更新rq->clock_pelt这个timeline的函数是 update_rq_clock_pelt()
 
@@ -321,7 +316,7 @@ pick_next_task_fair() 会优先pick虚拟时间最小的se。gse的虚拟时间�
 
 最终计算的 delta= delta * (capacity_cpu / capacity_max(1024)) * (cur_cpu_freq / max_cpu_freq) 也就是将当前cpu在当前频点上运行得到的delta时间值，缩放到最大性能CPU的最大频点上对应的delta时间值。然后累加到 clock_pelt 上。比如在小核上1GHz下跑了5ms，可能只等效于在超大核上运行1ms，因此在不同Cluster的CPU核上跑相同的时间，负载增加量是不一样的。
 
-**7.2. 负载定义与计算**
+## **7.2. 负载定义与计算**
 
 load_avg 定义为：load_avg = runnable% * scale_load_down(load)。
 
@@ -331,7 +326,7 @@ util_avg 定义为：util_avg = running% * SCHED_CAPACITY_SCALE。
 
 这些负载值保存在struct sched_avg结构中，此结构内嵌到se和cfs_rq结构中。此外，struct sched_avg中还引入了load_sum、runnable_sum、util_sum成员来辅助计算。不同实体(tse/gse/grq/cfs_rq)的负载只是其runnable% 多么想运行，和 running% 运行了多少的表现形式不同。这两个因数只对tse取值是\[0,1\]的，对其它实体则超出了这个范围。
 
-**7.2. 1. tse负载**
+### **7.2.1. tse负载**
 
 下面看一下tse负载计算公式，为了加深印象，举一个跑死循环的例子。计算函数见 update_load_avg --> \_\_update_load_avg_se().
 
@@ -347,7 +342,7 @@ runnable_sum: 是对任务 running+runnable 状态的几何级数累加值然后
 
 util_sum: 是对任务 running 状态的几何级数累加值然后scale up后的值。对于一个独占某个核的死循环，此值趋近于 LOAD_AVG_MAX * SCHED_CAPACITY_SCALE，若不能独占，会比此值小。
 
-**7.2.2. cfs_rq的负载**
+### **7.2.2. cfs_rq的负载**
 
 下面看一下cfs_rq负载计算公式，为了加深印象，举一个跑死循环的例子。计算函数见 update_load_avg --> update_cfs_rq_load_avg --> \_\_update_load_avg_cfs_rq()。
 
@@ -365,7 +360,7 @@ util_sum: cfs_rq 上所有任务 running 状态下的几何级数之和再乘以
 
 load_avg、runnable_avg、util_avg分别从权重(优先级)、任务个数、CPU时间片占用三个维度来描述CPU的负载。
 
-**7.2.3. gse 负载**
+### **7.2.3. gse 负载**
 
 对比着tse来讲解gse:
 
@@ -377,76 +372,75 @@ load_avg、runnable_avg、util_avg分别从权重(优先级)、任务个数、CP
 
 (4) gse会比tse多出了一个负载传导更新过程，放到下面讲解(若不使能CFS组调度，只有一层，没有tg的层次结构，因此不需要传导，只需要更新到cfs_rq上即可)。
 
-**7.2. 4. grq 负载**
+### **7.2.4. grq 负载**
 
 grq的负载和cfs_rq的负载在更新上没有什么不同。grq会比cfs_rq多了一个负载传导更新过程，放到下面讲解。
 
-**7.2.5. tg的负载**
+### **7.2.5. tg的负载**
 
 tg只有一个load负载，就是tg->load_avg，取值为\\Sum tg->cfs_rq\[\]->avg.load_avg，也即tg所有CPU上的grq的 load_avg 之和。tg负载更新是在update_tg_load_avg()中实现的，主要用于给gse\[\]分配权重。
-!\[\[Pasted image 20240926174240.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174240.png]]
 
 调用路径：
-!\[\[Pasted image 20240926174245.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-**7.3. 负载传导**
+![[Pasted image 20240926174245.png]]
+
+## **7.3. 负载传导**
 
 负载传导是使能CFS组调度后才有的概念。当tg层次结构上插入或删除一个tse的时候，整个层次结构的负载都变化了，因此需要逐层向上层进行传导。
 
-**7.3.1. 负载传导触发条件**
+### **7.3.1. 负载传导触发条件**
 
 是否需要进行负载传导是通过struct cfs_rq 的 propagate 成员进行标记。grq上增加/删除的tse时会触发负载传导过程。tse的负载load_sum值会记录在 struct cfs_rq 的 prop_runnable_sum 成员上，然后逐层向上传导。其它负载(runnable\_*、util\_*)则会通过tse-->grq-->gse-->grq...逐层向上层传导。
 
 在 add_tg_cfs_propagate() 中标记需要进行负载传导：
 
-!\[\[Pasted image 20240926174456.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174456.png]]
 
 此函数调用路径：
-!\[\[Pasted image 20240926174502.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174502.png]]
 
 由上可见，当从非CSF调度类变为CFS调度类、移到当前tg中来、新建的任务开始挂到cfs_rq上、迁移到当前CPU都会触发负载传导过程，此时会向整个层次结构中传导添加这个任务带来的负载。当任务从当前CPU迁移走、变为非CFS调度类、从tg迁移走，此时会向整个层次结构中传导移除这个任务降低的负载。
 
 注意，任务休眠时并没有将其负载移除，只是休眠期间其负载不增加了，随时间衰减。
 
-**7.3.2. 负载传导过程**
+### **7.3.2. 负载传导过程**
 
 负载传导过程体现在逐层更新负载的过程中。如下，负载更新函数update_load_avg() 在主要路径下，每层都会进行调用：
-!\[\[Pasted image 20240926174507.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174507.png]]
 
 load负载传导函数和标记需要进行传导的函数是同一个，为 add_tg_cfs_propagate(), 其调用路径如下：
-!\[\[Pasted image 20240926174513.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-7.3.2.1. update_tg_cfs_util() 更新gse和grq的util\_\* 负载，并负责将负载传递给上层。
-!\[\[Pasted image 20240926174518.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174513.png]]
+
+#### 7.3.2.1. update_tg_cfs_util() 更新gse和grq的util_* 负载，并负责将负载传递给上层。
+
+![[Pasted image 20240926174518.png]]
 
 可见gse的util负载在传导时直接取的是其grq上的util负载。然后通过更新上层 grq 的 util_avg 向上层传导。
 
-7.3.2.2. update_tg_cfs_runnable() 更新gse和grq的runnable\_\*负载，并负责将负载传递给上层。
-!\[\[Pasted image 20240926174524.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+#### 7.3.2.2. update_tg_cfs_runnable() 更新gse和grq的runnable\_\*负载，并负责将负载传递给上层。
+
+![[Pasted image 20240926174524.png]]
 
 可见gse的runnable负载在传导时也是直接取的是其grq上的runnable负载。然后通过更新上层 grq 的 runnable_avg 向上层传导。
 
-7.3.2.3. update_tg_cfs_load() 更新gse和grq的load\_\*负载，并负责将负载传递给上层。
+#### 7.3.2.3. update_tg_cfs_load() 更新gse和grq的load\_\*负载，并负责将负载传递给上层。
 
 load负载比较特殊，负载传导时并不是直接取自grq的load负载，而是在向grq添加/删除任务时就记录了tse 的load_sum值，然后在 add_tg_cfs_propagate() 中逐层向上传导，传导位置调用路径：
-!\[\[Pasted image 20240926174529.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174529.png]]
 
 对load负载的标记和传导都是这个函数:
-!\[\[Pasted image 20240926174535.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174535.png]]
 
 load负载更新函数：
-!\[\[Pasted image 20240926174542.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174542.png]]
 
 删除任务就是将grq上的se的平均load_sum赋值给gse。添加任务是将gse的load_sum直接加上delta值。
 
@@ -459,12 +453,11 @@ load负载传导赋值方式上为什么和runnable负载和util负载有差异�
 对于load_avg的传导举个例子，如下图5，假如ts2一直休眠，ts1和ts3是两个死循环，那么gse1的grq1的load_avg将趋近于4096，而根cfs_rq的负载将趋近于2048，若此时要将ts3迁移走，若像计算runnable和util负载那样直接想减，得到的delta值是-4096，那么根cfs_rq的load_avg将会是个负值(2048-4096\<0)，这显然是不合理的。若通过load_sum进行传导，它只是个时间级数，相减后根cfs_rq上只相当于损失了50%的负载。
 
 图5:
-!\[\[Pasted image 20240926174551.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174551.png]]
 
 注: 这只是在tg的层次结构中添加/删除任务时的负载的传导更新路径，随着时间的流逝，即使没有添加/移除任务，gse/grq的负载也会更新，因为普通的负载更新函数 \_\_update_load_avg_se()/update_cfs_rq_load_avg() 并没有区分是tse还是gse，是cfs_rq还是grq。
 
-**7.4. 层次负载**
+## **7.4. 层次负载**
 
 在负载均衡的时候，需要迁移CPU上的负载以便达到均衡，为了达成这个目的，需要在CPU之间进行任务迁移。然而各个task se的load avg并不能真实反映它对root cfs rq（即对该CPU）的负载贡献，因为task se/cfs rq总是在某个具体level上计算其load avg。比如grq的load_avg并不会等于其上挂的所有tse的load_avg的和，因为runnable的时间级数肯定是Sum(tse) > grq的(有runnable等待运行的状态存在)。
 
@@ -477,26 +470,24 @@ load负载传导赋值方式上为什么和runnable负载和util负载有差异�
 tse的h_load = grq的h_load  x  tse的load avg / grq的load avg
 
 获取和更新task的h_load的函数如下：
-!\[\[Pasted image 20240926174559.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240926174559.png]]
 
 更新grq的h_load的函数如下：
 
-!\[\[Pasted image 20240926174628.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174628.png]]
 
 调用路径：
 
-!\[\[Pasted image 20240926174634.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240926174634.png]]
 
 可以看到，主要是唤醒wake_affine_weight机制和负载均衡逻辑中使用。比如迁移类型为load的负载均衡中，要迁移多少load_avg可以使负载达到均衡，使用的就是task_h_load()，见 detach_tasks()。
 
-**八、总结**
+# **八、总结**
 
 本文介绍了CFS组调度功能引入的原因，配置方法，和一些实现细节。此功能可以在高负载下"软限制"(相比与CFS带宽控制)各分组任务对CPU资源的使用占比，以达到各组之间公平使用CPU资源的目的。在老版原生Android代码中对后台分组限制的较狠(甚是将 background/cpu.shares 设置到52)，将CPU资源重点向前台分组进行倾斜，但这个配置可能会在某些场景下出现前台任务被后台任务卡住的情况，对于普适性配置，最新的一些Android版本中将各个分组的 cpu.shares 都设置为1024以追求CPU资源在各组之间的公平。
 
-**九、参考**
+# **九、参考**
 
 1.内核源码(https://www.kernel.org/)和Android源码(https://source.android.com/docs/setup/download/downloading)
 
@@ -506,11 +497,6 @@ tse的h_load = grq的h_load  x  tse的load avg / grq的load avg
 
 4.PELT算法浅析: http://www.wowotech.net/process_management/pelt.html
 
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
-
-长按关注内核工匠微信
-
-Linux内核黑科技| 技术文章 | 精选教程
 
 Reads 2778
 
@@ -519,8 +505,6 @@ Reads 2778
 Send Message
 
 [](javacript:;)
-
-![](http://mmbiz.qpic.cn/mmbiz_png/d4hoYJlxOjNfxSer7sH7b1yJBvlpWyx1AdCugCLScXKu60Ezh9oSCrZw36x9GTL1qvIzptqlefgS1vkQwBE7OA/300?wx_fmt=png&wxfrom=18)
 
 OPPO内核工匠
 

@@ -71,7 +71,7 @@
 
 tasklet_disable和tasklet_enable支持嵌套，但是需要成对使用。
 
-2、系统如何管理tasklet？
+## 2、系统如何管理tasklet？
 
 系统中的每个cpu都会维护一个tasklet的链表，定义如下：
 
@@ -80,7 +80,7 @@ tasklet_disable和tasklet_enable支持嵌套，但是需要成对使用。
 
 linux kernel中，和tasklet相关的softirq有两项，HI_SOFTIRQ用于高优先级的tasklet，TASKLET_SOFTIRQ用于普通的tasklet。对于softirq而言，优先级就是出现在softirq pending register（\_\_softirq_pending）中的先后顺序，位于bit 0拥有最高的优先级，也就是说，如果有多个不同类型的softirq同时触发，那么执行的先后顺序依赖在softirq pending register的位置，kernel总是从右向左依次判断是否置位，如果置位则执行。HI_SOFTIRQ占据了bit 0，其优先级甚至高过timer，需要慎用（实际上，我grep了内核代码，似乎没有发现对HI_SOFTIRQ的使用）。当然HI_SOFTIRQ和TASKLET_SOFTIRQ的机理是一样的，因此本文只讨论TASKLET_SOFTIRQ，大家可以举一反三。
 
-3、如何定义一个tasklet？
+## 3、如何定义一个tasklet？
 
 你可以用下面的宏定义来静态定义tasklet：
 
@@ -92,7 +92,7 @@ linux kernel中，和tasklet相关的softirq有两项，HI_SOFTIRQ用于高优�
 
 这两个宏都可以静态定义一个struct tasklet_struct的变量，只不过初始化后的tasklet一个是处于eable状态，一个处于disable状态的。当然，也可以动态分配tasklet，然后调用tasklet_init来初始化该tasklet。
 
-4、如何调度一个tasklet
+## 4、如何调度一个tasklet
 
 为了调度一个tasklet执行，我们可以使用tasklet_schedule这个接口：
 
@@ -104,7 +104,7 @@ linux kernel中，和tasklet相关的softirq有两项，HI_SOFTIRQ用于高优�
 
 程序在多个上下文中可以多次调度同一个tasklet执行（也可能来自多个cpu core），不过实际上该tasklet只会一次挂入首次调度到的那个cpu的tasklet链表，也就是说，即便是多次调用tasklet_schedule，实际上tasklet只会挂入一个指定CPU的tasklet队列中（而且只会挂入一次），也就是说只会调度一次执行。这是通过TASKLET_STATE_SCHED这个flag来完成的，我们可以用下面的图片来描述：
 
-[![tasklet](http://www.wowotech.net/content/uploadfile/201507/2f814e61e193b5a0a694ef3673b4f60620150702100946.gif "tasklet")](http://www.wowotech.net/content/uploadfile/201507/06299a79874281afa05198f9d72a87da20150702100845.gif)
+![[Pasted image 20241024194239.png]]
 
 我们假设HW block A的驱动使用的tasklet机制并且在中断handler（top half）中将静态定义的tasklet（这个tasklet是各个cpu共享的，不是per cpu的）调度执行（也就是调用tasklet_schedule函数）。当HW block A检测到硬件的动作（例如接收FIFO中数据达到半满）就会触发IRQ line上的电平或者边缘信号，GIC检测到该信号会将该中断分发给某个CPU执行其top half handler，我们假设这次是cpu0，因此该driver的tasklet被挂入CPU0对应的tasklet链表（tasklet_vec）并将state的状态设定为TASKLET_STATE_SCHED。HW block A的驱动中的tasklet虽已调度，但是没有执行，如果这时候，硬件又一次触发中断并在cpu1上执行，虽然tasklet_schedule函数被再次调用，但是由于TASKLET_STATE_SCHED已经设定，因此不会将HW block A的驱动中的这个tasklet挂入cpu1的tasklet链表中。
 
@@ -128,7 +128,7 @@ linux kernel中，和tasklet相关的softirq有两项，HI_SOFTIRQ用于高优�
 
 （3）raise TASKLET_SOFTIRQ类型的softirq。
 
-5、在什么时机会执行tasklet？
+## 5、在什么时机会执行tasklet？
 
 上面描述了tasklet的调度，当然调度tasklet不等于执行tasklet，系统会在适合的时间点执行tasklet callback function。由于tasklet是基于softirq的，因此，我们首先总结一下softirq的执行场景：
 
@@ -200,7 +200,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [tasklet](http://www.wowotech.net/tag/tasklet)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [ARMv8-a架构简介](http://www.wowotech.net/armv8a_arch/armv8-a_overview.html) | [Linux cpufreq framework(2)\_cpufreq driver](http://www.wowotech.net/pm_subsystem/cpufreq_driver.html)»
 

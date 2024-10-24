@@ -1,10 +1,11 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2018-2-22 18:23 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-一、前言
+# 一、前言
 
 Linux内核的DL调度器是一个全局EDF调度器，它主要针对有deadline限制的sporadic任务。注意：这些术语已经在本系列文章的[第一部分](http://www.wowotech.net/process_management/deadline-scheduler-1.html)中说明了，这里不再赘述。在这本文中，我们将一起来看看Linux DL调度器的细节以及如何使用它。另外，本文对应的英文原文是https://lwn.net/Articles/743946/，感谢lwn和Daniel Bristot de Oliveira的分享。
 
-二、细节
+# 二、细节
 
 DL调度器是根据任务的deadline来确定调度的优先顺序的：deadline最早到来的那个任务最先调度执行。对于有M个处理器的系统，优先级最高的前M个deadline任务（即deadline最早到来的前M个任务）将被选择在对应M个处理器上运行。
 
@@ -20,7 +21,7 @@ Linux DL调度器还实现了constant bandwidth server（CBS）算法，该算�
 
 对于那些cpu利用率很高的任务而言，一个很好的策略是将系统进行区域划分。即将一些高负载任务隔离开来，从而使“小活”（cpu使用率不高）和“大活”各自在一组不同的CPU上进行调度。目前，DL调度器不允许用户设置一个线程的亲和性，不过可以使用control group cpusets来对系统进行分区。
 
-三、使用方法
+# 三、使用方法
 
 例如，考虑一个有八个CPU的系统。一个“大活”的CPU利用率接近90%（单核场景下），而组内其他任务的利用率都较低。在这种场景下，一个推荐的设置是这样的：CPU0运行CPU利用率高的那个“大活”任务，让其他任务运行在其余的CPU上。要想实现这样的系统配置，用户可以执行以下步骤：
 
@@ -60,11 +61,13 @@ Linux DL调度器还实现了constant bandwidth server（CBS）算法，该算�
 
 这里的配置过程和配置cluster的过程是一样的，这里就不再具体解释了。现在我们需要把shell移到partition这个cpuset中，操作命令如下：
 
-> # echo $$ > tasks
+```c
+# echo  > tasks
+```
 
 完成上面的准备工作之后，最后一步就是在shell中启动deadline任务。
 
-四、程序员视角
+# 四、程序员视角
 
 我们在这一章讨论使用DL调度器的场景。我们提供了三个例子：
 

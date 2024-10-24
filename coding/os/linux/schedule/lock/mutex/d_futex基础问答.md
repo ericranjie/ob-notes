@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2022-10-9 7:20 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、什么是futex？
@@ -142,7 +143,7 @@ Java中的Wait和notify的功能是native实现，在虚拟机提供支持。Syn
 
 Non-PI futex引起的优先级翻转（priority inversion）问题如下图所示：
 
-![](http://www.wowotech.net/content/uploadfile/202210/acb11665271753.png)
+![[Pasted image 20241024184134.png]]
 
 低优先级任务C首先持锁，这样当高优先级任务A试图持锁失败进入D状态。一般而言，C任务临界区比较短，完成之后就释放锁，任务A就可以执行了。然而，在C执行过程中，中等优先级的任务B被唤醒，抢占了任务C的执行，这时候，所有优先级在A和C之间的任务都可以抢占C的执行，从而使得任务A无法在确定的时间内获取到CPU资源。
 
@@ -166,23 +167,23 @@ PI-futex是通过rt mutex来实现的，因此我们这里简单的聊一聊内�
 
 从rt mutex的视角看任务：
 
-![](http://www.wowotech.net/content/uploadfile/202210/10c11665271783.png)
+![[Pasted image 20241024184121.png]]
 
 rt_mutex_waiter用来抽象一个阻塞在rt mutex的任务：task成员指向这个任务，lock成员指向对应的rt mutex对象，tree_entry是挂入blocker红黑树的节点，rt mutex对象的waiters成员就是这颗红黑树的根节点（wait_lock成员用来保护红黑树的操作）。而owner则指向持锁的任务。需要特别说明的是waiters这个红黑树是按照任务优先级排序的，left most节点就是对应该锁的top waiter。
 
 从任务的视角来看rt mutex：
 
-![](http://www.wowotech.net/content/uploadfile/202210/33591665271808.png)
+![[Pasted image 20241024184109.png]]
 
 为了支持rt mutex，task struct也增加了若干的成员，最重要的就是pi_waiters。由于一个任务可以持有多把锁，每把锁都有top waiter，因此和一个任务关联的top waiter也有非常多，这些top waiter形成了一个红黑树（同样也是按照优先级排序），pi_waiters成员就是这颗红黑树的根节点。这颗红黑树的left most的任务优先级就是实现优先级继承协议中规定要临时提升的优先级。pi_top_task成员指向了left most节点对应的任务对象，我们称之top pi waiter。Task struct的pi_blocked_on成员则指向其阻塞的rt_mutex_waiter对象。
 
 有了上面的基本概念之后，我们讲一下PI chain的概念。首先看看任务和锁的基本关系，如下图所示：
 
-![](http://www.wowotech.net/content/uploadfile/202210/2d2e1665271838.png)
+![[Pasted image 20241024184052.png]]
 
 在上面的图片中，task 1持有了Lock A和Lock B，阻塞在Lock C上。一个任务只能阻塞在一个锁上，所以红色箭头只能是从任务到锁，不能分叉。由于一个任务可以持有多把锁，所以黑色箭头会有多个锁指向一个任务，即多把锁汇聚于任务。有了这个基本的关系图之后，我们可以形成更加复杂的任务和锁的逻辑图，如下：
 
-![](http://www.wowotech.net/content/uploadfile/202210/b9c21665271865.png)
+![[Pasted image 20241024184043.png]]
 
 在上面这张图中有四条PI chain：
 
@@ -197,7 +198,7 @@ rt_mutex_waiter用来抽象一个阻塞在rt mutex的任务：task成员指向�
 
 熟悉Linux的工程师都了解内核中的mutex互斥锁以及支持PI的互斥锁版本rt mutex。如果想让用户空间的互斥锁实现优先级继承的功能，那么其实不需要futex模块实现复杂的PI chain，实际上对PI状态的跟踪是通过rt mutex代理来完成的，原理图如下：
 
-![](http://www.wowotech.net/content/uploadfile/202210/d9cb1665271889.png)
+![[Pasted image 20241024184031.png]]
 
 我们先看接口部分，normal futex使用FUTEX_WAIT和FUTEX_WAKE操作码来完成阻塞和唤醒的动作。对于PI futex而言，FUTEX_LOCK_PI用来执行上锁，而FUTEX_UNLOCK_PI用来完成解锁。这里的lock和unlock其实是对futex的代理rt mutex而言的。
 
@@ -209,7 +210,7 @@ Pi futex主要有两个逻辑过程：通过FUTEX_LOCK_PI上锁，通过FUTEX_UN
 
 这里的“上锁”有点误导，不是“试图持锁”的意思，而是竞争上层锁失败之后，陷入内核准备进入阻塞状态。这里为了记录PI state，所以需要对代理rt mutex执行上锁的动作（基本上也是会阻塞在rt mutex上）。对于pi futex的。正常futex的部分，例如get hash key、找futex对应的hash bucket、插入hash队列等操作，这里不再描述，主要看PI futex特有的部分。
 
-![](http://www.wowotech.net/content/uploadfile/202210/e6641665271916.png)
+![[Pasted image 20241024183923.png]]
 
 第一次futex lock pi稍微复杂一点，需要完成owner持锁和current task的阻塞在锁上这两个动作。注意：这里的锁指的是rt mutex。当线程持上层锁成功的时候，我们并不能同时对rt mutex持锁成功并设置owner，因此这时候并不会有futex系统调用进入内核。当第一次阻塞的时候，会通过futex系统调用把owner id传递给内核，这时候我们需要分配一个futex pi state对象创建一个rt mutex，同时建立这个rt mutex和owner task的关系：
 
@@ -240,11 +241,9 @@ FUTEX_UNLOCK_PI的流程留给读者自行分析了。
 
 本文首发在“内核工匠”微信公众号，欢迎扫描以下二维码关注公众号获取最新Linux技术分享：
 
-![](http://www.wowotech.net/content/uploadfile/202111/b9c21636066902.png)
-
 标签: [futex](http://www.wowotech.net/tag/futex)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux读写锁逻辑解析](http://www.wowotech.net/kernel_synchronization/rwsem.html) | [如何使能500个virtio_blk设备](http://www.wowotech.net/linux_kenrel/509.html)»
 

@@ -1,5 +1,5 @@
-Linux开发架构之路
-_2023年05月30日 20:47_ _湖南_
+
+Linux开发架构之路 _2023年05月30日 20:47_ _湖南_
 
 # 关于CAS等原子操作
 
@@ -73,7 +73,7 @@ bool atomic_compare_exchange_weak( volatile std::atomic* obj,
                                    T* expected, T desired );
 ```
 
-## 无锁队列的链表实现
+# 无锁队列的链表实现
 
 初始化一个队列的代码很简，初始化一个dummy结点（注：在链表操作中，使用一个dummy结点，可以少掉很多边界条件的判断），如下所示：
 
@@ -109,10 +109,6 @@ EnQueue(Q, data) //进队列
 我们可以看到，程序中的那个 do-while 的 Retry-Loop 中的 CAS 操作：如果 p->next 是 NULL，那么，把新结点 n 加到队尾。如果不成功，则重新再来一次！
 
 就是说，很有可能我在准备在队列尾加入结点时，别的线程已经加成功了，于是tail指针就变了，于是我的CAS返回了false，于是程序再试，直到试成功为止。这个很像我们的抢电话热线的不停重播的情况。
-
-**相关视频推荐**\
-[高并发场景下，三种锁方案：互斥锁，自旋锁，原子操作的优缺点](http://mp.weixin.qq.com/s?__biz=Mzg2MzQzMjc0Mw==&mid=2247487305&idx=1&sn=277fd1c8314cc0e511b7a58083a9bb5b&chksm=ce79f601f90e7f17e96e0812c33408c4d81dbd75001d28018bb2d19e2e3735ac83ebcd9aef0c&scene=21#wechat_redirect)\
-[C++后端开发-C++无锁队列的设计与实现](http://mp.weixin.qq.com/s?__biz=Mzg2MzQzMjc0Mw==&mid=2247487588&idx=1&sn=d4dda88dc5b5d6157cc5062f32e9a596&chksm=ce79e92cf90e603a042b05e59b300c982c799ed67cd3a0e6e19e2a3faa58368b45cf010c2152&scene=21#wechat_redirect)
 
 但是你会看到，为什么我们的“置尾结点”的操作不判断是否成功，因为：
 
@@ -222,7 +218,7 @@ DeQueue(Q) //出队列，改进版
 }
 ```
 
-## CAS的ABA问题
+# CAS的ABA问题
 
 所谓ABA，问题基本是这个样子：
 
@@ -241,7 +237,7 @@ DeQueue(Q) //出队列，改进版
 
 这就是ABA的问题。
 
-## 解决ABA的问题
+# 解决ABA的问题
 
 维基百科上给了一个解——使用double-CAS（双保险的CAS），例如，在32位系统上，我们要检查64位的内容
 
@@ -271,7 +267,7 @@ SafeRead(q)   {
 
 其中的 Fetch&Add和Release分是是加引用计数和减引用计数，都是原子操作，这样就可以阻止内存被回收了。
 
-## 用数组实现无锁队列
+# 用数组实现无锁队列
 
 使用数组来实现队列是很常见的方法，因为没有内存的分部和释放，一切都会变得简单，实现的思路如下：
 
@@ -288,9 +284,10 @@ SafeRead(q)   {
 - 累加后求个模什么的就可以知道TAIL和HEAD的位置了。
 
 如下图所示：
-!\[\[Pasted image 20240925101654.png\]\]
 
-## 小结
+![[Pasted image 20240925101654.png]]
+
+# 小结
 
 以上基本上就是所有的无锁队列的技术细节，这些技术都可以用在其它的无锁数据结构上。
 

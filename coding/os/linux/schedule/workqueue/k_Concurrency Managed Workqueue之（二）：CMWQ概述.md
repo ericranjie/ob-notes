@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-7-31 12:29 分类：[中断子系统](http://www.wowotech.net/sort/irq_subsystem)
 
 # 一、前言
@@ -6,7 +7,7 @@
 
 本文的代码来自linux kernel 4.0。
 
-二、为何需要CMWQ？
+# 二、为何需要CMWQ？
 
 内核中很多场景需要异步执行环境（在驱动中尤其常见），这时候，我们需要定义一个work（执行哪一个函数）并挂入workqueue。处理该work的线程叫做worker，不断的处理队列中的work，当处理完毕后则休眠，队列中有work的时候就醒来处理，如此周而复始。一切看起来比较完美，问题出在哪里呢？
 
@@ -28,7 +29,7 @@ flush work是一个长期过程，因此很有可能被调度出去，这样调�
 
 （4）二元化的线程池机制。基本上workqueue也是thread pool的一种，但是创建的线程数目是二元化的设定：要么是1，要么是number of CPU，但是，有些场景中，创建number of CPU太多，而创建一个线程又太少，这时候，勉强使用了single threaded workqueue，但是不得不接受串行处理work，使用multi threaded workqueue吧，占用资源太多。二元化的线程池机制让用户无所适从。
 
-三、CMWQ如何解决问题的呢？
+# 三、CMWQ如何解决问题的呢？
 
 1、设计原则。在进行CMWQ的时候遵循下面两个原则：
 
@@ -36,7 +37,7 @@ flush work是一个长期过程，因此很有可能被调度出去，这样调�
 
 （2）明确的划分了workqueue的前端接口和后端实现机制。CMWQ的整体架构如下：
 
-[![cmwq](http://www.wowotech.net/content/uploadfile/201507/fa89b634ddda99e7d302bee62a00f57520150731042913.gif "cmwq")](http://www.wowotech.net/content/uploadfile/201507/9c45a683d212959582073233b703346720150731042811.gif)
+![[Pasted image 20241024182908.png]]
 
 对于workqueue的用户而言，前端的操作包括二种，一个是创建workqueue。可以选择创建自己的workqueue，当然也可以不创建而是使用系统缺省的workqueue。另外一个操作就是将指定的work添加到workqueue。在旧的workqueue机制中，workqueue和worker thread是密切联系的概念，对于single workqueue，创建一个系统范围的worker thread，对于multi workqueue，创建per-CPU的worker thread，一切都是固定死的。针对这样的设计，我们可以进一步思考其合理性。workqueue用户的需求就是一个异步执行的环境，把创建workqueue和创建worker thread绑定起来大大限定了资源的使用，其实具体后台是如何处理work，是否否启动了多个thread，如何管理多个线程之间的协调，workqueue的用户并不关心。
 
@@ -62,7 +63,7 @@ OK，上面讲了线程池的创建，了解到创建workqueue和创建worker th
 
 对于CMWQ，当B work阻塞了，thread pool可以感知到这一事件，这时候它会创建一个新的worker thread来处理C D这两个work，从而解决了并发的问题。由于解决了并发问题，实际上也解决了由于竞争一个execution context而引入的各种问题（例如dead lock）。
 
-四、接口API
+# 四、接口API
 
 1、初始化work的接口保持不变，可以静态或者动态创建work。
 
@@ -105,7 +106,7 @@ _原创文章，转发请注明出处。蜗窝科技_
 
 标签: [CMWQ](http://www.wowotech.net/tag/CMWQ)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Concurrency Managed Workqueue之（三）：创建workqueue代码分析](http://www.wowotech.net/irq_subsystem/alloc_workqueue.html) | [linux cpufreq framework(3)\_cpufreq core](http://www.wowotech.net/pm_subsystem/cpufreq_core.html)»
 
