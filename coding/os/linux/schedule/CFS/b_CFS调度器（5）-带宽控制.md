@@ -1,3 +1,4 @@
+
 作者：[smcdef](http://www.wowotech.net/author/531) 发布于：2018-12-22 15:07 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 # 前言
@@ -14,7 +15,7 @@
 
 总结一下就是，`cfs_bandwidth`就像是一个全局时间池（时间池管理时间，类比内存池管理内存）。每个group cfs_rq如果想让其管理的红黑树上的调度实体调度，必须首先向全局时间池中申请固定的时间片，然后供其进程消耗。当时间片消耗完，继续从全局时间池中申请时间片。终有一刻，时间池中已经没有时间可供申请。此时就是throttle cfs_rq的大好时机。
 
-## 数据结构
+# 数据结构
 
 每个`task_group`都包含`cfs_bandwidth`结构体，主要记录和管理时间池的时间信息。
 
@@ -52,7 +53,7 @@ struct cfs_rq {#ifdef CONFIG_FAIR_GROUP_SCHED	struct rq *rq;	              /* 1 
 > 1. throttled：如果cfs_rq被throttle后，throttled变量置1，unthrottle的时候，throttled变量置0；throttle_count：由于task_group支持嵌套，当parent task_group的cfs_rq被throttle的时候，其chaild task_group对应的cfs_rq的throttle_count成员计数增加。
 > 1. 被throttle的cfs_rq挂入`cfs_bandwidth->throttled_cfs_rq`链表。
 
-## bandwidth贡献
+# bandwidth贡献
 
 周期性调度中会调用update_curr()函数更新当前正在运行进程的虚拟时间。该进程bandwidth贡献也在此时累计。从进程依附的cfs_rq的可用时间中减去进程运行的时间，如果时间不够，就从全局时间池中申请一定时间片。在update_curr()函数中调用account_cfs_rq_runtime()函数统计cfs_rq剩余可运行时间。
 
@@ -106,7 +107,7 @@ static int assign_cfs_rq_runtime(struct cfs_rq *cfs_rq){	struct task_group *tg =
 > 1. cfs_rq剩余可用时间增加。
 > 1. 如果cfs_rq向全局时间池申请不到时间片，那么该函数返回0，否则返回1，代表申请时间片成功，不需要throttle。
 
-## 如何throttle cfs_rq
+# 如何throttle cfs_rq
 
 假设上述assign_cfs_rq_runtime()函数返回0，意味着申请时间失败。cfs_rq需要被throttle。函数返回后，会设置TIF_NEED_RESCHED flag，意味着调度即将开始。调度器核心层通过pick_next_task()函数挑选出下一个应该运行的进程。CFS调度器的pick_next_task接口函数是pick_next_task_fair()。CFS调度器挑选进程前会先put_prev_task()。在该函数中会调用接口函数put_prev_task_fair()，函数如下：
 
@@ -187,10 +188,11 @@ static int tg_throttle_down(struct task_group *tg, void *data){	struct rq *rq = 
 
 throttle cfs_rq时，数据结构示意图如下：
 
-[![throttle-cfs_rq.png](http://www.wowotech.net/content/uploadfile/201812/43d91545462538.png "点击查看原图")](http://www.wowotech.net/content/uploadfile/201812/43d91545462538.png)
+![[Pasted image 20241024201816.png]]
+
 顺着被throttle cfs_rq依附的task_group的children链表，找到所有的task_group，并增加对应CPU的cfs_rq->throttle_count成员。
 
-## 如何unthrottle cfs_rq
+# 如何unthrottle cfs_rq
 
 unthrottle cfs_rq操作会在周期定时器定时时间到达之际进行。负责unthrottle cfs_rq操作的函数是unthrottle_cfs_rq()，该函数和throttle_cfs_rq()的操作相反。函数如下：
 
@@ -269,7 +271,7 @@ tg_unthrottle_up()函数如下：
 
 除了递减`cfs_rq->throttle_count`计数外，还计算了throttled_clock_task_time时间。和throttled_time不同的是，throttled_clock_task_time时间还包括由于parent cfs_rq被throttle的时间。虽然自己是unthrottle状态，但是parent cfs_rq是throttle状态，自己也是没办法运行的。所以throttled_clock_task_time统计的是`cfs_rq->throttle_count`从非零变成0经历的时间总和。
 
-## 周期更新quota
+# 周期更新quota
 
 带宽的限制是以`task_group`为单位，每一个`task_group`内嵌`cfs_bandwidth`结构体。周期性的更新quota利用的是高精度定时器，周期是period。`struct hrtimer period_timer`嵌在`cfs_bandwidth`结构体就是为了这个目的。定时器的初始化函数是init_cfs_bandwidth()。
 
@@ -413,7 +415,7 @@ slack_timer定时器的回调函数是sched_cfs_slack_timer()。sched_cfs_slack_
 > 1. 全局时间池剩余可运行时间必须大于slice（默认5ms），因为cfs_rq申请时间片的单位是5ms。
 > 1. distribute_cfs_runtime()函数已经分析过，根据传递的参数runtime计算可以unthrottle多少个cfs_rq，就unthrottle几个cfs_rq，尽力而为。
 
-## 用户空间如何使用
+# 用户空间如何使用
 
 CFS bandwidth control提供的接口是以cgroupfs的形式呈现。提供以下三个文件。
 
@@ -433,7 +435,7 @@ cpu.stat文件会输出以下3点信息。
 - nr_throttled: 用户组发生带宽限制次数
 - throttled_time: 用户组中调度实体总的限制时间和
 
-### 用户组层级限制
+## 用户组层级限制
 
 cpu.cfs_quota_us和cpu.cfs_period_us接口可以将一个task_group带宽控制在：max(c_i) \<= C(这里C代表parent task_group带宽，c_i代表它的children taskgroup)。所有的children task_group中最大带宽不能超过parent task_group带宽。但是，允许所有的children task_group带宽总额大于parent task_group带宽。即：\\Sum (c_i) >= C。所以，task_group被throttle有两种可能原因：
 
@@ -442,7 +444,7 @@ cpu.cfs_quota_us和cpu.cfs_period_us接口可以将一个task_group带宽控制�
 
 第2种情况下，虽然child task_group仍然剩余quota没有消耗，但是child task_group也必须等到parent task_group下个周期时间到来。
 
-### 使用举例
+# 使用举例
 
 1. 设置task_group带宽100%
 
@@ -473,7 +475,7 @@ cpu.cfs_quota_us和cpu.cfs_period_us接口可以将一个task_group带宽控制�
 
 标签: [CFS](http://www.wowotech.net/tag/CFS) [bandwidth](http://www.wowotech.net/tag/bandwidth)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [CFS调度器（6）-总结](http://www.wowotech.net/process_management/452.html) | [CFS调度器（4）-PELT(per entity load tracking)](http://www.wowotech.net/process_management/450.html)»
 

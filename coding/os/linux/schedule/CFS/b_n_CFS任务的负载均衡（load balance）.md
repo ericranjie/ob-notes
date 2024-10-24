@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2021-11-22 20:49 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 # 前言
@@ -6,11 +7,11 @@
 
 本文出现的内核代码来自Linux5.10.61，为了减少篇幅，我们尽量删除不相关代码，如果有兴趣，读者可以配合代码阅读本文。
 
-## 一、几种负载均衡的概述
+# 一、几种负载均衡的概述
 
 整个Linux的负载均衡器有下面的几个类型：
 
-![](http://www.wowotech.net/content/uploadfile/202111/b31e1637585550.png)
+![[Pasted image 20241024201856.png]]
 
 实际上内核的负载均衡器（本文都是特指CFS任务的）有两种，一种是为繁忙CPU们准备的periodic balancer，用于CFS任务在busy cpu上的均衡。还有一种是为idle cpu们准备的idle balancer，用于把繁忙CPU上的任务均衡到idle cpu上来。idle balancer有两种，一种是nohz idle balancer，另外一种是new idle balancer。
 
@@ -97,9 +98,9 @@ B、由于各个cpu上的tick大约是同步到来，因此自下而上的周期
 
 最后强调一下，这一小节的内容适用于periodic balance和nozh idle balance。
 
-三、nohz idle balance
+# 三、nohz idle balance
 
-1、Nohz idle均衡的触发条件
+## 1、Nohz idle均衡的触发条件
 
 nohz idle均衡的触发上一章已经描述了部分过程：scheduler_tick函数中调用trigger_load_balance函数，最终通过nohz_balancer_kick函数来触发，具体代码逻辑如下：
 
@@ -146,7 +147,7 @@ E、在同构系统中，我们还是期望负载能够在各个LLC domain上进
 
 一旦确定要进行nohz idle balance，我们就会调用kick_ilb函数来选择一个适合的CPU作为代表，来进行负载均衡。
 
-2、选择哪一个CPU？
+## 2、选择哪一个CPU？
 
 kick_ilb函数代码逻辑大致如下：
 
@@ -170,7 +171,7 @@ c) Kickee被中断唤醒，执行scheduler_ipi来处理这个ipi中断。当发�
 
 我们再强调一下：被kick的那个idle cpu并不是负责拉其他繁忙cpu上的任务到本CPU上就完事了，kickee是为了重新均衡所有idle cpu（tick被停掉）的负载，也就是说被选中的idle cpu仅仅是一个系统所有idle cpu的代表，它被唤醒是要把系统中繁忙CPU的任务均衡到系统中所有的idle cpu们。
 
-3、均衡处理
+## 3、均衡处理
 
 和tick balance一样，nohz idle balance的SCHED_SOFTIRQ软中断的处理函数run_rebalance_domains，只不过在这里调用nohz_idle_balance函数完成均衡。具体执行nohz idle balance非常简单，遍历系统所有的idle cpu，调用rebalance_domains来完成该cpu上的各个level的sched domain的负载均衡。
 
@@ -192,9 +193,9 @@ E、rebalance_domains中会根据情况修改rq->next_balance，因此这里需�
 
 \_nohz_idle_balance第二段的代码主要是处理本CPU（即被选中的idle cpu代表）的均衡，比较简单，不再赘述。
 
-四、new idle load balance
+# 四、new idle load balance
 
-1、均衡触发
+## 1、均衡触发
 
 Newidle balance的主入口函数是newidle_balance，我们分段解读其逻辑：
 
@@ -234,7 +235,7 @@ E、累计各个层级sched domain上的开销，用于控制new idle balance的
 
 F、在任何一个层级的sched domain上通过均衡拉取了任务，那么new idle balance都会终止，不会进一步去更高层级上进行sched domain的均衡。同样的，这也是为了控制new idle balance的开销。
 
-2、关于new idle balance的开销
+## 2、关于new idle balance的开销
 
 由于其他的均衡方式都是基于tick触发的，因此均衡次数都比较容易控制住。New idle balance不一样，每次cpu进入idle就会触发，因此我们需要谨慎对待。目前内核中使用两个参数来控制new idle balance的频次：cpu的平均idle时间和new idle balance的最大开销。本小节描述如何计算这两个参数的。
 
@@ -265,11 +266,11 @@ avg_idle的算法非常简单，首先在newidle_balance的时候记录idle_stam
 
 为了防止CPU一次idle太久时间带来的影响，我们限制了avg_idle的最大值，即计算出来avg_idle的值不能大于2倍的max_idle_balance_cost值。
 
-五、结束语
+# 五、结束语
 
 周期性均衡和nohz idle balance都是SCHED类型的软中断触发，最后都调用了rebalance_domains来执行该CPU上各个level的sched domain的均衡，具体在某个sched domain执行均衡的函数是load_balance函数。对于new idle load balance，也是遍历该CPU上各个level的sched domain执行均衡动作，调用的函数仍然是load_balance。因此，无论哪一种均衡，最后都万法归宗来到load_balance。由于篇幅原因，本文不再相信分析load_balance的逻辑，想要了解细节且听下回分解吧。
 
-参考文献：
+# 参考文献：
 
 1、内核源代码
 
@@ -277,11 +278,9 @@ avg_idle的算法非常简单，首先在newidle_balance的时候记录idle_stam
 
 本文首发在“内核工匠”微信公众号，欢迎扫描以下二维码关注公众号获取最新Linux技术分享：
 
-![](http://www.wowotech.net/content/uploadfile/202111/b9c21636066902.png)
-
 标签: [load](http://www.wowotech.net/tag/load) [balance](http://www.wowotech.net/tag/balance)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [CFS任务放置代码详解](http://www.wowotech.net/process_management/task_placement_detail.html) | [Atomic operation in aarch64](http://www.wowotech.net/armv8a_arch/492.html)»
 

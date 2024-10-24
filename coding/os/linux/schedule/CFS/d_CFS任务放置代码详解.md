@@ -1,20 +1,21 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2021-12-31 7:00 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-前言
+# 前言
 
 我们描述CFS任务负载均衡的系列文章一共三篇，第一篇是框架部分，第二篇描述了task placement的逻辑过程，第三篇是负载均衡的情景分析，包括tick balance、nohz idle balance和new idle balance。之前已经有一篇关于task placement的文档发表在本站，为了更精细的讲解代码逻辑，我们这次增加了代码分析部分。本文作为第二篇任务放置的附篇，深入讲解task placement的代码流程。
 
 本文出现的内核代码来自Linux5.10.61，为了减少篇幅，我们对引用的代码进行了删减（例如去掉了NUMA的代码，毕竟手机平台上我们暂时不关注这个特性），如果有兴趣，读者可以配合完整的源代码代码阅读本文。
 
-一、能量模型框架及其相关数据结构
+# 一、能量模型框架及其相关数据结构
 
-1、概述
+## 1、概述
 
 在嵌入式平台上，为了控制功耗，很多硬件模块被设计成可以运行在多种频率下工作（配合对应的电压，形成不同的performance level），这种硬件的驱动模块可以感知到在不同performance level下的能耗。系统中的某些模块可能会希望能感知到硬件能耗从而做出不同的判决。能量模型框架（Energy Model (EM) framework）是一个通用的接口模块，该接口连接了支持不同perf level的驱动模块和系统中的其他想要感知能量消耗的模块。
 
 一个典型的例子就是CPU调度器和CPU驱动模块，调度器希望能够感知底层CPU能量的消耗，从而做出更优的选核策略。对于CPU设备，各个cluster有各自独立的调频机制，cluster内的CPU统一工作在一个频率下。因此每个cluster就会形成一个性能域（performance domain）。调度器通过EM framework接口可以获取CPU在各个performance level的能量消耗。在了解了能量模型的基本概念之后，我们一起来看看和调度器相关的EM数据结构。
 
-2、struct root_domain
+## 2、struct root_domain
 
 最初引入root domain的概念是因为rt调度的问题。对于cfs task，我们只要保证每一个cpu runqueue上的公平就OK了（load balancer也会尽量cpu之间的公平），不需要严格保证全局公平。但是对于rt task就不行了，我们必须保证从全局范围看，优先级最高的任务最优先得到调度。然而这样会引入扩展性问题：随着cpu core数据增大，维持全局的rt调度策略有些困难，这样的情况下，我们把CPU分成一个个的区域，每一个区域对应一个root domain。对于rt调度，我们不需要维持全局，只要保证一个root domain中，最高优先级的rt任务最优先得到调度即可。当然，后来更多的成员增加到这个数据结构中（例如本文要描述的performance domain），丰富了它的含义。在手机平台上，我们只有一个root domain，有点类似整个系统的味道了。本文只描述和任务放置相关的成员，具体如下：
 
@@ -30,7 +31,7 @@
 
 在CPU拓扑初始化的时候，通过build_perf_domains函数创建各个perf domain，形成root domain的perf domain链表。
 
-3、struct perf_domain
+## 3、struct perf_domain
 
 Struct perf_comain表示一个CPU性能域，perf_comain和cpufreq policy是一一对应的，对于一个4+3+1结构的平台，每一个性能域都是由perf_domain抽象，因此系统共计3个perf domain，形成链表，链表头在root domain。Perf_domain的各个成员如下：
 
@@ -41,7 +42,7 @@ Struct perf_comain表示一个CPU性能域，perf_comain和cpufreq policy是一�
 |struct perf_domain \*next|系统中的perf domain会形成链表，这里指向下一个perf domain|
 |struct rcu_head rcu|保护perf domain list的rcu|
 
-4、struct em_perf_domain
+## 4、struct em_perf_domain
 
 在EM framework中，我们使用em_perf_domain来抽象一个performance domain：
 
@@ -52,7 +53,7 @@ Struct perf_comain表示一个CPU性能域，perf_comain和cpufreq policy是一�
 |int nr_perf_states|该perf domain支持多少个perf states，即上面perf states表格的条目数|
 |unsigned long cpus\[\]|该性能域包括哪些cpu？|
 
-5、struct em_perf_state
+## 5、struct em_perf_state
 
 每个性能域都有若干个perf level，每一个perf level对应能耗是不同的，我们用struct em_perf_state来表示一个perf level下的能耗信息：
 
@@ -63,7 +64,7 @@ Struct perf_comain表示一个CPU性能域，perf_comain和cpufreq policy是一�
 |unsigned long power|该perf level对应的功率|
 |unsigned long cost|为了方便能量运算的一个中间参数，等于power * max_frequency / frequency，下一章会详细解释|
 
-二、能量计算概述
+# 二、能量计算概述
 
 我们都知道一个基本的能量计算公式，如下：
 
@@ -83,23 +84,23 @@ CPU在该频点运行时间 =  cpu utility / cpu current capacity
 
 CPU在某个perf state的算力如下：
 
-![](http://www.wowotech.net/content/uploadfile/202112/b6c31640905558.png)
+![[Pasted image 20241024202029.png]]
 
 不考虑idle state的功耗，Cpu在某个perf state的能量估计如下：
 
-![](http://www.wowotech.net/content/uploadfile/202112/71421640905603.png)
+![[Pasted image 20241024202038.png]]
 
 把公式（1）带入公式（2）可以得到：
 
-![](http://www.wowotech.net/content/uploadfile/202112/05261640905651.png)
+![[Pasted image 20241024202046.png]]
 
 上面公式的第一项是一个常量，保存在em_perf_state的cost成员中。由于每个perf domain中的微架构都是一样的，因此scale_cpu是一样的，那么cost也是一样的，通过提取公因式我们可以得到整个perf domain的能耗公式：
 
-![](http://www.wowotech.net/content/uploadfile/202112/1ed01640905685.png)
+![[Pasted image 20241024202057.png]]
 
-三、Task placement概述
+# 三、Task placement概述
 
-1、唤醒场景的Task placement
+## 1、唤醒场景的Task placement
 
 一个线程进入阻塞状态后，异步事件或者其他线程会调用try_to_wake_up函数唤醒该线程，这时候会引发一次唤醒场景的task placement，在手机平台上任务放置大概的选核思路如下：
 
@@ -111,7 +112,7 @@ CPU在某个perf state的算力如下：
 
 一般而言Non-wake affine场景下的Non-EAS选核是要走慢速路径的，但是在手机平台，所有的各个level的sched domain都没有设定SD_BALANCE_WAKE的标记，因此我们无法确定wakeup均衡的范围，因此走快速路径。
 
-2、Fork和exec场景的Task placement
+## 2、Fork和exec场景的Task placement
 
 对fork后新任务的唤醒，内核不是用try_to_wake_up来处理，而是用了wake_up_new_task。这个函数会调用fork类型的选核函数完成任务放置。当新任务调用exec类函数开启自己新的旅程之后，内核会调用sched_exec启动一次exec类型的placement。这两种类型的placement选核思路类似：
 
@@ -119,7 +120,7 @@ CPU在某个perf state的算力如下：
 
 （2）对于exec场景，找到最高level且支持SD_BALANCE_EXEC的sched domain（即找到exec均衡的范围），走慢速路径来进行选核
 
-四、select_task_rq_fair函数代码分析
+# 四、select_task_rq_fair函数代码分析
 
 无论哪种类型的task placement，最终都是调用select_task_rq_fair函数完成逻辑，只是传递参数不同。该函数的逻辑分成三个段落：第一段是EAS的bypass路径，第二段是选择sched domain的逻辑（快速路径的的sched domain不需要选择，固定为为LLC domain），第三段是CPU的选择。我们先看第一段逻辑，它是唤醒类型的EAS处理，如下：
 
@@ -159,7 +160,7 @@ A、慢速选核路径，需要在选定的sched domain中寻找最空闲的grou
 
 B、快速选核路径，主要是在LLC domain中选择距离new_cpu比较近的空闲CPU。对于wake affine，这里的new_cpu就是wake_affine选定的target cpu，对于其他场景new_cpu就是prev cpu。
 
-五、EAS选核
+# 五、EAS选核
 
 find_energy_efficient_cpu函数用来为被唤醒的任务找到一个能效比最高的目标CPU。主要搜索的步骤如下：
 
@@ -213,7 +214,7 @@ F、对比各个perf domain中选择的最佳CPU（剩余空闲算力最大）�
 
 在EAS选核最后，选出的best_energy_cpu还要和prev cpu进行PK，毕竟prev cpu有可能带来潜在的性能收益（提高cache命中率），只有当best_energy_cpu相对prev cpu能耗收益大于CPU总耗能的1/16，才选择best_energy_cpu，否则还是运行在prev cpu上。
 
-六、能量计算
+# 六、能量计算
 
 compute_energy函数原型如下：
 
