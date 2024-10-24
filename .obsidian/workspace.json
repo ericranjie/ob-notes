@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "file": "coding/os/linux/schedule/lock/RCU/i_RCU（1）- 概述.md",
                 "mode": "source",
                 "source": false
               }
@@ -85,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "file": "coding/os/linux/schedule/lock/RCU/i_RCU（1）- 概述.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -102,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
+                "file": "coding/os/linux/schedule/lock/RCU/i_RCU（1）- 概述.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -125,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md"
+                "file": "coding/os/linux/schedule/lock/RCU/i_RCU（1）- 概述.md"
               }
             }
           }
@@ -148,6 +148,9 @@
   },
   "active": "55dec6effde51c58",
   "lastOpenFiles": [
+    "coding/os/linux/schedule/lock/RCU/k_Linux2.6.23 ：sleepable RCU的实现.md",
+    "coding/os/linux/schedule/lock/rwlock/d_Linux读写锁逻辑解析.md",
+    "coding/os/linux/schedule/preempt/b_内核抢占，让世界变得更美好.md",
     "coding/os/linux/schedule/preempt/b_全方位剖析内核抢占机制.md",
     "coding/os/linux/schedule/k_Linux调度器：进程优先级.md",
     "coding/os/linux/schedule/interrupt/k_Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
@@ -181,9 +184,6 @@
     "coding/os/linux/schedule/k_Kernel同步机制的底层实现.md",
     "coding/os/linux/schedule/k_Linux中常见同步机制设计原理.md",
     "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
-    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
-    "coding/os/linux/schedule/CFS/O(n)、O(1)和CFS调度器.md",
-    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（任务放置）.md",
     "zx99-image/-20241021",
     "interview/leetcode/codetop/1-dimensional",
     "interview/leetcode/codetop",

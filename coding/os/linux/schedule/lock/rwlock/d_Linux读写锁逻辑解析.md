@@ -1,3 +1,4 @@
+
 作者：[OPPO内核团队](http://www.wowotech.net/author/538) 发布于：2023-5-29 20:57 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、Linux为何会引入读写锁？

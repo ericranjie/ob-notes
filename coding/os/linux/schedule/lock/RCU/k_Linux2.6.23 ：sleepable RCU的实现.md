@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2016-2-4 18:38 分类：[内核同步机制](http://www.wowotech.net/sort/kernel_synchronization)
 
 # 一、前言
