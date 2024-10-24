@@ -38,20 +38,20 @@ https://www.ntop.org/products/packet-capture/pf_ring/
 DPDK似乎找到了一种正确的方法，即直接将数据包拉到用户态来处理，绕过操作系统内核(Tilera Core以及通用的netmap当然也是这种方式)。虽然它们的实现各自不同，但整体看来，这些机制又大又重。
 
 由于网卡功能有限，它没有逻辑计算单元，仅负责收发数据包的IO操作以及极少量的数据包缓存，大部分的协议流程都必须由主机CPU来完成，即便绕过了操作系统内核，CPU也还是必须的，因此DPDK一般而言都是专门分配一个或者几个CPU核心来处理数据包。
-!\[\[Pasted image 20240920195200.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240920195200.png]]
 
 既然数据包来自网卡，何不让网卡自己去处理？给网卡赋予逻辑处理能力就可以了。
 
 因此，ASIC以及FPGA承担了高性能网络处理的职责，专门的电路可以及时就地处理数据包，无需主机CPU参与，解放了CPU。
-!\[\[Pasted image 20240920195205.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240920195205.png]]
 
 但同样是大而重的，你必须采用专用的软件对专门的硬件进行编程，类似DPDK有一套需要学习后才能上手的SDK一样，FPGA甚至需要专门的语言。
 
 何不在网卡上装一个足够通用的CPU配备一块足够通用的内存呢，如此网卡就是一个五脏俱全的小型计算机了，既然是个计算机，那就可以执行通用代码咯。
-!\[\[Pasted image 20240920195212.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240920195212.png]]
 
 **和DPDK把数据包拉到用户态的方向相反，与其把数据上拉被CPU处理，把处理数据包的代码向下注入网卡是殊途同归的，为了让网卡可以执行注下去的代码，给网卡内置几个CPU即可，这就是智能网卡的思路。**
 
@@ -60,16 +60,16 @@ DPDK从上面经由用户态bypass内核协议栈，智能网卡从下面在硬�
 在这个意义上，DPDK其实就是把x86 CPU+Ringbuffer和Intel网卡一起，当成了一块 “智能网卡”
 
 下面的图示展示了智能网卡的结构以及注入代码的执行逻辑，来自netronome的Open-NFP官网：
-!\[\[Pasted image 20240920195216.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240920195216.png]]
 
 netronome开创了智能网卡新时代，netronome SmartNIC可以配备几十个处理器同时执行网络数据包处理的代码，从而卸载主机CPU的劳力，这就是我们常说的硬件Offload。
 
 那么如何把代码注入到智能网卡呢？
 
 你可以使用专用的模式，阅读智能网卡厂商的指令集，然后确保最终的机器码对应该指令集即可，但幸运的是，我们有通用的eBPF的JIT编译，可以将eBPF中间字节码编译成智能网卡的机器码。整个过程从编程到部署，非常通用：
-!\[\[Pasted image 20240920195221.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240920195221.png]]
 
 目前netronome SmartNIC已经实现了该JIT编译器，参见Linux内核目录树：
 
