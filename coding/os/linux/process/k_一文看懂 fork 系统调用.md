@@ -1,7 +1,7 @@
-Linux内核那些事
-_2021年10月19日 09:02_
 
-## 前言
+Linux内核那些事 _2021年10月19日 09:02_
+
+# 前言
 
 Unix标准的复制进程的系统调用时fork（即分叉），但是Linux，BSD等操作系统并不止实现这一个，确切的说linux实现了三个，fork,vfork,clone（确切说vfork创造出来的是轻量级进程，也叫线程，是共享资源的进程）
 
@@ -21,9 +21,9 @@ fork, vfork和clone的系统调用的入口地址分别是sys_fork, sys_vfork和
 
 即不同的体系结构可能需要采用不同的方式或者寄存器来存储函数调用的参数， 因此linux在设计系统调用的时候, 将其划分成体系结构相关的层次和体系结构无关的层次, 前者复杂提取出依赖与体系结构的特定的参数，后者则依据参数的设置执行特定的真正操作。
 
-## fork, vfork, clone系统调用的实现
+# fork, vfork, clone系统调用的实现
 
-### 关于do_fork和_do_frok
+## 关于do_fork和_do_frok
 
 linux2.5.32以后, 添加了TLS(Thread Local Storage)机制, clone的标识CLONE_SETTLS接受一个参数来设置线程的本地存储区。sys_clone也因此增加了一个int参数来传入相应的点tls_val。sys_clone通过do_fork来调用copy_process完成进程的复制，它调用特定的copy_thread和copy_thread把相应的系统调用参数从pt_regs寄存器列表中提取出来，但是会导致意外的情况。
 
@@ -55,12 +55,12 @@ linux2.5.32以后, 添加了TLS(Thread Local Storage)机制, clone的标识CLONE
 |child_tidptr|与clone的ctid参数相同, 子进程在用户太下pid的地址，该参数在CLONE_CHILD_SETTID标志被设定时有意义|
 
 其中clone_flags如下表所示
-!\[\[Pasted image 20240923195855.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240923195855.png]]
 
 CLONE_FLAGS
 
-## sys_fork的实现
+# sys_fork的实现
 
 不同体系结构下的fork实现sys_fork主要是通过标志集合区分, 在大多数体系结构上, 典型的fork实现方式与如下
 
@@ -91,7 +91,7 @@ SYSCALL_DEFINE0(fork){#ifdef CONFIG_MMU    return _do_fork(SIGCHLD, 0, 0
 
 如果do_fork成功, 则新建进程的pid作为系统调用的结果返回, 否则返回错误码
 
-## sys_vfork的实现
+# sys_vfork的实现
 
 **早期实现**
 
@@ -149,9 +149,9 @@ SYSCALL_DEFINE5(clone, unsigned long, clone_flags, unsigned long, newsp, 
 
 另外还指令了用户空间的两个指针(parent_tidptr和child_tidptr), 用于与线程库通信
 
-## 创建子进程的流程
+# 创建子进程的流程
 
-### \_do_fork的流程
+## _do_fork的流程
 
 > \_do_fork和do_fork在进程的复制的时候并没有太大的区别, 他们就只是在进程tls复制的过程中实现有细微差别
 
@@ -171,9 +171,7 @@ SYSCALL_DEFINE5(clone, unsigned long, clone_flags, unsigned long, newsp, 
 
 > 我们从\<深入linux'内核架构>中找到了早期的流程图，基本一致可以作为参考
 
-!\[\[Pasted image 20240923200025.png\]\]
-
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240923200025.png]]
 
 do_fork
 
@@ -181,7 +179,7 @@ do_fork
 long _do_fork(unsigned long clone_flags,      unsigned long stack_start,      unsigned long stack_size,      int __user *parent_tidptr,      int __user *child_tidptr,      unsigned long tls){    struct task_struct *p;    int trace = 0;    long nr;      /*     * Determine whether and which event to report to ptracer.  When     * called from kernel_thread or CLONE_UNTRACED is explicitly     * requested, no event is reported; otherwise, report if the event     * for the type of forking is enabled.     */    if (!(clone_flags & CLONE_UNTRACED)) {    if (clone_flags & CLONE_VFORK)        trace = PTRACE_EVENT_VFORK;    else if ((clone_flags & CSIGNAL) != SIGCHLD)        trace = PTRACE_EVENT_CLONE;    else        trace = PTRACE_EVENT_FORK;      if (likely(!ptrace_event_enabled(current, trace)))        trace = 0;    }   /*  复制进程描述符，copy_process()的返回值是一个 task_struct 指针  */    p = copy_process(clone_flags, stack_start, stack_size,         child_tidptr, NULL, trace, tls);    /*     * Do this prior waking up the new thread - the thread pointer     * might get invalid after that point, if the thread exits quickly.     */    if (!IS_ERR(p)) {    struct completion vfork;    struct pid *pid;      trace_sched_process_fork(current, p);   /*  得到新创建的进程的pid信息  */    pid = get_task_pid(p, PIDTYPE_PID);    nr = pid_vnr(pid);      if (clone_flags & CLONE_PARENT_SETTID)        put_user(nr, parent_tidptr);       /*  如果调用的 vfork()方法，初始化 vfork 完成处理信息 */    if (clone_flags & CLONE_VFORK) {        p->vfork_done = &vfork;        init_completion(&vfork);        get_task_struct(p);    } /*  将子进程加入到调度器中，为其分配 CPU，准备执行  */    wake_up_new_task(p);      /* forking complete and child started to run, tell ptracer */    if (unlikely(trace))        ptrace_event_pid(trace, pid);       /*  如果是 vfork，将父进程加入至等待队列，等待子进程完成  */    if (clone_flags & CLONE_VFORK) {        if (!wait_for_vfork_done(p, &vfork))        ptrace_event_pid(PTRACE_EVENT_VFORK_DONE, pid);    }      put_pid(pid);    } else {    nr = PTR_ERR(p);    }    return nr;}
 ```
 
-## copy_process流程
+# copy_process流程
 
 > http://lxr.free-electrons.com/source/kernel/fork.c?v=4.5#L1237
 
@@ -200,21 +198,53 @@ long _do_fork(unsigned long clone_flags,      unsigned long stack_sta
 1. 为新进程分配并设置新的 pid
 
 > 我们从\<深入linux'内核架构>中找到了早期的流程图，基本一致可以作为参考
-> !\[\[Pasted image 20240923195950.png\]\]
-> !\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+> ![[Pasted image 20240923195950.png]]
 
 do_fork
 
 ```c
-/* * This creates a new process as a copy of the old one, * but does not actually start it yet. * * It copies the registers, and all the appropriate * parts of the process environment (as per the clone * flags). The actual kick-off is left to the caller. */static struct task_struct *copy_process(unsigned long clone_flags,                    unsigned long stack_start,                    unsigned long stack_size,                    int __user *child_tidptr,                    struct pid *pid,                    int trace,                    unsigned long tls){    int retval;    struct task_struct *p;    retval = security_task_create(clone_flags);    if (retval)        goto fork_out; //  复制当前的 task_struct    retval = -ENOMEM;    p = dup_task_struct(current);    if (!p)        goto fork_out;    ftrace_graph_init_task(p);    //初始化互斥变量    rt_mutex_init_task(p);#ifdef CONFIG_PROVE_LOCKING    DEBUG_LOCKS_WARN_ON(!p->hardirqs_enabled);    DEBUG_LOCKS_WARN_ON(!p->softirqs_enabled);#endif //检查进程数是否超过限制，由操作系统定义    retval = -EAGAIN;    if (atomic_read(&p->real_cred->user->processes) >=            task_rlimit(p, RLIMIT_NPROC)) {        if (p->real_cred->user != INIT_USER &&            !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN))            goto bad_fork_free;    }    current->flags &= ~PF_NPROC_EXCEEDED;    retval = copy_creds(p, clone_flags);    if (retval < 0)        goto bad_fork_free;    /*     * If multiple threads are within copy_process(), then this check     * triggers too late. This doesn't hurt, the check is only there     * to stop root fork bombs.     */ //检查进程数是否超过 max_threads 由内存大小决定    retval = -EAGAIN;    if (nr_threads >= max_threads)        goto bad_fork_cleanup_count;    delayacct_tsk_init(p);  /* Must remain after dup_task_struct() */    p->flags &= ~(PF_SUPERPRIV | PF_WQ_WORKER);    p->flags |= PF_FORKNOEXEC;    INIT_LIST_HEAD(&p->children);    INIT_LIST_HEAD(&p->sibling);    rcu_copy_process(p);    p->vfork_done = NULL;    //  初始化自旋锁    spin_lock_init(&p->alloc_lock); //  初始化挂起信号    init_sigpending(&p->pending);    //  初始化 CPU 定时器    posix_cpu_timers_init(p); //  ......    /* Perform scheduler related setup. Assign this task to a CPU.      初始化进程数据结构，并把进程状态设置为 TASK_RUNNING    */    retval = sched_fork(clone_flags, p);    if (retval)        goto bad_fork_cleanup_policy; retval = perf_event_init_task(p);    /* 复制所有进程信息，包括文件系统、信号处理函数、信号、内存管理等   */    if (retval)        goto bad_fork_cleanup_policy;    retval = audit_alloc(p);    if (retval)        goto bad_fork_cleanup_perf;    /* copy all the process information */    shm_init_task(p);    retval = copy_semundo(clone_flags, p);    if (retval)        goto bad_fork_cleanup_audit;    retval = copy_files(clone_flags, p);    if (retval)        goto bad_fork_cleanup_semundo;    retval = copy_fs(clone_flags, p);    if (retval)        goto bad_fork_cleanup_files;    retval = copy_sighand(clone_flags, p);    if (retval)        goto bad_fork_cleanup_fs;    retval = copy_signal(clone_flags, p);    if (retval)        goto bad_fork_cleanup_sighand;    retval = copy_mm(clone_flags, p);    if (retval)        goto bad_fork_cleanup_signal;    retval = copy_namespaces(clone_flags, p);    if (retval)        goto bad_fork_cleanup_mm;    retval = copy_io(clone_flags, p);    if (retval)        goto bad_fork_cleanup_namespaces;    /*    初始化子进程内核栈     linux-4.2新增处理TLS        之前版本是 retval = copy_thread(clone_flags, stack_start, stack_size, p);        */    retval = copy_thread_tls(clone_flags, stack_start, stack_size, p, tls);    if (retval)        goto bad_fork_cleanup_io; /*  为新进程分配新的pid  */    if (pid != &init_struct_pid) {        pid = alloc_pid(p->nsproxy->pid_ns_for_children);        if (IS_ERR(pid)) {            retval = PTR_ERR(pid);            goto bad_fork_cleanup_io;        }    } /*  设置子进程的pid  */    /* ok, now we should be set up.. */    p->pid = pid_nr(pid);    if (clone_flags & CLONE_THREAD) {        p->exit_signal = -1;        p->group_leader = current->group_leader;        p->tgid = current->tgid;    } else {        if (clone_flags & CLONE_PARENT)            p->exit_signal = current->group_leader->exit_signal;        else            p->exit_signal = (clone_flags & CSIGNAL);        p->group_leader = p;        p->tgid = p->pid;    }    p->nr_dirtied = 0;    p->nr_dirtied_pause = 128 >> (PAGE_SHIFT - 10);    p->dirty_paused_when = 0;    p->pdeath_signal = 0;    INIT_LIST_HEAD(&p->thread_group);    p->task_works = NULL;    /*     * Make it visible to the rest of the system, but dont wake it up yet.     * Need tasklist lock for parent etc handling!     */    write_lock_irq(&tasklist_lock); /*  调用fork的进程为其父进程  */    /* CLONE_PARENT re-uses the old parent */    if (clone_flags & (CLONE_PARENT|CLONE_THREAD)) {        p->real_parent = current->real_parent;        p->parent_exec_id = current->parent_exec_id;    } else {        p->real_parent = current;        p->parent_exec_id = current->self_exec_id;    }    spin_lock(&current->sighand->siglock);    // ......    return p;}
+/* * This creates a new process as a copy of the old one, * but does not actually start it yet. * * It copies the registers, and all the appropriate * parts of the process environment (as per the clone * flags). The actual kick-off is left to the caller. */
+static struct task_struct *copy_process(unsigned long clone_flags,    unsigned long stack_start,  unsigned long stack_size,  int __user *child_tidptr,  struct pid *pid, int trace,  unsigned long tls {
+int retval;
+struct task_struct *p;
+retval = security_task_create(clone_flags);
+if (retval)        goto fork_out; //  复制当前的 task_struct
+retval = -ENOMEM;
+p = dup_task_struct(current);
+if (!p)        goto fork_out;
+ftrace_graph_init_task(p);    //初始化互斥变量    
+rt_mutex_init_task(p);
+#ifdef CONFIG_PROVE_LOCKING    
+DEBUG_LOCKS_WARN_ON(!p->hardirqs_enabled);    
+DEBUG_LOCKS_WARN_ON(!p->softirqs_enabled);
+#endif //检查进程数是否超过限制，由操作系统定义    
+retval = -EAGAIN;    
+if (atomic_read(&p->real_cred->user->processes) >=            
+	task_rlimit(p, RLIMIT_NPROC)) {
+	        if (p->real_cred->user != INIT_USER &&
+	                    !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN))            
+	                    goto bad_fork_free;
+	                        }
+	                            current->flags &= ~PF_NPROC_EXCEEDED;    retval = copy_creds(p, clone_flags);    if (retval < 0)        goto bad_fork_free;    /*     * If multiple threads are within copy_process(), then this check     * triggers too late. This doesn't hurt, the check is only there     * to stop root fork bombs.     */ //检查进程数是否超过 max_threads 由内存大小决定    retval = -EAGAIN;    if (nr_threads >= max_threads)        goto bad_fork_cleanup_count;    delayacct_tsk_init(p);  /* Must remain after dup_task_struct() */    p->flags &= ~(PF_SUPERPRIV | PF_WQ_WORKER);    p->flags |= PF_FORKNOEXEC;    INIT_LIST_HEAD(&p->children);    INIT_LIST_HEAD(&p->sibling);    rcu_copy_process(p);    p->vfork_done = NULL;    //  初始化自旋锁    spin_lock_init(&p->alloc_lock); //  初始化挂起信号    init_sigpending(&p->pending);    //  初始化 CPU 定时器    posix_cpu_timers_init(p); //  ......    /* Perform scheduler related setup. Assign this task to a CPU.      初始化进程数据结构，并把进程状态设置为 TASK_RUNNING    */    retval = sched_fork(clone_flags, p);    if (retval)        goto bad_fork_cleanup_policy; retval = perf_event_init_task(p);    /* 复制所有进程信息，包括文件系统、信号处理函数、信号、内存管理等   */    if (retval)        goto bad_fork_cleanup_policy;    retval = audit_alloc(p);    if (retval)        goto bad_fork_cleanup_perf;    /* copy all the process information */    shm_init_task(p);    retval = copy_semundo(clone_flags, p);    if (retval)        goto bad_fork_cleanup_audit;    retval = copy_files(clone_flags, p);    if (retval)        goto bad_fork_cleanup_semundo;    retval = copy_fs(clone_flags, p);    if (retval)        goto bad_fork_cleanup_files;    retval = copy_sighand(clone_flags, p);    if (retval)        goto bad_fork_cleanup_fs;    retval = copy_signal(clone_flags, p);    if (retval)        goto bad_fork_cleanup_sighand;    retval = copy_mm(clone_flags, p);    if (retval)        goto bad_fork_cleanup_signal;    retval = copy_namespaces(clone_flags, p);    if (retval)        goto bad_fork_cleanup_mm;    retval = copy_io(clone_flags, p);    if (retval)        goto bad_fork_cleanup_namespaces;    /*    初始化子进程内核栈     linux-4.2新增处理TLS        之前版本是 retval = copy_thread(clone_flags, stack_start, stack_size, p);        */    retval = copy_thread_tls(clone_flags, stack_start, stack_size, p, tls);    if (retval)        goto bad_fork_cleanup_io; /*  为新进程分配新的pid  */    if (pid != &init_struct_pid) {        pid = alloc_pid(p->nsproxy->pid_ns_for_children);        if (IS_ERR(pid)) {            retval = PTR_ERR(pid);            goto bad_fork_cleanup_io;        }    } /*  设置子进程的pid  */    /* ok, now we should be set up.. */    p->pid = pid_nr(pid);    if (clone_flags & CLONE_THREAD) {        p->exit_signal = -1;        p->group_leader = current->group_leader;        p->tgid = current->tgid;    } else {        if (clone_flags & CLONE_PARENT)            p->exit_signal = current->group_leader->exit_signal;        else            p->exit_signal = (clone_flags & CSIGNAL);        p->group_leader = p;        p->tgid = p->pid;    }    p->nr_dirtied = 0;    p->nr_dirtied_pause = 128 >> (PAGE_SHIFT - 10);    p->dirty_paused_when = 0;    p->pdeath_signal = 0;    INIT_LIST_HEAD(&p->thread_group);    p->task_works = NULL;    /*     * Make it visible to the rest of the system, but dont wake it up yet.     * Need tasklist lock for parent etc handling!     */    write_lock_irq(&tasklist_lock); /*  调用fork的进程为其父进程  */    /* CLONE_PARENT re-uses the old parent */    if (clone_flags & (CLONE_PARENT|CLONE_THREAD)) {        p->real_parent = current->real_parent;        p->parent_exec_id = current->parent_exec_id;    } else {        p->real_parent = current;        p->parent_exec_id = current->self_exec_id;    }    spin_lock(&current->sighand->siglock);    // ......    return p;}
 ```
 
-## dup_task_struct 流程
+# dup_task_struct 流程
 
 > http://lxr.free-electrons.com/source/kernel/fork.c?v=4.5#L334
 
 ```c
-static struct task_struct *dup_task_struct(struct task_struct *orig){ struct task_struct *tsk; struct thread_info *ti; int node = tsk_fork_get_node(orig); int err; //分配一个 task_struct 节点 tsk = alloc_task_struct_node(node); if (!tsk)  return NULL; //分配一个 thread_info 节点，包含进程的内核栈，ti 为栈底 ti = alloc_thread_info_node(tsk, node); if (!ti)  goto free_tsk; //将栈底的值赋给新节点的栈 tsk->stack = ti; //…… return tsk;}
+static struct task_struct *dup_task_struct(struct task_struct *orig){ 
+struct task_struct *tsk; 
+struct thread_info *ti; 
+int node = tsk_fork_get_node(orig); 
+int err; //分配一个 task_struct 节点 
+tsk = alloc_task_struct_node(node); 
+if (!tsk)  return NULL; //分配一个 thread_info 节点，包含进程的内核栈，ti 为栈底 
+ti = alloc_thread_info_node(tsk, node); 
+if (!ti)  goto free_tsk; //将栈底的值赋给新节点的栈 
+tsk->stack = ti; //…… 
+return tsk;
+}
 ```
 
 1. 调用alloc_task_struct_node分配一个 task_struct 节点
@@ -222,17 +252,28 @@ static struct task_struct *dup_task_struct(struct task_struct *orig){ stru
 1. 调用alloc_thread_info_node分配一个 thread_info 节点，其实是分配了一个thread_union联合体,将栈底返回给 ti
 
 ```c
-union thread_union {   struct thread_info thread_info;  unsigned long stack[THREAD_SIZE/sizeof(long)];};
+union thread_union {   
+struct thread_info thread_info;  
+unsigned long stack[THREAD_SIZE/sizeof(long)];
+};
 ```
 
 - 最后将栈底的值 ti 赋值给新节点的栈
 
 - 最终执行完dup_task_struct之后，子进程除了tsk->stack指针不同之外，全部都一样！
 
-## sched_fork 流程
+# sched_fork 流程
 
 ```c
-int sched_fork(unsigned long clone_flags, struct task_struct *p){ unsigned long flags; int cpu = get_cpu(); __sched_fork(clone_flags, p); //  将子进程状态设置为 TASK_RUNNING p->state = TASK_RUNNING; //  …… //  为子进程分配 CPU set_task_cpu(p, cpu); put_cpu(); return 0;}
+int sched_fork(unsigned long clone_flags, struct task_struct *p){ 
+unsigned long flags; 
+int cpu = get_cpu(); __sched_fork(clone_flags, p); //  将子进程状态设置为 TASK_RUNNING 
+p->state = TASK_RUNNING; //  
+…… //  为子进程分配 CPU 
+set_task_cpu(p, cpu); 
+put_cpu(); 
+return 0;
+}
 ```
 
 我们可以看到sched_fork大致完成了两项重要工作，
@@ -241,7 +282,7 @@ int sched_fork(unsigned long clone_flags, struct task_struct *p){ unsigne
 
 - 二是为其分配 CPU
 
-## copy_thread和copy_thread_tls流程
+# copy_thread和copy_thread_tls流程
 
 我们可以看到linux-4.2之后增加了copy_thread_tls函数和CONFIG_HAVE_COPY_THREAD_TLS宏
 
@@ -268,7 +309,7 @@ copy_thread 这段代码为我们解释了两个相当重要的问题！
 
 - 二是，p->thread.ip = (unsigned long) ret_from_fork;将子进程的 ip 设置为 ret_form_fork 的首地址，因此子进程是从 ret_from_fork 开始执行的
 
-## 总结
+# 总结
 
 fork, vfork和clone的系统调用的入口地址分别是sys_fork, sys_vfork和sys_clone, 而他们的定义是依赖于体系结构的, 而他们最终都调用了_do_fork（linux-4.2之前的内核中是do_fork），在_do_fork中通过copy_process复制进程的信息，调用wake_up_new_task将子进程加入调度器中
 
@@ -285,8 +326,8 @@ fork, vfork和clone的系统调用的入口地址分别是sys_fork, sys_vfork和
 1. 最终子进程从ret_from_fork开始执行
 
 进程的创建到执行过程如下图所示
-!\[\[Pasted image 20240923201201.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240923201201.png]]
 
 进程的状态
 

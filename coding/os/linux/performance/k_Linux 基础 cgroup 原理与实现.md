@@ -1,13 +1,11 @@
 
-CPP开发者
-
-_2022年01月19日 11:55_
+CPP开发者 _2022年01月19日 11:55_
 
 以下文章来源于Linux内核那些事 ，作者songsong001
 
 本文将通过分析源码（本文使用的 Linux2.6.25 版本）来介绍 `CGroup` 的实现原理。在分析源码前，我们先介绍几个重要的数据结构，因为 `CGroup` 就是通过这几个数据结构来控制进程组对各种资源的使用。
 
-## `cgroup` 结构体
+# `cgroup` 结构体
 
 前面介绍过，`cgroup` 是用来控制进程组对各种资源的使用，而在内核中，`cgroup` 是通过 `cgroup` 结构体来描述的，我们来看看其定义：
 
@@ -26,10 +24,11 @@ struct cgroup {    unsigned long flags;        /* "unsigned lo
 1. `top_cgroup`: `层级` 的根节点（根cgroup）。
 
 我们通过下面图片来描述 `层级` 中各个 `cgroup` 组成的树状关系：
+
 ![[Pasted image 20240920124925.png]]
 cgroup-links
 
-## `cgroup_subsys_state` 结构体
+# `cgroup_subsys_state` 结构体
 
 每个 `子系统` 都有属于自己的资源控制统计信息结构，而且每个 `cgroup` 都绑定一个这样的结构，这种资源控制统计信息结构就是通过 `cgroup_subsys_state` 结构体实现的，其定义如下：
 
@@ -60,7 +59,8 @@ struct mem_cgroup {    
 ```
 
 从 `mem_cgroup` 结构的定义可以发现，`mem_cgroup` 结构的第一个字段就是一个 `cgroup_subsys_state` 结构。下面的图片展示了他们之间的关系：
-!\[\[Pasted image 20240920124937.png\]\]
+
+![[Pasted image 20240920124937.png]]
 
 cgroup-state-memory
 
@@ -73,7 +73,7 @@ cgroup-state-memory
 ![[Pasted image 20240920124951.png]]
 cgroup-subsys-state
 
-## `css_set` 结构体
+# `css_set` 结构体
 
 由于一个进程可以同时添加到不同的 `cgroup` 中（前提是这些 `cgroup` 属于不同的 `层级`）进行资源控制，而这些 `cgroup` 附加了不同的资源控制 `子系统`。所以需要使用一个结构把这些 `子系统` 的资源控制统计信息收集起来，方便进程通过 `子系统ID` 快速查找到对应的 `子系统` 资源控制统计信息，而 `css_set` 结构体就是用来做这件事情。`css_set` 结构体定义如下：
 
@@ -97,11 +97,12 @@ struct task_struct {    ...    struct css_set *cgroups;    struc
 可以看出，`task_struct` 结构的 `cgroups` 字段就是指向 `css_set` 结构的指针，而 `cg_list` 字段用于连接所有使用此 `css_set` 结构的进程列表。
 
 `task_struct` 结构与 `css_set` 结构的关系如下图：
+
 ![[Pasted image 20240920125058.png]]
 
 cgroup-task-cssset
 
-## `cgroup_subsys` 结构
+# `cgroup_subsys` 结构
 
 `CGroup` 通过 `cgroup_subsys` 结构操作各个 `子系统`，每个 `子系统` 都要实现一个这样的结构，其定义如下：
 
@@ -133,7 +134,7 @@ struct cgroup_subsys mem_cgroup_subsys = {    .name = "memory",   �
 static struct cgroup_subsys *subsys[] = {    cpuset_subsys,    debug_subsys,    ns_subsys,    cpu_cgroup_subsys,    cpuacct_subsys,    mem_cgroup_subsys};
 ```
 
-## `CGroup` 的挂载
+# `CGroup` 的挂载
 
 前面介绍了 `CGroup` 相关的几个结构体，接下来我们分析一下 `CGroup` 的实现。
 
@@ -177,7 +178,7 @@ struct cgroupfs_root {    struct super_block *sb;    unsigned long�
 
 接着调用 `rebind_subsystems()` 函数把挂载时指定要附加的 `子系统` 添加到 `cgroupfs_root` 结构的 `subsys_list` 链表中，并且为根 `cgroup` 的 `subsys` 字段设置各个 `子系统` 的资源控制统计信息对象，最后调用 `cgroup_populate_dir()` 函数向挂载目录创建 `cgroup` 的管理文件（如 `tasks` 文件）和各个 `子系统` 的管理文件（如 `memory.limit_in_bytes` 文件）。
 
-## 向 `CGroup` 添加要进行资源控制的进程
+# 向 `CGroup` 添加要进行资源控制的进程
 
 通过向 `CGroup` 的 `tasks` 文件写入要进行资源控制的进程PID，即可以对进程进行资源控制。例如下面命令：
 
@@ -205,7 +206,7 @@ int cgroup_attach_task(struct cgroup *cgrp, struct task_struct *tsk){  �
 
 最后，`cgroup_attach_task()` 函数会调用附加在 `层级` 上的所有 `子系统` 的 `attach()` 函数对新增进程进行一些其他的操作（这些操作由各自 `子系统` 去实现）。
 
-## 限制 `CGroup` 的资源使用
+# 限制 `CGroup` 的资源使用
 
 本文主要是使用 `内存子系统` 作为例子，所以这里分析内存限制的原理。
 
@@ -223,7 +224,7 @@ static ssize_t mem_cgroup_write(struct cgroup *cont, struct cftype *cft,�
 
 其主要工作就是把 `内存子系统` 的资源控制对象 `mem_cgroup` 的 `res.limit` 字段设置为指定的数值。
 
-## 限制进程使用资源
+# 限制进程使用资源
 
 当设置好 `cgroup` 的资源使用限制信息，并且把进程添加到这个 `cgroup` 的 `tasks` 列表后，进程的资源使用就会受到这个 `cgroup` 的限制。这里使用 `内存子系统` 作为例子，来分析一下内核是怎么通过 `cgroup` 来限制进程对资源的使用的。
 

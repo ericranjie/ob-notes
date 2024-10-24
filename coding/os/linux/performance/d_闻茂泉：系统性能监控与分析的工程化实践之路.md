@@ -1,6 +1,5 @@
-闻茂泉（广成） Linux阅码场
 
-_2022年01月17日 08:02_
+闻茂泉（广成） Linux阅码场 _2022年01月17日 08:02_
 
 **【作者介绍】**
 
@@ -26,7 +25,7 @@ _2022年01月17日 08:02_
 
 系统性能监控工具和跟踪采样工具各有优势和特点，我们认为应该挖据各自潜力、发挥各自优势，让他们都最大限度在系统性能分析工作中发挥恰当的作用，切不可偏颇于任何一方。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6byuUMpQ02jBuXvdD92FyJAdJ6bbc4FUYKOEumf5d97vmRQKpj7BUjTeHicoCaJN8tLwabYxXOzRUusg/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241024225051.png]]
 
 在对系统性能监控和跟踪采样工具的具体理解上，我们认同如下3个理念：
 
@@ -52,7 +51,7 @@ https://gitee.com/anolis/tracing-ssar.git
 
 其中Reference_zh-CN.md是详细的中文帮助手册，package目录中有rpm和deb包提供，其他操作系统可以自行编译打包。
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/Ass1lsY6byuUMpQ02jBuXvdD92FyJAdJrtsIdFMzRWewJQLNcuol1QErkByPz6KibkLAXaX14p8aGUm2u5nEDIA/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241024225103.png]]
 
 ssar工具分为采集器、内层的通用查询器、外层的增强查询器和经典查询器几部分。
 

@@ -1,8 +1,7 @@
-一口Linux
-_2021年12月18日 11:38_
-以下文章来源于飞天小牛肉 ，作者小牛肉
 
-\](https://mp.weixin.qq.com/s?\_\_biz=MzUxMjEyNDgyNw==&mid=2247500770&idx=1&sn=f508978b102349a6e5d90f93e7720bd7&chksm=f96bb116ce1c3800d23549832f6d88221c375522593a6a1c1ad46168f07b6ec690b295102808&mpshare=1&scene=24&srcid=12185wVOSD6YYXImHWfKF8pC&sharer_sharetime=1639833523104&sharer_shareid=5fb9813bfe9ffc983435bfc8d8c5e9ca&key=daf9bdc5abc4e8d0c1c4ecc259988152f7710de743fcf40006a761b3a422b4351188a31d0fa061cddfde6cf57dde5de5c1dea4f06fc9567c51eaa4ca53815a246b9b39c106fe020d4cd87f34a92981e9b59ae419a33e3abcf78b782e53d79ef8a7a6721180d54b9edacc6529adb7129471a79447a5cd29d54f9f591e6e1ad63c&ascene=0&uin=MTEwNTU1MjgwMw%3D%3D&devicetype=Windows+11+x64&version=63090b19&lang=zh_CN&countrycode=CN&exportkey=n_ChQIAhIQghJrWLvxiy0tPXz8ncZQxRLmAQIE97dBBAEAAAAAAKqfEkJpmOwAAAAOpnltbLcz9gKNyK89dVj0SnXqCN6DBADlugbujvafgdvk%2F2nCIXhJzhF0%2Be1mFPEQ1x%2FewAe%2BBlBbNYCKaimKj2Dh46X3lDlNuj%2FMzsCmtstWOkcJO0gfrYGOfIEcBHu%2FHtrExDSkG1BQVsFJE1El80t2qxM487nEMSzGUzM4tBEmgkzbLibNQOBlcIhu%2FofVA7x86Nzrj2oaPzzqWjkMXYop%2BzlqsZtjmO14TaMJ%2Bia4f5XOBvIZSksHsv4OvRnS88k5KYzdws5owa%2Fkw6V9&acctmode=0&pass_ticket=rEd9TIgn4OdPmPOBdXk2sf6UFFIrsfLZqRRO%2BjBWN2BHSkdpRAowX8Yt%2BlFTuQyR&wx_header=1&fasttmpl_type=0&fasttmpl_fullversion=7351805-zh_CN-zip&fasttmpl_flag=1#)
+一口Linux _2021年12月18日 11:38_
+
+以下文章来源于飞天小牛肉 ，作者小牛肉
 
 这个问题挺有区分度的，我也是昨天整理面经才看见的这道题。
 
@@ -10,23 +9,23 @@ _2021年12月18日 11:38_
 
 > 老规矩，背诵版在文末。
 
-## 引子
+# 引子
 
 在进入文题之前，我想有必要解释下虚拟地址（逻辑地址）和物理地址的区别
 
 下面这段 C 代码摘录自《操作系统导论 -  \[美\] 雷姆兹·H.阿帕希杜塞尔》，依次打印出 main 函数的地址，由 malloc（类似于 Java 中的 new 操作）返回的堆空间分配的值，以及栈上一个整数的地址：
 
-![](https://mmbiz.qpic.cn/mmbiz_png/PocakShgoGELnicBoj8poS9or2DUBdPEFcGuibAok1eyNatVm7IZxTUvZCagQCAxvuUp4wpibU6jzOoFfNuBDKr3A/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241024221407.png]]
 
 得到以下输出：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/PocakShgoGELnicBoj8poS9or2DUBdPEFxS1JOGXJycZffKZK2w2Uv55lESHgJ0iamEDj86ics11vQaIAcp12MLwQ/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241024221424.png]]
 
 我们需要知道的是，**所有这些打印出来的地址都是虚拟的**，在物理内存中这些地址并不真实存在，它们最终都将由操作系统和 CPU 硬件翻译成真正的物理地址，然后才能从真实的物理位置获取该地址的值。
 
 OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个直观的理解，下面正文开始。
 
-## 物理寻址 Physical  Addressing
+# 物理寻址 Physical  Addressing
 
 物理地址的概念很好理解，你可以把它称为**真正的地址**。《深入理解计算机系统 - 第 3 版》中给出的物理地址（physical address）的定义如下：
 
@@ -38,7 +37,7 @@ OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个
 
 物理寻址过程如下：当 CPU 执行到这条指令时，会生成物理地址 4，然后通过内存主线，把它传递给内存，内存取出从物理地址 4 处开始的 4 字节字，并将它返回给 CPU，CPU 会将它存放到指定的寄存器中。看下图：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/PocakShgoGELnicBoj8poS9or2DUBdPEFRxzI0Qia0jEPCuHLzfPjImjoCx3CBZtGsAUZujGkZyoMIvU0W272DQw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241024221440.png]]
 
 其实不难发现，物理寻址这种方式，**每一个程序都直接访问物理内存**，其实是存在重大缺陷的：
 
@@ -60,13 +59,13 @@ OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个
 
 如下图所示，有 3 个进程（A、B、C），每个进程拥有从 512KB 物理内存中切出来给它们的一小部分内存，可以理解为这 3 个进程共享物理内存：
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/PocakShgoGELnicBoj8poS9or2DUBdPEFFGKiaNeMK4qeavjDHxPo8vsPgGhs5gmW8AIicrcNoLLGaibE3NYCRp7Mw/640?wx_fmt=png&tp=wxpic&wxfrom=5&wx_lazy=1&wx_co=1)
+![[Pasted image 20241024221454.png]]
 
 显然，这种方式是存在一定安全隐患的。毕竟如果各个进程之间可以随意读取、写入内容的话那就乱套了。
 
 那么如何对每个进程使用的地址进行**保护**（protection）呢？继续使用物理内存模型肯定是不行了，因此操作系统创造了一个新的内存抽象，引入了一个新的内存模型，那就是**虚拟地址空间**，很多书中都会直接称呼为 “地址空间（Address Space）”。
 
-## 虚拟寻址 Virtual Addressing
+# 虚拟寻址 Virtual Addressing
 
 上面提到，对于物理内存模型来说，如果各个进程之间可以随意读取、写入内容的话那就乱套了。
 
@@ -89,8 +88,8 @@ OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个
 页表是一个十分重要的数据结构！
 
 操作系统为每个进程建立了一张页表。一个进程对应一张页表，进程的每个页面对应一个页表项，每个页表项由页号和块号（页框号）组成，记录着进程页面和实际存放的内存块之间的映射关系。
-!\[\[Pasted image 20240922200948.png\]\]
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
+![[Pasted image 20240922200948.png]]
 
 从数学角度来说，页表是一个函数，它的参数是虚拟页号，结果是物理页框号。
 
@@ -98,7 +97,7 @@ OK，上述就当作一个引子，让各位对物理地址和虚拟地址有个
 
 !\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 
-## 进程切换为什么比线程切换慢？
+# 进程切换为什么比线程切换慢？
 
 呼，讲了一大堆，其实最重要的就是这句话：
 

@@ -1,22 +1,9 @@
-CPP开发者
 
-_2022年04月20日 11:50_
-
-↓推荐关注↓
-
-![](http://mmbiz.qpic.cn/mmbiz_png/DSU8cv1j3ibStMRcibJLd4TkNlt53KNZj0A2IicORH4REC4ics87icsx703M5giby2wuofz3dicMsHVcXDMXTM6t6VBQw/300?wx_fmt=png&wxfrom=19)
-
-**开源前哨**
-
-点击获取10万+ star的开发资源库。 日常分享热门、有趣和实用的开源项目～
-
-167篇原创内容
-
-公众号
+CPP开发者 _2022年04月20日 11:50_
 
 Jason Donenfeld 是 WireGuard 的主要开发者，同时他也是 Linux 内核随机数相关代码的维护者，近日在他的领导下，Linux 内核的随机数生成器代码有了巨大幅度的改进。
 
-**getrandom()背景**
+# **getrandom()背景**
 
 2014年的时候，getrandom()被加入kernel，当时一个理由是因为LibreSSL project在Linux上抱怨在文件描述符被黑客恶意用光的情况下没有办法生成随机数。此前的获取方法是从/dev/urandom来读取，不过如果攻击者让所有文件都被打开，那么就没法打开/dev/urandom了，也就没法拿到随机苏。这样大家就创建了getrandom()系统调用，能够在不需要文件描述符（甚至像chroom或者container里这种没有/dev/urandom文件节点）的情况下就能拿到随机数了。
 
@@ -28,19 +15,17 @@ Ts'o认为今后这里肯定会有问题，必须得找个方法，要么能让u
 
 **Linus Torvalds**指出，RDRAND指令又不是在每个系统上都有的，所以没法依靠RDRAND指令来解决所有问题。他也觉得今后ssd会使用更多的polling而不是中断的情况下，情况会变得更糟，大家要针对这种“更少中断”的环境早作打算。
 
-**优化**
+# **优化**
 
 在之前的 Linux 5.17 中，Jason Donenfeld 就在随机代码用 BLAKE2s 代替了 SHA1，由于 BLAKE2s 自带的特性，前者通常比后者更快更安全。经过测试，通过这个简单的转换就能获得 131% 左右的速度提升。
 
 虽然在 Linux 5.17 中有了速度上的大幅提升，但 Jason Donenfeld 对此并没满足。因此在 Linux 5.18 中他对随机代码作出了更多的改进。
 
-!\[\[Pasted image 20240920124501.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240920124501.png]]
 
 通过查看 Linux 的 random.git 仓库的日志能够看出（上图），开发者 Jason Donenfeld 在最近两天时间里进行了大量的代码提交。这些提交内容都将在 3 月下旬 Linux 5.18 的合并窗口启动时引入内核。
 
-!\[\[Pasted image 20240920124507.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+![[Pasted image 20240920124507.png]]
 
 在邮件中特别强调到，通过使用正在开发的最新代码，用于获取随机字节的 getrandom() 调用能够获得更好的性能。在配备英特尔 Xeon E5-2697 v2 @ 2.70GHz CPU 和 112G 内存的设备上进行 stress-ng getrandom() 基准测试后，更是获得了 8450% 的性能提升。
 
@@ -64,9 +49,7 @@ Ts'o认为今后这里肯定会有问题，必须得找个方法，要么能让u
 
 **关注『CPP开发者』**
 
-看精选C/C++技术文章
-
-![](http://mmbiz.qpic.cn/mmbiz_png/pldYwMfYJpia3uWic6GbPCC1LgjBWzkBVqYrMfbfT6o9uMDnlLELGNgYDP496LvDfiaAiaOt0cZBlBWw4icAs6OHg8Q/300?wx_fmt=png&wxfrom=19)
+---
 
 **CPP开发者**
 

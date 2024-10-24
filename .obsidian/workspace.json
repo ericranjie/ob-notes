@@ -11,9 +11,11 @@
             "id": "55dec6effde51c58",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "zx99-image/Pasted image 20241024201816.png"
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
+                "mode": "source",
+                "source": false
               }
             }
           }
@@ -83,7 +85,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "zx99-image/Pasted image 20241024201816.png",
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -100,7 +102,7 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "zx99-image/Pasted image 20241024201816.png",
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               }
@@ -123,7 +125,7 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "zx99-image/Pasted image 20241024201816.png"
+                "file": "coding/os/linux/network/debug/p_一个 TCP 发送缓冲区问题的解析.md"
               }
             }
           }
@@ -146,42 +148,42 @@
   },
   "active": "97c141a77dfb8bbf",
   "lastOpenFiles": [
-    "coding/os/linux/schedule/CFS/d_CFS调度器（2）-源码解析.md",
-    "coding/os/linux/schedule/CFS/d_CFS调度器（1）-基本原理.md",
-    "zx99-image/Pasted image 20241024202340.png",
-    "coding/os/linux/schedule/CFS/d_CFS任务放置代码详解.md",
-    "zx99-image/Pasted image 20241024202057.png",
-    "zx99-image/Pasted image 20241024202046.png",
-    "zx99-image/Pasted image 20241024202038.png",
-    "zx99-image/Pasted image 20241024202029.png",
-    "coding/os/linux/schedule/CFS/b_n_CFS任务的负载均衡（load balance）.md",
-    "zx99-image/Pasted image 20241024201856.png",
-    "coding/os/linux/schedule/CFS/b_CFS调度器（5）-带宽控制.md",
-    "zx99-image/Pasted image 20241024201816.png",
-    "coding/os/linux/schedule/CFS/a_O(n)、O(1)和CFS调度器.md",
-    "coding/os/linux/schedule/CFS/a_CFS组调度.md",
-    "zx99-image/Pasted image 20241024200053.png",
-    "Pasted image 20241024200857.png",
-    "coding/os/linux/schedule/CFS/k_CFS调度器（6）-总结.md",
-    "coding/os/linux/schedule/CFS/k_CFS调度器（3）-组调度.md",
-    "zx99-image/Pasted image 20241024200628.png",
-    "coding/os/linux/schedule/CFS/k_CFS任务的负载均衡（概述）.md",
-    "coding/os/linux/schedule/deadline/k_deadline调度器之（一）：原理.md",
-    "coding/os/linux/schedule/deadline/d_Deadline调度器之（二）：细节和使用方法.md",
-    "coding/os/linux/schedule/debug/p_n_关于numa loadbance的死锁分析.md",
-    "coding/os/linux/schedule/interrupt/d_irq wakeup in linux.md",
-    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（八）：softirq.md",
-    "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（二）：IRQ Domain介绍.md",
-    "coding/os/linux/schedule/interrupt/a_linux kernel的中断子系统之（三）：IRQ number和中断描述符.md",
-    "coding/os/linux/schedule/interrupt/a_d_n_linux kernel的中断子系统之（七）：GIC代码分析.md",
-    "coding/os/linux/schedule/interrupt/b_【中断】的本质.md",
-    "coding/os/linux/schedule/interrupt/d_Linux中断虚拟化（二）.md",
-    "coding/os/linux/schedule/interrupt/p_中断上下文中调度会怎样？.md",
-    "coding/os/linux/schedule/interrupt/k_Linux内核中的IPI(Inter-Processor Interrupt, 核间中断).md",
-    "coding/os/linux/schedule/interrupt/i_linux kernel的中断子系统之（九）：tasklet.md",
-    "coding/os/linux/schedule/interrupt/i_Linux kernel的中断子系统之（一）：综述.md",
-    "coding/os/linux/schedule/interrupt/d_linux kernel的中断子系统之（四）：High level irq event handler.md",
-    "coding/os/linux/schedule/interrupt/d_Linux kernel的中断子系统之（六）：ARM中断处理过程.md",
+    "zx99-image/Pasted image 20241024232458.png",
+    "coding/os/linux/network/debug/p_Wireshark的抓包和分析，看这篇就够了！.md",
+    "zx99-image/Pasted image 20241024225051.png",
+    "zx99-image/Pasted image 20241024225651.png",
+    "coding/os/linux/network/debug/p_virtio-net 的前后端延迟高分析.md",
+    "zx99-image/Pasted image 20241024225549.png",
+    "zx99-image/Pasted image 20241024225537.png",
+    "zx99-image/Pasted image 20241024225523.png",
+    "zx99-image/Pasted image 20241024225513.png",
+    "zx99-image/Pasted image 20241024225458.png",
+    "zx99-image/Pasted image 20241024225441.png",
+    "zx99-image/Pasted image 20241024225428.png",
+    "zx99-image/Pasted image 20241024225417.png",
+    "coding/os/linux/network/debug/p_Linux内核常见的网络丢包场景分析.md",
+    "coding/os/linux/network/debug/k_终于搞懂了服务器为啥产生大量的TIME_WAIT！.md",
+    "coding/os/linux/network/debug/k_用户态 tcpdump 如何实现抓到内核网络包的.md",
+    "coding/os/linux/performance/c_n_Linux 性能基准测试工具及测试方法.md",
+    "coding/os/linux/performance/c_好书推荐--《代码优化：有效使用内存》.md",
+    "coding/os/linux/performance/d_闻茂泉：系统性能监控与分析的工程化实践之路.md",
+    "coding/os/linux/performance/i_性能提升 8450%，Linux 内核函数获大幅改进.md",
+    "coding/os/linux/performance/i_系统性能监控工具ssar实例精选 龙蜥SIG.md",
+    "coding/os/linux/performance/k_Linux 基础 cgroup 原理与实现.md",
+    "coding/os/linux/performance/k_一文说清linux system load.md",
+    "coding/os/linux/performance/k_一次系统调用开销到底有多大？.md",
+    "coding/os/linux/performance/t_性能优化的路有多远？.md",
+    "coding/os/linux/schedule/k_从CPU层次结构到调度域的建立.md",
+    "coding/os/linux/schedule/o_b_n_schedutil governor情景分析.md",
+    "coding/os/linux/performance/b_微信工程师：常见性能优化方案与实用工具.md",
+    "coding/os/linux/performance/b_低延迟场景下的性能优化实践.md",
+    "coding/os/linux/performance/b_n_Linux系统性能优化：七个实战经验.md",
+    "coding/os/linux/performance/a_从纳秒级优化谈CPU眼里的好代码.md",
+    "coding/os/linux/performance/a_n_系统性能分析从入门到进阶.md",
+    "coding/os/linux/performance/a_Linux问题分析与性能优化.md",
+    "coding/os/linux/performance/flame-graph/a_剖析CPU性能火焰图生成的内部原理.md",
+    "coding/os/linux/process/k_进程管理和终端驱动：基本概念.md",
+    "coding/os/linux/process/k_一文看懂 fork 系统调用.md",
     "coding/os/linux/schedule/real-time",
     "coding/os/linux/schedule/atomic",
     "zx99-image/-20241021",

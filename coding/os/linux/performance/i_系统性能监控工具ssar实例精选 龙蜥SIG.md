@@ -3,7 +3,7 @@ Linux阅码场 _2021年11月25日 07:03_
 
 以下文章来源于OpenAnolis龙蜥 ，作者闻茂泉、李靖轩 **OpenAnolis龙蜥**.
 
-### **前言**
+# **前言**
 
 ssar 是阿里自研并贡献至龙蜥社区的一款系统性能监控工具。该工具系统开销很小，已经在公司部分业务规模化部署，**且持续稳定运行 1 年以上。**
 
@@ -11,7 +11,7 @@ ssar 工具近期在国内领先的操作系统开源社区及创新平台龙蜥
 
 ssar 工具在日常使用中也解决了很多实际的生产问题，为了能让大家更快速的了解 ssar 的用途，**这里特别从案例使用的角度挑选了工具的十大典型使用场景进行介绍。**
 
-### **一、定位 CPU 和内存波动时的进程级因素**
+# **一、定位 CPU 和内存波动时的进程级因素**
 
 日常运维中，整机 CPU 和内存经常出现较大的增长，从而引起系统不稳定。此时特别需要能回朔历史数据，查看指标波动时刻的进程级 CPU 和内存等影响因素。
 
@@ -57,7 +57,7 @@ $ ssar proc -p $(pidof sresar) -i 1 --mem
 $ ssar proc -p $(pidof sresar) -i 1 --cpu
 ```
 
-### **二、跟踪单进程的CPU和内存波动详情**
+# **二、跟踪单进程的CPU和内存波动详情**
 
 通过上面的方法，发掘出了影响整机指标波动的进程，还可以进一步通过 proc 子命令更进一步追踪特定进程的 CPU 和内存变化情况。其中左尖括号（\<）表示 2021-08-09T11:39:00 时刻该 sresar 进程还没有启动，右尖括号（>）表示 2021-08-09T11:47:00 时刻该 sresar 进程已经结束。
 
@@ -79,7 +79,7 @@ $ ssar proc -p $(pidof sresar) -i 1 --mem
 $ ssar proc -p $(pidof sresar) -i 1 --cpu
 ```
 
-### **三、记录5秒级精度的系统load信息**
+# **三、记录5秒级精度的系统load信息**
 
 ssar 的 load5s 子命令不仅将 load 的精度提高到了 5s，还创造性增加了load5s 指标，**load5s 指标比 load1、load5 和 load15 指标更加精准**，更能反映系统当时的压力情况。这里明显可以看出传统的 load1 指标在系统负载压力消失后，还一定的滞后性，但load5s指标却可以精准的显示机器的负载压力。
 
@@ -99,7 +99,7 @@ collect_datetime       threads    load1   runq  load5s
 $ ssar load5s -f 2021-07-15T19:00:00 -r 300 -z
 ```
 
-### **四、记录线程D状态异常的stack详情**
+# **四、记录线程D状态异常的stack详情**
 
 对于 load5s 值大于 CPU 核数一定倍数的情况，会触发 load 详情的采集，其中针对 D 状态线程会抽样记录内核调用栈。使用 load2p 可以显示详细的 D 状态调用栈信息。
 
@@ -118,7 +118,7 @@ page_fault
 
 ```
 
-### **五、诊断整机高阶内存不足情况**
+# **五、诊断整机高阶内存不足情况**
 
 系统内存不足相关的问题，一直是日常运维中最常见的问题之一。有时候我们会从系统日志中看到类似这样的日志信息“page allocction failure: order:4”，这是 free 内存不足，并且伴随内存碎片化，内核空间申请不到高阶内存的表现。
 
@@ -156,7 +156,7 @@ collect_datetime        order0     order1     order2     order3     order4     o
 
 ```
 
-### **六、定位 Cgroup 级别的内存颠簸问题**
+# **六、定位 Cgroup 级别的内存颠簸问题**
 
 在 cgroup 层面出现内存不足时，也有一个内存颠簸问题，会引起系统严重的问题。
 
@@ -196,7 +196,7 @@ $ ssar procs -f 2021-09-09T14:51:00 -r 1 -o pid,rss,maj_flt,maj_dlt,cmd -k maj_d
 
 进一步，通过 ssar 的 procs 子命令，可以定位到发生大量主缺页中断的正是 pid 为 58532 和 46873 这 2 个 java 进程。引起 java 进程大量发生主缺页中断的原因是进程 rss 内存极度逼近 cgroup 组设置的memory.limit_in_bytes 值，导致 cgroup 组内留给 clean 状态的代码段内存空间不足以完全加载所有程序代码段。所以代码段在程序执行中，只能不断的被丢弃再从磁盘读取。
 
-### **七、网络 TCP 重传扩展信息**
+# **七、网络 TCP 重传扩展信息**
 
 在主机网络层面，日常运维中也会受到网络丢包、重传和乱序等问题的困扰。这里也提供了几组更加深入的网络指标供诊断网络问题使用。
 
@@ -244,7 +244,7 @@ Time           RenoFailures SackFailures LossFailures AbortOnMemory AbortFailed
 
 对于 TCP 的一些典型丢包和异常，可以通过 --tcpdrop/--tcperr 来观察，譬如上面我们看到在 08/09/21-16:55 时，有较多的 ListenDrops 和 ListenOverflows，说明有较多的 TCP SYN 建连请求，导致 TCP 的 accept 队列满了，这种情况说明到达服务端的新建连接请求比服务端 accept() 消费新的连接请求的速度要快，有可能是突发来了较多的建连请求，也可能是服务端长时间没有调用 accept() 来消费 accept 队列中的半连接请求。
 
-### **八、自定义采集任意系统指标**
+# **八、自定义采集任意系统指标**
 
 做驱动开发的同学很可能希望能记录自己的驱动模块中一些性能数据，ssar 工具为这种场景提供了简单和完善的采集方案。只需要驱动开发同学，将内核模块中的性能指标通过/proc/或/sys/下的伪文件方式暴露为用户空间即可。数据可以是累积值，也可以是瞬时值，例如 mydev 伪文件中有 2 个值，左侧的indicator1 是累积值，右侧的 indicator2 是瞬时值。
 
@@ -309,7 +309,7 @@ ssar 还支持指标不是整数的情况，支持实数和字符串形式的指
 
 如果只想采集这个驱动指标文件mydev，ssar还提供了2个配置参数load5s_flag 和 proc_flag 来关闭load和进程级指标采集。节省不必要的磁盘存储空间开销。
 
-### **九、诊断特定CPU中断不均情况**
+# **九、诊断特定CPU中断不均情况**
 
 特定 CPU 的 softirq 资源消耗过多，会影响此 CPU 上用于用户空间的资源使用。因此当中断分布不均时，会严重影响用户空间进程的执行。首先需要了解 softirq 资源消耗在各个 CPU 之间是否均衡。
 
@@ -351,7 +351,7 @@ Time             count irq CPU name                 count irq CPU name
 
 ``` $ tsar2 --cpu -I cpu,cpu0,cpu1,cpu2,cpu3,cpu4,cpu5,cpu6,cpu7 -s sirq -i 1 -l``$ tsar2 irqtop -i 1 -C 5 -l ```
 
-### **十、支持灵活的数据输出和解析**
+# **十、支持灵活的数据输出和解析**
 
 ssar 不仅数据指标非常丰富，而且输出格式上也非常易于使用和解析。ssar 的所有数据输出，都支持支持 json 格式输出，便于 python 等高级语言的解析。使用方法就是在命令上增加一个 --api 选项。
 
@@ -373,13 +373,13 @@ $ ssar -r 5 -o user,system,memfree,anonpages -H -P
 
 _**https://codeup.openanolis.cn/codeup/tracing_diagnosis/ssar.git**_
 
-—— 完 ——
+---
 
 **关于龙蜥社区SIG**
 
 SIG是开放的，并争取让交付成果成为社区发行的一部分，由组内核心成员主导治理，可通过邮件列表和组内的成员进行交流。龙蜥社区SIG目前已超20个，包括跟踪诊断技术SIG、商密软件栈、高性能存储技术SIG、Java语言与虚拟机SIG、Cloud Kernel、OceanBase SIG等。
 
-!\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
+
 
 **SIG网址：https://openanolis.cn/sig**
 

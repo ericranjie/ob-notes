@@ -1,12 +1,13 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2015-3-12 13:00 分类：[基础学科](http://www.wowotech.net/sort/basic_subject)
 
-一、前言
+# 一、前言
 
 本文以一个简单的例子来描述ARM linux下的stack frame。
 
 本文也是对tigger网友问题的回复。
 
-二、源代码
+# 二、源代码
 
 > #include \<stdio.h>
 >
@@ -53,9 +54,9 @@
 > return 0;\
 > }
 
-三、逐级stack frame分析
+# 三、逐级stack frame分析
 
-1、准备知识
+## 1、准备知识
 
 根据AAPCS的描述，stack是full-descending并且需要满足两种约束：一种是通用约束，适用所有的场景，另外一种是针对public interface的约束。通用约束有3条：
 
@@ -69,15 +70,15 @@
 
 关于ARM的ABI，还有一份文档，IHI0046B_ABI_Advisory_1，这份文件中讲到，在调用所有的AAPCS兼容的函数的时候都要求SP是对齐在8个字节上。
 
-2、起始点的用户栈的情况
+## 2、起始点的用户栈的情况
 
 在[静态链接](http://www.wowotech.net/basic_subject/static-link.html)文档中，我们说过，函数的入口函数不是main函数而是_start函数，调用序列是_start()->\_\_libc_start_main()->main()。main函数之前对于所有的程序都是一样的，因此不需要每一个程序员都重复进行那些动作，因此留给程序员一个main函数的入口，开始自己相关逻辑的处理。内核在start函数（我在这里以及后面的文档中省略了下划线）之前的stack frame并不是空的，内核会创建一些资料在stack上，具体如下：
 
-![](http://www.wowotech.net/content/uploadfile/201502/3a47b6f0c30041e9f67642b3cbf4e87320150216070618.gif)
+![[Pasted image 20241024221544.png]]
 
 具体怎么在用户栈上建立上面的数据结构，有兴趣的同学可以参考内核的create_elf_tables函数。此外，需要提醒的是这些数据内容虽然在栈上，但是不是stack frame的一部分，有点类似内核空间到用户空间参数传递的味道。为何这么说呢？因为在start函数中有一条汇编指令：mov    fp, #0，该指令清除frame pointer，在debugger做栈的回溯的时候，当fp等于0的时候也就意味着到了最外层函数。
 
-3、start函数的start frame
+## 3、start函数的start frame
 
 > 0000829c \<\_start>:\
 > 829c:    e59fc024     ldr    ip, \[pc, #36\]    ; 82c8 \<.text+0x2c>\

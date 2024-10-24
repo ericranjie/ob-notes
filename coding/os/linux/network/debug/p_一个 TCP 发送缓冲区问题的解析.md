@@ -1,11 +1,11 @@
-Linux云计算网络
-_2024年09月05日 08:13_ _广东_
+
+Linux云计算网络 _2024年09月05日 08:13_ _广东_
 
 > 原文：https://segmentfault.com/a/1190000021488755
 
 最近遇到一个问题，简化模型如下：
 
-![Image](https://mmbiz.qpic.cn/sz_mmbiz_png/1TDxR6xkRSEVcIFbvnhyS0JiaPcBB7lKBRNad0sXPiaE1dHySn9ib22ZiaTeFwmpywXEy0wngsDyNI457nnmQNZo3Q/640?wx_fmt=png&from=appmsg&wxfrom=5&wx_lazy=1&wx_co=1&tp=webp "image")
+![[Pasted image 20241024232458.png]]
 
 Client 创建一个 TCP 的 socket，并通过 SO_SNDBUF 选项设置它的发送缓冲区大小为 4096 字节，连接到 Server 后，每 1 秒发送一个 TCP 数据段长度为 1024 的报文。Server 端不调用 recv()。预期的结果分为以下几个阶段：
 
@@ -37,14 +37,14 @@ ESTAB   0        14480          192.168.183.130:52454           192.168.183.130:
 ```
 
 有必要解释一下这里的 Send-Q 的含义。我们知道，TCP 是的发送过程是受到滑动窗口限制。
-!\[\[Pasted image 20241003192825.png\]\]
-!\[Image\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E "image")
+
+![[Pasted image 20241003192825.png]]
 
 这里的 Send-Q 就是发送端滑动窗口的左边沿到所有未发送的报文的总长度。
 
 那么为什么这个值超过了 SO_SNDBUF 呢？
 
-### 双倍 SO_SNDBUF
+# 双倍 SO_SNDBUF
 
 当用户通过 SO_SNDBUF 选项设置套接字发送缓冲区时，内核将其记录在 sk->sk_sndbuf 中。
 

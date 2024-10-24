@@ -18,6 +18,7 @@ The following article is from 开发内功修炼 Author 张彦飞allen
 ## 一、网络包接收过程
 
 在[图解Linux网络包接收过程](http://mp.weixin.qq.com/s?__biz=MzAxODI5ODMwOA==&mid=2666548640&idx=1&sn=7e6dcbbcd569ad4f3c20e915b78b3bac&chksm=80dc890bb7ab001d4cd880c773b3e7b3b9ee4d7d9d4fac0ebbeaa6d247c70084d8cde829bcf2&scene=21#wechat_redirect)一文中我们详细介绍了网络包是如何从网卡到达用户进程中的。这个过程我们可以简单用如下这个图来表示。
+
 ![[Pasted image 20241003161545.png]]
 
 ### 找到 tcpdump 抓包点

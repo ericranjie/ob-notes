@@ -1,10 +1,11 @@
+
 作者：[itrocker](http://www.wowotech.net/author/295) 发布于：2015-11-24 15:01 分类：[电源管理子系统](http://www.wowotech.net/sort/pm_subsystem)
 
-**1** **什么是进程冻结**
+# **1** **什么是进程冻结**
 
 进程冻结技术（freezing of tasks）是指在系统hibernate或者suspend的时候，将用户进程和部分内核线程置于“可控”的暂停状态。
 
-**2** **为什么需要冻结技术**
+# **2** **为什么需要冻结技术**
 
 假设没有冻结技术，进程可以在任意可调度的点暂停，而且直到cpu_down才会暂停并迁移。这会给系统带来很多问题：
 
@@ -16,13 +17,13 @@
 
 (4)有可能导致进程感知系统休眠。系统休眠的理想状态是所有任务对休眠过程无感知，睡醒之后全部自动恢复工作，但是有些进程，比如某个进程需要所有cpu online才能正常工作，如果进程不冻结，那么在休眠过程中将会工作异常。
 
-**3** **代码实现框架**
+# **3** **代码实现框架**
 
 冻结的对象是内核中可以被调度执行的实体，包括用户进程、内核线程和work_queue。用户进程默认是可以被冻结的，借用信号处理机制实现；内核线程和work_queue默认是不能被冻结的，少数内核线程和work_queue在创建时指定了freezable标志，这些任务需要对freeze状态进行判断，当系统进入freezing时，主动暂停运行。
 
 kernel threads可以通过调用kthread_freezable_should_stop来判断freezing状态，并主动调用\_\_refrigerator进入冻结；work_queue通过判断max_active属性，如果max_active=0，则不能入队新的work，所有work延后执行。
 
-![](http://www.wowotech.net/content/uploadfile/201511/29551448348577.png)
+![[Pasted image 20241024221332.png]]
 
 标记系统freeze状态的有三个重要的全局变量：pm_freezing、system_freezing_cnt和pm_nosig_freezing，如果全为0，表示系统未进入冻结；system_freezing_cnt>0表示系统进入冻结，pm_freezing=true表示冻结用户进程，pm_nosig_freezing=true表示冻结内核线程和workqueue。它们会在freeze_processes和freeze_kernel_threads中置位，在thaw_processes和thaw_kernel_threads中清零。
 

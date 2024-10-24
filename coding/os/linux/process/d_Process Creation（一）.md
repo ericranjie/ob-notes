@@ -1,6 +1,7 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-4-23 8:39 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
-一、前言
+# 一、前言
 
 为什么要写一个关于进程如何创建的文档？其实用do_fork作为关键字进行索引，你会发现网上的相关文档数以万计。作为一个内核工程师，对进程以及进程相关的内容当然是非常感兴趣，但是网上的资料并不能令我非常满意（也许是我没有检索到好的文章），一个简单的例子如下：
 
@@ -31,7 +32,7 @@
 
 注：本文引用的内核代码来自3.14版本的linux kernel。
 
-二、用户空间如何创建进程
+# 二、用户空间如何创建进程
 
 应用程序在用户空间创建进程有两种场景：
 
@@ -49,7 +50,7 @@
 之所以vfork要阻塞父进程是因为vfork后父子进程使用的是完全相同的memory descriptor, 也就是说使用的是完全相同的虚拟内存空间, 包括栈也相同。所以两个进程不能同时运行, 否则栈就乱掉了。所以vfork后, 父进程是阻塞的，直到调用了exec系列函数或者exit函数后。这时候，子进程的mm(old_mm)需要释放掉，不再与父进程共用了，这时候就可以解 除父进程的阻塞状态。\
 除了fork和vfork，Linux内核还提供的clone的系统调用接口主要用于线程的创建，这个接口提供了更多的灵活性，可以让用户指定父进程和子进程（也就是创建的进程）共享的内容。其实通过传递不同的参数，clone接口可以实现fork和vfork的功能。更多细节可以参考后面具体的内核代码分析
 
-三、系统调用相关代码分析
+# 三、系统调用相关代码分析
 
 fork对应的系统调用代码如下：
 
@@ -119,7 +120,7 @@ clone对应的系统调用代码如下：
 
 从上面的代码片段可以看出，无论哪一个系统调用，最终都是使用了do_fork这个内核函数，后续我们的分析主要几种在对这个函数逐行解读。
 
-四、trace相关的处理
+# 四、trace相关的处理
 
 > if (!(clone_flags & CLONE_UNTRACED)) {\
 > if (clone_flags & CLONE_VFORK)\
@@ -137,7 +138,7 @@ Linux的内核提供了ptrace这样的系统调用，通过它，一个进程（
 
 在了解完上述的背景之后，再来看代码就比较简单了。这个代码块控制创建进程是否向tracer上报信号，如果需要上报，那么要上报哪些信号。如果用户进程 在创建的时候有携带CLONE_UNTRACED的flag，那么该进程则不能被trace。对于内核线程，在创建的时候都会携带该flag，这也就意味着，内核线程是无法被traced，也就不需要上报event给tracer。
 
-五、参数检查和安全检查
+# 五、参数检查和安全检查
 
 > if ((clone_flags & (CLONE_NEWNS|CLONE_FS)) == (CLONE_NEWNS|CLONE_FS))\
 > return ERR_PTR(-EINVAL);
@@ -203,7 +204,7 @@ CLONE_NEWUSER设定的时候，就会为fork的进程创建一个新的user name
 
 这一段代码是和LinuxSecurity Modules相关的。LinuxSecurity Modules是一个安全框架，允许各种安全模型插入到内核。大家熟知的一个计算机安全模型就是selinux。具体这里就不再描述。如果本次操作通过了 安全校验，那么后续的操作可以顺利进行
 
-六、复制内核栈、thread_info和task_struct
+# 六、复制内核栈、thread_info和task_struct
 
 > retval = -ENOMEM;\
 > p = dup_task_struct(current);\
@@ -226,7 +227,7 @@ _原创文章，转发请注明出处。蜗窝科技，[www.wowotech.net](http:/
 
 标签: [do_fork](http://www.wowotech.net/tag/do_fork)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux设备模型(7)\_Class](http://www.wowotech.net/device_model/class.html) | [Unix的历史](http://www.wowotech.net/tech_discuss/Unix%E7%9A%84%E5%8E%86%E5%8F%B2.html)»
 

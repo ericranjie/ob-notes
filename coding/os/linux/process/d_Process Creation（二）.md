@@ -1,3 +1,4 @@
+
 作者：[linuxer](http://www.wowotech.net/author/3 "linuxer") 发布于：2014-4-28 15:40 分类：[进程管理](http://www.wowotech.net/sort/process_management)
 
 本文是[Process Creation（一）](http://www.wowotech.net/linux_kenrel/Process-Creation-1.html)的延续，主要内容包括：
@@ -10,7 +11,7 @@
 
 4、子进程如何复制父进程的flag
 
-七、初始化Realtime Mutex相关的成员
+# 七、初始化Realtime Mutex相关的成员
 
 > static void rt_mutex_init_task(struct task_struct \*p)\
 > {\
@@ -25,7 +26,7 @@
 
 Mutex是一种人民群众喜闻乐见的内核同步方式，不过real time mutex是什么呢？real time mutex是被设计用来支PI-futexes的。什么是PI？什么又是futex？PI是优先级继承（Priority Inheritance），该方法是用来解决优先级翻转问题的。什么是优先级翻转（Priority Inversion）？它是一种调度延迟现象。一般而言，调度器总是优先调度到优先级高的进程（线程），但是，当同步资源被较低优先级的进程所拥有（也就是说持有锁），高优先级的进程未能获取该同步资源，这时候，高优先级进程要等到持有锁的进程释放该资源后才能被调度到。下面的图片更加详细的描述了该问题：
 
-![](http://www.wowotech.net/content/uploadfile/201405/931e1399512700.gif)
+![[Pasted image 20241024221158.png]]
 
 低优先级进程和高优先级进程都需要访问一个公共资源，因此需要一个mutex来保护对该公共资源的访问。
 
@@ -37,7 +38,7 @@ T0时刻，只有低优先级进程处于可运行状态，运行过程中，在
 
 OK，了解完这些内容之后，我们回到了futex。linux内核提供了一个叫做快速用户空间互斥（Fast User-Space Mutexes）的锁的机制，简称futex，通过这样的机制用户空间程序可以实现对互斥资源的快速访问。为什么提供futex这样的机制？如何使用？在用户空间如何互斥？为何能够快速？问题太多了，下次我会启动一个专题来描述futex。
 
-八、process credentials
+# 八、process credentials
 
 > retval = -EAGAIN;\
 > if (atomic_read(&p->real_cred->user->processes) >=\
@@ -116,7 +117,7 @@ OK，了解完这些内容之后，我们回到了futex。linux内核提供了�
 
 对于创建进程，内核会分配一个新的cred描述符，copy 父进程的credentials，也就是说，不是共享cred描述符，而的确是copy的动作了。如果本次fork也携带了CLONE_NEWUSER参数，打算创建一个新的user namespace，那么父子进程的username space也需要独立开来，
 
-九、进程创建总数限制
+# 九、进程创建总数限制
 
 > retval = -EAGAIN;\
 > if (nr_threads >= max_threads)\
@@ -133,7 +134,7 @@ nr_threads是系统当前的线程数目；max_threads是系统允许容纳的�
 
 max_threads可以由用户进行设定。在/proc/sys目录下保存着若干的内核参数，该目录下的kernel/threads-max文件就是对系统内的可以创建的最大线程数的限制。
 
-十、模块处理
+# 十、模块处理
 
 > if (!try_module_get(task_thread_info(p)->exec_domain->module))\
 > goto bad_fork_cleanup_count;
@@ -142,7 +143,7 @@ struct thread_info数据结构中的exec_domain成员指向了当前进程/线�
 
 既然是共享了父进程的exec_domain，那么需要通过try_module_get去增加reference count（具体的copy在copy thread info的时候已经完成了）。
 
-十一、per-task delay accounting的处理
+# 十一、per-task delay accounting的处理
 
 > delayacct_tsk_init(p);
 
@@ -170,7 +171,7 @@ delayacct是一个缩写，是指per-task delay accounting。这个feature是统
 
 进程描述符中的delays成员记录了该task的delay统计信息，delayacct_tsk_init就是对该数据结构进程初始化。本文先简单描述概念，后续会有专门的文件来描述进程的统计信息。
 
-十二、复制进程描述符的flag
+# 十二、复制进程描述符的flag
 
 > static void copy_flags(unsigned long clone_flags, struct task_struct \*p)\
 > {\
@@ -193,7 +194,7 @@ _原创文章，转发请注明出处。蜗窝科技_，[www.wowotech.net](http:
 
 标签: [process](http://www.wowotech.net/tag/process) [management](http://www.wowotech.net/tag/management) [do_fork](http://www.wowotech.net/tag/do_fork)
 
-[![](http://www.wowotech.net/content/uploadfile/201605/ef3e1463542768.png)](http://www.wowotech.net/support_us.html)
+---
 
 « [Linux电源管理(1)\_整体架构](http://www.wowotech.net/pm_subsystem/pm_architecture.html) | [Linux设备模型(8)\_platform设备](http://www.wowotech.net/device_model/platform_device.html)»
 

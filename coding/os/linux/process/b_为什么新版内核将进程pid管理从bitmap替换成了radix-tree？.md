@@ -1,3 +1,4 @@
+
 2024-03-30 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(286) 评论(0)
 
 大家好，我是飞哥！
@@ -8,7 +9,7 @@
 
 所以今天我来给大家聊聊为什么 Linux 内核要将 bitmap 替换成基数树，最后也看看这次替换的性能效果。
 
-## 一、旧的 bitmap 方式管理 pid
+# 一、旧的 bitmap 方式管理 pid
 
 内核需要为每一个进程/线程都分配一个进程号。
 
@@ -68,7 +69,7 @@ static int alloc_pidmap(struct pid_namespace *pid_ns)
 
 在最近几年的业界发展中，服务器的内存越来越大，服务器上几百 GB 的内存都很常见。另外随着这几年轻量化容器云的发展，服务器上运行的进程数越来越多。传统的基于 bitmap 来管理分配的 pid 的节约内存的优势越来越显得没有价值，而它分配新 pid 时占用的 CPU 资源较高这一缺点越来越明显。
 
-## 二、使用基数树管理 pid
+# 二、使用基数树管理 pid
 
 在 2017 年的时候，Gargi Sharma 提交了一个名为 “Replace PID bitmap allocation with IDR AP” 的 patch，在这个提交里 bitmap 被开始替换成了基数树。并最终被并入到了 Linux 4.15 的版本中。关于这个提交的详情参见 [https://lwn.net/Articles/735675/](https://lwn.net/Articles/735675/) 或 [https://lore.kernel.org/lkml/f5104f457ed581e0ac032a68af03c5ba5cb94755.1506342921.git.gs051095@gmail.com/](https://lore.kernel.org/lkml/f5104f457ed581e0ac032a68af03c5ba5cb94755.1506342921.git.gs051095@gmail.com/)
 
@@ -125,7 +126,7 @@ tags 用来记录 slog 数组中每一个下标的存储状态。其中每个树
 
 那么 100、1000、10000、50000、60000 这几个数组成的基数树的结构如下图所示。
 
-![图1.png](https://kfngxl.cn/usr/uploads/2024/03/2478390977.png "图1.png")
+![[Pasted image 20241024220849.png]]
 
 拿整数 100 举例，按每 6 bit 一段分表示后为 0, 1, 36。其第一段是 0 ，那就在基数树的根节点的 slots 的 0 号下标存储其子节点指针。其第 2 分段为 1 ，那就在其第二层节点的 slots 的 1 号下标存储其子节点指针。在第三层节点的 slots 的 36 号下标存储最终的值 100。
 
@@ -180,7 +181,7 @@ void __rcu **idr_get_free(struct radix_tree_root *root, ...)
 }
 ```
 
-## 三、基数树的性能效果
+# 三、基数树的性能效果
 
 原理我们讲完了，我们再来看下使用基数树替代 bitmap 后的性能表现如何。这里我们直接引用该 patch 的提交者 Gargi Sharma 提供的实验数据。 来自 [https://lwn.net/Articles/735675/](https://lwn.net/Articles/735675/)。
 
@@ -207,52 +208,6 @@ sys    0m0.184s    0m0.264s
 更多干货内容，详见：
 
 Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
-关注公众号：微信扫描下方二维码\
-![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
 
-本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [为什么新版内核将进程pid管理从bitmap替换成了radix-tree？](https://kfngxl.cn/index.php/archives/738/)
 
-标签：没有标签
-
-![张彦飞（@开发内功修炼）](https://secure.gravatar.com/avatar/23c60606a05a1e9b9fac9cadbd055ad7?s=50&r=g)
-
-#### 张彦飞（@开发内功修炼）
-
-腾讯、搜狗、字节等公司13年工作经验，著有《深入理解Linux网络》一书，个人技术公众号「开发内功修炼」
-
-上一篇：[一次限制进程的 CPU 用量的实操过程](https://kfngxl.cn/index.php/archives/737/ "一次限制进程的 CPU 用量的实操过程")下一篇：[Docker容器里进程的 pid 是如何申请出来的？](https://kfngxl.cn/index.php/archives/745/ "Docker容器里进程的 pid 是如何申请出来的？")
-
-### 相关推荐
-
-- [C语言竟可以调用Go语言函数，这是如何实现的？](https://kfngxl.cn/index.php/archives/810/ "C语言竟可以调用Go语言函数，这是如何实现的？")
-- [理解内存的Rank、位宽以及内存颗粒内部结构](https://kfngxl.cn/index.php/archives/798/ "理解内存的Rank、位宽以及内存颗粒内部结构")
-- [看懂服务器 CPU 内存支持，学会计算内存带宽](https://kfngxl.cn/index.php/archives/787/ "看懂服务器 CPU 内存支持，学会计算内存带宽")
-- [磁盘开篇：扒开机械硬盘坚硬的外衣！](https://kfngxl.cn/index.php/archives/774/ "磁盘开篇：扒开机械硬盘坚硬的外衣！")
-- [经典，Linux文件系统十问](https://kfngxl.cn/index.php/archives/769/ "经典，Linux文件系统十问")
-- [Linux进程是如何创建出来的？](https://kfngxl.cn/index.php/archives/687/ "Linux进程是如何创建出来的？")
-- [内核是如何给容器中的进程分配CPU资源的？](https://kfngxl.cn/index.php/archives/752/ "内核是如何给容器中的进程分配CPU资源的？")
-- [Docker容器里进程的 pid 是如何申请出来的？](https://kfngxl.cn/index.php/archives/745/ "Docker容器里进程的 pid 是如何申请出来的？")
-
-### 标签云
-
-[内存硬件 （1）](https://kfngxl.cn/index.php/tag/%E5%86%85%E5%AD%98%E7%A1%AC%E4%BB%B6/)[服务器 （1）](https://kfngxl.cn/index.php/tag/%E6%9C%8D%E5%8A%A1%E5%99%A8/)[技术面试 （1）](https://kfngxl.cn/index.php/tag/%E6%8A%80%E6%9C%AF%E9%9D%A2%E8%AF%95/)[同步阻塞 （1）](https://kfngxl.cn/index.php/tag/%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E/)[进程 （1）](https://kfngxl.cn/index.php/tag/%E8%BF%9B%E7%A8%8B/)
-
-- 最新文章
-
-- - 06-13[C语言竟可以调用Go语言函数，这是如何实现的？](https://kfngxl.cn/index.php/archives/810/ "C语言竟可以调用Go语言函数，这是如何实现的？")
-    - 05-13[理解内存的Rank、位宽以及内存颗粒内部结构](https://kfngxl.cn/index.php/archives/798/ "理解内存的Rank、位宽以及内存颗粒内部结构")
-    - 05-13[看懂服务器 CPU 内存支持，学会计算内存带宽](https://kfngxl.cn/index.php/archives/787/ "看懂服务器 CPU 内存支持，学会计算内存带宽")
-    - 04-09[磁盘开篇：扒开机械硬盘坚硬的外衣！](https://kfngxl.cn/index.php/archives/774/ "磁盘开篇：扒开机械硬盘坚硬的外衣！")
-    - 04-08[经典，Linux文件系统十问](https://kfngxl.cn/index.php/archives/769/ "经典，Linux文件系统十问")
-
-- 站点统计
-
-- - 文章总数：87篇
-    - 分类总数：3个
-    - 总访问量：36924次
-    - 本站运营：0年168天18小时
-
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
-本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
-
-- ###### 去顶部
+![张彦飞（@开发内功修炼）](https://secure.gravatar.com/avatar/23c60606a05a1e9b9fac9cadbd055ad7?s=50&r=g

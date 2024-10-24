@@ -1,5 +1,5 @@
-土豆居士 一口Linux
-_2021年12月10日 11:50_
+
+土豆居士 一口Linux _2021年12月10日 11:50_
 
 在探讨这个问题之前，我们先来弄清什么是进程。
 
@@ -7,7 +7,7 @@ _2021年12月10日 11:50_
 
 # 一：进程状态
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/icRxcMBeJfcibNZrQ7MJaddQtgYRQuaAHMoDEn4PcEicQvcvibZibQT3hU8YrYocic5s1cgasV6GcLe041C6nIecMj3w/640?wx_fmt=png&wxfrom=13&tp=wxpic)
+![[Pasted image 20241024221243.png]]
 
 程序运行必须加载在内存中，当有过多的就绪态或阻塞态进程在内存中没有运行，因为内存很小，有可能不足。系统需要把他们移动到内存外磁盘中，称为挂起状态。就绪状态的进程挂起就是挂起就绪状态，阻塞进程挂起就称为阻塞挂起状态。
 
@@ -27,7 +27,7 @@ _2021年12月10日 11:50_
 #include<stdio.h>#include<stdlib.h>#include<unistd.h>#include<string.h>#include<assert.h>#include<sys/types.h> int main(){	pid_t pid=fork(); 	if(pid==0)  //子进程	{     	printf("child id is %d\n",getpid());		printf("parent id is %d\n",getppid());	}	else  //父进程不退出，使子进程成为僵尸进程	{        while(1)		{}	}	exit(0);}
 ```
 
-我们将它挂在后台执行，可以看到结果，用ps可以看到子进程后有一个<defunct> ,defunct是已死的，僵尸的意思,可以看出这时的子进程已经是一个僵尸进程了。因为子进程已经结束，而其父进程并未释放其PCB，所以产生了这个僵尸进程。
+我们将它挂在后台执行，可以看到结果，用ps可以看到子进程后有一个`<defunct>`,defunct是已死的，僵尸的意思,可以看出这时的子进程已经是一个僵尸进程了。因为子进程已经结束，而其父进程并未释放其PCB，所以产生了这个僵尸进程。
 
 !\[图片\](data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8'%3F%3E%3Csvg width='1px' height='1px' viewBox='0 0 1 1' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink'%3E%3Ctitle%3E%3C/title%3E%3Cg stroke='none' stroke-width='1' fill='none' fill-rule='evenodd' fill-opacity='0'%3E%3Cg transform='translate(-249.000000, -126.000000)' fill='%23FFFFFF'%3E%3Crect x='249' y='126' width='1' height='1'%3E%3C/rect%3E%3C/g%3E%3C/g%3E%3C/svg%3E)
 

@@ -1,15 +1,17 @@
+
 2024-03-29 [CPU篇](https://kfngxl.cn/index.php/category/cpu/) 阅读(221) 评论(0)
 
 大家好，我是飞哥！
 
-在进行CPU性能优化的时候，我们经常先需要分析出来我们的应用程序中的CPU资源在哪些函数中使用的比较多，这样才能高效地优化。一个非常好的分析工具就是《性能之巅》作者 Brendan Gregg 发明的火焰图。\
-![图1.png](https://kfngxl.cn/usr/uploads/2024/03/1639106072.png "图1.png")
+在进行CPU性能优化的时候，我们经常先需要分析出来我们的应用程序中的CPU资源在哪些函数中使用的比较多，这样才能高效地优化。一个非常好的分析工具就是《性能之巅》作者 Brendan Gregg 发明的火焰图。
+
+![[Pasted image 20241024222758.png]]
 
 在这张火焰图中，一个函数占据的宽度越宽，表明该函数消耗的 CPU 占比越高。但对于位于火焰图下方的函数来说，它们虽然开销比较大，但都是因为其子函数执行消耗的。所以一般都是看最上方的宽度较长的函数，这是导致整个系统 CPU 比较高的热点，把它优化掉可以提升程序运行性能。
 
 我们今天就来介绍下火焰图的是怎么做出来的，以及它的工作原理。
 
-## 一、火焰图的使用
+# 一、火焰图的使用
 
 为了更好地展示火焰图的原理，我专门写了一小段代码，
 
@@ -48,8 +50,9 @@ int main() {
 # perf script | ./FlameGraph/stackcollapse-perf.pl | ./FlameGraph/flamegraph.pl > out.svg
 ```
 
-这样，一副火焰图就生成好了。\
-![图2.png](https://kfngxl.cn/usr/uploads/2024/03/3888175034.png "图2.png")
+这样，一副火焰图就生成好了。
+
+![[Pasted image 20241024223603.png]]
 
 之所以选择我提供一个 demo 代码来生成，是因为这个足够简单和清晰，方便大家理解。在上面这个火焰图中，可以看出 main 函数调用了 funcA、funcB、funcC，其中 funcA 又调用了 funcD、funcE，然后这些函数的开销又都不是自己花掉的，而是因为自己调用的一个 CPU 密集型的函数 caculate。整个系统的调用栈的耗时统计就十分清晰的展现在眼前了。
 
@@ -59,9 +62,9 @@ int main() {
 
 怎么样，火焰图使用起来是不是还挺简单的。接下来的小节中我们再来讲讲火焰图生成全过程的内部原理。理解了这个，你才能讲火焰图用的得心应手。
 
-## 二、perf采样
+# 二、perf采样
 
-### 2.1 perf 介绍
+## 2.1 perf 介绍
 
 在生成火焰图的第一步中，就是需要对你要观察的进程或服务器进行采样。采样可用的工具有好几个，我们这里用的是 perf record。
 
@@ -116,15 +119,15 @@ int main() {
 # perf report -n --stdio
 ```
 
-![图3.png](https://kfngxl.cn/usr/uploads/2024/03/2122573516.png "图3.png")
+![[Pasted image 20241024223636.png]]
 
-### 2.2 内核工作过程
+## 2.2 内核工作过程
 
 我们来简单看一下内核是如何工作的。
 
 perf在采样的过程大概分为两步，一是调用 perf_event_open 来打开一个 event 文件，而是调用 read、mmap等系统调用读取内核采样回来的数据。整体的工作流程图大概如下
 
-![](https://kfngxl.cn/usr/uploads/2024/03/3703312428.png "![](图6.png)")
+![[Pasted image 20241024223708.png]]
 
 其中 perf_event_open 完成了非常重要的几项工作。
 
@@ -134,7 +137,7 @@ perf在采样的过程大概分为两步，一是调用 perf_event_open 来打�
 
 我们来看下它的几个关键执行过程。在 perf_event_open 调用的 perf_event_alloc 指定了采样处理回调函数为，比如perf_event_output_backward、perf_event_output_forward等
 
-```
+```c
 static struct perf_event *
 perf_event_alloc(struct perf_event_attr *attr, ...)
 {   
@@ -224,7 +227,7 @@ void perf_prepare_sample(...)
 
 这样硬件和内核一起协助配合就完成了函数调用栈的采样。后面 perf 工具就可以读取这些数据并进行下一次的处理了。
 
-## 三、FlameGraph工作过程
+# 三、FlameGraph工作过程
 
 前面我们用 perf script 解析是看到的函数调用栈信息比较的长。
 
@@ -273,7 +276,7 @@ funcD; 1
 
 其中 funcA 因为两行记录合并，所以占据了 3 的宽度。funcD 没有合并，占据就是1。另外 funcB、funcC都画在A上的上方，占据的宽度都是2。
 
-## 总结
+# 总结
 
 火焰图是一个非常好的用于分析热点函数的工具，只要你关注性能优化，就应该学会使用它来分析你的程序。我们今天的文章不光是介绍了火焰图是如何生成的，而且还介绍了其底层的工作原理。火焰图的生成主要分两步，一是采样，而是渲染。
 
@@ -286,52 +289,3 @@ funcD; 1
 更多干货内容，详见：
 
 Github：[https://github.com/yanfeizhang/coder-kung-fu](https://github.com/yanfeizhang/coder-kung-fu)\
-关注公众号：微信扫描下方二维码\
-![qrcode2_640.png](https://kfngxl.cn/usr/uploads/2024/05/4275823318.png "qrcode2_640.png")
-
-本原创文章未经允许不得转载 | 当前页面：[开发内功修炼@张彦飞](https://kfngxl.cn/) » [剖析CPU性能火焰图生成的内部原理](https://kfngxl.cn/index.php/archives/655/)
-
-标签：没有标签
-
-![张彦飞（@开发内功修炼）](https://secure.gravatar.com/avatar/23c60606a05a1e9b9fac9cadbd055ad7?s=50&r=g)
-
-#### 张彦飞（@开发内功修炼）
-
-腾讯、搜狗、字节等公司13年工作经验，著有《深入理解Linux网络》一书，个人技术公众号「开发内功修炼」
-
-上一篇：[人人都应该知道的CPU缓存运行效率](https://kfngxl.cn/index.php/archives/648/ "人人都应该知道的CPU缓存运行效率")下一篇：[盘点内核中常见的CPU性能卡点](https://kfngxl.cn/index.php/archives/671/ "盘点内核中常见的CPU性能卡点")
-
-### 相关推荐
-
-- [C语言竟可以调用Go语言函数，这是如何实现的？](https://kfngxl.cn/index.php/archives/810/ "C语言竟可以调用Go语言函数，这是如何实现的？")
-- [理解内存的Rank、位宽以及内存颗粒内部结构](https://kfngxl.cn/index.php/archives/798/ "理解内存的Rank、位宽以及内存颗粒内部结构")
-- [看懂服务器 CPU 内存支持，学会计算内存带宽](https://kfngxl.cn/index.php/archives/787/ "看懂服务器 CPU 内存支持，学会计算内存带宽")
-- [磁盘开篇：扒开机械硬盘坚硬的外衣！](https://kfngxl.cn/index.php/archives/774/ "磁盘开篇：扒开机械硬盘坚硬的外衣！")
-- [经典，Linux文件系统十问](https://kfngxl.cn/index.php/archives/769/ "经典，Linux文件系统十问")
-- [Linux进程是如何创建出来的？](https://kfngxl.cn/index.php/archives/687/ "Linux进程是如何创建出来的？")
-- [内核是如何给容器中的进程分配CPU资源的？](https://kfngxl.cn/index.php/archives/752/ "内核是如何给容器中的进程分配CPU资源的？")
-- [Docker容器里进程的 pid 是如何申请出来的？](https://kfngxl.cn/index.php/archives/745/ "Docker容器里进程的 pid 是如何申请出来的？")
-
-### 标签云
-
-[内存硬件 （1）](https://kfngxl.cn/index.php/tag/%E5%86%85%E5%AD%98%E7%A1%AC%E4%BB%B6/)[服务器 （1）](https://kfngxl.cn/index.php/tag/%E6%9C%8D%E5%8A%A1%E5%99%A8/)[技术面试 （1）](https://kfngxl.cn/index.php/tag/%E6%8A%80%E6%9C%AF%E9%9D%A2%E8%AF%95/)[同步阻塞 （1）](https://kfngxl.cn/index.php/tag/%E5%90%8C%E6%AD%A5%E9%98%BB%E5%A1%9E/)[进程 （1）](https://kfngxl.cn/index.php/tag/%E8%BF%9B%E7%A8%8B/)
-
-- 最新文章
-
-- - 06-13[C语言竟可以调用Go语言函数，这是如何实现的？](https://kfngxl.cn/index.php/archives/810/ "C语言竟可以调用Go语言函数，这是如何实现的？")
-    - 05-13[理解内存的Rank、位宽以及内存颗粒内部结构](https://kfngxl.cn/index.php/archives/798/ "理解内存的Rank、位宽以及内存颗粒内部结构")
-    - 05-13[看懂服务器 CPU 内存支持，学会计算内存带宽](https://kfngxl.cn/index.php/archives/787/ "看懂服务器 CPU 内存支持，学会计算内存带宽")
-    - 04-09[磁盘开篇：扒开机械硬盘坚硬的外衣！](https://kfngxl.cn/index.php/archives/774/ "磁盘开篇：扒开机械硬盘坚硬的外衣！")
-    - 04-08[经典，Linux文件系统十问](https://kfngxl.cn/index.php/archives/769/ "经典，Linux文件系统十问")
-
-- 站点统计
-
-- - 文章总数：87篇
-    - 分类总数：3个
-    - 总访问量：36925次
-    - 本站运营：0年168天18小时
-
-© 2010 - 2024 [开发内功修炼@张彦飞](https://kfngxl.cn/) | [京ICP备2024054136号](http://beian.miit.gov.cn/)\
-本站部分图片、文章来源于网络，版权归原作者所有，如有侵权，请联系我们删除。
-
-- ###### 去顶部
